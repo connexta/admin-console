@@ -3,7 +3,8 @@ import Paper from 'material-ui/Paper'
 
 import { connect } from 'react-redux'
 
-import Mount from '../../components/mount'
+import Mount from 'react-mount'
+
 import {
   getBins,
   getOptions,

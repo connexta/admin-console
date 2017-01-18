@@ -8,7 +8,7 @@ import FlatButton from 'material-ui/FlatButton'
 
 import Flexbox from 'flexbox-react'
 import CircularProgress from 'material-ui/CircularProgress'
-import Mount from '../../../components/mount'
+import Mount from 'react-mount'
 
 import {
   probeOptions,

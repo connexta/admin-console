@@ -8,7 +8,7 @@ import { changeStage, testSources, persistConfig, resetSourceWizardState, fetchC
 import Flexbox from 'flexbox-react'
 import { Link } from 'react-router'
 import { setDefaults } from '../../actions'
-import Mount from '../../components/mount'
+import Mount from 'react-mount'
 
 import {
   stageStyle

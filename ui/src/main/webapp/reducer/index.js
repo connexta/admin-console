@@ -17,7 +17,7 @@ import sourceWizard from '../wizards/sources/reducer'
 import home from '../home'
 import wcpm, * as webContext from '../adminTools/webContextPolicyManager/reducer'
 
-import fetch, * as fetchSelectors from '../fetch'
+import fetch, * as fetchSelectors from 'redux-fetch'
 
 export const getException = (state) => fetchSelectors.getException(state.get('fetch'))
 export const isSubmitting = (state, id) => fetchSelectors.isSubmitting(state.get('fetch'), id)

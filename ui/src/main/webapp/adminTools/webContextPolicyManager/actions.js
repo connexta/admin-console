@@ -1,5 +1,5 @@
 import { getBins } from '../../reducer'
-import { get, post } from '../../fetch'
+import { get, post } from 'redux-fetch'
 
 // Bin level
 export const replaceAllBins = (bins, whitelistContexts) => ({ type: 'WCPM/REPLACE_ALL_BINS', bins, whitelistContexts })

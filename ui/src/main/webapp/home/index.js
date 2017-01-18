@@ -5,6 +5,8 @@ import { Map } from 'immutable'
 import Flexbox from 'flexbox-react'
 import { Link } from 'react-router'
 
+import { get, post } from 'redux-fetch'
+
 import Paper from 'material-ui/Paper'
 import AccountIcon from 'material-ui/svg-icons/action/account-circle'
 import LanguageIcon from 'material-ui/svg-icons/action/language'
@@ -16,7 +18,6 @@ import IconButton from 'material-ui/IconButton'
 import RaisedButton from 'material-ui/RaisedButton'
 
 import * as styles from './styles.less'
-import { get, post } from '../fetch'
 
 // actions
 

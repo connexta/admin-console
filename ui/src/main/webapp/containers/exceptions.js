@@ -7,7 +7,7 @@ import * as styles from './exceptions.less'
 
 import { Tabs, Tab } from 'material-ui/Tabs'
 
-import { clearException } from '../fetch'
+import { clearException } from 'redux-fetch'
 
 import Http from 'material-ui/svg-icons/action/http'
 import Code from 'material-ui/svg-icons/action/code'

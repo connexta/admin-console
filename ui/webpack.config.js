@@ -30,6 +30,12 @@ var config = {
       }
     ]
   },
+  resolve: {
+    root: [
+      path.resolve('./src/main/webapp/lib'),
+      path.resolve('./node_modules')
+    ]
+  },
   plugins: [
     new webpack.ProvidePlugin({
       Promise: 'es6-promise'

@@ -1,4 +1,4 @@
-import { post } from '../../fetch'
+import { post } from 'redux-fetch'
 
 import { getAllConfig } from '../../reducer'
 

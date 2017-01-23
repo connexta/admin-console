@@ -1,17 +1,13 @@
 import React from 'react'
 
-import {
-  Stage,
-  StageControls,
-  Title,
-  Description,
-  Begin,
-  Back
-} from '../../components/stage'
+import Stage from 'components/Stage'
+import Title from 'components/Title'
+import Description from 'components/Description'
+import Action from 'components/Action'
+import ActionGroup from 'components/ActionGroup'
 
-import { RadioSelection } from '../../inputs'
+import { RadioSelection } from 'admin-wizard/inputs'
 
-// TODO Make the value selected from the radio button persist
 const LdapTypes = [
   {
     value: 'activeDirectory',
@@ -35,8 +31,8 @@ const LdapTypes = [
   }
 ]
 
-const LdapTypeSelection = ({ id, disabled, configs: { ldapType } = {} }) => (
-  <Stage id={id}>
+const LdapTypeSelection = ({ disabled, prev, next, configs: { ldapType } = {} }) => (
+  <Stage>
     <Title>LDAP Type Selection</Title>
     <Description>
       Select the type of LDAP you plan to connect to.
@@ -46,12 +42,19 @@ const LdapTypeSelection = ({ id, disabled, configs: { ldapType } = {} }) => (
       options={LdapTypes}
       name='LDAP Type Selections'
       disabled={disabled} />
-    <StageControls>
-      <Back disabled={disabled} />
-      <Begin
+    <ActionGroup>
+      <Action
+        secondary
+        label='back'
+        onClick={prev}
+        disabled={disabled} />
+      <Action
+        primary
+        label='begin'
+        onClick={next}
         disabled={disabled || !ldapType}
         nextStageId={ldapType === 'embeddedLdap' ? 'configure-embedded-ldap' : 'network-settings'} />
-    </StageControls>
+    </ActionGroup>
   </Stage>
 )
 

@@ -1,25 +1,19 @@
-import React from 'react'
+import React, { Component } from 'react'
 
 import { connect } from 'react-redux'
 
-import { getConfig } from '../../../reducer'
+import { editConfig } from 'admin-wizard/actions'
 
-import { editConfig, testConfig } from '../../actions'
+import Mount from 'react-mount'
 
-import {
-  Stage,
-  StageControls,
-  Title,
-  Description,
-  Back
-} from '../../components/stage'
+import Stage from 'components/Stage'
+import Spinner from 'components/Spinner'
+import Title from 'components/Title'
+import Description from 'components/Description'
+import Action from 'components/Action'
+import ActionGroup from 'components/ActionGroup'
 
-import {
-  setMappingToAdd,
-  addMapping,
-  setSelectedMappings,
-  removeSelectedMappings
-} from '../actions'
+import { Select } from 'admin-wizard/inputs'
 
 import { Card, CardHeader } from 'material-ui/Card'
 
@@ -32,126 +26,147 @@ import {
   TableRowColumn
 } from 'material-ui/Table'
 
-import SelectField from 'material-ui/SelectField'
-import MenuItem from 'material-ui/MenuItem'
 import RaisedButton from 'material-ui/RaisedButton'
 
-const LdapAttributeMappingStage = (props) => {
-  const {
-    id,
-    disabled,
-    tableMappings = [],
-    subjectClaims = [],
-    userAttributes = [],
-    mappingToadd,
+class AttributeMapperView extends Component {
+  constructor (props) {
+    super(props)
+    this.state = { selected: [] }
+  }
+  filterUpdateMappings () {
+    const {
+      editConfig,
+      configs: {
+        attributeMappings = {}
+      } = {}
+    } = this.props
 
-    // actions
-    setMappingToAdd,
-    addMapping,
-    setSelectedMappings,
-    removeSelectedMappings
-  } = props
+    let o = {}
 
-  return (
-    <Stage id={id} probeUrl='/admin/beta/config/probe/ldap/subject-attributes'>
-      <Title>LDAP User Attribute Mapping</Title>
-      <Description>
-        In order to authenticate users, the attributes of the users must be mapped to the STS
-        claims.
-        Not all attributes must be mapped but any unmapped attributes will not be used for
-        authentication.
-        Claims can be mapped to 1 or more attributes.
-      </Description>
-      <SelectField floatingLabelText='STS Claim'
-        value={mappingToadd.subjectClaim}
-        style={{width: '100%', clear: 'both'}}
-        onChange={(e, i) => setMappingToAdd({subjectClaim: subjectClaims[i]})}>
-        {subjectClaims.map((claim, i) => <MenuItem key={i} value={claim} primaryText={claim} />)}
-      </SelectField>
-      <SelectField floatingLabelText='LDAP User Attribute'
-        value={mappingToadd.userAttribute}
-        style={{width: '100%', clear: 'both'}}
-        onChange={(e, i) => setMappingToAdd({userAttribute: userAttributes[i]})}>
-        {userAttributes.map((attri, i) => <MenuItem key={i} value={attri}
-          primaryText={attri} />)}
-      </SelectField>
-      <RaisedButton
-        label='Add Mapping'
-        primary
-        disabled={mappingToadd.subjectClaim === undefined || mappingToadd.userAttribute === undefined}
-        style={{margin: '0 auto', marginBottom: '30px', marginTop: '10px', display: 'block'}}
-        onClick={() => addMapping(mappingToadd)} />
-      <Card expanded style={{ width: '100%' }}>
-        <CardHeader style={{ fontSize: '0.80em' }}>
-          <Title>STS Claims to LDAP Attribute Mapping</Title>
-          <Description>
-            The mappings below will be saved.
-          </Description>
-        </CardHeader>
-        <Table onRowSelection={(indexs) => setSelectedMappings(indexs)}
-          multiSelectable>
-          <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
-            <TableRow >
-              <TableHeaderColumn>STS Claim</TableHeaderColumn>
-              <TableHeaderColumn style={{ width: 120 }}>LDAP User Attribute</TableHeaderColumn>
-            </TableRow>
-          </TableHeader>
-          <TableBody showRowHover deselectOnClickaway={false}>
-            {tableMappings.map((mapping, i) =>
-              <TableRow key={i} selected={mapping.selected}>
-                <TableRowColumn>
-                  <span style={{cursor: 'help'}} title={mapping.subjectClaim}>{mapping.subjectClaim}</span>
-                </TableRowColumn>
-                <TableRowColumn style={{ width: 120 }}>{mapping.userAttribute}</TableRowColumn>
-              </TableRow>)}
-          </TableBody>
-        </Table>
+    Object.keys(attributeMappings).filter((_, i) => {
+      if (this.state.selected === 'all') {
+        return false
+      }
+      return this.state.selected.indexOf(i) === -1
+    }).forEach((key) => {
+      o[key] = attributeMappings[key]
+    })
+
+    editConfig('attributeMappings', o)
+    this.setState({ selected: [] })
+  }
+  render () {
+    const {
+      editConfig,
+      configs: {
+        attributeMappings = {},
+        subjectClaims,
+        userAttributes
+      } = {}
+    } = this.props
+
+    return (
+      <div>
+        <Select
+          id='subjectClaims'
+          label='STS Claim' />
+        <Select
+          id='userAttributes'
+          label='LDAP User Attribute' />
+
+        <RaisedButton
+          primary
+          style={{margin: '0 auto', marginBottom: '30px', marginTop: '10px', display: 'block'}}
+          label='Add Mapping'
+          onClick={() => editConfig('attributeMappings', { ...attributeMappings, [subjectClaims]: userAttributes })}
+          disabled={subjectClaims === undefined || userAttributes === undefined} />
+
+        <Card expanded style={{ width: '100%' }}>
+          <CardHeader style={{ fontSize: '0.80em' }}>
+            <Title>STS Claims to LDAP Attribute Mapping</Title>
+            <Description>
+              The mappings below will be saved.
+            </Description>
+          </CardHeader>
+          <Table multiSelectable onRowSelection={(selected) => this.setState({ selected })}>
+            <TableHeader>
+              <TableRow>
+                <TableHeaderColumn>STS Claim</TableHeaderColumn>
+                <TableHeaderColumn style={{ width: 120 }}>LDAP User Attribute</TableHeaderColumn>
+              </TableRow>
+            </TableHeader>
+            <TableBody showRowHover deselectOnClickaway={false}>
+              {Object.keys(attributeMappings).map((subjectClaim, i) =>
+                <TableRow key={i} selected={this.state.selected === 'all' || this.state.selected.indexOf(i) > -1}>
+                  <TableRowColumn>
+                    <span style={{cursor: 'help'}} title={subjectClaim}>{subjectClaim}</span>
+                  </TableRowColumn>
+                  <TableRowColumn style={{ width: 120 }}>{attributeMappings[subjectClaim]}</TableRowColumn>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </Card>
+
         <RaisedButton
           label='Remove Selected Mappings'
           primary
           style={{display: 'block'}}
-          disabled={tableMappings.filter((mapping) => mapping.selected).length === 0}
-          onClick={() => removeSelectedMappings()} />
-      </Card>
-      <StageControls>
-        <Back disabled={disabled} />
-        <NextAttributeMapping id={id} disabled={disabled || tableMappings.length === 0} url='/admin/beta/config/test/ldap/attribute-mapping' attributeMappings={toAttributeMapping(tableMappings)}
-          nextStageId='confirm' />
-      </StageControls>
+          disabled={this.state.selected.length === 0}
+          onClick={this.filterUpdateMappings.bind(this)} />
+      </div>
+    )
+  }
+}
+
+const AttributeMapper = connect(null, { editConfig })(AttributeMapperView)
+
+const LdapAttributeMappingStage = (props) => {
+  const {
+    disabled,
+    submitting,
+    configs,
+    configs: {
+      attributeMappings = {}
+    } = {},
+
+    prev,
+    probe,
+    test
+  } = props
+
+  return (
+    <Stage>
+      <Mount probeId='subject-attributes' on={probe} />
+      <Spinner submitting={submitting}>
+        <Title>LDAP User Attribute Mapping</Title>
+        <Description>
+          In order to authenticate users, the attributes of the users must be mapped to the STS
+          claims.
+          Not all attributes must be mapped but any unmapped attributes will not be used for
+          authentication.
+          Claims can be mapped to 1 or more attributes.
+        </Description>
+
+        <AttributeMapper disabled={disabled} configs={configs} />
+
+        <ActionGroup>
+          <Action
+            secondary
+            label='back'
+            onClick={prev}
+            disabled={disabled} />
+          <Action
+            primary
+            label='next'
+            onClick={test}
+            disabled={disabled || Object.keys(attributeMappings).length === 0}
+            testId='attribute-mapping'
+            nextStageId='confirm' />
+        </ActionGroup>
+      </Spinner>
     </Stage>
   )
 }
 
-const toAttributeMapping = (tableMappings) => {
-  return (tableMappings.length !== 0) ? tableMappings.reduce((prevObj, mapping) => {
-    prevObj[mapping.subjectClaim] = mapping.userAttribute
-    return prevObj
-  }, {}) : {}
-}
-// todo Need to transform map into a string, list map
-const mapDispatchToPropsNextAttributeMapping = (dispatch, {id, url, nextStageId, attributeMappings}) => ({
-  next: () => { dispatch(editConfig('attributeMappings', attributeMappings)); dispatch(testConfig(id, url, nextStageId)) }
-})
-const NextAttributeMappingView = ({next, disabled, nextStageId}) => <RaisedButton label='Next' disabled={disabled} primary onClick={next} />
-const NextAttributeMapping = connect(null, mapDispatchToPropsNextAttributeMapping)(NextAttributeMappingView)
-
-const getSubjectClaims = (state) => (getConfig(state, 'subjectClaims') !== undefined ? getConfig(state, 'subjectClaims').options : undefined)
-const getUserAttributes = (state) => (getConfig(state, 'userAttributes') !== undefined ? getConfig(state, 'userAttributes').options : undefined)
-const getTableMappings = (state) => state.getIn(['wizard', 'tableMappings'])
-const getMappingToAdd = (state) => state.getIn(['wizard', 'mappingToAdd'])
-
-export default connect(
-  (state) => ({
-    subjectClaims: getSubjectClaims(state),
-    userAttributes: getUserAttributes(state),
-    tableMappings: getTableMappings(state),
-    mappingToadd: getMappingToAdd(state)
-  }),
-
-  {
-    setMappingToAdd,
-    addMapping,
-    setSelectedMappings,
-    removeSelectedMappings
-  }
-)(LdapAttributeMappingStage)
+export default LdapAttributeMappingStage

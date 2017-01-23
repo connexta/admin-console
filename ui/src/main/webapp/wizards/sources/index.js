@@ -1,13 +1,15 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { getSourceStage, getIsSubmitting } from './reducer'
-import Wizard from '../components/wizard'
 
 import Flexbox from 'flexbox-react'
 import CircularProgress from 'material-ui/CircularProgress'
 import Paper from 'material-ui/Paper'
 
 import styles from './styles.less'
+
+import Mount from 'react-mount'
+import { clearWizard } from 'admin-wizard/actions'
 
 import {
   WelcomeStage,
@@ -17,6 +19,12 @@ import {
   CompletedStage,
   ManualEntryStage
 } from './stages'
+
+const WizardView = ({ id, children, clearWizard }) => (
+  <Mount key={id} off={clearWizard}>{children}</Mount>
+)
+
+const Wizard = connect(null, { clearWizard })(WizardView)
 
 /*
   - welcomeStage

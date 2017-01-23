@@ -1,16 +1,13 @@
 import React from 'react'
 
-import {
-  Stage,
-  StageControls,
-  Title,
-  Description,
-  Save,
-  Back
-} from '../../components/stage'
+import Stage from 'components/Stage'
+import Title from 'components/Title'
+import Description from 'components/Description'
+import Action from 'components/Action'
+import ActionGroup from 'components/ActionGroup'
 
-export default ({ id }) => (
-  <Stage id={id}>
+export default ({ disabled, prev, persist }) => (
+  <Stage>
     <Title>LDAP Confirm</Title>
 
     <Description>
@@ -18,9 +15,19 @@ export default ({ id }) => (
       save the LDAP configuration?
     </Description>
 
-    <StageControls>
-      <Back />
-      <Save id={id} url='/admin/beta/config/persist/ldap/create' nextStageId='final-stage' />
-    </StageControls>
+    <ActionGroup>
+      <Action
+        secondary
+        label='back'
+        onClick={prev}
+        disabled={disabled} />
+      <Action
+        primary
+        label='save'
+        onClick={persist}
+        disabled={disabled}
+        persistId='create'
+        nextStageId='final-stage' />
+    </ActionGroup>
   </Stage>
 )

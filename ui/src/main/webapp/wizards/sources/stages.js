@@ -27,9 +27,10 @@ import {
   ConstrainedSourceInfo,
   SourceRadioButtons,
   NavPanes,
-  Submit,
-  Message
+  Submit
 } from './components'
+
+import Message from 'components/Message'
 
 // Welcome Stage
 const welcomeTitle = 'Welcome to the Source Configuration Wizard'

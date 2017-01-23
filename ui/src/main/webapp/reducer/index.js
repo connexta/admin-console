@@ -12,7 +12,7 @@ const backendError = (state = {}, { type, err } = {}) => {
 
 export const getBackendErrors = (state) => state.get('backendError')
 
-import wizard, * as ldap from '../wizards/ldap/reducer'
+import wizard, * as ldap from 'admin-wizard/reducer'
 import sourceWizard from '../wizards/sources/reducer'
 import home from '../home'
 import wcpm, * as webContext from '../adminTools/webContextPolicyManager/reducer'

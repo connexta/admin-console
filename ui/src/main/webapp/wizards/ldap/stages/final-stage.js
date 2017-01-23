@@ -2,16 +2,14 @@ import React from 'react'
 
 import { Link } from 'react-router'
 
-import {
-  Stage,
-  StageControls,
-  Title,
-  Description,
-  Submit
-} from '../../components/stage'
+import Stage from 'components/Stage'
+import Action from 'components/Action'
+import ActionGroup from 'components/ActionGroup'
+import Title from 'components/Title'
+import Description from 'components/Description'
 
-export default ({ id }) => (
-  <Stage id={id}>
+export default () => (
+  <Stage>
     <Title>Success!</Title>
 
     <Description>
@@ -20,10 +18,10 @@ export default ({ id }) => (
       endpoints.
     </Description>
 
-    <StageControls>
+    <ActionGroup>
       <Link to='/web-context-policy-manager'>
-        <Submit label='Go to Web Context Policy Manager' />
+        <Action primary label='Go to Web Context Policy Manager' />
       </Link>
-    </StageControls>
+    </ActionGroup>
   </Stage>
 )

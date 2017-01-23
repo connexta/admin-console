@@ -1,14 +1,12 @@
 import React from 'react'
 
-import {
-  Stage,
-  StageControls,
-  Title,
-  Description,
-  Begin
-} from '../../components/stage'
+import Stage from 'components/Stage'
+import Title from 'components/Title'
+import Description from 'components/Description'
+import Action from 'components/Action'
+import ActionGroup from 'components/ActionGroup'
 
-import { RadioSelection } from '../../inputs'
+import { RadioSelection } from 'admin-wizard/inputs'
 
 const LdapUseCases = [
   {
@@ -27,8 +25,8 @@ const LdapUseCases = [
 
 // TODO update description to described LDAP as a login or credential store
 // TODO Make the value selected from the radio button persist
-const IntroductionStage = ({ id, disabled, configs: { ldapUseCase } = {} }) => (
-  <Stage id={id}>
+const IntroductionStage = ({ disabled, next, configs: { ldapUseCase } = {} }) => (
+  <Stage>
     <Title>Welcome to the LDAP Configuration Wizard</Title>
     <Description>
       This guide will walk through setting up the LDAP as an
@@ -41,9 +39,14 @@ const IntroductionStage = ({ id, disabled, configs: { ldapUseCase } = {} }) => (
       options={LdapUseCases}
       name='LDAP Use Cases'
       disabled={disabled} />
-    <StageControls justifyContent='center'>
-      <Begin disabled={disabled || !ldapUseCase} nextStageId='ldap-type-selection' />
-    </StageControls>
+    <ActionGroup>
+      <Action
+        primary
+        label='begin'
+        onClick={next}
+        nextStageId='ldap-type-selection'
+        disabled={disabled || !ldapUseCase} />
+    </ActionGroup>
   </Stage>
 )
 

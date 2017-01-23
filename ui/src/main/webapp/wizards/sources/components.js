@@ -13,7 +13,7 @@ import AlertIcon from 'material-ui/svg-icons/alert/warning'
 import InfoIcon from 'material-ui/svg-icons/action/info'
 import {green500, red500} from 'material-ui/styles/colors'
 import RaisedButton from 'material-ui/RaisedButton'
-import { editConfigs } from '../../actions'
+import { editConfigs } from 'admin-wizard/actions'
 
 import LeftIcon from 'material-ui/svg-icons/hardware/keyboard-arrow-left'
 import RightIcon from 'material-ui/svg-icons/hardware/keyboard-arrow-right'
@@ -32,15 +32,13 @@ import {
   navButtonStylesDisabled
 } from './styles.less'
 
-import ldapStyles from '../ldap/styles.less'
-
 import {
   Input,
   Password,
   Hostname,
   Port,
   Select
-} from '../inputs'
+} from 'admin-wizard/inputs'
 
 export const WidthConstraint = ({ children }) => (
   <div className={widthConstraintStyle}>
@@ -81,10 +79,6 @@ export const ConstrainedSelectInput = ({ id, label, description, options }) => (
     <Select id={id} label={label} options={options} />
     <DescriptionIcon description={description} />
   </WidthConstraint>
-)
-
-export const Message = ({type, message}) => (
-  <div className={type === 'FAILURE' ? ldapStyles.error : ldapStyles.success}>{message}</div>
 )
 
 const DescriptionIcon = ({ description }) => {

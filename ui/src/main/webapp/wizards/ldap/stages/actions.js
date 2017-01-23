@@ -1,12 +1,8 @@
 import { post } from 'redux-fetch'
 
-import { getAllConfig } from '../../reducer'
+import { getAllConfig } from '../../../reducer'
 
 export const setProbeValue = (value) => ({ type: 'SET_PROBE_VALUE', value })
-export const setMappingToAdd = (mapping) => ({type: 'SET_SELECTED_MAPPING', mapping})
-export const addMapping = (mapping) => ({type: 'ADD_MAPPING', mapping})
-export const setSelectedMappings = (indexs) => ({type: 'SELECT_MAPPINGS', indexs})
-export const removeSelectedMappings = () => ({type: 'REMOVE_SELECTED_MAPPINGS'})
 
 export const probe = (url) => async (dispatch, getState) => {
   const config = getAllConfig(getState())

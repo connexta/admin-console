@@ -1,42 +1,70 @@
 import React from 'react'
 
-import {
-  Stage,
-  StageControls,
-  Title,
-  Description,
-  Back,
-  Next
-} from '../../components/stage'
+import Mount from 'react-mount'
+
+import Stage from 'components/Stage'
+import Title from 'components/Title'
+import Description from 'components/Description'
+import Action from 'components/Action'
+import ActionGroup from 'components/ActionGroup'
+import Message from 'components/Message'
+import Spinner from 'components/Spinner'
 
 import {
   Hostname,
   Port,
   Select
-} from '../../inputs'
+} from 'admin-wizard/inputs'
 
-const NetworkSettings = ({ id, disabled }) => (
-  <Stage id={id} defaults={{ port: 1636, encryptionMethod: 'LDAPS', hostName: 'localhost' }}>
-    <Title>LDAP Network Settings</Title>
-    <Description>
-      Lets start with the network configurations of your LDAP store.
-    </Description>
+const NetworkSettings = (props) => {
+  const {
+    setDefaults,
+    prev,
+    test,
+    submitting,
+    disabled,
+    messages = []
+  } = props
 
-    <Hostname id='hostName' disabled={disabled} />
-    <Port id='port' disabled={disabled} options={[389, 636]} />
-    <Select id='encryptionMethod'
-      label='Encryption Method'
-      disabled={disabled}
-      options={[ 'None', 'LDAPS', 'StartTLS' ]} />
+  return (
+    <Stage>
+      <Mount
+        on={setDefaults}
+        port={1636}
+        encryptionMethod='LDAPS'
+        hostName='localhost' />
+      <Spinner submitting={submitting}>
+        <Title>LDAP Network Settings</Title>
+        <Description>
+          Lets start with the network configurations of your LDAP store.
+        </Description>
 
-    <StageControls>
-      <Back disabled={disabled} />
-      <Next id={id}
-        disabled={disabled}
-        url='/admin/beta/config/test/ldap/connection'
-        nextStageId='bind-settings' />
-    </StageControls>
-  </Stage>
-)
+        <Hostname id='hostName' disabled={disabled} />
+        <Port id='port' disabled={disabled} options={[389, 636]} />
+        <Select id='encryptionMethod'
+          label='Encryption Method'
+          disabled={disabled}
+          options={[ 'None', 'LDAPS', 'StartTLS' ]} />
+
+        <ActionGroup>
+          <Action
+            secondary
+            label='back'
+            onClick={prev}
+            disabled={disabled} />
+          <Action
+            primary
+            label='next'
+            onClick={test}
+            disabled={disabled}
+            nextStageId='bind-settings'
+            testId='connection' />
+        </ActionGroup>
+
+        {messages.map((msg, i) => <Message key={i} {...msg} />)}
+      </Spinner>
+    </Stage>
+  )
+}
 
 export default NetworkSettings

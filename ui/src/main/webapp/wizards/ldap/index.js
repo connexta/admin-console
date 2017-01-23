@@ -1,10 +1,4 @@
-import React from 'react'
-
-import { connect } from 'react-redux'
-
-import { getDisplayedLdapStage, getAllConfig } from '../../reducer'
-
-import Wizard from '../components/wizard'
+import { createWizard } from 'admin-wizard'
 
 import IntroductionStage from './stages/introduction-stage'
 import LdapTypeSelection from './stages/ldap-type-selection'
@@ -16,7 +10,7 @@ import LdapAttributeMappingStage from './stages/attribute-mapping'
 import Confirm from './stages/confirm'
 import FinalStage from './stages/final-stage'
 
-const stageMapping = {
+export const stages = {
   'introduction-stage': IntroductionStage,
   'ldap-type-selection': LdapTypeSelection,
   'configure-embedded-ldap': ConfigureEmbeddedLdap,
@@ -28,15 +22,4 @@ const stageMapping = {
   'final-stage': FinalStage
 }
 
-const LdapWizardView = ({ id, configs }) => (
-  <Wizard id='ldap'>
-    {React.createElement(stageMapping[id], { id, configs })}
-  </Wizard>
-)
-
-const LdapWizard = connect((state) => ({
-  id: getDisplayedLdapStage(state),
-  configs: getAllConfig(state)
-}))(LdapWizardView)
-
-export default LdapWizard
+export default createWizard('ldap', stages)

@@ -66,13 +66,10 @@ import {
   newBinDisabledStyle,
   contextPathGroupStyle,
   whitelistContextPathGroupStyle,
-  claimsAttributeStyle
-} from './styles.less'
-
-import {
+  claimsAttributeStyle,
   submitting,
   error
-} from '../../wizards/components/stage/styles.less'
+} from './styles.less'
 
 let Edit = ({editing, binNumber, editModeOn}) => {
   return !editing ? (

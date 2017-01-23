@@ -41,7 +41,7 @@ const BindSettings = (props) => {
     <Stage>
       <Mount
         on={setDefaults}
-        bindUserDn='cn=admin'
+        bindUserDn={props.configs.ldapType === 'activeDirectory' ? 'user@domain' : 'cn=admin'}
         bindUserPassword='secret'
         bindUserMethod='Simple' />
 

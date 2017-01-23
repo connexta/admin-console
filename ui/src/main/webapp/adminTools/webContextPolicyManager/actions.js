@@ -127,7 +127,7 @@ export const persistChanges = (binNumber, url) => async (dispatch, getState) => 
   const json = await res.json()
 
   // check for server exceptions
-  if (json.messages[0].exceptions.length > 0) {
+  if (json.messages[0].exceptions && json.messages[0].exceptions.length > 0) {
     dispatch(setError('general', 'The server encountered an error. Please check the server logs for more information.'))
     return
   }

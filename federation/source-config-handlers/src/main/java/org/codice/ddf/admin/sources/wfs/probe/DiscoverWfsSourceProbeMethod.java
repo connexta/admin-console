@@ -17,8 +17,7 @@ import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.PASSWO
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.PORT;
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_HOSTNAME;
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.USERNAME;
-import static org.codice.ddf.admin.api.handler.ConfigurationMessage.MessageType.FAILURE;
-import static org.codice.ddf.admin.api.handler.ConfigurationMessage.buildMessage;
+import static org.codice.ddf.admin.api.handler.ConfigurationMessage.INTERNAL_ERROR;
 import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.BAD_CONFIG;
 import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.CERT_ERROR;
 import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.DISCOVER_SOURCES_ID;
@@ -27,11 +26,13 @@ import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.NO_E
 import static org.codice.ddf.admin.api.handler.report.ProbeReport.createProbeReport;
 import static org.codice.ddf.admin.sources.wfs.WfsSourceConfigurationHandler.WFS_SOURCE_CONFIGURATION_HANDLER_ID;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import org.codice.ddf.admin.api.config.sources.WfsSourceConfiguration;
+import org.codice.ddf.admin.api.handler.commons.UrlAvailability;
 import org.codice.ddf.admin.api.handler.method.ProbeMethod;
 import org.codice.ddf.admin.api.handler.report.ProbeReport;
 import org.codice.ddf.admin.sources.wfs.WfsSourceUtils;
@@ -63,29 +64,34 @@ public class DiscoverWfsSourceProbeMethod extends ProbeMethod<WfsSourceConfigura
 
     @Override
     public ProbeReport probe(WfsSourceConfiguration configuration) {
+        WfsSourceConfiguration config = new WfsSourceConfiguration(configuration);
         ProbeReport probeReport = new ProbeReport(configuration.validate(REQUIRED_FIELDS));
         if (probeReport.containsFailureMessages()) {
             return probeReport;
         }
-        Optional<String> url = WfsSourceUtils.confirmEndpointUrl(configuration);
-        if (url.isPresent()) {
-            if (url.get().equals(CERT_ERROR)) {
-                return createProbeReport(SUCCESS_TYPES, FAILURE_TYPES, null, CERT_ERROR);
-            }
-            configuration.endpointUrl(url.get());
-        } else {
-            return createProbeReport(SUCCESS_TYPES, FAILURE_TYPES, null, NO_ENDPOINT);
-        }
 
-        Optional<WfsSourceConfiguration> preferred = WfsSourceUtils.getPreferredConfig(configuration);
-        if (preferred.isPresent()) {
-            Map<String, Object> results = ImmutableMap.of(WFS_DISCOVER_SOURCES_ID,
-                    preferred.get()
-                            .configurationHandlerId(WFS_SOURCE_CONFIGURATION_HANDLER_ID));
-            return createProbeReport(SUCCESS_TYPES, FAILURE_TYPES, null, ENDPOINT_DISCOVERED).probeResults(results);
+        String result;
+        Map<String, Object> probeResult = new HashMap<>();
+        Optional<UrlAvailability> availability = WfsSourceUtils.confirmEndpointUrl(config);
+        if (!availability.isPresent()) {
+            result = NO_ENDPOINT;
+        } else if (availability.get().isCertError()) {
+            result = CERT_ERROR;
+        } else if (availability.get().isAvailable()) {
+            config.endpointUrl(availability.get().getUrl());
+            Optional<WfsSourceConfiguration> preferred = WfsSourceUtils.getPreferredConfig(config);
+            if(preferred.isPresent()) {
+                result = ENDPOINT_DISCOVERED;
+                probeResult.put(WFS_DISCOVER_SOURCES_ID,
+                        preferred.get().configurationHandlerId(WFS_SOURCE_CONFIGURATION_HANDLER_ID));
+            } else {
+                result = INTERNAL_ERROR;
+            }
+
         } else {
-            return probeReport.messages(buildMessage(FAILURE, BAD_CONFIG, FAILURE_TYPES.get(BAD_CONFIG)));
+            result = INTERNAL_ERROR;
         }
+        return createProbeReport(SUCCESS_TYPES, FAILURE_TYPES, null, result).probeResults(probeResult);
     }
 
 }

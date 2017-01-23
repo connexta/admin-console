@@ -15,14 +15,25 @@ package org.codice.ddf.admin.api.handler.commons;
 
 public class UrlAvailability {
 
+    private String url;
     private boolean available;
     private boolean trustedCertAuthority;
     private boolean certError;
 
-    public UrlAvailability() {
+    public UrlAvailability(String url) {
+        this.url = url;
         available = false;
         trustedCertAuthority = false;
         certError = false;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public UrlAvailability url(String url) {
+        this.url = url;
+        return this;
     }
 
     public boolean isAvailable() {

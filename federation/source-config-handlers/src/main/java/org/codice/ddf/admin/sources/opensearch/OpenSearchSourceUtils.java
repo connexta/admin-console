@@ -14,13 +14,11 @@
 package org.codice.ddf.admin.sources.opensearch;
 
 import static java.net.HttpURLConnection.HTTP_OK;
-import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.CERT_ERROR;
 import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.PING_TIMEOUT;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import javax.net.ssl.SSLContext;
@@ -45,30 +43,19 @@ public class OpenSearchSourceUtils {
             "http://%s:%d/catalog/query");
 
     //Given a config, returns the correct URL format for the endpoint if one exists
-    public static Optional<String> confirmEndpointUrl(OpenSearchSourceConfiguration config) {
+    public static Optional<UrlAvailability> confirmEndpointUrl(OpenSearchSourceConfiguration config) {
         return URL_FORMATS.stream()
                 .map(formatUrl -> String.format(formatUrl,
                         config.sourceHostName(),
                         config.sourcePort()))
-                .map(url -> {
-                    UrlAvailability avail = OpenSearchSourceUtils.getUrlAvailability(url);
-                    if (avail.isAvailable()) {
-                        return url;
-                    }
-                    if (avail.isCertError()) {
-                        return CERT_ERROR;
-                    }
-                    return null;
-                })
-                .filter(Objects::nonNull)
-                .findFirst()
-                .map(Optional::of)
-                .orElse(Optional.empty());
+                .map(OpenSearchSourceUtils::getUrlAvailability)
+                .filter(avail -> avail.isAvailable() || avail.isCertError())
+                .findFirst();
     }
 
     // Given a configuration with and endpointUrl, determines if that URL is available as an OS source
     public static UrlAvailability getUrlAvailability(String url) {
-        UrlAvailability result = new UrlAvailability();
+        UrlAvailability result = new UrlAvailability(url);
         int status;
         String contentType;
         HttpClient client = HttpClientBuilder.create()

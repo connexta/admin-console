@@ -14,7 +14,6 @@
 package org.codice.ddf.admin.sources.csw;
 
 import static java.net.HttpURLConnection.HTTP_OK;
-import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.CERT_ERROR;
 import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.OWS_NAMESPACE_CONTEXT;
 import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.PING_TIMEOUT;
 import static org.codice.ddf.admin.api.services.CswServiceProperties.CSW_GMD_FACTORY_PID;
@@ -24,7 +23,6 @@ import static org.codice.ddf.admin.api.services.CswServiceProperties.CSW_SPEC_FA
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import javax.net.ssl.SSLContext;
@@ -70,7 +68,7 @@ public class CswSourceUtils {
 
     // Given a config with an endpoint URL, determines if that URL is a functional CSW endpoint.
     public static UrlAvailability getUrlAvailability(String url) {
-        UrlAvailability result = new UrlAvailability();
+        UrlAvailability result = new UrlAvailability(url);
         String contentType;
         int status;
         long contentLength;
@@ -164,25 +162,14 @@ public class CswSourceUtils {
     }
 
     // Determines the correct CSW endpoint URL format given a config with a Hostname and Port
-    public static Optional<String> confirmEndpointUrl(CswSourceConfiguration config) {
+    public static Optional<UrlAvailability> confirmEndpointUrl(CswSourceConfiguration config) {
         return URL_FORMATS.stream()
                 .map(formatUrl -> String.format(formatUrl,
                         config.sourceHostName(),
                         config.sourcePort()))
-                .map(url -> {
-                    UrlAvailability avail = getUrlAvailability(url);
-                    if (avail.isAvailable()) {
-                        return url;
-                    }
-                    if (avail.isCertError()) {
-                        return CERT_ERROR;
-                    }
-                    return null;
-                })
-                .filter(Objects::nonNull)
-                .findFirst()
-                .map(Optional::of)
-                .orElse(Optional.empty());
+                .map(CswSourceUtils::getUrlAvailability)
+                .filter(avail -> avail.isAvailable() || avail.isCertError())
+                .findFirst();
     }
 
 }

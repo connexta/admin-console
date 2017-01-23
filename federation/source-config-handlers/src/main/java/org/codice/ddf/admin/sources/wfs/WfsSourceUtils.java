@@ -14,7 +14,6 @@
 package org.codice.ddf.admin.sources.wfs;
 
 import static java.net.HttpURLConnection.HTTP_OK;
-import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.CERT_ERROR;
 import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.OWS_NAMESPACE_CONTEXT;
 import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.PING_TIMEOUT;
 import static org.codice.ddf.admin.api.services.WfsServiceProperties.WFS1_FACTORY_PID;
@@ -23,7 +22,6 @@ import static org.codice.ddf.admin.api.services.WfsServiceProperties.WFS2_FACTOR
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import javax.net.ssl.SSLContext;
@@ -60,29 +58,18 @@ public class WfsSourceUtils {
             "http://%s:%d/wfs");
 
     // TODO: tbatie - 1/20/17 - Consider returning configurationMessages instead of string
-    public static Optional<String> confirmEndpointUrl(WfsSourceConfiguration config) {
+    public static Optional<UrlAvailability> confirmEndpointUrl(WfsSourceConfiguration config) {
         return URL_FORMATS.stream()
                 .map(formatUrl -> String.format(formatUrl,
                         config.sourceHostName(),
                         config.sourcePort()))
-                .map(url -> {
-                    UrlAvailability avail = WfsSourceUtils.getUrlAvailability(url);
-                    if (avail.isAvailable()) {
-                        return url;
-                    }
-                    if (avail.isCertError()) {
-                        return CERT_ERROR;
-                    }
-                    return null;
-                })
-                .filter(Objects::nonNull)
-                .findFirst()
-                .map(Optional::of)
-                .orElse(Optional.empty());
+                .map(WfsSourceUtils::getUrlAvailability)
+                .filter(avail -> avail.isAvailable() || avail.isCertError())
+                .findFirst();
     }
 
     public static UrlAvailability getUrlAvailability(String url) {
-        UrlAvailability result = new UrlAvailability();
+        UrlAvailability result = new UrlAvailability(url);
         int status;
         String contentType;
         HttpClient client = HttpClientBuilder.create()

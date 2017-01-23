@@ -17,22 +17,22 @@ import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.PASSWO
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.PORT;
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_HOSTNAME;
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.USERNAME;
-import static org.codice.ddf.admin.api.handler.ConfigurationMessage.MessageType.FAILURE;
-import static org.codice.ddf.admin.api.handler.ConfigurationMessage.MessageType.SUCCESS;
-import static org.codice.ddf.admin.api.handler.ConfigurationMessage.buildMessage;
 import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.BAD_CONFIG;
 import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.CERT_ERROR;
 import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.DISCOVER_SOURCES_ID;
 import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.ENDPOINT_DISCOVERED;
 import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.NO_ENDPOINT;
+import static org.codice.ddf.admin.api.handler.report.ProbeReport.createProbeReport;
 import static org.codice.ddf.admin.api.services.OpensearchServiceProperties.OPENSEARCH_FACTORY_PID;
 import static org.codice.ddf.admin.sources.opensearch.OpenSearchSourceConfigurationHandler.OPENSEARCH_SOURCE_CONFIGURATION_HANDLER_ID;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import org.codice.ddf.admin.api.config.sources.OpenSearchSourceConfiguration;
+import org.codice.ddf.admin.api.handler.commons.UrlAvailability;
 import org.codice.ddf.admin.api.handler.method.ProbeMethod;
 import org.codice.ddf.admin.api.handler.report.ProbeReport;
 import org.codice.ddf.admin.sources.opensearch.OpenSearchSourceUtils;
@@ -79,29 +79,27 @@ public class DiscoverOpenSearchSourceProbeMethod
             return validationResults;
         }
 
-        Optional<String> url = OpenSearchSourceUtils.confirmEndpointUrl(configuration);
-        if (url.isPresent()) {
-            if (url.get().equals(CERT_ERROR)) {
-                return validationResults.messages(buildMessage(FAILURE,
-                        CERT_ERROR,
-                        FAILURE_TYPES.get(CERT_ERROR)));
+        String result;
+        Map<String, Object> probeResult = new HashMap<>();
+        Optional<UrlAvailability> availability = OpenSearchSourceUtils.confirmEndpointUrl(configuration);
+        if (availability.isPresent()) {
+            UrlAvailability url = availability.get();
+            if (url.isCertError()){
+                result = CERT_ERROR;
+            } else {
+                OpenSearchSourceConfiguration openSearchConfig = new OpenSearchSourceConfiguration(
+                        configuration);
+                openSearchConfig.endpointUrl(url.getUrl())
+                        .factoryPid(OPENSEARCH_FACTORY_PID)
+                        .configurationHandlerId(OPENSEARCH_SOURCE_CONFIGURATION_HANDLER_ID);
+
+                result = ENDPOINT_DISCOVERED;
+                probeResult.put(OPENSEARCH_DISCOVER_SOURCES_ID, openSearchConfig);
             }
-            OpenSearchSourceConfiguration opensearchConfig = new OpenSearchSourceConfiguration(
-                    configuration);
-
-            opensearchConfig.endpointUrl(url.get())
-                    .factoryPid(OPENSEARCH_FACTORY_PID)
-                    .configurationHandlerId(OPENSEARCH_SOURCE_CONFIGURATION_HANDLER_ID);
-
-            return validationResults.messages(buildMessage(SUCCESS,
-                    ENDPOINT_DISCOVERED,
-                    SUCCESS_TYPES.get(ENDPOINT_DISCOVERED)))
-                    .probeResults(ImmutableMap.of(DISCOVER_SOURCES_ID, opensearchConfig));
         } else {
-            return new ProbeReport(buildMessage(FAILURE,
-                    NO_ENDPOINT,
-                    FAILURE_TYPES.get(NO_ENDPOINT)));
+            result = NO_ENDPOINT;
         }
+        return createProbeReport(SUCCESS_TYPES, FAILURE_TYPES, null, result).probeResults(probeResult);
     }
 
 }

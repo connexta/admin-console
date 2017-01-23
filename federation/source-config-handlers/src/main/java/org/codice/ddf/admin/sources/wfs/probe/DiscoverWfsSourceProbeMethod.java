@@ -23,6 +23,7 @@ import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.CERT
 import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.DISCOVER_SOURCES_ID;
 import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.ENDPOINT_DISCOVERED;
 import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.NO_ENDPOINT;
+import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.UNTRUSTED_CA;
 import static org.codice.ddf.admin.api.handler.report.ProbeReport.createProbeReport;
 import static org.codice.ddf.admin.sources.wfs.WfsSourceConfigurationHandler.WFS_SOURCE_CONFIGURATION_HANDLER_ID;
 
@@ -51,6 +52,8 @@ public class DiscoverWfsSourceProbeMethod extends ProbeMethod<WfsSourceConfigura
             CERT_ERROR, "The discovered source has incorrectly configured SSL certificates and is insecure.",
             NO_ENDPOINT, "No Wfs endpoint found.",
             BAD_CONFIG, "Endpoint discovered, but could not create valid configuration.");
+    public static final Map<String, String> WARNING_TYPES = ImmutableMap.of(UNTRUSTED_CA,
+            "The discovered URL has incorrectly configured SSL certificates and is likely insecure.");
 
     public DiscoverWfsSourceProbeMethod() {
         super(WFS_DISCOVER_SOURCES_ID,
@@ -81,7 +84,7 @@ public class DiscoverWfsSourceProbeMethod extends ProbeMethod<WfsSourceConfigura
             config.endpointUrl(availability.get().getUrl());
             Optional<WfsSourceConfiguration> preferred = WfsSourceUtils.getPreferredConfig(config);
             if(preferred.isPresent()) {
-                result = ENDPOINT_DISCOVERED;
+                result = availability.get().isTrustedCertAuthority() ? ENDPOINT_DISCOVERED : UNTRUSTED_CA;
                 probeResult.put(WFS_DISCOVER_SOURCES_ID,
                         preferred.get().configurationHandlerId(WFS_SOURCE_CONFIGURATION_HANDLER_ID));
             } else {
@@ -91,7 +94,7 @@ public class DiscoverWfsSourceProbeMethod extends ProbeMethod<WfsSourceConfigura
         } else {
             result = INTERNAL_ERROR;
         }
-        return createProbeReport(SUCCESS_TYPES, FAILURE_TYPES, null, result).probeResults(probeResult);
+        return createProbeReport(SUCCESS_TYPES, FAILURE_TYPES, WARNING_TYPES, result).probeResults(probeResult);
     }
 
 }

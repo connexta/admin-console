@@ -22,6 +22,7 @@ import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.CERT
 import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.DISCOVER_SOURCES_ID;
 import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.ENDPOINT_DISCOVERED;
 import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.NO_ENDPOINT;
+import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.UNTRUSTED_CA;
 import static org.codice.ddf.admin.api.handler.report.ProbeReport.createProbeReport;
 import static org.codice.ddf.admin.api.services.OpensearchServiceProperties.OPENSEARCH_FACTORY_PID;
 import static org.codice.ddf.admin.sources.opensearch.OpenSearchSourceConfigurationHandler.OPENSEARCH_SOURCE_CONFIGURATION_HANDLER_ID;
@@ -62,6 +63,9 @@ public class DiscoverOpenSearchSourceProbeMethod
             BAD_CONFIG,
             "Endpoint discovered, but could not create valid configuration.");
 
+    public static final Map<String, String> WARNING_TYPES = ImmutableMap.of(UNTRUSTED_CA,
+            "The discovered URL has incorrectly configured SSL certificates and is likely insecure.");
+
     public DiscoverOpenSearchSourceProbeMethod() {
         super(OPENSEARCH_DISCOVER_SOURCES_ID,
                 DESCRIPTION,
@@ -93,13 +97,13 @@ public class DiscoverOpenSearchSourceProbeMethod
                         .factoryPid(OPENSEARCH_FACTORY_PID)
                         .configurationHandlerId(OPENSEARCH_SOURCE_CONFIGURATION_HANDLER_ID);
 
-                result = ENDPOINT_DISCOVERED;
+                result = availability.get().isTrustedCertAuthority() ? ENDPOINT_DISCOVERED : UNTRUSTED_CA;
                 probeResult.put(OPENSEARCH_DISCOVER_SOURCES_ID, openSearchConfig);
             }
         } else {
             result = NO_ENDPOINT;
         }
-        return createProbeReport(SUCCESS_TYPES, FAILURE_TYPES, null, result).probeResults(probeResult);
+        return createProbeReport(SUCCESS_TYPES, FAILURE_TYPES, WARNING_TYPES, result).probeResults(probeResult);
     }
 
 }

@@ -23,6 +23,7 @@ import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.CERT
 import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.DISCOVER_SOURCES_ID;
 import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.ENDPOINT_DISCOVERED;
 import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.NO_ENDPOINT;
+import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.UNTRUSTED_CA;
 import static org.codice.ddf.admin.api.handler.report.ProbeReport.createProbeReport;
 import static org.codice.ddf.admin.sources.csw.CswSourceConfigurationHandler.CSW_SOURCE_CONFIGURATION_HANDLER_ID;
 
@@ -52,6 +53,8 @@ public class DiscoverCswSourceProbeMethod extends ProbeMethod<CswSourceConfigura
             NO_ENDPOINT, "No CSW endpoint found.",
             BAD_CONFIG, "Endpoint discovered, but could not create valid configuration.",
             INTERNAL_ERROR, "Failed to create configuration from valid request to valid endpoint.");
+    public static final Map<String, String> WARNING_TYPES = ImmutableMap.of(UNTRUSTED_CA,
+            "The discovered URL has incorrectly configured SSL certificates and is likely insecure.");
 
     public DiscoverCswSourceProbeMethod() {
         super(CSW_DISCOVER_SOURCES_ID,
@@ -82,7 +85,7 @@ public class DiscoverCswSourceProbeMethod extends ProbeMethod<CswSourceConfigura
             config.endpointUrl(availability.get().getUrl());
             Optional<CswSourceConfiguration> preferred = CswSourceUtils.getPreferredConfig(config);
             if (preferred.isPresent()) {
-                result = ENDPOINT_DISCOVERED;
+                result = availability.get().isTrustedCertAuthority() ? ENDPOINT_DISCOVERED : UNTRUSTED_CA;
                 probeResult.put(CSW_DISCOVER_SOURCES_ID,
                         preferred.get().configurationHandlerId(CSW_SOURCE_CONFIGURATION_HANDLER_ID));
             } else {
@@ -91,7 +94,7 @@ public class DiscoverCswSourceProbeMethod extends ProbeMethod<CswSourceConfigura
         } else {
             result = INTERNAL_ERROR;
         }
-        return createProbeReport(SUCCESS_TYPES, FAILURE_TYPES, null, result).probeResults(probeResult);
+        return createProbeReport(SUCCESS_TYPES, FAILURE_TYPES, WARNING_TYPES, result).probeResults(probeResult);
     }
 
 }

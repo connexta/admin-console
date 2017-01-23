@@ -73,8 +73,7 @@ public class DiscoverCswSourceProbeMethod extends ProbeMethod<CswSourceConfigura
         Optional<String> url = CswSourceUtils.confirmEndpointUrl(config);
         if (!url.isPresent()) {
             return createProbeReport(SUCCESS_TYPES, FAILURE_TYPES, null, NO_ENDPOINT);
-        } else if (url.get()
-                .equals(CERT_ERROR)) {
+        } else if (url.get().equals(CERT_ERROR)) {
             return createProbeReport(SUCCESS_TYPES, FAILURE_TYPES, null, CERT_ERROR);
         }
 

@@ -8,30 +8,9 @@ import Sources from './wizards/sources'
 import { Home } from './home'
 import Wcpm from './adminTools/webContextPolicyManager'
 
-import { Router, Route, hashHistory, IndexRoute } from 'react-router'
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 import AppBar from 'material-ui/AppBar'
 import Flexbox from 'flexbox-react'
-
-const fixed = {
-  position: 'fixed',
-  top: 0,
-  left: 0,
-  bottom: 0,
-  right: 0
-}
-
-const App = ({ children }) => (
-  <div>
-    <Flexbox flexDirection='column' height='100vh' style={fixed}>
-      <AppBar title='Admin UI (BETA)' />
-      <Flexbox flex='1' style={{ overflowY: 'scroll', width: '100%' }}>
-        <div style={{ maxWidth: 960, margin: '0 auto' }}>{children}</div>
-      </Flexbox>
-      <Exception />
-    </Flexbox>
-  </div>
-)
 
 var DevTools
 
@@ -43,20 +22,38 @@ if (process.env.NODE_ENV !== 'production') {
   DevTools = require('./containers/dev-tools').default
 }
 
-export default () => (
+const fixed = {
+  position: 'fixed',
+  top: 0,
+  left: 0,
+  bottom: 0,
+  right: 0
+}
+
+const App = ({ children }) => (
   <MuiThemeProvider>
     <Provider store={store}>
       <div>
-        <Router history={hashHistory}>
-          <Route path='/' component={App}>
-            <IndexRoute component={Home} />
-            <Route path='/ldap' component={Ldap} />
-            <Route path='/sources' component={Sources} />
-            <Route path='/web-context-policy-manager' component={Wcpm} />
-          </Route>
-        </Router>
+        <Flexbox flexDirection='column' height='100vh' style={fixed}>
+          <AppBar title='Admin UI (BETA)' />
+          <Flexbox flex='1' style={{ overflowY: 'scroll', width: '100%' }}>
+            <div style={{ maxWidth: 960, margin: '0 auto' }}>{children}</div>
+          </Flexbox>
+          <Exception />
+        </Flexbox>
         <DevTools />
       </div>
     </Provider>
   </MuiThemeProvider>
 )
+
+export const routes = {
+  path: '/',
+  component: App,
+  indexRoute: { component: Home },
+  childRoutes: [
+    { path: 'ldap', component: Ldap },
+    { path: 'sources', component: Sources },
+    { path: 'web-context-policy-manager', component: Wcpm }
+  ]
+}

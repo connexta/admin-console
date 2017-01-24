@@ -2,9 +2,11 @@ var webpack = require('webpack')
 var validate = require('webpack-validator')
 var merge = require('webpack-merge')
 var path = require('path')
+var fs = require('fs')
 var glob = require('glob')
 var HtmlWebpackPlugin = require('html-webpack-plugin')
 var ExtractTextPlugin = require("extract-text-webpack-plugin")
+var StaticSiteGeneratorPlugin = require('static-site-generator-webpack-plugin')
 
 var config = {
   output: {
@@ -46,8 +48,17 @@ var config = {
 }
 
 if (process.env.NODE_ENV === 'production') {
+  var html = fs.readFileSync('./src/main/resources/index.html', { encoding: 'utf8' })
+  var global = {
+    window: {
+      SERVER_RENDER: true,
+    }
+  }
   config = merge.smart(config, {
     entry: ['./src/main/webapp'],
+    output: {
+      libraryTarget: 'umd'
+    },
     plugins: [
       new webpack.DefinePlugin({
         'process.env.NODE_ENV': '"production"'
@@ -60,7 +71,8 @@ if (process.env.NODE_ENV === 'production') {
           drop_console: true,
           warnings: false
         }
-      })
+      }),
+      new StaticSiteGeneratorPlugin('main', ['/'], { html: html }, global)
     ]
   })
 } else if (process.env.NODE_ENV === 'ci') {

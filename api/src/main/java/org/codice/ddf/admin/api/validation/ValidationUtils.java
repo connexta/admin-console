@@ -75,7 +75,7 @@ public class ValidationUtils {
     public static List<ConfigurationMessage> validateContextPath(String contextPath, String configId) {
         List<ConfigurationMessage> errors = validateString(contextPath, configId);
         if (errors.isEmpty() && !PATH_VALIDATOR.isValidPath(contextPath)) {
-            errors.add(createInvalidFieldMsg("Improperly formatted context path.", contextPath));
+            errors.add(createInvalidFieldMsg("Improperly formatted context path.", configId));
         }
         return errors;
     }

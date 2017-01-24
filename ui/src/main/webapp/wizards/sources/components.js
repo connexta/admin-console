@@ -15,6 +15,8 @@ import { editConfigs } from 'admin-wizard/actions'
 import LeftIcon from 'material-ui/svg-icons/hardware/keyboard-arrow-left'
 import RightIcon from 'material-ui/svg-icons/hardware/keyboard-arrow-right'
 
+import SourceInfo from 'components/Information'
+
 import {
   stageStyle,
   descriptionIconStyle,
@@ -115,13 +117,6 @@ export const ConstrainedSourceInfo = ({ id, value, label }) => (
   <WidthConstraint>
     <SourceInfo id={id} value={value} label={label} />
   </WidthConstraint>
-)
-
-export const SourceInfo = ({ id, label, value }) => (
-  <div style={{ fontSize: '16px', lineHeight: '24px', width: '100%', display: 'inline-block', position: 'relative', height: '200ms' }}>
-    <label htmlFor={id} style={{ position: 'absolute', lineHeight: '22px', top: '30px', transform: 'scale(0.75) translate(0px, -28px)', transformOrigin: 'left top 0px' }}>{label}</label>
-    <p id={id} style={{ position: 'relative', height: '100%', margin: '28px 0px 7px', whiteSpace: 'nowrap' }}>{value}</p>
-  </div>
 )
 
 const prettyName = (id) => id.replace('-', ' ')

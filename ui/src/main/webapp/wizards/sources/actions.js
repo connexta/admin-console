@@ -54,7 +54,13 @@ const discoverSources = (url, opts, dispatch, id, nextStageId, body) => {
       if (status === 400) {
         dispatch(setMessages(id, json.messages))
       } else if (status === 200) {
-        dispatch(setSourceSelections(json.probeResults.discoveredSources))
+        let sources = [ ...json.probeResults.discoveredSources ]
+        json.messages.forEach((message, i) => {
+          message.subType === "UNTRUSTED_CA"
+          ? sources[i].trustedCertAuthority = false
+          : sources[i].trustedCertAuthority = true
+        })
+        dispatch(setSourceSelections(sources))
         dispatch(clearMessages(id))
         dispatch(fetchConfigTypes(nextStageId))
       } else if (status === 500) {

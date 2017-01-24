@@ -20,7 +20,6 @@ import static org.codice.ddf.admin.api.services.WfsServiceProperties.WFS1_FACTOR
 import static org.codice.ddf.admin.api.services.WfsServiceProperties.WFS2_FACTORY_PID;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,10 +48,10 @@ public class WfsSourceUtils {
 
     public static final String GET_CAPABILITIES_PARAMS = "?service=WFS&request=GetCapabilities";
 
-    private static final List<String> VALID_WFS_CONTENT_TYPES = ImmutableList.of("text/xml",
+    private static final List<String> WFS_MIME_TYPES = ImmutableList.of("text/xml",
             "application/xml");
 
-    private static final List<String> URL_FORMATS = Arrays.asList("https://%s:%d/services/wfs",
+    private static final List<String> URL_FORMATS = ImmutableList.of("https://%s:%d/services/wfs",
             "https://%s:%d/wfs",
             "http://%s:%d/services/wfs",
             "http://%s:%d/wfs");
@@ -85,7 +84,7 @@ public class WfsSourceUtils {
                     .getStatusCode();
             contentType = ContentType.getOrDefault(response.getEntity())
                     .getMimeType();
-            if (status == HTTP_OK && VALID_WFS_CONTENT_TYPES.contains(contentType)) {
+            if (status == HTTP_OK && WFS_MIME_TYPES.contains(contentType)) {
                 return result.trustedCertAuthority(true).certError(false).available(true);
             }
         } catch (SSLPeerUnverifiedException e) {
@@ -109,7 +108,7 @@ public class WfsSourceUtils {
                         .getStatusCode();
                 contentType = ContentType.getOrDefault(response.getEntity())
                         .getMimeType();
-                if (status == HTTP_OK && VALID_WFS_CONTENT_TYPES.contains(contentType)) {
+                if (status == HTTP_OK && WFS_MIME_TYPES.contains(contentType)) {
                     return result.trustedCertAuthority(false).certError(false).available(true);
                 }
             } catch (Exception e1) {

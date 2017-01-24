@@ -17,7 +17,6 @@ import static java.net.HttpURLConnection.HTTP_OK;
 import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.PING_TIMEOUT;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,8 +34,13 @@ import org.apache.http.ssl.SSLContexts;
 import org.codice.ddf.admin.api.config.sources.OpenSearchSourceConfiguration;
 import org.codice.ddf.admin.api.handler.commons.UrlAvailability;
 
+import com.google.common.collect.ImmutableList;
+
 public class OpenSearchSourceUtils {
-    private static final List<String> URL_FORMATS = Arrays.asList(
+
+    private static final List<String> OPENSEARCH_MIME_TYPES = ImmutableList.of("application/atom+xml");
+
+    private static final List<String> URL_FORMATS = ImmutableList.of(
             "https://%s:%d/services/catalog/query",
             "https://%s:%d/catalog/query",
             "http://%s:%d/services/catalog/query",
@@ -70,7 +74,7 @@ public class OpenSearchSourceUtils {
                     .getStatusCode();
             contentType = ContentType.getOrDefault(response.getEntity())
                     .getMimeType();
-            if (status == HTTP_OK && contentType.equals("application/atom+xml")) {
+            if (status == HTTP_OK && OPENSEARCH_MIME_TYPES.contains(contentType)) {
                 return result.trustedCertAuthority(true).certError(false).available(true);
             } else {
                 return result.trustedCertAuthority(true).certError(false).available(false);
@@ -96,7 +100,7 @@ public class OpenSearchSourceUtils {
                         .getStatusCode();
                 contentType = ContentType.getOrDefault(response.getEntity())
                         .getMimeType();
-                if (status == HTTP_OK && contentType.equals("application/atom+xml")) {
+                if (status == HTTP_OK && OPENSEARCH_MIME_TYPES.contains(contentType)) {
                     return result.trustedCertAuthority(false).certError(false).available(true);
                 }
             } catch (Exception e1) {

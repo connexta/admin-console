@@ -56,7 +56,7 @@ const discoverSources = (url, opts, dispatch, id, nextStageId, body) => {
       } else if (status === 200) {
         let sources = [ ...json.probeResults.discoveredSources ]
         json.messages.forEach((message, i) => {
-          message.subType === "UNTRUSTED_CA"
+          message.subType === 'UNTRUSTED_CA'
           ? sources[i].trustedCertAuthority = false
           : sources[i].trustedCertAuthority = true
         })

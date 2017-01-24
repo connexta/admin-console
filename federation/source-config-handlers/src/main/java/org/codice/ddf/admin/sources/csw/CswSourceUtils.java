@@ -21,7 +21,6 @@ import static org.codice.ddf.admin.api.services.CswServiceProperties.CSW_PROFILE
 import static org.codice.ddf.admin.api.services.CswServiceProperties.CSW_SPEC_FACTORY_PID;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,15 +44,20 @@ import org.codice.ddf.admin.api.config.sources.CswSourceConfiguration;
 import org.codice.ddf.admin.api.handler.commons.UrlAvailability;
 import org.w3c.dom.Document;
 
+import com.google.common.collect.ImmutableList;
+
 public class CswSourceUtils {
 
 
     public static final String GET_CAPABILITIES_PARAMS = "?service=CSW&request=GetCapabilities";
 
-    private static final List<String> URL_FORMATS = Arrays.asList("https://%s:%d/services/csw",
+    private static final List<String> URL_FORMATS = ImmutableList.of("https://%s:%d/services/csw",
             "https://%s:%d/csw",
             "http://%s:%d/services/csw",
             "http://%s:%d/csw");
+
+    private static final List<String> CSW_MIME_TYPES = ImmutableList.of("text/xml",
+            "application/xml");
 
     private static final String GMD_OUTPUT_SCHEMA = "http://www.isotc211.org/2005/gmd";
 
@@ -71,7 +75,6 @@ public class CswSourceUtils {
         UrlAvailability result = new UrlAvailability(url);
         String contentType;
         int status;
-        long contentLength;
         HttpClient client = HttpClientBuilder.create()
                 .setDefaultRequestConfig(RequestConfig.custom()
                         .setConnectTimeout(PING_TIMEOUT)
@@ -85,9 +88,7 @@ public class CswSourceUtils {
                     .getStatusCode();
             contentType = ContentType.getOrDefault(response.getEntity())
                     .getMimeType();
-            contentLength = response.getEntity()
-                    .getContentLength();
-            if (status == HTTP_OK && contentType.equals("text/xml") && contentLength > 0) {
+            if (status == HTTP_OK && CSW_MIME_TYPES.contains(contentType)) {
                 return result.trustedCertAuthority(true).certError(false).available(true);
             } else {
                 return result.trustedCertAuthority(true).certError(false).available(false);
@@ -114,9 +115,7 @@ public class CswSourceUtils {
                         .getStatusCode();
                 contentType = ContentType.getOrDefault(response.getEntity())
                         .getMimeType();
-                contentLength = response.getEntity()
-                        .getContentLength();
-                if (status == HTTP_OK && contentType.equals("text/xml") && contentLength > 0) {
+                if (status == HTTP_OK && CSW_MIME_TYPES.contains(contentType)) {
                     return result.trustedCertAuthority(false).certError(false).available(true);
                 }
             } catch (Exception e1) {

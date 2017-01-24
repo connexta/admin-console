@@ -10,12 +10,11 @@ import Description from 'components/Description'
 
 export default () => (
   <Stage>
-    <Title>Success!</Title>
+    <Title>LDAP configurations have been successfully saved!</Title>
 
     <Description>
-      The LDAP configuration has been successfully saved! Now that your
-      LDAP is configured, the final step is to use it to secure REST
-      endpoints.
+      Now that your LDAP is configured, the final step is to use it to secure REST
+      endpoints using the Web Context Policy Manager.
     </Description>
 
     <ActionGroup>

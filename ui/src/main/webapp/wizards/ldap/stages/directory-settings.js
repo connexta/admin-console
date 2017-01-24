@@ -101,8 +101,10 @@ const DirectorySettings = (props) => {
 
         <Title>LDAP Directory Structure</Title>
         <Description>
-          Next we need to configure the directories to for users/members and the attributes to use.
-          Below is the LDAP Query Tool, capable of executing queries against the connected LDAP to discover the required field values
+          Next we need to configure the directories for users/members and decide which attributes to use.
+          Default values have been filled out below and some other recommended values available via each
+          field's drop-down menu. This page also has an LDAP Query Tool capable of executing queries
+          against the connected LDAP to assist in customizing these settings.
         </Description>
         <InputAuto id='baseUserDn' disabled={disabled} label='Base User DN' />
         <InputAuto id='userNameAttribute' disabled={disabled} label='User Name Attribute' />

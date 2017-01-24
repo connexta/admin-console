@@ -48,8 +48,10 @@ const BindSettings = (props) => {
       <Spinner submitting={submitting}>
         <Title>LDAP Bind User Settings</Title>
         <Description>
-          Now that we've figured out the network environment, we need to
-          bind a user to the LDAP Store to retrieve additional information.
+          In order for the system to retrieve information from the LDAP store, it needs to bind to
+          a user that has permission to search the LDAP. This user will be used by the system whenever
+          it needs to access the LDAP store. Please provide that user's distinguished name, their
+          password, and the preferred user binding method.
         </Description>
 
         <Input id='bindUserDn' disabled={disabled} label='Bind User DN' />
@@ -62,9 +64,10 @@ const BindSettings = (props) => {
         {/* TODO GSSAPI SASL only */}
         {/* <Input id='bindKdcAddress' disabled={disabled} label='KDC Address (for Kerberos authentication)' /> */}
         {/* TODO GSSAPI and Digest MD5 SASL only */}
+        {/* Realm is needed for Kerberos and MD5 auth, currently only MD5 is supported by the wizard */}
         {
           (bindUserMethod === 'Digest MD5 SASL')
-            ? (<Input id='bindRealm' disabled={disabled} label='Realm (for Kerberos and Digest MD5 authentication)' />)
+            ? (<Input id='bindRealm' disabled={disabled} label='Realm (for Digest MD5 authentication)' />)
             : null
         }
 

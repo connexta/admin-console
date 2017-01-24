@@ -145,7 +145,6 @@ const LdapAttributeMappingStage = (props) => {
           claims.
           Not all attributes must be mapped but any unmapped attributes will not be used for
           authentication.
-          Claims can be mapped to 1 or more attributes.
         </Description>
 
         <AttributeMapper disabled={disabled} configs={configs} />

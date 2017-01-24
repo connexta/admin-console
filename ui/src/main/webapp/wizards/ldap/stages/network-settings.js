@@ -36,7 +36,10 @@ const NetworkSettings = (props) => {
       <Spinner submitting={submitting}>
         <Title>LDAP Network Settings</Title>
         <Description>
-          Lets start with the network configurations of your LDAP store.
+          To establish a connection to the remote LDAP store, we need the hostname of the
+          LDAP machine, the port number that the LDAP service is running on, and the
+          encryption method. Typically, port 636 uses LDAPS encryption and port 389 uses
+          StartTLS.
         </Description>
 
         <Hostname id='hostName' disabled={disabled} />

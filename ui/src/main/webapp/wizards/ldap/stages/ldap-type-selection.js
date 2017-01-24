@@ -33,9 +33,11 @@ const LdapTypes = [
 
 const LdapTypeSelection = ({ disabled, prev, next, configs: { ldapType } = {} }) => (
   <Stage>
-    <Title>LDAP Type Selection</Title>
+    <Title>What type of LDAP are you setting up?</Title>
     <Description>
-      Select the type of LDAP you plan to connect to.
+      This will help us recommend the best options for setting up your LDAP connection.
+      If you are unsure, choose 'Not Sure/None of the Above' and we'll do our best to
+      determine the connection type.
     </Description>
     <RadioSelection
       id='ldapType'

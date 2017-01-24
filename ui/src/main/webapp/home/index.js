@@ -5,16 +5,17 @@ import { Map } from 'immutable'
 import Flexbox from 'flexbox-react'
 import { Link } from 'react-router'
 
+import { poll, stopPolling } from 'redux-polling'
+import Mount from 'react-mount'
+
 import { get, post } from 'redux-fetch'
 
 import Paper from 'material-ui/Paper'
 import AccountIcon from 'material-ui/svg-icons/action/account-circle'
 import LanguageIcon from 'material-ui/svg-icons/action/language'
-import RefreshIcon from 'material-ui/svg-icons/navigation/refresh'
 import VpnLockIcon from 'material-ui/svg-icons/notification/vpn-lock'
 import Divider from 'material-ui/Divider'
 import { cyan500 } from 'material-ui/styles/colors'
-import IconButton from 'material-ui/IconButton'
 import RaisedButton from 'material-ui/RaisedButton'
 
 import * as styles from './styles.less'
@@ -34,10 +35,12 @@ const retrieve = (id) => async (dispatch) => {
   }
 }
 
-const refresh = () => (dispatch) => {
-  dispatch(retrieve('sources'))
-  dispatch(retrieve('ldap'))
-}
+const refresh = poll('home', () => (dispatch) =>
+  Promise.all([
+    dispatch(retrieve('sources')),
+    dispatch(retrieve('ldap'))
+  ])
+)
 
 export const deleteConfig = ({ configurationType, factoryPid, servicePid }) => async (dispatch) => {
   const url = '/admin/beta/config/persist/' + configurationType + '/delete'
@@ -196,11 +199,12 @@ const Title = ({ children }) => (
   <h1 className={styles.title}>{children}</h1>
 )
 
-const SourcesHomeView = ({ sourceConfigs = [], ldapConfigs = [], onRefresh }) => (
+const SourcesHomeView = ({ sourceConfigs = [], ldapConfigs = [], onRefresh, offRefresh }) => (
   <div style={{width: '100%'}}>
+    <Mount on={onRefresh} off={offRefresh} id='home' />
+
     <Title>
       Setup Wizards
-      <IconButton onClick={onRefresh}><RefreshIcon /></IconButton>
     </Title>
 
     <Flexbox flexDirection='row' flexWrap='wrap' style={{width: '100%'}}>
@@ -241,5 +245,5 @@ const SourcesHomeView = ({ sourceConfigs = [], ldapConfigs = [], onRefresh }) =>
 export const Home = connect((state) => ({
   sourceConfigs: getSourceConfigs(state),
   ldapConfigs: getLdapConfigs(state)
-}), { onRefresh: refresh })(SourcesHomeView)
+}), { onRefresh: refresh, offRefresh: stopPolling })(SourcesHomeView)
 

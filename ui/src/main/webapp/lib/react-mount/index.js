@@ -9,8 +9,10 @@ export default class extends Component {
     }
   }
   componentWillUnmount () {
+    const { off, ...rest } = this.props
+    delete rest.on // delete potentially passed prop
     if (typeof this.props.off === 'function') {
-      this.props.off()
+      off(rest)
     }
   }
   render () {

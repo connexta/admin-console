@@ -12,6 +12,10 @@ const backendError = (state = {}, { type, err } = {}) => {
 
 export const getBackendErrors = (state) => state.get('backendError')
 
+import polling from 'redux-polling'
+import * as pollingSelectors from 'redux-polling/selectors'
+export const isPolling = (state, id) => pollingSelectors.isPolling(state.get('polling'), id)
+
 import wizard, * as ldap from 'admin-wizard/reducer'
 import sourceWizard from '../wizards/sources/reducer'
 import home from '../home'
@@ -35,4 +39,4 @@ export const getEditingBinNumber = (state) => webContext.getEditingBinNumber(sta
 export const getConfirmDelete = (state) => webContext.getConfirmDelete(state.get('wcpm'))
 export const getWcpmErrors = (state) => webContext.getWcpmErrors(state.get('wcpm'))
 
-export default combineReducers({ fetch, wizard, backendError, sourceWizard, home, wcpm })
+export default combineReducers({ fetch, wizard, backendError, sourceWizard, home, wcpm, polling })

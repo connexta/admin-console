@@ -7,11 +7,8 @@ import { setNavStage, setConfigSource } from './actions'
 import IconButton from 'material-ui/IconButton'
 import {RadioButton, RadioButtonGroup} from 'material-ui/RadioButton'
 import Flexbox from 'flexbox-react'
-import CheckIcon from 'material-ui/svg-icons/action/check-circle'
-import CloseIcon from 'material-ui/svg-icons/navigation/cancel'
 import AlertIcon from 'material-ui/svg-icons/alert/warning'
 import InfoIcon from 'material-ui/svg-icons/action/info'
-import {green500, red500} from 'material-ui/styles/colors'
 import RaisedButton from 'material-ui/RaisedButton'
 import { editConfigs } from 'admin-wizard/actions'
 
@@ -91,19 +88,6 @@ const DescriptionIcon = ({ description }) => {
   } else {
     return null
   }
-}
-
-const statusPageStyles = { width: '300px', height: '300px' }
-
-export const StatusPage = ({succeeded}) => {
-  if (succeeded) {
-    return (
-      <CheckIcon style={statusPageStyles} color={green500} />
-    )
-  }
-  return (
-    <CloseIcon style={statusPageStyles} color={red500} />
-  )
 }
 
 export const ButtonBox = ({ disabled, id, path = [], label, description, children = [] }) => (

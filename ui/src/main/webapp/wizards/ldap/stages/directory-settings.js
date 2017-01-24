@@ -109,7 +109,7 @@ const DirectorySettings = (props) => {
         <InputAuto id='baseUserDn' disabled={disabled} label='Base User DN' />
         <InputAuto id='userNameAttribute' disabled={disabled} label='User Name Attribute' />
         <InputAuto id='baseGroupDn' disabled={disabled} label='Base Group DN' />
-        {ldapUseCase === 'loginAndCredentialStore' || ldapUseCase === 'credentialStore'
+        {ldapUseCase === 'authenticationAndAttributeStore' || ldapUseCase === 'attributeStore'
           ? <div>
             <InputAuto id='groupObjectClass' disabled={disabled} label='LDAP Group ObjectClass' />
             <InputAuto id='membershipAttribute' disabled={disabled} label='LDAP Membership Attribute' />
@@ -130,7 +130,7 @@ const DirectorySettings = (props) => {
             onClick={test}
             disabled={disabled}
             testId='dir-struct'
-            nextStageId={ldapUseCase === 'loginAndCredentialStore' || ldapUseCase === 'credentialStore' ? 'attribute-mapping' : 'confirm'} />
+            nextStageId={ldapUseCase === 'authenticationAndAttributeStore' || ldapUseCase === 'attributeStore' ? 'attribute-mapping' : 'confirm'} />
         </ActionGroup>
 
         {messages.map((msg, i) => <Message key={i} {...msg} />)}

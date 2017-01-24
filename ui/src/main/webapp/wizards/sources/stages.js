@@ -10,6 +10,8 @@ import { Link } from 'react-router'
 import { setDefaults } from '../../actions'
 import Mount from 'react-mount'
 
+import LargeStatusIndicator from 'components/LargeStatusIndicator'
+
 import {
   stageStyle
 } from './styles.less'
@@ -20,7 +22,6 @@ import {
   ConstrainedHostnameInput,
   ConstrainedPortInput,
   ConstrainedSelectInput,
-  StatusPage,
   ButtonBox,
   Info,
   CenteredElements,
@@ -122,7 +123,7 @@ const ConfirmationStageView = ({ selectedSource, persistConfig, sourceName, conf
       <ConstrainedInput id='sourceName' label='Source Name' description={sourceNameDescription} />
       <ConstrainedSourceInfo label='Source Address' value={selectedSource.endpointUrl} />
       <ConstrainedSourceInfo label='Username' value={selectedSource.sourceUserName || 'none'} />
-      <ConstrainedSourceInfo label='Password' value={selectedSource.sourceUserPassword || 'none'} />
+      <ConstrainedSourceInfo label='Password' value={selectedSource.sourceUserPassword ? '*****' : 'none'} />
       <Submit label='Finish' disabled={sourceName === undefined || sourceName === ''} onClick={() => persistConfig('/admin/beta/config/persist/' + (selectedSource.configurationHandlerId || configType) + '/create', null, 'completedStage', configType)} />
     </CenteredElements>
   </NavPanes>
@@ -144,7 +145,7 @@ const CompletedStageView = ({ resetSourceWizardState }) => (
   <Flexbox className={stageStyle} justifyContent='center' flexDirection='row'>
     <CenteredElements>
       <Info title={completedTitle} subtitle={completedSubtitle} />
-      <StatusPage succeeded />
+      <LargeStatusIndicator success />
       <ButtonBox>
         <Link to='/'>
           <Submit label='Go Home' onClick={resetSourceWizardState} />

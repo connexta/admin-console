@@ -10,16 +10,16 @@ import { RadioSelection } from 'admin-wizard/inputs'
 
 const LdapUseCases = [
   {
-    value: 'login',
-    label: 'Login'
+    value: 'authentication',
+    label: 'Authentication'
   },
   {
-    value: 'credentialStore',
-    label: 'Credential store'
+    value: 'attributeStore',
+    label: 'Attribute store'
   },
   {
-    value: 'loginAndCredentialStore',
-    label: 'Login and Credential Store'
+    value: 'authenticationAndAttributeStore',
+    label: 'Authentication and Attribute Store'
   }
 ]
 

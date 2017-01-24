@@ -12,10 +12,10 @@ import Spinner from 'components/Spinner'
 
 const useCaseDescription = (ldapUseCase) => {
   switch (ldapUseCase) {
-    case 'loginAndCredentialStore':
-      return 'login source & credential store'
-    case 'login' :
-      return 'login source'
+    case 'authenticationAndAttributeStore':
+      return 'authentication source & attribute store'
+    case 'authentication' :
+      return 'authentication source'
     default:
       return 'credential store'
   }

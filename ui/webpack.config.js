@@ -4,6 +4,7 @@ var merge = require('webpack-merge')
 var path = require('path')
 var glob = require('glob')
 var HtmlWebpackPlugin = require('html-webpack-plugin')
+var ExtractTextPlugin = require("extract-text-webpack-plugin")
 
 var config = {
   output: {
@@ -22,7 +23,7 @@ var config = {
       },
       {
         test: /\.less$/,
-        loader: 'style!css?modules&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]!less'
+        loader: ExtractTextPlugin.extract('style-loader', 'css?sourceMap&modules&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]!less?sourceMap')
       },
       {
         test: /\.json$/,
@@ -39,7 +40,8 @@ var config = {
   plugins: [
     new webpack.ProvidePlugin({
       Promise: 'es6-promise'
-    })
+    }),
+    new ExtractTextPlugin("[name].css")
   ]
 }
 

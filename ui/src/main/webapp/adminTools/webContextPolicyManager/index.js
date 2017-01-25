@@ -305,7 +305,7 @@ const PolicyBin = ({ policyBin, binNumber, editing, editingBinNumber }) => (
         <AuthTypesGroup bin={policyBin} binNumber={binNumber} editing={editing} />
       </Flexbox>
       <Flexbox style={{ width: '60%', padding: '5px' }} flexDirection='column'>
-        <p className={infoSubtitleLeft}>Required Attributes</p>
+        <p className={infoSubtitleLeft}>{(editing) ? 'Required Attributes (Optional)' : 'Required Attributes'}</p>
         <Divider />
         <Flexbox flexDirection='column'>
           <AttributeTableGroup bin={policyBin} binNumber={binNumber} editing={editing} />

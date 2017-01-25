@@ -112,10 +112,10 @@ const DirectorySettings = (props) => {
         {ldapUseCase === 'authenticationAndAttributeStore' || ldapUseCase === 'attributeStore'
           ? <div>
             <InputAuto id='groupObjectClass' disabled={disabled} label='LDAP Group ObjectClass' />
-          <InputAuto id='groupAttributeHoldingMember' disabled={disabled}
-                     label='Group Attribute Holding Member References'/>
-          <InputAuto id='memberAttributeReferencedInGroup' disabled={disabled}
-                     label='Member Attribute Referenced in Groups'/>
+            <InputAuto id='groupAttributeHoldingMember' disabled={disabled}
+              label='Group Attribute Holding Member References' />
+            <InputAuto id='memberAttributeReferencedInGroup' disabled={disabled}
+              label='Member Attribute Referenced in Groups' />
           </div>
           : null}
 

@@ -45,37 +45,37 @@ export const WidthConstraint = ({ children }) => (
   </div>
 )
 
-export const ConstrainedInput = ({ id, label, description, value }) => (
+export const ConstrainedInput = ({ id, label, description, value, ...rest }) => (
   <WidthConstraint>
-    <Input id={id} label={label} />
+    <Input id={id} label={label} {...rest} />
     <DescriptionIcon description={description} />
   </WidthConstraint>
 )
 
-export const ConstrainedPasswordInput = ({ id, label, description }) => (
+export const ConstrainedPasswordInput = ({ id, label, description, ...rest }) => (
   <WidthConstraint>
-    <Password id={id} label={label} />
+    <Password id={id} label={label} {...rest} />
     <DescriptionIcon description={description} />
   </WidthConstraint>
 )
 
-export const ConstrainedHostnameInput = ({ id, label, description }) => (
+export const ConstrainedHostnameInput = ({ id, label, description, ...rest }) => (
   <WidthConstraint>
-    <Hostname id={id} label={label} />
+    <Hostname id={id} label={label} {...rest} />
     <DescriptionIcon description={description} />
   </WidthConstraint>
 )
 
-export const ConstrainedPortInput = ({ id, label, description }) => (
+export const ConstrainedPortInput = ({ id, label, description, ...rest }) => (
   <WidthConstraint>
-    <Port id={id} label={label} value={8993} />
+    <Port id={id} label={label} value={8993} {...rest} />
     <DescriptionIcon description={description} />
   </WidthConstraint>
 )
 
-export const ConstrainedSelectInput = ({ id, label, description, options }) => (
+export const ConstrainedSelectInput = ({ id, label, description, options, ...rest }) => (
   <WidthConstraint>
-    <Select id={id} label={label} options={options} />
+    <Select id={id} label={label} options={options} {...rest} />
     <DescriptionIcon description={description} />
   </WidthConstraint>
 )
@@ -113,9 +113,9 @@ export const CenteredElements = ({ children, stageIndex, className }) => (
   </Flexbox>
 )
 
-export const ConstrainedSourceInfo = ({ id, value, label }) => (
+export const ConstrainedSourceInfo = ({ id, value, label, ...rest }) => (
   <WidthConstraint>
-    <SourceInfo id={id} value={value} label={label} />
+    <SourceInfo id={id} value={value} label={label} {...rest} />
   </WidthConstraint>
 )
 

@@ -58,23 +58,41 @@ const discoveryStageDefaults = {
   sourceHostName: 'localhost',
   sourcePort: 8993
 }
-const DiscoveryStageView = ({ testSources, setDefaults, messages }) => (
+const DiscoveryStageView = ({ testSources, setDefaults, messages, configs }) => (
   <Mount on={() => setDefaults(discoveryStageDefaults)}>
     <NavPanes backClickTarget='welcomeStage' forwardClickTarget='sourceSelectionStage'>
       <CenteredElements>
         <Info title={discoveryTitle} subtitle={discoverySubtitle} />
-        <ConstrainedHostnameInput id='sourceHostName' label='Hostname' />
-        <ConstrainedPortInput id='sourcePort' label='Port' />
-        <ConstrainedInput id='sourceUserName' label='Username (optional)' />
-        <ConstrainedPasswordInput id='sourceUserPassword' label='Password (optional)' />
+        <ConstrainedHostnameInput
+          id='sourceHostName'
+          label='Hostname'
+          errorText={(isEmpty(configs.sourceHostName)) ? 'Cannot be blank' : null} />
+        <ConstrainedPortInput
+          id='sourcePort'
+          label='Port'
+          errorText={(configs.sourcePort < 0) ? 'Invalid port number' : null} />
+        <ConstrainedInput
+          id='sourceUserName'
+          label='Username (optional)'
+          errorText={(isEmpty(configs.sourceUserName) && !isEmpty(configs.sourceUserPassword)) ? 'Password with no username' : null} />
+        <ConstrainedPasswordInput
+          id='sourceUserPassword'
+          label='Password (optional)'
+          errorText={(!isEmpty(configs.sourceUserName) && isEmpty(configs.sourceUserPassword)) ? 'Username with no password' : null} />
         {messages.map((msg, i) => <Message key={i} {...msg} />)}
-        <Submit label='Check' onClick={() => testSources('/admin/beta/config/probe/sources/discover-sources', 'sources', 'sourceSelectionStage', 'source')} />
+        <Submit
+          label='Check'
+          disabled={isEmpty(configs.sourceHostName) ||
+            configs.sourcePort < 0 ||
+            isEmpty(configs.sourceUserName) !== isEmpty(configs.sourceUserPassword)}
+          onClick={() => testSources('/admin/beta/config/probe/sources/discover-sources', 'sources', 'sourceSelectionStage', 'source')} />
       </CenteredElements>
     </NavPanes>
   </Mount>
 )
 export const DiscoveryStage = connect((state) => ({
-  messages: getMessages(state, 'source')
+  messages: getMessages(state, 'source'),
+  configs: getAllConfig(state)
 }), {
   testSources,
   setDefaults
@@ -123,7 +141,7 @@ const ConfirmationStageView = ({ selectedSource, persistConfig, sourceName, conf
       <ConstrainedSourceInfo label='Source Address' value={selectedSource.endpointUrl} />
       <ConstrainedSourceInfo label='Username' value={selectedSource.sourceUserName || 'none'} />
       <ConstrainedSourceInfo label='Password' value={selectedSource.sourceUserPassword ? '*****' : 'none'} />
-      <Submit label='Finish' disabled={sourceName === undefined || sourceName === ''} onClick={() => persistConfig('/admin/beta/config/persist/' + (selectedSource.configurationHandlerId || configType) + '/create', null, 'completedStage', configType)} />
+      <Submit label='Finish' disabled={sourceName === undefined || sourceName.trim() === ''} onClick={() => persistConfig('/admin/beta/config/persist/' + (selectedSource.configurationHandlerId || configType) + '/create', null, 'completedStage', configType)} />
     </CenteredElements>
   </NavPanes>
 )
@@ -136,6 +154,10 @@ export const ConfirmationStage = connect((state) => ({
 }), ({
   persistConfig
 }))(ConfirmationStageView)
+
+const isEmpty = (string) => {
+  return !string || !string.trim()
+}
 
 // Completed Stage
 const completedTitle = 'All Done!'

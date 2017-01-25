@@ -106,12 +106,16 @@ const DirectorySettings = (props) => {
           field's drop-down menu. This page also has an LDAP Query Tool capable of executing queries
           against the connected LDAP to assist in customizing these settings.
         </Description>
-        <InputAuto id='baseUserDn' disabled={disabled} label='Base User DN' />
-        <InputAuto id='userNameAttribute' disabled={disabled} label='User Name Attribute' />
-        <InputAuto id='baseGroupDn' disabled={disabled} label='Base Group DN' />
+        <InputAuto id='baseUserDn' disabled={disabled} label='Base User DN'
+          tooltip='Full LDAP path to where users can be found.'/>
+        <InputAuto id='userNameAttribute' disabled={disabled} label='User Name Attribute'
+          tooltip='Attribute used to designate the user’s name in LDAP. Typically uid or cn.'/>
+        <InputAuto id='baseGroupDn' disabled={disabled} label='Base Group DN'
+          tooltip='Full LDAP path to where groups can be found.'/>
         {ldapUseCase === 'authenticationAndAttributeStore' || ldapUseCase === 'attributeStore'
           ? <div>
-            <InputAuto id='groupObjectClass' disabled={disabled} label='LDAP Group ObjectClass' />
+            <InputAuto id='groupObjectClass' disabled={disabled} label='LDAP Group ObjectClass'
+              tooltip='ObjectClass that defines structure for group membership in LDAP. Typically groupOfNames.'/>
             <InputAuto id='groupAttributeHoldingMember' disabled={disabled}
               label='Group Attribute Holding Member References' />
             <InputAuto id='memberAttributeReferencedInGroup' disabled={disabled}

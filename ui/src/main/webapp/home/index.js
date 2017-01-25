@@ -152,23 +152,25 @@ export const LdapTile = connect(null, (dispatch, props) => ({
 }))(LdapTileView)
 
 const TileLink = ({ to, title, subtitle, children }) => (
-  <Link to={to}>
-    <Paper className={styles.main}>
-      <div style={{width: '100%', height: '100%'}}>
-        <Flexbox
-          alignItems='center'
-          flexDirection='column'
-          justifyContent='center'
-          style={{width: '100%', height: '100%'}}>
+  <div>
+    <Link to={to}>
+      <Paper className={styles.main}>
+        <div style={{width: '100%', height: '100%'}}>
+          <Flexbox
+            alignItems='center'
+            flexDirection='column'
+            justifyContent='center'
+            style={{width: '100%', height: '100%'}}>
 
-          <p className={styles.titleTitle}>{title}</p>
-          {children}
-          <p className={styles.tileSubtitle}>{subtitle}</p>
+            <p className={styles.titleTitle}>{title}</p>
+            {children}
+            <p className={styles.tileSubtitle}>{subtitle}</p>
 
-        </Flexbox>
-      </div>
-    </Paper>
-  </Link>
+          </Flexbox>
+        </div>
+      </Paper>
+    </Link>
+  </div>
 )
 
 const SourceConfigTiles = ({ sourceConfigs }) => {

@@ -16,6 +16,7 @@ package org.codice.ddf.admin.api.validation;
 import static org.codice.ddf.admin.api.config.context.ContextPolicyBin.AUTH_TYPES;
 import static org.codice.ddf.admin.api.config.context.ContextPolicyBin.CONTEXT_PATHS;
 import static org.codice.ddf.admin.api.config.context.ContextPolicyBin.REALM;
+import static org.codice.ddf.admin.api.config.context.ContextPolicyBin.REQ_ATTRIS;
 import static org.codice.ddf.admin.api.handler.ConfigurationMessage.createInvalidFieldMsg;
 import static org.codice.ddf.admin.api.handler.ConfigurationMessage.createMissingRequiredFieldMsg;
 import static org.codice.ddf.admin.api.validation.ValidationUtils.validateString;
@@ -55,7 +56,13 @@ public class SecurityValidationUtils {
                     .map(cpb -> cpb.validate(Arrays.asList(REALM, CONTEXT_PATHS, AUTH_TYPES)))
                     .flatMap(List::stream)
                     .collect(Collectors.toList()));
-            // TODO: tbatie - 1/16/17 - Check if the req attri fields has values, if so validate
+
+            errors.addAll(bins.stream()
+                    .filter(cpb -> cpb.requiredAttributes() != null && !cpb.requiredAttributes()
+                            .isEmpty())
+                    .map(cpb -> cpb.validate(Arrays.asList(REQ_ATTRIS)))
+                    .flatMap(List::stream)
+                    .collect(Collectors.toList()));
         }
         return errors;
     }

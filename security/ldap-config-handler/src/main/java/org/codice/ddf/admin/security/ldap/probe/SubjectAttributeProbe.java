@@ -22,7 +22,8 @@ import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.BIND_USER_P
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.ENCRYPTION_METHOD;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.HOST_NAME;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.LDAP_TYPE;
-import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.MEMBERSHIP_ATTRIBUTE;
+import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.GROUP_ATTRIBUTE_HOLDING_MEMBER;
+import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.PORT;
 import static org.codice.ddf.admin.api.services.PolicyManagerServiceProperties.STS_CLAIMS_CONFIGURATION_CONFIG_ID;
 import static org.codice.ddf.admin.api.services.PolicyManagerServiceProperties.STS_CLAIMS_PROPS_KEY_CLAIMS;
@@ -59,8 +60,7 @@ public class SubjectAttributeProbe extends ProbeMethod<LdapConfiguration> {
             BIND_USER_DN,
             BIND_USER_PASSWORD,
             BIND_METHOD,
-            BASE_GROUP_DN,
-            MEMBERSHIP_ATTRIBUTE);
+            BASE_GROUP_DN, GROUP_ATTRIBUTE_HOLDING_MEMBER, MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP);
 
     private static final List<String> OPTIONAL_FIELDS = ImmutableList.of(
             BIND_REALM,
@@ -102,9 +102,13 @@ public class SubjectAttributeProbe extends ProbeMethod<LdapConfiguration> {
                     serverGuesser.getClaimAttributeOptions(configuration.baseUserDn());
         } catch (SearchResultReferenceIOException | LdapException e) {
             LOGGER.warn("Error retrieving attributes from LDAP server; this may indicate a "
-                            + "configuration issue with baseGroupDN {} or membershipAttribute {}",
+                            + "configuration issue with {}: {}, {}: {}, or {}: {}",
+                    LdapConfiguration.BASE_GROUP_DN,
                     configuration.baseGroupDn(),
-                    configuration.membershipAttribute());
+                    LdapConfiguration.GROUP_ATTRIBUTE_HOLDING_MEMBER,
+                    configuration.groupAttributeHoldingMember(),
+                    LdapConfiguration.MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP,
+                    configuration.memberAttributeReferencedInGroup());
         }
 
         // TODO: tbatie - 1/19/17 - Need to return messages about the probe result and/or if something goes wrong

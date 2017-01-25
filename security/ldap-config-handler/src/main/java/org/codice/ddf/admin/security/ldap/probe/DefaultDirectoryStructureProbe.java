@@ -24,7 +24,8 @@ import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.ENCRYPTION_
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.GROUP_OBJECT_CLASS;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.HOST_NAME;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.LDAP_TYPE;
-import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.MEMBERSHIP_ATTRIBUTE;
+import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.GROUP_ATTRIBUTE_HOLDING_MEMBER;
+import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.PORT;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.QUERY;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.QUERY_BASE;
@@ -95,7 +96,10 @@ public class DefaultDirectoryStructureProbe extends ProbeMethod<LdapConfiguratio
             probeReport.probeResult(BASE_GROUP_DN, guesser.getGroupBaseChoices());
             probeReport.probeResult(USER_NAME_ATTRIBUTE, guesser.getUserNameAttribute());
             probeReport.probeResult(GROUP_OBJECT_CLASS, guesser.getGroupObjectClass());
-            probeReport.probeResult(MEMBERSHIP_ATTRIBUTE, guesser.getMembershipAttribute());
+            probeReport.probeResult(GROUP_ATTRIBUTE_HOLDING_MEMBER,
+                    guesser.getGroupAttributeHoldingMember());
+            probeReport.probeResult(MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP,
+                    guesser.getMemberAttributeReferencedInGroup());
 
             // TODO RAP 13 Dec 16: Better query, perhaps driven by guessers?
             probeReport.probeResult(QUERY, Collections.singletonList("objectClass=*"));

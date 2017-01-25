@@ -28,11 +28,11 @@ import org.codice.ddf.admin.api.configurator.Operation;
 
 /**
  * Transactional handler for persisting property file changes.
- *
+ * <p>
  * <b> This code is experimental. While this class is functional and tested, it may change or be
  * removed in a future version of the library. </b>
  */
-public abstract class PropertyOperation implements Operation<Void, Properties> {
+public abstract class PropertyOperation implements Operation<Void, Map<String, String>> {
     /**
      * Transactional handler for creating property files
      */
@@ -43,9 +43,9 @@ public abstract class PropertyOperation implements Operation<Void, Properties> {
 
         @Override
         public Void commit() throws ConfiguratorException {
-            Properties properties = new Properties();
-            properties.putAll(configs);
-            saveProperties(properties);
+            Map<String, String> propertyMap = new HashMap<>();
+            propertyMap.putAll(configs);
+            saveProperties(propertyMap);
 
             return null;
         }
@@ -94,29 +94,30 @@ public abstract class PropertyOperation implements Operation<Void, Properties> {
 
         @Override
         public Void commit() throws ConfiguratorException {
-            Properties properties = new Properties();
+            Map<String, String> propertyMap = new HashMap<>();
 
             if (keepIgnored) {
-                properties.putAll(currentProperties);
+                propertyMap.putAll(currentProperties);
             }
-            properties.putAll(configs);
-            saveProperties(properties);
+            propertyMap.putAll(configs);
+            saveProperties(propertyMap);
 
             return null;
         }
     }
 
-    protected final File configFile;
+    final File configFile;
 
     protected final Map<String, String> configs;
 
-    protected final Properties currentProperties;
+    final Map<String, String> currentProperties;
 
     private PropertyOperation(Path configFile, Map<String, String> configs,
             boolean loadCurrentProps) {
         this.configFile = configFile.toFile();
         this.configs = new HashMap<>(configs);
 
+        currentProperties = new HashMap<>();
         if (loadCurrentProps) {
             Properties result;
             try {
@@ -133,9 +134,10 @@ public abstract class PropertyOperation implements Operation<Void, Properties> {
                                 .getName()));
             }
 
-            currentProperties = result;
-        } else {
-            currentProperties = new Properties();
+            result.keySet()
+                    .stream()
+                    .map(String.class::cast)
+                    .forEach(k -> currentProperties.put(k, result.getProperty(k)));
         }
     }
 
@@ -183,11 +185,13 @@ public abstract class PropertyOperation implements Operation<Void, Properties> {
     }
 
     @Override
-    public Properties readState() throws ConfiguratorException {
+    public Map<String, String> readState() throws ConfiguratorException {
         return currentProperties;
     }
 
-    protected void saveProperties(Properties properties) throws ConfiguratorException {
+    void saveProperties(Map<String, String> propertyMap) throws ConfiguratorException {
+        Properties properties = new Properties();
+        properties.putAll(propertyMap);
         try (FileOutputStream out = new FileOutputStream(configFile)) {
             properties.store(out, null);
         } catch (IOException e) {

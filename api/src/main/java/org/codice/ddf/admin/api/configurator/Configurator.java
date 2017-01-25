@@ -20,7 +20,6 @@ import java.util.Collections;
 import java.util.Deque;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Properties;
 import java.util.UUID;
 
 import javax.management.MBeanServerInvocationHandler;
@@ -213,7 +212,7 @@ public class Configurator {
      * @param propFile the property file to query
      * @return the current set of key:value pairs
      */
-    public Properties getProperties(Path propFile) {
+    public Map<String, String> getProperties(Path propFile) {
         return PropertyOperation.forUpdate(propFile, Collections.emptyMap(), true)
                 .readState();
     }

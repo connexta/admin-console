@@ -47,7 +47,8 @@ public class LdapClaimsHandlerServiceProperties {
     public static final String PROPERTY_FILE_LOCATION = "propertyFileLocation";
     // ---
 
-    public static final LdapConfiguration ldapClaimsHandlerServiceToLdapConfig(Map<String, Object> props) {
+    public static LdapConfiguration ldapClaimsHandlerServiceToLdapConfig(
+            Map<String, Object> props) {
         LdapConfiguration config = new LdapConfiguration();
         config.servicePid(props.get(SERVICE_PID_KEY) == null ? null : (String) props.get(SERVICE_PID_KEY));
         URI ldapUri = getUriFromProperty((String) props.get(URL));
@@ -64,20 +65,21 @@ public class LdapClaimsHandlerServiceProperties {
         config.baseUserDn((String) props.get(USER_BASE_DN));
         config.baseGroupDn((String) props.get(GROUP_BASE_DN));
         config.groupObjectClass((String) props.get(OBJECT_CLASS));
-        config.membershipAttribute((String) props.get(MEMBERSHIP_USER_ATTRIBUTE));
-        config.memberNameAttribute((String) props.get(MEMBER_NAME_ATTRIBUTE));
+        config.groupAttributeHoldingMember((String) props.get(MEMBERSHIP_USER_ATTRIBUTE));
+        config.memberAttributeReferencedInGroup((String) props.get(MEMBER_NAME_ATTRIBUTE));
 
         String attributeMappingsPath = (String) props.get(PROPERTY_FILE_LOCATION);
         config.attributeMappingsPath(attributeMappingsPath);
         Map<String, String> attributeMappings =
-                new HashMap(new Configurator().getProperties(Paths.get(attributeMappingsPath)));
+                new HashMap<>(new Configurator().getProperties(Paths.get(attributeMappingsPath)));
         config.attributeMappings(attributeMappings);
         config.ldapUseCase(CREDENTIAL_STORE);
         return config;
     }
 
-    public static final Map<String, Object> ldapConfigToLdapClaimsHandlerService(LdapConfiguration config) {
-        Map<String, Object> props = new HashMap();
+    public static Map<String, Object> ldapConfigToLdapClaimsHandlerService(
+            LdapConfiguration config) {
+        Map<String, Object> props = new HashMap<>();
         String ldapUrl = getLdapUrl(config);
         boolean startTls = isStartTls(config);
         props.put(URL, ldapUrl + config.hostName() + ":" + config.port());
@@ -89,10 +91,8 @@ public class LdapClaimsHandlerServiceProperties {
         props.put(USER_BASE_DN, config.baseUserDn());
         props.put(GROUP_BASE_DN, config.baseGroupDn());
         props.put(OBJECT_CLASS, config.groupObjectClass());
-        props.put(MEMBERSHIP_USER_ATTRIBUTE, config.membershipAttribute());
-
-        // TODO: tbatie - 1/15/17 - memberNameAttribute is not implemented in UI
-        props.put(MEMBER_NAME_ATTRIBUTE, config.membershipAttribute());
+        props.put(MEMBERSHIP_USER_ATTRIBUTE, config.memberAttributeReferencedInGroup());
+        props.put(MEMBER_NAME_ATTRIBUTE, config.groupAttributeHoldingMember());
         props.put(PROPERTY_FILE_LOCATION, config.attributeMappingsPath());
         return props;
     }

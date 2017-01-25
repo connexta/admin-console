@@ -60,8 +60,11 @@ public class LdapConfiguration extends Configuration {
     public static final String LDAP_TYPE = "ldapType";
     public static final String LDAP_USE_CASE = "ldapUseCase";
     public static final String GROUP_OBJECT_CLASS = "groupObjectClass";
-    public static final String MEMBER_NAME_ATTRIBUTE = "memberNameAttribute";
-    public static final String MEMBERSHIP_ATTRIBUTE = "membershipAttribute";
+
+    public static final String GROUP_ATTRIBUTE_HOLDING_MEMBER = "groupAttributeHoldingMember";
+
+    public static final String MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP =
+            "memberAttributeReferencedInGroup";
     public static final String ATTRIBUTE_MAPPINGS = "attributeMappings";
     public static final String ATTRIBUTE_MAPPING_PATH = "attributeMappingsPath";
 
@@ -81,8 +84,10 @@ public class LdapConfiguration extends Configuration {
     private String ldapType;
     private String ldapUseCase;
     private String groupObjectClass;
-    private String membershipAttribute;
-    private String memberNameAttribute;
+
+    private String groupAttributeHoldingMember;
+
+    private String memberAttributeReferencedInGroup;
     public Map<String, String> attributeMappings;
     private String attributeMappingsPath;
 
@@ -105,8 +110,12 @@ public class LdapConfiguration extends Configuration {
                     .put(LDAP_TYPE, config -> validateLdapType(config.ldapType(), LDAP_TYPE))
                     .put(LDAP_USE_CASE, config -> validateLdapUseCase(config.ldapUseCase(), LDAP_USE_CASE))
                     .put(GROUP_OBJECT_CLASS, config -> validateGroupObjectClass(config.groupObjectClass(), GROUP_OBJECT_CLASS))
-                    .put(MEMBERSHIP_ATTRIBUTE, config -> validateString(config.membershipAttribute(), MEMBERSHIP_ATTRIBUTE))
-                    .put(MEMBER_NAME_ATTRIBUTE, config -> validateString(config.memberNameAttribute(), MEMBER_NAME_ATTRIBUTE))
+            .put(GROUP_ATTRIBUTE_HOLDING_MEMBER,
+                    config -> validateString(config.groupAttributeHoldingMember(),
+                            GROUP_ATTRIBUTE_HOLDING_MEMBER))
+            .put(MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP,
+                    config -> validateString(config.memberAttributeReferencedInGroup(),
+                            MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP))
                     .put(ATTRIBUTE_MAPPINGS, config -> validateMapping(config.attributeMappings(), ATTRIBUTE_MAPPINGS))
                     .put(ATTRIBUTE_MAPPING_PATH, config -> validateFilePath(config.attributeMappingsPath(), ATTRIBUTE_MAPPING_PATH))
                     .build();
@@ -164,11 +173,13 @@ public class LdapConfiguration extends Configuration {
     public String groupObjectClass() {
         return groupObjectClass;
     }
-    public String membershipAttribute() {
-        return membershipAttribute;
+
+    public String groupAttributeHoldingMember() {
+        return groupAttributeHoldingMember;
     }
-    public String memberNameAttribute() {
-        return memberNameAttribute;
+
+    public String memberAttributeReferencedInGroup() {
+        return memberAttributeReferencedInGroup;
     }
     public Map<String, String> attributeMappings() {
         return attributeMappings;
@@ -242,12 +253,15 @@ public class LdapConfiguration extends Configuration {
         this.groupObjectClass = groupObjectClass;
         return this;
     }
-    public LdapConfiguration membershipAttribute(String membershipAttribute) {
-        this.membershipAttribute = membershipAttribute;
+
+    public LdapConfiguration groupAttributeHoldingMember(String groupAttributeHoldingMember) {
+        this.groupAttributeHoldingMember = groupAttributeHoldingMember;
         return this;
     }
-    public LdapConfiguration memberNameAttribute(String memberNameAttribute) {
-        this.memberNameAttribute = memberNameAttribute;
+
+    public LdapConfiguration memberAttributeReferencedInGroup(
+            String memberAttributeReferencedInGroup) {
+        this.memberAttributeReferencedInGroup = memberAttributeReferencedInGroup;
         return this;
     }
     public LdapConfiguration attributeMappings(Map<String, String> attributeMapping) {

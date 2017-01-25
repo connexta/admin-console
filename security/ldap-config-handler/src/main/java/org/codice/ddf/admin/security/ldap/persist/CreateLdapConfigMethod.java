@@ -26,7 +26,8 @@ import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.ENCRYPTION_
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.GROUP_OBJECT_CLASS;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.HOST_NAME;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.LDAP_USE_CASE;
-import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.MEMBERSHIP_ATTRIBUTE;
+import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.GROUP_ATTRIBUTE_HOLDING_MEMBER;
+import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.PORT;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.USER_NAME_ATTRIBUTE;
 import static org.codice.ddf.admin.api.handler.ConfigurationMessage.FAILED_PERSIST;
@@ -79,7 +80,8 @@ public class CreateLdapConfigMethod extends PersistMethod<LdapConfiguration>{
     public static final List<String> ALL_REQUIRED_FIELDS = ImmutableList.<String>builder()
             .addAll(LOGIN_REQUIRED_FIELDS)
             .add(GROUP_OBJECT_CLASS)
-            .add(MEMBERSHIP_ATTRIBUTE)
+            .add(GROUP_ATTRIBUTE_HOLDING_MEMBER)
+            .add(MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP)
             .add(ATTRIBUTE_MAPPINGS).build();
 
     public static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(SUCCESSFUL_PERSIST, "Successfully saved LDAP settings.");

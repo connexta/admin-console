@@ -34,7 +34,10 @@ export default ({ disabled, prev, persist, configs }) => (
           <Info label='Bind User Password' value='*****' />
           <Info label='Bind User Method' value={configs.bindUserMethod} />
           <Info label='LDAP Group Object Class' value={configs.groupObjectClass} />
-          <Info label='Membership Attribute' value={configs.membershipAttribute} />
+            <Info label='Group Attribute Holding Member References'
+                  value={configs.groupAttributeHoldingMember}/>
+            <Info label='Member Attribute Referenced in Groups'
+                  value={configs.memberAttributeReferencedInGroup}/>
         </Flexbox>
       </Flexbox>
       { configs.ldapUseCase !== 'authentication'

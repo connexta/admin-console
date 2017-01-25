@@ -45,7 +45,8 @@ public class LdapValidationUtils {
     public static final String LOGIN_AND_CREDENTIAL_STORE = "authenticationAndAttributeStore";
     public static final ImmutableList LDAP_USE_CASES = ImmutableList.of(LOGIN, CREDENTIAL_STORE, LOGIN_AND_CREDENTIAL_STORE);
 
-    public static final List<ConfigurationMessage> validateEncryptionMethod(String encryptionMethod, String configId) {
+    public static List<ConfigurationMessage> validateEncryptionMethod(String encryptionMethod,
+            String configId) {
         List<ConfigurationMessage> errors = validateString(encryptionMethod, configId);
         if (errors.isEmpty() && LDAP_ENCRYPTION_METHODS.stream().noneMatch(e -> e.equalsIgnoreCase(encryptionMethod))) {
             errors.add(createInvalidFieldMsg("Unknown encryption method \"" + encryptionMethod + "\". Encryption method must be one of: " + String.join(",", LDAP_ENCRYPTION_METHODS), configId));
@@ -53,11 +54,12 @@ public class LdapValidationUtils {
         return errors;
     }
 
-    public static final List<ConfigurationMessage> validateDn(String dn, String configId) {
+    public static List<ConfigurationMessage> validateDn(String dn, String configId) {
         return validateString(dn, configId);
     }
 
-    public static final List<ConfigurationMessage> validateBindUserMethod(String bindMethod, String configId) {
+    public static List<ConfigurationMessage> validateBindUserMethod(String bindMethod,
+            String configId) {
         List<ConfigurationMessage> errors = validateString(bindMethod, configId);
         if(errors.isEmpty() && !BIND_METHODS.contains(bindMethod)) {
             errors.add(createInvalidFieldMsg("Unknown bind method \"" + bindMethod + "\". Bind method must be one of: " + String.join(",", BIND_METHODS), configId));
@@ -65,27 +67,29 @@ public class LdapValidationUtils {
         return errors;
     }
 
-    public static final List<ConfigurationMessage> validateBindKdcAddress(String bindKdcAddress, String configId) {
+    public static List<ConfigurationMessage> validateBindKdcAddress(String bindKdcAddress,
+            String configId) {
         // TODO: tbatie - 1/16/17 - Need to do additional validation
         return validateString(bindKdcAddress, configId);
     }
 
-    public static final List<ConfigurationMessage> validateBindRealm(String bindRealm, String configId) {
+    public static List<ConfigurationMessage> validateBindRealm(String bindRealm, String configId) {
         // TODO: tbatie - 1/16/17 - Is there more validation we can do?
         return validateString(bindRealm, configId);
     }
 
-    public static final List<ConfigurationMessage> validateLdapQuery(String query, String configId) {
+    public static List<ConfigurationMessage> validateLdapQuery(String query, String configId) {
         // TODO: tbatie - 1/16/17 - validate query
         return validateString(query, configId);
     }
 
-    public static final List<ConfigurationMessage> validateLdapType(String ldapType, String configId) {
+    public static List<ConfigurationMessage> validateLdapType(String ldapType, String configId) {
         // TODO: tbatie - 1/16/17 - not sure if there is any additional validation we should do here
         return validateString(ldapType, configId);
     }
 
-    public static final List<ConfigurationMessage> validateLdapUseCase(String ldapUseCase, String configId) {
+    public static List<ConfigurationMessage> validateLdapUseCase(String ldapUseCase,
+            String configId) {
         List<ConfigurationMessage> errors = validateString(ldapUseCase, configId);
         if(errors.isEmpty() && !LDAP_USE_CASES.contains(ldapUseCase)) {
             errors.add(createInvalidFieldMsg("Unknown LDAP use case \"" + ldapUseCase + "\". LDAP use case must be one of: " + String.join(",", LDAP_USE_CASES), configId));
@@ -93,7 +97,8 @@ public class LdapValidationUtils {
         return errors;
     }
 
-    public static final List<ConfigurationMessage> validateGroupObjectClass(String objectClass, String configId) {
+    public static List<ConfigurationMessage> validateGroupObjectClass(String objectClass,
+            String configId) {
         // TODO: tbatie - 1/16/17 - not sure if there is any additional validation we should do here at the syntax level
         return validateString(objectClass, configId);
     }

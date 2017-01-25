@@ -39,16 +39,12 @@ import org.codice.ddf.admin.security.ldap.test.AttributeMappingTestMethod;
 import org.codice.ddf.admin.security.ldap.test.BindUserTestMethod;
 import org.codice.ddf.admin.security.ldap.test.ConnectTestMethod;
 import org.codice.ddf.admin.security.ldap.test.DirectoryStructTestMethod;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableList;
 
 public class LdapConfigurationHandler extends DefaultConfigurationHandler<LdapConfiguration> {
 
     private static final String LDAP_CONFIGURATION_HANDLER_ID = LdapConfiguration.CONFIGURATION_TYPE;
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(LdapConfigurationHandler.class);
 
     @Override
     public String getConfigurationHandlerId() {

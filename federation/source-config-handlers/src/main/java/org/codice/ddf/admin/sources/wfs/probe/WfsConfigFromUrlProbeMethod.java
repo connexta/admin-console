@@ -65,11 +65,6 @@ public class WfsConfigFromUrlProbeMethod extends ProbeMethod<WfsSourceConfigurat
 
     @Override
     public ProbeReport probe(WfsSourceConfiguration configuration) {
-        ProbeReport results = new ProbeReport(configuration.validate(REQUIRED_FIELDS));
-        if (!results.containsFailureMessages()) {
-            return results;
-        }
-
         UrlAvailability status = WfsSourceUtils.getUrlAvailability(configuration.endpointUrl());
         String result;
         Map<String, Object> probeResult = new HashMap<>();

@@ -64,10 +64,6 @@ public class CswConfigFromUrlProbeMethod extends ProbeMethod<CswSourceConfigurat
 
     @Override
     public ProbeReport probe(CswSourceConfiguration configuration) {
-        List<ConfigurationMessage> validationErrors = configuration.validate(REQUIRED_FIELDS);
-        if (!validationErrors.isEmpty()) {
-            return new ProbeReport(validationErrors);
-        }
         UrlAvailability status = CswSourceUtils.getUrlAvailability(configuration.endpointUrl());
         String result;
         Map<String, Object> probeResult = new HashMap<>();

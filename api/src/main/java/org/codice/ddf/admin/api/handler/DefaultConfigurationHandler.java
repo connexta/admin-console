@@ -33,7 +33,6 @@ import org.codice.ddf.admin.api.handler.report.Report;
  */
 public abstract class DefaultConfigurationHandler<S extends Configuration> implements ConfigurationHandler<S> {
 
-    // TODO: tbatie - 1/20/17 - We should move the required field validation down to this level
     /**
      * Return all the {@link ProbeMethod} this {@link ConfigurationHandler} supports.
      *
@@ -66,10 +65,20 @@ public abstract class DefaultConfigurationHandler<S extends Configuration> imple
                 .filter(method -> method.id()
                         .equals(probeId))
                 .findFirst();
+        if(!probeMethod.isPresent()) {
+            return getNoProbeFoundReport(probeId);
+        }
 
-        return probeMethod.isPresent() ?
-                probeMethod.get().probe(configuration) :
-                getNoProbeFoundReport(probeId);
+        if (probeMethod.get().getRequiredFields() != null) {
+            ProbeReport validationReport = new ProbeReport(configuration.validate(probeMethod.get()
+                    .getRequiredFields()));
+            if (validationReport.containsFailureMessages()) {
+                return validationReport;
+            }
+        }
+
+        return probeMethod.get()
+                .probe(configuration);
     }
 
     @Override
@@ -83,14 +92,22 @@ public abstract class DefaultConfigurationHandler<S extends Configuration> imple
                         .equals(testId))
                 .findFirst();
 
-        return testMethod.isPresent() ?
-                testMethod.get().test(configuration) :
-                getNoTestFoundReport(testId);
+        if(!testMethod.isPresent()) {
+            return getNoTestFoundReport(testId);
+        }
+
+        if(testMethod.get().getRequiredFields() != null) {
+            Report validationReport = new Report(configuration.validate(testMethod.get().getRequiredFields()));
+            if(validationReport.containsFailureMessages()) {
+                return validationReport;
+            }
+        }
+
+        return testMethod.get().test(configuration);
     }
 
     @Override
     public Report persist(String persistId, S configuration) {
-
         if (getPersistMethods() == null) {
             return getNoTestFoundReport(persistId);
         }
@@ -100,9 +117,18 @@ public abstract class DefaultConfigurationHandler<S extends Configuration> imple
                         .equals(persistId))
                 .findFirst();
 
-        return persistMethod.isPresent() ?
-                persistMethod.get().persist(configuration) :
-                getNoTestFoundReport(persistId);
+        if(!persistMethod.isPresent()) {
+            return getNoTestFoundReport(persistId);
+        }
+
+        if(persistMethod.get().getRequiredFields() != null) {
+            Report validationReport = new Report(configuration.validate(persistMethod.get().getRequiredFields()));
+            if(validationReport.containsFailureMessages()) {
+                return validationReport;
+            }
+        }
+
+        return persistMethod.get().persist(configuration);
     }
 
     private Report getNoTestFoundReport(String badId){

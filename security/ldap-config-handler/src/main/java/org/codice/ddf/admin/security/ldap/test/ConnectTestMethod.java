@@ -66,11 +66,6 @@ public class ConnectTestMethod extends TestMethod<LdapConfiguration> {
 
     @Override
     public Report test(LdapConfiguration configuration) {
-        List<ConfigurationMessage> checkMessages = configuration.validate(REQUIRED_FIELDS);
-        if (CollectionUtils.isNotEmpty(checkMessages)) {
-            return new Report(checkMessages);
-        }
-
         LdapTestingCommons.LdapConnectionAttempt connectionAttempt =
                 getLdapConnection(configuration);
         if (connectionAttempt.connection() != null) {

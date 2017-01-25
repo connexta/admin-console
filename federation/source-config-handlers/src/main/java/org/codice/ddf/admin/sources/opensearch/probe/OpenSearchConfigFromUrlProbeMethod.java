@@ -65,11 +65,6 @@ public class OpenSearchConfigFromUrlProbeMethod extends ProbeMethod<OpenSearchSo
 
     @Override
     public ProbeReport probe(OpenSearchSourceConfiguration configuration) {
-        ProbeReport validationResults = new ProbeReport(configuration.validate(REQUIRED_FIELDS));
-        if(validationResults.containsFailureMessages()) {
-            return validationResults;
-        }
-
         UrlAvailability status = OpenSearchSourceUtils.getUrlAvailability(configuration.endpointUrl());
         String result;
         Map<String, Object> probeResult = new HashMap<>();

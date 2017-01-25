@@ -53,11 +53,6 @@ public class AttributeMappingTestMethod extends TestMethod<LdapConfiguration> {
 
     @Override
     public Report test(LdapConfiguration configuration) {
-        Report report = new Report(configuration.validate(REQUIRED_FIELDS));
-        if(report.containsFailureMessages()) {
-            return report;
-        }
-
         List stsClaims = Arrays.asList((String[]) new Configurator().getConfig(STS_CLAIMS_CONFIGURATION_CONFIG_ID).get(STS_CLAIMS_PROPS_KEY_CLAIMS));
         Optional<String> unknownStsClaim = configuration.attributeMappings()
                 .keySet()

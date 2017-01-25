@@ -76,6 +76,7 @@ public class DirectoryStructTestMethod extends TestMethod<LdapConfiguration> {
             BIND_USER_PASSWORD,
             BIND_METHOD,
             BASE_USER_DN,
+            // TODO: tbatie - 1/11/17 - validate membershipNameAttribute once implemented
             BASE_GROUP_DN,
             USER_NAME_ATTRIBUTE);
 
@@ -109,13 +110,6 @@ public class DirectoryStructTestMethod extends TestMethod<LdapConfiguration> {
 
     @Override
     public Report test(LdapConfiguration configuration) {
-        // TODO: tbatie - 1/11/17 - validate membershipNameAttribute once implemented
-        List<ConfigurationMessage> checkMessages = configuration.validate(REQUIRED_FIELDS);
-
-        if (CollectionUtils.isNotEmpty(checkMessages)) {
-            return new ProbeReport(checkMessages);
-        }
-
         LdapConnectionAttempt connectionAttempt = bindUserToLdapConnection(configuration);
 
         if (connectionAttempt.result() != SUCCESSFUL_BIND) {

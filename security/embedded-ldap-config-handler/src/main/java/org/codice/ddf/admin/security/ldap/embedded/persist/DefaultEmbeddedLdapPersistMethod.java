@@ -59,11 +59,6 @@ public class DefaultEmbeddedLdapPersistMethod extends PersistMethod<EmbeddedLdap
     @Override
     public Report persist(EmbeddedLdapConfiguration configuration) {
         Configurator configurator = new Configurator();
-        Report testReport = new Report(configuration.validate(REQUIRED_FIELDS));
-        if(testReport.containsFailureMessages()) {
-            return testReport;
-        }
-
         configurator.startFeature(EMBEDDED_LDAP_FEATURE);
         switch (configuration.ldapUseCase()) {
         case LOGIN:

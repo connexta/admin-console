@@ -52,11 +52,6 @@ public class DeleteWfsSourcePersistMethod extends PersistMethod<WfsSourceConfigu
 
     @Override
     public Report persist(WfsSourceConfiguration configuration) {
-        Report results = new Report(configuration.validate(REQUIRED_FIELDS));
-        if (!results.containsFailureMessages()) {
-            return results;
-        }
-
         Configurator configurator = new Configurator();
         configurator.deleteManagedService(configuration.servicePid());
         OperationReport report = configurator.commit();

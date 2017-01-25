@@ -52,11 +52,6 @@ public class ManualUrlTestMethod extends TestMethod<SourceConfiguration> {
 
     @Override
     public Report test(SourceConfiguration configuration) {
-        Report validationResults = new Report(configuration.validate(REQUIRED_FIELDS));
-        if(validationResults.containsFailureMessages()) {
-            return validationResults;
-        }
-
         Optional<ConfigurationMessage> message = SourceHandlerCommons.endpointIsReachable(configuration);
         return message.isPresent() ? new Report(message.get()) :
                 new Report(buildMessage(SUCCESS, REACHED_URL, SUCCESS_TYPES.get(REACHED_URL)));

@@ -53,11 +53,6 @@ public class DeleteLdapConfigMethod extends PersistMethod<LdapConfiguration> {
 
     @Override
     public Report persist(LdapConfiguration config) {
-        Report validatedReport = new Report(config.validate(REQUIRED_FIELDS));
-        if (validatedReport.containsFailureMessages()) {
-            return validatedReport;
-        }
-
         Configurator configurator = new Configurator();
         configurator.deleteManagedService(config.servicePid());
         OperationReport report = configurator.commit();

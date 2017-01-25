@@ -57,15 +57,9 @@ public class CreateWfsSourcePersistMethod extends PersistMethod<WfsSourceConfigu
 
     @Override
     public Report persist(WfsSourceConfiguration configuration) {
-        Report results = new Report(configuration.validate(REQUIRED_FIELDS));
-        if (!results.containsFailureMessages()) {
-            return results;
-        }
-
         Configurator configurator = new Configurator();
-        OperationReport report;
         configurator.createManagedService(configuration.factoryPid(), wfsConfigToServiceProps(configuration));
-        report = configurator.commit();
+        OperationReport report = configurator.commit();
         return createReport(SUCCESS_TYPES, FAILURE_TYPES, null, report.containsFailedResults() ? FAILED_PERSIST : SUCCESSFUL_PERSIST);
     }
 

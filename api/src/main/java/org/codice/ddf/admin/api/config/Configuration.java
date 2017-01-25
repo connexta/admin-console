@@ -19,6 +19,10 @@ package org.codice.ddf.admin.api.config;
  * removed in a future version of the library. </b>
  */
 
+import java.util.List;
+
+import org.codice.ddf.admin.api.handler.ConfigurationMessage;
+
 /**
  * A {@link Configuration} is the super class for all configurations that can be handled by the
  * {@link org.codice.ddf.admin.api.handler.ConfigurationHandler}.
@@ -42,6 +46,8 @@ public abstract class Configuration {
     }
 
     public abstract ConfigurationType getConfigurationType();
+
+    public abstract List<ConfigurationMessage> validate(List<String> fields);
 
     //Getters
     public String configurationHandlerId() {

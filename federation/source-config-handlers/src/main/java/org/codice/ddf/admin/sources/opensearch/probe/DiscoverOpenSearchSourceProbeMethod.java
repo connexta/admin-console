@@ -78,11 +78,6 @@ public class DiscoverOpenSearchSourceProbeMethod
 
     @Override
     public ProbeReport probe(OpenSearchSourceConfiguration configuration) {
-        ProbeReport validationResults = new ProbeReport(configuration.validate(REQUIRED_FIELDS));
-        if (validationResults.containsFailureMessages()) {
-            return validationResults;
-        }
-
         String result;
         Map<String, Object> probeResult = new HashMap<>();
         Optional<UrlAvailability> availability = OpenSearchSourceUtils.confirmEndpointUrl(configuration);

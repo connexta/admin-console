@@ -52,7 +52,7 @@ const LdapTypeSelection = ({ disabled, prev, next, configs: { ldapType } = {} })
         disabled={disabled} />
       <Action
         primary
-        label='begin'
+        label='next'
         onClick={next}
         disabled={disabled || !ldapType}
         nextStageId={ldapType === 'embeddedLdap' ? 'configure-embedded-ldap' : 'network-settings'} />

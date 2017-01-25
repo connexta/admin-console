@@ -81,12 +81,7 @@ public class DefaultDirectoryStructureProbe extends ProbeMethod<LdapConfiguratio
 
     @Override
     public ProbeReport probe(LdapConfiguration configuration) {
-        ProbeReport probeReport = new ProbeReport(configuration.validate(REQUIRED_FIELDS));
-
-        if (probeReport.containsFailureMessages()) {
-            return probeReport;
-        }
-
+        ProbeReport probeReport = new ProbeReport();
         String ldapType = configuration.ldapType();
         ServerGuesser guesser = ServerGuesser.buildGuesser(ldapType,
                 bindUserToLdapConnection(configuration).connection());

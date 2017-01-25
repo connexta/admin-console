@@ -23,10 +23,12 @@ import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.BIND_REALM;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.BIND_USER_DN;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.BIND_USER_PASSWORD;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.ENCRYPTION_METHOD;
+import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.GROUP_ATTRIBUTE_HOLDING_MEMBER;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.GROUP_OBJECT_CLASS;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.HOST_NAME;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.LDAP_USE_CASE;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.GROUP_ATTRIBUTE_HOLDING_MEMBER;
+import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.PORT;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.USER_NAME_ATTRIBUTE;
@@ -77,12 +79,16 @@ public class CreateLdapConfigMethod extends PersistMethod<LdapConfiguration>{
 
     public static final List<String> LOGIN_OPTIONAL_FIELDS = ImmutableList.of(BIND_KDC, BIND_REALM);
 
-    public static final List<String> ALL_REQUIRED_FIELDS = ImmutableList.<String>builder()
-            .addAll(LOGIN_REQUIRED_FIELDS)
-            .add(GROUP_OBJECT_CLASS)
-            .add(GROUP_ATTRIBUTE_HOLDING_MEMBER)
-            .add(MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP)
-            .add(ATTRIBUTE_MAPPINGS).build();
+    public static final List<String> ADDITIONAL_ATTRIBUTE_STORE_FIELDS = ImmutableList.of(
+                GROUP_OBJECT_CLASS,
+                GROUP_ATTRIBUTE_HOLDING_MEMBER,
+                MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP,
+                ATTRIBUTE_MAPPINGS);
+
+    public static final List<String> ALL_OPTIONAL_FIELDS = ImmutableList.<String>builder().addAll(
+            LOGIN_OPTIONAL_FIELDS)
+            .addAll(ADDITIONAL_ATTRIBUTE_STORE_FIELDS)
+            .build();
 
     public static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(SUCCESSFUL_PERSIST, "Successfully saved LDAP settings.");
     public static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(FAILED_PERSIST, "Unable to persist changes.");
@@ -90,8 +96,8 @@ public class CreateLdapConfigMethod extends PersistMethod<LdapConfiguration>{
     public CreateLdapConfigMethod() {
         super(LDAP_CREATE_ID,
                 DESCRIPTION,
-                ALL_REQUIRED_FIELDS,
-                LOGIN_OPTIONAL_FIELDS,
+                LOGIN_REQUIRED_FIELDS,
+                ALL_OPTIONAL_FIELDS,
                 SUCCESS_TYPES,
                 FAILURE_TYPES,
                 null);
@@ -117,8 +123,7 @@ public class CreateLdapConfigMethod extends PersistMethod<LdapConfiguration>{
         }
 
         if (config.ldapUseCase().equals(CREDENTIAL_STORE) || config.ldapUseCase().equals(LOGIN_AND_CREDENTIAL_STORE)) {
-            Report validationReport = new Report(config.validate(
-                    ALL_REQUIRED_FIELDS));
+            Report validationReport = new Report(config.validate(ADDITIONAL_ATTRIBUTE_STORE_FIELDS));
             if(validationReport.containsFailureMessages()) {
                 return validationReport;
             }

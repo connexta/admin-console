@@ -63,7 +63,7 @@ public class LdapLoginServiceProperties {
         ldapConfiguration.hostName(ldapUri.getHost());
         ldapConfiguration.port(ldapUri.getPort());
         if ((Boolean) props.get(START_TLS)) {
-            ldapConfiguration.encryptionMethod(TLS);
+            ldapConfiguration.encryptionMethod(START_TLS);
         }
         ldapConfiguration.ldapUseCase(LOGIN);
         return ldapConfiguration;

@@ -58,11 +58,6 @@ public class CreateOpenSearchSourcePersistMethod
 
     @Override
     public Report persist(OpenSearchSourceConfiguration configuration) {
-        Report validationResults = new Report(configuration.validate(REQUIRED_FIELDS));
-        if (validationResults.containsFailureMessages()) {
-            return validationResults;
-        }
-
         Configurator configurator = new Configurator();
         configurator.createManagedService(configuration.factoryPid(), openSearchConfigToServiceProps(configuration));
         OperationReport report = configurator.commit();

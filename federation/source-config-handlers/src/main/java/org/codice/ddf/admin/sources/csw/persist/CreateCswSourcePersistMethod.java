@@ -59,11 +59,6 @@ public class CreateCswSourcePersistMethod extends PersistMethod<CswSourceConfigu
 
     @Override
     public Report persist(CswSourceConfiguration configuration) {
-        Report validationResults = new Report(configuration.validate(REQUIRED_FIELDS));
-        if (validationResults.containsFailureMessages()) {
-            return validationResults;
-        }
-
         Configurator configurator = new Configurator();
         configurator.createManagedService(configuration.factoryPid(), cswConfigToServiceProps(configuration));
         OperationReport report = configurator.commit();

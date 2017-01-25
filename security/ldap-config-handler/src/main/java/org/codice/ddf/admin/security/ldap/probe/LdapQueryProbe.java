@@ -75,12 +75,7 @@ public class LdapQueryProbe extends ProbeMethod<LdapConfiguration> {
 
     @Override
     public ProbeReport probe(LdapConfiguration configuration) {
-        ProbeReport probeReport = new ProbeReport(configuration.validate(REQUIRED_FIELDS));
-
-        if (probeReport.containsFailureMessages()) {
-            return probeReport;
-        }
-
+        ProbeReport probeReport = new ProbeReport();
         Connection connection = bindUserToLdapConnection(configuration).connection();
         List<SearchResultEntry> searchResults = getLdapQueryResults(connection,
                 configuration.queryBase(),

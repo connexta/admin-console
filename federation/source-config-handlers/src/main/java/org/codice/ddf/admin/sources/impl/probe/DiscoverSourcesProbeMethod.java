@@ -56,11 +56,7 @@ public class DiscoverSourcesProbeMethod extends ProbeMethod<SourceConfiguration>
     }
     @Override
     public ProbeReport probe(SourceConfiguration config) {
-        ProbeReport sourcesProbeReport = new ProbeReport(config.validate(REQUIRED_FIELDS));
-        if (sourcesProbeReport.containsFailureMessages()) {
-            return sourcesProbeReport;
-        }
-
+        ProbeReport sourcesProbeReport = new ProbeReport();
         List<ProbeReport> sourceProbeReports = handlers.stream()
                 .map(handler -> handler.probe(DISCOVER_SOURCES_ID, config))
                 .collect(Collectors.toList());

@@ -29,6 +29,7 @@ import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.SUCCESSFUL
 import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.toDescriptionMap;
 import static org.codice.ddf.admin.security.ldap.test.LdapTestingCommons.bindUserToLdapConnection;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -83,12 +84,7 @@ public class BindUserTestMethod extends TestMethod<LdapConfiguration> {
 
     @Override
     public Report test(LdapConfiguration configuration) {
-        List<ConfigurationMessage> checkMessages = configuration.validate(REQUIRED_FIELDS);
-
-        if (CollectionUtils.isNotEmpty(checkMessages)) {
-            return new ProbeReport(checkMessages);
-        }
-
+        List<ConfigurationMessage> checkMessages = new ArrayList<>();
         if(configuration.bindUserMethod().equals(LdapValidationUtils.GSSAPI_SASL)) {
             checkMessages.addAll(configuration.validate(OPTIONAL_FIELDS));
             if (CollectionUtils.isNotEmpty(checkMessages)) {

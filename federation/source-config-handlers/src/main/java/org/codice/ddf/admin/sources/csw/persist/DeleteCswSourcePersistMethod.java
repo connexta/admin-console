@@ -50,11 +50,6 @@ public class DeleteCswSourcePersistMethod extends PersistMethod<CswSourceConfigu
 
     @Override
     public Report persist(CswSourceConfiguration configuration) {
-        Report validateResults = new Report(configuration.validate(REQUIRED_FIELDS));
-        if(validateResults.containsFailureMessages()) {
-            return validateResults;
-        }
-
         Configurator configurator = new Configurator();
         configurator.deleteManagedService(configuration.servicePid());
         OperationReport report = configurator.commit();

@@ -55,11 +55,6 @@ public class EditContextPolicyMethod extends PersistMethod<ContextPolicyConfigur
 
     @Override
     public Report persist(ContextPolicyConfiguration config) {
-        Report report = new Report(config.validate(ALL_FIELDS));
-        if(report.containsFailureMessages()) {
-            return report;
-        }
-
         Configurator configurator = new Configurator();
         configurator.updateConfigFile(POLICY_MANAGER_PID,
                 configToPolicyManagerProps(config),

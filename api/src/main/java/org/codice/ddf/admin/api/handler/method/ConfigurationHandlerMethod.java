@@ -55,6 +55,10 @@ public abstract class ConfigurationHandlerMethod {
         this.warningTypes = warningTypes;
     }
 
+    public List<String> getRequiredFields() {
+        return requiredFields;
+    }
+
     public String id() {
         return id;
     }

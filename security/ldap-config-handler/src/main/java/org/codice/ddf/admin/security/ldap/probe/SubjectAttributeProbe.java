@@ -82,12 +82,7 @@ public class SubjectAttributeProbe extends ProbeMethod<LdapConfiguration> {
 
     @Override
     public ProbeReport probe(LdapConfiguration configuration) {
-        ProbeReport probeReport = new ProbeReport(configuration.validate(REQUIRED_FIELDS));
-
-        if (probeReport.containsFailureMessages()) {
-            return probeReport;
-        }
-
+        ProbeReport probeReport = new ProbeReport();
         Object subjectClaims = new Configurator().getConfig(STS_CLAIMS_CONFIGURATION_CONFIG_ID)
                 .get(STS_CLAIMS_PROPS_KEY_CLAIMS);
 

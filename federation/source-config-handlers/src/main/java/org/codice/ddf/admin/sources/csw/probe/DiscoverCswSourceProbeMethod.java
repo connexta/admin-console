@@ -69,11 +69,7 @@ public class DiscoverCswSourceProbeMethod extends ProbeMethod<CswSourceConfigura
     @Override
     public ProbeReport probe(CswSourceConfiguration configuration) {
         CswSourceConfiguration config = new CswSourceConfiguration(configuration);
-        ProbeReport results = new ProbeReport(config.validate(REQUIRED_FIELDS));
-        if (results.containsFailureMessages()) {
-            return results;
-        }
-
+        ProbeReport results = new ProbeReport();
         String result;
         Map<String, Object> probeResult = new HashMap<>();
         Optional<UrlAvailability> availability = CswSourceUtils.confirmEndpointUrl(config);

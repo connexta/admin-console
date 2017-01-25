@@ -17,7 +17,7 @@ const IntroductionStage = ({ disabled, next, configs: { ldapUseCase } = {} }) =>
     <ActionGroup>
       <Action
         primary
-        label='begin'
+        label='begin ldap wizard'
         onClick={next}
         nextStageId='use-case-stage'
         disabled={disabled} />

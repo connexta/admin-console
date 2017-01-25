@@ -35,7 +35,7 @@ import Message from 'components/Message'
 
 // Welcome Stage
 const welcomeTitle = 'Welcome to the Source Configuration Wizard'
-const welcomeSubtitle = 'This guide will walk you through the discovery and configuration of the ' +
+const welcomeSubtitle = 'This wizard will guide you through discovering and configuring ' +
   "various sources that are used to query metadata in other DDF's or external systems. " +
   'To begin, make sure you have the hostname and port of the source you plan to configure.'
 
@@ -114,13 +114,12 @@ export const SourceSelectionStage = connect((state) => ({
 
 // Confirmation Stage
 const confirmationTitle = 'Finalize Source Configuration'
-const confirmationSubtitle = 'Name your source, confirm details, and press finish to add source'
-const sourceNameDescription = 'Use a unique name to identify this source'
+const confirmationSubtitle = 'Please give your source a unique name, confirm details, and press finish to add source'
 const ConfirmationStageView = ({ selectedSource, persistConfig, sourceName, configType }) => (
   <NavPanes backClickTarget='sourceSelectionStage' forwardClickTarget='completedStage'>
     <CenteredElements>
       <Info title={confirmationTitle} subtitle={confirmationSubtitle} />
-      <ConstrainedInput id='sourceName' label='Source Name' description={sourceNameDescription} />
+      <ConstrainedInput id='sourceName' label='Source Name' />
       <ConstrainedSourceInfo label='Source Address' value={selectedSource.endpointUrl} />
       <ConstrainedSourceInfo label='Username' value={selectedSource.sourceUserName || 'none'} />
       <ConstrainedSourceInfo label='Password' value={selectedSource.sourceUserPassword ? '*****' : 'none'} />

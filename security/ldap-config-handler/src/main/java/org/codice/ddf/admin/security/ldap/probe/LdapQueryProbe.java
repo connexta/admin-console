@@ -37,6 +37,7 @@ import org.codice.ddf.admin.api.handler.method.ProbeMethod;
 import org.codice.ddf.admin.api.handler.report.ProbeReport;
 import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.Connection;
+import org.forgerock.opendj.ldap.SearchScope;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
 
 import com.google.common.collect.ImmutableList;
@@ -82,8 +83,10 @@ public class LdapQueryProbe extends ProbeMethod<LdapConfiguration> {
 
         Connection connection = bindUserToLdapConnection(configuration).connection();
         List<SearchResultEntry> searchResults = getLdapQueryResults(connection,
+                configuration.queryBase(),
                 configuration.query(),
-                configuration.queryBase(), MAX_QUERY_RESULTS);
+                SearchScope.WHOLE_SUBTREE,
+                MAX_QUERY_RESULTS);
         List<Map<String, String>> convertedSearchResults = new ArrayList<>();
 
         for (SearchResultEntry entry : searchResults) {

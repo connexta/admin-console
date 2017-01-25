@@ -151,18 +151,25 @@ public class LdapTestingCommons {
 
     /**
      * Executes a query against the ldap connection
-     * @param ldapConnection Ldap connection to run query on
-     * @param ldapQuery Query to perform
+     *
+     * @param ldapConnection   Ldap connection to run query on
      * @param ldapSearchBaseDN Base DN to run the query on
-     * @param maxResults Max number of results to return from query. Use -1 for all results
-     * @return
+     * @param ldapQuery        Query to perform
+     * @param searchScope      Scope of query
+     * @param maxResults       Max number of results to return from query. Use -1 for all results
+     * @param attributes       Optional list of attributes for return projection; if null,
+     *                         then all attributes will be returned
+     * @return list of results
      */
     public static List<SearchResultEntry> getLdapQueryResults(Connection ldapConnection,
-            String ldapQuery, String ldapSearchBaseDN, int maxResults) {
-
-        final ConnectionEntryReader reader = ldapConnection.search(ldapSearchBaseDN,
-                SearchScope.WHOLE_SUBTREE,
-                ldapQuery);
+            String ldapSearchBaseDN, String ldapQuery, SearchScope searchScope, int maxResults,
+            String... attributes) {
+        ConnectionEntryReader reader;
+        if (attributes == null) {
+            reader = ldapConnection.search(ldapSearchBaseDN, searchScope, ldapQuery);
+        } else {
+            reader = ldapConnection.search(ldapSearchBaseDN, searchScope, ldapQuery, attributes);
+        }
 
         List<SearchResultEntry> entries = new ArrayList<>();
         try {

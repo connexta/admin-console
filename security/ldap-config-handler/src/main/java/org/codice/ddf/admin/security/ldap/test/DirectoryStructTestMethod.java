@@ -45,6 +45,7 @@ import static org.codice.ddf.admin.security.ldap.test.LdapTestingCommons.bindUse
 import static org.codice.ddf.admin.security.ldap.test.LdapTestingCommons.getLdapQueryResults;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,6 +57,8 @@ import org.codice.ddf.admin.api.handler.method.TestMethod;
 import org.codice.ddf.admin.api.handler.report.ProbeReport;
 import org.codice.ddf.admin.api.handler.report.Report;
 import org.forgerock.opendj.ldap.Connection;
+import org.forgerock.opendj.ldap.Filter;
+import org.forgerock.opendj.ldap.SearchScope;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
 
 import com.google.common.collect.ImmutableList;
@@ -76,7 +79,9 @@ public class DirectoryStructTestMethod extends TestMethod<LdapConfiguration> {
             BASE_GROUP_DN,
             USER_NAME_ATTRIBUTE);
 
-    private static final List<String> OPTIONAL_FIELDS = ImmutableList.of(BIND_REALM, BIND_KDC, GROUP_OBJECT_CLASS);
+    private static final List<String> OPTIONAL_FIELDS = ImmutableList.of(BIND_REALM,
+            BIND_KDC,
+            GROUP_OBJECT_CLASS);
 
     private static final Map<String, String> SUCCESS_TYPES = toDescriptionMap(Arrays.asList(
             FOUND_BASE_USER_DN,
@@ -96,14 +101,11 @@ public class DirectoryStructTestMethod extends TestMethod<LdapConfiguration> {
             NO_GROUPS_IN_BASE_GROUP_DN));
 
     public DirectoryStructTestMethod() {
-        super(LDAP_DIRECTORY_STRUCT_TEST_ID,
-                DESCRIPTION, REQUIRED_FIELDS, OPTIONAL_FIELDS,
+        super(LDAP_DIRECTORY_STRUCT_TEST_ID, DESCRIPTION, REQUIRED_FIELDS, OPTIONAL_FIELDS,
                 SUCCESS_TYPES,
                 FAILURE_TYPES,
                 WARNING_TYPES);
     }
-
-    public static final int MAX_ENTRIES_TO_SEARCH = 300;
 
     @Override
     public Report test(LdapConfiguration configuration) {
@@ -120,51 +122,60 @@ public class DirectoryStructTestMethod extends TestMethod<LdapConfiguration> {
             return createReport(SUCCESS_TYPES,
                     FAILURE_TYPES,
                     WARNING_TYPES,
-                    Arrays.asList(connectionAttempt.result()
+                    Collections.singletonList(connectionAttempt.result()
                             .name()));
         }
 
-        // TODO: tbatie - 1/11/17 - We can perform much better query below since since we have the attributes to search
-        Connection ldapConnection = connectionAttempt.connection();
-        List<SearchResultEntry> baseUsersResults = getLdapQueryResults(ldapConnection,
-                "objectClass=*",
-                configuration.baseUserDn(), MAX_ENTRIES_TO_SEARCH);
-
         Map<String, String> resultsWithConfigIds = new HashMap<>();
-
-        if (baseUsersResults.isEmpty()) {
-            resultsWithConfigIds.put(BASE_USER_DN_NOT_FOUND.name(), BASE_USER_DN);
-        } else if (baseUsersResults.size() <= 1) {
-            resultsWithConfigIds.put(NO_USERS_IN_BASE_USER_DN.name(), BASE_USER_DN);
-        } else {
-            resultsWithConfigIds.put(FOUND_BASE_USER_DN.name(), BASE_USER_DN);
-            List<SearchResultEntry> userNameAttribute = getLdapQueryResults(ldapConnection,
-                    configuration.userNameAttribute() + "=*",
-                    configuration.baseUserDn(), MAX_ENTRIES_TO_SEARCH);
-            if (userNameAttribute.isEmpty()) {
-                resultsWithConfigIds.put(USER_NAME_ATTRIBUTE_NOT_FOUND.name(), USER_NAME_ATTRIBUTE);
+        try (Connection ldapConnection = connectionAttempt.connection()) {
+            List<SearchResultEntry> userDirExists = getLdapQueryResults(ldapConnection,
+                    configuration.baseUserDn(),
+                    Filter.present("objectClass")
+                            .toString(),
+                    SearchScope.BASE_OBJECT,
+                    1);
+            if (userDirExists.isEmpty()) {
+                resultsWithConfigIds.put(BASE_USER_DN_NOT_FOUND.name(), BASE_USER_DN);
             } else {
-                resultsWithConfigIds.put(FOUND_USER_NAME_ATTRIBUTE.name(), USER_NAME_ATTRIBUTE);
+                List<SearchResultEntry> baseUsersResults = getLdapQueryResults(ldapConnection,
+                        configuration.baseUserDn(),
+                        Filter.present(configuration.userNameAttribute())
+                                .toString(),
+                        SearchScope.SUBORDINATES,
+                        1);
+                if (baseUsersResults.isEmpty()) {
+                    resultsWithConfigIds.put(NO_USERS_IN_BASE_USER_DN.name(), BASE_USER_DN);
+                    resultsWithConfigIds.put(USER_NAME_ATTRIBUTE_NOT_FOUND.name(),
+                            USER_NAME_ATTRIBUTE);
+                } else {
+                    resultsWithConfigIds.put(FOUND_USER_NAME_ATTRIBUTE.name(), USER_NAME_ATTRIBUTE);
+                }
             }
+
+            List<SearchResultEntry> groupDirExists = getLdapQueryResults(ldapConnection,
+                    configuration.baseGroupDn(),
+                    Filter.present("objectClass")
+                            .toString(),
+                    SearchScope.BASE_OBJECT,
+                    1);
+            if (groupDirExists.isEmpty()) {
+                resultsWithConfigIds.put(BASE_GROUP_DN_NOT_FOUND.name(), BASE_GROUP_DN);
+            } else {
+                List<SearchResultEntry> baseGroupResults = getLdapQueryResults(ldapConnection,
+                        configuration.baseGroupDn(),
+                        Filter.equality("objectClass", configuration.groupObjectClass())
+                                .toString(),
+                        SearchScope.SUBORDINATES,
+                        1,
+                        "objectClass");
+                if (baseGroupResults.isEmpty()) {
+                    resultsWithConfigIds.put(NO_GROUPS_IN_BASE_GROUP_DN.name(), BASE_GROUP_DN);
+                } else {
+                    resultsWithConfigIds.put(FOUND_BASE_GROUP_DN.name(), BASE_GROUP_DN);
+                }
+            }
+
         }
-
-        List<SearchResultEntry> baseGroupResults = getLdapQueryResults(ldapConnection,
-                "objectClass=*",
-                configuration.baseGroupDn(), MAX_ENTRIES_TO_SEARCH);
-
-        if (baseGroupResults.isEmpty()) {
-            resultsWithConfigIds.put(BASE_GROUP_DN_NOT_FOUND.name(), BASE_GROUP_DN);
-        } else if (baseGroupResults.size() <= 1) {
-            resultsWithConfigIds.put(NO_GROUPS_IN_BASE_GROUP_DN.name(), BASE_GROUP_DN);
-        } else {
-            resultsWithConfigIds.put(FOUND_BASE_GROUP_DN.name(), BASE_GROUP_DN);
-        }
-        ldapConnection.close();
-
-        return createReport(SUCCESS_TYPES,
-                FAILURE_TYPES,
-                WARNING_TYPES,
-                resultsWithConfigIds);
+        return createReport(SUCCESS_TYPES, FAILURE_TYPES, WARNING_TYPES, resultsWithConfigIds);
     }
-
 }

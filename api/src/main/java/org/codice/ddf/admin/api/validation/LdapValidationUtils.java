@@ -40,9 +40,9 @@ public class LdapValidationUtils {
     public static final List<String> BIND_METHODS = ImmutableList.of(SIMPLE, SASL, GSSAPI_SASL, DIGEST_MD5_SASL);
 
     // TODO: tbatie - 1/17/17 - Rename these constants to authenticationAndAttributeStore
-    public static final String LOGIN = "login";
-    public static final String CREDENTIAL_STORE = "credentialStore";
-    public static final String LOGIN_AND_CREDENTIAL_STORE = "loginAndCredentialStore";
+    public static final String LOGIN = "authentication";
+    public static final String CREDENTIAL_STORE = "attributeStore";
+    public static final String LOGIN_AND_CREDENTIAL_STORE = "authenticationAndAttributeStore";
     public static final ImmutableList LDAP_USE_CASES = ImmutableList.of(LOGIN, CREDENTIAL_STORE, LOGIN_AND_CREDENTIAL_STORE);
 
     public static final List<ConfigurationMessage> validateEncryptionMethod(String encryptionMethod, String configId) {

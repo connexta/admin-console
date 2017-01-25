@@ -19,7 +19,7 @@ const LdapUseCases = [
   },
   {
     value: 'authenticationAndAttributeStore',
-    label: 'Authentication and Attribute Store'
+    label: 'Authentication and attribute store'
   }
 ]
 

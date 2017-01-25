@@ -2,6 +2,8 @@ import React from 'react'
 
 import Flexbox from 'flexbox-react'
 
+import Divider from 'material-ui/Divider'
+
 import Stage from 'components/Stage'
 import Title from 'components/Title'
 import Description from 'components/Description'
@@ -24,30 +26,44 @@ export default ({ disabled, prev, persist, configs }) => (
     </Description>
 
     <Flexbox flexDirection='column'>
-      <Flexbox flexDirection='row' />
+      <Flexbox flexDirection='row' justifyContent='space-between'>
+        <Flexbox flexDirection='column'>
+          <Info label='LDAP Function' value={useCaseMapping[configs.ldapUseCase]} />
+          <Info label='Hostname' value={configs.hostName} />
+          <Info label='Port' value={configs.port} />
+          <Info label='Encryption Method' value={configs.encryptionMethod} />
+          <Info label='Base User DN' value={configs.baseUserDn} />
+        </Flexbox>
+        <Flexbox flexDirection='column'>
+          <Info label='User Name Attribute' value={configs.userNameAttribute} />
+          <Info label='Base Group DN' value={configs.baseGroupDn} />
+          <Info label='Bind User DN' value={configs.bindUserDn} />
+          <Info label='Bind User Password' value='*****' />
+          <Info label='Bind User Method' value={configs.bindUserMethod} />
+        </Flexbox>
+      </Flexbox>
+      <Divider />
+      { configs.ldapUseCase !== 'authentication'
+        ? (
+          <div>
+            <Info label='LDAP Group Object Class' value={configs.groupObjectClass} />
+            <Info label='Membership Attribute' value={configs.membershipAttribute} />
+            <Info label='Attribute Mappings'
+              value={Object.keys(configs.attributeMappings).map(
+                  (key) => {
+                    return key + ' = ' + configs.attributeMappings[key]
+                  })
+                }
+          />
+            <Divider />
+          </div>
+        )
+        : null
+      }
     </Flexbox>
 
-    <Info label='LDAP Function' value={useCaseMapping[configs.ldapUseCase]} />
-    <Info label='Hostname' value={configs.hostName} />
-    <Info label='Port' value={configs.port} />
     {/* // todo: below are most of the config settings - decide which of these to display here
 
-    <Info label='Encryption Method' value={configs.encryptionMethod} />
-    <Info label='Bind User DN' value={configs.bindUserDn} />
-    <Info label='Bind User Password' value='*****' />
-    <Info label='Bind User Method' value={configs.bindUserMethod} />
-    <Info label='Base User DN' value={configs.baseUserDn} />
-    <Info label='User Name Attribute' value={configs.userNameAttribute} />
-    <Info label='Base Group DN' value={configs.baseGroupDn} />
-    <Info label='LDAP Group Object Class' value={configs.groupObjectClass} />
-    <Info label='Membership Attribute' value={configs.membershipAttribute} />
-    <Info label='Attribute Mappings'
-          value={ Object.keys(configs.attributeMappings).map(
-            (key) => {
-              return key + ' = ' + configs.attributeMappings[key]
-            })
-          }
-    />
     */}
 
     <Description>

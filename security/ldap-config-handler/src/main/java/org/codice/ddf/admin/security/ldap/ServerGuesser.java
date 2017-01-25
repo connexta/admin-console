@@ -13,13 +13,18 @@
  */
 package org.codice.ddf.admin.security.ldap;
 
+import static org.forgerock.opendj.ldap.schema.ObjectClassType.AUXILIARY;
+import static org.forgerock.opendj.ldap.schema.ObjectClassType.STRUCTURAL;
+
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -29,12 +34,17 @@ import java.util.stream.Collectors;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.opendj.ldap.Entries;
+import org.forgerock.opendj.ldap.Filter;
 import org.forgerock.opendj.ldap.LdapException;
+import org.forgerock.opendj.ldap.RootDSE;
 import org.forgerock.opendj.ldap.SearchResultReferenceIOException;
 import org.forgerock.opendj.ldap.SearchScope;
+import org.forgerock.opendj.ldap.requests.Requests;
+import org.forgerock.opendj.ldap.requests.SearchRequest;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
 import org.forgerock.opendj.ldap.schema.AttributeType;
-import org.forgerock.opendj.ldap.schema.ObjectClassType;
+import org.forgerock.opendj.ldap.schema.ObjectClass;
+import org.forgerock.opendj.ldap.schema.Schema;
 import org.forgerock.opendj.ldif.ConnectionEntryReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,6 +71,9 @@ public abstract class ServerGuesser {
                     ServerGuesser.OpenDjGuesser::new);
 
     protected final Connection connection;
+
+    private static final Predicate<ObjectClass> STRUCT_OR_AUX =
+            oc -> oc.getObjectClassType() == STRUCTURAL || oc.getObjectClassType() == AUXILIARY;
 
     private ServerGuesser(Connection connection) {
         this.connection = connection;
@@ -116,28 +129,43 @@ public abstract class ServerGuesser {
         return getChoices("(|(ou=group*)(name=group*)(cn=group*)(objectClass=groupOfUniqueNames))");
     }
 
-    public Set<String> getClaimAttributeOptions(String baseGroupDn, String membershipAttribute)
+    public Set<String> getClaimAttributeOptions(String baseUserDn)
             throws SearchResultReferenceIOException, LdapException {
+        // Find all object classes with names like *person* in the core schema;
+        // this will catch person, organizationalPerson, inetOrgPerson, etc. if present
+        SortedSet<String> attributes = extractAttributes(Schema.getCoreSchema()
+                        .getObjectClasses(),
+                oc -> oc.getNameOrOID()
+                        .toLowerCase()
+                        .matches(".*person.*"));
 
-        // Using the base group DN and membership attributes to constrain search,
-        // find one user's DN
-        ConnectionEntryReader reader = connection.search(baseGroupDn,
+        // TODO RAP 24 Jan 17: This should be moved elsewhere
+        // Find any given user with the clearance attribute
+        SearchRequest clearanceReq = Requests.newSearchRequest(DN.valueOf(baseUserDn),
                 SearchScope.WHOLE_SUBTREE,
-                String.format("%s=*", membershipAttribute),
-                membershipAttribute);
-        SearchResultEntry searchResultEntry = reader.readEntry();
-        String tokenUserDn = searchResultEntry.getAttribute(membershipAttribute)
-                .firstValueAsString();
+                Filter.present("2.16.840.1.101.2.2.1.203"),
+                "objectClass");
+        ConnectionEntryReader clearanceReader = connection.search(clearanceReq);
 
-        // Return the required and optional attributes of the structural objectClasses
-        // associated with that member
-        SearchResultEntry entry = connection.readEntry(DN.valueOf(tokenUserDn));
-        return Entries.getObjectClasses(entry)
-                .stream()
-                .filter(oc -> oc.getObjectClassType()
-                        .equals(ObjectClassType.STRUCTURAL))
-                .flatMap(oc -> Sets.union(oc.getDeclaredRequiredAttributes(),
-                        oc.getDeclaredOptionalAttributes())
+        if (clearanceReader.hasNext()) {
+            SearchResultEntry entry = clearanceReader.readEntry();
+            RootDSE rootDSE = RootDSE.readRootDSE(connection);
+            DN subschemaDN = rootDSE.getSubschemaSubentry();
+            Schema subschema = Schema.readSchema(connection, subschemaDN);
+
+            // Check against both the subschema and the default schema
+            attributes.addAll(extractAttributes(Entries.getObjectClasses(entry, subschema),
+                    STRUCT_OR_AUX));
+            attributes.addAll(extractAttributes(Entries.getObjectClasses(entry), STRUCT_OR_AUX));
+        }
+        return attributes;
+    }
+
+    private SortedSet<String> extractAttributes(Collection<ObjectClass> objectClasses,
+            Predicate<ObjectClass> predicate) {
+        return objectClasses.stream()
+                .filter(predicate)
+                .flatMap(oc -> Sets.union(oc.getRequiredAttributes(), oc.getOptionalAttributes())
                         .stream())
                 .map(AttributeType::getNameOrOID)
                 .collect(Collectors.toCollection(TreeSet::new));

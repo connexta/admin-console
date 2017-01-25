@@ -54,16 +54,7 @@ public class LdapValidationUtils {
     }
 
     public static final List<ConfigurationMessage> validateDn(String dn, String configId) {
-        List<ConfigurationMessage> errors = validateString(dn, configId);
-        if (errors.isEmpty()) {
-            try {
-                new LdapName(dn);
-            } catch (InvalidNameException e) {
-                errors.add(createInvalidFieldMsg(String.format("Invalid DN \"%s\"", dn), configId));
-            }
-        }
-
-        return errors;
+        return validateString(dn, configId);
     }
 
     public static final List<ConfigurationMessage> validateBindUserMethod(String bindMethod, String configId) {

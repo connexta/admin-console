@@ -13,7 +13,7 @@ import Description from 'components/Description'
 import Action from 'components/Action'
 import ActionGroup from 'components/ActionGroup'
 
-import { Select } from 'admin-wizard/inputs'
+import {Select, InputAuto} from 'admin-wizard/inputs'
 
 import { Card, CardHeader } from 'material-ui/Card'
 
@@ -70,7 +70,7 @@ class AttributeMapperView extends Component {
         <Select
           id='subjectClaims'
           label='STS Claim' />
-        <Select
+        <InputAuto
           id='userAttributes'
           label='LDAP User Attribute' />
 

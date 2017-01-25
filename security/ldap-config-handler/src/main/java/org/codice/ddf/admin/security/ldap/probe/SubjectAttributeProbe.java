@@ -99,8 +99,7 @@ public class SubjectAttributeProbe extends ProbeMethod<LdapConfiguration> {
             ServerGuesser serverGuesser = ServerGuesser.buildGuesser(configuration.ldapType(),
                     ldapConnectionAttempt.connection());
             ldapEntryAttributes =
-                    serverGuesser.getClaimAttributeOptions(configuration.baseGroupDn(),
-                            configuration.membershipAttribute());
+                    serverGuesser.getClaimAttributeOptions(configuration.baseUserDn());
         } catch (SearchResultReferenceIOException | LdapException e) {
             LOGGER.warn("Error retrieving attributes from LDAP server; this may indicate a "
                             + "configuration issue with baseGroupDN {} or membershipAttribute {}",

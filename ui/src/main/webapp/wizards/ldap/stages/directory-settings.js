@@ -66,7 +66,7 @@ const LdapQueryToolView = ({ disabled, probeValue, probe }) => (
       {probeValue.length === 0
        ? null
        : (<div className={styles.queryWindow}>
-         <h2 className={styles.title}>Query Results</h2>
+         <Title>Query Results</Title>
          <List>
            {probeValue.map((v, i) => <QueryResult key={i} {...v} />)}
          </List>
@@ -107,15 +107,15 @@ const DirectorySettings = (props) => {
           against the connected LDAP to assist in customizing these settings.
         </Description>
         <InputAuto id='baseUserDn' disabled={disabled} label='Base User DN'
-          tooltip='Full LDAP path to where users can be found.'/>
+          tooltip='Full LDAP path to where users can be found.' />
         <InputAuto id='userNameAttribute' disabled={disabled} label='User Name Attribute'
-          tooltip='Attribute used to designate the user’s name in LDAP. Typically uid or cn.'/>
+          tooltip='Attribute used to designate the user’s name in LDAP. Typically uid or cn.' />
         <InputAuto id='baseGroupDn' disabled={disabled} label='Base Group DN'
-          tooltip='Full LDAP path to where groups can be found.'/>
+          tooltip='Full LDAP path to where groups can be found.' />
         {ldapUseCase === 'authenticationAndAttributeStore' || ldapUseCase === 'attributeStore'
           ? <div>
             <InputAuto id='groupObjectClass' disabled={disabled} label='LDAP Group ObjectClass'
-              tooltip='ObjectClass that defines structure for group membership in LDAP. Typically groupOfNames.'/>
+              tooltip='ObjectClass that defines structure for group membership in LDAP. Typically groupOfNames.' />
             <InputAuto id='groupAttributeHoldingMember' disabled={disabled}
               label='Group Attribute Holding Member References' />
             <InputAuto id='memberAttributeReferencedInGroup' disabled={disabled}

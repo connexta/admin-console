@@ -42,9 +42,9 @@ import static org.codice.ddf.admin.api.services.LdapClaimsHandlerServiceProperti
 import static org.codice.ddf.admin.api.services.LdapLoginServiceProperties.LDAP_LOGIN_FEATURE;
 import static org.codice.ddf.admin.api.services.LdapLoginServiceProperties.LDAP_LOGIN_MANAGED_SERVICE_FACTORY_PID;
 import static org.codice.ddf.admin.api.services.LdapLoginServiceProperties.ldapConfigurationToLdapLoginService;
-import static org.codice.ddf.admin.api.validation.LdapValidationUtils.CREDENTIAL_STORE;
-import static org.codice.ddf.admin.api.validation.LdapValidationUtils.LOGIN;
-import static org.codice.ddf.admin.api.validation.LdapValidationUtils.LOGIN_AND_CREDENTIAL_STORE;
+import static org.codice.ddf.admin.api.validation.LdapValidationUtils.ATTRIBUTE_STORE;
+import static org.codice.ddf.admin.api.validation.LdapValidationUtils.AUTHENTICATION;
+import static org.codice.ddf.admin.api.validation.LdapValidationUtils.AUTHENTICATION_AND_ATTRIBUTE_STORE;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -108,8 +108,8 @@ public class CreateLdapConfigMethod extends PersistMethod<LdapConfiguration>{
         OperationReport report;
         Configurator configurator = new Configurator();
         if (config.ldapUseCase()
-                .equals(LOGIN) || config.ldapUseCase()
-                .equals(LOGIN_AND_CREDENTIAL_STORE)) {
+                .equals(AUTHENTICATION) || config.ldapUseCase()
+                .equals(AUTHENTICATION_AND_ATTRIBUTE_STORE)) {
 
             // TODO: tbatie - 1/15/17 - Validate optional fields
             Report validationReport = new Report(config.validate(LOGIN_REQUIRED_FIELDS));
@@ -122,7 +122,8 @@ public class CreateLdapConfigMethod extends PersistMethod<LdapConfiguration>{
             configurator.createManagedService(LDAP_LOGIN_MANAGED_SERVICE_FACTORY_PID, ldapLoginServiceProps);
         }
 
-        if (config.ldapUseCase().equals(CREDENTIAL_STORE) || config.ldapUseCase().equals(LOGIN_AND_CREDENTIAL_STORE)) {
+        if (config.ldapUseCase().equals(ATTRIBUTE_STORE) || config.ldapUseCase().equals(
+                AUTHENTICATION_AND_ATTRIBUTE_STORE)) {
             Report validationReport = new Report(config.validate(ADDITIONAL_ATTRIBUTE_STORE_FIELDS));
             if(validationReport.containsFailureMessages()) {
                 return validationReport;

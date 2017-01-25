@@ -22,9 +22,9 @@ import static org.codice.ddf.admin.api.services.EmbeddedLdapServiceProperties.DE
 import static org.codice.ddf.admin.api.services.EmbeddedLdapServiceProperties.EMBEDDED_LDAP_FEATURE;
 import static org.codice.ddf.admin.api.services.LdapClaimsHandlerServiceProperties.LDAP_CLAIMS_HANDLER_FEATURE;
 import static org.codice.ddf.admin.api.services.LdapLoginServiceProperties.LDAP_LOGIN_FEATURE;
-import static org.codice.ddf.admin.api.validation.LdapValidationUtils.CREDENTIAL_STORE;
-import static org.codice.ddf.admin.api.validation.LdapValidationUtils.LOGIN;
-import static org.codice.ddf.admin.api.validation.LdapValidationUtils.LOGIN_AND_CREDENTIAL_STORE;
+import static org.codice.ddf.admin.api.validation.LdapValidationUtils.ATTRIBUTE_STORE;
+import static org.codice.ddf.admin.api.validation.LdapValidationUtils.AUTHENTICATION;
+import static org.codice.ddf.admin.api.validation.LdapValidationUtils.AUTHENTICATION_AND_ATTRIBUTE_STORE;
 
 import java.util.List;
 import java.util.Map;
@@ -61,15 +61,15 @@ public class DefaultEmbeddedLdapPersistMethod extends PersistMethod<EmbeddedLdap
         Configurator configurator = new Configurator();
         configurator.startFeature(EMBEDDED_LDAP_FEATURE);
         switch (configuration.ldapUseCase()) {
-        case LOGIN:
+        case AUTHENTICATION:
             configurator.startFeature(LDAP_LOGIN_FEATURE);
             configurator.startFeature(DEFAULT_EMBEDDED_LDAP_LOGIN_CONFIG_FEATURE);
             break;
-        case CREDENTIAL_STORE:
+        case ATTRIBUTE_STORE:
             configurator.startFeature(LDAP_CLAIMS_HANDLER_FEATURE);
             configurator.startFeature(DEFAULT_EMBEDDED_LDAP_CLAIMS_HANDLER_CONFIG_FEATURE);
             break;
-        case LOGIN_AND_CREDENTIAL_STORE:
+        case AUTHENTICATION_AND_ATTRIBUTE_STORE:
             configurator.startFeature(LDAP_LOGIN_FEATURE);
             configurator.startFeature(LDAP_CLAIMS_HANDLER_FEATURE);
             configurator.startFeature(ALL_DEFAULT_EMBEDDED_LDAP_CONFIG_FEATURE);

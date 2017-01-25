@@ -68,8 +68,8 @@ public class ProbeReport extends Report {
         return probeResults;
     }
 
-    public ProbeReport messages(ConfigurationMessage message) {
-        super.messages(message);
+    public ProbeReport addMessage(ConfigurationMessage message) {
+        super.addMessage(message);
         return this;
     }
 }

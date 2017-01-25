@@ -73,7 +73,7 @@ public class DiscoverSourcesProbeMethod extends ProbeMethod<SourceConfiguration>
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList());
 
-        sourcesProbeReport.probeResult(DISCOVERED_SOURCES_KEY, discoveredSources).messages(probeSourceMessages);
+        sourcesProbeReport.probeResult(DISCOVERED_SOURCES_KEY, discoveredSources).addMessages(probeSourceMessages);
         return sourcesProbeReport;
     }
 }

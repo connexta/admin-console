@@ -18,9 +18,6 @@ import static org.codice.ddf.admin.api.validation.ValidationUtils.validateString
 
 import java.util.List;
 
-import javax.naming.InvalidNameException;
-import javax.naming.ldap.LdapName;
-
 import org.codice.ddf.admin.api.handler.ConfigurationMessage;
 
 import com.google.common.collect.ImmutableList;
@@ -39,11 +36,11 @@ public class LdapValidationUtils {
     public static final String DIGEST_MD5_SASL = "Digest MD5 SASL";
     public static final List<String> BIND_METHODS = ImmutableList.of(SIMPLE, SASL, GSSAPI_SASL, DIGEST_MD5_SASL);
 
-    // TODO: tbatie - 1/17/17 - Rename these constants to authenticationAndAttributeStore
-    public static final String LOGIN = "authentication";
-    public static final String CREDENTIAL_STORE = "attributeStore";
-    public static final String LOGIN_AND_CREDENTIAL_STORE = "authenticationAndAttributeStore";
-    public static final ImmutableList LDAP_USE_CASES = ImmutableList.of(LOGIN, CREDENTIAL_STORE, LOGIN_AND_CREDENTIAL_STORE);
+    public static final String AUTHENTICATION = "authentication";
+    public static final String ATTRIBUTE_STORE = "attributeStore";
+    public static final String AUTHENTICATION_AND_ATTRIBUTE_STORE = "authenticationAndAttributeStore";
+    public static final ImmutableList LDAP_USE_CASES = ImmutableList.of(AUTHENTICATION,
+            ATTRIBUTE_STORE, AUTHENTICATION_AND_ATTRIBUTE_STORE);
 
     public static List<ConfigurationMessage> validateEncryptionMethod(String encryptionMethod,
             String configId) {

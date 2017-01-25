@@ -14,8 +14,7 @@
 package org.codice.ddf.admin.api.services;
 
 import static org.codice.ddf.admin.api.validation.LdapValidationUtils.LDAPS;
-import static org.codice.ddf.admin.api.validation.LdapValidationUtils.LOGIN;
-import static org.codice.ddf.admin.api.validation.LdapValidationUtils.TLS;
+import static org.codice.ddf.admin.api.validation.LdapValidationUtils.AUTHENTICATION;
 import static org.codice.ddf.admin.api.validation.ValidationUtils.FACTORY_PID_KEY;
 import static org.codice.ddf.admin.api.validation.ValidationUtils.SERVICE_PID_KEY;
 
@@ -65,7 +64,7 @@ public class LdapLoginServiceProperties {
         if ((Boolean) props.get(START_TLS)) {
             ldapConfiguration.encryptionMethod(START_TLS);
         }
-        ldapConfiguration.ldapUseCase(LOGIN);
+        ldapConfiguration.ldapUseCase(AUTHENTICATION);
         return ldapConfiguration;
     }
 

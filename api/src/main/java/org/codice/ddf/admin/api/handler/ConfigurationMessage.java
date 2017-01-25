@@ -18,7 +18,7 @@ import static org.codice.ddf.admin.api.handler.ConfigurationMessage.MessageType.
 
 /**
  * A {@link ConfigurationMessage} encapsulates the results of an operation performed on a {@link org.codice.ddf.admin.api.config.Configuration}.
- * {@link ConfigurationMessage}s are wrapped by {@link org.codice.ddf.admin.api.handler.report.Report}s to relay messages about the {@link org.codice.ddf.admin.api.handler.method.ConfigurationHandlerMethod}s results.
+ * {@link ConfigurationMessage}s are wrapped by {@link org.codice.ddf.admin.api.handler.report.Report}s to relay addMessage about the {@link org.codice.ddf.admin.api.handler.method.ConfigurationHandlerMethod}s results.
  */
 public class ConfigurationMessage {
 

@@ -106,7 +106,7 @@ public class SubjectAttributeProbe extends ProbeMethod<LdapConfiguration> {
                     configuration.memberAttributeReferencedInGroup());
         }
 
-        // TODO: tbatie - 1/19/17 - Need to return messages about the probe result and/or if something goes wrong
+        // TODO: tbatie - 1/19/17 - Need to return addMessage about the probe result and/or if something goes wrong
         return probeReport.probeResult(SUBJECT_CLAIMS_ID, subjectClaims)
                 .probeResult(USER_ATTRIBUTES, ldapEntryAttributes);
     }

@@ -21,8 +21,8 @@ import static org.codice.ddf.admin.api.services.PolicyManagerServiceProperties.I
 import static org.codice.ddf.admin.api.services.PolicyManagerServiceProperties.IDP_SERVER_BUNDLE_NAME;
 import static org.codice.ddf.admin.api.services.PolicyManagerServiceProperties.STS_CLAIMS_CONFIGURATION_CONFIG_ID;
 import static org.codice.ddf.admin.api.services.PolicyManagerServiceProperties.STS_CLAIMS_PROPS_KEY_CLAIMS;
-import static org.codice.ddf.admin.api.validation.LdapValidationUtils.LOGIN;
-import static org.codice.ddf.admin.api.validation.LdapValidationUtils.LOGIN_AND_CREDENTIAL_STORE;
+import static org.codice.ddf.admin.api.validation.LdapValidationUtils.AUTHENTICATION;
+import static org.codice.ddf.admin.api.validation.LdapValidationUtils.AUTHENTICATION_AND_ATTRIBUTE_STORE;
 import static org.codice.ddf.admin.api.validation.SecurityValidationUtils.BASIC;
 import static org.codice.ddf.admin.api.validation.SecurityValidationUtils.GUEST;
 import static org.codice.ddf.admin.api.validation.SecurityValidationUtils.IDP;
@@ -107,9 +107,9 @@ public class AvailableOptionsProbeMethod extends ProbeMethod<ContextPolicyConfig
         if (ldapConfigHandler == null || ldapConfigHandler.getConfigurations()
                 .stream()
                 .anyMatch(config -> ((LdapConfiguration) config).ldapUseCase()
-                        .equals(LOGIN)
+                        .equals(AUTHENTICATION)
                         || ((LdapConfiguration) config).ldapUseCase()
-                        .equals(LOGIN_AND_CREDENTIAL_STORE))) {
+                        .equals(AUTHENTICATION_AND_ATTRIBUTE_STORE))) {
             realms.add(LDAP);
         }
 

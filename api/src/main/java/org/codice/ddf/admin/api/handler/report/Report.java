@@ -72,15 +72,15 @@ public class Report {
 
         for (String result : results) {
             if (successTypes != null && successTypes.containsKey(result)) {
-                testReport.messages(new ConfigurationMessage(ConfigurationMessage.MessageType.SUCCESS,
+                testReport.addMessage(new ConfigurationMessage(ConfigurationMessage.MessageType.SUCCESS,
                         result,
                         successTypes.get(result)));
             } else if (warningTypes != null && warningTypes.containsKey(result)) {
-                testReport.messages(new ConfigurationMessage(ConfigurationMessage.MessageType.WARNING,
+                testReport.addMessage(new ConfigurationMessage(ConfigurationMessage.MessageType.WARNING,
                         result,
                         warningTypes.get(result)));
             } else if (failureTypes != null && failureTypes.containsKey(result)) {
-                testReport.messages(new ConfigurationMessage(ConfigurationMessage.MessageType.FAILURE,
+                testReport.addMessage(new ConfigurationMessage(ConfigurationMessage.MessageType.FAILURE,
                         result,
                         failureTypes.get(result)));
             }
@@ -97,15 +97,15 @@ public class Report {
             String resultName = result.getKey();
             String resultConfigId = result.getValue();
             if (successTypes != null && successTypes.containsKey(resultName)) {
-                testReport.messages(new ConfigurationMessage(ConfigurationMessage.MessageType.SUCCESS,
+                testReport.addMessage(new ConfigurationMessage(ConfigurationMessage.MessageType.SUCCESS,
                         resultName,
                         successTypes.get(resultName)).configFieldId(resultConfigId));
             } else if (warningTypes != null && warningTypes.containsKey(resultName)) {
-                testReport.messages(new ConfigurationMessage(ConfigurationMessage.MessageType.WARNING,
+                testReport.addMessage(new ConfigurationMessage(ConfigurationMessage.MessageType.WARNING,
                         resultName,
                         warningTypes.get(resultName)).configFieldId(resultConfigId));
             } else if (failureTypes != null && failureTypes.containsKey(resultName)) {
-                testReport.messages(new ConfigurationMessage(ConfigurationMessage.MessageType.FAILURE,
+                testReport.addMessage(new ConfigurationMessage(ConfigurationMessage.MessageType.FAILURE,
                         resultName,
                         failureTypes.get(resultName)).configFieldId(resultConfigId));
             }
@@ -119,13 +119,12 @@ public class Report {
     }
 
     //Setters
-    public Report messages(ConfigurationMessage result) {
+    public Report addMessage(ConfigurationMessage result) {
         this.messages.add(result);
         return this;
     }
 
-    // TODO: tbatie - 1/20/17 - rename to addMessages
-    public Report messages(List<ConfigurationMessage> messages) {
+    public Report addMessages(List<ConfigurationMessage> messages) {
         this.messages.addAll(messages);
         return this;
     }

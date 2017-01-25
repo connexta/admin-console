@@ -1,3 +1,5 @@
+import React from 'react'
+
 import CheckIcon from 'material-ui/svg-icons/action/check-circle'
 import CloseIcon from 'material-ui/svg-icons/navigation/cancel'
 

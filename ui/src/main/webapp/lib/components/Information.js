@@ -1,3 +1,5 @@
+import React from 'react'
+
 import { informationDiv, informationLabel, informationP, informationListItemP } from './styles.less'
 
 export default ({ id, label, value }) => (

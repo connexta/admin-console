@@ -36,6 +36,7 @@ import org.codice.ddf.admin.api.config.ldap.LdapConfiguration;
 import org.codice.ddf.admin.api.handler.method.ProbeMethod;
 import org.codice.ddf.admin.api.handler.report.ProbeReport;
 import org.forgerock.opendj.ldap.Attribute;
+import org.forgerock.opendj.ldap.ByteString;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.SearchScope;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
@@ -91,6 +92,9 @@ public class LdapQueryProbe extends ProbeMethod<LdapConfiguration> {
                         entry.getName()
                                 .toString());
                 if (!attri.getAttributeDescriptionAsString().toLowerCase().contains("password")) {
+                    for(ByteString attris : attri) {
+
+                    }
                     entryMap.put(attri.getAttributeDescriptionAsString(), attri.firstValueAsString());
                 }
             }

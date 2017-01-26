@@ -99,7 +99,7 @@ public class AvailableOptionsProbeMethod extends ProbeMethod<ContextPolicyConfig
 
     public List<String> getRealms() {
         List<String> realms = new ArrayList<>(Arrays.asList(KARAF));
-        // TODO: tbatie - 1/12/17 - If a IdpConfigurationHandler exists replace this with a service reference
+        // If an IdpConfigurationHandler exists replace this with a service reference
         if(configurator.isBundleStarted(IDP_SERVER_BUNDLE_NAME)) {
             realms.add(IDP);
         }

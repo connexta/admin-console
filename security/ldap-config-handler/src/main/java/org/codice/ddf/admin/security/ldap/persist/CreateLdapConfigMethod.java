@@ -48,6 +48,7 @@ import static org.codice.ddf.admin.api.validation.LdapValidationUtils.AUTHENTICA
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -56,7 +57,9 @@ import org.codice.ddf.admin.api.config.ldap.LdapConfiguration;
 import org.codice.ddf.admin.api.configurator.Configurator;
 import org.codice.ddf.admin.api.configurator.OperationReport;
 import org.codice.ddf.admin.api.handler.method.PersistMethod;
+import org.codice.ddf.admin.api.handler.report.ProbeReport;
 import org.codice.ddf.admin.api.handler.report.Report;
+import org.codice.ddf.admin.api.validation.LdapValidationUtils;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -77,7 +80,7 @@ public class CreateLdapConfigMethod extends PersistMethod<LdapConfiguration>{
             BASE_USER_DN,
             BASE_GROUP_DN);
 
-    public static final List<String> LOGIN_OPTIONAL_FIELDS = ImmutableList.of(BIND_KDC, BIND_REALM);
+    public static final List<String> LOGIN_OPTIONAL_FIELDS = ImmutableList.of(BIND_REALM);
 
     public static final List<String> ADDITIONAL_ATTRIBUTE_STORE_FIELDS = ImmutableList.of(
                 GROUP_OBJECT_CLASS,
@@ -111,7 +114,12 @@ public class CreateLdapConfigMethod extends PersistMethod<LdapConfiguration>{
                 .equals(AUTHENTICATION) || config.ldapUseCase()
                 .equals(AUTHENTICATION_AND_ATTRIBUTE_STORE)) {
 
-            // TODO: tbatie - 1/15/17 - Validate optional fields
+            if(config.bindUserMethod().equals(LdapValidationUtils.DIGEST_MD5_SASL)) {
+                ProbeReport optValidationReport = new ProbeReport(config.validate(Arrays.asList(BIND_REALM)));
+                if(optValidationReport.containsFailureMessages()) {
+                    return optValidationReport;
+                }
+            }
             Report validationReport = new Report(config.validate(LOGIN_REQUIRED_FIELDS));
             if(validationReport.containsFailureMessages()) {
                 return validationReport;

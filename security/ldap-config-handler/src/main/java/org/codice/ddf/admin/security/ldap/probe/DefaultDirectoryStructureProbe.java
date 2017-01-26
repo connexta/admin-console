@@ -21,23 +21,27 @@ import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.BIND_REALM;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.BIND_USER_DN;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.BIND_USER_PASSWORD;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.ENCRYPTION_METHOD;
+import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.GROUP_ATTRIBUTE_HOLDING_MEMBER;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.GROUP_OBJECT_CLASS;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.HOST_NAME;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.LDAP_TYPE;
-import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.GROUP_ATTRIBUTE_HOLDING_MEMBER;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.PORT;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.QUERY;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.QUERY_BASE;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.USER_NAME_ATTRIBUTE;
+import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.SUCCESSFUL_PROBE;
+import static org.codice.ddf.admin.api.handler.report.ProbeReport.createProbeReport;
 import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.CANNOT_BIND;
 import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.CANNOT_CONFIGURE;
 import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.CANNOT_CONNECT;
+import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.SUCCESSFUL_BIND;
 import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.toDescriptionMap;
 import static org.codice.ddf.admin.security.ldap.test.LdapTestingCommons.bindUserToLdapConnection;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -45,8 +49,10 @@ import org.codice.ddf.admin.api.config.ldap.LdapConfiguration;
 import org.codice.ddf.admin.api.handler.method.ProbeMethod;
 import org.codice.ddf.admin.api.handler.report.ProbeReport;
 import org.codice.ddf.admin.security.ldap.ServerGuesser;
+import org.codice.ddf.admin.security.ldap.test.LdapTestingCommons;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 public class DefaultDirectoryStructureProbe extends ProbeMethod<LdapConfiguration> {
 
@@ -67,6 +73,8 @@ public class DefaultDirectoryStructureProbe extends ProbeMethod<LdapConfiguratio
             BIND_USER_PASSWORD,
             BIND_METHOD);
 
+    private static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(SUCCESSFUL_PROBE, "Successfully discovered recommended values");
+
     private static final List<String> OPTIONAL_FIELDS = ImmutableList.of(BIND_REALM, BIND_KDC);
 
     private static final Map<String, String> FAILURE_TYPES = toDescriptionMap(Arrays.asList(
@@ -74,33 +82,44 @@ public class DefaultDirectoryStructureProbe extends ProbeMethod<LdapConfiguratio
             CANNOT_CONNECT,
             CANNOT_BIND));
 
-    // TODO: tbatie - 1/19/17 - Set success types and return addMessage from probe message if something goes wrong
+    private static final List<String> RETURN_TYPES = ImmutableList.of(BASE_USER_DN,
+            BASE_GROUP_DN,
+            USER_NAME_ATTRIBUTE,
+            GROUP_OBJECT_CLASS,
+            GROUP_ATTRIBUTE_HOLDING_MEMBER,
+            MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP,
+            QUERY,
+            QUERY_BASE);
+
     public DefaultDirectoryStructureProbe() {
-        super(ID, DESCRIPTION, REQUIRED_FIELDS, OPTIONAL_FIELDS, null, FAILURE_TYPES, null);
+        super(ID, DESCRIPTION, REQUIRED_FIELDS, OPTIONAL_FIELDS, SUCCESS_TYPES, FAILURE_TYPES, null, RETURN_TYPES);
     }
 
     @Override
     public ProbeReport probe(LdapConfiguration configuration) {
-        ProbeReport probeReport = new ProbeReport();
-        String ldapType = configuration.ldapType();
-        ServerGuesser guesser = ServerGuesser.buildGuesser(ldapType,
-                bindUserToLdapConnection(configuration).connection());
-
-        if (guesser != null) {
-            probeReport.probeResult(BASE_USER_DN, guesser.getUserBaseChoices());
-            probeReport.probeResult(BASE_GROUP_DN, guesser.getGroupBaseChoices());
-            probeReport.probeResult(USER_NAME_ATTRIBUTE, guesser.getUserNameAttribute());
-            probeReport.probeResult(GROUP_OBJECT_CLASS, guesser.getGroupObjectClass());
-            probeReport.probeResult(GROUP_ATTRIBUTE_HOLDING_MEMBER,
-                    guesser.getGroupAttributeHoldingMember());
-            probeReport.probeResult(MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP,
-                    guesser.getMemberAttributeReferencedInGroup());
-
-            // TODO RAP 13 Dec 16: Better query, perhaps driven by guessers?
-            probeReport.probeResult(QUERY, Collections.singletonList("objectClass=*"));
-            probeReport.probeResult(QUERY_BASE, guesser.getBaseContexts());
+        LdapTestingCommons.LdapConnectionAttempt connectionAttempt = bindUserToLdapConnection(configuration);
+        if(connectionAttempt.result() != SUCCESSFUL_BIND) {
+            return createProbeReport(SUCCESS_TYPES, FAILURE_TYPES, null, connectionAttempt.result().name());
         }
 
-        return probeReport;
+        Map<String, Object> probeResult = new HashMap<>();
+        String ldapType = configuration.ldapType();
+        ServerGuesser guesser = ServerGuesser.buildGuesser(ldapType,connectionAttempt.connection());
+
+        if (guesser != null) {
+            probeResult.put(BASE_USER_DN, guesser.getUserBaseChoices());
+            probeResult.put(BASE_GROUP_DN, guesser.getGroupBaseChoices());
+            probeResult.put(USER_NAME_ATTRIBUTE, guesser.getUserNameAttribute());
+            probeResult.put(GROUP_OBJECT_CLASS, guesser.getGroupObjectClass());
+            probeResult.put(GROUP_ATTRIBUTE_HOLDING_MEMBER,
+                    guesser.getGroupAttributeHoldingMember());
+            probeResult.put(MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP,
+                    guesser.getMemberAttributeReferencedInGroup());
+            // TODO RAP 13 Dec 16: Better query, perhaps driven by guessers?
+            probeResult.put(QUERY, Collections.singletonList("objectClass=*"));
+            probeResult.put(QUERY_BASE, guesser.getBaseContexts());
+        }
+
+        return createProbeReport(SUCCESS_TYPES, FAILURE_TYPES, null, SUCCESSFUL_PROBE).probeResults(probeResult);
     }
 }

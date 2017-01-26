@@ -89,7 +89,7 @@ class AttributeMapperView extends Component {
             </Description>
           </CardHeader>
           <Table multiSelectable onRowSelection={(selected) => this.setState({ selected })}>
-            <TableHeader>
+            <TableHeader displaySelectAll={false} >
               <TableRow>
                 <TableHeaderColumn>STS Claim</TableHeaderColumn>
                 <TableHeaderColumn style={{ width: 120 }}>LDAP User Attribute</TableHeaderColumn>

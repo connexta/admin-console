@@ -1,10 +1,7 @@
 import React from 'react'
 import Paper from 'material-ui/Paper'
-
-import { connect } from 'react-redux'
-
+import {connect} from 'react-redux'
 import Mount from 'react-mount'
-
 import {
   getBins,
   getOptions,
@@ -13,7 +10,6 @@ import {
   getWcpmErrors,
   isSubmitting
 } from '../../reducer'
-
 import {
   removeBin,
   addAttribute,
@@ -31,7 +27,6 @@ import {
   cancelRemoveBin,
   addContextPath
 } from './actions'
-
 import Flexbox from 'flexbox-react'
 import IconButton from 'material-ui/IconButton'
 import TextField from 'material-ui/TextField'
@@ -42,17 +37,21 @@ import MenuItem from 'material-ui/MenuItem'
 import FlatButton from 'material-ui/FlatButton'
 import RaisedButton from 'material-ui/RaisedButton'
 import CircularProgress from 'material-ui/CircularProgress'
-import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table'
-
-import { cyanA700 } from 'material-ui/styles/colors'
-
+import {
+  Table,
+  TableBody,
+  TableHeader,
+  TableHeaderColumn,
+  TableRow,
+  TableRowColumn
+} from 'material-ui/Table'
+import {cyanA700} from 'material-ui/styles/colors'
 import CancelIcon from 'material-ui/svg-icons/content/remove-circle-outline'
 import DeleteIcon from 'material-ui/svg-icons/action/delete'
 import AddIcon from 'material-ui/svg-icons/content/add-circle-outline'
 import ContentAdd from 'material-ui/svg-icons/content/add'
 import EditModeIcon from 'material-ui/svg-icons/editor/mode-edit'
 import ClearIcon from 'material-ui/svg-icons/content/clear'
-
 import {
   contextPolicyStyle,
   infoTitle,
@@ -274,7 +273,9 @@ const WhitelistBin = ({ policyBin, binNumber, editing, editingBinNumber }) => (
       <ContextPathGroup binNumber={binNumber} bin={policyBin} editing={editing} />
       <Flexbox style={{ padding: '5px' }} flexDirection='column' justifyContent='center'>
         <p className={infoTitle}>Whitelisted Contexts</p>
-        <p className={infoSubtitle}>The contexts listed here will not be checked against any policies and all requests made to these endpoints will be permitted. Use with caution.</p>
+        <p className={infoSubtitle}>
+          The paths listed here will not be checked against any policies and all requests under these paths will be permitted. Use with caution!
+        </p>
       </Flexbox>
     </Flexbox>
     <Edit editing={editing} binNumber={binNumber} />
@@ -364,7 +365,17 @@ let wcpm = ({ updatePolicyBins, isSubmitting }) => (
     <Flexbox flexDirection='column' style={{ width: '100%', height: '100%' }}>
       <Paper style={{ backgroundColor: '#EEE', width: '100%' }}>
         <p className={infoTitle}>Web Context Policy Manager</p>
-        <p className={infoSubtitle}>The Web Context Policy Manager defines all security policies for REST endpoints. It defines the realms a context should authenticate against, the type of authentication that a context requires, and any user attributes that are required for authorization.</p>
+        <p className={infoSubtitle}>
+          The Web Context Policy Manager defines security policies for all subpaths of this web server.
+          It defines the realms a path should be authenticated against, the type of authentication that
+          a path requires, and any user attributes that are required for authorization.
+        </p>
+
+        <p className={infoSubtitle}>
+          Any subpaths of a configured path will inherit its parent's policy. For example, in a system
+          where a policy is configured for '/a', its policy applies to '/a/b' and '/a/b/c' unless otherwise
+          specified.
+        </p>
       </Paper>
       <Divider />
       <PolicyBins />

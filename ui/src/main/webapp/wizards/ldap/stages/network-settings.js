@@ -30,9 +30,8 @@ const NetworkSettings = (props) => {
     <Stage>
       <Mount
         on={setDefaults}
-        port={1636}
-        encryptionMethod='LDAPS'
-        hostName='localhost' />
+        port={636}
+        encryptionMethod='LDAPS' />
       <Spinner submitting={submitting}>
         <Title>LDAP Network Settings</Title>
         <Description>

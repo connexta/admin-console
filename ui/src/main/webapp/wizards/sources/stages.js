@@ -4,6 +4,8 @@ import { connect } from 'react-redux'
 import { getSourceSelections, getConfigurationHandlerId, getSourceName, getConfigTypes } from './reducer'
 import { getMessages, getAllConfig, getConfig } from '../../reducer'
 import { changeStage, testSources, persistConfig, resetSourceWizardState, fetchConfigTypes, testManualUrl } from './actions'
+import Title from 'components/Title'
+import Description from 'components/Description'
 
 import Flexbox from 'flexbox-react'
 import { Link } from 'react-router'
@@ -34,15 +36,17 @@ import {
 import Message from 'components/Message'
 
 // Welcome Stage
-const welcomeTitle = 'Welcome to the Source Configuration Wizard'
-const welcomeSubtitle = 'This wizard will guide you through discovering and configuring ' +
-  "various sources that are used to query metadata in other DDF's or external systems. " +
-  'To begin, make sure you have the hostname and port of the source you plan to configure.'
-
 const WelcomeStageView = ({ changeStage }) => (
   <Flexbox className={stageStyle} justifyContent='center' flexDirection='row'>
     <CenteredElements>
-      <Info title={welcomeTitle} subtitle={welcomeSubtitle} />
+      <Title>
+        Welcome to the Source Configuration Wizard
+      </Title>
+      <Description>
+        This wizard will guide you through discovering and configuring
+        various sources that are used to query metadata from catalogs.
+        To begin, make sure you have the hostname and port of the source you plan to configure.
+      </Description>
       <Submit label='Begin Source Setup' onClick={() => changeStage('discoveryStage')} />
     </CenteredElements>
   </Flexbox>
@@ -53,9 +57,9 @@ export const WelcomeStage = connect(null, {
 
 // Discovery Stage
 const discoveryTitle = 'Discover Available Sources'
-const discoverySubtitle = 'Enter source information to scan for available sources'
+const discoverySubtitle = 'Enter connection information to scan for available sources on a host.'
 const discoveryStageDefaults = {
-  sourceHostName: 'localhost',
+  sourceHostName: '',
   sourcePort: 8993
 }
 const DiscoveryStageView = ({ testSources, setDefaults, messages, configs }) => (
@@ -66,7 +70,7 @@ const DiscoveryStageView = ({ testSources, setDefaults, messages, configs }) => 
         <ConstrainedHostnameInput
           id='sourceHostName'
           label='Hostname'
-          errorText={(isEmpty(configs.sourceHostName)) ? 'Cannot be blank' : null} />
+          errorText={(configs.sourceHostName) === null ? 'Cannot be blank' : null} />
         <ConstrainedPortInput
           id='sourcePort'
           label='Port'
@@ -101,7 +105,7 @@ export const DiscoveryStage = connect((state) => ({
 // Source Selection Stage
 const sourceSelectionTitle = 'Sources Found!'
 const sourceSelectionSubtitle = 'Choose which source to add'
-const noSourcesFoundTitle = 'No Sources Were Found'
+const noSourcesFoundTitle = 'No Sources Found'
 const noSourcesFoundSubtitle = 'Click below to enter source information manually, or go back to enter a different hostname/port.'
 
 const SourceSelectionStageView = ({sourceSelections = [], selectedSourceConfigHandlerId, changeStage, fetchConfigTypes}) => {
@@ -132,7 +136,7 @@ export const SourceSelectionStage = connect((state) => ({
 
 // Confirmation Stage
 const confirmationTitle = 'Finalize Source Configuration'
-const confirmationSubtitle = 'Please give your source a unique name, confirm details, and press finish to add source'
+const confirmationSubtitle = 'Please give your source a unique name, confirm details, and press finish to create source.'
 const ConfirmationStageView = ({ selectedSource, persistConfig, sourceName, configType }) => (
   <NavPanes backClickTarget='sourceSelectionStage' forwardClickTarget='completedStage'>
     <CenteredElements>
@@ -180,7 +184,7 @@ export const CompletedStage = connect(null, { resetSourceWizardState })(Complete
 
 // Manual Entry Page
 const manualEntryTitle = 'Manual Source Entry'
-const manualEntrySubtitle = 'Choose a source configuration type and enter a source URL'
+const manualEntrySubtitle = 'Choose a source configuration type and enter a source URL.'
 const ManualEntryStageView = ({ configOptions, endpointUrl, configType, testManualUrl }) => (
   <NavPanes backClickTarget='sourceSelectionStage' forwardClickTarget='confirmationStage'>
     <CenteredElements>

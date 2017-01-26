@@ -21,6 +21,9 @@ const BindSettings = (props) => {
     // data
     disabled,
     submitting,
+    configs: {
+      ldapType
+    },
     configs = {},
     messages = [],
 
@@ -41,7 +44,7 @@ const BindSettings = (props) => {
     <Stage>
       <Mount
         on={setDefaults}
-        bindUserDn={props.configs.ldapType === 'activeDirectory' ? 'user@domain' : 'cn=admin'}
+        bindUserDn={ldapType === 'activeDirectory' ? 'user@domain' : 'cn=admin'}
         bindUserPassword='secret'
         bindUserMethod='Simple' />
 

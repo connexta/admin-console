@@ -15,7 +15,6 @@ package org.codice.ddf.admin.security.ldap.probe;
 
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.BASE_GROUP_DN;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.BASE_USER_DN;
-import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.BIND_KDC;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.BIND_METHOD;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.BIND_REALM;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.BIND_USER_DN;
@@ -75,7 +74,7 @@ public class DefaultDirectoryStructureProbe extends ProbeMethod<LdapConfiguratio
 
     private static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(SUCCESSFUL_PROBE, "Successfully discovered recommended values");
 
-    private static final List<String> OPTIONAL_FIELDS = ImmutableList.of(BIND_REALM, BIND_KDC);
+    private static final List<String> OPTIONAL_FIELDS = ImmutableList.of(BIND_REALM);
 
     private static final Map<String, String> FAILURE_TYPES = toDescriptionMap(Arrays.asList(
             CANNOT_CONFIGURE,

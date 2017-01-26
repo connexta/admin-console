@@ -86,7 +86,6 @@ public class AvailableOptionsProbeMethod extends ProbeMethod<ContextPolicyConfig
     }
 
     public List<String> getAuthTypes() {
-        // TODO: tbatie - 1/12/17 - Is there a preference order we should apply with these auth types?
         // TODO: tbatie - 1/12/17 - (Ticket) need to eventually check if these handlers are running for these auth types instead of hardcoding
         List<String> authTypes = new ArrayList<>(Arrays.asList(BASIC, SAML, PKI, GUEST));
 

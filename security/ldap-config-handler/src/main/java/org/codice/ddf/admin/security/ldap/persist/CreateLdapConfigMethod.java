@@ -17,7 +17,6 @@ package org.codice.ddf.admin.security.ldap.persist;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.ATTRIBUTE_MAPPINGS;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.BASE_GROUP_DN;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.BASE_USER_DN;
-import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.BIND_KDC;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.BIND_METHOD;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.BIND_REALM;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.BIND_USER_DN;

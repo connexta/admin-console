@@ -56,7 +56,6 @@ public class WfsSourceUtils {
             "http://%s:%d/services/wfs",
             "http://%s:%d/wfs");
 
-    // TODO: tbatie - 1/20/17 - Consider returning configurationMessages instead of string
     public static Optional<UrlAvailability> confirmEndpointUrl(WfsSourceConfiguration config) {
         return URL_FORMATS.stream()
                 .map(formatUrl -> String.format(formatUrl,

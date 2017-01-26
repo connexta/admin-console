@@ -52,7 +52,7 @@ public class LdapLoginServiceProperties {
         ldapConfiguration.bindUserDn((String) props.get(LDAP_BIND_USER_DN));
         ldapConfiguration.bindUserPassword((String) props.get(LDAP_BIND_USER_PASS));
         ldapConfiguration.bindUserMethod((String) props.get(BIND_METHOD));
-        ldapConfiguration.bindKdcAddress((String) props.get(KDC_ADDRESS));
+//        ldapConfiguration.bindKdcAddress((String) props.get(KDC_ADDRESS));
         ldapConfiguration.bindRealm((String) props.get(REALM));
         ldapConfiguration.userNameAttribute((String) props.get(USER_NAME_ATTRIBUTE));
         ldapConfiguration.baseUserDn((String) props.get(USER_BASE_DN));
@@ -78,7 +78,7 @@ public class LdapLoginServiceProperties {
         ldapStsConfig.put(LDAP_BIND_USER_DN, config.bindUserDn());
         ldapStsConfig.put(LDAP_BIND_USER_PASS, config.bindUserPassword());
         ldapStsConfig.put(BIND_METHOD, config.bindUserMethod());
-        ldapStsConfig.put(KDC_ADDRESS, config.bindKdcAddress());
+//        ldapStsConfig.put(KDC_ADDRESS, config.bindKdcAddress());
         ldapStsConfig.put(REALM, config.bindRealm());
 
         ldapStsConfig.put(USER_NAME_ATTRIBUTE, config.userNameAttribute());

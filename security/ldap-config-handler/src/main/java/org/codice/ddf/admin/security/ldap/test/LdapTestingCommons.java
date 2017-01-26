@@ -15,9 +15,7 @@
 package org.codice.ddf.admin.security.ldap.test;
 
 import static org.codice.ddf.admin.api.validation.LdapValidationUtils.DIGEST_MD5_SASL;
-import static org.codice.ddf.admin.api.validation.LdapValidationUtils.GSSAPI_SASL;
 import static org.codice.ddf.admin.api.validation.LdapValidationUtils.LDAPS;
-import static org.codice.ddf.admin.api.validation.LdapValidationUtils.SASL;
 import static org.codice.ddf.admin.api.validation.LdapValidationUtils.SIMPLE;
 import static org.codice.ddf.admin.api.validation.LdapValidationUtils.START_TLS;
 import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.CANNOT_BIND;
@@ -40,7 +38,6 @@ import org.forgerock.opendj.ldap.LDAPOptions;
 import org.forgerock.opendj.ldap.SearchScope;
 import org.forgerock.opendj.ldap.requests.BindRequest;
 import org.forgerock.opendj.ldap.requests.DigestMD5SASLBindRequest;
-import org.forgerock.opendj.ldap.requests.GSSAPISASLBindRequest;
 import org.forgerock.opendj.ldap.requests.Requests;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
 import org.forgerock.opendj.ldif.ConnectionEntryReader;
@@ -99,7 +96,7 @@ public class LdapTestingCommons {
                     ldapConfiguration.bindUserDn(),
                     ldapConfiguration.bindUserPassword(),
                     ldapConfiguration.bindRealm(),
-                    ldapConfiguration.bindKdcAddress());
+                    null);
             connection.bind(bindRequest);
         } catch (Exception e) {
             return new LdapConnectionAttempt(CANNOT_BIND);
@@ -115,16 +112,16 @@ public class LdapTestingCommons {
         case SIMPLE:
             request = Requests.newSimpleBindRequest(bindUserDN, bindUserCredentials.toCharArray());
             break;
-        case SASL:
-            request = Requests.newPlainSASLBindRequest(bindUserDN,
-                    bindUserCredentials.toCharArray());
-            break;
-        case GSSAPI_SASL:
-            request = Requests.newGSSAPISASLBindRequest(bindUserDN,
-                    bindUserCredentials.toCharArray());
-            ((GSSAPISASLBindRequest) request).setRealm(realm);
-            ((GSSAPISASLBindRequest) request).setKDCAddress(kdcAddress);
-            break;
+//        case SASL:
+//            request = Requests.newPlainSASLBindRequest(bindUserDN,
+//                    bindUserCredentials.toCharArray());
+//            break;
+//        case GSSAPI_SASL:
+//            request = Requests.newGSSAPISASLBindRequest(bindUserDN,
+//                    bindUserCredentials.toCharArray());
+//            ((GSSAPISASLBindRequest) request).setRealm(realm);
+//            ((GSSAPISASLBindRequest) request).setKDCAddress(kdcAddress);
+//            break;
         case DIGEST_MD5_SASL:
             request = Requests.newDigestMD5SASLBindRequest(bindUserDN,
                     bindUserCredentials.toCharArray());
@@ -182,6 +179,7 @@ public class LdapTestingCommons {
                 }
             }
         } catch (IOException e) {
+            // TODO: tbatie - 1/25/17 - We should be catching an invalid query exception and probably a lot more. Make sure to return the proper configuration message
             reader.close();
         }
 

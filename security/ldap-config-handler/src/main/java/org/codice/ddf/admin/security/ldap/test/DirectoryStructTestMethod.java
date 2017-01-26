@@ -16,7 +16,6 @@ package org.codice.ddf.admin.security.ldap.test;
 
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.BASE_GROUP_DN;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.BASE_USER_DN;
-import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.BIND_KDC;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.BIND_METHOD;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.BIND_REALM;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.BIND_USER_DN;
@@ -46,15 +45,13 @@ import static org.codice.ddf.admin.security.ldap.test.LdapTestingCommons.getLdap
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.codice.ddf.admin.api.config.ldap.LdapConfiguration;
-import org.codice.ddf.admin.api.handler.ConfigurationMessage;
 import org.codice.ddf.admin.api.handler.method.TestMethod;
-import org.codice.ddf.admin.api.handler.report.ProbeReport;
 import org.codice.ddf.admin.api.handler.report.Report;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.Filter;
@@ -80,14 +77,13 @@ public class DirectoryStructTestMethod extends TestMethod<LdapConfiguration> {
             BASE_GROUP_DN,
             USER_NAME_ATTRIBUTE);
 
-    private static final List<String> OPTIONAL_FIELDS = ImmutableList.of(BIND_REALM,
-            BIND_KDC,
-            GROUP_OBJECT_CLASS);
+    private static final List<String> OPTIONAL_FIELDS = ImmutableList.of(BIND_REALM, GROUP_OBJECT_CLASS);
 
     private static final Map<String, String> SUCCESS_TYPES = toDescriptionMap(Arrays.asList(
             FOUND_BASE_USER_DN,
             FOUND_BASE_GROUP_DN,
             FOUND_USER_NAME_ATTRIBUTE));
+    // TODO: tbatie - 1/25/17 - There are additional success types to add to this list
 
     private static final Map<String, String> FAILURE_TYPES = toDescriptionMap(Arrays.asList(
             CANNOT_CONFIGURE,
@@ -96,6 +92,7 @@ public class DirectoryStructTestMethod extends TestMethod<LdapConfiguration> {
             BASE_USER_DN_NOT_FOUND,
             BASE_GROUP_DN_NOT_FOUND,
             USER_NAME_ATTRIBUTE_NOT_FOUND));
+    // TODO: tbatie - 1/25/17 - There are additional failure types to add to this list
 
     private static final Map<String, String> WARNING_TYPES = toDescriptionMap(Arrays.asList(
             NO_USERS_IN_BASE_USER_DN,

@@ -14,7 +14,6 @@
 package org.codice.ddf.admin.security.ldap.probe;
 
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.BASE_GROUP_DN;
-import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.BIND_KDC;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.BIND_METHOD;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.BIND_REALM;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.BIND_USER_DN;
@@ -63,8 +62,7 @@ public class SubjectAttributeProbe extends ProbeMethod<LdapConfiguration> {
             BASE_GROUP_DN, GROUP_ATTRIBUTE_HOLDING_MEMBER, MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP);
 
     private static final List<String> OPTIONAL_FIELDS = ImmutableList.of(
-            BIND_REALM,
-            BIND_KDC);
+            BIND_REALM);
 
     private static final String SUBJECT_CLAIMS_ID = "subjectClaims";
 

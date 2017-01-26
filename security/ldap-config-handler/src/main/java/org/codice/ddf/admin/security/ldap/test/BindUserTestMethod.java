@@ -14,7 +14,6 @@
 
 package org.codice.ddf.admin.security.ldap.test;
 
-import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.BIND_KDC;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.BIND_METHOD;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.BIND_REALM;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.BIND_USER_DN;
@@ -61,8 +60,7 @@ public class BindUserTestMethod extends TestMethod<LdapConfiguration> {
             BIND_METHOD);
 
     private static final List<String> OPTIONAL_FIELDS = ImmutableList.of(
-            BIND_REALM,
-            BIND_KDC);
+            BIND_REALM);
 
     public static final Map<String, String> SUCCESS_TYPES =
             toDescriptionMap(Collections.singletonList(SUCCESSFUL_BIND));
@@ -85,7 +83,7 @@ public class BindUserTestMethod extends TestMethod<LdapConfiguration> {
     @Override
     public Report test(LdapConfiguration configuration) {
         List<ConfigurationMessage> checkMessages = new ArrayList<>();
-        if(configuration.bindUserMethod().equals(LdapValidationUtils.GSSAPI_SASL)) {
+        if(configuration.bindUserMethod().equals(LdapValidationUtils.DIGEST_MD5_SASL)) {
             checkMessages.addAll(configuration.validate(OPTIONAL_FIELDS));
             if (CollectionUtils.isNotEmpty(checkMessages)) {
                 return new ProbeReport(checkMessages);

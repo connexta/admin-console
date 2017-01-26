@@ -14,7 +14,6 @@
 
 package org.codice.ddf.admin.api.config.ldap;
 
-import static org.codice.ddf.admin.api.validation.LdapValidationUtils.validateBindKdcAddress;
 import static org.codice.ddf.admin.api.validation.LdapValidationUtils.validateBindRealm;
 import static org.codice.ddf.admin.api.validation.LdapValidationUtils.validateBindUserMethod;
 import static org.codice.ddf.admin.api.validation.LdapValidationUtils.validateDn;
@@ -49,7 +48,7 @@ public class LdapConfiguration extends Configuration {
     public static final String BIND_USER_DN = "bindUserDn";
     public static final String BIND_USER_PASSWORD = "bindUserPassword";
     public static final String BIND_METHOD = "bindMethod";
-    public static final String BIND_KDC = "kdcAddress";
+//    public static final String BIND_KDC = "kdcAddress";
     public static final String BIND_REALM = "realm";
     public static final String USER_NAME_ATTRIBUTE = "userNameAttribute";
     public static final String BASE_GROUP_DN = "baseGroupDn";
@@ -73,7 +72,7 @@ public class LdapConfiguration extends Configuration {
     private String bindUserMethod;
     private String bindUserDn;
     private String bindUserPassword;
-    private String bindKdcAddress;
+//    private String bindKdcAddress;
     private String bindRealm;
     private String userNameAttribute;
     private String baseGroupDn;
@@ -99,7 +98,7 @@ public class LdapConfiguration extends Configuration {
                     .put(BIND_USER_DN, config -> validateDn(config.bindUserDn(), BIND_USER_DN))
                     .put(BIND_USER_PASSWORD, config -> validateString(config.bindUserPassword(), BIND_USER_PASSWORD))
                     .put(BIND_METHOD, config -> validateBindUserMethod(config.bindUserMethod(), BIND_METHOD))
-                    .put(BIND_KDC, config -> validateBindKdcAddress(config.bindKdcAddress(), BIND_KDC))
+//                    .put(BIND_KDC, config -> validateBindKdcAddress(config.bindKdcAddress(), BIND_KDC))
                     .put(BIND_REALM, config -> validateBindRealm(config.bindRealm(), BIND_REALM))
                     .put(USER_NAME_ATTRIBUTE, config -> validateString(config.userNameAttribute(), USER_NAME_ATTRIBUTE))
                     .put(BASE_GROUP_DN, config -> validateDn(config.baseGroupDn(), BASE_GROUP_DN))
@@ -142,9 +141,9 @@ public class LdapConfiguration extends Configuration {
     public String bindUserMethod() {
         return bindUserMethod;
     }
-    public String bindKdcAddress() {
-        return bindKdcAddress;
-    }
+//    public String bindKdcAddress() {
+//        return bindKdcAddress;
+//    }
     public String bindRealm() {
         return bindRealm;
     }
@@ -212,10 +211,10 @@ public class LdapConfiguration extends Configuration {
         this.bindUserMethod = bindUserMethod;
         return this;
     }
-    public LdapConfiguration bindKdcAddress(String bindKdcAddress) {
-        this.bindKdcAddress = bindKdcAddress;
-        return this;
-    }
+//    public LdapConfiguration bindKdcAddress(String bindKdcAddress) {
+//        this.bindKdcAddress = bindKdcAddress;
+//        return this;
+//    }
     public LdapConfiguration bindRealm(String bindRealm) {
         this.bindRealm = bindRealm;
         return this;

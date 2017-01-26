@@ -117,7 +117,7 @@ public class LdapConfiguration extends Configuration {
                     config -> validateString(config.memberAttributeReferencedInGroup(),
                             MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP))
                     .put(ATTRIBUTE_MAPPINGS, config -> validateMapping(config.attributeMappings(), ATTRIBUTE_MAPPINGS))
-                    .put(ATTRIBUTE_MAPPING_PATH, config -> validateFilePath(config.attributeMappingsPath(), ATTRIBUTE_MAPPING_PATH))
+                    .put(ATTRIBUTE_MAPPING_PATH, config -> validateString(config.attributeMappingsPath(), ATTRIBUTE_MAPPING_PATH))
                     .build();
 
     public List<ConfigurationMessage> validate(List<String> fields) {

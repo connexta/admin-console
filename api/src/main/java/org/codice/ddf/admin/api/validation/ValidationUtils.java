@@ -117,22 +117,6 @@ public class ValidationUtils {
         return errors;
     }
 
-    public static final List<ConfigurationMessage> validateFilePath(String filePath,
-            String configId) {
-        List<ConfigurationMessage> errors = validateString(filePath, configId);
-
-        if(errors.isEmpty()) {
-            try {
-                // TODO: tbatie - 1/20/17 - Need to double check if this is actually validating correctly
-                Paths.get(filePath);
-            } catch (InvalidPathException e) {
-                LOGGER.debug("Received an invalid path {}", filePath, e);
-            }
-        }
-
-        return errors;
-    }
-
     public static boolean validUrlFormat(String uriStr) {
         try {
             new URI(uriStr);

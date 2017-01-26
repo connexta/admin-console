@@ -31,10 +31,11 @@ public class LdapValidationUtils {
     public static final ImmutableList<String> LDAP_ENCRYPTION_METHODS = ImmutableList.of(LDAPS, TLS, START_TLS, NONE);
 
     public static final String SIMPLE = "Simple";
-    public static final String SASL = "SASL";
-    public static final String GSSAPI_SASL = "GSSAPI SASL";
+//  These fields are not currently supported for binding
+//  public static final String SASL = "SASL";
+//  public static final String GSSAPI_SASL = "GSSAPI SASL";
     public static final String DIGEST_MD5_SASL = "Digest MD5 SASL";
-    public static final List<String> BIND_METHODS = ImmutableList.of(SIMPLE, SASL, GSSAPI_SASL, DIGEST_MD5_SASL);
+    public static final List<String> BIND_METHODS = ImmutableList.of(SIMPLE, DIGEST_MD5_SASL);
 
     public static final String AUTHENTICATION = "authentication";
     public static final String ATTRIBUTE_STORE = "attributeStore";

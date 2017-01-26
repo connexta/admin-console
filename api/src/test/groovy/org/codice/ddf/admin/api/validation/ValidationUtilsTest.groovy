@@ -13,7 +13,7 @@
  **/
 package org.codice.ddf.admin.api.validation
 
-import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap
 import spock.lang.Specification
 
 import static org.codice.ddf.admin.api.handler.ConfigurationMessage.INVALID_FIELD
@@ -21,7 +21,15 @@ import static org.codice.ddf.admin.api.handler.ConfigurationMessage.MISSING_REQU
 
 class ValidationUtilsTest extends Specification{
     def static sampleConfigFieldId = 'sampleConfigFieldId'
+    def static invalidMappingOneEntry = new HashMap<>()
+    def static invalidMappingMultipleEntries = new HashMap()
 
+    def setup() {
+        invalidMappingOneEntry.put("validKey", null)
+        invalidMappingMultipleEntries.put("validKey", "validValue")
+        invalidMappingMultipleEntries.put("validKey", null)
+
+    }
     def 'test valid String validationString'() {
         when:
         def errors = ValidationUtils.validateString("validStr", sampleConfigFieldId)
@@ -148,10 +156,10 @@ class ValidationUtilsTest extends Specification{
         errors.size() == 0
 
         where:
-        validMapping                            | _
-        ImmutableMap.of("entry", "value")       | _
+        validMapping                      | _
+        ImmutableMap.of("entry", "value") | _
         ImmutableMap.of("entry", "value",
-                        "entry2", "value2")     | _
+                "entry2", "value2")       | _
     }
 
     def 'test invalid mapping validateMapping'() {
@@ -163,10 +171,29 @@ class ValidationUtilsTest extends Specification{
         then:
         errors.size() == 1
 
-//        TODO - add additional invalid mappings
+
         where:
-        invalidMapping  | errorFieldId        | errorSubtype
+        invalidMapping                | errorFieldId        | errorSubtype
+        null                          | sampleConfigFieldId | MISSING_REQUIRED_FIELD
+        new HashMap<>()               | sampleConfigFieldId | MISSING_REQUIRED_FIELD
+        invalidMappingOneEntry        | sampleConfigFieldId | INVALID_FIELD
+        invalidMappingMultipleEntries | sampleConfigFieldId | INVALID_FIELD
+    }
+
+    def 'test invalid hostname validateHostname'() {
+        when:
+        def errors = ValidationUtils.validateHostName(invalidHostName, sampleConfigFieldId)
+        errorFieldId = errors[0].configFieldId()
+        errorSubtype = errors[0].subtype()
+
+        then:
+        errors.size() == 1
+
+        where:
+        invalidHostName | errorFieldId        | errorSubtype
         null            | sampleConfigFieldId | MISSING_REQUIRED_FIELD
-        new HashMap<>() | sampleConfigFieldId | MISSING_REQUIRED_FIELD
+        ""              | sampleConfigFieldId | MISSING_REQUIRED_FIELD
+        "invalid.!&@"   | sampleConfigFieldId | INVALID_FIELD
+        "inva_lid.com"   | sampleConfigFieldId | INVALID_FIELD
     }
 }

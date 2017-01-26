@@ -127,9 +127,7 @@ public class ValidationUtils {
     }
 
     public static final boolean validHostnameFormat(String hostname) {
-        // TODO: tbatie - 1/20/17 - Can we use the UrlValidator for this instead?
-        return HOST_NAME_PATTERN.matcher(hostname)
-                .matches();
+        return PATH_VALIDATOR.isValid(hostname);
     }
 
     public static final boolean validPortFormat(int port) {

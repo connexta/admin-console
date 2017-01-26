@@ -23,7 +23,6 @@ import static org.codice.ddf.admin.api.validation.LdapValidationUtils.validateGr
 import static org.codice.ddf.admin.api.validation.LdapValidationUtils.validateLdapQuery;
 import static org.codice.ddf.admin.api.validation.LdapValidationUtils.validateLdapType;
 import static org.codice.ddf.admin.api.validation.LdapValidationUtils.validateLdapUseCase;
-import static org.codice.ddf.admin.api.validation.ValidationUtils.validateFilePath;
 import static org.codice.ddf.admin.api.validation.ValidationUtils.validateHostName;
 import static org.codice.ddf.admin.api.validation.ValidationUtils.validateMapping;
 import static org.codice.ddf.admin.api.validation.ValidationUtils.validatePort;

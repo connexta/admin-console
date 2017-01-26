@@ -47,7 +47,7 @@ public class CswServiceProperties {
         CswSourceConfiguration cswConfig = new CswSourceConfiguration();
         cswConfig.factoryPid(cswSourceProps.get(FACTORY_PID_KEY) == null ? null : (String) cswSourceProps.get(FACTORY_PID_KEY));
         cswConfig.servicePid(cswSourceProps.get(SERVICE_PID_KEY) == null ? null : (String) cswSourceProps.get(SERVICE_PID_KEY));
-        cswConfig.sourceName(cswSourceProps.get(SOURCE_NAME) == null ? null : (String) cswSourceProps.get(SOURCE_NAME));
+        cswConfig.sourceName(cswSourceProps.get(ID) == null ? null : (String) cswSourceProps.get(ID));
         cswConfig.endpointUrl(cswSourceProps.get(CSW_URL) == null ? null : (String) cswSourceProps.get(CSW_URL));
         cswConfig.outputSchema(cswSourceProps.get(OUTPUT_SCHEMA) == null ? null : (String) cswSourceProps.get(OUTPUT_SCHEMA));
         return cswConfig;

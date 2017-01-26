@@ -44,7 +44,6 @@ import org.codice.ddf.admin.api.handler.method.ProbeMethod;
 import org.codice.ddf.admin.api.handler.report.ProbeReport;
 import org.codice.ddf.admin.security.ldap.test.LdapTestingCommons;
 import org.forgerock.opendj.ldap.Attribute;
-import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.SearchScope;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
 
@@ -90,7 +89,6 @@ public class LdapQueryProbe extends ProbeMethod<LdapConfiguration> {
     @Override
     public ProbeReport probe(LdapConfiguration configuration) {
         ProbeReport probeReport = new ProbeReport();
-        Connection connection = bindUserToLdapConnection(configuration).connection();
         LdapTestingCommons.LdapConnectionAttempt connectionAttempt = bindUserToLdapConnection(configuration);
 
         if (connectionAttempt.result() != SUCCESSFUL_BIND) {

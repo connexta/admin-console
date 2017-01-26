@@ -72,44 +72,26 @@ const configs = (state = Map(), { type, id, value = [] }) => {
 export default configs
 
 // views
-
-// todo tbatie - we need to revisist the vocabulary of this stuff
 const getSourceTypeFromFactoryPid = (factoryPid) => {
-  if (factoryPid.includes('Wfs_v1_0_0')) {
-    return 'WFS v1 Source'
-  } else if (factoryPid.includes('Wfs_v2_0_0')) {
-    return 'WFS v2 Source'
-  } else if (factoryPid.includes('Csw_Federation_Profile_Source')) {
-    return 'DDF Extended Capabilities CSW Source'
-  } else if (factoryPid.includes('Gmd_Csw_Federated_Source')) {
-    return 'GMD CSW Specification Source'
-  } else if (factoryPid.includes('Csw_Federated_Source')) {
-    return 'CSW Specification Source'
-  } else if (factoryPid.includes('OpenSearchSource')) {
-    return 'Open Search Source'
-  } else {
-    return 'Unknown'
-  }
+  return factoryPid.replace(/_/g, ' ')
 }
 
 const SourceTileView = (props) => {
   const {
     sourceName,
     factoryPid,
-    servicePid,
     sourceUserName,
-    sourceUserPassword,
     endpointUrl,
     onDeleteConfig
   } = props
 
   return (
     <Paper className={styles.config}>
-      <div title={servicePid} className={styles.tileTitle}>{sourceName} - {endpointUrl}</div>
-      <div>Type: {getSourceTypeFromFactoryPid(factoryPid)}</div>
-      <div>Username: {sourceUserName || 'none'}</div>
-      <div>Password: {sourceUserPassword || 'none'}</div>
-
+      <div className={styles.tileTitle}>{sourceName}</div>
+      <ConfigField fieldName='Source Type' value={getSourceTypeFromFactoryPid(factoryPid)} />
+      <ConfigField fieldName='Endpoint' value={endpointUrl} />
+      <ConfigField fieldName='Username' value={sourceUserName || 'none'} />
+      <ConfigField fieldName='Password' value={sourceUserName || '******'} />
       <RaisedButton style={{marginTop: 20}} label='Delete' secondary onClick={onDeleteConfig} />
     </Paper>
   )
@@ -125,24 +107,24 @@ const LdapTileView = (props) => {
     port,
     encryptionMethod,
     bindUserDn,
-    bindUserPassword,
     userNameAttribute,
     baseGroupDn,
     baseUserDn,
-    onDeleteConfig
+    onDeleteConfig,
+    ldapUseCase
   } = props
 
   return (
     <Paper className={styles.config}>
-      <div>Hostname: {hostName}</div>
-      <div>Port: {port}</div>
-      <div>Encryption Method: {encryptionMethod}</div>
-      <div>Bind User DN: {bindUserDn}</div>
-      <div>Bind User Password: {bindUserPassword}</div>
-      <div>UserName Attribute: {userNameAttribute}</div>
-      <div>Base Group DN: {baseGroupDn}</div>
-      <div>Base User DN: {baseUserDn}</div>
-
+      <div className={styles.tileTitle}>{ldapUseCase === 'authentication' ? 'LDAP Authentication Source' : 'LDAP Attribute Store'}</div>
+      <ConfigField fieldName='Hostname' value={hostName} />
+      <ConfigField fieldName='Port' value={port} />
+      <ConfigField fieldName='Encryption Method' value={encryptionMethod} />
+      <ConfigField fieldName='Bind User' value={bindUserDn} />
+      <ConfigField fieldName='Bind User Password' value='******' />
+      <ConfigField fieldName='UserName Attribute' value={userNameAttribute} />
+      <ConfigField fieldName='Base Group DN' value={baseGroupDn} />
+      <ConfigField fieldName='Base User DN' value={baseUserDn} />
       <RaisedButton style={{marginTop: 20}} label='Delete' secondary onClick={onDeleteConfig} />
     </Paper>
   )
@@ -171,6 +153,10 @@ const TileLink = ({ to, title, subtitle, children }) => (
       </Paper>
     </Link>
   </div>
+)
+
+const ConfigField = ({fieldName, value}) => (
+  <div className={styles.configField}>{fieldName}: {value}</div>
 )
 
 const SourceConfigTiles = ({ sourceConfigs }) => {

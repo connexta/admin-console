@@ -18,8 +18,6 @@ import static org.codice.ddf.admin.api.handler.ConfigurationMessage.createMissin
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.file.InvalidPathException;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -127,7 +125,8 @@ public class ValidationUtils {
     }
 
     public static final boolean validHostnameFormat(String hostname) {
-        return PATH_VALIDATOR.isValid(hostname);
+        return HOST_NAME_PATTERN.matcher(hostname)
+                .matches();
     }
 
     public static final boolean validPortFormat(int port) {

@@ -13,8 +13,8 @@
  */
 package org.codice.ddf.admin.api.services;
 
-import static org.codice.ddf.admin.api.validation.LdapValidationUtils.LDAPS;
 import static org.codice.ddf.admin.api.validation.LdapValidationUtils.AUTHENTICATION;
+import static org.codice.ddf.admin.api.validation.LdapValidationUtils.LDAPS;
 import static org.codice.ddf.admin.api.validation.ValidationUtils.FACTORY_PID_KEY;
 import static org.codice.ddf.admin.api.validation.ValidationUtils.SERVICE_PID_KEY;
 
@@ -35,7 +35,7 @@ public class LdapLoginServiceProperties {
     public static final String LDAP_BIND_USER_DN = "ldapBindUserDn";
     public static final String LDAP_BIND_USER_PASS = "ldapBindUserPass";
     public static final String BIND_METHOD = "bindMethod";
-    public static final String KDC_ADDRESS = "kdcAddress";
+//    public static final String KDC_ADDRESS = "kdcAddress";
     public static final String REALM = "realm";
     public static final String USER_NAME_ATTRIBUTE = "userNameAttribute";
     public static final String USER_BASE_DN = "userBaseDn";

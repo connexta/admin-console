@@ -25,7 +25,6 @@ import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.QUERY;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.QUERY_BASE;
 import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.SUCCESSFUL_PROBE;
 import static org.codice.ddf.admin.api.handler.report.ProbeReport.createProbeReport;
-import static org.codice.ddf.admin.api.handler.report.Report.createReport;
 import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.CANNOT_BIND;
 import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.CANNOT_CONFIGURE;
 import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.CANNOT_CONNECT;

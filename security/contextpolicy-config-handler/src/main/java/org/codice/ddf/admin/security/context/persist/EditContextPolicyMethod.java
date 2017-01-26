@@ -14,7 +14,6 @@
 
 package org.codice.ddf.admin.security.context.persist;
 
-import static org.codice.ddf.admin.api.config.context.ContextPolicyConfiguration.ALL_FIELDS;
 import static org.codice.ddf.admin.api.config.context.ContextPolicyConfiguration.CONTEXT_POLICY_BINS;
 import static org.codice.ddf.admin.api.config.context.ContextPolicyConfiguration.WHITE_LIST_CONTEXTS;
 import static org.codice.ddf.admin.api.handler.ConfigurationMessage.FAILED_PERSIST;

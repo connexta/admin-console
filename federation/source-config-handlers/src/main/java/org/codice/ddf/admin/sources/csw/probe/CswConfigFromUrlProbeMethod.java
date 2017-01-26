@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.codice.ddf.admin.api.config.sources.CswSourceConfiguration;
-import org.codice.ddf.admin.api.handler.ConfigurationMessage;
 import org.codice.ddf.admin.api.handler.commons.UrlAvailability;
 import org.codice.ddf.admin.api.handler.method.ProbeMethod;
 import org.codice.ddf.admin.api.handler.report.ProbeReport;

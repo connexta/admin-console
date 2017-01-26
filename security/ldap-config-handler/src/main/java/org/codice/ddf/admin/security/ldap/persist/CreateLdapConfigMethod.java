@@ -26,8 +26,6 @@ import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.GROUP_ATTRI
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.GROUP_OBJECT_CLASS;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.HOST_NAME;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.LDAP_USE_CASE;
-import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.GROUP_ATTRIBUTE_HOLDING_MEMBER;
-import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.PORT;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.USER_NAME_ATTRIBUTE;

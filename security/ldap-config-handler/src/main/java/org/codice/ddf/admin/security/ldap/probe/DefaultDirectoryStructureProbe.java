@@ -62,9 +62,7 @@ public class DefaultDirectoryStructureProbe extends ProbeMethod<LdapConfiguratio
                     + "username attribute, the group membership attribute, and the objectClass "
                     + "representing groups.";
 
-
-    private static final List<String> REQUIRED_FIELDS = ImmutableList.of(
-            LDAP_TYPE,
+    private static final List<String> REQUIRED_FIELDS = ImmutableList.of(LDAP_TYPE,
             HOST_NAME,
             PORT,
             ENCRYPTION_METHOD,
@@ -72,7 +70,8 @@ public class DefaultDirectoryStructureProbe extends ProbeMethod<LdapConfiguratio
             BIND_USER_PASSWORD,
             BIND_METHOD);
 
-    private static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(SUCCESSFUL_PROBE, "Successfully discovered recommended values");
+    private static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(SUCCESSFUL_PROBE,
+            "Successfully discovered recommended values");
 
     private static final List<String> OPTIONAL_FIELDS = ImmutableList.of(BIND_REALM);
 
@@ -91,19 +90,32 @@ public class DefaultDirectoryStructureProbe extends ProbeMethod<LdapConfiguratio
             QUERY_BASE);
 
     public DefaultDirectoryStructureProbe() {
-        super(ID, DESCRIPTION, REQUIRED_FIELDS, OPTIONAL_FIELDS, SUCCESS_TYPES, FAILURE_TYPES, null, RETURN_TYPES);
+        super(ID,
+                DESCRIPTION,
+                REQUIRED_FIELDS,
+                OPTIONAL_FIELDS,
+                SUCCESS_TYPES,
+                FAILURE_TYPES,
+                null,
+                RETURN_TYPES);
     }
 
     @Override
     public ProbeReport probe(LdapConfiguration configuration) {
-        LdapTestingCommons.LdapConnectionAttempt connectionAttempt = bindUserToLdapConnection(configuration);
-        if(connectionAttempt.result() != SUCCESSFUL_BIND) {
-            return createProbeReport(SUCCESS_TYPES, FAILURE_TYPES, null, connectionAttempt.result().name());
+        LdapTestingCommons.LdapConnectionAttempt connectionAttempt = bindUserToLdapConnection(
+                configuration);
+        if (connectionAttempt.result() != SUCCESSFUL_BIND) {
+            return createProbeReport(SUCCESS_TYPES,
+                    FAILURE_TYPES,
+                    null,
+                    connectionAttempt.result()
+                            .name());
         }
 
         Map<String, Object> probeResult = new HashMap<>();
         String ldapType = configuration.ldapType();
-        ServerGuesser guesser = ServerGuesser.buildGuesser(ldapType,connectionAttempt.connection());
+        ServerGuesser guesser = ServerGuesser.buildGuesser(ldapType,
+                connectionAttempt.connection());
 
         if (guesser != null) {
             probeResult.put(BASE_USER_DN, guesser.getUserBaseChoices());
@@ -119,6 +131,7 @@ public class DefaultDirectoryStructureProbe extends ProbeMethod<LdapConfiguratio
             probeResult.put(QUERY_BASE, guesser.getBaseContexts());
         }
 
-        return createProbeReport(SUCCESS_TYPES, FAILURE_TYPES, null, SUCCESSFUL_PROBE).probeResults(probeResult);
+        return createProbeReport(SUCCESS_TYPES, FAILURE_TYPES, null, SUCCESSFUL_PROBE).probeResults(
+                probeResult);
     }
 }

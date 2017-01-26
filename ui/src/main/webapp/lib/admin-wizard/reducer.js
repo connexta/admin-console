@@ -24,12 +24,12 @@ const config = (state = Map(), { type, id, value, values, messages, options }) =
       return state.clear()
     case 'SET_MESSAGES':
       const errs = fromJS(messages)
-        .filter((v) => v.has('configId'))
-        .reduce((m, v) => m.set(v.get('configId'), Map.of('message', v)), Map())
+        .filter((v) => v.has('configFieldId'))
+        .reduce((m, v) => m.set(v.get('configFieldId'), Map.of('message', v)), Map())
 
       return state.mergeDeep(errs)
     case 'CLEAR_MESSAGES':
-      return state.map((config) => config.delete('error').delete('success'))
+      return state.map((config) => config.delete('message'))
     case 'CLEAR_WIZARD':
       return Map()
   }
@@ -41,7 +41,7 @@ const messages = (state = Map(), { type, id, messages }) => {
   switch (type) {
     case 'SET_MESSAGES':
       const msgs = fromJS(messages)
-        .filter((m) => !m.has('configId'))
+        .filter((m) => !m.has('configFieldId'))
 
       return state.updateIn([id], List(), m => m.concat(msgs))
     case 'CLEAR_MESSAGES':

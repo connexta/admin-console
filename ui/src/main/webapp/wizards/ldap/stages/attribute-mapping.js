@@ -83,7 +83,7 @@ class AttributeMapperView extends Component {
 
         <Card expanded style={{ width: '100%' }}>
           <CardHeader style={{ fontSize: '0.80em' }}>
-            <Title>STS Claims to LDAP Attribute Mapping</Title>
+            <Title>STS Claims to LDAP User Attribute Mapping</Title>
             <Description>
               The mappings below will be saved.
             </Description>
@@ -141,10 +141,9 @@ const LdapAttributeMappingStage = (props) => {
       <Spinner submitting={submitting}>
         <Title>LDAP User Attribute Mapping</Title>
         <Description>
-          In order to authenticate users, the attributes of the users must be mapped to the STS
-          claims.
-          Not all attributes must be mapped but any unmapped attributes will not be used for
-          authentication.
+          In order to authorize users, their attributes must be mapped to the Security Token
+          Service (STS) claims. Not all attributes must be mapped but any unmapped attributes
+          will not be used for authorization.
         </Description>
 
         <AttributeMapper disabled={disabled} configs={configs} />

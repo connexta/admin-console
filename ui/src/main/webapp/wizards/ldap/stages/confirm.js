@@ -13,7 +13,7 @@ import { confirmationInfo } from './styles.less'
 
 export default ({ disabled, prev, persist, configs }) => (
   <Stage>
-    <Title>LDAP Confirm</Title>
+    <Title>LDAP Settings Confirmation</Title>
 
     <Description>
       All of the values have been successfully verified. Would you like to

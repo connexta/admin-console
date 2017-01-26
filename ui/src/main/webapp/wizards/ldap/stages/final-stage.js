@@ -11,12 +11,12 @@ import LargeStatusIndicator from 'components/LargeStatusIndicator'
 
 export default () => (
   <Stage>
-    <Title>LDAP configurations have been successfully saved!</Title>
+    <Title>LDAP Configurations Have Been Successfully Saved!</Title>
 
     <LargeStatusIndicator success />
 
     <Description>
-      Now that your LDAP is configured, the final step is to use it to secure REST
+      Now that your LDAP is configured, the final step is to secure
       endpoints using the Web Context Policy Manager.
     </Description>
 

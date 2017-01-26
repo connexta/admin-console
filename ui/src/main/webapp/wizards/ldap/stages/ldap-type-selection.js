@@ -14,12 +14,12 @@ const LdapTypes = [
     label: 'Active Directory'
   },
   {
-    value: 'openDj',
-    label: 'OpenDJ'
-  },
-  {
     value: 'openLdap',
     label: 'OpenLDAP'
+  },
+  {
+    value: 'openDj',
+    label: 'OpenDJ'
   },
   {
     value: 'embeddedLdap',
@@ -36,7 +36,7 @@ const LdapTypeSelection = ({ disabled, prev, next, configs: { ldapType } = {} })
     <Title>What type of LDAP are you setting up?</Title>
     <Description>
       This will help us recommend the best options for setting up your LDAP connection.
-      If you are unsure, choose 'Not Sure/None of the Above' and we'll do our best to
+      If you are unsure, choose 'Not Sure/None of the Above' and we will do our best to
       determine the connection type.
     </Description>
     <RadioSelection

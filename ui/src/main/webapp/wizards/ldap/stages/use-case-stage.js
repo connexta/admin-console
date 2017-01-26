@@ -25,7 +25,7 @@ const LdapUseCases = [
 
 // TODO update description to described LDAP as a login or credential store
 // TODO Make the value selected from the radio button persist
-const UseCaseStage = ({ disabled, next, configs: { ldapUseCase } = {} }) => (
+const UseCaseStage = ({ disabled, next, prev, configs: { ldapUseCase } = {} }) => (
   <Stage>
     <Title>How do you plan to use LDAP?</Title>
     <Description>
@@ -39,6 +39,11 @@ const UseCaseStage = ({ disabled, next, configs: { ldapUseCase } = {} }) => (
       name='LDAP Use Cases'
       disabled={disabled} />
     <ActionGroup>
+      <Action
+        secondary
+        label='back'
+        onClick={prev}
+        disabled={disabled} />
       <Action
         primary
         label='next'

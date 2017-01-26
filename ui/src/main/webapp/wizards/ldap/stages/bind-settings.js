@@ -48,13 +48,16 @@ const BindSettings = (props) => {
       <Spinner submitting={submitting}>
         <Title>LDAP Bind User Settings</Title>
         <Description>
-          In order for the system to retrieve information from the LDAP store, it needs to bind to
-          a user that has permission to search the LDAP. This user will be used by the system whenever
-          it needs to access the LDAP store. Please provide that user's distinguished name, their
-          password, and the preferred user binding method.
+          In order for the system to retrieve information from the LDAP store, it needs to bind
+          a user that has permission to search it. This user will be used by the system whenever
+          it needs to access the LDAP store.
+        </Description>
+        <Description> {/* todo - left justify this one? maybe not - test if it looks bad */}
+          User credentials may be provided as a DN (distinguished name), User ID, or in the format UserID@Realm.
+          The requirements for different LDAP servers vary; please contact your LDAP administrator if you need guidance.
         </Description>
 
-        <Input id='bindUserDn' disabled={disabled} label='Bind User DN' />
+        <Input id='bindUserDn' disabled={disabled} label='Bind User' />
         <Password id='bindUserPassword' disabled={disabled} label='Bind User Password' />
         <Select id='bindUserMethod'
           label='Bind User Method'

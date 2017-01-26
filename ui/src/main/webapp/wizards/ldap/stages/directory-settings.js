@@ -102,24 +102,26 @@ const DirectorySettings = (props) => {
         <Title>LDAP Directory Structure</Title>
         <Description>
           Next we need to configure the directories for users/members and decide which attributes to use.
-          Default values have been filled out below and some other recommended values available via each
+          Default values have been filled out below and some other recommended values are available via each
           field's drop-down menu. This page also has an LDAP Query Tool capable of executing queries
           against the connected LDAP to assist in customizing these settings.
         </Description>
         <InputAuto id='baseUserDn' disabled={disabled} label='Base User DN'
-          tooltip='Full LDAP path to where users can be found.' />
+          tooltip='Distinguished name of the LDAP directory in which users can be found.' />
         <InputAuto id='userNameAttribute' disabled={disabled} label='User Name Attribute'
           tooltip='Attribute used to designate the user’s name in LDAP. Typically uid or cn.' />
         <InputAuto id='baseGroupDn' disabled={disabled} label='Base Group DN'
-          tooltip='Full LDAP path to where groups can be found.' />
+          tooltip='Distinguished name of the LDAP directory in which groups can be found.' />
         {ldapUseCase === 'authenticationAndAttributeStore' || ldapUseCase === 'attributeStore'
           ? <div>
             <InputAuto id='groupObjectClass' disabled={disabled} label='LDAP Group ObjectClass'
-              tooltip='ObjectClass that defines structure for group membership in LDAP. Typically groupOfNames.' />
+              tooltip='ObjectClass that defines the structure for group membership in LDAP. Typically groupOfNames.' />
             <InputAuto id='groupAttributeHoldingMember' disabled={disabled}
-              label='Group Attribute Holding Member References' />
+              label='Group Attribute Holding Member References'
+              tooltip='' />
             <InputAuto id='memberAttributeReferencedInGroup' disabled={disabled}
-              label='Member Attribute Referenced in Groups' />
+              label='Member Attribute Referenced in Groups'
+              tooltip='' />
           </div>
           : null}
 

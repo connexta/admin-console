@@ -35,7 +35,7 @@ const App = ({ children }) => (
     <Provider store={store}>
       <div>
         <Flexbox flexDirection='column' height='100vh' style={fixed}>
-          <AppBar title='Admin UI (BETA)' />
+          <AppBar title='Admin Console (BETA)' />
           <Flexbox flex='1' style={{ overflowY: 'scroll', width: '100%' }}>
             <div style={{ maxWidth: 960, margin: '0 auto' }}>{children}</div>
           </Flexbox>

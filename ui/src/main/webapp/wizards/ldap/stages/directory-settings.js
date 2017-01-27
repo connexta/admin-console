@@ -117,11 +117,12 @@ const DirectorySettings = (props) => {
             <InputAuto id='groupObjectClass' disabled={disabled} label='LDAP Group ObjectClass'
               tooltip='ObjectClass that defines the structure for group membership in LDAP. Typically groupOfNames.' />
             <InputAuto id='groupAttributeHoldingMember' disabled={disabled}
-              label='Group Attribute Holding Member References'
-              tooltip='' />
+                       label='Group Attribute Holding Member References'
+                       tooltip='Multivalued-attribute on the group entry that holds references to users.'/>
             <InputAuto id='memberAttributeReferencedInGroup' disabled={disabled}
-              label='Member Attribute Referenced in Groups'
-              tooltip='' />
+                       label='Member Attribute Referenced in Groups'
+                       tooltip='The attribute of the user entry that, when combined with the Base User DN,
+              forms the reference value, e.g. XXX=jsmith,ou=users,dc=example,dc=com'/>
           </div>
           : null}
 

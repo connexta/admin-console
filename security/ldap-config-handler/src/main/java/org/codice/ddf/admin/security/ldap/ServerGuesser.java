@@ -122,7 +122,7 @@ public abstract class ServerGuesser {
     }
 
     public List<String> getMemberAttributeReferencedInGroup() {
-        return ImmutableList.of("dn");
+        return ImmutableList.of("uid");
     }
 
     public List<String> getUserBaseChoices() {
@@ -253,11 +253,6 @@ public abstract class ServerGuesser {
         @Override
         public List<String> getGroupObjectClass() {
             return Collections.singletonList("group");
-        }
-
-        @Override
-        public List<String> getMemberAttributeReferencedInGroup() {
-            return ImmutableList.of("dn");
         }
 
         @Override

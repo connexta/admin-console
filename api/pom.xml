@@ -36,14 +36,39 @@
         </dependency>
         <!---->
 
-        <!--Spock dependencies-->
+        <!--todo these ldap dependencies to be removed when ldap is yanked out of this module-->
+        <!--ldap connection dependencies-->
         <dependency>
-            <groupId>ddf.lib</groupId>
-            <artifactId>spock-shaded</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
+            <groupId>org.codice.org.forgerock.opendj</groupId>
+            <artifactId>opendj-core</artifactId>
+            <version>3.0.0.ALPHA2</version>
         </dependency>
-        <!---->
+        <dependency>
+            <groupId>org.forgerock.commons</groupId>
+            <artifactId>i18n-slf4j</artifactId>
+            <version>1.4.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons</groupId>
+            <artifactId>i18n-core</artifactId>
+            <version>1.4.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codice.org.forgerock.commons</groupId>
+            <artifactId>forgerock-util</artifactId>
+            <version>2.0.0.ALPHA1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codice.org.forgerock.opendj</groupId>
+            <artifactId>opendj-grizzly</artifactId>
+            <version>3.0.0.ALPHA2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.grizzly</groupId>
+            <artifactId>grizzly-framework</artifactId>
+            <version>2.3.14</version>
+        </dependency>
+        <!--ldap connection dependencies end-->
 
         <dependency>
             <groupId>ddf.admin.core</groupId>
@@ -75,6 +100,14 @@
             <artifactId>oro</artifactId>
             <version>2.0.8</version>
         </dependency>
+
+        <!--Spock dependencies-->
+        <dependency>
+            <groupId>ddf.lib</groupId>
+            <artifactId>spock-shaded</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -85,6 +118,17 @@
                 <configuration>
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}-beta</Bundle-SymbolicName>
+                        <Embed-Dependency>
+                            <!--todo Remove when ldap is removed from module-->
+                            <!--ldap connection dependencies-->
+                            opendj-grizzly,
+                            forgerock-util,
+                            grizzly-framework,
+                            opendj-core,
+                            i18n-slf4j,
+                            i18n-core
+                            <!--ldap connection dependencies end -->
+                        </Embed-Dependency>
                         <Export-Package>
                             org.codice.ddf.admin.api.*
                         </Export-Package>

@@ -19,7 +19,7 @@ import spock.lang.Specification
 import static org.codice.ddf.admin.api.handler.ConfigurationMessage.INVALID_FIELD
 import static org.codice.ddf.admin.api.handler.ConfigurationMessage.MISSING_REQUIRED_FIELD
 
-class ValidationUtilsTest extends Specification{
+class ValidationUtilsTest extends Specification {
     def static sampleConfigFieldId = 'sampleConfigFieldId'
     def static invalidMappingOneEntry = new HashMap<>()
     def static invalidMappingMultipleEntries = new HashMap()
@@ -30,6 +30,7 @@ class ValidationUtilsTest extends Specification{
         invalidMappingMultipleEntries.put("validKey", null)
 
     }
+
     def 'test valid String validationString'() {
         when:
         def errors = ValidationUtils.validateString("validStr", sampleConfigFieldId)
@@ -48,9 +49,31 @@ class ValidationUtilsTest extends Specification{
         errors.size() == 1
 
         where:
-        invalidStr  | errorFieldId        | errorSubtype
-        ""          | sampleConfigFieldId | MISSING_REQUIRED_FIELD
-        null        | sampleConfigFieldId | MISSING_REQUIRED_FIELD
+        invalidStr | errorFieldId        | errorSubtype
+        ""         | sampleConfigFieldId | MISSING_REQUIRED_FIELD
+        "   "      | sampleConfigFieldId | MISSING_REQUIRED_FIELD
+        null       | sampleConfigFieldId | MISSING_REQUIRED_FIELD
+    }
+
+    def 'test validate string no white space'() {
+        when:
+        def errors = ValidationUtils.validateStringNoWhiteSpace(input, sampleConfigFieldId)
+
+        then:
+        errors.size() == errorSubtype.size()
+        if (!errors.empty) {
+            errors[0].configFieldId() == sampleConfigFieldId
+            errors*.subtype() == errorSubtype
+        }
+
+        where:
+        input | errorSubtype
+        ''    | [MISSING_REQUIRED_FIELD]
+        '  '  | [MISSING_REQUIRED_FIELD]
+        'x '  | [INVALID_FIELD]
+        ' x'  | [INVALID_FIELD]
+        'x z' | [INVALID_FIELD]
+        'x'   | []
     }
 
     def 'test valid host name validateHostName'() {
@@ -93,11 +116,11 @@ class ValidationUtilsTest extends Specification{
         errors.size() == 0
 
         where:
-        validPort    | _
-        1            | _
-        1000         | _
-        8993         | _
-        65535        | _
+        validPort | _
+        1         | _
+        1000      | _
+        8993      | _
+        65535     | _
     }
 
     def 'test invalid port validatePort'() {
@@ -110,11 +133,11 @@ class ValidationUtilsTest extends Specification{
         errors.size() == 1
 
         where:
-        invalidPort    | errorFieldId        | errorSubtype
-        -5            | sampleConfigFieldId | INVALID_FIELD
-        0             | sampleConfigFieldId | INVALID_FIELD
-        65536         | sampleConfigFieldId | INVALID_FIELD
-        65540         | sampleConfigFieldId | INVALID_FIELD
+        invalidPort | errorFieldId        | errorSubtype
+        -5          | sampleConfigFieldId | INVALID_FIELD
+        0           | sampleConfigFieldId | INVALID_FIELD
+        65536       | sampleConfigFieldId | INVALID_FIELD
+        65540       | sampleConfigFieldId | INVALID_FIELD
     }
 
     def 'test valid context path validateContextPath'() {
@@ -146,6 +169,28 @@ class ValidationUtilsTest extends Specification{
         ""                 | sampleConfigFieldId | MISSING_REQUIRED_FIELD
         "abcd/"            | sampleConfigFieldId | INVALID_FIELD
         "/abcd`"           | sampleConfigFieldId | INVALID_FIELD
+    }
+
+    def 'test mapping no white space validation'() {
+        when:
+        def errors = ValidationUtils.validateMappingNoWhiteSpace((Map<String, String>) input, sampleConfigFieldId)
+
+        then:
+        errors.size() == errorSubtype.size()
+        if (!errors.empty) {
+            errors[0].configFieldId() == sampleConfigFieldId
+            errors*.subtype() == errorSubtype
+        }
+
+        where:
+        input      | errorSubtype
+        null       | [MISSING_REQUIRED_FIELD]
+        [:]        | [MISSING_REQUIRED_FIELD]
+        [a: null]  | [INVALID_FIELD]
+        [a: '']    | [INVALID_FIELD]
+        [a: '  ']  | [INVALID_FIELD]
+        [a: 'x y'] | [INVALID_FIELD]
+        [a: 'x']   | []
     }
 
     def 'test valid mapping validateMapping'() {
@@ -194,6 +239,6 @@ class ValidationUtilsTest extends Specification{
         null            | sampleConfigFieldId | MISSING_REQUIRED_FIELD
         ""              | sampleConfigFieldId | MISSING_REQUIRED_FIELD
         "invalid.!&@"   | sampleConfigFieldId | INVALID_FIELD
-        "inva_lid.com"   | sampleConfigFieldId | INVALID_FIELD
+        "inva_lid.com"  | sampleConfigFieldId | INVALID_FIELD
     }
 }

@@ -38,7 +38,8 @@ public class AttributeMappingTestMethod extends TestMethod<LdapConfiguration> {
 
     public static final String LDAP_ATTRIBUTE_MAPPING_TEST_ID = "attribute-mapping";
 
-    public static final String DESCRIPTION = "Verifies that sts mapping values are valid and exist.";
+    public static final String DESCRIPTION =
+            "Verifies that sts mapping values are valid and exist.";
 
     public static final List<String> REQUIRED_FIELDS = ImmutableList.of(ATTRIBUTE_MAPPINGS);
 
@@ -48,22 +49,30 @@ public class AttributeMappingTestMethod extends TestMethod<LdapConfiguration> {
             "Attribute mapping was successfully validated.");
 
     public AttributeMappingTestMethod() {
-        super(LDAP_ATTRIBUTE_MAPPING_TEST_ID, DESCRIPTION, REQUIRED_FIELDS, null, SUCCESS_TYPES, null, null);
+        super(LDAP_ATTRIBUTE_MAPPING_TEST_ID,
+                DESCRIPTION,
+                REQUIRED_FIELDS,
+                null,
+                SUCCESS_TYPES,
+                null,
+                null);
     }
 
     @Override
     public Report test(LdapConfiguration configuration) {
-        List stsClaims = Arrays.asList((String[]) new Configurator().getConfig(STS_CLAIMS_CONFIGURATION_CONFIG_ID).get(STS_CLAIMS_PROPS_KEY_CLAIMS));
+        List stsClaims = Arrays.asList((String[]) new Configurator().getConfig(
+                STS_CLAIMS_CONFIGURATION_CONFIG_ID)
+                .get(STS_CLAIMS_PROPS_KEY_CLAIMS));
         Optional<String> unknownStsClaim = configuration.attributeMappings()
                 .keySet()
                 .stream()
                 .filter(claim -> !stsClaims.contains(claim))
                 .findFirst();
 
-        if(unknownStsClaim.isPresent()) {
-            return new Report(createInvalidFieldMsg("Unknown STS claim \"" + unknownStsClaim.get()
-                            + "\", the STS properties are not set to handle this claim.",
-                    ATTRIBUTE_MAPPINGS));
+        if (unknownStsClaim.isPresent()) {
+            return new Report(createInvalidFieldMsg(String.format(
+                    "Unknown STS claim [%s], the STS properties are not set to handle this claim.",
+                    unknownStsClaim.get()), ATTRIBUTE_MAPPINGS));
         }
 
         return new Report(buildMessage(SUCCESS, VALIDATED, SUCCESS_TYPES.get(VALIDATED)));

@@ -19,85 +19,140 @@ import static org.codice.ddf.admin.api.validation.ValidationUtils.validateString
 import java.util.List;
 
 import org.codice.ddf.admin.api.handler.ConfigurationMessage;
+import org.forgerock.i18n.LocalizedIllegalArgumentException;
+import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.Filter;
 
 import com.google.common.collect.ImmutableList;
 
 public class LdapValidationUtils {
-
+    // TODO RAP 26 Jan 17: Shouldn't be public/used elsewhere
+    // The constants in here should either all be private or they should be relocated
+    // to a common repository class/interface that all the ldap configuration classes can access
     public static final String LDAPS = "ldaps";
-    public static final String TLS = "tls";
-    public static final String START_TLS ="startTls";
-    public static final String NONE = "none";
-    public static final ImmutableList<String> LDAP_ENCRYPTION_METHODS = ImmutableList.of(LDAPS, TLS, START_TLS, NONE);
+
+    public static final String START_TLS = "startTls";
 
     public static final String SIMPLE = "Simple";
-//  These fields are not currently supported for binding
-//  public static final String SASL = "SASL";
-//  public static final String GSSAPI_SASL = "GSSAPI SASL";
+
+    //  These fields are not currently supported for binding
+    //  public static final String SASL = "SASL";
+    //  public static final String GSSAPI_SASL = "GSSAPI SASL";
     public static final String DIGEST_MD5_SASL = "Digest MD5 SASL";
-    public static final List<String> BIND_METHODS = ImmutableList.of(SIMPLE, DIGEST_MD5_SASL);
 
     public static final String AUTHENTICATION = "authentication";
+
     public static final String ATTRIBUTE_STORE = "attributeStore";
-    public static final String AUTHENTICATION_AND_ATTRIBUTE_STORE = "authenticationAndAttributeStore";
-    public static final ImmutableList LDAP_USE_CASES = ImmutableList.of(AUTHENTICATION,
-            ATTRIBUTE_STORE, AUTHENTICATION_AND_ATTRIBUTE_STORE);
+
+    public static final String AUTHENTICATION_AND_ATTRIBUTE_STORE =
+            "authenticationAndAttributeStore";
+
+    static final String NONE = "none";
+
+    private static final List<String> BIND_METHODS = ImmutableList.of(SIMPLE, DIGEST_MD5_SASL);
+
+    private static final ImmutableList<String> LDAP_ENCRYPTION_METHODS = ImmutableList.of(LDAPS,
+            START_TLS,
+            NONE);
+
+    private static final ImmutableList<String> LDAP_USE_CASES = ImmutableList.of(AUTHENTICATION,
+            ATTRIBUTE_STORE,
+            AUTHENTICATION_AND_ATTRIBUTE_STORE);
+
+    // TODO RAP 26 Jan 17: More constants that should be centralized and for which we should
+    // come up with a solution to better share between JS and Java
+    static final String ACTIVE_DIRECTORY = "activeDirectory";
+
+    static final String OPEN_LDAP = "openLdap";
+
+    static final String OPEN_DJ = "openDj";
+
+    static final String EMBEDDED = "embeddedLdap";
+
+    static final String UNKNOWN = "unknown";
+
+    private static final ImmutableList<String> LDAP_TYPES = ImmutableList.of(ACTIVE_DIRECTORY,
+            OPEN_LDAP,
+            OPEN_DJ,
+            EMBEDDED,
+            UNKNOWN);
 
     public static List<ConfigurationMessage> validateEncryptionMethod(String encryptionMethod,
             String configId) {
         List<ConfigurationMessage> errors = validateString(encryptionMethod, configId);
-        if (errors.isEmpty() && LDAP_ENCRYPTION_METHODS.stream().noneMatch(e -> e.equalsIgnoreCase(encryptionMethod))) {
-            errors.add(createInvalidFieldMsg("Unknown encryption method \"" + encryptionMethod + "\". Encryption method must be one of: " + String.join(",", LDAP_ENCRYPTION_METHODS), configId));
+        if (errors.isEmpty() && LDAP_ENCRYPTION_METHODS.stream()
+                .noneMatch(encryptionMethod::equalsIgnoreCase)) {
+            errors.add(createInvalidFieldMsg(String.format(
+                    "Unknown encryption method [%s]. Encryption method must be one of: [%s]",
+                    encryptionMethod,
+                    String.join(",", LDAP_ENCRYPTION_METHODS)), configId));
         }
         return errors;
     }
 
     public static List<ConfigurationMessage> validateDn(String dn, String configId) {
-        return validateString(dn, configId);
+        List<ConfigurationMessage> errors = validateString(dn, configId);
+        if (errors.isEmpty()) {
+            try {
+                DN.valueOf(dn);
+            } catch (LocalizedIllegalArgumentException e) {
+                errors.add(createInvalidFieldMsg(String.format("Invalid DN [%s]", dn), configId));
+            }
+
+        }
+
+        return errors;
     }
 
     public static List<ConfigurationMessage> validateBindUserMethod(String bindMethod,
             String configId) {
         List<ConfigurationMessage> errors = validateString(bindMethod, configId);
-        if(errors.isEmpty() && !BIND_METHODS.contains(bindMethod)) {
-            errors.add(createInvalidFieldMsg("Unknown bind method \"" + bindMethod + "\". Bind method must be one of: " + String.join(",", BIND_METHODS), configId));
+        if (errors.isEmpty() && BIND_METHODS.stream()
+                .noneMatch(bindMethod::equalsIgnoreCase)) {
+            errors.add(createInvalidFieldMsg(String.format(
+                    "Unknown bind method [%s]. Bind method must be one of: [%s]",
+                    bindMethod,
+                    String.join(",", BIND_METHODS)), configId));
         }
         return errors;
     }
 
-    public static List<ConfigurationMessage> validateBindKdcAddress(String bindKdcAddress,
-            String configId) {
-        // TODO: tbatie - 1/16/17 - Need to do additional validation
-        return validateString(bindKdcAddress, configId);
-    }
-
-    public static List<ConfigurationMessage> validateBindRealm(String bindRealm, String configId) {
-        // TODO: tbatie - 1/16/17 - Is there more validation we can do?
-        return validateString(bindRealm, configId);
-    }
-
     public static List<ConfigurationMessage> validateLdapQuery(String query, String configId) {
-        // TODO: tbatie - 1/16/17 - validate query
-        return validateString(query, configId);
+        List<ConfigurationMessage> errors = validateString(query, configId);
+        if (errors.isEmpty()) {
+            try {
+                Filter.valueOf(query);
+            } catch (LocalizedIllegalArgumentException e) {
+                errors.add(createInvalidFieldMsg(String.format(
+                        "Badly formatted LDAP query filter: %s",
+                        e.getMessage()), configId));
+            }
+        }
+        return errors;
     }
 
     public static List<ConfigurationMessage> validateLdapType(String ldapType, String configId) {
-        // TODO: tbatie - 1/16/17 - not sure if there is any additional validation we should do here
-        return validateString(ldapType, configId);
+        List<ConfigurationMessage> errors = validateString(ldapType, configId);
+        if (errors.isEmpty() && LDAP_TYPES.stream()
+                .noneMatch(ldapType::equalsIgnoreCase)) {
+            errors.add(createInvalidFieldMsg(String.format(
+                    "Unknown LDAP type [%s]. LDAP type must be one of: [%s]",
+                    ldapType,
+                    String.join(",", LDAP_TYPES)), configId));
+        }
+        return errors;
     }
 
     public static List<ConfigurationMessage> validateLdapUseCase(String ldapUseCase,
             String configId) {
         List<ConfigurationMessage> errors = validateString(ldapUseCase, configId);
-        if(errors.isEmpty() && !LDAP_USE_CASES.contains(ldapUseCase)) {
-            errors.add(createInvalidFieldMsg("Unknown LDAP use case \"" + ldapUseCase + "\". LDAP use case must be one of: " + String.join(",", LDAP_USE_CASES), configId));
+        if (errors.isEmpty() && LDAP_USE_CASES.stream()
+                .noneMatch(ldapUseCase::equalsIgnoreCase)) {
+            errors.add(createInvalidFieldMsg(String.format(
+                    "Unknown LDAP use case [%s]. LDAP use case must be one of: [%s]",
+                    ldapUseCase,
+                    String.join(",", LDAP_USE_CASES)), configId));
         }
         return errors;
-    }
-
-    public static List<ConfigurationMessage> validateGroupObjectClass(String objectClass,
-            String configId) {
-        // TODO: tbatie - 1/16/17 - not sure if there is any additional validation we should do here at the syntax level
-        return validateString(objectClass, configId);
     }
 }

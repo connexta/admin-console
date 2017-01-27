@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -29,32 +30,41 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.validator.UrlValidator;
 import org.codice.ddf.admin.api.config.Configuration;
 import org.codice.ddf.admin.api.handler.ConfigurationMessage;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ValidationUtils {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ValidationUtils.class);
-
     public static final String SERVICE_PID_KEY = "service.pid";
 
     public static final String FACTORY_PID_KEY = "service.factoryPid";
 
-    private static final Pattern HOST_NAME_PATTERN = Pattern.compile("[0-9a-zA-Z\\.-]+");
+    private static final Pattern HOST_NAME_PATTERN = Pattern.compile("[0-9a-zA-Z.-]+");
+
+    private static final Predicate<String> WHITE_SPACE = Pattern.compile("\\s")
+            .asPredicate();
+
+    private static final Predicate<String> NOT_EMPTY_NO_WHITE_SPACE =
+            ((Predicate<String>) StringUtils::isEmpty).or(WHITE_SPACE);
 
     private static final UriPathValidator PATH_VALIDATOR = new UriPathValidator();
 
-    public static final List<ConfigurationMessage> validateString(String strToCheck,
-            String configId) {
+    public static List<ConfigurationMessage> validateString(String strToCheck, String configId) {
         List<ConfigurationMessage> errors = new ArrayList<>();
-        if (StringUtils.isEmpty(strToCheck)) {
+        if (StringUtils.isBlank(strToCheck)) {
             errors.add(createMissingRequiredFieldMsg(configId));
         }
         return errors;
     }
 
-    public static final List<ConfigurationMessage> validateHostName(String hostName,
-            String configId) {
+    public static List<ConfigurationMessage> validateStringNoWhiteSpace(String strToCheck, String configId) {
+        List<ConfigurationMessage> errors = validateString(strToCheck, configId);
+        if (errors.isEmpty()) {
+            if (WHITE_SPACE.test(strToCheck)) {
+                errors.add(createInvalidFieldMsg("Invalid whitespace in input", configId));
+            }
+        }
+        return errors;
+    }
+
+    public static List<ConfigurationMessage> validateHostName(String hostName, String configId) {
         List<ConfigurationMessage> errors = validateString(hostName, configId);
         if (errors.isEmpty() && !validHostnameFormat(hostName)) {
             errors.add(createInvalidFieldMsg("Hostname format is invalid.", configId));
@@ -62,7 +72,7 @@ public class ValidationUtils {
         return errors;
     }
 
-    public static final List<ConfigurationMessage> validatePort(int port, String configId) {
+    public static List<ConfigurationMessage> validatePort(int port, String configId) {
         List<ConfigurationMessage> errors = new ArrayList<>();
         if (!validPortFormat(port)) {
             errors.add(createInvalidFieldMsg("Port is not in valid range.", configId));
@@ -70,7 +80,8 @@ public class ValidationUtils {
         return errors;
     }
 
-    public static List<ConfigurationMessage> validateContextPath(String contextPath, String configId) {
+    public static List<ConfigurationMessage> validateContextPath(String contextPath,
+            String configId) {
         List<ConfigurationMessage> errors = validateString(contextPath, configId);
         if (errors.isEmpty() && !PATH_VALIDATOR.isValidPath(contextPath)) {
             errors.add(createInvalidFieldMsg("Improperly formatted context path.", configId));
@@ -86,7 +97,7 @@ public class ValidationUtils {
         return errors;
     }
 
-    public static final List<ConfigurationMessage> validateContextPaths(List<String> contexts,
+    public static List<ConfigurationMessage> validateContextPaths(List<String> contexts,
             String configId) {
         List<ConfigurationMessage> errors = new ArrayList<>();
         if (contexts == null || contexts.isEmpty()) {
@@ -100,41 +111,18 @@ public class ValidationUtils {
         return errors;
     }
 
-    public static final List<ConfigurationMessage> validateMapping(Map<String, String> mapping,
+    public static List<ConfigurationMessage> validateMapping(Map<String, String> mapping,
             String configId) {
-        List<ConfigurationMessage> errors = new ArrayList<>();
-        if (mapping == null || mapping.isEmpty()) {
-            errors.add(createMissingRequiredFieldMsg(configId));
-        } else if (mapping.values()
-                .stream()
-                .anyMatch(StringUtils::isEmpty)) {
-            errors.add(createInvalidFieldMsg("Attribute mapping cannot map to an empty values.",
-                    configId));
-        }
-
-        return errors;
+        return validateMapping(mapping, configId, StringUtils::isEmpty);
     }
 
-    public static boolean validUrlFormat(String uriStr) {
-        try {
-            new URI(uriStr);
-            return true;
-        } catch (URISyntaxException e) {
-            return false;
-        }
+    public static List<ConfigurationMessage> validateMappingNoWhiteSpace(
+            Map<String, String> mapping, String configId) {
+        return validateMapping(mapping, configId, NOT_EMPTY_NO_WHITE_SPACE);
     }
 
-    public static final boolean validHostnameFormat(String hostname) {
-        return HOST_NAME_PATTERN.matcher(hostname)
-                .matches();
-    }
-
-    public static final boolean validPortFormat(int port) {
-        return port > 0 && port < 65536;
-    }
-
-    public static final <T extends Configuration> List<ConfigurationMessage> validate(
-            List<String> fields, T configuration,
+    public static <T extends Configuration> List<ConfigurationMessage> validate(List<String> fields,
+            T configuration,
             Map<String, Function<T, List<ConfigurationMessage>>> fieldsToValidations) {
         return fields.stream()
                 .map(s -> fieldsToValidations.get(s)
@@ -148,5 +136,37 @@ public class ValidationUtils {
         protected boolean isValidPath(String path) {
             return super.isValidPath(path);
         }
+    }
+
+    private static boolean validUrlFormat(String uriStr) {
+        try {
+            new URI(uriStr);
+            return true;
+        } catch (URISyntaxException e) {
+            return false;
+        }
+    }
+
+    private static boolean validHostnameFormat(String hostname) {
+        return HOST_NAME_PATTERN.matcher(hostname)
+                .matches();
+    }
+
+    private static boolean validPortFormat(int port) {
+        return port > 0 && port < 65536;
+    }
+
+    private static List<ConfigurationMessage> validateMapping(Map<String, String> mapping,
+            String configId, Predicate<String> predicate) {
+        List<ConfigurationMessage> errors = new ArrayList<>();
+        if (mapping == null || mapping.isEmpty()) {
+            errors.add(createMissingRequiredFieldMsg(configId));
+        } else if (mapping.values()
+                .stream()
+                .anyMatch(predicate)) {
+            errors.add(createInvalidFieldMsg("Map value is invalid.", configId));
+        }
+
+        return errors;
     }
 }

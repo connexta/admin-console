@@ -14,18 +14,17 @@
 
 package org.codice.ddf.admin.api.config.ldap;
 
-import static org.codice.ddf.admin.api.validation.LdapValidationUtils.validateBindRealm;
 import static org.codice.ddf.admin.api.validation.LdapValidationUtils.validateBindUserMethod;
 import static org.codice.ddf.admin.api.validation.LdapValidationUtils.validateDn;
 import static org.codice.ddf.admin.api.validation.LdapValidationUtils.validateEncryptionMethod;
-import static org.codice.ddf.admin.api.validation.LdapValidationUtils.validateGroupObjectClass;
 import static org.codice.ddf.admin.api.validation.LdapValidationUtils.validateLdapQuery;
 import static org.codice.ddf.admin.api.validation.LdapValidationUtils.validateLdapType;
 import static org.codice.ddf.admin.api.validation.LdapValidationUtils.validateLdapUseCase;
 import static org.codice.ddf.admin.api.validation.ValidationUtils.validateHostName;
-import static org.codice.ddf.admin.api.validation.ValidationUtils.validateMapping;
+import static org.codice.ddf.admin.api.validation.ValidationUtils.validateMappingNoWhiteSpace;
 import static org.codice.ddf.admin.api.validation.ValidationUtils.validatePort;
 import static org.codice.ddf.admin.api.validation.ValidationUtils.validateString;
+import static org.codice.ddf.admin.api.validation.ValidationUtils.validateStringNoWhiteSpace;
 
 import java.util.List;
 import java.util.Map;
@@ -89,33 +88,50 @@ public class LdapConfiguration extends Configuration {
     public Map<String, String> attributeMappings;
     private String attributeMappingsPath;
 
-    private static final Map<String, Function<LdapConfiguration, List<ConfigurationMessage>>> FIELD_TO_VALIDATION_FUNC = new ImmutableMap.Builder<String, Function<LdapConfiguration, List<ConfigurationMessage>>>()
-                    .put(SERVICE_PID, config -> validateString(config.servicePid(), SERVICE_PID))
+    private static final Map<String, Function<LdapConfiguration, List<ConfigurationMessage>>>
+            FIELD_TO_VALIDATION_FUNC =
+            new ImmutableMap.Builder<String, Function<LdapConfiguration, List<ConfigurationMessage>>>().put(
+                    SERVICE_PID,
+                    config -> validateString(config.servicePid(), SERVICE_PID))
                     .put(FACTORY_PID, config -> validateString(config.factoryPid(), FACTORY_PID))
                     .put(HOST_NAME, config -> validateHostName(config.hostName(), HOST_NAME))
                     .put(PORT, config -> validatePort(config.port(), PORT))
-                    .put(ENCRYPTION_METHOD, config -> validateEncryptionMethod(config.encryptionMethod(), ENCRYPTION_METHOD))
-                    .put(BIND_USER_DN, config -> validateDn(config.bindUserDn(), BIND_USER_DN))
-                    .put(BIND_USER_PASSWORD, config -> validateString(config.bindUserPassword(), BIND_USER_PASSWORD))
-                    .put(BIND_METHOD, config -> validateBindUserMethod(config.bindUserMethod(), BIND_METHOD))
-//                    .put(BIND_KDC, config -> validateBindKdcAddress(config.bindKdcAddress(), BIND_KDC))
-                    .put(BIND_REALM, config -> validateBindRealm(config.bindRealm(), BIND_REALM))
-                    .put(USER_NAME_ATTRIBUTE, config -> validateString(config.userNameAttribute(), USER_NAME_ATTRIBUTE))
+                    .put(ENCRYPTION_METHOD,
+                            config -> validateEncryptionMethod(config.encryptionMethod(),
+                                    ENCRYPTION_METHOD))
+                    .put(BIND_USER_DN, config -> validateString(config.bindUserDn(), BIND_USER_DN))
+                    .put(BIND_USER_PASSWORD,
+                            config -> validateString(config.bindUserPassword(), BIND_USER_PASSWORD))
+                    .put(BIND_METHOD,
+                            config -> validateBindUserMethod(config.bindUserMethod(), BIND_METHOD))
+                    // .put(BIND_KDC, config -> validateBindKdcAddress(config.bindKdcAddress(), BIND_KDC))
+                    .put(BIND_REALM,
+                            config -> validateStringNoWhiteSpace(config.bindRealm(), BIND_REALM))
+                    .put(USER_NAME_ATTRIBUTE,
+                            config -> validateStringNoWhiteSpace(config.userNameAttribute(),
+                                    USER_NAME_ATTRIBUTE))
                     .put(BASE_GROUP_DN, config -> validateDn(config.baseGroupDn(), BASE_GROUP_DN))
                     .put(BASE_USER_DN, config -> validateDn(config.baseUserDn(), BASE_USER_DN))
                     .put(QUERY, config -> validateLdapQuery(config.query(), QUERY))
                     .put(QUERY_BASE, config -> validateDn(config.queryBase(), QUERY_BASE))
                     .put(LDAP_TYPE, config -> validateLdapType(config.ldapType(), LDAP_TYPE))
-                    .put(LDAP_USE_CASE, config -> validateLdapUseCase(config.ldapUseCase(), LDAP_USE_CASE))
-                    .put(GROUP_OBJECT_CLASS, config -> validateGroupObjectClass(config.groupObjectClass(), GROUP_OBJECT_CLASS))
-            .put(GROUP_ATTRIBUTE_HOLDING_MEMBER,
-                    config -> validateString(config.groupAttributeHoldingMember(),
-                            GROUP_ATTRIBUTE_HOLDING_MEMBER))
-            .put(MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP,
-                    config -> validateString(config.memberAttributeReferencedInGroup(),
-                            MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP))
-                    .put(ATTRIBUTE_MAPPINGS, config -> validateMapping(config.attributeMappings(), ATTRIBUTE_MAPPINGS))
-                    .put(ATTRIBUTE_MAPPING_PATH, config -> validateString(config.attributeMappingsPath(), ATTRIBUTE_MAPPING_PATH))
+                    .put(LDAP_USE_CASE,
+                            config -> validateLdapUseCase(config.ldapUseCase(), LDAP_USE_CASE))
+                    .put(GROUP_OBJECT_CLASS,
+                            config -> validateStringNoWhiteSpace(config.groupObjectClass(),
+                                    GROUP_OBJECT_CLASS))
+                    .put(GROUP_ATTRIBUTE_HOLDING_MEMBER,
+                            config -> validateStringNoWhiteSpace(config.groupAttributeHoldingMember(),
+                                    GROUP_ATTRIBUTE_HOLDING_MEMBER))
+                    .put(MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP,
+                            config -> validateStringNoWhiteSpace(config.memberAttributeReferencedInGroup(),
+                                    MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP))
+                    .put(ATTRIBUTE_MAPPINGS,
+                            config -> validateMappingNoWhiteSpace(config.attributeMappings(),
+                                    ATTRIBUTE_MAPPINGS))
+                    .put(ATTRIBUTE_MAPPING_PATH,
+                            config -> validateString(config.attributeMappingsPath(),
+                                    ATTRIBUTE_MAPPING_PATH))
                     .build();
 
     public List<ConfigurationMessage> validate(List<String> fields) {

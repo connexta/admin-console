@@ -21,8 +21,10 @@ import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.BIND_REALM;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.BIND_USER_DN;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.BIND_USER_PASSWORD;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.ENCRYPTION_METHOD;
+import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.GROUP_ATTRIBUTE_HOLDING_MEMBER;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.GROUP_OBJECT_CLASS;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.HOST_NAME;
+import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.PORT;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.USER_NAME_ATTRIBUTE;
 import static org.codice.ddf.admin.api.handler.report.Report.createReport;
@@ -35,6 +37,8 @@ import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.FOUND_BASE
 import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.FOUND_BASE_USER_DN;
 import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.FOUND_USER_NAME_ATTRIBUTE;
 import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.NO_GROUPS_IN_BASE_GROUP_DN;
+import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.NO_GROUPS_WITH_MEMBERS;
+import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.NO_REFERENCED_MEMBER;
 import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.NO_USERS_IN_BASE_USER_DN;
 import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.SUCCESSFUL_BIND;
 import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.USER_NAME_ATTRIBUTE_NOT_FOUND;
@@ -45,7 +49,6 @@ import static org.codice.ddf.admin.security.ldap.test.LdapTestingCommons.getLdap
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -57,7 +60,9 @@ import org.forgerock.opendj.ldap.Filter;
 import org.forgerock.opendj.ldap.SearchScope;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
 
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Multimap;
 
 public class DirectoryStructTestMethod extends TestMethod<LdapConfiguration> {
     private static final String LDAP_DIRECTORY_STRUCT_TEST_ID = "dir-struct";
@@ -76,7 +81,10 @@ public class DirectoryStructTestMethod extends TestMethod<LdapConfiguration> {
             BASE_GROUP_DN,
             USER_NAME_ATTRIBUTE);
 
-    private static final List<String> OPTIONAL_FIELDS = ImmutableList.of(BIND_REALM, GROUP_OBJECT_CLASS);
+    private static final List<String> OPTIONAL_FIELDS = ImmutableList.of(BIND_REALM,
+            GROUP_OBJECT_CLASS,
+            GROUP_ATTRIBUTE_HOLDING_MEMBER,
+            MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP);
 
     private static final Map<String, String> SUCCESS_TYPES = toDescriptionMap(Arrays.asList(
             FOUND_BASE_USER_DN,
@@ -95,7 +103,9 @@ public class DirectoryStructTestMethod extends TestMethod<LdapConfiguration> {
 
     private static final Map<String, String> WARNING_TYPES = toDescriptionMap(Arrays.asList(
             NO_USERS_IN_BASE_USER_DN,
-            NO_GROUPS_IN_BASE_GROUP_DN));
+            NO_GROUPS_IN_BASE_GROUP_DN,
+            NO_GROUPS_WITH_MEMBERS,
+            NO_REFERENCED_MEMBER));
 
     public DirectoryStructTestMethod() {
         super(LDAP_DIRECTORY_STRUCT_TEST_ID, DESCRIPTION, REQUIRED_FIELDS, OPTIONAL_FIELDS,
@@ -106,6 +116,19 @@ public class DirectoryStructTestMethod extends TestMethod<LdapConfiguration> {
 
     @Override
     public Report test(LdapConfiguration configuration) {
+        if (configuration.ldapUseCase()
+                // TODO RAP 26 Jan 17: Consts
+                .equals("attributeStore") || configuration.ldapUseCase()
+                .equals("authenticationAndAttributeStore")) {
+            Report validationReport = new Report(configuration.validate(ImmutableList.of(
+                    GROUP_OBJECT_CLASS,
+                    GROUP_ATTRIBUTE_HOLDING_MEMBER,
+                    MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP)));
+            if (validationReport.containsFailureMessages()) {
+                return validationReport;
+            }
+        }
+
         LdapConnectionAttempt connectionAttempt = bindUserToLdapConnection(configuration);
 
         if (connectionAttempt.result() != SUCCESSFUL_BIND) {
@@ -116,7 +139,7 @@ public class DirectoryStructTestMethod extends TestMethod<LdapConfiguration> {
                             .name()));
         }
 
-        Map<String, String> resultsWithConfigIds = new HashMap<>();
+        Multimap<String, String> resultsWithConfigIds = ArrayListMultimap.create();
         try (Connection ldapConnection = connectionAttempt.connection()) {
             List<SearchResultEntry> userDirExists = getLdapQueryResults(ldapConnection,
                     configuration.baseUserDn(),
@@ -151,6 +174,7 @@ public class DirectoryStructTestMethod extends TestMethod<LdapConfiguration> {
             if (groupDirExists.isEmpty()) {
                 resultsWithConfigIds.put(BASE_GROUP_DN_NOT_FOUND.name(), BASE_GROUP_DN);
             } else {
+                // First check the group objectClass is on at least one entry in the directory
                 List<SearchResultEntry> baseGroupResults = getLdapQueryResults(ldapConnection,
                         configuration.baseGroupDn(),
                         Filter.equality("objectClass", configuration.groupObjectClass())
@@ -160,8 +184,53 @@ public class DirectoryStructTestMethod extends TestMethod<LdapConfiguration> {
                         "objectClass");
                 if (baseGroupResults.isEmpty()) {
                     resultsWithConfigIds.put(NO_GROUPS_IN_BASE_GROUP_DN.name(), BASE_GROUP_DN);
+                    resultsWithConfigIds.put(NO_GROUPS_IN_BASE_GROUP_DN.name(), GROUP_OBJECT_CLASS);
                 } else {
                     resultsWithConfigIds.put(FOUND_BASE_GROUP_DN.name(), BASE_GROUP_DN);
+                }
+
+                // Then, check that there is a group entry (of the correct objectClass) that has
+                // any member references
+                List<SearchResultEntry> groups = getLdapQueryResults(ldapConnection,
+                        configuration.baseGroupDn(),
+                        Filter.and(Filter.equality("objectClass", configuration.groupObjectClass()),
+                                Filter.present(configuration.groupAttributeHoldingMember()))
+                                .toString(),
+                        SearchScope.SUBORDINATES,
+                        1,
+                        configuration.groupAttributeHoldingMember());
+                if (groups.isEmpty()) {
+                    resultsWithConfigIds.put(NO_GROUPS_WITH_MEMBERS.name(),
+                            GROUP_ATTRIBUTE_HOLDING_MEMBER);
+                } else {
+                    String memberRef = groups.get(0)
+                            .getAttribute(configuration.groupAttributeHoldingMember())
+                            .firstValueAsString();
+                    // This memberRef will be in the format:
+                    // memberAttributeReferencedInGroup + username + baseUserDN
+                    // Strip the baseUserDN and query for the remainder as a Filter
+                    // beneath the baseUserDN
+                    List<String> split = Arrays.asList(memberRef.split(","));
+
+                    String userFilter = split.get(0);
+                    String checkUserBase = String.join(",", split.subList(1, split.size()));
+                    if (!checkUserBase.equalsIgnoreCase(configuration.baseUserDn())) {
+                        resultsWithConfigIds.put(NO_REFERENCED_MEMBER.name(),
+                                MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP);
+                    }
+                    if (!userFilter.split("=")[0].equalsIgnoreCase(configuration.memberAttributeReferencedInGroup())) {
+                        resultsWithConfigIds.put(NO_REFERENCED_MEMBER.name(),
+                                MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP);
+                    }
+                    List<SearchResultEntry> foundMember = getLdapQueryResults(ldapConnection,
+                            configuration.baseUserDn(),
+                            userFilter,
+                            SearchScope.SUBORDINATES,
+                            1);
+                    if (foundMember.isEmpty()) {
+                        resultsWithConfigIds.put(NO_REFERENCED_MEMBER.name(),
+                                MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP);
+                    }
                 }
             }
 

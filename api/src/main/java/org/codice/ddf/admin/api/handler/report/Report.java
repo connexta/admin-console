@@ -21,6 +21,8 @@ import java.util.Map;
 
 import org.codice.ddf.admin.api.handler.ConfigurationMessage;
 
+import com.google.common.collect.Multimap;
+
 /**
  * A {@link Report} is used to relay the results to the caller of an operation performed on a {@link org.codice.ddf.admin.api.config.Configuration}
  * by the {@link org.codice.ddf.admin.api.handler.ConfigurationHandler}.
@@ -90,10 +92,10 @@ public class Report {
 
     public static Report createReport(Map<String, String> successTypes,
             Map<String, String> failureTypes, Map<String, String> warningTypes,
-            Map<String, String> resultsToConfigIds) {
+            Multimap<String, String> resultsToConfigIds) {
         Report testReport = new Report();
 
-        for (Map.Entry<String, String> result : resultsToConfigIds.entrySet()) {
+        for (Map.Entry<String, String> result : resultsToConfigIds.entries()) {
             String resultName = result.getKey();
             String resultConfigId = result.getValue();
             if (successTypes != null && successTypes.containsKey(resultName)) {

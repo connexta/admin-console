@@ -165,7 +165,6 @@ public class ConfigurationHandlerRouter implements SparkApplication {
                 .orElse(null);
     }
 
-
     private Gson getGsonParser() {
         RuntimeTypeAdapterFactory rtaf = RuntimeTypeAdapterFactory.of(Configuration.class,
                 CONFIGURATION_TYPE_FIELD);

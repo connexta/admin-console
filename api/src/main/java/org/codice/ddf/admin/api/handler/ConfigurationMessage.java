@@ -16,6 +16,8 @@ package org.codice.ddf.admin.api.handler;
 
 import static org.codice.ddf.admin.api.handler.ConfigurationMessage.MessageType.FAILURE;
 
+import java.util.Map;
+
 /**
  * A {@link ConfigurationMessage} encapsulates the results of an operation performed on a {@link org.codice.ddf.admin.api.config.Configuration}.
  * {@link ConfigurationMessage}s are wrapped by {@link org.codice.ddf.admin.api.handler.report.Report}s to relay addMessage about the {@link org.codice.ddf.admin.api.handler.method.ConfigurationHandlerMethod}s results.
@@ -64,6 +66,27 @@ public class ConfigurationMessage {
         return new ConfigurationMessage(type, subtype, message);
     }
 
+    public static ConfigurationMessage buildMessage(Map<String, String> successTypes, Map<String, String> failureTypes, Map<String, String> warningTypes, String result) {
+        return buildMessage(successTypes, failureTypes, null, result, null);
+    }
+
+    public static ConfigurationMessage buildMessage(Map<String, String> successTypes, Map<String, String> failureTypes, Map<String, String> warningTypes, String result, String configFieldId) {
+        if (successTypes != null && successTypes.containsKey(result)) {
+            return new ConfigurationMessage(ConfigurationMessage.MessageType.SUCCESS,
+                    result,
+                    successTypes.get(result), configFieldId);
+        } else if (warningTypes != null && warningTypes.containsKey(result)) {
+            return new ConfigurationMessage(ConfigurationMessage.MessageType.WARNING,
+                    result,
+                    warningTypes.get(result), configFieldId);
+        } else if (failureTypes != null && failureTypes.containsKey(result)) {
+            return new ConfigurationMessage(ConfigurationMessage.MessageType.FAILURE,
+                    result,
+                    failureTypes.get(result), configFieldId);
+        }
+        return null;
+    }
+
     // Getters
     public MessageType type() {
         return type;
@@ -93,6 +116,6 @@ public class ConfigurationMessage {
     }
 
     public static ConfigurationMessage createMissingRequiredFieldMsg(String configFieldId) {
-        return new ConfigurationMessage(FAILURE, MISSING_REQUIRED_FIELD, "Missing required field \"" + configFieldId + "\".", configFieldId);
+        return new ConfigurationMessage(FAILURE, MISSING_REQUIRED_FIELD, "Missing required field.", configFieldId);
     }
 }

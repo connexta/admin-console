@@ -14,6 +14,8 @@
 package org.codice.ddf.admin.sources.opensearch.probe;
 
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.ENDPOINT_URL;
+import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_USERNAME;
+import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_USER_PASSWORD;
 import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.BAD_CONFIG;
 import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.CANNOT_CONNECT;
 import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.CANNOT_VERIFY;
@@ -22,12 +24,14 @@ import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.CONF
 import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.CONFIG_FROM_URL_ID;
 import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.UNTRUSTED_CA;
 import static org.codice.ddf.admin.api.handler.report.ProbeReport.createProbeReport;
+import static org.codice.ddf.admin.api.validation.SourceValidationUtils.validateOptionalUsernameAndPassword;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.codice.ddf.admin.api.config.sources.OpenSearchSourceConfiguration;
+import org.codice.ddf.admin.api.handler.ConfigurationMessage;
 import org.codice.ddf.admin.api.handler.commons.UrlAvailability;
 import org.codice.ddf.admin.api.handler.method.ProbeMethod;
 import org.codice.ddf.admin.api.handler.report.ProbeReport;
@@ -40,6 +44,8 @@ public class OpenSearchConfigFromUrlProbeMethod extends ProbeMethod<OpenSearchSo
 
     public static final String OPENSEARCH_CONFIG_FROM_URL_ID = CONFIG_FROM_URL_ID;
     public static final String DESCRIPTION = "Attempts to create an OpenSearch configuration from a given URL.";
+
+    public static final List<String> OPTIONAL_FIELDS = ImmutableList.of(SOURCE_USERNAME, SOURCE_USER_PASSWORD);
     public static final List<String> REQUIRED_FIELDS = ImmutableList.of(ENDPOINT_URL);
     public static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(CONFIG_CREATED, "Created OpenSearch configuration from provided URL.");
 
@@ -57,7 +63,7 @@ public class OpenSearchConfigFromUrlProbeMethod extends ProbeMethod<OpenSearchSo
         super(OPENSEARCH_CONFIG_FROM_URL_ID,
                 DESCRIPTION,
                 REQUIRED_FIELDS,
-                null,
+                OPTIONAL_FIELDS,
                 SUCCESS_TYPES,
                 FAILURE_TYPES,
                 WARNING_TYPES);
@@ -75,5 +81,10 @@ public class OpenSearchConfigFromUrlProbeMethod extends ProbeMethod<OpenSearchSo
             result = status.isCertError() ? CERT_ERROR : CANNOT_CONNECT;
         }
         return createProbeReport(SUCCESS_TYPES, FAILURE_TYPES, WARNING_TYPES, result).probeResults(probeResult);
+    }
+
+    @Override
+    public List<ConfigurationMessage> validateOptionalFields(OpenSearchSourceConfiguration configuration) {
+        return validateOptionalUsernameAndPassword(configuration);
     }
 }

@@ -15,6 +15,7 @@ package org.codice.ddf.admin.api.services;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -69,7 +70,7 @@ public class PolicyManagerServiceProperties {
             if (!foundBin) {
                 bins.add(new ContextPolicyBin().realm(policy.getRealm())
                         .requiredAttributes(policyRequiredAttributes)
-                        .authenticationTypes(new ArrayList<>(policy.getAuthenticationMethods()))
+                        .authenticationTypes(new HashSet<>(policy.getAuthenticationMethods()))
                         .contextPaths(policy.getContextPath()));
             }
         }

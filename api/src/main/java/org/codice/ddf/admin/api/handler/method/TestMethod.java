@@ -29,7 +29,7 @@ import org.codice.ddf.admin.api.handler.report.Report;
  *
  * @param <S> the {@link Configuration} type to test.
  */
-public abstract class TestMethod<S extends Configuration> extends ConfigurationHandlerMethod {
+public abstract class TestMethod<S extends Configuration> extends ConfigurationHandlerMethod<S> {
 
     public TestMethod(String id, String description, List<String> requiredFields,
             List<String> optionalFields, Map<String, String> successTypes,

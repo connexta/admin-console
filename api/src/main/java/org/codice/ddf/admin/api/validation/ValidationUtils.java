@@ -58,7 +58,7 @@ public class ValidationUtils {
         List<ConfigurationMessage> errors = validateString(strToCheck, configId);
         if (errors.isEmpty()) {
             if (WHITE_SPACE.test(strToCheck)) {
-                errors.add(createInvalidFieldMsg("Invalid whitespace in input", configId));
+                errors.add(createInvalidFieldMsg("Invalid whitespace in input.", configId));
             }
         }
         return errors;

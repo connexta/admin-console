@@ -24,6 +24,7 @@ import static org.codice.ddf.admin.api.validation.ValidationUtils.validateString
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.api.config.context.ContextPolicyBin;
@@ -76,8 +77,9 @@ public class SecurityValidationUtils {
         return errors;
     }
 
-    public static final List<ConfigurationMessage> validateAuthTypes(List<String> authTypes, String configId) {
+    public static final List<ConfigurationMessage> validateAuthTypes(Set<String> authTypes, String configId) {
         List<ConfigurationMessage> errors = new ArrayList<>();
+        // TODO: tbatie - 1/27/17 - Should check for duplicate authTypes
         if (authTypes == null || authTypes.isEmpty()) {
             errors.add(createMissingRequiredFieldMsg(configId));
         } else {

@@ -14,8 +14,14 @@
 
 package org.codice.ddf.admin.api.handler.method;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import org.codice.ddf.admin.api.config.Configuration;
+import org.codice.ddf.admin.api.handler.ConfigurationMessage;
 
 import com.google.gson.annotations.Expose;
 
@@ -25,7 +31,7 @@ import com.google.gson.annotations.Expose;
 
  * A {@link ConfigurationHandlerMethod} represents a method that is meant to be performed on a {@link org.codice.ddf.admin.api.config.Configuration}.
  */
-public abstract class ConfigurationHandlerMethod {
+public abstract class ConfigurationHandlerMethod<S extends Configuration> {
 
     @Expose
     final String id;
@@ -55,11 +61,39 @@ public abstract class ConfigurationHandlerMethod {
         this.warningTypes = warningTypes;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public List<String> getOptionalFields() {
+        return optionalFields;
+    }
+
     public List<String> getRequiredFields() {
         return requiredFields;
     }
 
     public String id() {
         return id;
+    }
+
+    public List<ConfigurationMessage> validate(S configuration) {
+        return Stream.concat(validateRequiredFields(configuration).stream(), validateOptionalFields(configuration).stream()).collect(
+                Collectors.toList());
+    }
+
+    public List<ConfigurationMessage> validateRequiredFields(S configuration) {
+        if(getRequiredFields() != null && !getRequiredFields().isEmpty()) {
+            return configuration.validate(getRequiredFields());
+        }
+        return new ArrayList<>();
+    }
+
+    public List<ConfigurationMessage> validateOptionalFields(S configuration) {
+        return new ArrayList<>();
     }
 }

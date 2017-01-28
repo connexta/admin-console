@@ -28,7 +28,7 @@ import org.codice.ddf.admin.api.handler.report.Report;
  *
  * @param <S> the {@link Configuration} type to persist.
  */
-public abstract class PersistMethod<S extends Configuration> extends ConfigurationHandlerMethod {
+public abstract class PersistMethod<S extends Configuration> extends ConfigurationHandlerMethod<S> {
     public PersistMethod(String id, String description, List<String> requiredFields,
             List<String> optionalFields, Map<String, String> successTypes,
             Map<String, String> failureTypes, Map<String, String> warningTypes) {

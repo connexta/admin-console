@@ -15,14 +15,15 @@ package org.codice.ddf.admin.sources.wfs.persist;
 
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.ENDPOINT_URL;
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.FACTORY_PID;
-import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.PASSWORD;
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_NAME;
-import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.USERNAME;
+import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_USERNAME;
+import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_USER_PASSWORD;
 import static org.codice.ddf.admin.api.handler.ConfigurationMessage.FAILED_PERSIST;
 import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.CREATE;
 import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.SUCCESSFUL_PERSIST;
 import static org.codice.ddf.admin.api.handler.report.Report.createReport;
 import static org.codice.ddf.admin.api.services.WfsServiceProperties.wfsConfigToServiceProps;
+import static org.codice.ddf.admin.api.validation.SourceValidationUtils.validateOptionalUsernameAndPassword;
 
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,7 @@ import java.util.Map;
 import org.codice.ddf.admin.api.config.sources.WfsSourceConfiguration;
 import org.codice.ddf.admin.api.configurator.Configurator;
 import org.codice.ddf.admin.api.configurator.OperationReport;
+import org.codice.ddf.admin.api.handler.ConfigurationMessage;
 import org.codice.ddf.admin.api.handler.method.PersistMethod;
 import org.codice.ddf.admin.api.handler.report.Report;
 
@@ -41,7 +43,8 @@ public class CreateWfsSourcePersistMethod extends PersistMethod<WfsSourceConfigu
     public static final String CREATE_WFS_SOURCE_ID = CREATE;
     public static final String DESCRIPTION = "Attempts to create and persist a WFS source given a configuration.";
     private static final List<String> REQUIRED_FIELDS = ImmutableList.of(SOURCE_NAME, ENDPOINT_URL, FACTORY_PID);
-    private static final List<String> OPTIONAL_FIELDS = ImmutableList.of(USERNAME, PASSWORD);
+    private static final List<String> OPTIONAL_FIELDS = ImmutableList.of(SOURCE_USERNAME,
+            SOURCE_USER_PASSWORD);
     private static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(SUCCESSFUL_PERSIST, "WFS Source successfully created.");
     private static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(FAILED_PERSIST, "Failed to create WFS Source.");
 
@@ -63,4 +66,8 @@ public class CreateWfsSourcePersistMethod extends PersistMethod<WfsSourceConfigu
         return createReport(SUCCESS_TYPES, FAILURE_TYPES, null, report.containsFailedResults() ? FAILED_PERSIST : SUCCESSFUL_PERSIST);
     }
 
+    @Override
+    public List<ConfigurationMessage> validateOptionalFields(WfsSourceConfiguration configuration) {
+        return validateOptionalUsernameAndPassword(configuration);
+    }
 }

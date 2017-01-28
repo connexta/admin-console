@@ -14,14 +14,15 @@
 package org.codice.ddf.admin.sources.opensearch.persist;
 
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.ENDPOINT_URL;
-import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.PASSWORD;
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_NAME;
-import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.USERNAME;
+import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_USERNAME;
+import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_USER_PASSWORD;
 import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.CREATE;
 import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.FAILED_PERSIST;
 import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.SUCCESSFUL_PERSIST;
 import static org.codice.ddf.admin.api.handler.report.Report.createReport;
 import static org.codice.ddf.admin.api.services.OpenSearchServiceProperties.openSearchConfigToServiceProps;
+import static org.codice.ddf.admin.api.validation.SourceValidationUtils.validateOptionalUsernameAndPassword;
 
 import java.util.List;
 import java.util.Map;
@@ -42,7 +43,8 @@ public class CreateOpenSearchSourcePersistMethod
 
     public static final String DESCRIPTION = "Attempts to create and persist a OpenSearch source given a configuration.";
     public static final List<String> REQUIRED_FIELDS = ImmutableList.of(SOURCE_NAME, ENDPOINT_URL);
-    private static final List<String> OPTIONAL_FIELDS = ImmutableList.of(USERNAME, PASSWORD);
+    private static final List<String> OPTIONAL_FIELDS = ImmutableList.of(SOURCE_USERNAME,
+            SOURCE_USER_PASSWORD);
     private static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(SUCCESSFUL_PERSIST, "OpenSearch Source successfully created.");
     private static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(FAILED_PERSIST, "Failed to create OpenSearch Source.");
 
@@ -67,4 +69,8 @@ public class CreateOpenSearchSourcePersistMethod
                 report.containsFailedResults() ? ConfigurationMessage.FAILED_PERSIST : SUCCESSFUL_PERSIST);
     }
 
+    @Override
+    public List<ConfigurationMessage> validateOptionalFields(OpenSearchSourceConfiguration configuration) {
+        return validateOptionalUsernameAndPassword(configuration);
+    }
 }

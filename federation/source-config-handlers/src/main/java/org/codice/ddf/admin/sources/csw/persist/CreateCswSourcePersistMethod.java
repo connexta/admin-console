@@ -17,20 +17,23 @@ import static org.codice.ddf.admin.api.config.sources.CswSourceConfiguration.FOR
 import static org.codice.ddf.admin.api.config.sources.CswSourceConfiguration.OUTPUT_SCHEMA;
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.ENDPOINT_URL;
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.FACTORY_PID;
-import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.PASSWORD;
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_NAME;
-import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.USERNAME;
+import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_USERNAME;
+import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_USER_PASSWORD;
 import static org.codice.ddf.admin.api.handler.ConfigurationMessage.FAILED_PERSIST;
 import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.CREATE;
 import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.SUCCESSFUL_PERSIST;
 import static org.codice.ddf.admin.api.services.CswServiceProperties.cswConfigToServiceProps;
+import static org.codice.ddf.admin.api.validation.SourceValidationUtils.validateOptionalUsernameAndPassword;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import org.codice.ddf.admin.api.config.sources.CswSourceConfiguration;
 import org.codice.ddf.admin.api.configurator.Configurator;
 import org.codice.ddf.admin.api.configurator.OperationReport;
+import org.codice.ddf.admin.api.handler.ConfigurationMessage;
 import org.codice.ddf.admin.api.handler.method.PersistMethod;
 import org.codice.ddf.admin.api.handler.report.Report;
 
@@ -43,7 +46,8 @@ public class CreateCswSourcePersistMethod extends PersistMethod<CswSourceConfigu
     public static final String DESCRIPTION = "Attempts to create and persist a CSW source given a configuration.";
 
     public static final List<String> REQUIRED_FIELDS = ImmutableList.of(SOURCE_NAME, ENDPOINT_URL, FACTORY_PID);
-    private static final List<String> OPTIONAL_FIELDS = ImmutableList.of(USERNAME, PASSWORD, OUTPUT_SCHEMA, FORCE_SPATIAL_FILTER);
+    private static final List<String> OPTIONAL_FIELDS = ImmutableList.of(SOURCE_USERNAME,
+            SOURCE_USER_PASSWORD, OUTPUT_SCHEMA, FORCE_SPATIAL_FILTER);
     private static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(SUCCESSFUL_PERSIST, "CSW Source successfully created.");
     private static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(FAILED_PERSIST, "Failed to create CSW Source.");
 
@@ -65,4 +69,15 @@ public class CreateCswSourcePersistMethod extends PersistMethod<CswSourceConfigu
         return Report.createReport(SUCCESS_TYPES, FAILURE_TYPES, null, report.containsFailedResults() ? FAILED_PERSIST : SUCCESSFUL_PERSIST);
     }
 
+    @Override
+    public List<ConfigurationMessage> validateOptionalFields(CswSourceConfiguration configuration) {
+        List<ConfigurationMessage> validationResults = validateOptionalUsernameAndPassword(configuration);
+        if(configuration.outputSchema() != null) {
+            validationResults.addAll(configuration.validate(Arrays.asList(OUTPUT_SCHEMA)));
+        }
+        if(configuration.forceSpatialFilter() != null) {
+            validationResults.addAll(configuration.validate(Arrays.asList(FORCE_SPATIAL_FILTER)));
+        }
+        return validationResults;
+    }
 }

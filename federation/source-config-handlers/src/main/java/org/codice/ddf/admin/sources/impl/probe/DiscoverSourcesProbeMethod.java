@@ -13,10 +13,11 @@
  */
 package org.codice.ddf.admin.sources.impl.probe;
 
-import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.PASSWORD;
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.PORT;
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_HOSTNAME;
-import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.USERNAME;
+import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_USERNAME;
+import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_USER_PASSWORD;
+import static org.codice.ddf.admin.api.validation.SourceValidationUtils.validateOptionalUsernameAndPassword;
 
 import java.util.Collection;
 import java.util.List;
@@ -35,7 +36,8 @@ public class DiscoverSourcesProbeMethod extends ProbeMethod<SourceConfiguration>
     public static final String DISCOVER_SOURCES_ID = "discover-sources";
     public static final String DESCRIPTION = "Retrieves possible configurations for the specified url.";
     public static final List<String> REQUIRED_FIELDS = ImmutableList.of(SOURCE_HOSTNAME, PORT);
-    public static final List<String> OPTIONAL_FIELDS = ImmutableList.of(USERNAME, PASSWORD);
+    public static final List<String> OPTIONAL_FIELDS = ImmutableList.of(SOURCE_USERNAME,
+            SOURCE_USER_PASSWORD);
 
     public static final String DISCOVERED_SOURCES_KEY = "discoveredSources";
     public static final List<String> RETURN_TYPES = ImmutableList.of(DISCOVERED_SOURCES_KEY);
@@ -75,5 +77,10 @@ public class DiscoverSourcesProbeMethod extends ProbeMethod<SourceConfiguration>
 
         sourcesProbeReport.probeResult(DISCOVERED_SOURCES_KEY, discoveredSources).addMessages(probeSourceMessages);
         return sourcesProbeReport;
+    }
+
+    @Override
+    public List<ConfigurationMessage> validateOptionalFields(SourceConfiguration configuration) {
+        return validateOptionalUsernameAndPassword(configuration);
     }
 }

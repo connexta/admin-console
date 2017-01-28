@@ -45,7 +45,7 @@ public class ContextPolicyBin {
 
     private Set<String> contextPaths;
     private String realm;
-    private List<String> authenticationTypes;
+    private Set<String> authenticationTypes;
     private Map<String, String> requiredAttributes;
 
     private static final Map<String, Function<ContextPolicyBin, List<ConfigurationMessage>>> FIELD_TO_VALIDATION_FUNC = new ImmutableMap.Builder<String, Function<ContextPolicyBin, List<ConfigurationMessage>>>()
@@ -56,7 +56,7 @@ public class ContextPolicyBin {
             .build();
 
     public ContextPolicyBin() {
-        authenticationTypes = new ArrayList<>();
+        authenticationTypes = new HashSet<>();
         requiredAttributes = new HashMap<>();
         contextPaths = new HashSet<>();
     }
@@ -72,7 +72,7 @@ public class ContextPolicyBin {
     public Set<String> contextPaths() {
         return contextPaths;
     }
-    public List<String> authenticationTypes() {
+    public Set<String> authenticationTypes() {
         return authenticationTypes;
     }
     public Map<String, String> requiredAttributes() {
@@ -87,7 +87,7 @@ public class ContextPolicyBin {
         this.realm = realm;
         return this;
     }
-    public ContextPolicyBin authenticationTypes(List<String> authenticationTypes) {
+    public ContextPolicyBin authenticationTypes(Set<String> authenticationTypes) {
         this.authenticationTypes = authenticationTypes;
         return this;
     }

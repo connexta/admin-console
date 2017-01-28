@@ -49,7 +49,7 @@ public class LdapConfiguration extends Configuration {
     public static final String BIND_USER_PASSWORD = "bindUserPassword";
     public static final String BIND_METHOD = "bindMethod";
 //    public static final String BIND_KDC = "kdcAddress";
-    public static final String BIND_REALM = "realm";
+    public static final String BIND_REALM = "bindRealm";
     public static final String USER_NAME_ATTRIBUTE = "userNameAttribute";
     public static final String BASE_GROUP_DN = "baseGroupDn";
     public static final String BASE_USER_DN = "baseUserDn";

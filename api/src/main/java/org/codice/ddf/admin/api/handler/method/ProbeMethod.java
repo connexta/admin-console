@@ -30,7 +30,7 @@ import com.google.gson.annotations.Expose;
  *
  * @param <S> the {@link Configuration} type to probe.
  */
-public abstract class ProbeMethod<S extends Configuration> extends ConfigurationHandlerMethod {
+public abstract class ProbeMethod<S extends Configuration> extends ConfigurationHandlerMethod<S> {
 
     @Expose
     final List<String> returnTypes;

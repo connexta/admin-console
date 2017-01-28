@@ -22,9 +22,10 @@ public class HandlerCommons {
 
     // Common Result subTypes
     public static final String SUCCESSFUL_PERSIST = "SUCCESSFUL_PERSIST";
-    public static final String FAILED_PERSIST = "FAILED_PERSIST";
-
     public static final String SUCCESSFUL_PROBE = "SUCCESSFUL_PROBE";
+    public static final String SUCCESSFUL_TEST = "SUCCESSFUL_TEST";
+
+    public static final String FAILED_PERSIST = "FAILED_PERSIST";
     public static final String FAILED_PROBE = "FAILED_PROBE";
 
 }

@@ -21,6 +21,7 @@ import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.BIND_USER_P
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.ENCRYPTION_METHOD;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.HOST_NAME;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.PORT;
+import static org.codice.ddf.admin.api.validation.LdapValidationUtils.validateBindRealm;
 import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.CANNOT_BIND;
 import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.CANNOT_CONFIGURE;
 import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.CANNOT_CONNECT;
@@ -105,4 +106,8 @@ public class BindUserTestMethod extends TestMethod<LdapConfiguration> {
                         .name()));
     }
 
+    @Override
+    public List<ConfigurationMessage> validateOptionalFields(LdapConfiguration configuration) {
+        return validateBindRealm(configuration);
+    }
 }

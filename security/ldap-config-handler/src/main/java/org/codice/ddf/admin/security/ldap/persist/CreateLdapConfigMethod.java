@@ -42,10 +42,10 @@ import static org.codice.ddf.admin.api.services.LdapLoginServiceProperties.ldapC
 import static org.codice.ddf.admin.api.validation.LdapValidationUtils.ATTRIBUTE_STORE;
 import static org.codice.ddf.admin.api.validation.LdapValidationUtils.AUTHENTICATION;
 import static org.codice.ddf.admin.api.validation.LdapValidationUtils.AUTHENTICATION_AND_ATTRIBUTE_STORE;
+import static org.codice.ddf.admin.api.validation.LdapValidationUtils.validateBindRealm;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -53,10 +53,9 @@ import java.util.UUID;
 import org.codice.ddf.admin.api.config.ldap.LdapConfiguration;
 import org.codice.ddf.admin.api.configurator.Configurator;
 import org.codice.ddf.admin.api.configurator.OperationReport;
+import org.codice.ddf.admin.api.handler.ConfigurationMessage;
 import org.codice.ddf.admin.api.handler.method.PersistMethod;
-import org.codice.ddf.admin.api.handler.report.ProbeReport;
 import org.codice.ddf.admin.api.handler.report.Report;
-import org.codice.ddf.admin.api.validation.LdapValidationUtils;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -77,18 +76,11 @@ public class CreateLdapConfigMethod extends PersistMethod<LdapConfiguration>{
             BASE_USER_DN,
             BASE_GROUP_DN);
 
-    public static final List<String> LOGIN_OPTIONAL_FIELDS = ImmutableList.of(BIND_REALM);
-
-    public static final List<String> ADDITIONAL_ATTRIBUTE_STORE_FIELDS = ImmutableList.of(
-                GROUP_OBJECT_CLASS,
-                GROUP_ATTRIBUTE_HOLDING_MEMBER,
-                MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP,
-                ATTRIBUTE_MAPPINGS);
-
-    public static final List<String> ALL_OPTIONAL_FIELDS = ImmutableList.<String>builder().addAll(
-            LOGIN_OPTIONAL_FIELDS)
-            .addAll(ADDITIONAL_ATTRIBUTE_STORE_FIELDS)
-            .build();
+    public static final List<String> OPTIONAL_FIELDS = ImmutableList.of(BIND_REALM,
+            GROUP_OBJECT_CLASS,
+            GROUP_ATTRIBUTE_HOLDING_MEMBER,
+            MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP,
+            ATTRIBUTE_MAPPINGS);
 
     public static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(SUCCESSFUL_PERSIST, "Successfully saved LDAP settings.");
     public static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(FAILED_PERSIST, "Unable to persist changes.");
@@ -97,7 +89,7 @@ public class CreateLdapConfigMethod extends PersistMethod<LdapConfiguration>{
         super(LDAP_CREATE_ID,
                 DESCRIPTION,
                 LOGIN_REQUIRED_FIELDS,
-                ALL_OPTIONAL_FIELDS,
+                OPTIONAL_FIELDS,
                 SUCCESS_TYPES,
                 FAILURE_TYPES,
                 null);
@@ -111,17 +103,6 @@ public class CreateLdapConfigMethod extends PersistMethod<LdapConfiguration>{
                 .equals(AUTHENTICATION) || config.ldapUseCase()
                 .equals(AUTHENTICATION_AND_ATTRIBUTE_STORE)) {
 
-            if(config.bindUserMethod().equals(LdapValidationUtils.DIGEST_MD5_SASL)) {
-                ProbeReport optValidationReport = new ProbeReport(config.validate(Arrays.asList(BIND_REALM)));
-                if(optValidationReport.containsFailureMessages()) {
-                    return optValidationReport;
-                }
-            }
-            Report validationReport = new Report(config.validate(LOGIN_REQUIRED_FIELDS));
-            if(validationReport.containsFailureMessages()) {
-                return validationReport;
-            }
-
             Map<String, Object> ldapLoginServiceProps = ldapConfigurationToLdapLoginService(config);
             configurator.startFeature(LDAP_LOGIN_FEATURE);
             configurator.createManagedService(LDAP_LOGIN_MANAGED_SERVICE_FACTORY_PID, ldapLoginServiceProps);
@@ -129,10 +110,6 @@ public class CreateLdapConfigMethod extends PersistMethod<LdapConfiguration>{
 
         if (config.ldapUseCase().equals(ATTRIBUTE_STORE) || config.ldapUseCase().equals(
                 AUTHENTICATION_AND_ATTRIBUTE_STORE)) {
-            Report validationReport = new Report(config.validate(ADDITIONAL_ATTRIBUTE_STORE_FIELDS));
-            if(validationReport.containsFailureMessages()) {
-                return validationReport;
-            }
 
             Path newAttributeMappingPath = Paths.get(System.getProperty("ddf.home"),
                     "etc",
@@ -140,7 +117,6 @@ public class CreateLdapConfigMethod extends PersistMethod<LdapConfiguration>{
                     "ldapAttributeMap-" + UUID.randomUUID()
                             .toString() + ".props");
             config.attributeMappingsPath(newAttributeMappingPath.toString());
-
             Map<String, Object> ldapClaimsServiceProps = ldapConfigToLdapClaimsHandlerService(config);
             configurator.createPropertyFile(newAttributeMappingPath, config.attributeMappings());
             configurator.startFeature(LDAP_CLAIMS_HANDLER_FEATURE);
@@ -152,5 +128,20 @@ public class CreateLdapConfigMethod extends PersistMethod<LdapConfiguration>{
                 FAILURE_TYPES,
                 null,
                 report.containsFailedResults() ? FAILED_PERSIST : SUCCESSFUL_PERSIST);
+    }
+
+    @Override
+    public List<ConfigurationMessage> validateOptionalFields(LdapConfiguration configuration) {
+        List<ConfigurationMessage> validationResults = validateBindRealm(configuration);
+        if (configuration.ldapUseCase()
+                .equals(AUTHENTICATION) || configuration.ldapUseCase()
+                .equals(AUTHENTICATION_AND_ATTRIBUTE_STORE)) {
+            validationResults.addAll(configuration.validate(ImmutableList.of(
+                    GROUP_OBJECT_CLASS,
+                    GROUP_ATTRIBUTE_HOLDING_MEMBER,
+                    MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP,
+                    ATTRIBUTE_MAPPINGS)));
+        }
+        return validationResults;
     }
 }

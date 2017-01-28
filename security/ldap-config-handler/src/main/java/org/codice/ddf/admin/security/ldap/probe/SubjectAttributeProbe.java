@@ -26,6 +26,7 @@ import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.MEMBER_ATTR
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.PORT;
 import static org.codice.ddf.admin.api.services.PolicyManagerServiceProperties.STS_CLAIMS_CONFIGURATION_CONFIG_ID;
 import static org.codice.ddf.admin.api.services.PolicyManagerServiceProperties.STS_CLAIMS_PROPS_KEY_CLAIMS;
+import static org.codice.ddf.admin.api.validation.LdapValidationUtils.validateBindRealm;
 import static org.codice.ddf.admin.security.ldap.test.LdapTestingCommons.bindUserToLdapConnection;
 
 import java.util.List;
@@ -33,6 +34,7 @@ import java.util.Set;
 
 import org.codice.ddf.admin.api.config.ldap.LdapConfiguration;
 import org.codice.ddf.admin.api.configurator.Configurator;
+import org.codice.ddf.admin.api.handler.ConfigurationMessage;
 import org.codice.ddf.admin.api.handler.method.ProbeMethod;
 import org.codice.ddf.admin.api.handler.report.ProbeReport;
 import org.codice.ddf.admin.security.ldap.ServerGuesser;
@@ -107,5 +109,10 @@ public class SubjectAttributeProbe extends ProbeMethod<LdapConfiguration> {
         // TODO: tbatie - 1/19/17 - Need to return addMessage about the probe result and/or if something goes wrong
         return probeReport.probeResult(SUBJECT_CLAIMS_ID, subjectClaims)
                 .probeResult(USER_ATTRIBUTES, ldapEntryAttributes);
+    }
+
+    @Override
+    public List<ConfigurationMessage> validateOptionalFields(LdapConfiguration configuration) {
+        return validateBindRealm(configuration);
     }
 }

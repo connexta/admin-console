@@ -13,11 +13,15 @@
  */
 package org.codice.ddf.admin.api.validation;
 
+import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.BIND_REALM;
 import static org.codice.ddf.admin.api.handler.ConfigurationMessage.createInvalidFieldMsg;
 import static org.codice.ddf.admin.api.validation.ValidationUtils.validateString;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import org.codice.ddf.admin.api.config.ldap.LdapConfiguration;
 import org.codice.ddf.admin.api.handler.ConfigurationMessage;
 import org.forgerock.i18n.LocalizedIllegalArgumentException;
 import org.forgerock.opendj.ldap.DN;
@@ -152,6 +156,14 @@ public class LdapValidationUtils {
                     "Unknown LDAP use case [%s]. LDAP use case must be one of: [%s]",
                     ldapUseCase,
                     String.join(",", LDAP_USE_CASES)), configId));
+        }
+        return errors;
+    }
+
+    public static List<ConfigurationMessage> validateBindRealm(LdapConfiguration configuration) {
+        List<ConfigurationMessage> errors = new ArrayList<>();
+        if(configuration.bindUserMethod() != null && configuration.bindUserMethod().equals(LdapValidationUtils.DIGEST_MD5_SASL)) {
+            errors.addAll(configuration.validate(Arrays.asList(BIND_REALM)));
         }
         return errors;
     }

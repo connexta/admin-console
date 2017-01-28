@@ -39,8 +39,8 @@ public class SourceConfiguration extends Configuration {
     public static final String SOURCE_HOSTNAME = "sourceHostName";
     public static final String PORT = "sourcePort";
     public static final String ENDPOINT_URL = "endpointUrl";
-    public static final String USERNAME = "sourceUserName";
-    public static final String PASSWORD = "sourceUserPassword";
+    public static final String SOURCE_USERNAME = "sourceUserName";
+    public static final String SOURCE_USER_PASSWORD = "sourceUserPassword";
 
     private String sourceName;
     private String sourceHostName;
@@ -69,8 +69,10 @@ public class SourceConfiguration extends Configuration {
                 .put(SOURCE_HOSTNAME, config -> validateHostName(config.sourceHostName(),
                         SOURCE_HOSTNAME))
                 .put(PORT, config -> validatePort(config.sourcePort(), PORT))
-                .put(USERNAME, config -> validateString(config.sourceUserName(), USERNAME))
-                .put(PASSWORD, config -> validateString(config.sourceUserPassword(), PASSWORD))
+                .put(SOURCE_USERNAME, config -> validateString(config.sourceUserName(),
+                        SOURCE_USERNAME))
+                .put(SOURCE_USER_PASSWORD, config -> validateString(config.sourceUserPassword(),
+                        SOURCE_USER_PASSWORD))
                 .put(ENDPOINT_URL, config -> validateUrl(config.endpointUrl(), ENDPOINT_URL))
                 .put(SERVICE_PID, config -> validateString(config.servicePid(), SERVICE_PID))
                 .build();

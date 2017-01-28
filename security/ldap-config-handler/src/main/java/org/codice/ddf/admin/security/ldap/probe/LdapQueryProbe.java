@@ -25,6 +25,7 @@ import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.QUERY;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.QUERY_BASE;
 import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.SUCCESSFUL_PROBE;
 import static org.codice.ddf.admin.api.handler.report.ProbeReport.createProbeReport;
+import static org.codice.ddf.admin.api.validation.LdapValidationUtils.validateBindRealm;
 import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.CANNOT_BIND;
 import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.CANNOT_CONFIGURE;
 import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.CANNOT_CONNECT;
@@ -40,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.codice.ddf.admin.api.config.ldap.LdapConfiguration;
+import org.codice.ddf.admin.api.handler.ConfigurationMessage;
 import org.codice.ddf.admin.api.handler.method.ProbeMethod;
 import org.codice.ddf.admin.api.handler.report.ProbeReport;
 import org.codice.ddf.admin.security.ldap.test.LdapTestingCommons;
@@ -121,5 +123,10 @@ public class LdapQueryProbe extends ProbeMethod<LdapConfiguration> {
 
         return probeReport.probeResult(LDAP_QUERY_RESULTS,
                 convertedSearchResults);
+    }
+
+    @Override
+    public List<ConfigurationMessage> validateOptionalFields(LdapConfiguration configuration) {
+        return validateBindRealm(configuration);
     }
 }

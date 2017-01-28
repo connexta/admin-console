@@ -13,14 +13,19 @@
  */
 package org.codice.ddf.admin.api.validation;
 
+import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_USERNAME;
+import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_USER_PASSWORD;
 import static org.codice.ddf.admin.api.handler.ConfigurationMessage.createInvalidFieldMsg;
 import static org.codice.ddf.admin.api.services.CswServiceProperties.CSW_FACTORY_PIDS;
 import static org.codice.ddf.admin.api.services.OpenSearchServiceProperties.OPENSEARCH_FACTORY_PID;
 import static org.codice.ddf.admin.api.services.WfsServiceProperties.WFS_FACTORY_PIDS;
 import static org.codice.ddf.admin.api.validation.ValidationUtils.validateString;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import org.codice.ddf.admin.api.config.sources.SourceConfiguration;
 import org.codice.ddf.admin.api.handler.ConfigurationMessage;
 
 public class SourceValidationUtils {
@@ -55,5 +60,13 @@ public class SourceValidationUtils {
     public static List<ConfigurationMessage> validateCswOutputSchema(String outputSchema, String configId) {
         // TODO: tbatie - 1/17/17 - Validate the output schema
         return validateString(outputSchema, configId);
+    }
+
+    public static List<ConfigurationMessage> validateOptionalUsernameAndPassword(SourceConfiguration configuration) {
+        List<ConfigurationMessage> validationResults = new ArrayList<>();
+        if (configuration.sourceUserName() != null) {
+            validationResults.addAll(configuration.validate(Arrays.asList(SOURCE_USERNAME, SOURCE_USER_PASSWORD)));
+        }
+        return validationResults;
     }
 }

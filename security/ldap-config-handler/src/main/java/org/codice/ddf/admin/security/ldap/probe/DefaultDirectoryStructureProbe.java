@@ -31,6 +31,7 @@ import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.QUERY_BASE;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.USER_NAME_ATTRIBUTE;
 import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.SUCCESSFUL_PROBE;
 import static org.codice.ddf.admin.api.handler.report.ProbeReport.createProbeReport;
+import static org.codice.ddf.admin.api.validation.LdapValidationUtils.validateBindRealm;
 import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.CANNOT_BIND;
 import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.CANNOT_CONFIGURE;
 import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.CANNOT_CONNECT;
@@ -45,6 +46,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.codice.ddf.admin.api.config.ldap.LdapConfiguration;
+import org.codice.ddf.admin.api.handler.ConfigurationMessage;
 import org.codice.ddf.admin.api.handler.method.ProbeMethod;
 import org.codice.ddf.admin.api.handler.report.ProbeReport;
 import org.codice.ddf.admin.security.ldap.ServerGuesser;
@@ -133,5 +135,10 @@ public class DefaultDirectoryStructureProbe extends ProbeMethod<LdapConfiguratio
 
         return createProbeReport(SUCCESS_TYPES, FAILURE_TYPES, null, SUCCESSFUL_PROBE).probeResults(
                 probeResult);
+    }
+
+    @Override
+    public List<ConfigurationMessage> validateOptionalFields(LdapConfiguration configuration) {
+        return validateBindRealm(configuration);
     }
 }

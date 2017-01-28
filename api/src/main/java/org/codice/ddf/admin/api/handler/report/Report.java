@@ -14,10 +14,13 @@
 
 package org.codice.ddf.admin.api.handler.report;
 
+import static org.codice.ddf.admin.api.handler.ConfigurationMessage.buildMessage;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.api.handler.ConfigurationMessage;
 
@@ -64,55 +67,29 @@ public class Report {
 
     public static Report createReport(Map<String, String> successTypes,
             Map<String, String> failureTypes, Map<String, String> warningTypes,
-            String results) {
-        return  createReport(successTypes, failureTypes, warningTypes, Arrays.asList(results));
+            String result) {
+        return  createReport(successTypes, failureTypes, warningTypes, Arrays.asList(result));
     }
+
     public static Report createReport(Map<String, String> successTypes,
             Map<String, String> failureTypes, Map<String, String> warningTypes,
             List<String> results) {
-        Report testReport = new Report();
-
-        for (String result : results) {
-            if (successTypes != null && successTypes.containsKey(result)) {
-                testReport.addMessage(new ConfigurationMessage(ConfigurationMessage.MessageType.SUCCESS,
-                        result,
-                        successTypes.get(result)));
-            } else if (warningTypes != null && warningTypes.containsKey(result)) {
-                testReport.addMessage(new ConfigurationMessage(ConfigurationMessage.MessageType.WARNING,
-                        result,
-                        warningTypes.get(result)));
-            } else if (failureTypes != null && failureTypes.containsKey(result)) {
-                testReport.addMessage(new ConfigurationMessage(ConfigurationMessage.MessageType.FAILURE,
-                        result,
-                        failureTypes.get(result)));
-            }
-        }
-        return testReport;
+        return new Report().addMessages(results.stream()
+                .map(result -> buildMessage(successTypes, failureTypes, warningTypes, result))
+                .collect(Collectors.toList()));
     }
 
     public static Report createReport(Map<String, String> successTypes,
             Map<String, String> failureTypes, Map<String, String> warningTypes,
             Multimap<String, String> resultsToConfigIds) {
-        Report testReport = new Report();
-
-        for (Map.Entry<String, String> result : resultsToConfigIds.entries()) {
-            String resultName = result.getKey();
-            String resultConfigId = result.getValue();
-            if (successTypes != null && successTypes.containsKey(resultName)) {
-                testReport.addMessage(new ConfigurationMessage(ConfigurationMessage.MessageType.SUCCESS,
-                        resultName,
-                        successTypes.get(resultName)).configFieldId(resultConfigId));
-            } else if (warningTypes != null && warningTypes.containsKey(resultName)) {
-                testReport.addMessage(new ConfigurationMessage(ConfigurationMessage.MessageType.WARNING,
-                        resultName,
-                        warningTypes.get(resultName)).configFieldId(resultConfigId));
-            } else if (failureTypes != null && failureTypes.containsKey(resultName)) {
-                testReport.addMessage(new ConfigurationMessage(ConfigurationMessage.MessageType.FAILURE,
-                        resultName,
-                        failureTypes.get(resultName)).configFieldId(resultConfigId));
-            }
-        }
-        return testReport;
+        return new Report().addMessages(resultsToConfigIds.entries()
+                .stream()
+                .map(entry -> buildMessage(successTypes,
+                        failureTypes,
+                        warningTypes,
+                        entry.getKey(),
+                        entry.getValue()))
+                .collect(Collectors.toList()));
     }
 
     //Getters

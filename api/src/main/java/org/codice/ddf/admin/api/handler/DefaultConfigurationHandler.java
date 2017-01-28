@@ -61,23 +61,21 @@ public abstract class DefaultConfigurationHandler<S extends Configuration> imple
             return getNoProbeFoundReport(probeId);
         }
 
-        Optional<ProbeMethod> probeMethod = getProbeMethods().stream()
+        Optional<ProbeMethod> matchedProbeMethod = getProbeMethods().stream()
                 .filter(method -> method.id()
                         .equals(probeId))
                 .findFirst();
-        if(!probeMethod.isPresent()) {
+        if(!matchedProbeMethod.isPresent()) {
             return getNoProbeFoundReport(probeId);
         }
 
-        if (probeMethod.get().getRequiredFields() != null) {
-            ProbeReport validationReport = new ProbeReport(configuration.validate(probeMethod.get()
-                    .getRequiredFields()));
-            if (validationReport.containsFailureMessages()) {
-                return validationReport;
-            }
+        ProbeReport validationReport = new ProbeReport();
+        validationReport.addMessages(matchedProbeMethod.get().validate(configuration));
+        if (validationReport.containsFailureMessages()) {
+            return validationReport;
         }
 
-        return probeMethod.get()
+        return matchedProbeMethod.get()
                 .probe(configuration);
     }
 
@@ -96,11 +94,10 @@ public abstract class DefaultConfigurationHandler<S extends Configuration> imple
             return getNoTestFoundReport(testId);
         }
 
-        if(testMethod.get().getRequiredFields() != null) {
-            Report validationReport = new Report(configuration.validate(testMethod.get().getRequiredFields()));
-            if(validationReport.containsFailureMessages()) {
-                return validationReport;
-            }
+        Report validationReport = new Report();
+        validationReport.addMessages(testMethod.get().validate(configuration));
+        if (validationReport.containsFailureMessages()) {
+            return validationReport;
         }
 
         return testMethod.get().test(configuration);
@@ -121,11 +118,10 @@ public abstract class DefaultConfigurationHandler<S extends Configuration> imple
             return getNoTestFoundReport(persistId);
         }
 
-        if(persistMethod.get().getRequiredFields() != null) {
-            Report validationReport = new Report(configuration.validate(persistMethod.get().getRequiredFields()));
-            if(validationReport.containsFailureMessages()) {
-                return validationReport;
-            }
+        Report validationReport = new Report();
+        validationReport.addMessages(persistMethod.get().validate(configuration));
+        if (validationReport.containsFailureMessages()) {
+            return validationReport;
         }
 
         return persistMethod.get().persist(configuration);

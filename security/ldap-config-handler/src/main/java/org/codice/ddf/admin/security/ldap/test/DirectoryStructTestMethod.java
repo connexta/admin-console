@@ -27,15 +27,16 @@ import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.HOST_NAME;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.PORT;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.USER_NAME_ATTRIBUTE;
+import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.SUCCESSFUL_TEST;
 import static org.codice.ddf.admin.api.handler.report.Report.createReport;
+import static org.codice.ddf.admin.api.validation.LdapValidationUtils.ATTRIBUTE_STORE;
+import static org.codice.ddf.admin.api.validation.LdapValidationUtils.AUTHENTICATION_AND_ATTRIBUTE_STORE;
+import static org.codice.ddf.admin.api.validation.LdapValidationUtils.validateBindRealm;
 import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.BASE_GROUP_DN_NOT_FOUND;
 import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.BASE_USER_DN_NOT_FOUND;
 import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.CANNOT_BIND;
 import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.CANNOT_CONFIGURE;
 import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.CANNOT_CONNECT;
-import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.FOUND_BASE_GROUP_DN;
-import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.FOUND_BASE_USER_DN;
-import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.FOUND_USER_NAME_ATTRIBUTE;
 import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.NO_GROUPS_IN_BASE_GROUP_DN;
 import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.NO_GROUPS_WITH_MEMBERS;
 import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.NO_REFERENCED_MEMBER;
@@ -53,6 +54,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.codice.ddf.admin.api.config.ldap.LdapConfiguration;
+import org.codice.ddf.admin.api.handler.ConfigurationMessage;
 import org.codice.ddf.admin.api.handler.method.TestMethod;
 import org.codice.ddf.admin.api.handler.report.Report;
 import org.forgerock.opendj.ldap.Connection;
@@ -62,6 +64,7 @@ import org.forgerock.opendj.ldap.responses.SearchResultEntry;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
 
 public class DirectoryStructTestMethod extends TestMethod<LdapConfiguration> {
@@ -77,7 +80,6 @@ public class DirectoryStructTestMethod extends TestMethod<LdapConfiguration> {
             BIND_USER_PASSWORD,
             BIND_METHOD,
             BASE_USER_DN,
-            // TODO: tbatie - 1/11/17 - validate membershipNameAttribute once implemented
             BASE_GROUP_DN,
             USER_NAME_ATTRIBUTE);
 
@@ -86,11 +88,7 @@ public class DirectoryStructTestMethod extends TestMethod<LdapConfiguration> {
             GROUP_ATTRIBUTE_HOLDING_MEMBER,
             MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP);
 
-    private static final Map<String, String> SUCCESS_TYPES = toDescriptionMap(Arrays.asList(
-            FOUND_BASE_USER_DN,
-            FOUND_BASE_GROUP_DN,
-            FOUND_USER_NAME_ATTRIBUTE));
-    // TODO: tbatie - 1/25/17 - There are additional success types to add to this list
+    private static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(SUCCESSFUL_TEST, "All directory fields have been verified successfully");
 
     private static final Map<String, String> FAILURE_TYPES = toDescriptionMap(Arrays.asList(
             CANNOT_CONFIGURE,
@@ -116,19 +114,6 @@ public class DirectoryStructTestMethod extends TestMethod<LdapConfiguration> {
 
     @Override
     public Report test(LdapConfiguration configuration) {
-        if (configuration.ldapUseCase()
-                // TODO RAP 26 Jan 17: Consts
-                .equals("attributeStore") || configuration.ldapUseCase()
-                .equals("authenticationAndAttributeStore")) {
-            Report validationReport = new Report(configuration.validate(ImmutableList.of(
-                    GROUP_OBJECT_CLASS,
-                    GROUP_ATTRIBUTE_HOLDING_MEMBER,
-                    MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP)));
-            if (validationReport.containsFailureMessages()) {
-                return validationReport;
-            }
-        }
-
         LdapConnectionAttempt connectionAttempt = bindUserToLdapConnection(configuration);
 
         if (connectionAttempt.result() != SUCCESSFUL_BIND) {
@@ -160,8 +145,6 @@ public class DirectoryStructTestMethod extends TestMethod<LdapConfiguration> {
                     resultsWithConfigIds.put(NO_USERS_IN_BASE_USER_DN.name(), BASE_USER_DN);
                     resultsWithConfigIds.put(USER_NAME_ATTRIBUTE_NOT_FOUND.name(),
                             USER_NAME_ATTRIBUTE);
-                } else {
-                    resultsWithConfigIds.put(FOUND_USER_NAME_ATTRIBUTE.name(), USER_NAME_ATTRIBUTE);
                 }
             }
 
@@ -185,8 +168,6 @@ public class DirectoryStructTestMethod extends TestMethod<LdapConfiguration> {
                 if (baseGroupResults.isEmpty()) {
                     resultsWithConfigIds.put(NO_GROUPS_IN_BASE_GROUP_DN.name(), BASE_GROUP_DN);
                     resultsWithConfigIds.put(NO_GROUPS_IN_BASE_GROUP_DN.name(), GROUP_OBJECT_CLASS);
-                } else {
-                    resultsWithConfigIds.put(FOUND_BASE_GROUP_DN.name(), BASE_GROUP_DN);
                 }
 
                 // Then, check that there is a group entry (of the correct objectClass) that has
@@ -233,8 +214,26 @@ public class DirectoryStructTestMethod extends TestMethod<LdapConfiguration> {
                     }
                 }
             }
-
         }
+
+        if(resultsWithConfigIds.isEmpty()) {
+            return createReport(SUCCESS_TYPES, FAILURE_TYPES, WARNING_TYPES, SUCCESSFUL_TEST);
+        }
+
         return createReport(SUCCESS_TYPES, FAILURE_TYPES, WARNING_TYPES, resultsWithConfigIds);
+    }
+
+    @Override
+    public List<ConfigurationMessage> validateOptionalFields(LdapConfiguration configuration) {
+        List<ConfigurationMessage> validationResults = validateBindRealm(configuration);
+        if (configuration.ldapUseCase()
+                .equals(ATTRIBUTE_STORE) || configuration.ldapUseCase()
+                .equals(AUTHENTICATION_AND_ATTRIBUTE_STORE)) {
+            validationResults.addAll(configuration.validate(ImmutableList.of(
+                    GROUP_OBJECT_CLASS,
+                    GROUP_ATTRIBUTE_HOLDING_MEMBER,
+                    MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP)));
+        }
+        return validationResults;
     }
 }

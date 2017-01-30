@@ -1,7 +1,8 @@
 import 'whatwg-fetch'
 
 import { getAllConfig } from '../../reducer'
-import { backendError, clearWizard } from '../../actions'
+import { clearWizard } from 'admin-wizard/actions'
+import { backendError } from '../../actions'
 
 export const changeStage = (stageId) => ({ type: 'SOURCE_CHANGE_STAGE', stage: stageId })
 export const resetStages = () => ({type: 'SOURCE_RESET_STAGES'})

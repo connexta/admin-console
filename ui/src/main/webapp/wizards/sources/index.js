@@ -21,7 +21,7 @@ import {
 } from './stages'
 
 const WizardView = ({ id, children, clearWizard }) => (
-  <Mount key={id} off={clearWizard}>{children}</Mount>
+  <Mount key={id}>{children}</Mount>
 )
 
 const Wizard = connect(null, { clearWizard })(WizardView)

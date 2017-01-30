@@ -9,24 +9,18 @@ import {RadioButton, RadioButtonGroup} from 'material-ui/RadioButton'
 import Flexbox from 'flexbox-react'
 import AlertIcon from 'material-ui/svg-icons/alert/warning'
 import InfoIcon from 'material-ui/svg-icons/action/info'
-import RaisedButton from 'material-ui/RaisedButton'
 import { editConfigs } from 'admin-wizard/actions'
 
 import LeftIcon from 'material-ui/svg-icons/hardware/keyboard-arrow-left'
 import RightIcon from 'material-ui/svg-icons/hardware/keyboard-arrow-right'
 
-import SourceInfo from 'components/Information'
+import Info from 'components/Information'
 
 import {
-  stageStyle,
   descriptionIconStyle,
   widthConstraintStyle,
-  infoTitle,
-  infoSubtitle,
-  submit,
   animated,
   fadeIn,
-  outerFlex,
   navButtonStyles,
   navButtonStylesDisabled
 } from './styles.less'
@@ -92,30 +86,15 @@ const DescriptionIcon = ({ description }) => {
   }
 }
 
-export const ButtonBox = ({ disabled, id, path = [], label, description, children = [] }) => (
-  <div>
-    <Flexbox justifyContent='center' flexDirection='row'>
-      {children}
-    </Flexbox>
-  </div>
-)
-
-export const Info = ({id, title, subtitle}) => (
-  <div>
-    <p id={id} className={infoTitle}>{title}</p>
-    <p id={id} className={infoSubtitle}>{subtitle}</p>
-  </div>
-)
-
-export const CenteredElements = ({ children, stageIndex, className }) => (
-  <Flexbox alignItems='center' className={[outerFlex, animated, fadeIn].join(' ')} style={{width: '100%', height: '100%'}} flexDirection='column' justifyContent='center'>
+export const CenteredElements = ({ children, stageIndex, style }) => (
+  <div style={style} className={[animated, fadeIn].join(' ')}>
     {children}
-  </Flexbox>
+  </div>
 )
 
-export const ConstrainedSourceInfo = ({ id, value, label, ...rest }) => (
+export const ConstrainedInfo = ({ id, value, label, ...rest }) => (
   <WidthConstraint>
-    <SourceInfo id={id} value={value} label={label} {...rest} />
+    <Info id={id} value={value} label={label} {...rest} />
   </WidthConstraint>
 )
 
@@ -200,15 +179,15 @@ const SourceRadioButton = ({ disabled, value, label, valueSelected = 'undefined'
 export const BackNav = ({onClick, disabled}) => {
   if (!disabled) {
     return (
-      <span className={navButtonStyles} onClick={onClick}>
+      <div className={navButtonStyles} onClick={onClick}>
         <LeftIcon style={{height: '100%', width: '100%'}} />
-      </span>
+      </div>
     )
   } else {
     return (
-      <span className={navButtonStylesDisabled}>
+      <div className={navButtonStylesDisabled}>
         <LeftIcon style={{color: 'lightgrey', height: '100%', width: '100%'}} />
-      </span>
+      </div>
     )
   }
 }
@@ -216,15 +195,15 @@ export const BackNav = ({onClick, disabled}) => {
 const ForwardNavView = ({onClick, clean, currentStage, maxStage, disabled}) => {
   if (clean && (currentStage !== maxStage) && !disabled) {
     return (
-      <span className={navButtonStyles} onClick={onClick}>
+      <div className={navButtonStyles} onClick={onClick}>
         <RightIcon style={{height: '100%', width: '100%'}} />
-      </span>
+      </div>
     )
   } else {
     return (
-      <span className={navButtonStylesDisabled}>
+      <div className={navButtonStylesDisabled}>
         <RightIcon style={{color: 'lightgrey', height: '100%', width: '100%'}} />
-      </span>
+      </div>
     )
   }
 }
@@ -234,14 +213,13 @@ export const ForwardNav = connect((state) => ({
   currentStage: getSourceStage(state)}))(ForwardNavView)
 
 const NavPanesView = ({ children, backClickTarget, forwardClickTarget, setNavStage, backDisabled = false, forwardDisabled = false }) => (
-  <Flexbox className={stageStyle} justifyContent='center' flexDirection='row'>
+  <Flexbox justifyContent='center' flexDirection='row'>
     <BackNav disabled={backDisabled} onClick={() => setNavStage(backClickTarget)} />
-    {children}
+    <CenteredElements style={{ width: '80%' }}>
+      {children}
+    </CenteredElements>
     <ForwardNav disabled={forwardDisabled} onClick={() => setNavStage(forwardClickTarget)} />
   </Flexbox>
 )
 export const NavPanes = connect(null, { setNavStage: setNavStage })(NavPanesView)
 
-export const Submit = ({ label = 'Submit', onClick, disabled = false }) => (
-  <RaisedButton className={submit} label={label} disabled={disabled} primary onClick={onClick} />
-)

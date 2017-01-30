@@ -16,6 +16,8 @@ package org.codice.ddf.admin.api.config.ldap;
 
 import org.codice.ddf.admin.api.config.ConfigurationType;
 
+import com.google.common.base.MoreObjects;
+
 public class EmbeddedLdapConfiguration extends LdapConfiguration {
 
     public static final String CONFIGURATION_TYPE = "embedded-ldap";
@@ -56,5 +58,17 @@ public class EmbeddedLdapConfiguration extends LdapConfiguration {
     @Override
     public ConfigurationType getConfigurationType() {
         return new ConfigurationType(CONFIGURATION_TYPE, EmbeddedLdapConfiguration.class);
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("embeddedLdapPort", embeddedLdapPort)
+                .add("embeddedLdapsPort", embeddedLdapsPort)
+                .add("embeddedLdapAdminPort", embeddedLdapAdminPort)
+                .add("ldifPath", ldifPath)
+                .add("embeddedLdapStorageLocation", embeddedLdapStorageLocation)
+                .addValue(super.toString())
+                .toString();
     }
 }

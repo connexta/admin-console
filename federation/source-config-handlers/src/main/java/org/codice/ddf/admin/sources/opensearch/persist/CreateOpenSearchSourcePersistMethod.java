@@ -60,7 +60,7 @@ public class CreateOpenSearchSourcePersistMethod
     public Report persist(OpenSearchSourceConfiguration configuration) {
         Configurator configurator = new Configurator();
         configurator.createManagedService(configuration.factoryPid(), openSearchConfigToServiceProps(configuration));
-        OperationReport report = configurator.commit();
+        OperationReport report = configurator.commit("Opensearch source saved with details: {}", configuration.toString());
         return createReport(SUCCESS_TYPES,
                 FAILURE_TYPES,
                 null,

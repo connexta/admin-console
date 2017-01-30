@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.api.handler.ConfigurationMessage;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableMap;
 
 /**
@@ -101,5 +102,15 @@ public class ContextPolicyBin {
     public ContextPolicyBin contextPaths(String context) {
         contextPaths.add(context);
         return this;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("contextPaths", contextPaths)
+                .add("realm", realm)
+                .add("authenticationTypes", authenticationTypes)
+                .add("requiredAttributes", requiredAttributes)
+                .toString();
     }
 }

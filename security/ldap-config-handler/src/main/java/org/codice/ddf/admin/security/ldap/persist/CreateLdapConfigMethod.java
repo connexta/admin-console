@@ -147,7 +147,7 @@ public class CreateLdapConfigMethod extends PersistMethod<LdapConfiguration>{
             configurator.createManagedService(LDAP_CLAIMS_HANDLER_MANAGED_SERVICE_FACTORY_PID, ldapClaimsServiceProps);
         }
 
-        report = configurator.commit();
+        report = configurator.commit("LDAP Configuration saved with details: {}", config.toString());
         return createReport(SUCCESS_TYPES,
                 FAILURE_TYPES,
                 null,

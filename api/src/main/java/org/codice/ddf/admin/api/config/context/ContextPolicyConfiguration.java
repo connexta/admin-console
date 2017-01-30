@@ -27,6 +27,7 @@ import org.codice.ddf.admin.api.config.ConfigurationType;
 import org.codice.ddf.admin.api.handler.ConfigurationMessage;
 import org.codice.ddf.admin.api.validation.ValidationUtils;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableMap;
 
 /**
@@ -74,6 +75,14 @@ public class ContextPolicyConfiguration extends Configuration {
     public ContextPolicyConfiguration whiteListContexts(List<String> whiteListContexts) {
         this.whiteListContexts = whiteListContexts;
         return this;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("contextPolicyBins", contextPolicyBins)
+                .add("whiteListContexts", whiteListContexts)
+                .toString();
     }
 }
 

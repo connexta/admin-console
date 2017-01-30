@@ -53,7 +53,8 @@ public class DeleteOpenSearchSourcePersistMethod extends PersistMethod<OpenSearc
     public Report persist(OpenSearchSourceConfiguration configuration) {
         Configurator configurator = new Configurator();
         configurator.deleteManagedService(configuration.servicePid());
-        OperationReport report = configurator.commit();
+        OperationReport report = configurator.commit("Opensearch source deleted for servicePid: {}", configuration.servicePid());
+
         return createReport(SUCCESS_TYPES, FAILURE_TYPES, null, report.containsFailedResults() ? FAILED_PERSIST : SUCCESSFUL_PERSIST);
     }
 

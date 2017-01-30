@@ -28,6 +28,7 @@ import org.codice.ddf.admin.api.config.ConfigurationType;
 import org.codice.ddf.admin.api.handler.ConfigurationMessage;
 import org.codice.ddf.admin.api.validation.ValidationUtils;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableMap;
 
 public class SourceConfiguration extends Configuration {
@@ -128,5 +129,17 @@ public class SourceConfiguration extends Configuration {
     public SourceConfiguration sourceHostName(String sourceHostName) {
         this.sourceHostName = sourceHostName;
         return this;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("sourceName", sourceName)
+                .add("sourceHostName", sourceHostName)
+                .add("sourcePort", sourcePort)
+                .add("endpointUrl", endpointUrl)
+                .add("sourceUserName", sourceUserName)
+                .add("sourceUserPassword", "********")
+                .toString();
     }
 }

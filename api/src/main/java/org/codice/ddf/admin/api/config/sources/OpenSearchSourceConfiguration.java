@@ -30,10 +30,14 @@ public class OpenSearchSourceConfiguration extends SourceConfiguration {
 
     public static final String CONFIGURATION_TYPE = "opensearch-source";
 
-    private static final Map<String, Function<OpenSearchSourceConfiguration, List<ConfigurationMessage>>> FIELDS_TO_VALIDATION_FUNC = new ImmutableMap.Builder<String, Function<OpenSearchSourceConfiguration, List<ConfigurationMessage>>>()
-            .putAll(getBaseFieldValidationMap())
-            .put(FACTORY_PID, config -> validateOpensearchFactoryPid(config.factoryPid(), FACTORY_PID))
-            .build();
+    private static final Map<String, Function<OpenSearchSourceConfiguration, List<ConfigurationMessage>>>
+            FIELDS_TO_VALIDATION_FUNC =
+            new ImmutableMap.Builder<String, Function<OpenSearchSourceConfiguration, List<ConfigurationMessage>>>().putAll(
+                    getBaseFieldValidationMap())
+                    .put(FACTORY_PID,
+                            config -> validateOpensearchFactoryPid(config.factoryPid(),
+                                    FACTORY_PID))
+                    .build();
 
     public OpenSearchSourceConfiguration() {
     }

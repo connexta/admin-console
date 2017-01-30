@@ -59,7 +59,7 @@ public class EditContextPolicyMethod extends PersistMethod<ContextPolicyConfigur
                 configToPolicyManagerProps(config),
                 false);
 
-        OperationReport configReport = configurator.commit();
+        OperationReport configReport = configurator.commit("Web Context Policy saved with details: {}", config.toString());
 
         return Report.createReport(SUCCESS_TYPES, FAILURE_TYPES, null, configReport.containsFailedResults() ? FAILED_PERSIST : SUCCESSFUL_PERSIST);
     }

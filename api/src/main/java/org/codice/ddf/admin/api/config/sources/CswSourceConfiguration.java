@@ -25,6 +25,7 @@ import org.codice.ddf.admin.api.config.ConfigurationType;
 import org.codice.ddf.admin.api.handler.ConfigurationMessage;
 import org.codice.ddf.admin.api.validation.ValidationUtils;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableMap;
 
 public class CswSourceConfiguration extends SourceConfiguration {
@@ -78,5 +79,14 @@ public class CswSourceConfiguration extends SourceConfiguration {
     public CswSourceConfiguration forceSpatialFilter(String forceSpatialFilter) {
         this.forceSpatialFilter = forceSpatialFilter;
         return this;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("outputSchema", outputSchema)
+                .add("forceSpatialFilter", forceSpatialFilter)
+                .addValue(super.toString())
+                .toString();
     }
 }

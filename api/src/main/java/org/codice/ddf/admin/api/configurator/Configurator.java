@@ -40,6 +40,8 @@ import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ddf.security.common.audit.SecurityLogger;
+
 /**
  * Transactional orchestrator for persisting configuration changes.
  * <p>
@@ -62,6 +64,29 @@ public class Configurator {
     private static final Logger LOGGER = LoggerFactory.getLogger(Configurator.class);
 
     private final Map<String, Operation> configHandlers = new LinkedHashMap<>();
+
+    /**
+     * Sequentially invokes all the {@link Operation}s, committing their changes. If a failure
+     * occurs during the processing, a rollback is attempted of those handlers that had already been
+     * committed.
+     * <p>
+     * In the case of a successful commit, the {@link SecurityLogger} will be invoked to log changes.
+     *
+     * @param auditMessage In the case of a successful commit, the message to pass to the
+     *                     {@link SecurityLogger}
+     * @param auditParams  In the case of a successful commit, the optional parameters to pass to the
+     *                     {@link SecurityLogger} to be interpolated into the message
+     * @return report of the commit status, whether successful, successfully rolled back, or partially
+     * rolled back with errors
+     */
+    public OperationReport commit(String auditMessage, String... auditParams) {
+        OperationReport report = commit();
+        if (report.txactSucceeded()) {
+            SecurityLogger.audit(auditMessage, (Object[]) auditParams);
+        }
+
+        return report;
+    }
 
     /**
      * Sequentially invokes all the {@link Operation}s, committing their changes. If a failure

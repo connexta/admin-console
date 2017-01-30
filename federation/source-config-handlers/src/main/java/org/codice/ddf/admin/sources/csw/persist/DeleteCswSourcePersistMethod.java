@@ -52,7 +52,8 @@ public class DeleteCswSourcePersistMethod extends PersistMethod<CswSourceConfigu
     public Report persist(CswSourceConfiguration configuration) {
         Configurator configurator = new Configurator();
         configurator.deleteManagedService(configuration.servicePid());
-        OperationReport report = configurator.commit();
+        OperationReport report = configurator.commit("CSW source deleted for servicePid: {}", configuration.servicePid());
+
         return Report.createReport(SUCCESS_TYPES, FAILURE_TYPES, null, report.containsFailedResults() ? FAILED_PERSIST : SUCCESSFUL_PERSIST);
     }
 

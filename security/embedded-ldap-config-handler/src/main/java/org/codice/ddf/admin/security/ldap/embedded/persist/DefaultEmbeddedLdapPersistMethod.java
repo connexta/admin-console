@@ -75,7 +75,7 @@ public class DefaultEmbeddedLdapPersistMethod extends PersistMethod<EmbeddedLdap
             configurator.startFeature(ALL_DEFAULT_EMBEDDED_LDAP_CONFIG_FEATURE);
             break;
         }
-        OperationReport report = configurator.commit();
+        OperationReport report = configurator.commit("Embedded LDAP saved with details: {}", configuration.toString());
 
         return Report.createReport(SUCCESS_TYPES,
                 FAILURE_TYPES,

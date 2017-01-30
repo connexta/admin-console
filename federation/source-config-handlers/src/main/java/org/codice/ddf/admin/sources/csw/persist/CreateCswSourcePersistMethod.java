@@ -61,7 +61,7 @@ public class CreateCswSourcePersistMethod extends PersistMethod<CswSourceConfigu
     public Report persist(CswSourceConfiguration configuration) {
         Configurator configurator = new Configurator();
         configurator.createManagedService(configuration.factoryPid(), cswConfigToServiceProps(configuration));
-        OperationReport report = configurator.commit();
+        OperationReport report = configurator.commit("CSW source saved with details: {}", configuration.toString());
         return Report.createReport(SUCCESS_TYPES, FAILURE_TYPES, null, report.containsFailedResults() ? FAILED_PERSIST : SUCCESSFUL_PERSIST);
     }
 

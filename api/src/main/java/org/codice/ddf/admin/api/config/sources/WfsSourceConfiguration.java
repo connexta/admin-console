@@ -29,10 +29,14 @@ import com.google.common.collect.ImmutableMap;
 public class WfsSourceConfiguration extends SourceConfiguration {
 
     public static final String CONFIGURATION_TYPE = "wfs-source";
-    private static final Map<String, Function<SourceConfiguration, List<ConfigurationMessage>>> FIELDS_TO_VALIDATION_FUNC = new ImmutableMap.Builder<String, Function<SourceConfiguration, List<ConfigurationMessage>>>()
-            .putAll(getBaseFieldValidationMap())
-            .put(FACTORY_PID, config -> validateWfsFactoryPid(config.factoryPid(), FACTORY_PID))
-            .build();
+
+    private static final Map<String, Function<SourceConfiguration, List<ConfigurationMessage>>>
+            FIELDS_TO_VALIDATION_FUNC =
+            new ImmutableMap.Builder<String, Function<SourceConfiguration, List<ConfigurationMessage>>>().putAll(
+                    getBaseFieldValidationMap())
+                    .put(FACTORY_PID,
+                            config -> validateWfsFactoryPid(config.factoryPid(), FACTORY_PID))
+                    .build();
 
     public WfsSourceConfiguration() {
 

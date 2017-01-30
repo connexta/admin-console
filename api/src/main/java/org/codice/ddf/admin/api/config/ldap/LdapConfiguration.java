@@ -35,6 +35,7 @@ import org.codice.ddf.admin.api.config.ConfigurationType;
 import org.codice.ddf.admin.api.handler.ConfigurationMessage;
 import org.codice.ddf.admin.api.validation.ValidationUtils;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableMap;
 
 public class LdapConfiguration extends Configuration {
@@ -290,5 +291,28 @@ public class LdapConfiguration extends Configuration {
     @Override
     public ConfigurationType getConfigurationType() {
         return new ConfigurationType(CONFIGURATION_TYPE, LdapConfiguration.class);
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("hostName", hostName)
+                .add("port", port)
+                .add("encryptionMethod", encryptionMethod)
+                .add("bindUserMethod", bindUserMethod)
+                .add("bindUserDn", bindUserDn)
+                .add("bindUserPassword", "********")
+                .add("bindRealm", bindRealm)
+                .add("userNameAttribute", userNameAttribute)
+                .add("baseGroupDn", baseGroupDn)
+                .add("baseUserDn", baseUserDn)
+                .add("ldapType", ldapType)
+                .add("ldapUseCase", ldapUseCase)
+                .add("groupObjectClass", groupObjectClass)
+                .add("groupAttributeHoldingMember", groupAttributeHoldingMember)
+                .add("memberAttributeReferencedInGroup", memberAttributeReferencedInGroup)
+                .add("attributeMappings", attributeMappings)
+                .add("attributeMappingsPath", attributeMappingsPath)
+                .toString();
     }
 }

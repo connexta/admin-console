@@ -35,11 +35,16 @@ import com.google.common.collect.ImmutableMap;
 public class DeleteLdapConfigMethod extends PersistMethod<LdapConfiguration> {
 
     public static final String DELETE_CONFIG_ID = DELETE;
+
     public static final String DESCRIPTION = "Deletes the specified LDAP configuration.";
 
     public static final List<String> REQUIRED_FIELDS = ImmutableList.of(SERVICE_PID);
-    public static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(SUCCESSFUL_PERSIST, "Successfully deleted configuration.");
-    public static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(FAILED_PERSIST, "Unable to delete configuration.");
+
+    public static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(SUCCESSFUL_PERSIST,
+            "Successfully deleted configuration.");
+
+    public static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(FAILED_PERSIST,
+            "Unable to delete configuration.");
 
     public DeleteLdapConfigMethod() {
         super(DELETE_CONFIG_ID,
@@ -55,7 +60,10 @@ public class DeleteLdapConfigMethod extends PersistMethod<LdapConfiguration> {
     public Report persist(LdapConfiguration config) {
         Configurator configurator = new Configurator();
         configurator.deleteManagedService(config.servicePid());
-        OperationReport report = configurator.commit();
+
+        OperationReport report =
+                configurator.commit("LDAP Configuration deleted for servicePid: {}",
+                        config.servicePid());
 
         return createReport(SUCCESS_TYPES,
                 FAILURE_TYPES,

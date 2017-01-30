@@ -54,7 +54,7 @@ public class DeleteWfsSourcePersistMethod extends PersistMethod<WfsSourceConfigu
     public Report persist(WfsSourceConfiguration configuration) {
         Configurator configurator = new Configurator();
         configurator.deleteManagedService(configuration.servicePid());
-        OperationReport report = configurator.commit();
+        OperationReport report = configurator.commit("WFS source deleted for servicePid: {}", configuration.servicePid());
 
         return createReport(SUCCESS_TYPES,
                 FAILURE_TYPES,

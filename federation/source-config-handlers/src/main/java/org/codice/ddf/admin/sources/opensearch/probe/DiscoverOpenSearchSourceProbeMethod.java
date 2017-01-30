@@ -24,7 +24,7 @@ import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.ENDP
 import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.NO_ENDPOINT;
 import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.UNTRUSTED_CA;
 import static org.codice.ddf.admin.api.handler.report.ProbeReport.createProbeReport;
-import static org.codice.ddf.admin.api.services.OpensearchServiceProperties.OPENSEARCH_FACTORY_PID;
+import static org.codice.ddf.admin.api.services.OpenSearchServiceProperties.OPENSEARCH_FACTORY_PID;
 import static org.codice.ddf.admin.sources.opensearch.OpenSearchSourceConfigurationHandler.OPENSEARCH_SOURCE_CONFIGURATION_HANDLER_ID;
 
 import java.util.HashMap;

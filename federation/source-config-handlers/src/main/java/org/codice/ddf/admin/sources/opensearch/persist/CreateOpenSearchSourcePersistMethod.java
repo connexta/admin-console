@@ -21,7 +21,7 @@ import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.CREATE;
 import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.FAILED_PERSIST;
 import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.SUCCESSFUL_PERSIST;
 import static org.codice.ddf.admin.api.handler.report.Report.createReport;
-import static org.codice.ddf.admin.api.services.OpensearchServiceProperties.openSearchConfigToServiceProps;
+import static org.codice.ddf.admin.api.services.OpenSearchServiceProperties.openSearchConfigToServiceProps;
 
 import java.util.List;
 import java.util.Map;

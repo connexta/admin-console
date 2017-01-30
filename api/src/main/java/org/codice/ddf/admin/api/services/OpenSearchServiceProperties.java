@@ -13,6 +13,8 @@
  */
 package org.codice.ddf.admin.api.services;
 
+import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.PORT;
+import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_HOSTNAME;
 import static org.codice.ddf.admin.api.validation.ValidationUtils.FACTORY_PID_KEY;
 import static org.codice.ddf.admin.api.validation.ValidationUtils.SERVICE_PID_KEY;
 
@@ -21,9 +23,9 @@ import java.util.Map;
 
 import org.codice.ddf.admin.api.config.sources.OpenSearchSourceConfiguration;
 
-public class OpensearchServiceProperties {
+public class OpenSearchServiceProperties {
 
-    // --- Opeansearch service properties
+    // --- OpenSearch service properties
     public static final String OPENSEARCH_FACTORY_PID = "OpenSearchSource";
     public static final String ID = "id";
     public static final String ENDPOINT_URL = "endpointUrl";
@@ -36,6 +38,8 @@ public class OpensearchServiceProperties {
         config.factoryPid(props.get(FACTORY_PID_KEY) == null ? null : (String) props.get(FACTORY_PID_KEY));
         config.servicePid(props.get(SERVICE_PID_KEY) == null ? null : (String) props.get(SERVICE_PID_KEY));
         config.sourceName(props.get(ID) == null ? null : (String) props.get(ID));
+        config.sourceHostName(props.get(SOURCE_HOSTNAME) == null ? null : (String) props.get(SOURCE_HOSTNAME));
+        config.sourcePort(props.get(PORT) == null ? 0 : (int) props.get(PORT));
         config.endpointUrl(props.get(ENDPOINT_URL) == null ? null : (String) props.get(ENDPOINT_URL));
         config.sourceUserName(props.get(USERNAME) == null ? null : (String) props.get(USERNAME));
         config.sourceUserPassword(props.get(PASSWORD) == null ? null : (String) props.get(PASSWORD));

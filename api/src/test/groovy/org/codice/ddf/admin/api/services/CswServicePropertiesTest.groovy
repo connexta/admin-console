@@ -16,8 +16,6 @@ package org.codice.ddf.admin.api.services
 import org.codice.ddf.admin.api.config.sources.CswSourceConfiguration
 import spock.lang.Specification
 
-import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.PASSWORD
-import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.USERNAME
 import static org.codice.ddf.admin.api.services.CswServiceProperties.CSW_URL
 import static org.codice.ddf.admin.api.services.CswServiceProperties.EVENT_SERVICE_ADDRESS
 import static org.codice.ddf.admin.api.services.CswServiceProperties.FORCE_SPATIAL_FILTER
@@ -46,7 +44,7 @@ class CswServicePropertiesTest extends Specification {
     private static final TEST_OUTPUT_SCHEMA = "testOutputSchema"
     private static final TEST_FORCE_SPATIAL_FILTER = "testForceSpatialFilter"
 
-    def 'test populated map to config' () {
+    def 'test populated map to CSW config' () {
         setup:
         def props = [FACTORY_PID_KEY, TEST_FACTORY_PID,
                      SERVICE_PID_KEY, TEST_SERVICE_PID,
@@ -76,7 +74,7 @@ class CswServicePropertiesTest extends Specification {
         config.forceSpatialFilter() == TEST_FORCE_SPATIAL_FILTER
     }
 
-    def 'test empty map to config'() {
+    def 'test empty map to CSW config'() {
 
         setup:
         def props = new HashMap()
@@ -97,7 +95,7 @@ class CswServicePropertiesTest extends Specification {
         config.forceSpatialFilter() == null
     }
 
-    def 'test empty config to map'() {
+    def 'test empty CSW config to map'() {
         setup:
         def config = Mock(CswSourceConfiguration)
 
@@ -121,7 +119,7 @@ class CswServicePropertiesTest extends Specification {
         props.get(FORCE_SPATIAL_FILTER) == null
     }
 
-    def 'test full config to map'() {
+    def 'test populated CSW config to map'() {
         setup:
         def config = Mock(CswSourceConfiguration)
 

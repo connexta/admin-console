@@ -15,7 +15,7 @@ package org.codice.ddf.admin.api.validation;
 
 import static org.codice.ddf.admin.api.handler.ConfigurationMessage.createInvalidFieldMsg;
 import static org.codice.ddf.admin.api.services.CswServiceProperties.CSW_FACTORY_PIDS;
-import static org.codice.ddf.admin.api.services.OpensearchServiceProperties.OPENSEARCH_FACTORY_PID;
+import static org.codice.ddf.admin.api.services.OpenSearchServiceProperties.OPENSEARCH_FACTORY_PID;
 import static org.codice.ddf.admin.api.services.WfsServiceProperties.WFS_FACTORY_PIDS;
 import static org.codice.ddf.admin.api.validation.ValidationUtils.validateString;
 

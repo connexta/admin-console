@@ -14,7 +14,7 @@
 
 package org.codice.ddf.admin.sources.opensearch;
 
-import static org.codice.ddf.admin.api.services.OpensearchServiceProperties.OPENSEARCH_FACTORY_PID;
+import static org.codice.ddf.admin.api.services.OpenSearchServiceProperties.OPENSEARCH_FACTORY_PID;
 
 import java.util.Arrays;
 import java.util.List;
@@ -32,7 +32,7 @@ import org.codice.ddf.admin.api.handler.method.TestMethod;
 import org.codice.ddf.admin.api.handler.method.commons.ManualUrlTestMethod;
 import org.codice.ddf.admin.api.handler.report.ProbeReport;
 import org.codice.ddf.admin.api.handler.report.Report;
-import org.codice.ddf.admin.api.services.OpensearchServiceProperties;
+import org.codice.ddf.admin.api.services.OpenSearchServiceProperties;
 import org.codice.ddf.admin.sources.opensearch.persist.CreateOpenSearchSourcePersistMethod;
 import org.codice.ddf.admin.sources.opensearch.persist.DeleteOpenSearchSourcePersistMethod;
 import org.codice.ddf.admin.sources.opensearch.probe.DiscoverOpenSearchSourceProbeMethod;
@@ -80,7 +80,7 @@ public class OpenSearchSourceConfigurationHandler extends DefaultConfigurationHa
         return configurator.getManagedServiceConfigs(OPENSEARCH_FACTORY_PID)
                 .values()
                 .stream()
-                .map(OpensearchServiceProperties::servicePropsToOpenSearchConfig)
+                .map(OpenSearchServiceProperties::servicePropsToOpenSearchConfig)
                 .map(config -> config.sourceUserPassword("*****"))
                 .collect(Collectors.toList());
     }

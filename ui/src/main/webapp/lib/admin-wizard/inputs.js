@@ -70,7 +70,7 @@ const InputAutoView = ({ value = '', options = [], type = 'text', message = {}, 
   return (
     <Flexbox flexDirection='row' style={{ position: 'relative' }}>
       <AutoComplete
-        menuStyle={{ maxHeight: 200, overflowY: 'scroll'}}
+        menuStyle={{ maxHeight: 200, overflowY: 'scroll' }}
         fullWidth
         openOnFocus
         dataSource={options.map((value) => ({ text: String(value), value }))}

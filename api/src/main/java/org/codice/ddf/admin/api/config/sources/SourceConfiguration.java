@@ -37,16 +37,16 @@ public class SourceConfiguration extends Configuration {
     public static final String SOURCE_NAME = "sourceName";
     public static final String SOURCE_HOSTNAME = "sourceHostName";
     public static final String PORT = "sourcePort";
+    public static final String ENDPOINT_URL = "endpointUrl";
     public static final String USERNAME = "sourceUserName";
     public static final String PASSWORD = "sourceUserPassword";
-    public static final String ENDPOINT_URL = "endpointUrl";
 
     private String sourceName;
     private String sourceHostName;
     private int sourcePort;
+    private String endpointUrl;
     private String sourceUserName;
     private String sourceUserPassword;
-    private String endpointUrl;
 
     public SourceConfiguration() {
 

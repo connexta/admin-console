@@ -14,6 +14,8 @@
 
 package org.codice.ddf.admin.api.services;
 
+import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.PORT;
+import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_HOSTNAME;
 import static org.codice.ddf.admin.api.validation.ValidationUtils.FACTORY_PID_KEY;
 import static org.codice.ddf.admin.api.validation.ValidationUtils.SERVICE_PID_KEY;
 
@@ -29,13 +31,13 @@ public class CswServiceProperties {
 
     // --- Csw service properties
     public static final String ID = "id";
-    public static final String SOURCE_NAME = "sourceName";
     public static final String CSW_URL = "cswUrl";
     public static final String EVENT_SERVICE_ADDRESS = "eventServiceAddress";
     public static final String OUTPUT_SCHEMA = "outputSchema";
     public static final String FORCE_SPATIAL_FILTER = "forceSpatialFilter";
     public static final String USERNAME = "username";
     public static final String PASSWORD = "password";
+
     public static final String CSW_PROFILE_FACTORY_PID = "Csw_Federation_Profile_Source";
     public static final String CSW_GMD_FACTORY_PID = "Gmd_Csw_Federated_Source";
     public static final String CSW_SPEC_FACTORY_PID = "Csw_Federated_Source";
@@ -48,8 +50,13 @@ public class CswServiceProperties {
         cswConfig.factoryPid(cswSourceProps.get(FACTORY_PID_KEY) == null ? null : (String) cswSourceProps.get(FACTORY_PID_KEY));
         cswConfig.servicePid(cswSourceProps.get(SERVICE_PID_KEY) == null ? null : (String) cswSourceProps.get(SERVICE_PID_KEY));
         cswConfig.sourceName(cswSourceProps.get(ID) == null ? null : (String) cswSourceProps.get(ID));
+        cswConfig.sourceHostName(cswSourceProps.get(SOURCE_HOSTNAME) == null ? null : (String) cswSourceProps.get(SOURCE_HOSTNAME));
+        cswConfig.sourcePort(cswSourceProps.get(PORT) == null ? 0 : (int) cswSourceProps.get(PORT));
         cswConfig.endpointUrl(cswSourceProps.get(CSW_URL) == null ? null : (String) cswSourceProps.get(CSW_URL));
+        cswConfig.sourceUserName(cswSourceProps.get(USERNAME) == null ? null : (String) cswSourceProps.get(USERNAME));
+        cswConfig.sourceUserPassword(cswSourceProps.get(PASSWORD) == null ? null : (String) cswSourceProps.get(PASSWORD));
         cswConfig.outputSchema(cswSourceProps.get(OUTPUT_SCHEMA) == null ? null : (String) cswSourceProps.get(OUTPUT_SCHEMA));
+        cswConfig.forceSpatialFilter(cswSourceProps.get(FORCE_SPATIAL_FILTER) == null ? null : (String) cswSourceProps.get(FORCE_SPATIAL_FILTER));
         return cswConfig;
     }
 
@@ -57,7 +64,7 @@ public class CswServiceProperties {
         HashMap<String, Object> props = new HashMap<>();
         props.put(ID, config.sourceName());
         props.put(CSW_URL, config.endpointUrl());
-        if (!config.factoryPid().equals(CSW_GMD_FACTORY_PID)) {
+        if (config.factoryPid() != null && !config.factoryPid().equals(CSW_GMD_FACTORY_PID)) {
             props.put(EVENT_SERVICE_ADDRESS, config.endpointUrl() + "/subscription");
         }
         if (config.sourceUserName() != null) {

@@ -63,14 +63,17 @@ const LdapQueryToolView = ({ disabled, probeValue, probe }) => (
         <FlatButton disabled={disabled} secondary label='run query' onClick={() => probe('/admin/beta/config/probe/ldap/query')} />
       </div>
 
-      {probeValue.length === 0
-       ? null
-       : (<div className={styles.queryWindow}>
-         <Title>Query Results</Title>
-         <List>
-           {probeValue.map((v, i) => <QueryResult key={i} {...v} />)}
-         </List>
-       </div>)}
+        (
+        <div className={styles.queryWindow}>
+            <Title>Query Results</Title>
+            {probeValue.length === 0
+                ? 'No results'
+                : <List>
+                {probeValue.map((v, i) => <QueryResult key={i} {...v} />)}
+            </List>
+            }
+        </div>
+        )
     </CardActions>
   </Card>
 )

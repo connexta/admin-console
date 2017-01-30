@@ -65,7 +65,7 @@ const LdapQueryToolView = ({ disabled, probeValue, probe }) => (
 
         (
         <div className={styles.queryWindow}>
-            <Title>Query Results</Title>
+          <Title>Query Results</Title>
             {probeValue.length === 0
                 ? 'No results'
                 : <List>

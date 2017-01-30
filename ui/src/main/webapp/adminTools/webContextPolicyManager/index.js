@@ -86,7 +86,7 @@ let ContextPathItem = ({ contextPath, binNumber, pathNumber, removePath, editing
   <div>
     <Divider />
     <Flexbox flexDirection='row' justifyContent='space-between'>
-      <span className={contextPolicyStyle}>{contextPath}</span>
+      <div className={contextPolicyStyle}>{contextPath}</div>
       {editing ? (<IconButton tooltip={'Remove'} tooltipPosition='top-center' onClick={removePath}><CancelIcon /></IconButton>) : null}
     </Flexbox>
   </div>
@@ -96,9 +96,9 @@ ContextPathItem = connect(null, (dispatch, { binNumber, pathNumber, attribute })
 let NewContextPathItem = ({ binNumber, addPath, onEdit, newPath, attribute, addButtonVisible = true, error }) => (
   <div>
     <Divider />
-    <Flexbox flexDirection='row' justifyContent='space-between'>
-      <TextField fullWidth style={{ paddingLeft: '10px' }} id='name' hintText='Add New Path' onChange={(event, value) => onEdit(value)} value={newPath || ''} errorText={error} />
-      {(addButtonVisible) ? (<IconButton tooltip={'Add'} tooltipPosition='top-center' onClick={addPath}><AddIcon color={cyanA700} /></IconButton>) : null }
+    <Flexbox style={{ position: 'relative' }} flexDirection='row' justifyContent='space-between'>
+      <TextField hintStyle={{ padding: '0px 10px' }} inputStyle={{ padding: '0px 10px' }} style={{ width: '100%' }} id='name' hintText='Add New Path' onChange={(event, value) => onEdit(value)} value={newPath || ''} errorText={error} />
+      {(addButtonVisible) ? (<IconButton style={{ position: 'absolute', right: '0px' }} tooltip={'Add'} tooltipPosition='top-center' onClick={addPath}><AddIcon color={cyanA700} /></IconButton>) : null }
       {(newPath && newPath.trim() !== '')
         ? <IconButton style={{ position: 'absolute', left: '-10px', width: '10px', height: '10px' }} iconStyle={{ width: '10px', height: '10px' }} onClick={() => onEdit('')}><ClearIcon /></IconButton>
         : null
@@ -114,21 +114,21 @@ NewContextPathItem = connect((state) => ({
 }))(NewContextPathItem)
 
 let ContextPathGroup = ({ bin, binNumber, editing }) => (
-  <Flexbox className={(bin.name === 'WHITELIST') ? whitelistContextPathGroupStyle : contextPathGroupStyle} flexDirection='column'>
+  <div className={(bin.name === 'WHITELIST') ? whitelistContextPathGroupStyle : contextPathGroupStyle}>
     <p className={infoSubtitleLeft}>Context Paths</p>
     {bin.contextPaths.map((contextPath, pathNumber) => (<ContextPathItem attribute='contextPaths' contextPath={contextPath} key={pathNumber} binNumber={binNumber} pathNumber={pathNumber} editing={editing} />))}
     {editing ? <NewContextPathItem binNumber={binNumber} attribute='contextPaths' newPath={bin['newcontextPaths']} /> : null}
-  </Flexbox>
+  </div>
 )
 
 let NewSelectItem = ({ binNumber, addPath, onEdit, newPath, attribute, options, addButtonVisible = true, error }) => (
   <div>
     <Divider />
     <Flexbox style={{ position: 'relative' }} flexDirection='row' justifyContent='space-between'>
-      <SelectField fullWidth style={{ paddingLeft: '10px' }} id='name' hintText='Add New Path' onChange={(event, i, value) => onEdit(value)} value={newPath || ''} errorText={error}>
+      <SelectField hintStyle={{ padding: '0px 10px' }} inputStyle={{ padding: '0px 10px' }} style={{ width: '100%' }} id='name' hintText='Add New Path' onChange={(event, i, value) => onEdit(value)} value={newPath || ''} errorText={error}>
         { options.map((item, key) => (<MenuItem value={item} key={key} primaryText={item} />)) }
       </SelectField>
-      {(addButtonVisible) ? (<IconButton tooltip={'Add Item'} tooltipPosition='top-center' onClick={addPath}><AddIcon color={cyanA700} /></IconButton>) : null }
+      {(addButtonVisible) ? (<IconButton style={{ position: 'absolute', right: '0px' }} tooltip={'Add Item'} tooltipPosition='top-center' onClick={addPath}><AddIcon color={cyanA700} /></IconButton>) : null }
       {(newPath && newPath.trim() !== '')
         ? <IconButton style={{ position: 'absolute', left: '-15px', width: '10px', height: '10px' }} iconStyle={{ width: '10px', height: '10px' }} onClick={() => onEdit('')}><ClearIcon /></IconButton>
         : null
@@ -193,12 +193,12 @@ ConfirmationPanel = connect((state) => ({
 }))(ConfirmationPanel)
 
 let AuthTypesGroup = ({ bin, binNumber, policyOptions, editing, error }) => (
-  <Flexbox flexDirection='column'>
+  <div>
     {bin.authenticationTypes.map((contextPath, pathNumber) => (<ContextPathItem attribute='authenticationTypes' contextPath={contextPath} key={pathNumber} binNumber={binNumber} pathNumber={pathNumber} editing={editing} />))}
     {editing ? (
       <NewSelectItem binNumber={binNumber} attribute='authenticationTypes' options={policyOptions.authenticationTypes.filter((option) => !bin.authenticationTypes.includes(option))} newPath={bin['newauthenticationTypes']} error={error} />
     ) : null }
-  </Flexbox>
+  </div>
 )
 AuthTypesGroup = connect(
   (state) => ({
@@ -230,7 +230,7 @@ let AttributeTableGroup = ({ bin, binNumber, policyOptions, editAttribute, remov
       {editing ? (
         <TableRow>
           <TableRowColumn style={{ position: 'relative' }}>
-            <SelectField style={{ margin: '0px', width: '100%', fontSize: '14px' }} id='claims' value={bin.newrequiredClaim || ''} onChange={(event, i, value) => editAttribute('requiredClaim', value)} errorText={claimError}>
+            <SelectField style={{ margin: '0px', width: '100%', fontSize: '14px' }} id='claims' value={bin.newrequiredClaim || ''} onChange={(event, i, value) => editAttribute('requiredClaim', value)} hintText='Attribute' errorText={claimError}>
               {policyOptions.claims.map((claim, i) => (<MenuItem style={{ fontSize: '12px' }} value={claim} primaryText={claim} key={i} />))}
             </SelectField>
             {(bin.newrequiredClaim && bin.newrequiredClaim.trim() !== '')
@@ -239,7 +239,7 @@ let AttributeTableGroup = ({ bin, binNumber, policyOptions, editAttribute, remov
             }
           </TableRowColumn>
           <TableRowColumn style={{ width: 120, position: 'relative' }}>
-            <TextField fullWidth style={{ margin: '0px', fontSize: '14px' }} id='claims' value={bin.newrequiredAttribute || ''} onChange={(event, value) => editAttribute('requiredAttribute', value)} errorText={attrError} />
+            <TextField fullWidth style={{ margin: '0px', fontSize: '14px' }} id='claims' value={bin.newrequiredAttribute || ''} onChange={(event, value) => editAttribute('requiredAttribute', value)} hintText='Claim' errorText={attrError} />
             <IconButton style={{ position: 'absolute', right: 0, top: 0 }} tooltip={'Add Item'} tooltipPosition='top-center' onClick={addAttributeMapping}><AddIcon color={cyanA700} /></IconButton>
             {(bin.newrequiredAttribute && bin.newrequiredAttribute.trim() !== '')
               ? <IconButton style={{ position: 'absolute', left: '-5px', width: '10px', height: '10px' }} iconStyle={{ width: '10px', height: '10px' }} onClick={() => editAttribute('requiredAttribute', '')}><ClearIcon /></IconButton>
@@ -271,11 +271,15 @@ const WhitelistBin = ({ policyBin, binNumber, editing, editingBinNumber }) => (
   <Paper className={policyBinOuterStyle} >
     <Flexbox flexDirection='row'>
       <ContextPathGroup binNumber={binNumber} bin={policyBin} editing={editing} />
-      <Flexbox style={{ padding: '5px' }} flexDirection='column' justifyContent='center'>
-        <p className={infoTitle}>Whitelisted Contexts</p>
-        <p className={infoSubtitle}>
-          The paths listed here will not be checked against any policies and all requests under these paths will be permitted. Use with caution!
-        </p>
+      <Flexbox flex='1' style={{ padding: '5px' }} flexDirection='column' justifyContent='center'>
+        <div>
+          <p className={infoTitle}>
+            Whitelisted Contexts
+          </p>
+          <p className={infoSubtitle}>
+            The paths listed here will not be checked against any policies and all requests under these paths will be permitted. Use with caution!
+          </p>
+        </div>
       </Flexbox>
     </Flexbox>
     <Edit editing={editing} binNumber={binNumber} />
@@ -298,20 +302,20 @@ const PolicyBin = ({ policyBin, binNumber, editing, editingBinNumber }) => (
   <Paper className={policyBinOuterStyle} >
     <Flexbox flexDirection='row'>
       <ContextPathGroup binNumber={binNumber} bin={policyBin} editing={editing} />
-      <Flexbox style={{ width: '20%', padding: '5px' }} flexDirection='column'>
+      <div style={{ width: '20%', padding: '5px', boxSizing: 'border-box' }}>
         <p className={infoSubtitleLeft}>Realm</p>
         <Divider />
         <Realm bin={policyBin} binNumber={binNumber} editing={editing} />
         <p className={infoSubtitleLeft}>Authentication Types</p>
         <AuthTypesGroup bin={policyBin} binNumber={binNumber} editing={editing} />
-      </Flexbox>
-      <Flexbox style={{ width: '60%', padding: '5px' }} flexDirection='column'>
+      </div>
+      <div style={{ width: '60%', padding: '5px', boxSizing: 'border-box' }}>
         <p className={infoSubtitleLeft}>{(editing) ? 'Required Attributes (Optional)' : 'Required Attributes'}</p>
         <Divider />
-        <Flexbox flexDirection='column'>
+        <div>
           <AttributeTableGroup bin={policyBin} binNumber={binNumber} editing={editing} />
-        </Flexbox>
-      </Flexbox>
+        </div>
+      </div>
     </Flexbox>
     <ErrorBanner editing={editing} />
     <Edit editing={editing} binNumber={binNumber} />
@@ -321,14 +325,14 @@ const PolicyBin = ({ policyBin, binNumber, editing, editingBinNumber }) => (
 )
 
 let PolicyBins = ({ policies, editingBinNumber }) => (
-  <Flexbox style={{ height: '100%', width: '100%', overflowY: 'scroll', padding: '0px 5px', boxSizing: 'border-box' }} flexDirection='column' alignItems='center' >
+  <div>
     { policies.map((policyBin, binNumber) => {
       return (policyBin.name === 'WHITELIST')
         ? (<WhitelistBin policyBin={policyBin} key={binNumber} binNumber={binNumber} editing={binNumber === editingBinNumber} editingBinNumber={editingBinNumber} />)
         : (<PolicyBin policyBin={policyBin} key={binNumber} binNumber={binNumber} editing={binNumber === editingBinNumber} editingBinNumber={editingBinNumber} />)
     })}
     <NewBin editing={editingBinNumber !== null} />
-  </Flexbox>
+  </div>
 )
 PolicyBins = connect((state) => ({
   policies: getBins(state),
@@ -362,8 +366,8 @@ NewBin = connect((state) => ({ nextBinNumber: getBins(state).length }), { addNew
 
 let wcpm = ({ updatePolicyBins, isSubmitting }) => (
   <Mount on={() => updatePolicyBins('/admin/beta/config/configurations/context-policy-manager')}>
-    <Flexbox flexDirection='column' style={{ width: '100%', height: '100%' }}>
-      <Paper style={{ backgroundColor: '#EEE', width: '100%' }}>
+    <div>
+      <div style={{ padding: 20 }}>
         <p className={infoTitle}>Web Context Policy Manager</p>
         <p className={infoSubtitle}>
           The Web Context Policy Manager defines security policies for all subpaths of this web server.
@@ -376,8 +380,7 @@ let wcpm = ({ updatePolicyBins, isSubmitting }) => (
           where a policy is configured for '/a', its policy applies to '/a/b' and '/a/b/c' unless otherwise
           specified.
         </p>
-      </Paper>
-      <Divider />
+      </div>
       <PolicyBins />
       {isSubmitting
         ? (<div className={submitting}>
@@ -387,7 +390,7 @@ let wcpm = ({ updatePolicyBins, isSubmitting }) => (
         </div>)
         : null
       }
-    </Flexbox>
+    </div>
   </Mount>
 )
 export default connect(

@@ -16,6 +16,7 @@ package org.codice.ddf.admin.api.services
 import org.codice.ddf.admin.api.config.sources.CswSourceConfiguration
 import spock.lang.Specification
 
+import static org.codice.ddf.admin.api.services.CswServiceProperties.CSW_GMD_FACTORY_PID
 import static org.codice.ddf.admin.api.services.CswServiceProperties.CSW_URL
 import static org.codice.ddf.admin.api.services.CswServiceProperties.EVENT_SERVICE_ADDRESS
 import static org.codice.ddf.admin.api.services.CswServiceProperties.FORCE_SPATIAL_FILTER
@@ -143,4 +144,16 @@ class CswServicePropertiesTest extends Specification {
         props.get(FORCE_SPATIAL_FILTER) == TEST_FORCE_SPATIAL_FILTER
     }
 
+    def 'test GMD factoryPid eventService population'() {
+        setup:
+        def config = Mock(CswSourceConfiguration)
+
+        when:
+        def props = CswServiceProperties.cswConfigToServiceProps(config)
+
+        then:
+        2 * config.factoryPid() >> CSW_GMD_FACTORY_PID
+        1 * config.endpointUrl()
+        props.get(EVENT_SERVICE_ADDRESS) == null
+    }
 }

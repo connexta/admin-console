@@ -13,6 +13,8 @@
  */
 package org.codice.ddf.admin.api.services;
 
+import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.PORT;
+import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_HOSTNAME;
 import static org.codice.ddf.admin.api.validation.ValidationUtils.FACTORY_PID_KEY;
 import static org.codice.ddf.admin.api.validation.ValidationUtils.SERVICE_PID_KEY;
 
@@ -37,13 +39,11 @@ public class WfsServiceProperties {
 
     public static final WfsSourceConfiguration servicePropsToWfsConfig(Map<String, Object> props){
         WfsSourceConfiguration wfsConfig = new WfsSourceConfiguration();
-        wfsConfig.factoryPid(props.get(FACTORY_PID_KEY) == null ?
-                null :
-                (String) props.get(FACTORY_PID_KEY));
-        wfsConfig.servicePid(props.get(SERVICE_PID_KEY) == null ?
-                null :
-                (String) props.get(SERVICE_PID_KEY));
+        wfsConfig.factoryPid(props.get(FACTORY_PID_KEY) == null ? null : (String) props.get(FACTORY_PID_KEY));
+        wfsConfig.servicePid(props.get(SERVICE_PID_KEY) == null ? null : (String) props.get(SERVICE_PID_KEY));
         wfsConfig.sourceName(props.get(ID) == null ? null : (String) props.get(ID));
+        wfsConfig.sourceHostName(props.get(SOURCE_HOSTNAME) == null ? null : (String) props.get(SOURCE_HOSTNAME));
+        wfsConfig.sourcePort(props.get(PORT) == null ? 0 : (int) props.get(PORT));
         wfsConfig.endpointUrl(props.get(WFS_URL) == null ? null : (String) props.get(WFS_URL));
         wfsConfig.sourceUserName(props.get(USERNAME) == null ? null : (String) props.get(USERNAME));
         wfsConfig.sourceUserPassword(props.get(PASSWORD) == null ? null : (String) props.get(PASSWORD));

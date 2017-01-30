@@ -25,7 +25,7 @@ var config = {
       },
       {
         test: /\.less$/,
-        loader: ExtractTextPlugin.extract('style-loader', 'css?sourceMap&modules&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]!less?sourceMap')
+        loader: 'style-loader!css?sourceMap&modules&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]!less?sourceMap'
       },
       {
         test: /\.json$/,
@@ -42,8 +42,7 @@ var config = {
   plugins: [
     new webpack.ProvidePlugin({
       Promise: 'es6-promise'
-    }),
-    new ExtractTextPlugin("[name].css")
+    })
   ]
 }
 
@@ -59,6 +58,14 @@ if (process.env.NODE_ENV === 'production') {
     output: {
       libraryTarget: 'umd'
     },
+    module: {
+      loaders: [
+        {
+          test: /\.less$/,
+          loader: ExtractTextPlugin.extract('style-loader', 'css?sourceMap&modules&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]!less?sourceMap')
+        }
+      ]
+    },
     plugins: [
       new webpack.DefinePlugin({
         'process.env.NODE_ENV': '"production"'
@@ -72,7 +79,8 @@ if (process.env.NODE_ENV === 'production') {
           warnings: false
         }
       }),
-      new StaticSiteGeneratorPlugin('main', ['/'], { html: html }, global)
+      new StaticSiteGeneratorPlugin('main', ['/'], { html: html }, global),
+      new ExtractTextPlugin("[name].css")
     ]
   })
 } else if (process.env.NODE_ENV === 'ci') {

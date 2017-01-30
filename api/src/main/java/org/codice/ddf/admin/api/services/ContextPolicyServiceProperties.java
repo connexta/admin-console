@@ -32,14 +32,13 @@ public class ContextPolicyServiceProperties {
     public static final String WHITE_LIST_CONTEXT = "whiteListContexts";
     // ---
 
-    public static final Map<String, Object> configToPolicyManagerProps(ContextPolicyConfiguration config){
+    public static Map<String, Object> configToPolicyManagerProps(ContextPolicyConfiguration config){
         List<String> realmsProps = new ArrayList<>();
         List<String> authTypesProps = new ArrayList<>();
         List<String> reqAttrisProps = new ArrayList<>();
 
         for (ContextPolicyBin bin : config.contextPolicyBins()) {
             bin.contextPaths()
-                    .stream()
                     .forEach(context -> {
                         realmsProps.add(context + "=" + bin.realm());
                         authTypesProps.add(context + "=" + String.join("|", bin.authenticationTypes()));

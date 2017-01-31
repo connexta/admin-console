@@ -23,44 +23,59 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang.StringUtils;
 import org.codice.ddf.admin.api.config.ldap.LdapConfiguration;
 import org.codice.ddf.configuration.PropertyResolver;
 
 public class LdapLoginServiceProperties {
     public static final Pattern URI_MATCHER = Pattern.compile("\\w*://.*");
+
     // --- Ldap Login Service Properties
     public static final String LDAP_LOGIN_MANAGED_SERVICE_FACTORY_PID = "Ldap_Login_Config";
+
     public static final String LDAP_LOGIN_FEATURE = "security-sts-ldaplogin";
 
     public static final String LDAP_BIND_USER_DN = "ldapBindUserDn";
+
     public static final String LDAP_BIND_USER_PASS = "ldapBindUserPass";
+
     public static final String BIND_METHOD = "bindMethod";
-//    public static final String KDC_ADDRESS = "kdcAddress";
+
+    //    public static final String KDC_ADDRESS = "kdcAddress";
     public static final String REALM = "realm";
+
     public static final String USER_NAME_ATTRIBUTE = "userNameAttribute";
+
     public static final String USER_BASE_DN = "userBaseDn";
+
     public static final String GROUP_BASE_DN = "groupBaseDn";
+
     public static final String LDAP_URL = "ldapUrl";
+
     public static final String START_TLS = "startTls";
     // ---
 
-    public static final LdapConfiguration ldapLoginServiceToLdapConfiguration(Map<String, Object> props) {
+    public static LdapConfiguration ldapLoginServiceToLdapConfiguration(Map<String, Object> props) {
         LdapConfiguration ldapConfiguration = new LdapConfiguration();
-        ldapConfiguration.servicePid(
-                props.get(SERVICE_PID_KEY) == null ? null : (String) props.get(SERVICE_PID_KEY));
-        ldapConfiguration.factoryPid(props.get(FACTORY_PID_KEY) == null ? null : (String) props.get(FACTORY_PID_KEY));
-        ldapConfiguration.bindUserDn((String) props.get(LDAP_BIND_USER_DN));
-        ldapConfiguration.bindUserPassword((String) props.get(LDAP_BIND_USER_PASS));
-        ldapConfiguration.bindUserMethod((String) props.get(BIND_METHOD));
-//        ldapConfiguration.bindKdcAddress((String) props.get(KDC_ADDRESS));
-        ldapConfiguration.bindRealm((String) props.get(REALM));
-        ldapConfiguration.userNameAttribute((String) props.get(USER_NAME_ATTRIBUTE));
-        ldapConfiguration.baseUserDn((String) props.get(USER_BASE_DN));
-        ldapConfiguration.baseGroupDn((String) props.get(GROUP_BASE_DN));
-        URI ldapUri = getUriFromProperty((String) props.get(LDAP_URL));
-        ldapConfiguration.encryptionMethod(ldapUri.getScheme());
-        ldapConfiguration.hostName(ldapUri.getHost());
-        ldapConfiguration.port(ldapUri.getPort());
+
+        ldapConfiguration.servicePid(mapStringValue(SERVICE_PID_KEY, props));
+        ldapConfiguration.factoryPid(mapStringValue(FACTORY_PID_KEY, props));
+        ldapConfiguration.bindUserDn(mapStringValue(LDAP_BIND_USER_DN, props));
+        ldapConfiguration.bindUserPassword(mapStringValue(LDAP_BIND_USER_PASS, props));
+        ldapConfiguration.bindUserMethod(mapStringValue(BIND_METHOD, props));
+        //        ldapConfiguration.bindKdcAddress((String) props.get(KDC_ADDRESS));
+        ldapConfiguration.bindRealm(mapStringValue(REALM, props));
+        ldapConfiguration.userNameAttribute(mapStringValue(USER_NAME_ATTRIBUTE, props));
+        ldapConfiguration.baseUserDn(mapStringValue(USER_BASE_DN, props));
+        ldapConfiguration.baseGroupDn(mapStringValue(GROUP_BASE_DN, props));
+        URI ldapUri = getUriFromProperty(mapStringValue(LDAP_URL, props));
+
+        if(ldapUri != null) {
+            ldapConfiguration.encryptionMethod(ldapUri.getScheme());
+            ldapConfiguration.hostName(ldapUri.getHost());
+            ldapConfiguration.port(ldapUri.getPort());
+        }
+
         if ((Boolean) props.get(START_TLS)) {
             ldapConfiguration.encryptionMethod(START_TLS);
         }
@@ -68,22 +83,26 @@ public class LdapLoginServiceProperties {
         return ldapConfiguration;
     }
 
-    public static final Map<String, Object> ldapConfigurationToLdapLoginService(LdapConfiguration config) {
+    public static Map<String, Object> ldapConfigurationToLdapLoginService(
+            LdapConfiguration config) {
         Map<String, Object> ldapStsConfig = new HashMap<>();
-        String ldapUrl = getLdapUrl(config);
-        boolean startTls = isStartTls(config);
 
-        ldapStsConfig.put(LDAP_URL, ldapUrl + config.hostName() + ":" + config.port());
-        ldapStsConfig.put(START_TLS, Boolean.toString(startTls));
-        ldapStsConfig.put(LDAP_BIND_USER_DN, config.bindUserDn());
-        ldapStsConfig.put(LDAP_BIND_USER_PASS, config.bindUserPassword());
-        ldapStsConfig.put(BIND_METHOD, config.bindUserMethod());
-//        ldapStsConfig.put(KDC_ADDRESS, config.bindKdcAddress());
-        ldapStsConfig.put(REALM, config.bindRealm());
+        if(config != null) {
+            String ldapUrl = getLdapUrl(config);
+            boolean startTls = isStartTls(config);
 
-        ldapStsConfig.put(USER_NAME_ATTRIBUTE, config.userNameAttribute());
-        ldapStsConfig.put(USER_BASE_DN, config.baseUserDn());
-        ldapStsConfig.put(GROUP_BASE_DN, config.baseGroupDn());
+            ldapStsConfig.put(LDAP_URL, ldapUrl + config.hostName() + ":" + config.port());
+            ldapStsConfig.put(START_TLS, Boolean.toString(startTls));
+            ldapStsConfig.put(LDAP_BIND_USER_DN, config.bindUserDn());
+            ldapStsConfig.put(LDAP_BIND_USER_PASS, config.bindUserPassword());
+            ldapStsConfig.put(BIND_METHOD, config.bindUserMethod());
+            //        ldapStsConfig.put(KDC_ADDRESS, config.bindKdcAddress());
+            ldapStsConfig.put(REALM, config.bindRealm());
+
+            ldapStsConfig.put(USER_NAME_ATTRIBUTE, config.userNameAttribute());
+            ldapStsConfig.put(USER_BASE_DN, config.baseUserDn());
+            ldapStsConfig.put(GROUP_BASE_DN, config.baseGroupDn());
+        }
         return ldapStsConfig;
     }
 
@@ -97,12 +116,20 @@ public class LdapLoginServiceProperties {
                 .equalsIgnoreCase(LDAPS) ? "ldaps://" : "ldap://";
     }
 
-    public static final URI getUriFromProperty(String ldapUrl) {
-        ldapUrl = PropertyResolver.resolveProperties(ldapUrl);
-        if (!URI_MATCHER.matcher(ldapUrl)
-                .matches()) {
-            ldapUrl = "ldap://" + ldapUrl;
+    public static URI getUriFromProperty(String ldapUrl) {
+        if(StringUtils.isNotEmpty(ldapUrl)) {
+            ldapUrl = PropertyResolver.resolveProperties(ldapUrl);
+            if (!URI_MATCHER.matcher(ldapUrl)
+                    .matches()) {
+                ldapUrl = "ldap://" + ldapUrl;
+            }
+            return URI.create(ldapUrl);
         }
-        return URI.create(ldapUrl);
+
+        return null;
+    }
+
+    public static String mapStringValue(String key, Map<String, Object> properties) {
+        return properties.get(key) == null ? null : (String) properties.get(key);
     }
 }

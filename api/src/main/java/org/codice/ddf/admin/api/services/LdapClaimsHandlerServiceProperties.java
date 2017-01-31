@@ -16,6 +16,7 @@ package org.codice.ddf.admin.api.services;
 import static org.codice.ddf.admin.api.services.LdapLoginServiceProperties.getLdapUrl;
 import static org.codice.ddf.admin.api.services.LdapLoginServiceProperties.getUriFromProperty;
 import static org.codice.ddf.admin.api.services.LdapLoginServiceProperties.isStartTls;
+import static org.codice.ddf.admin.api.services.LdapLoginServiceProperties.mapStringValue;
 import static org.codice.ddf.admin.api.validation.LdapValidationUtils.ATTRIBUTE_STORE;
 import static org.codice.ddf.admin.api.validation.ValidationUtils.SERVICE_PID_KEY;
 
@@ -24,6 +25,7 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.codice.ddf.admin.api.config.ldap.LdapConfiguration;
 import org.codice.ddf.admin.api.configurator.Configurator;
 
@@ -51,28 +53,35 @@ public class LdapClaimsHandlerServiceProperties {
             Map<String, Object> props) {
         LdapConfiguration config = new LdapConfiguration();
         config.servicePid(props.get(SERVICE_PID_KEY) == null ? null : (String) props.get(SERVICE_PID_KEY));
+
         URI ldapUri = getUriFromProperty((String) props.get(URL));
-        config.encryptionMethod(ldapUri.getScheme());
-        config.hostName(ldapUri.getHost());
-        config.port(ldapUri.getPort());
+        if(ldapUri != null) {
+            config.encryptionMethod(ldapUri.getScheme());
+            config.hostName(ldapUri.getHost());
+            config.port(ldapUri.getPort());
+        }
+
         if ((Boolean) props.get(START_TLS)) {
             config.encryptionMethod(START_TLS);
         }
-        config.bindUserDn((String) props.get(LDAP_BIND_USER_DN));
-        config.bindUserPassword((String) props.get(PASSWORD));
-        config.bindUserMethod((String) props.get(BIND_METHOD));
-        config.userNameAttribute((String) props.get(LOGIN_USER_ATTRIBUTE));
-        config.baseUserDn((String) props.get(USER_BASE_DN));
-        config.baseGroupDn((String) props.get(GROUP_BASE_DN));
-        config.groupObjectClass((String) props.get(OBJECT_CLASS));
-        config.groupAttributeHoldingMember((String) props.get(MEMBERSHIP_USER_ATTRIBUTE));
-        config.memberAttributeReferencedInGroup((String) props.get(MEMBER_NAME_ATTRIBUTE));
+        config.bindUserDn(mapStringValue(LDAP_BIND_USER_DN, props));
+        config.bindUserPassword(mapStringValue(PASSWORD, props));
+        config.bindUserMethod(mapStringValue(BIND_METHOD, props));
+        config.userNameAttribute(mapStringValue(LOGIN_USER_ATTRIBUTE, props));
+        config.baseUserDn(mapStringValue(USER_BASE_DN, props));
+        config.baseGroupDn(mapStringValue(GROUP_BASE_DN, props));
+        config.groupObjectClass(mapStringValue(OBJECT_CLASS, props));
+        config.groupAttributeHoldingMember(mapStringValue(MEMBERSHIP_USER_ATTRIBUTE, props));
+        config.memberAttributeReferencedInGroup(mapStringValue(MEMBER_NAME_ATTRIBUTE, props));
 
-        String attributeMappingsPath = (String) props.get(PROPERTY_FILE_LOCATION);
+        String attributeMappingsPath = mapStringValue(PROPERTY_FILE_LOCATION, props);
         config.attributeMappingsPath(attributeMappingsPath);
-        Map<String, String> attributeMappings =
-                new HashMap<>(new Configurator().getProperties(Paths.get(attributeMappingsPath)));
-        config.attributeMappings(attributeMappings);
+
+        if(StringUtils.isNotEmpty(attributeMappingsPath)) {
+            Map<String, String> attributeMappings = new HashMap<>(new Configurator().getProperties(
+                    Paths.get(attributeMappingsPath)));
+            config.attributeMappings(attributeMappings);
+        }
         config.ldapUseCase(ATTRIBUTE_STORE);
         return config;
     }
@@ -80,20 +89,23 @@ public class LdapClaimsHandlerServiceProperties {
     public static Map<String, Object> ldapConfigToLdapClaimsHandlerService(
             LdapConfiguration config) {
         Map<String, Object> props = new HashMap<>();
-        String ldapUrl = getLdapUrl(config);
-        boolean startTls = isStartTls(config);
-        props.put(URL, ldapUrl + config.hostName() + ":" + config.port());
-        props.put(START_TLS, startTls);
-        props.put(LDAP_BIND_USER_DN, config.bindUserDn());
-        props.put(PASSWORD, config.bindUserPassword());
-        props.put(BIND_METHOD, config.bindUserMethod());
-        props.put(LOGIN_USER_ATTRIBUTE, config.userNameAttribute());
-        props.put(USER_BASE_DN, config.baseUserDn());
-        props.put(GROUP_BASE_DN, config.baseGroupDn());
-        props.put(OBJECT_CLASS, config.groupObjectClass());
-        props.put(MEMBERSHIP_USER_ATTRIBUTE, config.memberAttributeReferencedInGroup());
-        props.put(MEMBER_NAME_ATTRIBUTE, config.groupAttributeHoldingMember());
-        props.put(PROPERTY_FILE_LOCATION, config.attributeMappingsPath());
+
+        if(config != null) {
+            String ldapUrl = getLdapUrl(config);
+            boolean startTls = isStartTls(config);
+            props.put(URL, ldapUrl + config.hostName() + ":" + config.port());
+            props.put(START_TLS, startTls);
+            props.put(LDAP_BIND_USER_DN, config.bindUserDn());
+            props.put(PASSWORD, config.bindUserPassword());
+            props.put(BIND_METHOD, config.bindUserMethod());
+            props.put(LOGIN_USER_ATTRIBUTE, config.userNameAttribute());
+            props.put(USER_BASE_DN, config.baseUserDn());
+            props.put(GROUP_BASE_DN, config.baseGroupDn());
+            props.put(OBJECT_CLASS, config.groupObjectClass());
+            props.put(MEMBERSHIP_USER_ATTRIBUTE, config.memberAttributeReferencedInGroup());
+            props.put(MEMBER_NAME_ATTRIBUTE, config.groupAttributeHoldingMember());
+            props.put(PROPERTY_FILE_LOCATION, config.attributeMappingsPath());
+        }
         return props;
     }
 }

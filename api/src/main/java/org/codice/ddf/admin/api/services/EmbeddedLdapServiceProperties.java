@@ -33,11 +33,15 @@ public class EmbeddedLdapServiceProperties {
 
     public static EmbeddedLdapConfiguration embeddedLdapServiceToEmbeddedLdapConfig(Map<String, Object> props) {
         EmbeddedLdapConfiguration config = new EmbeddedLdapConfiguration();
-        config.embeddedLdapPort((int) props.get(EMBEDDED_LDAP_PORT));
-        config.embeddedLdapsPort((int) props.get(EMBEDDED_LDAPS_PORT));
-        config.embeddedLdapAdminPort((int) props.get(EMBEDDED_LDAP_ADMIN_PORT));
-        config.ldifPath((String) props.get(LDIF_PATH));
+        config.embeddedLdapPort(mapIntValue(EMBEDDED_LDAP_PORT, props));
+        config.embeddedLdapsPort(mapIntValue(EMBEDDED_LDAPS_PORT, props));
+        config.embeddedLdapAdminPort(mapIntValue(EMBEDDED_LDAP_ADMIN_PORT, props));
+        config.ldifPath(props.get(LDIF_PATH) == null ? null : (String) props.get(LDIF_PATH));
         config.embeddedLdapStorageLocation(props.get(EMBEDDED_LDAP_STORAGE_LOCATION) == null ? null : (String) props.get(EMBEDDED_LDAP_STORAGE_LOCATION));
         return config;
+    }
+
+    public static int mapIntValue(String property, Map<String, Object> properties) {
+        return properties.get(property) == null ? -1 : (int) properties.get(property);
     }
 }

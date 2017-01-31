@@ -41,6 +41,8 @@ public class EmbeddedLdapConfigurationHandler
 
     private static final String EMBEDDED_LDAP_CONFIGURATION_HANDLER_ID = EmbeddedLdapConfiguration.CONFIGURATION_TYPE;
 
+    private Configurator configurator = new Configurator();
+
     @Override
     public List<ProbeMethod> getProbeMethods() {
         return null;
@@ -51,15 +53,15 @@ public class EmbeddedLdapConfigurationHandler
         return null;
     }
 
-    public List<PersistMethod> getPersistMethods(){
+    public List<PersistMethod> getPersistMethods() {
         return  ImmutableList.of(new DefaultEmbeddedLdapPersistMethod());
     }
 
     @Override
     public List<EmbeddedLdapConfiguration> getConfigurations() {
-        Configurator configurator = new Configurator();
         Map<String, Object> serviceProps = configurator.getConfig(EMBEDDED_LDAP_MANAGER_SERVICE_PID);
         if (serviceProps == null) {
+            LOGGER.debug("No service properties available for Embedded LDAP configuration. Returning empty list.");
             return Collections.emptyList();
         }
         return Collections.singletonList(embeddedLdapServiceToEmbeddedLdapConfig(serviceProps));
@@ -74,4 +76,10 @@ public class EmbeddedLdapConfigurationHandler
         return EMBEDDED_LDAP_CONFIGURATION_HANDLER_ID;
     }
 
+    /*
+      For testing purposes only.
+     */
+    protected void setConfigurator(Configurator configurator) {
+        this.configurator = configurator;
+    }
 }

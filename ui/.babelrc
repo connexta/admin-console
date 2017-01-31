@@ -1,7 +1,7 @@
 {
   "presets": [
     "react",
-    "latest",
+    ["latest", { "modules": false }],
     "stage-0"
   ],
   "plugins": [

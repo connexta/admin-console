@@ -1,5 +1,4 @@
 var webpack = require('webpack')
-var validate = require('webpack-validator')
 var merge = require('webpack-merge')
 var path = require('path')
 var fs = require('fs')
@@ -17,24 +16,39 @@ var config = {
   devtool: 'source-map',
   entry: ['babel-polyfill'],
   module: {
-    loaders: [
+    rules: [
       {
         test: /\.js$/,
         exclude: /node_modules/,
-        loader: 'babel'
+        use: [
+          'babel-loader'
+        ]
       },
       {
         test: /\.less$/,
-        loader: 'style-loader!css?sourceMap&modules&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]!less?sourceMap'
-      },
-      {
-        test: /\.json$/,
-        loader: 'json'
+        use: [
+          'style-loader',
+          {
+            loader: 'css-loader',
+            options: {
+              sourceMap: true,
+              modules: true,
+              importLoaders: 1,
+              localIdentName: '[name]__[local]___[hash:base64:5]'
+            }
+          },
+          {
+            loader: 'less-loader',
+            options: {
+              sourceMap: true,
+            }
+          }
+        ]
       }
     ]
   },
   resolve: {
-    root: [
+    modules: [
       path.resolve('./src/main/webapp/lib'),
       path.resolve('./node_modules')
     ]
@@ -59,10 +73,13 @@ if (process.env.NODE_ENV === 'production') {
       libraryTarget: 'umd'
     },
     module: {
-      loaders: [
+      rules: [
         {
           test: /\.less$/,
-          loader: ExtractTextPlugin.extract('style-loader', 'css?sourceMap&modules&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]!less?sourceMap')
+          loader: ExtractTextPlugin.extract({
+            fallbackLoader: 'style-loader',
+            loader: 'css-loader?sourceMap&modules&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]!less-loader?sourceMap'
+          })
         }
       ]
     },
@@ -71,6 +88,7 @@ if (process.env.NODE_ENV === 'production') {
         'process.env.NODE_ENV': '"production"'
       }),
       new webpack.optimize.UglifyJsPlugin({
+        sourceMap: true,
         output: {
           comments: false
         },
@@ -80,7 +98,7 @@ if (process.env.NODE_ENV === 'production') {
         }
       }),
       new StaticSiteGeneratorPlugin('main', ['/'], { html: html }, global),
-      new ExtractTextPlugin("[name].css")
+      new ExtractTextPlugin({ filename: "[name].css" })
     ]
   })
 } else if (process.env.NODE_ENV === 'ci') {
@@ -98,12 +116,13 @@ if (process.env.NODE_ENV === 'production') {
         .map(function (spec) { return path.resolve(spec) }),
     plugins: [new HtmlWebpackPlugin()],
     module: {
-      loaders: [
+      rules: [
         {
           test: /spec\.js$/,
-          loaders: [
-            'mocha',
-            path.resolve(__dirname, 'spec-loader.js')
+          use: [
+            'mocha-loader',
+            path.resolve(__dirname, 'spec-loader.js'),
+            'babel-loader'
           ],
           exclude: /(node_modules|target)/
         }
@@ -118,6 +137,9 @@ if (process.env.NODE_ENV === 'production') {
 } else if (process.env.NODE_ENV === 'test') {
   config = merge.smart(config, {
     devtool: 'source-map',
+    node: {
+      __filename: true
+    },
     output: {
       publicPath: '',
       filename: 'bundle.js',
@@ -143,10 +165,14 @@ if (process.env.NODE_ENV === 'production') {
       new webpack.HotModuleReplacementPlugin()
     ],
     module: {
-      loaders: [
+      rules: [
         {
           test: /spec\.js$/,
-          loader: 'mocha',
+          use: [
+            'mocha-loader',
+            path.resolve(__dirname, 'spec-loader.js'),
+            'babel-loader'
+          ],
           exclude: /(node_modules|target)/
         }
       ]
@@ -184,4 +210,4 @@ if (process.env.NODE_ENV === 'production') {
   })
 }
 
-module.exports = validate(config)
+module.exports = config

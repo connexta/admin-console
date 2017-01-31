@@ -9,6 +9,9 @@ import { Home } from './home'
 import Wcpm from './adminTools/webContextPolicyManager'
 
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
+import HomeIcon from 'material-ui/svg-icons/action/home'
+import IconButton from 'material-ui/IconButton'
+import { Link } from 'react-router'
 import AppBar from 'material-ui/AppBar'
 import Flexbox from 'flexbox-react'
 
@@ -30,12 +33,24 @@ const fixed = {
   right: 0
 }
 
+const LinkHomeIcon = (props) => (
+  <Link to='/'>
+    <HomeIcon {...props} />
+  </Link>
+)
+
 const App = ({ children }) => (
   <MuiThemeProvider>
     <Provider store={store}>
       <div>
         <Flexbox flexDirection='column' height='100vh' style={fixed}>
-          <AppBar title='Admin Console (BETA)' />
+          <AppBar
+            title='Admin Console (BETA)'
+            iconElementLeft={
+              <IconButton>
+                <LinkHomeIcon />
+              </IconButton>
+            } />
           <Flexbox flex='1' style={{ overflowY: 'scroll', width: '100%' }}>
             <div style={{ maxWidth: 960, margin: '0 auto' }}>{children}</div>
           </Flexbox>

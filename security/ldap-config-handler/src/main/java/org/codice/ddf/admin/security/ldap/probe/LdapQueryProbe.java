@@ -38,6 +38,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.api.config.ldap.LdapConfiguration;
 import org.codice.ddf.admin.api.handler.ConfigurationMessage;
@@ -45,6 +46,7 @@ import org.codice.ddf.admin.api.handler.method.ProbeMethod;
 import org.codice.ddf.admin.api.handler.report.ProbeReport;
 import org.codice.ddf.admin.security.ldap.test.LdapTestingCommons;
 import org.forgerock.opendj.ldap.Attribute;
+import org.forgerock.opendj.ldap.ByteString;
 import org.forgerock.opendj.ldap.SearchScope;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
 
@@ -106,7 +108,8 @@ public class LdapQueryProbe extends ProbeMethod<LdapConfiguration> {
         if (connectionAttempt.result() != SUCCESSFUL_BIND) {
             return createProbeReport(SUCCESS_TYPES,
                     FAILURE_TYPES,
-                    null, Collections.singletonList(connectionAttempt.result()
+                    null,
+                    Collections.singletonList(connectionAttempt.result()
                             .name()));
         }
 
@@ -127,8 +130,12 @@ public class LdapQueryProbe extends ProbeMethod<LdapConfiguration> {
                 if (!attri.getAttributeDescriptionAsString()
                         .toLowerCase()
                         .contains("password")) {
-                    entryMap.put(attri.getAttributeDescriptionAsString(),
-                            attri.firstValueAsString());
+                    List<String> attributeValueList = attri.parallelStream()
+                            .map(ByteString::toString)
+                            .collect(Collectors.toList());
+                    String attributeValue = attributeValueList.size() == 1 ? attributeValueList.get(
+                            0) : attributeValueList.toString();
+                    entryMap.put(attri.getAttributeDescriptionAsString(), attributeValue);
                 }
             }
             convertedSearchResults.add(entryMap);

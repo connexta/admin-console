@@ -13,7 +13,13 @@
  */
 package org.codice.ddf.admin.api.handler.commons;
 
+import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.CERT_ERROR;
+import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.UNKNOWN_ENDPOINT;
+import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.UNTRUSTED_CA;
+import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.VERIFIED_URL;
+
 public class UrlAvailability {
+
 
     private String url;
     private boolean available;
@@ -36,6 +42,7 @@ public class UrlAvailability {
         return this;
     }
 
+    //Determined whether the endpoint is of the specified type
     public boolean isAvailable() {
         return available;
     }
@@ -63,4 +70,15 @@ public class UrlAvailability {
         return this;
     }
 
+    public String getAvailabilityResult() {
+        if(certError) {
+            return CERT_ERROR;
+        } else if(!trustedCertAuthority) {
+            return UNTRUSTED_CA;
+        } else if(!available) {
+            return UNKNOWN_ENDPOINT;
+        } else {
+            return VERIFIED_URL;
+        }
+    }
 }

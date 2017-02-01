@@ -66,10 +66,11 @@ public class SubjectAttributeProbe extends ProbeMethod<LdapConfiguration> {
     private static final List<String> OPTIONAL_FIELDS = ImmutableList.of(
             BIND_REALM);
 
-    private static final String SUBJECT_CLAIMS_ID = "subjectClaims";
+    private static final String SUBJECT_CLAIMS = "subjectClaims";
 
     private static final String USER_ATTRIBUTES = "userAttributes";
 
+    private static final List<String> RETURN_TYPES = ImmutableList.of(SUBJECT_CLAIMS, USER_ATTRIBUTES);
     public SubjectAttributeProbe() {
         super(SUBJECT_ATTRIBUTES_PROBE_ID,
                 DESCRIPTION,
@@ -77,7 +78,8 @@ public class SubjectAttributeProbe extends ProbeMethod<LdapConfiguration> {
                 OPTIONAL_FIELDS,
                 null,
                 null,
-                null);
+                null,
+                RETURN_TYPES);
     }
 
     @Override
@@ -107,7 +109,7 @@ public class SubjectAttributeProbe extends ProbeMethod<LdapConfiguration> {
         }
 
         // TODO: tbatie - 1/19/17 - Need to return addMessage about the probe result and/or if something goes wrong
-        return probeReport.probeResult(SUBJECT_CLAIMS_ID, subjectClaims)
+        return probeReport.probeResult(SUBJECT_CLAIMS, subjectClaims)
                 .probeResult(USER_ATTRIBUTES, ldapEntryAttributes);
     }
 

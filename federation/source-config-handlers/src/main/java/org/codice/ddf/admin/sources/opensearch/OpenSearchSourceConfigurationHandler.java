@@ -29,7 +29,6 @@ import org.codice.ddf.admin.api.handler.SourceConfigurationHandler;
 import org.codice.ddf.admin.api.handler.method.PersistMethod;
 import org.codice.ddf.admin.api.handler.method.ProbeMethod;
 import org.codice.ddf.admin.api.handler.method.TestMethod;
-import org.codice.ddf.admin.api.handler.method.commons.ManualUrlTestMethod;
 import org.codice.ddf.admin.api.handler.report.ProbeReport;
 import org.codice.ddf.admin.api.handler.report.Report;
 import org.codice.ddf.admin.api.services.OpenSearchServiceProperties;
@@ -50,7 +49,7 @@ public class OpenSearchSourceConfigurationHandler extends DefaultConfigurationHa
 
     @Override
     public List<TestMethod> getTestMethods() {
-        return Arrays.asList(new ManualUrlTestMethod());
+        return null;
     }
 
     @Override

@@ -47,14 +47,15 @@ public class OpenSearchSourceUtils {
             "http://%s:%d/catalog/query");
 
     //Given a config, returns the correct URL format for the endpoint if one exists
-    public static Optional<UrlAvailability> confirmEndpointUrl(OpenSearchSourceConfiguration config) {
-        return URL_FORMATS.stream()
+    public static UrlAvailability confirmEndpointUrl(OpenSearchSourceConfiguration config) {
+        Optional<UrlAvailability> result = URL_FORMATS.stream()
                 .map(formatUrl -> String.format(formatUrl,
                         config.sourceHostName(),
                         config.sourcePort()))
                 .map(OpenSearchSourceUtils::getUrlAvailability)
                 .filter(avail -> avail.isAvailable() || avail.isCertError())
                 .findFirst();
+        return result.isPresent() ? result.get() : null;
     }
 
     // Given a configuration with and endpointUrl, determines if that URL is available as an OS source

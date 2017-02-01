@@ -15,9 +15,10 @@
 package org.codice.ddf.admin.security.ldap.test;
 
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.ATTRIBUTE_MAPPINGS;
-import static org.codice.ddf.admin.api.handler.ConfigurationMessage.MessageType.SUCCESS;
+import static org.codice.ddf.admin.api.handler.ConfigurationMessage.INVALID_FIELD;
 import static org.codice.ddf.admin.api.handler.ConfigurationMessage.buildMessage;
 import static org.codice.ddf.admin.api.handler.ConfigurationMessage.createInvalidFieldMsg;
+import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.SUCCESSFUL_TEST;
 import static org.codice.ddf.admin.api.services.PolicyManagerServiceProperties.STS_CLAIMS_CONFIGURATION_CONFIG_ID;
 import static org.codice.ddf.admin.api.services.PolicyManagerServiceProperties.STS_CLAIMS_PROPS_KEY_CLAIMS;
 
@@ -43,10 +44,10 @@ public class AttributeMappingTestMethod extends TestMethod<LdapConfiguration> {
 
     public static final List<String> REQUIRED_FIELDS = ImmutableList.of(ATTRIBUTE_MAPPINGS);
 
-    public static final String VALIDATED = "validated";
-
-    public static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(VALIDATED,
+    public static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(SUCCESSFUL_TEST,
             "Attribute mapping was successfully validated.");
+
+    public static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(INVALID_FIELD, "The given attribute mapping is invalid.");
 
     public AttributeMappingTestMethod() {
         super(LDAP_ATTRIBUTE_MAPPING_TEST_ID,
@@ -75,7 +76,7 @@ public class AttributeMappingTestMethod extends TestMethod<LdapConfiguration> {
                     unknownStsClaim.get()), ATTRIBUTE_MAPPINGS));
         }
 
-        return new Report(buildMessage(SUCCESS, VALIDATED, SUCCESS_TYPES.get(VALIDATED)));
+        return new Report(buildMessage(SUCCESS_TYPES, FAILURE_TYPES, null, SUCCESSFUL_TEST));
     }
 
 }

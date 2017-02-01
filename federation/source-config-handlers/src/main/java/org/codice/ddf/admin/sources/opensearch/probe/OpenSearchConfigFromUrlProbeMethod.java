@@ -16,15 +16,20 @@ package org.codice.ddf.admin.sources.opensearch.probe;
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.ENDPOINT_URL;
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_USERNAME;
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_USER_PASSWORD;
+import static org.codice.ddf.admin.api.handler.ConfigurationMessage.buildMessage;
 import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.BAD_CONFIG;
 import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.CANNOT_CONNECT;
-import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.CANNOT_VERIFY;
 import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.CERT_ERROR;
 import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.CONFIG_CREATED;
 import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.CONFIG_FROM_URL_ID;
+import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.DISCOVERED_SOURCES;
+import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.UNKNOWN_ENDPOINT;
 import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.UNTRUSTED_CA;
+import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.endpointIsReachable;
 import static org.codice.ddf.admin.api.handler.report.ProbeReport.createProbeReport;
+import static org.codice.ddf.admin.api.services.OpenSearchServiceProperties.OPENSEARCH_FACTORY_PID;
 import static org.codice.ddf.admin.api.validation.SourceValidationUtils.validateOptionalUsernameAndPassword;
+import static org.codice.ddf.admin.sources.opensearch.OpenSearchSourceConfigurationHandler.OPENSEARCH_SOURCE_CONFIGURATION_HANDLER_ID;
 
 import java.util.HashMap;
 import java.util.List;
@@ -56,8 +61,9 @@ public class OpenSearchConfigFromUrlProbeMethod extends ProbeMethod<OpenSearchSo
             CERT_ERROR, "The URL provided has improperly configured SSL certificates and is insecure.");
 
     public static final Map<String, String> WARNING_TYPES = ImmutableMap.of(
-            CANNOT_VERIFY, "The URL could not be verified as an OpenSearch endpoint.",
             UNTRUSTED_CA, "The URL's SSL certificate has been signed by an untrusted certificate authority and may be insecure.");
+
+    public static final List<String> RETURN_TYPES = ImmutableList.of(DISCOVERED_SOURCES);
 
     public OpenSearchConfigFromUrlProbeMethod() {
         super(OPENSEARCH_CONFIG_FROM_URL_ID,
@@ -66,21 +72,34 @@ public class OpenSearchConfigFromUrlProbeMethod extends ProbeMethod<OpenSearchSo
                 OPTIONAL_FIELDS,
                 SUCCESS_TYPES,
                 FAILURE_TYPES,
-                WARNING_TYPES);
+                WARNING_TYPES,
+                RETURN_TYPES);
     }
 
     @Override
     public ProbeReport probe(OpenSearchSourceConfiguration configuration) {
-        UrlAvailability status = OpenSearchSourceUtils.getUrlAvailability(configuration.endpointUrl());
-        String result;
-        Map<String, Object> probeResult = new HashMap<>();
-        if (status.isAvailable()) {
-            result = status.isTrustedCertAuthority() ? CONFIG_CREATED : UNTRUSTED_CA;
-            probeResult.put(OPENSEARCH_CONFIG_FROM_URL_ID, configuration.configurationHandlerId(OPENSEARCH_CONFIG_FROM_URL_ID));
-        } else {
-            result = status.isCertError() ? CERT_ERROR : CANNOT_CONNECT;
+        OpenSearchSourceConfiguration configCopy = new OpenSearchSourceConfiguration(configuration);
+        ProbeReport report = createProbeReport(SUCCESS_TYPES, FAILURE_TYPES, WARNING_TYPES, endpointIsReachable(configuration.endpointUrl()));
+        if(report.containsFailureMessages()) {
+            return report;
         }
-        return createProbeReport(SUCCESS_TYPES, FAILURE_TYPES, WARNING_TYPES, result).probeResults(probeResult);
+
+        UrlAvailability availability = OpenSearchSourceUtils.getUrlAvailability(configuration.endpointUrl());
+        if(availability == null) {
+            return report.addMessage(buildMessage(SUCCESS_TYPES, FAILURE_TYPES, WARNING_TYPES, UNKNOWN_ENDPOINT));
+        }
+
+        report.addMessage(buildMessage(SUCCESS_TYPES, FAILURE_TYPES, WARNING_TYPES, availability.getAvailabilityResult()));
+        if(report.containsFailureMessages()) {
+            return report;
+        }
+
+        Map<String, Object> probeResult = new HashMap<>();
+        probeResult.put(DISCOVERED_SOURCES, configCopy.endpointUrl(availability.getUrl())
+                .factoryPid(OPENSEARCH_FACTORY_PID)
+                .configurationHandlerId(OPENSEARCH_SOURCE_CONFIGURATION_HANDLER_ID));
+
+        return report.probeResults(probeResult);
     }
 
     @Override

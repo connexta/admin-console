@@ -79,7 +79,6 @@ public class SecurityValidationUtils {
 
     public static final List<ConfigurationMessage> validateAuthTypes(Set<String> authTypes, String configId) {
         List<ConfigurationMessage> errors = new ArrayList<>();
-        // TODO: tbatie - 1/27/17 - Should check for duplicate authTypes
         if (authTypes == null || authTypes.isEmpty()) {
             errors.add(createMissingRequiredFieldMsg(configId));
         } else {

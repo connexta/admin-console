@@ -1,8 +1,7 @@
 import 'whatwg-fetch'
-
-import { getAllConfig } from '../../reducer'
-import { clearWizard } from 'admin-wizard/actions'
-import { backendError } from '../../actions'
+import {getAllConfig} from '../../reducer'
+import {clearWizard} from 'admin-wizard/actions'
+import {backendError} from '../../actions'
 
 export const changeStage = (stageId) => ({ type: 'SOURCE_CHANGE_STAGE', stage: stageId })
 export const resetStages = () => ({type: 'SOURCE_RESET_STAGES'})
@@ -55,11 +54,19 @@ const discoverSources = (url, opts, dispatch, id, nextStageId, body) => {
       if (status === 400) {
         dispatch(setMessages(id, json.messages))
       } else if (status === 200) {
-        let sources = [ ...json.probeResults.discoveredSources ]
-        json.messages.forEach((message, i) => {
-          message.subType === 'UNTRUSTED_CA'
-          ? sources[i].trustedCertAuthority = false
-          : sources[i].trustedCertAuthority = true
+        let sources = [ ...json.probeResults.discoveredSources ].map((source) => (source.config))
+
+        // TODO: tbatie - We should change this trustedCertAuth to untrustedCertAuth or something better. this logic is ugly
+        json.probeResults.discoveredSources.forEach((source, i) => {
+          if (sources.message !== undefined && sources.message > 0) {
+            source.messages.forEach((message) => {
+              if (message.subType === 'UNTRUSTED_CA') {
+                sources[i].trustedCertAuthority = false
+              }
+            })
+          } else {
+            sources[i].trustedCertAuthority = true
+          }
         })
         dispatch(setSourceSelections(sources))
         dispatch(clearMessages(id))
@@ -134,7 +141,7 @@ export const testManualUrl = (endpointUrl, configType, nextStageId, id) => (disp
   dispatch(clearMessages(id))
   const config = getAllConfig(getState())
   const body = { ...config, configurationType: configType, endpointUrl: endpointUrl }
-  const url = '/admin/beta/config/probe/' + configType + '/retrieveConfiguration'
+  const url = '/admin/beta/config/probe/' + configType + '/config-from-url'
 
   const opts = {
     method: 'POST',
@@ -148,7 +155,7 @@ export const testManualUrl = (endpointUrl, configType, nextStageId, id) => (disp
       if (status === 400) {
         dispatch(setMessages(id, json.messages))
       } else if (status === 200) {
-        dispatch(setConfigSource(json.probeResults.retrieveConfiguration))
+        dispatch(setConfigSource(json.probeResults.discoveredSources))
         dispatch(changeStage(nextStageId))
       } else if (status === 500) {
         dispatch(backendError({ ...json, url, method: 'POST', body }))

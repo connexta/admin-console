@@ -17,9 +17,10 @@ import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.PORT;
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_HOSTNAME;
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_USERNAME;
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_USER_PASSWORD;
+import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.DISCOVERED_SOURCES;
+import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.DISCOVER_SOURCES_ID;
 import static org.codice.ddf.admin.api.validation.SourceValidationUtils.validateOptionalUsernameAndPassword;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,17 +31,18 @@ import org.codice.ddf.admin.api.handler.method.ProbeMethod;
 import org.codice.ddf.admin.api.handler.report.ProbeReport;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 public class DiscoverSourcesProbeMethod extends ProbeMethod<SourceConfiguration>{
 
-    public static final String DISCOVER_SOURCES_ID = "discover-sources";
-    public static final String DESCRIPTION = "Retrieves possible configurations for the specified url.";
+    public static final String CONFIG = "config";
+    public static final String MESSAGES = "messages";
+    public static final String DESCRIPTION = "Retrieves possible configurations for the specified url. The results will be in a list of maps with the keys " + CONFIG + ", " + MESSAGES;
     public static final List<String> REQUIRED_FIELDS = ImmutableList.of(SOURCE_HOSTNAME, PORT);
     public static final List<String> OPTIONAL_FIELDS = ImmutableList.of(SOURCE_USERNAME,
             SOURCE_USER_PASSWORD);
 
-    public static final String DISCOVERED_SOURCES_KEY = "discoveredSources";
-    public static final List<String> RETURN_TYPES = ImmutableList.of(DISCOVERED_SOURCES_KEY);
+    public static final List<String> RETURN_TYPES = ImmutableList.of(DISCOVERED_SOURCES);
 
     private List<SourceConfigurationHandler> handlers;
 
@@ -58,25 +60,18 @@ public class DiscoverSourcesProbeMethod extends ProbeMethod<SourceConfiguration>
     }
     @Override
     public ProbeReport probe(SourceConfiguration config) {
-        ProbeReport sourcesProbeReport = new ProbeReport();
+        ProbeReport report = new ProbeReport();
         List<ProbeReport> sourceProbeReports = handlers.stream()
                 .map(handler -> handler.probe(DISCOVER_SOURCES_ID, config))
                 .collect(Collectors.toList());
 
         List<Object> discoveredSources = sourceProbeReports.stream()
                 .filter(probeReport -> !probeReport.containsFailureMessages())
-                .map(report -> report.getProbeResults()
-                        .get(DISCOVER_SOURCES_ID))
+                .map(probeReport -> ImmutableMap.of(CONFIG, probeReport.probeResults().get(DISCOVERED_SOURCES),
+                        MESSAGES, report.messages()))
                 .collect(Collectors.toList());
 
-        List<ConfigurationMessage> probeSourceMessages = sourceProbeReports.stream()
-                .filter(probeReport -> !probeReport.containsFailureMessages())
-                .map(ProbeReport::messages)
-                .flatMap(Collection::stream)
-                .collect(Collectors.toList());
-
-        sourcesProbeReport.probeResult(DISCOVERED_SOURCES_KEY, discoveredSources).addMessages(probeSourceMessages);
-        return sourcesProbeReport;
+        return report.probeResult(DISCOVERED_SOURCES, discoveredSources);
     }
 
     @Override

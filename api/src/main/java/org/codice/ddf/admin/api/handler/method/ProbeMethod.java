@@ -35,20 +35,6 @@ public abstract class ProbeMethod<S extends Configuration> extends Configuration
     @Expose
     final List<String> returnTypes;
 
-    // TODO: tbatie - 1/12/17 - (Ticket) Remove this constructor and enforce the returnTypes field
-    public ProbeMethod(String id, String description, List<String> requiredFields,
-            List<String> optionalFields, Map<String, String> successTypes,
-            Map<String, String> failureTypes, Map<String, String> warningTypes) {
-        super(id,
-                description,
-                requiredFields,
-                optionalFields,
-                successTypes,
-                failureTypes,
-                warningTypes);
-        this.returnTypes = null;
-    }
-
     public ProbeMethod(String id, String description, List<String> requiredFields,
             List<String> optionalFields, Map<String, String> successTypes,
             Map<String, String> failureTypes, Map<String, String> warningTypes, List<String> returnTypes) {

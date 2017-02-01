@@ -15,21 +15,16 @@ package org.codice.ddf.admin.sources.impl.test;
 
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.PORT;
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_HOSTNAME;
-import static org.codice.ddf.admin.api.handler.ConfigurationMessage.MessageType.FAILURE;
-import static org.codice.ddf.admin.api.handler.ConfigurationMessage.MessageType.SUCCESS;
 import static org.codice.ddf.admin.api.handler.ConfigurationMessage.buildMessage;
 import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.CANNOT_CONNECT;
-import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.PING_TIMEOUT;
+import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.REACHED_URL;
 import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.VALID_URL_TEST_ID;
-import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.VERIFIED_URL;
 
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.Socket;
 import java.util.List;
 import java.util.Map;
 
 import org.codice.ddf.admin.api.config.sources.SourceConfiguration;
+import org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons;
 import org.codice.ddf.admin.api.handler.method.TestMethod;
 import org.codice.ddf.admin.api.handler.report.Report;
 
@@ -40,7 +35,8 @@ public class ValidUrlTestMethod extends TestMethod<SourceConfiguration> {
 
     private static final String DESCRIPTION = "Attempts to connect to a given hostname and port";
     private static final List<String> REQUIRED_FIELDS = ImmutableList.of(SOURCE_HOSTNAME, PORT);
-    private static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(VERIFIED_URL, "Connected to hostname and port.");
+
+    private static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(REACHED_URL, "Connected to hostname and port.");
     private static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(CANNOT_CONNECT, "Unable to connect to hostname and port.");
 
     public ValidUrlTestMethod() {
@@ -55,13 +51,6 @@ public class ValidUrlTestMethod extends TestMethod<SourceConfiguration> {
 
     @Override
     public Report test(SourceConfiguration configuration) {
-        try (Socket connection = new Socket()) {
-            connection.connect(new InetSocketAddress(configuration.sourceHostName(),
-                    configuration.sourcePort()), PING_TIMEOUT);
-            connection.close();
-            return new Report(buildMessage(SUCCESS, VERIFIED_URL, SUCCESS_TYPES.get(VERIFIED_URL)));
-        } catch (IOException e) {
-            return new Report(buildMessage(FAILURE, CANNOT_CONNECT, FAILURE_TYPES.get(CANNOT_CONNECT)));
-        }
+        return new Report(buildMessage(SUCCESS_TYPES, FAILURE_TYPES, null, SourceHandlerCommons.endpointIsReachable(configuration.sourceHostName(), configuration.sourcePort())));
     }
 }

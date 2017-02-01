@@ -161,14 +161,15 @@ public class CswSourceUtils {
     }
 
     // Determines the correct CSW endpoint URL format given a config with a Hostname and Port
-    public static Optional<UrlAvailability> confirmEndpointUrl(CswSourceConfiguration config) {
-        return URL_FORMATS.stream()
+    public static UrlAvailability confirmEndpointUrl(CswSourceConfiguration config) {
+        Optional<UrlAvailability> result =  URL_FORMATS.stream()
                 .map(formatUrl -> String.format(formatUrl,
                         config.sourceHostName(),
                         config.sourcePort()))
                 .map(CswSourceUtils::getUrlAvailability)
                 .filter(avail -> avail.isAvailable() || avail.isCertError())
                 .findFirst();
+        return result.isPresent() ? result.get() : null;
     }
 
 }

@@ -29,19 +29,15 @@ import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.SUCCESSFUL
 import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.toDescriptionMap;
 import static org.codice.ddf.admin.security.ldap.test.LdapTestingCommons.bindUserToLdapConnection;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.codice.ddf.admin.api.config.ldap.LdapConfiguration;
 import org.codice.ddf.admin.api.handler.ConfigurationMessage;
 import org.codice.ddf.admin.api.handler.method.TestMethod;
-import org.codice.ddf.admin.api.handler.report.ProbeReport;
 import org.codice.ddf.admin.api.handler.report.Report;
-import org.codice.ddf.admin.api.validation.LdapValidationUtils;
 
 import com.google.common.collect.ImmutableList;
 
@@ -83,14 +79,6 @@ public class BindUserTestMethod extends TestMethod<LdapConfiguration> {
 
     @Override
     public Report test(LdapConfiguration configuration) {
-        List<ConfigurationMessage> checkMessages = new ArrayList<>();
-        if(configuration.bindUserMethod().equals(LdapValidationUtils.DIGEST_MD5_SASL)) {
-            checkMessages.addAll(configuration.validate(OPTIONAL_FIELDS));
-            if (CollectionUtils.isNotEmpty(checkMessages)) {
-                return new ProbeReport(checkMessages);
-            }
-        }
-
         LdapTestingCommons.LdapConnectionAttempt bindConnectionAttempt = bindUserToLdapConnection(
                 configuration);
 

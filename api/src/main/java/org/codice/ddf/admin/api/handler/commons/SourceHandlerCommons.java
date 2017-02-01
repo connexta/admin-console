@@ -13,28 +13,24 @@
  */
 package org.codice.ddf.admin.api.handler.commons;
 
-import static org.codice.ddf.admin.api.handler.ConfigurationMessage.INVALID_FIELD;
-import static org.codice.ddf.admin.api.handler.ConfigurationMessage.MessageType.FAILURE;
-import static org.codice.ddf.admin.api.handler.ConfigurationMessage.buildMessage;
-
-import java.net.MalformedURLException;
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Iterator;
-import java.util.Optional;
 
 import javax.xml.namespace.NamespaceContext;
 
-import org.codice.ddf.admin.api.config.sources.SourceConfiguration;
-import org.codice.ddf.admin.api.handler.ConfigurationMessage;
-
 public class SourceHandlerCommons {
+
+    //Common probe return types
+    public static final String DISCOVERED_SOURCES = "discoveredSources";
 
     //Common probe, persist and test id's
     public static final String DISCOVER_SOURCES_ID = "discover-sources";
     public static final String CONFIG_FROM_URL_ID = "config-from-url";
     public static final String VALID_URL_TEST_ID = "valid-url";
-    public static final String MANUAL_URL_TEST_ID = "manual-url";
 
     //Common success types
     public static final String CONFIG_CREATED = "CONFIG_CREATED";
@@ -43,29 +39,38 @@ public class SourceHandlerCommons {
     public static final String REACHED_URL = "REACHED_URL";
 
     //Common warning types
-    public static final String CANNOT_VERIFY = "CANNOT_VERIFY";
     public static final String UNTRUSTED_CA = "UNTRUSTED_CA";
 
     //Common failed types
     public static final String CANNOT_CONNECT = "CANNOT_CONNECT";
-    public static final String NO_ENDPOINT = "NO_ENDPOINT";
+    public static final String UNKNOWN_ENDPOINT = "UNKNOWN_ENDPOINT";
     public static final String CERT_ERROR = "CERT_ERROR";
     public static final String BAD_CONFIG = "BAD_CONFIG";
 
 
     public static final int PING_TIMEOUT = 500;
 
-    public static Optional<ConfigurationMessage> endpointIsReachable(SourceConfiguration config) {
+    public static String endpointIsReachable(String hostname, int port) {
+        try (Socket connection = new Socket()) {
+            connection.connect(new InetSocketAddress(hostname,
+                    port), PING_TIMEOUT);
+            connection.close();
+            return REACHED_URL;
+
+        } catch (IOException e) {
+            return CANNOT_CONNECT;
+        }
+    }
+
+    public static String endpointIsReachable(String url) {
         try {
-            URLConnection urlConnection = (new URL(config.endpointUrl())).openConnection();
+            URLConnection urlConnection = (new URL(url).openConnection());
             urlConnection.setConnectTimeout(PING_TIMEOUT);
             urlConnection.connect();
-        } catch (MalformedURLException | IllegalArgumentException e) {
-            return Optional.of(buildMessage(FAILURE, INVALID_FIELD, "URL is improperly formatted."));
+            return REACHED_URL;
         } catch (Exception e) {
-            Optional.of(buildMessage(FAILURE, CANNOT_CONNECT, "Cannot reach URL."));
+            return CANNOT_CONNECT;
         }
-        return Optional.empty();
     }
 
     /*********************************************************
@@ -87,5 +92,4 @@ public class SourceHandlerCommons {
             return null;
         }
     };
-
 }

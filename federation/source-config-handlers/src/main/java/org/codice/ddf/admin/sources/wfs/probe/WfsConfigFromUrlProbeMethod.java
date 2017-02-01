@@ -18,10 +18,10 @@ import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_USER_PASSWORD;
 import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.BAD_CONFIG;
 import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.CANNOT_CONNECT;
-import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.CANNOT_VERIFY;
 import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.CERT_ERROR;
 import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.CONFIG_CREATED;
 import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.CONFIG_FROM_URL_ID;
+import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.DISCOVERED_SOURCES;
 import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.UNTRUSTED_CA;
 import static org.codice.ddf.admin.api.handler.report.ProbeReport.createProbeReport;
 import static org.codice.ddf.admin.api.validation.SourceValidationUtils.validateOptionalUsernameAndPassword;
@@ -55,8 +55,10 @@ public class WfsConfigFromUrlProbeMethod extends ProbeMethod<WfsSourceConfigurat
             CANNOT_CONNECT, "Could not reach specified URL.",
             CERT_ERROR, "The URL provided has improperly configured SSL certificates and is insecure.");
     public static final Map<String, String> WARNING_TYPES = ImmutableMap.of(
-            CANNOT_VERIFY, "Reached URL, but could not verify as WFS endpoint.",
             UNTRUSTED_CA, "The URL's SSL certificated has been signed by an untrusted certificate authority and may be insecure.");
+
+    public static final List<String> RETURN_TYPES = ImmutableList.of(DISCOVERED_SOURCES);
+
 
     public WfsConfigFromUrlProbeMethod() {
         super(WFS_CONFIG_FROM_URL_ID,
@@ -65,7 +67,8 @@ public class WfsConfigFromUrlProbeMethod extends ProbeMethod<WfsSourceConfigurat
                 OPTIONAL_FIELDS,
                 SUCCESS_TYPES,
                 FAILURE_TYPES,
-                WARNING_TYPES);
+                WARNING_TYPES,
+                RETURN_TYPES);
     }
 
     @Override
@@ -77,7 +80,7 @@ public class WfsConfigFromUrlProbeMethod extends ProbeMethod<WfsSourceConfigurat
             Optional<WfsSourceConfiguration> preferred = WfsSourceUtils.getPreferredConfig(configuration);
             if (preferred.isPresent()) {
                 result = status.isTrustedCertAuthority() ? CONFIG_CREATED : UNTRUSTED_CA;
-                probeResult.put(WFS_CONFIG_FROM_URL_ID, preferred.get().configurationHandlerId(WFS_SOURCE_CONFIGURATION_HANDLER_ID));
+                probeResult.put(DISCOVERED_SOURCES, preferred.get().configurationHandlerId(WFS_SOURCE_CONFIGURATION_HANDLER_ID));
             } else {
                 result = BAD_CONFIG;
             }

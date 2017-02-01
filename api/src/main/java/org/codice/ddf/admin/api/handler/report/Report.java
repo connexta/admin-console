@@ -38,16 +38,15 @@ public class Report {
         this.messages = new ArrayList<>();
     }
 
-    public Report(ConfigurationMessage... messages) {
-        this.messages = new ArrayList<>();
-        Arrays.stream(messages)
-                .forEach(msg -> this.messages.add(msg));
+    public Report(List<ConfigurationMessage> messages) {
+        this();
+        addMessages(messages);
     }
 
-    public Report(List<ConfigurationMessage> messages) {
-        this.messages = new ArrayList<>();
-        if(messages != null) {
-            this.messages.addAll(messages);
+    public Report(ConfigurationMessage... messages) {
+        this();
+        if (messages != null) {
+            addMessages(Arrays.asList(messages));
         }
     }
 
@@ -66,9 +65,8 @@ public class Report {
     }
 
     public static Report createReport(Map<String, String> successTypes,
-            Map<String, String> failureTypes, Map<String, String> warningTypes,
-            String result) {
-        return  createReport(successTypes, failureTypes, warningTypes, Arrays.asList(result));
+            Map<String, String> failureTypes, Map<String, String> warningTypes, String result) {
+        return createReport(successTypes, failureTypes, warningTypes, Arrays.asList(result));
     }
 
     public static Report createReport(Map<String, String> successTypes,
@@ -98,13 +96,19 @@ public class Report {
     }
 
     //Setters
-    public Report addMessage(ConfigurationMessage result) {
-        this.messages.add(result);
+    public Report addMessage(ConfigurationMessage message) {
+        if (message != null) {
+            this.messages.add(message);
+        }
         return this;
     }
 
     public Report addMessages(List<ConfigurationMessage> messages) {
-        this.messages.addAll(messages);
+        if (messages != null && !messages.isEmpty()) {
+            messages.stream()
+                    .filter(msg -> msg != null)
+                    .forEach(msg -> this.messages.add(msg));
+        }
         return this;
     }
 }

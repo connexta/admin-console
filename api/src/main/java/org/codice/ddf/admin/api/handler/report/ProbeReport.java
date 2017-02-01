@@ -64,7 +64,7 @@ public class ProbeReport extends Report {
         return this;
     }
 
-    public Map<String, Object> getProbeResults() {
+    public Map<String, Object> probeResults() {
         return probeResults;
     }
 

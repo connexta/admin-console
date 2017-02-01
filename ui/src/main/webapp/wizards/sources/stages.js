@@ -232,7 +232,7 @@ const ManualEntryStageView = ({ configOptions, endpointUrl, configType, testManu
 export const ManualEntryStage = connect((state) => ({
   configOptions: getConfigTypes(state),
   endpointUrl: getConfig(state, 'endpointUrl').value,
-  configType: (getConfig(state, 'manualEntryConfigTypeInput').value || {}).id
+  configType: getConfig(state, 'manualEntryConfigTypeInput').value
 }), {
   testManualUrl: testManualUrl
 })(ManualEntryStageView)

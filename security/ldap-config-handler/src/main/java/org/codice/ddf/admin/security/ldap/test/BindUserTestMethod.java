@@ -27,7 +27,6 @@ import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.CANNOT_CON
 import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.CANNOT_CONNECT;
 import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.SUCCESSFUL_BIND;
 import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.toDescriptionMap;
-import static org.codice.ddf.admin.security.ldap.test.LdapTestingCommons.bindUserToLdapConnection;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -42,32 +41,31 @@ import org.codice.ddf.admin.api.handler.report.Report;
 import com.google.common.collect.ImmutableList;
 
 public class BindUserTestMethod extends TestMethod<LdapConfiguration> {
-
-    public static final String LDAP_BIND_TEST_ID = "bind";
-
     public static final String DESCRIPTION =
             "Attempts to bind the specified user to specified ldap connection.";
 
-    private static final List<String> REQUIRED_FIELDS = ImmutableList.of(
-            HOST_NAME,
+    private static final List<String> REQUIRED_FIELDS = ImmutableList.of(HOST_NAME,
             PORT,
             ENCRYPTION_METHOD,
             BIND_USER_DN,
             BIND_USER_PASSWORD,
             BIND_METHOD);
 
-    private static final List<String> OPTIONAL_FIELDS = ImmutableList.of(
-            BIND_REALM);
+    private static final List<String> OPTIONAL_FIELDS = ImmutableList.of(BIND_REALM);
 
-    public static final Map<String, String> SUCCESS_TYPES =
+    private static final Map<String, String> SUCCESS_TYPES =
             toDescriptionMap(Collections.singletonList(SUCCESSFUL_BIND));
 
-    public static final Map<String, String> FAILURE_TYPES = toDescriptionMap(Arrays.asList(
+    private static final Map<String, String> FAILURE_TYPES = toDescriptionMap(Arrays.asList(
             CANNOT_CONFIGURE,
             CANNOT_CONNECT,
             CANNOT_BIND));
 
-    public BindUserTestMethod() {
+    private static final String LDAP_BIND_TEST_ID = "bind";
+
+    private final LdapTestingCommons ldapTestingCommons;
+
+    public BindUserTestMethod(LdapTestingCommons ldapTestingCommons) {
         super(LDAP_BIND_TEST_ID,
                 DESCRIPTION,
                 REQUIRED_FIELDS,
@@ -75,12 +73,14 @@ public class BindUserTestMethod extends TestMethod<LdapConfiguration> {
                 SUCCESS_TYPES,
                 FAILURE_TYPES,
                 null);
+
+        this.ldapTestingCommons = ldapTestingCommons;
     }
 
     @Override
     public Report test(LdapConfiguration configuration) {
-        LdapTestingCommons.LdapConnectionAttempt bindConnectionAttempt = bindUserToLdapConnection(
-                configuration);
+        LdapTestingCommons.LdapConnectionAttempt bindConnectionAttempt =
+                ldapTestingCommons.bindUserToLdapConnection(configuration);
 
         if (bindConnectionAttempt.result() == SUCCESSFUL_BIND) {
             bindConnectionAttempt.connection()
@@ -89,8 +89,7 @@ public class BindUserTestMethod extends TestMethod<LdapConfiguration> {
 
         return Report.createReport(SUCCESS_TYPES,
                 FAILURE_TYPES,
-                null,
-                Arrays.asList(bindConnectionAttempt.result()
+                null, Collections.singletonList(bindConnectionAttempt.result()
                         .name()));
     }
 

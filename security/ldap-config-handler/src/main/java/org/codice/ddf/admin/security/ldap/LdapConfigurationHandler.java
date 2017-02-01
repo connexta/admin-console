@@ -39,6 +39,7 @@ import org.codice.ddf.admin.security.ldap.test.AttributeMappingTestMethod;
 import org.codice.ddf.admin.security.ldap.test.BindUserTestMethod;
 import org.codice.ddf.admin.security.ldap.test.ConnectTestMethod;
 import org.codice.ddf.admin.security.ldap.test.DirectoryStructTestMethod;
+import org.codice.ddf.admin.security.ldap.test.LdapTestingCommons;
 
 import com.google.common.collect.ImmutableList;
 
@@ -58,17 +59,19 @@ public class LdapConfigurationHandler extends DefaultConfigurationHandler<LdapCo
 
     @Override
     public List<ProbeMethod> getProbeMethods() {
-        return ImmutableList.of(new DefaultDirectoryStructureProbe(),
-                new LdapQueryProbe(),
-                new SubjectAttributeProbe());
+        LdapTestingCommons ldapTestingCommons = new LdapTestingCommons();
+        return ImmutableList.of(new DefaultDirectoryStructureProbe(ldapTestingCommons),
+                new LdapQueryProbe(ldapTestingCommons),
+                new SubjectAttributeProbe(ldapTestingCommons));
     }
 
     @Override
     public List<TestMethod> getTestMethods() {
-        return ImmutableList.of(new ConnectTestMethod(),
-                new BindUserTestMethod(),
-                new DirectoryStructTestMethod(),
-                new AttributeMappingTestMethod());
+        LdapTestingCommons ldapTestingCommons = new LdapTestingCommons();
+        return ImmutableList.of(new ConnectTestMethod(ldapTestingCommons),
+                new BindUserTestMethod(ldapTestingCommons),
+                new DirectoryStructTestMethod(ldapTestingCommons),
+                new AttributeMappingTestMethod(new Configurator()));
     }
 
     @Override

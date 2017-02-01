@@ -36,32 +36,37 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 public class AttributeMappingTestMethod extends TestMethod<LdapConfiguration> {
-
-    public static final String LDAP_ATTRIBUTE_MAPPING_TEST_ID = "attribute-mapping";
-
     public static final String DESCRIPTION =
             "Verifies that sts mapping values are valid and exist.";
 
     public static final List<String> REQUIRED_FIELDS = ImmutableList.of(ATTRIBUTE_MAPPINGS);
 
-    public static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(SUCCESSFUL_TEST,
+    private static final String LDAP_ATTRIBUTE_MAPPING_TEST_ID = "attribute-mapping";
+
+    private static final String VALIDATED = "validated";
+
+    private static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(VALIDATED,
             "Attribute mapping was successfully validated.");
 
-    public static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(INVALID_FIELD, "The given attribute mapping is invalid.");
+    public static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(INVALID_FIELD,
+            "The given attribute mapping is invalid.");
 
-    public AttributeMappingTestMethod() {
+    private final Configurator configurator;
+
+    public AttributeMappingTestMethod(Configurator configurator) {
         super(LDAP_ATTRIBUTE_MAPPING_TEST_ID,
                 DESCRIPTION,
                 REQUIRED_FIELDS,
                 null,
-                SUCCESS_TYPES,
-                null,
+                SUCCESS_TYPES, FAILURE_TYPES,
                 null);
+
+        this.configurator = configurator;
     }
 
     @Override
     public Report test(LdapConfiguration configuration) {
-        List stsClaims = Arrays.asList((String[]) new Configurator().getConfig(
+        List stsClaims = Arrays.asList((String[]) configurator.getConfig(
                 STS_CLAIMS_CONFIGURATION_CONFIG_ID)
                 .get(STS_CLAIMS_PROPS_KEY_CLAIMS));
         Optional<String> unknownStsClaim = configuration.attributeMappings()

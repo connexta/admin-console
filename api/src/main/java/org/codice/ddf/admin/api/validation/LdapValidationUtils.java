@@ -18,7 +18,7 @@ import static org.codice.ddf.admin.api.handler.ConfigurationMessage.createInvali
 import static org.codice.ddf.admin.api.validation.ValidationUtils.validateString;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.codice.ddf.admin.api.config.ldap.LdapConfiguration;
@@ -162,8 +162,9 @@ public class LdapValidationUtils {
 
     public static List<ConfigurationMessage> validateBindRealm(LdapConfiguration configuration) {
         List<ConfigurationMessage> errors = new ArrayList<>();
-        if(configuration.bindUserMethod() != null && configuration.bindUserMethod().equals(LdapValidationUtils.DIGEST_MD5_SASL)) {
-            errors.addAll(configuration.validate(Arrays.asList(BIND_REALM)));
+        if (configuration.bindUserMethod() != null && configuration.bindUserMethod()
+                .equals(LdapValidationUtils.DIGEST_MD5_SASL)) {
+            errors.addAll(configuration.validate(Collections.singletonList(BIND_REALM)));
         }
         return errors;
     }

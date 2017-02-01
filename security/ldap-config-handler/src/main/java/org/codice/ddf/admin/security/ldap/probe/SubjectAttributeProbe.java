@@ -27,7 +27,6 @@ import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.PORT;
 import static org.codice.ddf.admin.api.services.PolicyManagerServiceProperties.STS_CLAIMS_CONFIGURATION_CONFIG_ID;
 import static org.codice.ddf.admin.api.services.PolicyManagerServiceProperties.STS_CLAIMS_PROPS_KEY_CLAIMS;
 import static org.codice.ddf.admin.api.validation.LdapValidationUtils.validateBindRealm;
-import static org.codice.ddf.admin.security.ldap.test.LdapTestingCommons.bindUserToLdapConnection;
 
 import java.util.List;
 import java.util.Set;
@@ -50,28 +49,33 @@ public class SubjectAttributeProbe extends ProbeMethod<LdapConfiguration> {
     private static final Logger LOGGER = LoggerFactory.getLogger(SubjectAttributeProbe.class);
 
     public static final String SUBJECT_ATTRIBUTES_PROBE_ID = "subject-attributes";
+
     private static final String DESCRIPTION =
             "Searches for the subject attributes for claims mapping.";
 
-    private static final List<String> REQUIRED_FIELDS = ImmutableList.of(
-            LDAP_TYPE,
+    private static final List<String> REQUIRED_FIELDS = ImmutableList.of(LDAP_TYPE,
             HOST_NAME,
             PORT,
             ENCRYPTION_METHOD,
             BIND_USER_DN,
             BIND_USER_PASSWORD,
             BIND_METHOD,
-            BASE_GROUP_DN, GROUP_ATTRIBUTE_HOLDING_MEMBER, MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP);
+            BASE_GROUP_DN,
+            GROUP_ATTRIBUTE_HOLDING_MEMBER,
+            MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP);
 
-    private static final List<String> OPTIONAL_FIELDS = ImmutableList.of(
-            BIND_REALM);
+    private static final List<String> OPTIONAL_FIELDS = ImmutableList.of(BIND_REALM);
 
     private static final String SUBJECT_CLAIMS = "subjectClaims";
 
     private static final String USER_ATTRIBUTES = "userAttributes";
 
-    private static final List<String> RETURN_TYPES = ImmutableList.of(SUBJECT_CLAIMS, USER_ATTRIBUTES);
-    public SubjectAttributeProbe() {
+    private static final List<String> RETURN_TYPES = ImmutableList.of(SUBJECT_CLAIMS,
+            USER_ATTRIBUTES);
+
+    private final LdapTestingCommons ldapTestingCommons;
+
+    public SubjectAttributeProbe(LdapTestingCommons ldapTestingCommons) {
         super(SUBJECT_ATTRIBUTES_PROBE_ID,
                 DESCRIPTION,
                 REQUIRED_FIELDS,
@@ -80,6 +84,7 @@ public class SubjectAttributeProbe extends ProbeMethod<LdapConfiguration> {
                 null,
                 null,
                 RETURN_TYPES);
+        this.ldapTestingCommons = ldapTestingCommons;
     }
 
     @Override
@@ -88,8 +93,8 @@ public class SubjectAttributeProbe extends ProbeMethod<LdapConfiguration> {
         Object subjectClaims = new Configurator().getConfig(STS_CLAIMS_CONFIGURATION_CONFIG_ID)
                 .get(STS_CLAIMS_PROPS_KEY_CLAIMS);
 
-        LdapTestingCommons.LdapConnectionAttempt ldapConnectionAttempt = bindUserToLdapConnection(
-                configuration);
+        LdapTestingCommons.LdapConnectionAttempt ldapConnectionAttempt =
+                ldapTestingCommons.bindUserToLdapConnection(configuration);
         Set<String> ldapEntryAttributes = null;
         try {
             // TODO: tbatie - 1/19/17 - Don't assume the connection is available, should check result first

@@ -60,11 +60,13 @@ import org.codice.ddf.admin.api.handler.report.Report;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
-public class CreateLdapConfigMethod extends PersistMethod<LdapConfiguration>{
+public class CreateLdapConfigMethod extends PersistMethod<LdapConfiguration> {
 
     public static final String LDAP_CREATE_ID = CREATE;
 
-    public static final String DESCRIPTION = "Persists the ldap configuration depending on the ldap use case.";
+    public static final String DESCRIPTION =
+            "Persists the ldap configuration depending on the ldap use case.";
+
     public static final List<String> LOGIN_REQUIRED_FIELDS = ImmutableList.of(LDAP_USE_CASE,
             HOST_NAME,
             PORT,
@@ -82,8 +84,11 @@ public class CreateLdapConfigMethod extends PersistMethod<LdapConfiguration>{
             MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP,
             ATTRIBUTE_MAPPINGS);
 
-    public static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(SUCCESSFUL_PERSIST, "Successfully saved LDAP settings.");
-    public static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(FAILED_PERSIST, "Unable to persist changes.");
+    public static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(SUCCESSFUL_PERSIST,
+            "Successfully saved LDAP settings.");
+
+    public static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(FAILED_PERSIST,
+            "Unable to persist changes.");
 
     public CreateLdapConfigMethod() {
         super(LDAP_CREATE_ID,
@@ -105,11 +110,13 @@ public class CreateLdapConfigMethod extends PersistMethod<LdapConfiguration>{
 
             Map<String, Object> ldapLoginServiceProps = ldapConfigurationToLdapLoginService(config);
             configurator.startFeature(LDAP_LOGIN_FEATURE);
-            configurator.createManagedService(LDAP_LOGIN_MANAGED_SERVICE_FACTORY_PID, ldapLoginServiceProps);
+            configurator.createManagedService(LDAP_LOGIN_MANAGED_SERVICE_FACTORY_PID,
+                    ldapLoginServiceProps);
         }
 
-        if (config.ldapUseCase().equals(ATTRIBUTE_STORE) || config.ldapUseCase().equals(
-                AUTHENTICATION_AND_ATTRIBUTE_STORE)) {
+        if (config.ldapUseCase()
+                .equals(ATTRIBUTE_STORE) || config.ldapUseCase()
+                .equals(AUTHENTICATION_AND_ATTRIBUTE_STORE)) {
 
             Path newAttributeMappingPath = Paths.get(System.getProperty("ddf.home"),
                     "etc",
@@ -117,13 +124,16 @@ public class CreateLdapConfigMethod extends PersistMethod<LdapConfiguration>{
                     "ldapAttributeMap-" + UUID.randomUUID()
                             .toString() + ".props");
             config.attributeMappingsPath(newAttributeMappingPath.toString());
-            Map<String, Object> ldapClaimsServiceProps = ldapConfigToLdapClaimsHandlerService(config);
+            Map<String, Object> ldapClaimsServiceProps =
+                    ldapConfigToLdapClaimsHandlerService(config);
             configurator.createPropertyFile(newAttributeMappingPath, config.attributeMappings());
             configurator.startFeature(LDAP_CLAIMS_HANDLER_FEATURE);
-            configurator.createManagedService(LDAP_CLAIMS_HANDLER_MANAGED_SERVICE_FACTORY_PID, ldapClaimsServiceProps);
+            configurator.createManagedService(LDAP_CLAIMS_HANDLER_MANAGED_SERVICE_FACTORY_PID,
+                    ldapClaimsServiceProps);
         }
 
-        report = configurator.commit("LDAP Configuration saved with details: {}", config.toString());
+        report = configurator.commit("LDAP Configuration saved with details: {}",
+                config.toString());
         return createReport(SUCCESS_TYPES,
                 FAILURE_TYPES,
                 null,
@@ -136,8 +146,7 @@ public class CreateLdapConfigMethod extends PersistMethod<LdapConfiguration>{
         if (configuration.ldapUseCase()
                 .equals(AUTHENTICATION) || configuration.ldapUseCase()
                 .equals(AUTHENTICATION_AND_ATTRIBUTE_STORE)) {
-            validationResults.addAll(configuration.validate(ImmutableList.of(
-                    GROUP_OBJECT_CLASS,
+            validationResults.addAll(configuration.validate(ImmutableList.of(GROUP_OBJECT_CLASS,
                     GROUP_ATTRIBUTE_HOLDING_MEMBER,
                     MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP,
                     ATTRIBUTE_MAPPINGS)));

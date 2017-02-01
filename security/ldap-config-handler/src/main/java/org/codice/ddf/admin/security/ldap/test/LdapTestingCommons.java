@@ -43,8 +43,7 @@ import org.forgerock.opendj.ldap.responses.SearchResultEntry;
 import org.forgerock.opendj.ldif.ConnectionEntryReader;
 
 public class LdapTestingCommons {
-
-    public static LdapConnectionAttempt getLdapConnection(LdapConfiguration ldapConfiguration) {
+    public LdapConnectionAttempt getLdapConnection(LdapConfiguration ldapConfiguration) {
         LDAPOptions ldapOptions = new LDAPOptions();
 
         try {
@@ -81,8 +80,7 @@ public class LdapTestingCommons {
         return new LdapConnectionAttempt(SUCCESSFUL_CONNECTION, ldapConnection);
     }
 
-    public static LdapConnectionAttempt bindUserToLdapConnection(
-            LdapConfiguration ldapConfiguration) {
+    public LdapConnectionAttempt bindUserToLdapConnection(LdapConfiguration ldapConfiguration) {
 
         LdapConnectionAttempt ldapConnectionResult = getLdapConnection(ldapConfiguration);
         if (ldapConnectionResult.result() != SUCCESSFUL_CONNECTION) {
@@ -105,47 +103,6 @@ public class LdapTestingCommons {
         return new LdapConnectionAttempt(SUCCESSFUL_BIND, connection);
     }
 
-    public static BindRequest selectBindMethod(String bindMethod, String bindUserDN,
-            String bindUserCredentials, String realm, String kdcAddress) {
-        BindRequest request;
-        switch (bindMethod) {
-        case SIMPLE:
-            request = Requests.newSimpleBindRequest(bindUserDN, bindUserCredentials.toCharArray());
-            break;
-//        case SASL:
-//            request = Requests.newPlainSASLBindRequest(bindUserDN,
-//                    bindUserCredentials.toCharArray());
-//            break;
-//        case GSSAPI_SASL:
-//            request = Requests.newGSSAPISASLBindRequest(bindUserDN,
-//                    bindUserCredentials.toCharArray());
-//            ((GSSAPISASLBindRequest) request).setRealm(realm);
-//            ((GSSAPISASLBindRequest) request).setKDCAddress(kdcAddress);
-//            break;
-        case DIGEST_MD5_SASL:
-            request = Requests.newDigestMD5SASLBindRequest(bindUserDN,
-                    bindUserCredentials.toCharArray());
-            ((DigestMD5SASLBindRequest) request).setCipher(DigestMD5SASLBindRequest.CIPHER_HIGH);
-            ((DigestMD5SASLBindRequest) request).getQOPs()
-                    .clear();
-            ((DigestMD5SASLBindRequest) request).getQOPs()
-                    .add(DigestMD5SASLBindRequest.QOP_AUTH_CONF);
-            ((DigestMD5SASLBindRequest) request).getQOPs()
-                    .add(DigestMD5SASLBindRequest.QOP_AUTH_INT);
-            ((DigestMD5SASLBindRequest) request).getQOPs()
-                    .add(DigestMD5SASLBindRequest.QOP_AUTH);
-            if (realm != null && !realm.equals("")) {
-                ((DigestMD5SASLBindRequest) request).setRealm(realm);
-            }
-            break;
-        default:
-            request = Requests.newSimpleBindRequest(bindUserDN, bindUserCredentials.toCharArray());
-            break;
-        }
-
-        return request;
-    }
-
     /**
      * Executes a query against the ldap connection
      *
@@ -158,7 +115,7 @@ public class LdapTestingCommons {
      *                         then all attributes will be returned
      * @return list of results
      */
-    public static List<SearchResultEntry> getLdapQueryResults(Connection ldapConnection,
+    public List<SearchResultEntry> getLdapQueryResults(Connection ldapConnection,
             String ldapSearchBaseDN, String ldapQuery, SearchScope searchScope, int maxResults,
             String... attributes) {
         ConnectionEntryReader reader;
@@ -187,6 +144,49 @@ public class LdapTestingCommons {
         return entries;
     }
 
+    private static BindRequest selectBindMethod(String bindMethod, String bindUserDN,
+            String bindUserCredentials, String realm, String kdcAddress) {
+        BindRequest request;
+
+        // TODO RAP 31 Jan 17: These case statements should operate in a case-insensitive manner
+        switch (bindMethod) {
+        case SIMPLE:
+            request = Requests.newSimpleBindRequest(bindUserDN, bindUserCredentials.toCharArray());
+            break;
+        //        case SASL:
+        //            request = Requests.newPlainSASLBindRequest(bindUserDN,
+        //                    bindUserCredentials.toCharArray());
+        //            break;
+        //        case GSSAPI_SASL:
+        //            request = Requests.newGSSAPISASLBindRequest(bindUserDN,
+        //                    bindUserCredentials.toCharArray());
+        //            ((GSSAPISASLBindRequest) request).setRealm(realm);
+        //            ((GSSAPISASLBindRequest) request).setKDCAddress(kdcAddress);
+        //            break;
+        case DIGEST_MD5_SASL:
+            request = Requests.newDigestMD5SASLBindRequest(bindUserDN,
+                    bindUserCredentials.toCharArray());
+            ((DigestMD5SASLBindRequest) request).setCipher(DigestMD5SASLBindRequest.CIPHER_HIGH);
+            ((DigestMD5SASLBindRequest) request).getQOPs()
+                    .clear();
+            ((DigestMD5SASLBindRequest) request).getQOPs()
+                    .add(DigestMD5SASLBindRequest.QOP_AUTH_CONF);
+            ((DigestMD5SASLBindRequest) request).getQOPs()
+                    .add(DigestMD5SASLBindRequest.QOP_AUTH_INT);
+            ((DigestMD5SASLBindRequest) request).getQOPs()
+                    .add(DigestMD5SASLBindRequest.QOP_AUTH);
+            if (realm != null && !realm.equals("")) {
+                ((DigestMD5SASLBindRequest) request).setRealm(realm);
+            }
+            break;
+        default:
+            request = Requests.newSimpleBindRequest(bindUserDN, bindUserCredentials.toCharArray());
+            break;
+        }
+
+        return request;
+    }
+
     public static class LdapConnectionAttempt {
 
         private LdapConnectionResult result;
@@ -210,5 +210,4 @@ public class LdapTestingCommons {
             return result;
         }
     }
-
 }

@@ -37,7 +37,6 @@ import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.CANNOT_CON
 import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.CANNOT_CONNECT;
 import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.SUCCESSFUL_BIND;
 import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.toDescriptionMap;
-import static org.codice.ddf.admin.security.ldap.test.LdapTestingCommons.bindUserToLdapConnection;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -91,7 +90,9 @@ public class DefaultDirectoryStructureProbe extends ProbeMethod<LdapConfiguratio
             QUERY,
             QUERY_BASE);
 
-    public DefaultDirectoryStructureProbe() {
+    private final LdapTestingCommons ldapTestingCommons;
+
+    public DefaultDirectoryStructureProbe(LdapTestingCommons ldapTestingCommons) {
         super(ID,
                 DESCRIPTION,
                 REQUIRED_FIELDS,
@@ -100,12 +101,13 @@ public class DefaultDirectoryStructureProbe extends ProbeMethod<LdapConfiguratio
                 FAILURE_TYPES,
                 null,
                 RETURN_TYPES);
+        this.ldapTestingCommons = ldapTestingCommons;
     }
 
     @Override
     public ProbeReport probe(LdapConfiguration configuration) {
-        LdapTestingCommons.LdapConnectionAttempt connectionAttempt = bindUserToLdapConnection(
-                configuration);
+        LdapTestingCommons.LdapConnectionAttempt connectionAttempt =
+                ldapTestingCommons.bindUserToLdapConnection(configuration);
         if (connectionAttempt.result() != SUCCESSFUL_BIND) {
             return createProbeReport(SUCCESS_TYPES,
                     FAILURE_TYPES,

@@ -60,7 +60,7 @@ public class LdapLoginServiceProperties {
 
         ldapConfiguration.servicePid(mapStringValue(SERVICE_PID_KEY, props));
         ldapConfiguration.factoryPid(mapStringValue(FACTORY_PID_KEY, props));
-        ldapConfiguration.bindUserDn(mapStringValue(LDAP_BIND_USER_DN, props));
+        ldapConfiguration.bindUser(mapStringValue(LDAP_BIND_USER_DN, props));
         ldapConfiguration.bindUserPassword(mapStringValue(LDAP_BIND_USER_PASS, props));
         ldapConfiguration.bindUserMethod(mapStringValue(BIND_METHOD, props));
         //        ldapConfiguration.bindKdcAddress((String) props.get(KDC_ADDRESS));
@@ -93,7 +93,7 @@ public class LdapLoginServiceProperties {
 
             ldapStsConfig.put(LDAP_URL, ldapUrl + config.hostName() + ":" + config.port());
             ldapStsConfig.put(START_TLS, Boolean.toString(startTls));
-            ldapStsConfig.put(LDAP_BIND_USER_DN, config.bindUserDn());
+            ldapStsConfig.put(LDAP_BIND_USER_DN, config.bindUser());
             ldapStsConfig.put(LDAP_BIND_USER_PASS, config.bindUserPassword());
             ldapStsConfig.put(BIND_METHOD, config.bindUserMethod());
             //        ldapStsConfig.put(KDC_ADDRESS, config.bindKdcAddress());

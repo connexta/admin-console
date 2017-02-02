@@ -42,7 +42,7 @@ export default ({ disabled, prev, persist, submitting, messages = [], configs })
           </Flexbox>
           <Flexbox className={confirmationInfo} flexDirection='column'>
             <Info label='Base Group DN' value={configs.baseGroupDn} />
-            <Info label='Bind User DN' value={configs.bindUserDn} />
+            <Info label='Bind User' value={configs.bindUser} />
             <Info label='Bind User Password' value='*****' />
             <Info label='Bind User Method' value={configs.bindUserMethod} />
             <Info label='LDAP Group Object Class' value={configs.groupObjectClass} />

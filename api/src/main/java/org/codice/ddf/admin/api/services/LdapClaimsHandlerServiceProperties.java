@@ -64,7 +64,7 @@ public class LdapClaimsHandlerServiceProperties {
         if ((Boolean) props.get(START_TLS)) {
             config.encryptionMethod(START_TLS);
         }
-        config.bindUserDn(mapStringValue(LDAP_BIND_USER_DN, props));
+        config.bindUser(mapStringValue(LDAP_BIND_USER_DN, props));
         config.bindUserPassword(mapStringValue(PASSWORD, props));
         config.bindUserMethod(mapStringValue(BIND_METHOD, props));
         config.userNameAttribute(mapStringValue(LOGIN_USER_ATTRIBUTE, props));
@@ -95,7 +95,7 @@ public class LdapClaimsHandlerServiceProperties {
             boolean startTls = isStartTls(config);
             props.put(URL, ldapUrl + config.hostName() + ":" + config.port());
             props.put(START_TLS, startTls);
-            props.put(LDAP_BIND_USER_DN, config.bindUserDn());
+            props.put(LDAP_BIND_USER_DN, config.bindUser());
             props.put(PASSWORD, config.bindUserPassword());
             props.put(BIND_METHOD, config.bindUserMethod());
             props.put(LOGIN_USER_ATTRIBUTE, config.userNameAttribute());

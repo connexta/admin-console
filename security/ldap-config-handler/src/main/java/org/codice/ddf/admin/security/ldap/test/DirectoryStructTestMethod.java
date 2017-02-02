@@ -18,7 +18,7 @@ import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.BASE_GROUP_
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.BASE_USER_DN;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.BIND_METHOD;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.BIND_REALM;
-import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.BIND_USER_DN;
+import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.BIND_USER;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.BIND_USER_PASSWORD;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.ENCRYPTION_METHOD;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.GROUP_ATTRIBUTE_HOLDING_MEMBER;
@@ -74,7 +74,7 @@ public class DirectoryStructTestMethod extends TestMethod<LdapConfiguration> {
     private static final List<String> REQUIRED_FIELDS = ImmutableList.of(HOST_NAME,
             PORT,
             ENCRYPTION_METHOD,
-            BIND_USER_DN,
+            BIND_USER,
             BIND_USER_PASSWORD,
             BIND_METHOD,
             BASE_USER_DN,

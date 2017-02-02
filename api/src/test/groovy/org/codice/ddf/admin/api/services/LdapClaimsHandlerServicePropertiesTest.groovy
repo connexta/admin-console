@@ -32,7 +32,7 @@ class LdapClaimsHandlerServicePropertiesTest extends Specification {
 
     static final TEST_URL = TEST_URI_SCHEME + "://" + TEST_HOST_NAME + ":" + TEST_PORT
 
-    static final TEST_BIND_USER_DN = "someBindUserDn"
+    static final TEST_BIND_USER = "someBindUser"
 
     static final TEST_PASSWORD = "password"
 
@@ -61,7 +61,7 @@ class LdapClaimsHandlerServicePropertiesTest extends Specification {
         def properties = [ValidationUtils.SERVICE_PID_KEY, TEST_SERVICE_PID,
                           LdapClaimsHandlerServiceProperties.URL, TEST_URL,
                           LdapClaimsHandlerServiceProperties.START_TLS, true,
-                          LdapClaimsHandlerServiceProperties.LDAP_BIND_USER_DN, TEST_BIND_USER_DN,
+                          LdapClaimsHandlerServiceProperties.LDAP_BIND_USER_DN, TEST_BIND_USER,
                           LdapClaimsHandlerServiceProperties.PASSWORD, TEST_PASSWORD,
                           LdapClaimsHandlerServiceProperties.BIND_METHOD, TEST_BIND_METHOD,
                           LdapClaimsHandlerServiceProperties.LOGIN_USER_ATTRIBUTE, TEST_LOGIN_USER_ATTRIBUTE,
@@ -81,7 +81,7 @@ class LdapClaimsHandlerServicePropertiesTest extends Specification {
         ldapConfiguration.encryptionMethod() == LdapClaimsHandlerServiceProperties.START_TLS
         ldapConfiguration.hostName() == TEST_HOST_NAME
         ldapConfiguration.port() == TEST_PORT
-        ldapConfiguration.bindUserDn() == TEST_BIND_USER_DN
+        ldapConfiguration.bindUser() == TEST_BIND_USER
         ldapConfiguration.bindUserPassword() == TEST_PASSWORD
         ldapConfiguration.bindUserMethod() == TEST_BIND_METHOD
         ldapConfiguration.userNameAttribute() == TEST_LOGIN_USER_ATTRIBUTE
@@ -121,7 +121,7 @@ class LdapClaimsHandlerServicePropertiesTest extends Specification {
         ldapConfiguration.encryptionMethod() == null
         ldapConfiguration.hostName() == null
         ldapConfiguration.port() == 0
-        ldapConfiguration.bindUserDn() == null
+        ldapConfiguration.bindUser() == null
         ldapConfiguration.bindUserPassword() == null
         ldapConfiguration.bindUserMethod() == null
         ldapConfiguration.userNameAttribute() == null
@@ -156,7 +156,7 @@ class LdapClaimsHandlerServicePropertiesTest extends Specification {
             encryptionMethod() >> TEST_URI_SCHEME
             hostName() >> TEST_HOST_NAME
             port() >> TEST_PORT
-            bindUserDn() >> TEST_BIND_USER_DN
+            bindUser() >> TEST_BIND_USER
             bindUserPassword() >> TEST_PASSWORD
             bindUserMethod() >> TEST_BIND_METHOD
             userNameAttribute() >> TEST_LOGIN_USER_ATTRIBUTE
@@ -174,7 +174,7 @@ class LdapClaimsHandlerServicePropertiesTest extends Specification {
         then:
         result.get(LdapClaimsHandlerServiceProperties.URL) == TEST_URL
         result.get(LdapClaimsHandlerServiceProperties.START_TLS) == false
-        result.get(LdapClaimsHandlerServiceProperties.LDAP_BIND_USER_DN) == TEST_BIND_USER_DN
+        result.get(LdapClaimsHandlerServiceProperties.LDAP_BIND_USER_DN) == TEST_BIND_USER
         result.get(LdapClaimsHandlerServiceProperties.PASSWORD) == TEST_PASSWORD
         result.get(LdapClaimsHandlerServiceProperties.BIND_METHOD) == TEST_BIND_METHOD
         result.get(LdapClaimsHandlerServiceProperties.LOGIN_USER_ATTRIBUTE) == TEST_LOGIN_USER_ATTRIBUTE

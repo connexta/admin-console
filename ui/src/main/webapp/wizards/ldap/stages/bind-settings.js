@@ -44,7 +44,7 @@ const BindSettings = (props) => {
     <Stage>
       <Mount
         on={setDefaults}
-        bindUserDn={ldapType === 'activeDirectory' ? 'user@domain' : 'cn=admin'}
+        bindUser={ldapType === 'activeDirectory' ? 'user@domain' : 'cn=admin'}
         bindUserPassword='secret'
         bindUserMethod='Simple' />
 
@@ -60,7 +60,7 @@ const BindSettings = (props) => {
           The requirements for different LDAP servers vary; please contact your LDAP administrator if you need guidance.
         </Description>
 
-        <Input id='bindUserDn' disabled={disabled} label='Bind User' />
+        <Input id='bindUser' disabled={disabled} label='Bind User' />
         <Password id='bindUserPassword' disabled={disabled} label='Bind User Password' />
         <Select id='bindUserMethod'
           label='Bind User Method'

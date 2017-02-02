@@ -91,7 +91,7 @@ public class LdapTestingCommons {
 
         try {
             BindRequest bindRequest = selectBindMethod(ldapConfiguration.bindUserMethod(),
-                    ldapConfiguration.bindUserDn(),
+                    ldapConfiguration.bindUser(),
                     ldapConfiguration.bindUserPassword(),
                     ldapConfiguration.bindRealm(),
                     null);
@@ -143,14 +143,14 @@ public class LdapTestingCommons {
         return entries;
     }
 
-    private static BindRequest selectBindMethod(String bindMethod, String bindUserDN,
+    private static BindRequest selectBindMethod(String bindMethod, String bindUser,
             String bindUserCredentials, String realm, String kdcAddress) {
         BindRequest request;
 
         // TODO RAP 31 Jan 17: These case statements should operate in a case-insensitive manner
         switch (bindMethod) {
         case SIMPLE:
-            request = Requests.newSimpleBindRequest(bindUserDN, bindUserCredentials.toCharArray());
+            request = Requests.newSimpleBindRequest(bindUser, bindUserCredentials.toCharArray());
             break;
         //        case SASL:
         //            request = Requests.newPlainSASLBindRequest(bindUserDN,
@@ -163,7 +163,7 @@ public class LdapTestingCommons {
         //            ((GSSAPISASLBindRequest) request).setKDCAddress(kdcAddress);
         //            break;
         case DIGEST_MD5_SASL:
-            request = Requests.newDigestMD5SASLBindRequest(bindUserDN,
+            request = Requests.newDigestMD5SASLBindRequest(bindUser,
                     bindUserCredentials.toCharArray());
             ((DigestMD5SASLBindRequest) request).setCipher(DigestMD5SASLBindRequest.CIPHER_HIGH);
             ((DigestMD5SASLBindRequest) request).getQOPs()
@@ -179,7 +179,7 @@ public class LdapTestingCommons {
             }
             break;
         default:
-            request = Requests.newSimpleBindRequest(bindUserDN, bindUserCredentials.toCharArray());
+            request = Requests.newSimpleBindRequest(bindUser, bindUserCredentials.toCharArray());
             break;
         }
 

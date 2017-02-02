@@ -26,7 +26,7 @@ class LdapLoginServicePropertiesTest extends Specification {
 
     static final TEST_FACTORY_PID = "testFactoryPidKey"
 
-    static final TEST_LDAP_BIND_USER_DN = "testLdapBindUserDn"
+    static final TEST_LDAP_BIND_USER = "testLdapBindUser"
 
     static final TEST_LDAP_BIND_USER_PASS = "testLdapBindUserPass"
 
@@ -56,7 +56,7 @@ class LdapLoginServicePropertiesTest extends Specification {
         setup:
         def properties = [ValidationUtils.SERVICE_PID_KEY, TEST_SERVICE_PID,
                           ValidationUtils.FACTORY_PID_KEY, TEST_FACTORY_PID,
-                          LdapLoginServiceProperties.LDAP_BIND_USER_DN, TEST_LDAP_BIND_USER_DN,
+                          LdapLoginServiceProperties.LDAP_BIND_USER_DN, TEST_LDAP_BIND_USER,
                           LdapLoginServiceProperties.LDAP_BIND_USER_PASS, TEST_LDAP_BIND_USER_PASS,
                           LdapLoginServiceProperties.BIND_METHOD, TEST_BIND_METHOD,
                           LdapLoginServiceProperties.REALM, TEST_REALM,
@@ -73,7 +73,7 @@ class LdapLoginServicePropertiesTest extends Specification {
         then:
         ldapConfiguration.servicePid() == TEST_SERVICE_PID
         ldapConfiguration.factoryPid() == TEST_FACTORY_PID
-        ldapConfiguration.bindUserDn() == TEST_LDAP_BIND_USER_DN
+        ldapConfiguration.bindUser() == TEST_LDAP_BIND_USER
         ldapConfiguration.bindUserPassword() == TEST_LDAP_BIND_USER_PASS
         ldapConfiguration.bindUserMethod() == TEST_BIND_METHOD
         ldapConfiguration.bindRealm() == TEST_REALM
@@ -123,7 +123,7 @@ class LdapLoginServicePropertiesTest extends Specification {
         then:
         ldapConfiguration.servicePid() == null
         ldapConfiguration.factoryPid() == null
-        ldapConfiguration.bindUserDn() == null
+        ldapConfiguration.bindUser() == null
         ldapConfiguration.bindUserPassword() == null
         ldapConfiguration.bindUserMethod() == null
         ldapConfiguration.bindRealm() == null
@@ -142,7 +142,7 @@ class LdapLoginServicePropertiesTest extends Specification {
             encryptionMethod() >> encryptMethod
             hostName() >> TEST_HOST_NAME
             port() >> 389
-            bindUserDn() >> TEST_LDAP_BIND_USER_DN
+            bindUser() >> TEST_LDAP_BIND_USER
             bindUserPassword() >> TEST_LDAP_BIND_USER_PASS
             bindUserMethod() >> TEST_BIND_METHOD
             bindRealm() >> TEST_REALM
@@ -157,7 +157,7 @@ class LdapLoginServicePropertiesTest extends Specification {
         then:
         result.get(LdapLoginServiceProperties.LDAP_URL) == encryptMethod + "://" + TEST_HOST_AND_PORT
         result.get(LdapLoginServiceProperties.START_TLS) == "false"
-        result.get(LdapLoginServiceProperties.LDAP_BIND_USER_DN) == TEST_LDAP_BIND_USER_DN
+        result.get(LdapLoginServiceProperties.LDAP_BIND_USER_DN) == TEST_LDAP_BIND_USER
         result.get(LdapLoginServiceProperties.LDAP_BIND_USER_PASS) == TEST_LDAP_BIND_USER_PASS
         result.get(LdapLoginServiceProperties.REALM) == TEST_REALM
         result.get(LdapLoginServiceProperties.USER_NAME_ATTRIBUTE) == TEST_USER_NAME_ATTRIBUTE
@@ -176,7 +176,7 @@ class LdapLoginServicePropertiesTest extends Specification {
             encryptionMethod() >> LdapLoginServiceProperties.START_TLS
             hostName() >> TEST_HOST_NAME
             port() >> 389
-            bindUserDn() >> TEST_LDAP_BIND_USER_DN
+            bindUser() >> TEST_LDAP_BIND_USER
             bindUserPassword() >> TEST_LDAP_BIND_USER_PASS
             bindUserMethod() >> TEST_BIND_METHOD
             bindRealm() >> TEST_REALM
@@ -191,7 +191,7 @@ class LdapLoginServicePropertiesTest extends Specification {
         then:
         result.get(LdapLoginServiceProperties.LDAP_URL) == TEST_LDAP_URL
         result.get(LdapLoginServiceProperties.START_TLS) == "true"
-        result.get(LdapLoginServiceProperties.LDAP_BIND_USER_DN) == TEST_LDAP_BIND_USER_DN
+        result.get(LdapLoginServiceProperties.LDAP_BIND_USER_DN) == TEST_LDAP_BIND_USER
         result.get(LdapLoginServiceProperties.LDAP_BIND_USER_PASS) == TEST_LDAP_BIND_USER_PASS
         result.get(LdapLoginServiceProperties.REALM) == TEST_REALM
         result.get(LdapLoginServiceProperties.USER_NAME_ATTRIBUTE) == TEST_USER_NAME_ATTRIBUTE

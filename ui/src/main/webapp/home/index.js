@@ -107,7 +107,7 @@ const LdapTileView = (props) => {
     hostName,
     port,
     encryptionMethod,
-    bindUserDn,
+    bindUser,
     userNameAttribute,
     baseGroupDn,
     baseUserDn,
@@ -122,7 +122,7 @@ const LdapTileView = (props) => {
       <ConfigField fieldName='Hostname' value={hostName} />
       <ConfigField fieldName='Port' value={port} />
       <ConfigField fieldName='Encryption Method' value={encryptionMethod} />
-      <ConfigField fieldName='Bind User' value={bindUserDn} />
+      <ConfigField fieldName='Bind User' value={bindUser} />
       <ConfigField fieldName='Bind User Password' value='******' />
       <ConfigField fieldName='UserName Attribute' value={userNameAttribute} />
       <ConfigField fieldName='Base Group DN' value={baseGroupDn} />

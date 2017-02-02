@@ -15,7 +15,7 @@ package org.codice.ddf.admin.security.ldap.probe;
 
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.BIND_METHOD;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.BIND_REALM;
-import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.BIND_USER_DN;
+import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.BIND_USER;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.BIND_USER_PASSWORD;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.ENCRYPTION_METHOD;
 import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.HOST_NAME;
@@ -65,7 +65,7 @@ public class LdapQueryProbe extends ProbeMethod<LdapConfiguration> {
             HOST_NAME,
             PORT,
             ENCRYPTION_METHOD,
-            BIND_USER_DN,
+            BIND_USER,
             BIND_USER_PASSWORD,
             BIND_METHOD,
             QUERY,

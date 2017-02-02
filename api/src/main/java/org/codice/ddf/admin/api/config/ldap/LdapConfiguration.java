@@ -45,7 +45,7 @@ public class LdapConfiguration extends Configuration {
     public static final String HOST_NAME = "hostName";
     public static final String PORT = "port";
     public static final String ENCRYPTION_METHOD = "encryptionMethod";
-    public static final String BIND_USER_DN = "bindUserDn";
+    public static final String BIND_USER = "bindUser";
     public static final String BIND_USER_PASSWORD = "bindUserPassword";
     public static final String BIND_METHOD = "bindMethod";
 //    public static final String BIND_KDC = "kdcAddress";
@@ -70,7 +70,7 @@ public class LdapConfiguration extends Configuration {
     private int port;
     private String encryptionMethod;
     private String bindUserMethod;
-    private String bindUserDn;
+    private String bindUser;
     private String bindUserPassword;
 //    private String bindKdcAddress;
     private String bindRealm;
@@ -100,7 +100,7 @@ public class LdapConfiguration extends Configuration {
                     .put(ENCRYPTION_METHOD,
                             config -> validateEncryptionMethod(config.encryptionMethod(),
                                     ENCRYPTION_METHOD))
-                    .put(BIND_USER_DN, config -> validateString(config.bindUserDn(), BIND_USER_DN))
+                    .put(BIND_USER, config -> validateString(config.bindUser(), BIND_USER))
                     .put(BIND_USER_PASSWORD,
                             config -> validateString(config.bindUserPassword(), BIND_USER_PASSWORD))
                     .put(BIND_METHOD,
@@ -149,8 +149,8 @@ public class LdapConfiguration extends Configuration {
     public String encryptionMethod() {
         return encryptionMethod;
     }
-    public String bindUserDn() {
-        return bindUserDn;
+    public String bindUser() {
+        return bindUser;
     }
     public String bindUserPassword() {
         return bindUserPassword;
@@ -216,8 +216,8 @@ public class LdapConfiguration extends Configuration {
         this.encryptionMethod = encryptionMethod;
         return this;
     }
-    public LdapConfiguration bindUserDn(String bindUserDn) {
-        this.bindUserDn = bindUserDn;
+    public LdapConfiguration bindUser(String bindUser) {
+        this.bindUser = bindUser;
         return this;
     }
     public LdapConfiguration bindUserPassword(String bindUserPassword) {
@@ -300,7 +300,7 @@ public class LdapConfiguration extends Configuration {
                 .add("port", port)
                 .add("encryptionMethod", encryptionMethod)
                 .add("bindUserMethod", bindUserMethod)
-                .add("bindUserDn", bindUserDn)
+                .add("bindUser", bindUser)
                 .add("bindUserPassword", "********")
                 .add("bindRealm", bindRealm)
                 .add("userNameAttribute", userNameAttribute)

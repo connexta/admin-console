@@ -38,7 +38,8 @@ import com.google.common.collect.ImmutableList;
 
 public class OpenSearchSourceUtils {
 
-    private static final List<String> OPENSEARCH_MIME_TYPES = ImmutableList.of("application/atom+xml");
+    private static final List<String> OPENSEARCH_MIME_TYPES = ImmutableList.of(
+            "application/atom+xml");
 
     private static final List<String> URL_FORMATS = ImmutableList.of(
             "https://%s:%d/services/catalog/query",
@@ -76,14 +77,20 @@ public class OpenSearchSourceUtils {
             contentType = ContentType.getOrDefault(response.getEntity())
                     .getMimeType();
             if (status == HTTP_OK && OPENSEARCH_MIME_TYPES.contains(contentType)) {
-                return result.trustedCertAuthority(true).certError(false).available(true);
+                return result.trustedCertAuthority(true)
+                        .certError(false)
+                        .available(true);
             } else {
-                return result.trustedCertAuthority(true).certError(false).available(false);
+                return result.trustedCertAuthority(true)
+                        .certError(false)
+                        .available(false);
             }
         } catch (SSLPeerUnverifiedException e) {
             // This is the hostname != cert name case - if this occurs, the URL's SSL cert configuration
             // is incorrect, or a serious network security issue has occurred.
-            return result.trustedCertAuthority(false).certError(true).available(false);
+            return result.trustedCertAuthority(false)
+                    .certError(true)
+                    .available(false);
         } catch (IOException e) {
             try {
                 SSLContext sslContext = SSLContexts.custom()
@@ -102,10 +109,14 @@ public class OpenSearchSourceUtils {
                 contentType = ContentType.getOrDefault(response.getEntity())
                         .getMimeType();
                 if (status == HTTP_OK && OPENSEARCH_MIME_TYPES.contains(contentType)) {
-                    return result.trustedCertAuthority(false).certError(false).available(true);
+                    return result.trustedCertAuthority(false)
+                            .certError(false)
+                            .available(true);
                 }
             } catch (Exception e1) {
-                return result.trustedCertAuthority(false).certError(false).available(false);
+                return result.trustedCertAuthority(false)
+                        .certError(false)
+                        .available(false);
             }
         }
         return result;

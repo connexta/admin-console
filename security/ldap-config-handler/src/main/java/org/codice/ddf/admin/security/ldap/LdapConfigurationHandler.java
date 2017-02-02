@@ -45,7 +45,8 @@ import com.google.common.collect.ImmutableList;
 
 public class LdapConfigurationHandler extends DefaultConfigurationHandler<LdapConfiguration> {
 
-    private static final String LDAP_CONFIGURATION_HANDLER_ID = LdapConfiguration.CONFIGURATION_TYPE;
+    private static final String LDAP_CONFIGURATION_HANDLER_ID =
+            LdapConfiguration.CONFIGURATION_TYPE;
 
     @Override
     public String getConfigurationHandlerId() {
@@ -82,17 +83,20 @@ public class LdapConfigurationHandler extends DefaultConfigurationHandler<LdapCo
 
     @Override
     public List<LdapConfiguration> getConfigurations() {
-        List<LdapConfiguration>  ldapLoginConfigs = new Configurator().getManagedServiceConfigs(LDAP_LOGIN_MANAGED_SERVICE_FACTORY_PID)
+        List<LdapConfiguration> ldapLoginConfigs = new Configurator().getManagedServiceConfigs(
+                LDAP_LOGIN_MANAGED_SERVICE_FACTORY_PID)
                 .values()
                 .stream()
                 .map(LdapLoginServiceProperties::ldapLoginServiceToLdapConfiguration)
                 .collect(Collectors.toList());
 
-        List<LdapConfiguration> ldapClaimsHandlerConfigs =  new Configurator().getManagedServiceConfigs(LDAP_CLAIMS_HANDLER_MANAGED_SERVICE_FACTORY_PID)
-                .values()
-                .stream()
-                .map(LdapClaimsHandlerServiceProperties::ldapClaimsHandlerServiceToLdapConfig)
-                .collect(Collectors.toList());
+        List<LdapConfiguration> ldapClaimsHandlerConfigs =
+                new Configurator().getManagedServiceConfigs(
+                        LDAP_CLAIMS_HANDLER_MANAGED_SERVICE_FACTORY_PID)
+                        .values()
+                        .stream()
+                        .map(LdapClaimsHandlerServiceProperties::ldapClaimsHandlerServiceToLdapConfig)
+                        .collect(Collectors.toList());
 
         return Stream.concat(ldapLoginConfigs.stream(), ldapClaimsHandlerConfigs.stream())
                 .map(config -> config.bindUserPassword("*******"))

@@ -28,30 +28,35 @@ import com.google.gson.annotations.Expose;
 /**
  * <b> This code is experimental. While this class is functional and tested, it may change or be
  * removed in a future version of the library. </b>
-
+ * <p>
  * A {@link ConfigurationHandlerMethod} represents a method that is meant to be performed on a {@link org.codice.ddf.admin.api.config.Configuration}.
  */
 public abstract class ConfigurationHandlerMethod<S extends Configuration> {
 
     @Expose
     final String id;
+
     @Expose
     final String description;
+
     @Expose
     final List<String> requiredFields;
+
     @Expose
     final List<String> optionalFields;
+
     @Expose
     final Map<String, String> successTypes;
+
     @Expose
     final Map<String, String> failureTypes;
+
     @Expose
     final Map<String, String> warningTypes;
 
-    public ConfigurationHandlerMethod(String id, String description,
-            List<String> requiredFields, List<String> optionalFields,
-            Map<String, String> successTypes, Map<String, String> failureTypes,
-            Map<String, String> warningTypes) {
+    public ConfigurationHandlerMethod(String id, String description, List<String> requiredFields,
+            List<String> optionalFields, Map<String, String> successTypes,
+            Map<String, String> failureTypes, Map<String, String> warningTypes) {
         this.id = id;
         this.description = description;
         this.requiredFields = requiredFields;
@@ -82,12 +87,13 @@ public abstract class ConfigurationHandlerMethod<S extends Configuration> {
     }
 
     public List<ConfigurationMessage> validate(S configuration) {
-        return Stream.concat(validateRequiredFields(configuration).stream(), validateOptionalFields(configuration).stream()).collect(
-                Collectors.toList());
+        return Stream.concat(validateRequiredFields(configuration).stream(),
+                validateOptionalFields(configuration).stream())
+                .collect(Collectors.toList());
     }
 
     public List<ConfigurationMessage> validateRequiredFields(S configuration) {
-        if(getRequiredFields() != null && !getRequiredFields().isEmpty()) {
+        if (getRequiredFields() != null && !getRequiredFields().isEmpty()) {
             return configuration.validate(getRequiredFields());
         }
         return new ArrayList<>();

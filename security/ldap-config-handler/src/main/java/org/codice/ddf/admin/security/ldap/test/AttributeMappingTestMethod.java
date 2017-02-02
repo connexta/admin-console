@@ -56,7 +56,8 @@ public class AttributeMappingTestMethod extends TestMethod<LdapConfiguration> {
                 DESCRIPTION,
                 REQUIRED_FIELDS,
                 null,
-                SUCCESS_TYPES, FAILURE_TYPES,
+                SUCCESS_TYPES,
+                FAILURE_TYPES,
                 null);
 
         this.configurator = configurator;

@@ -42,13 +42,21 @@ import com.google.common.collect.ImmutableMap;
 
 public class DefaultEmbeddedLdapPersistMethod extends PersistMethod<EmbeddedLdapConfiguration> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultEmbeddedLdapPersistMethod.class);
+    private static final Logger LOGGER =
+            LoggerFactory.getLogger(DefaultEmbeddedLdapPersistMethod.class);
 
     public static final String DEFAULT_CONFIGURATIONS_ID = "defaults";
-    public static final String DESCRIPTION = "Starts up the Opendj Embedded App and installs default realm and/or attribute store configurations.";
+
+    public static final String DESCRIPTION =
+            "Starts up the Opendj Embedded App and installs default realm and/or attribute store configurations.";
+
     public static final List<String> REQUIRED_FIELDS = ImmutableList.of(LDAP_USE_CASE);
-    public static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(SUCCESSFUL_PERSIST, "Successfully started and saved Embedded LDAP configurations.");
-    public static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(FAILED_PERSIST, "Failed to start Embedded LDAP or install a default configuration file.");
+
+    public static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(SUCCESSFUL_PERSIST,
+            "Successfully started and saved Embedded LDAP configurations.");
+
+    public static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(FAILED_PERSIST,
+            "Failed to start Embedded LDAP or install a default configuration file.");
 
     private Configurator configurator;
 
@@ -84,13 +92,12 @@ public class DefaultEmbeddedLdapPersistMethod extends PersistMethod<EmbeddedLdap
             configurator.startFeature(ALL_DEFAULT_EMBEDDED_LDAP_CONFIG_FEATURE);
             break;
         default:
-            LOGGER.debug("Unrecognized LDAP use case \"{}\". No commits will be made. ", configuration.ldapUseCase());
-            return Report.createReport(SUCCESS_TYPES,
-                    FAILURE_TYPES,
-                    null,
-                    FAILED_PERSIST);
+            LOGGER.debug("Unrecognized LDAP use case \"{}\". No commits will be made. ",
+                    configuration.ldapUseCase());
+            return Report.createReport(SUCCESS_TYPES, FAILURE_TYPES, null, FAILED_PERSIST);
         }
-        OperationReport report = configurator.commit("Embedded LDAP saved with details: {}", configuration.toString());
+        OperationReport report = configurator.commit("Embedded LDAP saved with details: {}",
+                configuration.toString());
 
         return Report.createReport(SUCCESS_TYPES,
                 FAILURE_TYPES,

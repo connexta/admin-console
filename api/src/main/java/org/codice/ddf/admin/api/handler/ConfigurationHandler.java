@@ -24,7 +24,7 @@ import org.codice.ddf.admin.api.handler.report.Report;
 /**
  * <b> This code is experimental. While this interface is functional and tested, it may change or be
  * removed in a future version of the library. </b>
- *
+ * <p>
  * A {@link ConfigurationHandler} is used to  {@link #probe}, {@link #test}, and {@link #persist} a {@link Configuration}
  */
 public interface ConfigurationHandler<S extends Configuration> {
@@ -32,7 +32,7 @@ public interface ConfigurationHandler<S extends Configuration> {
     /**
      * Used to discover information. This may be system specific or external to the system.
      *
-     * @param probeId A unique key that specifies the probe operation for the {@link ConfigurationHandler} to perform on the {@link Configuration}
+     * @param probeId       A unique key that specifies the probe operation for the {@link ConfigurationHandler} to perform on the {@link Configuration}
      * @param configuration A configuration containing information to be used for discovery of information
      * @return ProbeReport containing the results of probe
      */
@@ -41,7 +41,7 @@ public interface ConfigurationHandler<S extends Configuration> {
     /**
      * Tests a {@link Configuration}. For example, confirming that various {@link Configuration} fields are valid.
      *
-     * @param testId A unique key that specifies the test operation for the {@link ConfigurationHandler} to perform on the {@link Configuration}
+     * @param testId        A unique key that specifies the test operation for the {@link ConfigurationHandler} to perform on the {@link Configuration}
      * @param configuration Configuration to test
      * @return A {@link Report} containing the results of the operation
      */
@@ -50,7 +50,7 @@ public interface ConfigurationHandler<S extends Configuration> {
     /**
      * Persists a {@link Configuration}.
      *
-     * @param persistId A unique key that specifies the persist operation for the {@link ConfigurationHandler} to perform on the {@link Configuration}
+     * @param persistId     A unique key that specifies the persist operation for the {@link ConfigurationHandler} to perform on the {@link Configuration}
      * @param configuration Configuration to persist
      * @return A {@link Report} containing the results of the operation
      */
@@ -65,6 +65,7 @@ public interface ConfigurationHandler<S extends Configuration> {
 
     /**
      * Returns a CapabilitiesReport containing the capabilities of the {@link ConfigurationHandler}.
+     *
      * @return {@link CapabilitiesReport} containing all {@link org.codice.ddf.admin.api.handler.method.ConfigurationHandlerMethod}s the {@link ConfigurationHandler} supports.
      */
     CapabilitiesReport getCapabilities();
@@ -72,7 +73,7 @@ public interface ConfigurationHandler<S extends Configuration> {
     /**
      * Unique ID of this configuration handler. The uniqueness of the ID is not enforced.
      *
-     * @return  uid
+     * @return uid
      */
     String getConfigurationHandlerId();
 

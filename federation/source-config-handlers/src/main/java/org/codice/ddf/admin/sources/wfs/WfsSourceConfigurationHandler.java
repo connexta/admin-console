@@ -40,7 +40,8 @@ import org.codice.ddf.admin.sources.wfs.probe.WfsConfigFromUrlProbeMethod;
 public class WfsSourceConfigurationHandler extends DefaultConfigurationHandler<SourceConfiguration>
         implements SourceConfigurationHandler<SourceConfiguration> {
 
-    public static final String WFS_SOURCE_CONFIGURATION_HANDLER_ID = WfsSourceConfiguration.CONFIGURATION_TYPE;
+    public static final String WFS_SOURCE_CONFIGURATION_HANDLER_ID =
+            WfsSourceConfiguration.CONFIGURATION_TYPE;
 
     @Override
     public List<ProbeMethod> getProbeMethods() {
@@ -72,7 +73,6 @@ public class WfsSourceConfigurationHandler extends DefaultConfigurationHandler<S
     public Report persist(String persistId, SourceConfiguration configuration) {
         return super.persist(persistId, new WfsSourceConfiguration(configuration));
     }
-
 
     @Override
     public List<SourceConfiguration> getConfigurations() {

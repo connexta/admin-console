@@ -27,26 +27,37 @@ public class OpenSearchServiceProperties {
 
     // --- OpenSearch service properties
     public static final String OPENSEARCH_FACTORY_PID = "OpenSearchSource";
+
     public static final String ID = "id";
+
     public static final String ENDPOINT_URL = "endpointUrl";
+
     public static final String USERNAME = "username";
+
     public static final String PASSWORD = "password";
     // ---
 
-    public static final OpenSearchSourceConfiguration servicePropsToOpenSearchConfig(Map<String, Object> props){
+    public static final OpenSearchSourceConfiguration servicePropsToOpenSearchConfig(
+            Map<String, Object> props) {
         OpenSearchSourceConfiguration config = new OpenSearchSourceConfiguration();
-        config.factoryPid(props.get(FACTORY_PID_KEY) == null ? null : (String) props.get(FACTORY_PID_KEY));
-        config.servicePid(props.get(SERVICE_PID_KEY) == null ? null : (String) props.get(SERVICE_PID_KEY));
+        config.factoryPid(
+                props.get(FACTORY_PID_KEY) == null ? null : (String) props.get(FACTORY_PID_KEY));
+        config.servicePid(
+                props.get(SERVICE_PID_KEY) == null ? null : (String) props.get(SERVICE_PID_KEY));
         config.sourceName(props.get(ID) == null ? null : (String) props.get(ID));
-        config.sourceHostName(props.get(SOURCE_HOSTNAME) == null ? null : (String) props.get(SOURCE_HOSTNAME));
+        config.sourceHostName(
+                props.get(SOURCE_HOSTNAME) == null ? null : (String) props.get(SOURCE_HOSTNAME));
         config.sourcePort(props.get(PORT) == null ? 0 : (int) props.get(PORT));
-        config.endpointUrl(props.get(ENDPOINT_URL) == null ? null : (String) props.get(ENDPOINT_URL));
+        config.endpointUrl(
+                props.get(ENDPOINT_URL) == null ? null : (String) props.get(ENDPOINT_URL));
         config.sourceUserName(props.get(USERNAME) == null ? null : (String) props.get(USERNAME));
-        config.sourceUserPassword(props.get(PASSWORD) == null ? null : (String) props.get(PASSWORD));
+        config.sourceUserPassword(
+                props.get(PASSWORD) == null ? null : (String) props.get(PASSWORD));
         return config;
     }
 
-    public static final Map<String, Object> openSearchConfigToServiceProps(OpenSearchSourceConfiguration config) {
+    public static final Map<String, Object> openSearchConfigToServiceProps(
+            OpenSearchSourceConfiguration config) {
         HashMap<String, Object> props = new HashMap<>();
         props.put(ID, config.sourceName());
         props.put(ENDPOINT_URL, config.endpointUrl());

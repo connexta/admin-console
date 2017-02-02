@@ -54,7 +54,8 @@ public class ValidationUtils {
         return errors;
     }
 
-    public static List<ConfigurationMessage> validateStringNoWhiteSpace(String strToCheck, String configId) {
+    public static List<ConfigurationMessage> validateStringNoWhiteSpace(String strToCheck,
+            String configId) {
         List<ConfigurationMessage> errors = validateString(strToCheck, configId);
         if (errors.isEmpty()) {
             if (WHITE_SPACE.test(strToCheck)) {

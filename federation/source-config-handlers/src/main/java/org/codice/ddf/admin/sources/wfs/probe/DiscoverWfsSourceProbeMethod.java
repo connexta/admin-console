@@ -50,16 +50,26 @@ import com.google.common.collect.ImmutableMap;
 public class DiscoverWfsSourceProbeMethod extends ProbeMethod<WfsSourceConfiguration> {
 
     public static final String WFS_DISCOVER_SOURCES_ID = DISCOVER_SOURCES_ID;
-    public static final String DESCRIPTION = "Attempts to discover a WFS endpoint based on a hostname and port using optional authentication information.";
+
+    public static final String DESCRIPTION =
+            "Attempts to discover a WFS endpoint based on a hostname and port using optional authentication information.";
+
     public static final List<String> REQUIRED_FIELDS = ImmutableList.of(SOURCE_HOSTNAME, PORT);
+
     public static final List<String> OPTIONAL_FIELDS = ImmutableList.of(SOURCE_USERNAME,
             SOURCE_USER_PASSWORD);
-    public static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(CONFIG_CREATED, "Successfully created a configuration from the WFS endpoint.");
-    public static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(
-            CANNOT_CONNECT, "The URL provided could not be reached.",
-            UNKNOWN_ENDPOINT, "The endpoint does not appear to have WFS capabilities.",
-            CERT_ERROR, "The discovered source has incorrectly configured SSL certificates and is insecure.",
-            INTERNAL_ERROR, "Failed to create configuration from WFS URL.");
+
+    public static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(CONFIG_CREATED,
+            "Successfully created a configuration from the WFS endpoint.");
+
+    public static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(CANNOT_CONNECT,
+            "The URL provided could not be reached.",
+            UNKNOWN_ENDPOINT,
+            "The endpoint does not appear to have WFS capabilities.",
+            CERT_ERROR,
+            "The discovered source has incorrectly configured SSL certificates and is insecure.",
+            INTERNAL_ERROR,
+            "Failed to create configuration from WFS URL.");
 
     public static final Map<String, String> WARNING_TYPES = ImmutableMap.of(UNTRUSTED_CA,
             "The discovered URL has incorrectly configured SSL certificates and is likely insecure.");
@@ -80,27 +90,42 @@ public class DiscoverWfsSourceProbeMethod extends ProbeMethod<WfsSourceConfigura
     @Override
     public ProbeReport probe(WfsSourceConfiguration configuration) {
         WfsSourceConfiguration config = new WfsSourceConfiguration(configuration);
-        ProbeReport probeReport = new ProbeReport(buildMessage(SUCCESS_TYPES, FAILURE_TYPES, WARNING_TYPES, endpointIsReachable(config.sourceHostName(), config.sourcePort())));
-        if(probeReport.containsFailureMessages()) {
+        ProbeReport probeReport = new ProbeReport(buildMessage(SUCCESS_TYPES,
+                FAILURE_TYPES,
+                WARNING_TYPES,
+                endpointIsReachable(config.sourceHostName(), config.sourcePort())));
+        if (probeReport.containsFailureMessages()) {
             return probeReport;
         }
 
         UrlAvailability availability = WfsSourceUtils.confirmEndpointUrl(config);
-        if(availability == null) {
-            return probeReport.addMessage(buildMessage(SUCCESS_TYPES, FAILURE_TYPES, WARNING_TYPES, UNKNOWN_ENDPOINT));
+        if (availability == null) {
+            return probeReport.addMessage(buildMessage(SUCCESS_TYPES,
+                    FAILURE_TYPES,
+                    WARNING_TYPES,
+                    UNKNOWN_ENDPOINT));
         }
-        probeReport = createProbeReport(SUCCESS_TYPES, FAILURE_TYPES, WARNING_TYPES, availability.getAvailabilityResult());
-        if(probeReport.containsFailureMessages()) {
+        probeReport = createProbeReport(SUCCESS_TYPES,
+                FAILURE_TYPES,
+                WARNING_TYPES,
+                availability.getAvailabilityResult());
+        if (probeReport.containsFailureMessages()) {
             return probeReport;
         }
 
-        Optional<WfsSourceConfiguration> createdConfig = getPreferredConfig((WfsSourceConfiguration) config.endpointUrl(availability.getUrl()));
+        Optional<WfsSourceConfiguration> createdConfig =
+                getPreferredConfig((WfsSourceConfiguration) config.endpointUrl(availability.getUrl()));
         if (!createdConfig.isPresent()) {
-            return probeReport.addMessage(buildMessage(SUCCESS_TYPES, FAILURE_TYPES, WARNING_TYPES, INTERNAL_ERROR));
+            return probeReport.addMessage(buildMessage(SUCCESS_TYPES,
+                    FAILURE_TYPES,
+                    WARNING_TYPES,
+                    INTERNAL_ERROR));
         }
 
         Map<String, Object> probeResult = new HashMap<>();
-        probeResult.put(DISCOVERED_SOURCES, createdConfig.get().configurationHandlerId(WFS_SOURCE_CONFIGURATION_HANDLER_ID));
+        probeResult.put(DISCOVERED_SOURCES,
+                createdConfig.get()
+                        .configurationHandlerId(WFS_SOURCE_CONFIGURATION_HANDLER_ID));
 
         return probeReport.addMessage(buildMessage(SUCCESS_TYPES,
                 FAILURE_TYPES,

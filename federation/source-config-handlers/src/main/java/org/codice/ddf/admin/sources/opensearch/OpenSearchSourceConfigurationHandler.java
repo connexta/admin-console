@@ -37,14 +37,17 @@ import org.codice.ddf.admin.sources.opensearch.persist.DeleteOpenSearchSourcePer
 import org.codice.ddf.admin.sources.opensearch.probe.DiscoverOpenSearchSourceProbeMethod;
 import org.codice.ddf.admin.sources.opensearch.probe.OpenSearchConfigFromUrlProbeMethod;
 
-public class OpenSearchSourceConfigurationHandler extends DefaultConfigurationHandler<SourceConfiguration>
+public class OpenSearchSourceConfigurationHandler
+        extends DefaultConfigurationHandler<SourceConfiguration>
         implements SourceConfigurationHandler<SourceConfiguration> {
 
-    public static final String OPENSEARCH_SOURCE_CONFIGURATION_HANDLER_ID = OpenSearchSourceConfiguration.CONFIGURATION_TYPE;
+    public static final String OPENSEARCH_SOURCE_CONFIGURATION_HANDLER_ID =
+            OpenSearchSourceConfiguration.CONFIGURATION_TYPE;
 
     @Override
     public List<ProbeMethod> getProbeMethods() {
-        return Arrays.asList(new DiscoverOpenSearchSourceProbeMethod(), new OpenSearchConfigFromUrlProbeMethod());
+        return Arrays.asList(new DiscoverOpenSearchSourceProbeMethod(),
+                new OpenSearchConfigFromUrlProbeMethod());
     }
 
     @Override

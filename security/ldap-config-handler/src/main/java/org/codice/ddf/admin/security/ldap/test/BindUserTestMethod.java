@@ -89,7 +89,8 @@ public class BindUserTestMethod extends TestMethod<LdapConfiguration> {
 
         return Report.createReport(SUCCESS_TYPES,
                 FAILURE_TYPES,
-                null, Collections.singletonList(bindConnectionAttempt.result()
+                null,
+                Collections.singletonList(bindConnectionAttempt.result()
                         .name()));
     }
 

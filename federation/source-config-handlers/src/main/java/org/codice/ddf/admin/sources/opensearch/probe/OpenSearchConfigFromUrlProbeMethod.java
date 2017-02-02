@@ -48,19 +48,27 @@ import com.google.common.collect.ImmutableMap;
 public class OpenSearchConfigFromUrlProbeMethod extends ProbeMethod<OpenSearchSourceConfiguration> {
 
     public static final String OPENSEARCH_CONFIG_FROM_URL_ID = CONFIG_FROM_URL_ID;
-    public static final String DESCRIPTION = "Attempts to create an OpenSearch configuration from a given URL.";
 
-    public static final List<String> OPTIONAL_FIELDS = ImmutableList.of(SOURCE_USERNAME, SOURCE_USER_PASSWORD);
+    public static final String DESCRIPTION =
+            "Attempts to create an OpenSearch configuration from a given URL.";
+
+    public static final List<String> OPTIONAL_FIELDS = ImmutableList.of(SOURCE_USERNAME,
+            SOURCE_USER_PASSWORD);
+
     public static final List<String> REQUIRED_FIELDS = ImmutableList.of(ENDPOINT_URL);
-    public static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(CONFIG_CREATED, "Created OpenSearch configuration from provided URL.");
 
-    public static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(
-            BAD_CONFIG, "Failed to create a configuration from the URL.",
-            CANNOT_CONNECT, "THe URL provided could not be reached.",
-            CERT_ERROR, "The URL provided has improperly configured SSL certificates and is insecure.");
+    public static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(CONFIG_CREATED,
+            "Created OpenSearch configuration from provided URL.");
 
-    public static final Map<String, String> WARNING_TYPES = ImmutableMap.of(
-            UNTRUSTED_CA, "The URL's SSL certificate has been signed by an untrusted certificate authority and may be insecure.");
+    public static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(BAD_CONFIG,
+            "Failed to create a configuration from the URL.",
+            CANNOT_CONNECT,
+            "THe URL provided could not be reached.",
+            CERT_ERROR,
+            "The URL provided has improperly configured SSL certificates and is insecure.");
+
+    public static final Map<String, String> WARNING_TYPES = ImmutableMap.of(UNTRUSTED_CA,
+            "The URL's SSL certificate has been signed by an untrusted certificate authority and may be insecure.");
 
     public static final List<String> RETURN_TYPES = ImmutableList.of(DISCOVERED_SOURCES);
 
@@ -78,31 +86,43 @@ public class OpenSearchConfigFromUrlProbeMethod extends ProbeMethod<OpenSearchSo
     @Override
     public ProbeReport probe(OpenSearchSourceConfiguration configuration) {
         OpenSearchSourceConfiguration configCopy = new OpenSearchSourceConfiguration(configuration);
-        ProbeReport report = createProbeReport(SUCCESS_TYPES, FAILURE_TYPES, WARNING_TYPES, endpointIsReachable(configuration.endpointUrl()));
-        if(report.containsFailureMessages()) {
+        ProbeReport report = createProbeReport(SUCCESS_TYPES,
+                FAILURE_TYPES,
+                WARNING_TYPES,
+                endpointIsReachable(configuration.endpointUrl()));
+        if (report.containsFailureMessages()) {
             return report;
         }
 
-        UrlAvailability availability = OpenSearchSourceUtils.getUrlAvailability(configuration.endpointUrl());
-        if(availability == null) {
-            return report.addMessage(buildMessage(SUCCESS_TYPES, FAILURE_TYPES, WARNING_TYPES, UNKNOWN_ENDPOINT));
+        UrlAvailability availability =
+                OpenSearchSourceUtils.getUrlAvailability(configuration.endpointUrl());
+        if (availability == null) {
+            return report.addMessage(buildMessage(SUCCESS_TYPES,
+                    FAILURE_TYPES,
+                    WARNING_TYPES,
+                    UNKNOWN_ENDPOINT));
         }
 
-        report.addMessage(buildMessage(SUCCESS_TYPES, FAILURE_TYPES, WARNING_TYPES, availability.getAvailabilityResult()));
-        if(report.containsFailureMessages()) {
+        report.addMessage(buildMessage(SUCCESS_TYPES,
+                FAILURE_TYPES,
+                WARNING_TYPES,
+                availability.getAvailabilityResult()));
+        if (report.containsFailureMessages()) {
             return report;
         }
 
         Map<String, Object> probeResult = new HashMap<>();
-        probeResult.put(DISCOVERED_SOURCES, configCopy.endpointUrl(availability.getUrl())
-                .factoryPid(OPENSEARCH_FACTORY_PID)
-                .configurationHandlerId(OPENSEARCH_SOURCE_CONFIGURATION_HANDLER_ID));
+        probeResult.put(DISCOVERED_SOURCES,
+                configCopy.endpointUrl(availability.getUrl())
+                        .factoryPid(OPENSEARCH_FACTORY_PID)
+                        .configurationHandlerId(OPENSEARCH_SOURCE_CONFIGURATION_HANDLER_ID));
 
         return report.probeResults(probeResult);
     }
 
     @Override
-    public List<ConfigurationMessage> validateOptionalFields(OpenSearchSourceConfiguration configuration) {
+    public List<ConfigurationMessage> validateOptionalFields(
+            OpenSearchSourceConfiguration configuration) {
         return validateOptionalUsernameAndPassword(configuration);
     }
 }

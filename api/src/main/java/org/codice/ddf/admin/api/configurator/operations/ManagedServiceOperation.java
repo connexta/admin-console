@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Transactional handler factory for creating and deleting managed services.
- *
+ * <p>
  * <b> This code is experimental. While this class is functional and tested, it may change or be
  * removed in a future version of the library. </b>
  */
@@ -55,7 +55,8 @@ public abstract class ManagedServiceOperation
                 factoryPid = cfgAdmMbean.getFactoryPid(configPid);
                 currentProperties = cfgAdmMbean.getProperties(configPid);
             } catch (IOException e) {
-                ManagedServiceOperation.LOGGER.debug("Error getting current configuration for pid {}",
+                ManagedServiceOperation.LOGGER.debug(
+                        "Error getting current configuration for pid {}",
                         configPid,
                         e);
                 throw new ConfiguratorException("Internal error");

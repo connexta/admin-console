@@ -43,13 +43,24 @@ import com.google.common.collect.ImmutableMap;
 public class CreateCswSourcePersistMethod extends PersistMethod<CswSourceConfiguration> {
 
     public static final String CREATE_CSW_SOURCE_ID = CREATE;
-    public static final String DESCRIPTION = "Attempts to create and persist a CSW source given a configuration.";
 
-    public static final List<String> REQUIRED_FIELDS = ImmutableList.of(SOURCE_NAME, ENDPOINT_URL, FACTORY_PID);
+    public static final String DESCRIPTION =
+            "Attempts to create and persist a CSW source given a configuration.";
+
+    public static final List<String> REQUIRED_FIELDS = ImmutableList.of(SOURCE_NAME,
+            ENDPOINT_URL,
+            FACTORY_PID);
+
     private static final List<String> OPTIONAL_FIELDS = ImmutableList.of(SOURCE_USERNAME,
-            SOURCE_USER_PASSWORD, OUTPUT_SCHEMA, FORCE_SPATIAL_FILTER);
-    private static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(SUCCESSFUL_PERSIST, "CSW Source successfully created.");
-    private static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(FAILED_PERSIST, "Failed to create CSW Source.");
+            SOURCE_USER_PASSWORD,
+            OUTPUT_SCHEMA,
+            FORCE_SPATIAL_FILTER);
+
+    private static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(SUCCESSFUL_PERSIST,
+            "CSW Source successfully created.");
+
+    private static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(FAILED_PERSIST,
+            "Failed to create CSW Source.");
 
     public CreateCswSourcePersistMethod() {
         super(CREATE_CSW_SOURCE_ID,
@@ -64,18 +75,24 @@ public class CreateCswSourcePersistMethod extends PersistMethod<CswSourceConfigu
     @Override
     public Report persist(CswSourceConfiguration configuration) {
         Configurator configurator = new Configurator();
-        configurator.createManagedService(configuration.factoryPid(), cswConfigToServiceProps(configuration));
-        OperationReport report = configurator.commit("CSW source saved with details: {}", configuration.toString());
-        return Report.createReport(SUCCESS_TYPES, FAILURE_TYPES, null, report.containsFailedResults() ? FAILED_PERSIST : SUCCESSFUL_PERSIST);
+        configurator.createManagedService(configuration.factoryPid(),
+                cswConfigToServiceProps(configuration));
+        OperationReport report = configurator.commit("CSW source saved with details: {}",
+                configuration.toString());
+        return Report.createReport(SUCCESS_TYPES,
+                FAILURE_TYPES,
+                null,
+                report.containsFailedResults() ? FAILED_PERSIST : SUCCESSFUL_PERSIST);
     }
 
     @Override
     public List<ConfigurationMessage> validateOptionalFields(CswSourceConfiguration configuration) {
-        List<ConfigurationMessage> validationResults = validateOptionalUsernameAndPassword(configuration);
-        if(configuration.outputSchema() != null) {
+        List<ConfigurationMessage> validationResults = validateOptionalUsernameAndPassword(
+                configuration);
+        if (configuration.outputSchema() != null) {
             validationResults.addAll(configuration.validate(Arrays.asList(OUTPUT_SCHEMA)));
         }
-        if(configuration.forceSpatialFilter() != null) {
+        if (configuration.forceSpatialFilter() != null) {
             validationResults.addAll(configuration.validate(Arrays.asList(FORCE_SPATIAL_FILTER)));
         }
         return validationResults;

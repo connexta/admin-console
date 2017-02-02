@@ -25,7 +25,7 @@ import com.google.gson.annotations.Expose;
 /**
  * <b> This code is experimental. While this class is functional and tested, it may change or be
  * removed in a future version of the library. </b>
-
+ * <p>
  * A {@link ProbeMethod} is used to discover information about a specific {@link Configuration}.
  *
  * @param <S> the {@link Configuration} type to probe.
@@ -37,7 +37,8 @@ public abstract class ProbeMethod<S extends Configuration> extends Configuration
 
     public ProbeMethod(String id, String description, List<String> requiredFields,
             List<String> optionalFields, Map<String, String> successTypes,
-            Map<String, String> failureTypes, Map<String, String> warningTypes, List<String> returnTypes) {
+            Map<String, String> failureTypes, Map<String, String> warningTypes,
+            List<String> returnTypes) {
         super(id,
                 description,
                 requiredFields,

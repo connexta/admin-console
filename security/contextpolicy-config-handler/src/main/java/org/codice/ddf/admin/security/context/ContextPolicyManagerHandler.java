@@ -29,10 +29,13 @@ import org.codice.ddf.admin.api.handler.method.TestMethod;
 import org.codice.ddf.admin.security.context.persist.EditContextPolicyMethod;
 import org.codice.ddf.admin.security.context.probe.AvailableOptionsProbeMethod;
 
-public class ContextPolicyManagerHandler extends DefaultConfigurationHandler<ContextPolicyConfiguration> {
+public class ContextPolicyManagerHandler
+        extends DefaultConfigurationHandler<ContextPolicyConfiguration> {
 
     private ConfigurationHandler ldapConfigHandler;
-    public static final String CONTEXT_POLICY_MANAGER_HANDLER_ID = ContextPolicyConfiguration.CONFIGURATION_TYPE;
+
+    public static final String CONTEXT_POLICY_MANAGER_HANDLER_ID =
+            ContextPolicyConfiguration.CONFIGURATION_TYPE;
 
     @Override
     public String getConfigurationHandlerId() {

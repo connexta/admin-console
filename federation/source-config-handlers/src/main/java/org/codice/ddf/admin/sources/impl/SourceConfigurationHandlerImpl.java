@@ -30,16 +30,18 @@ import org.codice.ddf.admin.sources.impl.test.ValidUrlTestMethod;
 
 import com.google.common.collect.ImmutableList;
 
-public class SourceConfigurationHandlerImpl extends
-        DefaultConfigurationHandler<SourceConfiguration> {
+public class SourceConfigurationHandlerImpl
+        extends DefaultConfigurationHandler<SourceConfiguration> {
 
-    public static final String SOURCE_CONFIGURATION_HANDLER_ID = SourceConfiguration.CONFIGURATION_TYPE;
+    public static final String SOURCE_CONFIGURATION_HANDLER_ID =
+            SourceConfiguration.CONFIGURATION_TYPE;
 
     private List<SourceConfigurationHandler> srcHandlers;
 
     @Override
     public List<ProbeMethod> getProbeMethods() {
-        return ImmutableList.of(new DiscoverSourcesProbeMethod(srcHandlers), new GetConfigHandlersProbeMethod(srcHandlers));
+        return ImmutableList.of(new DiscoverSourcesProbeMethod(srcHandlers),
+                new GetConfigHandlersProbeMethod(srcHandlers));
     }
 
     @Override

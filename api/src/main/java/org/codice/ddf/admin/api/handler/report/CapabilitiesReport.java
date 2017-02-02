@@ -18,6 +18,7 @@ import java.util.List;
 import org.codice.ddf.admin.api.handler.method.PersistMethod;
 import org.codice.ddf.admin.api.handler.method.ProbeMethod;
 import org.codice.ddf.admin.api.handler.method.TestMethod;
+
 import com.google.gson.annotations.Expose;
 
 /**
@@ -44,11 +45,11 @@ public class CapabilitiesReport {
     /**
      * Creates a new {@link CapabilitiesReport}.
      *
-     * @param configurationType the type of {@link org.codice.ddf.admin.api.config.Configuration} supported by the {@link org.codice.ddf.admin.api.handler.ConfigurationHandler}
+     * @param configurationType      the type of {@link org.codice.ddf.admin.api.config.Configuration} supported by the {@link org.codice.ddf.admin.api.handler.ConfigurationHandler}
      * @param configurationHandlerId id of the {@link org.codice.ddf.admin.api.handler.ConfigurationHandler}
-     * @param testMethods available {@link TestMethod}s supported by the {@link org.codice.ddf.admin.api.handler.ConfigurationHandler}
-     * @param probeMethods available {@link ProbeMethod}s supported by the {@link org.codice.ddf.admin.api.handler.ConfigurationHandler}
-     * @param persistMethods available {@link PersistMethod}s supported by the {@link org.codice.ddf.admin.api.handler.ConfigurationHandler}
+     * @param testMethods            available {@link TestMethod}s supported by the {@link org.codice.ddf.admin.api.handler.ConfigurationHandler}
+     * @param probeMethods           available {@link ProbeMethod}s supported by the {@link org.codice.ddf.admin.api.handler.ConfigurationHandler}
+     * @param persistMethods         available {@link PersistMethod}s supported by the {@link org.codice.ddf.admin.api.handler.ConfigurationHandler}
      */
     public CapabilitiesReport(String configurationType, String configurationHandlerId,
             List<TestMethod> testMethods, List<ProbeMethod> probeMethods,

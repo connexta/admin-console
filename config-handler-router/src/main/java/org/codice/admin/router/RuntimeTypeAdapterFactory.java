@@ -14,6 +14,9 @@
  * Taken from https://github.com/google/gson/blob/master/extras/src/test/java/com/google/gson/typeadapters/RuntimeTypeAdapterFactoryTest.java
  * Copied to apply bug fix for https://github.com/google/gson/issues/712
  * It's also recommended to not use gson-extras as a dependency and instead copy the code you need
+ * <p>
+ * Taken from https://github.com/google/gson/blob/master/extras/src/test/java/com/google/gson/typeadapters/RuntimeTypeAdapterFactoryTest.java
+ * Copied to apply bug fix for https://github.com/google/gson/issues/712
  */
 // TODO: tbatie - 1/18/17 - Should the codice license be here?
 

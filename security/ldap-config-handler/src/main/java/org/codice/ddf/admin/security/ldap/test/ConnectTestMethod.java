@@ -72,7 +72,8 @@ public class ConnectTestMethod extends TestMethod<LdapConfiguration> {
 
         return Report.createReport(SUCCESS_TYPES,
                 FAILURE_TYPES,
-                null, Collections.singletonList(connectionAttempt.result()
+                null,
+                Collections.singletonList(connectionAttempt.result()
                         .name()));
     }
 

@@ -34,13 +34,20 @@ import org.codice.ddf.admin.api.handler.report.Report;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
-public class EditContextPolicyMethod extends PersistMethod<ContextPolicyConfiguration>{
+public class EditContextPolicyMethod extends PersistMethod<ContextPolicyConfiguration> {
 
     public static final String PERSIST_CONTEXT_POLICY_ID = EDIT;
+
     public static final String DESCRIPTION = "Persist changes to the Web Context Policy manager.";
-    public static final List<String> REQUIRED_FIELDS = ImmutableList.of(CONTEXT_POLICY_BINS, WHITE_LIST_CONTEXTS);
-    public static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(SUCCESSFUL_PERSIST, "Successfully saved Web Context Policy Manager settings");
-    public static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(FAILED_PERSIST, "Unable to persist changes");
+
+    public static final List<String> REQUIRED_FIELDS = ImmutableList.of(CONTEXT_POLICY_BINS,
+            WHITE_LIST_CONTEXTS);
+
+    public static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(SUCCESSFUL_PERSIST,
+            "Successfully saved Web Context Policy Manager settings");
+
+    public static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(FAILED_PERSIST,
+            "Unable to persist changes");
 
     public EditContextPolicyMethod() {
         super(PERSIST_CONTEXT_POLICY_ID,
@@ -59,10 +66,14 @@ public class EditContextPolicyMethod extends PersistMethod<ContextPolicyConfigur
                 configToPolicyManagerProps(config),
                 false);
 
-        OperationReport configReport = configurator.commit("Web Context Policy saved with details: {}", config.toString());
+        OperationReport configReport = configurator.commit(
+                "Web Context Policy saved with details: {}",
+                config.toString());
 
-        return Report.createReport(SUCCESS_TYPES, FAILURE_TYPES, null, configReport.containsFailedResults() ? FAILED_PERSIST : SUCCESSFUL_PERSIST);
+        return Report.createReport(SUCCESS_TYPES,
+                FAILURE_TYPES,
+                null,
+                configReport.containsFailedResults() ? FAILED_PERSIST : SUCCESSFUL_PERSIST);
     }
-
 
 }

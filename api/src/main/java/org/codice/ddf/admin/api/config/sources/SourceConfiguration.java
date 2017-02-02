@@ -36,17 +36,27 @@ public class SourceConfiguration extends Configuration {
     public static final String CONFIGURATION_TYPE = "sources";
 
     public static final String SOURCE_NAME = "sourceName";
+
     public static final String SOURCE_HOSTNAME = "sourceHostName";
+
     public static final String PORT = "sourcePort";
+
     public static final String ENDPOINT_URL = "endpointUrl";
+
     public static final String SOURCE_USERNAME = "sourceUserName";
+
     public static final String SOURCE_USER_PASSWORD = "sourceUserPassword";
 
     private String sourceName;
+
     private String sourceHostName;
+
     private int sourcePort;
+
     private String endpointUrl;
+
     private String sourceUserName;
+
     private String sourceUserPassword;
 
     public SourceConfiguration() {
@@ -64,15 +74,16 @@ public class SourceConfiguration extends Configuration {
     }
 
     public static <T extends SourceConfiguration> Map<String, Function<T, List<ConfigurationMessage>>> getBaseFieldValidationMap() {
-        return new ImmutableMap.Builder<String, Function<T, List<ConfigurationMessage>>>()
-                .put(SOURCE_NAME, config -> validateString(config.sourceName(), SOURCE_NAME))
-                .put(SOURCE_HOSTNAME, config -> validateHostName(config.sourceHostName(),
-                        SOURCE_HOSTNAME))
+        return new ImmutableMap.Builder<String, Function<T, List<ConfigurationMessage>>>().put(
+                SOURCE_NAME,
+                config -> validateString(config.sourceName(), SOURCE_NAME))
+                .put(SOURCE_HOSTNAME,
+                        config -> validateHostName(config.sourceHostName(), SOURCE_HOSTNAME))
                 .put(PORT, config -> validatePort(config.sourcePort(), PORT))
-                .put(SOURCE_USERNAME, config -> validateString(config.sourceUserName(),
-                        SOURCE_USERNAME))
-                .put(SOURCE_USER_PASSWORD, config -> validateString(config.sourceUserPassword(),
-                        SOURCE_USER_PASSWORD))
+                .put(SOURCE_USERNAME,
+                        config -> validateString(config.sourceUserName(), SOURCE_USERNAME))
+                .put(SOURCE_USER_PASSWORD,
+                        config -> validateString(config.sourceUserPassword(), SOURCE_USER_PASSWORD))
                 .put(ENDPOINT_URL, config -> validateUrl(config.endpointUrl(), ENDPOINT_URL))
                 .put(SERVICE_PID, config -> validateString(config.servicePid(), SERVICE_PID))
                 .build();
@@ -91,18 +102,23 @@ public class SourceConfiguration extends Configuration {
     public int sourcePort() {
         return sourcePort;
     }
+
     public String sourceName() {
         return sourceName;
     }
+
     public String endpointUrl() {
         return endpointUrl;
     }
+
     public String sourceHostName() {
         return sourceHostName;
     }
+
     public String sourceUserPassword() {
         return sourceUserPassword;
     }
+
     public String sourceUserName() {
         return sourceUserName;
     }
@@ -112,22 +128,27 @@ public class SourceConfiguration extends Configuration {
         this.sourceName = sourceName;
         return this;
     }
+
     public SourceConfiguration sourceUserName(String sourceUserName) {
         this.sourceUserName = sourceUserName;
         return this;
     }
+
     public SourceConfiguration endpointUrl(String endpointUrl) {
         this.endpointUrl = endpointUrl;
         return this;
     }
+
     public SourceConfiguration sourceUserPassword(String sourceUserPassword) {
         this.sourceUserPassword = sourceUserPassword;
         return this;
     }
+
     public SourceConfiguration sourcePort(int sourcePort) {
         this.sourcePort = sourcePort;
         return this;
     }
+
     public SourceConfiguration sourceHostName(String sourceHostName) {
         this.sourceHostName = sourceHostName;
         return this;

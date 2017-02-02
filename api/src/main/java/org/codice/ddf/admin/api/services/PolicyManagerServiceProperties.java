@@ -29,21 +29,23 @@ import org.codice.ddf.security.policy.context.impl.PolicyManager;
 
 public class PolicyManagerServiceProperties {
 
-    public static final String STS_CLAIMS_CONFIGURATION_CONFIG_ID = "ddf.security.sts.client.configuration";
+    public static final String STS_CLAIMS_CONFIGURATION_CONFIG_ID =
+            "ddf.security.sts.client.configuration";
+
     public static final String STS_CLAIMS_PROPS_KEY_CLAIMS = "claims";
 
     public static final String IDP_CLIENT_BUNDLE_NAME = "security-idp-client";
+
     public static final String IDP_SERVER_BUNDLE_NAME = "security-idp-server";
 
-
-    public static final ContextPolicyConfiguration contextPolicyServiceToContextPolicyConfig(){
-        ContextPolicyManager ref = new Configurator().getServiceReference(ContextPolicyManager.class);
+    public static final ContextPolicyConfiguration contextPolicyServiceToContextPolicyConfig() {
+        ContextPolicyManager ref =
+                new Configurator().getServiceReference(ContextPolicyManager.class);
         PolicyManager policyManager = ((PolicyManager) ref);
-        return new ContextPolicyConfiguration().contextPolicyBins(
-                policyManagerSettingsToBins(policyManager))
+        return new ContextPolicyConfiguration().contextPolicyBins(policyManagerSettingsToBins(
+                policyManager))
                 .whiteListContexts(policyManager.getWhiteListContexts());
     }
-
 
     // TODO: tbatie - 1/17/17 - (Ticket) Get rid of this PolicyManager reference and break this dependency.
     public static List<ContextPolicyBin> policyManagerSettingsToBins(PolicyManager policyManager) {
@@ -61,7 +63,8 @@ public class PolicyManagerServiceProperties {
             for (ContextPolicyBin bin : bins) {
                 if (bin.realm()
                         .equals(policy.getRealm()) && bin.authenticationTypes()
-                        .equals(policy.getAuthenticationMethods()) && hasSameRequiredAttributes(bin, policyRequiredAttributes)) {
+                        .equals(policy.getAuthenticationMethods()) && hasSameRequiredAttributes(bin,
+                        policyRequiredAttributes)) {
                     bin.contextPaths(policy.getContextPath());
                     foundBin = true;
                 }
@@ -78,14 +81,18 @@ public class PolicyManagerServiceProperties {
         return bins;
     }
 
-    public static boolean hasSameRequiredAttributes(ContextPolicyBin bin, Map<String, String> mappingsToCheck) {
-        if (!(bin.requiredAttributes().keySet()
+    public static boolean hasSameRequiredAttributes(ContextPolicyBin bin,
+            Map<String, String> mappingsToCheck) {
+        if (!(bin.requiredAttributes()
+                .keySet()
                 .containsAll(mappingsToCheck.keySet()) && mappingsToCheck.keySet()
-                .containsAll(bin.requiredAttributes().keySet()))) {
+                .containsAll(bin.requiredAttributes()
+                        .keySet()))) {
             return false;
         }
 
-        return !bin.requiredAttributes().entrySet()
+        return !bin.requiredAttributes()
+                .entrySet()
                 .stream()
                 .filter(binMapping -> !mappingsToCheck.get(binMapping.getKey())
                         .equals(binMapping.getValue()))

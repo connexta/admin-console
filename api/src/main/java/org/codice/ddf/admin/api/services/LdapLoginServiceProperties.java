@@ -70,7 +70,7 @@ public class LdapLoginServiceProperties {
         ldapConfiguration.baseGroupDn(mapStringValue(GROUP_BASE_DN, props));
         URI ldapUri = getUriFromProperty(mapStringValue(LDAP_URL, props));
 
-        if(ldapUri != null) {
+        if (ldapUri != null) {
             ldapConfiguration.encryptionMethod(ldapUri.getScheme());
             ldapConfiguration.hostName(ldapUri.getHost());
             ldapConfiguration.port(ldapUri.getPort());
@@ -87,7 +87,7 @@ public class LdapLoginServiceProperties {
             LdapConfiguration config) {
         Map<String, Object> ldapStsConfig = new HashMap<>();
 
-        if(config != null) {
+        if (config != null) {
             String ldapUrl = getLdapUrl(config);
             boolean startTls = isStartTls(config);
 
@@ -117,7 +117,7 @@ public class LdapLoginServiceProperties {
     }
 
     public static URI getUriFromProperty(String ldapUrl) {
-        if(StringUtils.isNotEmpty(ldapUrl)) {
+        if (StringUtils.isNotEmpty(ldapUrl)) {
             ldapUrl = PropertyResolver.resolveProperties(ldapUrl);
             if (!URI_MATCHER.matcher(ldapUrl)
                     .matches()) {

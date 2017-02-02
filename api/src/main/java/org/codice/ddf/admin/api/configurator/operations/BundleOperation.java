@@ -40,8 +40,7 @@ public class BundleOperation implements Operation<Void, Boolean> {
 
     private final boolean initActivationState;
 
-    private BundleOperation(String bundleSymName, boolean activate,
-            BundleContext bundleContext) {
+    private BundleOperation(String bundleSymName, boolean activate, BundleContext bundleContext) {
         this.newState = activate;
         this.bundleContext = bundleContext;
 

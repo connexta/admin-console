@@ -33,10 +33,17 @@ import com.google.common.collect.ImmutableMap;
 public class DeleteCswSourcePersistMethod extends PersistMethod<CswSourceConfiguration> {
 
     public static final String DELETE_CSW_SOURCE_ID = DELETE;
-    public static final String DESCRIPTION = "Attempts to delete a CSW source with the given configuration.";
+
+    public static final String DESCRIPTION =
+            "Attempts to delete a CSW source with the given configuration.";
+
     private static final List<String> REQUIRED_FIELDS = ImmutableList.of(SERVICE_PID);
-    private static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(SUCCESSFUL_PERSIST, "The CSW Source was successfully deleted.");
-    private static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(FAILED_PERSIST, "Failed to delete CSW source.");
+
+    private static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(SUCCESSFUL_PERSIST,
+            "The CSW Source was successfully deleted.");
+
+    private static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(FAILED_PERSIST,
+            "Failed to delete CSW source.");
 
     public DeleteCswSourcePersistMethod() {
         super(DELETE_CSW_SOURCE_ID,
@@ -52,9 +59,13 @@ public class DeleteCswSourcePersistMethod extends PersistMethod<CswSourceConfigu
     public Report persist(CswSourceConfiguration configuration) {
         Configurator configurator = new Configurator();
         configurator.deleteManagedService(configuration.servicePid());
-        OperationReport report = configurator.commit("CSW source deleted for servicePid: {}", configuration.servicePid());
+        OperationReport report = configurator.commit("CSW source deleted for servicePid: {}",
+                configuration.servicePid());
 
-        return Report.createReport(SUCCESS_TYPES, FAILURE_TYPES, null, report.containsFailedResults() ? FAILED_PERSIST : SUCCESSFUL_PERSIST);
+        return Report.createReport(SUCCESS_TYPES,
+                FAILURE_TYPES,
+                null,
+                report.containsFailedResults() ? FAILED_PERSIST : SUCCESSFUL_PERSIST);
     }
 
 }

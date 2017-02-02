@@ -48,7 +48,6 @@ import com.google.common.collect.ImmutableList;
 
 public class CswSourceUtils {
 
-
     public static final String GET_CAPABILITIES_PARAMS = "?service=CSW&request=GetCapabilities";
 
     private static final List<String> URL_FORMATS = ImmutableList.of("https://%s:%d/services/csw",
@@ -89,14 +88,20 @@ public class CswSourceUtils {
             contentType = ContentType.getOrDefault(response.getEntity())
                     .getMimeType();
             if (status == HTTP_OK && CSW_MIME_TYPES.contains(contentType)) {
-                return result.trustedCertAuthority(true).certError(false).available(true);
+                return result.trustedCertAuthority(true)
+                        .certError(false)
+                        .available(true);
             } else {
-                return result.trustedCertAuthority(true).certError(false).available(false);
+                return result.trustedCertAuthority(true)
+                        .certError(false)
+                        .available(false);
             }
         } catch (SSLPeerUnverifiedException e) {
             // This is the hostname != cert name case - if this occurs, the URL's SSL cert configuration
             // is incorrect, or a serious network security issue has occurred.
-            return result.trustedCertAuthority(false).certError(true).available(false);
+            return result.trustedCertAuthority(false)
+                    .certError(true)
+                    .available(false);
         } catch (IOException e) {
             try {
                 // We want to trust any root CA, but maintain all other standard SSL checks
@@ -116,10 +121,14 @@ public class CswSourceUtils {
                 contentType = ContentType.getOrDefault(response.getEntity())
                         .getMimeType();
                 if (status == HTTP_OK && CSW_MIME_TYPES.contains(contentType)) {
-                    return result.trustedCertAuthority(false).certError(false).available(true);
+                    return result.trustedCertAuthority(false)
+                            .certError(false)
+                            .available(true);
                 }
             } catch (Exception e1) {
-                return result.trustedCertAuthority(false).certError(false).available(false);
+                return result.trustedCertAuthority(false)
+                        .certError(false)
+                        .available(false);
             }
         }
         return result;
@@ -127,7 +136,8 @@ public class CswSourceUtils {
 
     // Given a configuration, determines the preferred CSW source type and output schema and returns
     // a config with the appropriate factoryPid and Output Schema.
-    public static Optional<CswSourceConfiguration> getPreferredConfig(CswSourceConfiguration config) {
+    public static Optional<CswSourceConfiguration> getPreferredConfig(
+            CswSourceConfiguration config) {
         CswSourceConfiguration preferred = new CswSourceConfiguration(config);
         HttpClient client = HttpClientBuilder.create()
                 .build();
@@ -145,15 +155,16 @@ public class CswSourceUtils {
                     .getContent());
             if ((Boolean) xpath.compile(HAS_CATALOG_METACARD_EXP)
                     .evaluate(capabilitiesXml, XPathConstants.BOOLEAN)) {
-                return Optional.of((CswSourceConfiguration) preferred.factoryPid(CSW_PROFILE_FACTORY_PID));
+                return Optional.of((CswSourceConfiguration) preferred.factoryPid(
+                        CSW_PROFILE_FACTORY_PID));
             } else if ((Boolean) xpath.compile(HAS_GMD_ISO_EXP)
                     .evaluate(capabilitiesXml, XPathConstants.BOOLEAN)) {
-                return Optional.of(((CswSourceConfiguration) preferred.factoryPid(CSW_GMD_FACTORY_PID)).outputSchema(
-                        GMD_OUTPUT_SCHEMA));
+                return Optional.of(((CswSourceConfiguration) preferred.factoryPid(
+                        CSW_GMD_FACTORY_PID)).outputSchema(GMD_OUTPUT_SCHEMA));
             } else {
-                return Optional.of(((CswSourceConfiguration) (preferred.factoryPid(CSW_SPEC_FACTORY_PID))).outputSchema(
-                        xpath.compile(GET_FIRST_OUTPUT_SCHEMA)
-                                .evaluate(capabilitiesXml)));
+                return Optional.of(((CswSourceConfiguration) (preferred.factoryPid(
+                        CSW_SPEC_FACTORY_PID))).outputSchema(xpath.compile(GET_FIRST_OUTPUT_SCHEMA)
+                        .evaluate(capabilitiesXml)));
             }
         } catch (Exception e) {
             return Optional.empty();
@@ -162,7 +173,7 @@ public class CswSourceUtils {
 
     // Determines the correct CSW endpoint URL format given a config with a Hostname and Port
     public static UrlAvailability confirmEndpointUrl(CswSourceConfiguration config) {
-        Optional<UrlAvailability> result =  URL_FORMATS.stream()
+        Optional<UrlAvailability> result = URL_FORMATS.stream()
                 .map(formatUrl -> String.format(formatUrl,
                         config.sourceHostName(),
                         config.sourcePort()))

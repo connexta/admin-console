@@ -39,21 +39,34 @@ import com.google.common.collect.ImmutableMap;
 public class ContextPolicyBin {
 
     public static final String CONTEXT_PATHS = "contextPaths";
+
     public static final String REALM = "realm";
+
     public static final String AUTH_TYPES = "authenticationTypes";
+
     public static final String REQ_ATTRIS = "requiredAttributes";
 
     private Set<String> contextPaths;
+
     private String realm;
+
     private Set<String> authenticationTypes;
+
     private Map<String, String> requiredAttributes;
 
-    private static final Map<String, Function<ContextPolicyBin, List<ConfigurationMessage>>> FIELD_TO_VALIDATION_FUNC = new ImmutableMap.Builder<String, Function<ContextPolicyBin, List<ConfigurationMessage>>>()
-            .put(REALM, config -> validateRealm(config.realm(), REALM))
-            .put(CONTEXT_PATHS, config -> validateContextPaths(new ArrayList<>(config.contextPaths()), CONTEXT_PATHS))
-            .put(AUTH_TYPES, config -> validateAuthTypes(config.authenticationTypes(), AUTH_TYPES))
-            .put(REQ_ATTRIS, config -> validateMapping(config.requiredAttributes(), REQ_ATTRIS))
-            .build();
+    private static final Map<String, Function<ContextPolicyBin, List<ConfigurationMessage>>>
+            FIELD_TO_VALIDATION_FUNC =
+            new ImmutableMap.Builder<String, Function<ContextPolicyBin, List<ConfigurationMessage>>>().put(
+                    REALM,
+                    config -> validateRealm(config.realm(), REALM))
+                    .put(CONTEXT_PATHS,
+                            config -> validateContextPaths(new ArrayList<>(config.contextPaths()),
+                                    CONTEXT_PATHS))
+                    .put(AUTH_TYPES,
+                            config -> validateAuthTypes(config.authenticationTypes(), AUTH_TYPES))
+                    .put(REQ_ATTRIS,
+                            config -> validateMapping(config.requiredAttributes(), REQ_ATTRIS))
+                    .build();
 
     public ContextPolicyBin() {
         authenticationTypes = new HashSet<>();
@@ -63,7 +76,8 @@ public class ContextPolicyBin {
 
     public List<ConfigurationMessage> validate(List<String> fields) {
         return fields.stream()
-                .map(s -> FIELD_TO_VALIDATION_FUNC.get(s).apply(this))
+                .map(s -> FIELD_TO_VALIDATION_FUNC.get(s)
+                        .apply(this))
                 .flatMap(List::stream)
                 .collect(Collectors.toList());
     }
@@ -72,12 +86,15 @@ public class ContextPolicyBin {
     public Set<String> contextPaths() {
         return contextPaths;
     }
+
     public Set<String> authenticationTypes() {
         return authenticationTypes;
     }
+
     public Map<String, String> requiredAttributes() {
         return requiredAttributes;
     }
+
     public String realm() {
         return realm;
     }
@@ -87,18 +104,22 @@ public class ContextPolicyBin {
         this.realm = realm;
         return this;
     }
+
     public ContextPolicyBin authenticationTypes(Set<String> authenticationTypes) {
         this.authenticationTypes = authenticationTypes;
         return this;
     }
+
     public ContextPolicyBin requiredAttributes(Map<String, String> requiredAttributes) {
         this.requiredAttributes = requiredAttributes;
         return this;
     }
+
     public ContextPolicyBin contextPaths(Set<String> contextPaths) {
         this.contextPaths = contextPaths;
         return this;
     }
+
     public ContextPolicyBin contextPaths(String context) {
         contextPaths.add(context);
         return this;

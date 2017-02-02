@@ -27,22 +27,17 @@ public class GetConfigHandlersProbeMethod extends ProbeMethod<SourceConfiguratio
 
     public static final String GET_CONFIG_HANDLER_ID = "config-handlers";
 
-    public static final String DESCRIPTION = "Retrieves the ids of all source configuration handlers currently running.";
+    public static final String DESCRIPTION =
+            "Retrieves the ids of all source configuration handlers currently running.";
 
     public static final String SRC_CONFIG_HNDLRS = "sourceConfigHandlers";
+
     public static final List<String> RETURN_TYPES = ImmutableList.of(SRC_CONFIG_HNDLRS);
 
     private List<SourceConfigurationHandler> handlers;
 
     public GetConfigHandlersProbeMethod(List<SourceConfigurationHandler> handlers) {
-        super(GET_CONFIG_HANDLER_ID,
-                DESCRIPTION,
-                null,
-                null,
-                null,
-                null,
-                null,
-                RETURN_TYPES);
+        super(GET_CONFIG_HANDLER_ID, DESCRIPTION, null, null, null, null, null, RETURN_TYPES);
         this.handlers = handlers;
     }
 

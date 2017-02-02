@@ -27,11 +27,12 @@ import org.codice.ddf.admin.api.handler.report.Report;
 /**
  * <b> This code is experimental. While this class is functional and tested, it may change or be
  * removed in a future version of the library. </b>
- *
- *  The {@link DefaultConfigurationHandler} will find and invoke a {@link org.codice.ddf.admin.api.handler.method.ConfigurationHandlerMethod} if one exists,
- *  otherwise it will return a no method found {@link Report}.
+ * <p>
+ * The {@link DefaultConfigurationHandler} will find and invoke a {@link org.codice.ddf.admin.api.handler.method.ConfigurationHandlerMethod} if one exists,
+ * otherwise it will return a no method found {@link Report}.
  */
-public abstract class DefaultConfigurationHandler<S extends Configuration> implements ConfigurationHandler<S> {
+public abstract class DefaultConfigurationHandler<S extends Configuration>
+        implements ConfigurationHandler<S> {
 
     /**
      * Return all the {@link ProbeMethod} this {@link ConfigurationHandler} supports.
@@ -50,7 +51,6 @@ public abstract class DefaultConfigurationHandler<S extends Configuration> imple
     /**
      * Return all the {@link PersistMethod} this {@link ConfigurationHandler} supports.
      *
-     *
      * @return a {@link List} of {@link PersistMethod}
      */
     public abstract List<PersistMethod> getPersistMethods();
@@ -65,12 +65,13 @@ public abstract class DefaultConfigurationHandler<S extends Configuration> imple
                 .filter(method -> method.id()
                         .equals(probeId))
                 .findFirst();
-        if(!matchedProbeMethod.isPresent()) {
+        if (!matchedProbeMethod.isPresent()) {
             return getNoProbeFoundReport(probeId);
         }
 
         ProbeReport validationReport = new ProbeReport();
-        validationReport.addMessages(matchedProbeMethod.get().validate(configuration));
+        validationReport.addMessages(matchedProbeMethod.get()
+                .validate(configuration));
         if (validationReport.containsFailureMessages()) {
             return validationReport;
         }
@@ -90,17 +91,19 @@ public abstract class DefaultConfigurationHandler<S extends Configuration> imple
                         .equals(testId))
                 .findFirst();
 
-        if(!testMethod.isPresent()) {
+        if (!testMethod.isPresent()) {
             return getNoTestFoundReport(testId);
         }
 
         Report validationReport = new Report();
-        validationReport.addMessages(testMethod.get().validate(configuration));
+        validationReport.addMessages(testMethod.get()
+                .validate(configuration));
         if (validationReport.containsFailureMessages()) {
             return validationReport;
         }
 
-        return testMethod.get().test(configuration);
+        return testMethod.get()
+                .test(configuration);
     }
 
     @Override
@@ -114,27 +117,30 @@ public abstract class DefaultConfigurationHandler<S extends Configuration> imple
                         .equals(persistId))
                 .findFirst();
 
-        if(!persistMethod.isPresent()) {
+        if (!persistMethod.isPresent()) {
             return getNoTestFoundReport(persistId);
         }
 
         Report validationReport = new Report();
-        validationReport.addMessages(persistMethod.get().validate(configuration));
+        validationReport.addMessages(persistMethod.get()
+                .validate(configuration));
         if (validationReport.containsFailureMessages()) {
             return validationReport;
         }
 
-        return persistMethod.get().persist(configuration);
+        return persistMethod.get()
+                .persist(configuration);
     }
 
-    private Report getNoTestFoundReport(String badId){
+    private Report getNoTestFoundReport(String badId) {
         return new Report(ConfigurationMessage.buildMessage(ConfigurationMessage.MessageType.FAILURE,
                 ConfigurationMessage.NO_METHOD_FOUND,
                 "Unknown method id: \"" + (badId == null ? "null" : badId + "\".")));
     }
 
-    private ProbeReport getNoProbeFoundReport(String badId){
-        return new ProbeReport(ConfigurationMessage.buildMessage(ConfigurationMessage.MessageType.FAILURE, ConfigurationMessage.NO_METHOD_FOUND,
+    private ProbeReport getNoProbeFoundReport(String badId) {
+        return new ProbeReport(ConfigurationMessage.buildMessage(ConfigurationMessage.MessageType.FAILURE,
+                ConfigurationMessage.NO_METHOD_FOUND,
                 "Unknown probe id \"" + (badId == null ? "null" : badId) + "\"."));
     }
 

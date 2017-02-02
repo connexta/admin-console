@@ -31,13 +31,21 @@ import org.codice.ddf.admin.api.handler.report.Report;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
-public class DeleteOpenSearchSourcePersistMethod extends PersistMethod<OpenSearchSourceConfiguration> {
+public class DeleteOpenSearchSourcePersistMethod
+        extends PersistMethod<OpenSearchSourceConfiguration> {
 
     public static final String DELETE_OPENSEARCH_SOURCE_ID = DELETE;
-    public static final String DESCRIPTION = "Attempts to delete an OpenSearch source with the given configuration.";
+
+    public static final String DESCRIPTION =
+            "Attempts to delete an OpenSearch source with the given configuration.";
+
     private static final List<String> REQUIRED_FIELDS = ImmutableList.of(SERVICE_PID);
-    private static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(SUCCESSFUL_PERSIST, "The CSW Source was successfully deleted.");
-    private static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(FAILED_PERSIST, "Failed to delete CSW source.");
+
+    private static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(SUCCESSFUL_PERSIST,
+            "The CSW Source was successfully deleted.");
+
+    private static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(FAILED_PERSIST,
+            "Failed to delete CSW source.");
 
     public DeleteOpenSearchSourcePersistMethod() {
         super(DELETE_OPENSEARCH_SOURCE_ID,
@@ -53,9 +61,13 @@ public class DeleteOpenSearchSourcePersistMethod extends PersistMethod<OpenSearc
     public Report persist(OpenSearchSourceConfiguration configuration) {
         Configurator configurator = new Configurator();
         configurator.deleteManagedService(configuration.servicePid());
-        OperationReport report = configurator.commit("Opensearch source deleted for servicePid: {}", configuration.servicePid());
+        OperationReport report = configurator.commit("Opensearch source deleted for servicePid: {}",
+                configuration.servicePid());
 
-        return createReport(SUCCESS_TYPES, FAILURE_TYPES, null, report.containsFailedResults() ? FAILED_PERSIST : SUCCESSFUL_PERSIST);
+        return createReport(SUCCESS_TYPES,
+                FAILURE_TYPES,
+                null,
+                report.containsFailedResults() ? FAILED_PERSIST : SUCCESSFUL_PERSIST);
     }
 
 }

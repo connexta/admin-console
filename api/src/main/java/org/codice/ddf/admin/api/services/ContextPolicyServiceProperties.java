@@ -25,14 +25,20 @@ import com.google.common.collect.ImmutableMap;
 
 public class ContextPolicyServiceProperties {
     // --- Policy manager props
-    public static final String POLICY_MANAGER_PID = "org.codice.ddf.security.policy.context.impl.PolicyManager";
+    public static final String POLICY_MANAGER_PID =
+            "org.codice.ddf.security.policy.context.impl.PolicyManager";
+
     public static final String AUTH_TYPES = "authenticationTypes";
-    public static final String REALMS  = "realms";
+
+    public static final String REALMS = "realms";
+
     public static final String REQUIRED_ATTRIBUTES = "requiredAttributes";
+
     public static final String WHITE_LIST_CONTEXT = "whiteListContexts";
     // ---
 
-    public static Map<String, Object> configToPolicyManagerProps(ContextPolicyConfiguration config){
+    public static Map<String, Object> configToPolicyManagerProps(
+            ContextPolicyConfiguration config) {
         List<String> realmsProps = new ArrayList<>();
         List<String> authTypesProps = new ArrayList<>();
         List<String> reqAttrisProps = new ArrayList<>();
@@ -41,8 +47,10 @@ public class ContextPolicyServiceProperties {
             bin.contextPaths()
                     .forEach(context -> {
                         realmsProps.add(context + "=" + bin.realm());
-                        authTypesProps.add(context + "=" + String.join("|", bin.authenticationTypes()));
-                        if (bin.requiredAttributes().isEmpty()) {
+                        authTypesProps.add(
+                                context + "=" + String.join("|", bin.authenticationTypes()));
+                        if (bin.requiredAttributes()
+                                .isEmpty()) {
                             reqAttrisProps.add(context + "=");
                         } else {
                             reqAttrisProps.add(context + "={" + String.join(";",
@@ -55,9 +63,13 @@ public class ContextPolicyServiceProperties {
                     });
         }
 
-        return ImmutableMap.of(AUTH_TYPES, authTypesProps,
-                REALMS, realmsProps,
-                REQUIRED_ATTRIBUTES, reqAttrisProps,
-                WHITE_LIST_CONTEXT, config.whiteListContexts());
+        return ImmutableMap.of(AUTH_TYPES,
+                authTypesProps,
+                REALMS,
+                realmsProps,
+                REQUIRED_ATTRIBUTES,
+                reqAttrisProps,
+                WHITE_LIST_CONTEXT,
+                config.whiteListContexts());
     }
 }

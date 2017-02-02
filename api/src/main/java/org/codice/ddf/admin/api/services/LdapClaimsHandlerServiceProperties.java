@@ -32,30 +32,44 @@ import org.codice.ddf.admin.api.configurator.Configurator;
 public class LdapClaimsHandlerServiceProperties {
 
     // --- Ldap Claims Handler Service Properties
-    public static final String LDAP_CLAIMS_HANDLER_MANAGED_SERVICE_FACTORY_PID = "Claims_Handler_Manager";
+    public static final String LDAP_CLAIMS_HANDLER_MANAGED_SERVICE_FACTORY_PID =
+            "Claims_Handler_Manager";
+
     public static final String LDAP_CLAIMS_HANDLER_FEATURE = "security-sts-ldapclaimshandler";
 
     public static final String URL = "url";
+
     public static final String START_TLS = "startTls";
+
     public static final String LDAP_BIND_USER_DN = "ldapBindUserDn";
+
     public static final String PASSWORD = "password";
+
     public static final String BIND_METHOD = "bindMethod";
+
     public static final String LOGIN_USER_ATTRIBUTE = "loginUserAttribute";
+
     public static final String USER_BASE_DN = "userBaseDn";
+
     public static final String GROUP_BASE_DN = "groupBaseDn";
+
     public static final String OBJECT_CLASS = "objectClass";
+
     public static final String MEMBERSHIP_USER_ATTRIBUTE = "membershipUserAttribute";
+
     public static final String MEMBER_NAME_ATTRIBUTE = "memberNameAttribute";
+
     public static final String PROPERTY_FILE_LOCATION = "propertyFileLocation";
     // ---
 
     public static LdapConfiguration ldapClaimsHandlerServiceToLdapConfig(
             Map<String, Object> props) {
         LdapConfiguration config = new LdapConfiguration();
-        config.servicePid(props.get(SERVICE_PID_KEY) == null ? null : (String) props.get(SERVICE_PID_KEY));
+        config.servicePid(
+                props.get(SERVICE_PID_KEY) == null ? null : (String) props.get(SERVICE_PID_KEY));
 
         URI ldapUri = getUriFromProperty((String) props.get(URL));
-        if(ldapUri != null) {
+        if (ldapUri != null) {
             config.encryptionMethod(ldapUri.getScheme());
             config.hostName(ldapUri.getHost());
             config.port(ldapUri.getPort());
@@ -77,7 +91,7 @@ public class LdapClaimsHandlerServiceProperties {
         String attributeMappingsPath = mapStringValue(PROPERTY_FILE_LOCATION, props);
         config.attributeMappingsPath(attributeMappingsPath);
 
-        if(StringUtils.isNotEmpty(attributeMappingsPath)) {
+        if (StringUtils.isNotEmpty(attributeMappingsPath)) {
             Map<String, String> attributeMappings = new HashMap<>(new Configurator().getProperties(
                     Paths.get(attributeMappingsPath)));
             config.attributeMappings(attributeMappings);
@@ -90,7 +104,7 @@ public class LdapClaimsHandlerServiceProperties {
             LdapConfiguration config) {
         Map<String, Object> props = new HashMap<>();
 
-        if(config != null) {
+        if (config != null) {
             String ldapUrl = getLdapUrl(config);
             boolean startTls = isStartTls(config);
             props.put(URL, ldapUrl + config.hostName() + ":" + config.port());

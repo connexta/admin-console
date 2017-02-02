@@ -36,21 +36,34 @@ public class SecurityValidationUtils {
 
     // TODO: tbatie - 1/20/17 - (Ticket) These realms eventually need to be configurable
     public static final String KARAF = "karaf";
+
     public static final String LDAP = "ldap";
+
     public static final String IDP = "IdP";
+
     public static final List<String> ALL_REALMS = ImmutableList.of(KARAF, LDAP, IDP);
 
     // TODO: tbatie - 1/20/17 - (Ticket) These auth types eventually need to be configurable
     public static final String SAML = "SAML";
-    public static final String BASIC = "basic";
-    public static final String PKI = "PKI";
-    public static final String CAS = "CAS";
-    public static final String GUEST = "GUEST";
-    public static final List<String> ALL_AUTH_TYPES = ImmutableList.of(SAML, BASIC, PKI, CAS, GUEST);
 
-    public static final List<ConfigurationMessage> validateContextPolicyBins(List<ContextPolicyBin> bins, String configId){
+    public static final String BASIC = "basic";
+
+    public static final String PKI = "PKI";
+
+    public static final String CAS = "CAS";
+
+    public static final String GUEST = "GUEST";
+
+    public static final List<String> ALL_AUTH_TYPES = ImmutableList.of(SAML,
+            BASIC,
+            PKI,
+            CAS,
+            GUEST);
+
+    public static final List<ConfigurationMessage> validateContextPolicyBins(
+            List<ContextPolicyBin> bins, String configId) {
         List<ConfigurationMessage> errors = new ArrayList<>();
-        if(bins == null || bins.isEmpty()) {
+        if (bins == null || bins.isEmpty()) {
             errors.add(createMissingRequiredFieldMsg(configId));
         } else {
             errors.addAll(bins.stream()
@@ -71,20 +84,25 @@ public class SecurityValidationUtils {
     public static final List<ConfigurationMessage> validateRealm(String realm, String configId) {
         List<ConfigurationMessage> errors = validateString(realm, configId);
         if (errors.isEmpty() && !ALL_REALMS.contains(realm)) {
-            errors.add(createInvalidFieldMsg("Unknown realm \"" + realm + "\". Realm must be one of " + String.join(",", ALL_REALMS), configId));
+            errors.add(createInvalidFieldMsg(
+                    "Unknown realm \"" + realm + "\". Realm must be one of " + String.join(",",
+                            ALL_REALMS), configId));
         }
 
         return errors;
     }
 
-    public static final List<ConfigurationMessage> validateAuthTypes(Set<String> authTypes, String configId) {
+    public static final List<ConfigurationMessage> validateAuthTypes(Set<String> authTypes,
+            String configId) {
         List<ConfigurationMessage> errors = new ArrayList<>();
         if (authTypes == null || authTypes.isEmpty()) {
             errors.add(createMissingRequiredFieldMsg(configId));
         } else {
             for (String authType : authTypes) {
                 if (!ALL_AUTH_TYPES.contains(authType)) {
-                    errors.add(createInvalidFieldMsg("Unknown authentication type \"" + authType + "\". Authentication type must be one of: " + String.join(",", ALL_AUTH_TYPES), configId));
+                    errors.add(createInvalidFieldMsg("Unknown authentication type \"" + authType
+                            + "\". Authentication type must be one of: " + String.join(",",
+                            ALL_AUTH_TYPES), configId));
                 }
             }
         }

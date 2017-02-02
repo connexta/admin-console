@@ -41,8 +41,7 @@ public class FeatureOperation implements Operation<Void, Boolean> {
 
     private final boolean initActivationState;
 
-    private FeatureOperation(String featureName, boolean newState,
-            BundleContext bundleContext) {
+    private FeatureOperation(String featureName, boolean newState, BundleContext bundleContext) {
         this.featureName = featureName;
         this.newState = newState;
         this.bundleContext = bundleContext;

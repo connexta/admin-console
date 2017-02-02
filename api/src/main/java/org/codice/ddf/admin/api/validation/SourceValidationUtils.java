@@ -41,26 +41,33 @@ public class SourceValidationUtils {
         return errors;
     }
 
-    public static List<ConfigurationMessage> validateCswFactoryPid(String factoryPid, String configId) {
+    public static List<ConfigurationMessage> validateCswFactoryPid(String factoryPid,
+            String configId) {
         List<ConfigurationMessage> errors = validateString(factoryPid, configId);
         if (errors.isEmpty() && !CSW_FACTORY_PIDS.contains(factoryPid)) {
-            errors.add(createInvalidFieldMsg("Unknown factory PID type \"" + factoryPid + "\". CSW factory pid must be one of: " + String.join(",", CSW_FACTORY_PIDS), configId));
+            errors.add(createInvalidFieldMsg("Unknown factory PID type \"" + factoryPid
+                            + "\". CSW factory pid must be one of: " + String.join(",", CSW_FACTORY_PIDS),
+                    configId));
         }
         return errors;
     }
 
-    public static List<ConfigurationMessage> validateOpensearchFactoryPid(String factoryPid, String configId) {
+    public static List<ConfigurationMessage> validateOpensearchFactoryPid(String factoryPid,
+            String configId) {
         List<ConfigurationMessage> errors = validateString(factoryPid, configId);
         if (errors.isEmpty() && !OPENSEARCH_FACTORY_PID.equals(factoryPid)) {
-            errors.add(createInvalidFieldMsg("Unknown factory PID type \"" + factoryPid + "\". OpenSearch factory pid must be " + OPENSEARCH_FACTORY_PID, configId));
+            errors.add(createInvalidFieldMsg("Unknown factory PID type \"" + factoryPid
+                    + "\". OpenSearch factory pid must be " + OPENSEARCH_FACTORY_PID, configId));
         }
         return errors;
     }
 
-    public static List<ConfigurationMessage> validateOptionalUsernameAndPassword(SourceConfiguration configuration) {
+    public static List<ConfigurationMessage> validateOptionalUsernameAndPassword(
+            SourceConfiguration configuration) {
         List<ConfigurationMessage> validationResults = new ArrayList<>();
         if (configuration.sourceUserName() != null) {
-            validationResults.addAll(configuration.validate(Arrays.asList(SOURCE_USERNAME, SOURCE_USER_PASSWORD)));
+            validationResults.addAll(configuration.validate(Arrays.asList(SOURCE_USERNAME,
+                    SOURCE_USER_PASSWORD)));
         }
         return validationResults;
     }

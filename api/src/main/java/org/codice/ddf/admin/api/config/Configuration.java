@@ -30,10 +30,13 @@ import org.codice.ddf.admin.api.handler.ConfigurationMessage;
 public abstract class Configuration {
 
     public static final String FACTORY_PID = "factoryPid";
+
     public static final String SERVICE_PID = "servicePid";
 
     private String factoryPid;
+
     private String servicePid;
+
     private String configurationHandlerId;
 
     public Configuration() {
@@ -53,9 +56,11 @@ public abstract class Configuration {
     public String configurationHandlerId() {
         return configurationHandlerId;
     }
-    public String servicePid(){
+
+    public String servicePid() {
         return servicePid;
     }
+
     public String factoryPid() {
         return factoryPid;
     }
@@ -65,14 +70,15 @@ public abstract class Configuration {
         this.configurationHandlerId = configurationHandlerId;
         return this;
     }
+
     public Configuration servicePid(String servicePid) {
         this.servicePid = servicePid;
         return this;
     }
+
     public Configuration factoryPid(String factoryPid) {
         this.factoryPid = factoryPid;
         return this;
     }
-
 
 }

@@ -19,6 +19,7 @@ package org.codice.ddf.admin.api.config;
  */
 public class ConfigurationType {
     private String configTypeName;
+
     private Class configClass;
 
     public ConfigurationType(String configTypeName, Class configClass) {

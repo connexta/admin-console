@@ -15,10 +15,11 @@
 package org.codice.ddf.admin.api.handler;
 
 import org.codice.ddf.admin.api.config.sources.SourceConfiguration;
+
 /**
  * <b> This code is experimental. While this interface is functional and tested, it may change or be
  * removed in a future version of the library. </b>
- *
+ * <p>
  * A marker interface that signifies this {@link ConfigurationHandler} can handle a {@link SourceConfiguration}.
  *
  * @param <S> the {@link org.codice.ddf.admin.api.config.sources.SourceConfiguration} this {@link SourceConfigurationHandler} can handle.

@@ -20,10 +20,12 @@ import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.VERI
 
 public class UrlAvailability {
 
-
     private String url;
+
     private boolean available;
+
     private boolean trustedCertAuthority;
+
     private boolean certError;
 
     public UrlAvailability(String url) {
@@ -71,11 +73,11 @@ public class UrlAvailability {
     }
 
     public String getAvailabilityResult() {
-        if(certError) {
+        if (certError) {
             return CERT_ERROR;
-        } else if(!trustedCertAuthority) {
+        } else if (!trustedCertAuthority) {
             return UNTRUSTED_CA;
-        } else if(!available) {
+        } else if (!available) {
             return UNKNOWN_ENDPOINT;
         } else {
             return VERIFIED_URL;

@@ -50,24 +50,35 @@ import com.google.common.collect.ImmutableMap;
 public class WfsConfigFromUrlProbeMethod extends ProbeMethod<WfsSourceConfiguration> {
 
     public static final String WFS_CONFIG_FROM_URL_ID = CONFIG_FROM_URL_ID;
-    public static final String DESCRIPTION = "Attempts to create a WFS configuration from a given URL.";
-    public static final List<String> OPTIONAL_FIELDS = ImmutableList.of(SOURCE_USERNAME, SOURCE_USER_PASSWORD);
+
+    public static final String DESCRIPTION =
+            "Attempts to create a WFS configuration from a given URL.";
+
+    public static final List<String> OPTIONAL_FIELDS = ImmutableList.of(SOURCE_USERNAME,
+            SOURCE_USER_PASSWORD);
+
     public static final List<String> REQUIRED_FIELDS = ImmutableList.of(ENDPOINT_URL);
-    public static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(CONFIG_CREATED, "Created WFS configuration from provided URL.",
-            REACHED_URL, "Successfully connected to URL.",
-            VERIFIED_URL, "Endpoint was successfully verified as a WFS endpoint.");
 
-    public static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(
-            CANNOT_CONNECT, "The URL provided could not be reached.",
-            UNKNOWN_ENDPOINT, "The endpoint does not appear to have WFS capabilities.",
-            CERT_ERROR, "The URL provided has improperly configured SSL Certificates and is insecure.",
-            INTERNAL_ERROR, "Failed to create a config from WFS URL.");
+    public static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(CONFIG_CREATED,
+            "Created WFS configuration from provided URL.",
+            REACHED_URL,
+            "Successfully connected to URL.",
+            VERIFIED_URL,
+            "Endpoint was successfully verified as a WFS endpoint.");
 
-    public static final Map<String, String> WARNING_TYPES = ImmutableMap.of(
-            UNTRUSTED_CA, "The URL's SSL certificate has been signed by an untrusted certificate authority, and is likely insecure.");
+    public static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(CANNOT_CONNECT,
+            "The URL provided could not be reached.",
+            UNKNOWN_ENDPOINT,
+            "The endpoint does not appear to have WFS capabilities.",
+            CERT_ERROR,
+            "The URL provided has improperly configured SSL Certificates and is insecure.",
+            INTERNAL_ERROR,
+            "Failed to create a config from WFS URL.");
+
+    public static final Map<String, String> WARNING_TYPES = ImmutableMap.of(UNTRUSTED_CA,
+            "The URL's SSL certificate has been signed by an untrusted certificate authority, and is likely insecure.");
 
     public static final List<String> RETURN_TYPES = ImmutableList.of(DISCOVERED_SOURCES);
-
 
     public WfsConfigFromUrlProbeMethod() {
         super(WFS_CONFIG_FROM_URL_ID,
@@ -98,7 +109,10 @@ public class WfsConfigFromUrlProbeMethod extends ProbeMethod<WfsSourceConfigurat
                     UNKNOWN_ENDPOINT));
         }
 
-        report.addMessage(buildMessage(SUCCESS_TYPES, FAILURE_TYPES, WARNING_TYPES, availability.getAvailabilityResult()));
+        report.addMessage(buildMessage(SUCCESS_TYPES,
+                FAILURE_TYPES,
+                WARNING_TYPES,
+                availability.getAvailabilityResult()));
         if (report.containsFailureMessages()) {
             return report;
         }

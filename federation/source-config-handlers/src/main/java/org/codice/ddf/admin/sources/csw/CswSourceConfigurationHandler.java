@@ -40,7 +40,8 @@ import org.codice.ddf.admin.sources.csw.probe.DiscoverCswSourceProbeMethod;
 public class CswSourceConfigurationHandler extends DefaultConfigurationHandler<SourceConfiguration>
         implements SourceConfigurationHandler<SourceConfiguration> {
 
-    public static final String CSW_SOURCE_CONFIGURATION_HANDLER_ID = CswSourceConfiguration.CONFIGURATION_TYPE;
+    public static final String CSW_SOURCE_CONFIGURATION_HANDLER_ID =
+            CswSourceConfiguration.CONFIGURATION_TYPE;
 
     @Override
     public List<ProbeMethod> getProbeMethods() {

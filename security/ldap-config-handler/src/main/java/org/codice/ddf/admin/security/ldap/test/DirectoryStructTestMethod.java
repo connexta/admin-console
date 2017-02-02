@@ -106,7 +106,10 @@ public class DirectoryStructTestMethod extends TestMethod<LdapConfiguration> {
     private final LdapTestingCommons ldapTestingCommons;
 
     public DirectoryStructTestMethod(LdapTestingCommons ldapTestingCommons) {
-        super(LDAP_DIRECTORY_STRUCT_TEST_ID, DESCRIPTION, REQUIRED_FIELDS, OPTIONAL_FIELDS,
+        super(LDAP_DIRECTORY_STRUCT_TEST_ID,
+                DESCRIPTION,
+                REQUIRED_FIELDS,
+                OPTIONAL_FIELDS,
                 SUCCESS_TYPES,
                 FAILURE_TYPES,
                 WARNING_TYPES);

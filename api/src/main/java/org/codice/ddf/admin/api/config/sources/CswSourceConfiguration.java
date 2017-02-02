@@ -33,18 +33,26 @@ public class CswSourceConfiguration extends SourceConfiguration {
     public static final String CONFIGURATION_TYPE = "csw-source";
 
     public static final String OUTPUT_SCHEMA = "outputSchema";
+
     public static final String FORCE_SPATIAL_FILTER = "forceSpatialFilter";
 
-    private static final Map<String, Function<CswSourceConfiguration, List<ConfigurationMessage>>> FIELDS_TO_VALIDATION_FUNC = new ImmutableMap.Builder<String, Function<CswSourceConfiguration, List<ConfigurationMessage>>>()
-            .putAll(getBaseFieldValidationMap())
-            .put(FACTORY_PID, config -> validateCswFactoryPid(config.factoryPid(), FACTORY_PID))
-            .put(OUTPUT_SCHEMA, config -> validateStringNoWhiteSpace(config.outputSchema(), OUTPUT_SCHEMA))
-            .build();
+    private static final Map<String, Function<CswSourceConfiguration, List<ConfigurationMessage>>>
+            FIELDS_TO_VALIDATION_FUNC =
+            new ImmutableMap.Builder<String, Function<CswSourceConfiguration, List<ConfigurationMessage>>>().putAll(
+                    getBaseFieldValidationMap())
+                    .put(FACTORY_PID,
+                            config -> validateCswFactoryPid(config.factoryPid(), FACTORY_PID))
+                    .put(OUTPUT_SCHEMA,
+                            config -> validateStringNoWhiteSpace(config.outputSchema(),
+                                    OUTPUT_SCHEMA))
+                    .build();
 
     private String outputSchema;
+
     private String forceSpatialFilter;
 
-    public CswSourceConfiguration() {}
+    public CswSourceConfiguration() {
+    }
 
     public CswSourceConfiguration(SourceConfiguration baseConfig) {
         super(baseConfig);
@@ -67,6 +75,7 @@ public class CswSourceConfiguration extends SourceConfiguration {
     public String outputSchema() {
         return outputSchema;
     }
+
     public String forceSpatialFilter() {
         return forceSpatialFilter;
     }
@@ -76,6 +85,7 @@ public class CswSourceConfiguration extends SourceConfiguration {
         this.outputSchema = outputSchema;
         return this;
     }
+
     public CswSourceConfiguration forceSpatialFilter(String forceSpatialFilter) {
         this.forceSpatialFilter = forceSpatialFilter;
         return this;

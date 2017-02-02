@@ -43,50 +43,82 @@ public class LdapConfiguration extends Configuration {
     public static final String CONFIGURATION_TYPE = "ldap";
 
     public static final String HOST_NAME = "hostName";
+
     public static final String PORT = "port";
+
     public static final String ENCRYPTION_METHOD = "encryptionMethod";
+
     public static final String BIND_USER = "bindUser";
+
     public static final String BIND_USER_PASSWORD = "bindUserPassword";
+
     public static final String BIND_METHOD = "bindMethod";
-//    public static final String BIND_KDC = "kdcAddress";
+
+    //    public static final String BIND_KDC = "kdcAddress";
     public static final String BIND_REALM = "bindRealm";
+
     public static final String USER_NAME_ATTRIBUTE = "userNameAttribute";
+
     public static final String BASE_GROUP_DN = "baseGroupDn";
+
     public static final String BASE_USER_DN = "baseUserDn";
+
     public static final String QUERY = "query";
+
     public static final String QUERY_BASE = "queryBase";
+
     public static final String LDAP_TYPE = "ldapType";
+
     public static final String LDAP_USE_CASE = "ldapUseCase";
+
     public static final String GROUP_OBJECT_CLASS = "groupObjectClass";
 
     public static final String GROUP_ATTRIBUTE_HOLDING_MEMBER = "groupAttributeHoldingMember";
 
     public static final String MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP =
             "memberAttributeReferencedInGroup";
+
     public static final String ATTRIBUTE_MAPPINGS = "attributeMappings";
+
     public static final String ATTRIBUTE_MAPPING_PATH = "attributeMappingsPath";
 
     private String hostName;
+
     private int port;
+
     private String encryptionMethod;
+
     private String bindUserMethod;
+
     private String bindUser;
+
     private String bindUserPassword;
-//    private String bindKdcAddress;
+
+    //    private String bindKdcAddress;
     private String bindRealm;
+
     private String userNameAttribute;
+
     private String baseGroupDn;
+
     private String baseUserDn;
+
     private String query;
+
     private String queryBase;
+
     private String ldapType;
+
     private String ldapUseCase;
+
     private String groupObjectClass;
 
     private String groupAttributeHoldingMember;
 
     private String memberAttributeReferencedInGroup;
+
     public Map<String, String> attributeMappings;
+
     private String attributeMappingsPath;
 
     private static final Map<String, Function<LdapConfiguration, List<ConfigurationMessage>>>
@@ -143,48 +175,62 @@ public class LdapConfiguration extends Configuration {
     public String hostName() {
         return hostName;
     }
+
     public int port() {
         return port;
     }
+
     public String encryptionMethod() {
         return encryptionMethod;
     }
+
     public String bindUser() {
         return bindUser;
     }
+
     public String bindUserPassword() {
         return bindUserPassword;
     }
+
     public String bindUserMethod() {
         return bindUserMethod;
     }
-//    public String bindKdcAddress() {
-//        return bindKdcAddress;
-//    }
+
+    //    public String bindKdcAddress() {
+    //        return bindKdcAddress;
+    //    }
     public String bindRealm() {
         return bindRealm;
     }
+
     public String userNameAttribute() {
         return userNameAttribute;
     }
+
     public String baseUserDn() {
         return baseUserDn;
     }
+
     public String baseGroupDn() {
         return baseGroupDn;
     }
+
     public String query() {
         return query;
     }
+
     public String queryBase() {
         return queryBase;
     }
+
     public String ldapType() {
         return ldapType;
     }
+
     public String ldapUseCase() {
         return ldapUseCase;
     }
+
     public String groupObjectClass() {
         return groupObjectClass;
     }
@@ -196,9 +242,11 @@ public class LdapConfiguration extends Configuration {
     public String memberAttributeReferencedInGroup() {
         return memberAttributeReferencedInGroup;
     }
+
     public Map<String, String> attributeMappings() {
         return attributeMappings;
     }
+
     public String attributeMappingsPath() {
         return attributeMappingsPath;
     }
@@ -208,62 +256,76 @@ public class LdapConfiguration extends Configuration {
         this.hostName = hostName;
         return this;
     }
+
     public LdapConfiguration port(int port) {
         this.port = port;
         return this;
     }
+
     public LdapConfiguration encryptionMethod(String encryptionMethod) {
         this.encryptionMethod = encryptionMethod;
         return this;
     }
+
     public LdapConfiguration bindUser(String bindUser) {
         this.bindUser = bindUser;
         return this;
     }
+
     public LdapConfiguration bindUserPassword(String bindUserPassword) {
         this.bindUserPassword = bindUserPassword;
         return this;
     }
+
     public LdapConfiguration bindUserMethod(String bindUserMethod) {
         this.bindUserMethod = bindUserMethod;
         return this;
     }
-//    public LdapConfiguration bindKdcAddress(String bindKdcAddress) {
-//        this.bindKdcAddress = bindKdcAddress;
-//        return this;
-//    }
+
+    //    public LdapConfiguration bindKdcAddress(String bindKdcAddress) {
+    //        this.bindKdcAddress = bindKdcAddress;
+    //        return this;
+    //    }
     public LdapConfiguration bindRealm(String bindRealm) {
         this.bindRealm = bindRealm;
         return this;
     }
+
     public LdapConfiguration userNameAttribute(String userNameAttribute) {
         this.userNameAttribute = userNameAttribute;
         return this;
     }
+
     public LdapConfiguration baseGroupDn(String baseGroupDn) {
         this.baseGroupDn = baseGroupDn;
         return this;
     }
+
     public LdapConfiguration baseUserDn(String baseUserDn) {
         this.baseUserDn = baseUserDn;
         return this;
     }
+
     public LdapConfiguration query(String query) {
         this.query = query;
         return this;
     }
+
     public LdapConfiguration queryBase(String queryBase) {
         this.queryBase = queryBase;
         return this;
     }
+
     public LdapConfiguration ldapType(String ldapType) {
         this.ldapType = ldapType;
         return this;
     }
+
     public LdapConfiguration ldapUseCase(String ldapUseCase) {
         this.ldapUseCase = ldapUseCase;
         return this;
     }
+
     public LdapConfiguration groupObjectClass(String groupObjectClass) {
         this.groupObjectClass = groupObjectClass;
         return this;
@@ -279,10 +341,12 @@ public class LdapConfiguration extends Configuration {
         this.memberAttributeReferencedInGroup = memberAttributeReferencedInGroup;
         return this;
     }
+
     public LdapConfiguration attributeMappings(Map<String, String> attributeMapping) {
         this.attributeMappings = attributeMapping;
         return this;
     }
+
     public LdapConfiguration attributeMappingsPath(String attributeMappingsPath) {
         this.attributeMappingsPath = attributeMappingsPath;
         return this;

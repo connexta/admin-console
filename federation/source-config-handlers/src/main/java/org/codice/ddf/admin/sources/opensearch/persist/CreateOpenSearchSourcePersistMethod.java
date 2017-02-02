@@ -41,12 +41,19 @@ public class CreateOpenSearchSourcePersistMethod
         extends PersistMethod<OpenSearchSourceConfiguration> {
     public static final String CREATE_OPENSEARCH_SOURCE_ID = CREATE;
 
-    public static final String DESCRIPTION = "Attempts to create and persist a OpenSearch source given a configuration.";
+    public static final String DESCRIPTION =
+            "Attempts to create and persist a OpenSearch source given a configuration.";
+
     public static final List<String> REQUIRED_FIELDS = ImmutableList.of(SOURCE_NAME, ENDPOINT_URL);
+
     private static final List<String> OPTIONAL_FIELDS = ImmutableList.of(SOURCE_USERNAME,
             SOURCE_USER_PASSWORD);
-    private static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(SUCCESSFUL_PERSIST, "OpenSearch Source successfully created.");
-    private static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(FAILED_PERSIST, "Failed to create OpenSearch Source.");
+
+    private static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(SUCCESSFUL_PERSIST,
+            "OpenSearch Source successfully created.");
+
+    private static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(FAILED_PERSIST,
+            "Failed to create OpenSearch Source.");
 
     public CreateOpenSearchSourcePersistMethod() {
         super(CREATE_OPENSEARCH_SOURCE_ID,
@@ -61,16 +68,21 @@ public class CreateOpenSearchSourcePersistMethod
     @Override
     public Report persist(OpenSearchSourceConfiguration configuration) {
         Configurator configurator = new Configurator();
-        configurator.createManagedService(configuration.factoryPid(), openSearchConfigToServiceProps(configuration));
-        OperationReport report = configurator.commit("Opensearch source saved with details: {}", configuration.toString());
+        configurator.createManagedService(configuration.factoryPid(),
+                openSearchConfigToServiceProps(configuration));
+        OperationReport report = configurator.commit("Opensearch source saved with details: {}",
+                configuration.toString());
         return createReport(SUCCESS_TYPES,
                 FAILURE_TYPES,
                 null,
-                report.containsFailedResults() ? ConfigurationMessage.FAILED_PERSIST : SUCCESSFUL_PERSIST);
+                report.containsFailedResults() ?
+                        ConfigurationMessage.FAILED_PERSIST :
+                        SUCCESSFUL_PERSIST);
     }
 
     @Override
-    public List<ConfigurationMessage> validateOptionalFields(OpenSearchSourceConfiguration configuration) {
+    public List<ConfigurationMessage> validateOptionalFields(
+            OpenSearchSourceConfiguration configuration) {
         return validateOptionalUsernameAndPassword(configuration);
     }
 }

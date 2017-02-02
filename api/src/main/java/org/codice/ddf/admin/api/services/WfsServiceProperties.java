@@ -29,28 +29,40 @@ import com.google.common.collect.ImmutableList;
 public class WfsServiceProperties {
     // --- Wfs Service Properties
     public static final String ID = "id";
+
     public static final String WFS_URL = "wfsUrl";
+
     public static final String USERNAME = "username";
+
     public static final String PASSWORD = "password";
+
     public static final String WFS1_FACTORY_PID = "Wfs_v1_0_0_Federated_Source";
+
     public static final String WFS2_FACTORY_PID = "Wfs_v2_0_0_Federated_Source";
-    public static final List<String> WFS_FACTORY_PIDS = ImmutableList.of(WFS1_FACTORY_PID, WFS2_FACTORY_PID);
+
+    public static final List<String> WFS_FACTORY_PIDS = ImmutableList.of(WFS1_FACTORY_PID,
+            WFS2_FACTORY_PID);
     // ----
 
-    public static final WfsSourceConfiguration servicePropsToWfsConfig(Map<String, Object> props){
+    public static final WfsSourceConfiguration servicePropsToWfsConfig(Map<String, Object> props) {
         WfsSourceConfiguration wfsConfig = new WfsSourceConfiguration();
-        wfsConfig.factoryPid(props.get(FACTORY_PID_KEY) == null ? null : (String) props.get(FACTORY_PID_KEY));
-        wfsConfig.servicePid(props.get(SERVICE_PID_KEY) == null ? null : (String) props.get(SERVICE_PID_KEY));
+        wfsConfig.factoryPid(
+                props.get(FACTORY_PID_KEY) == null ? null : (String) props.get(FACTORY_PID_KEY));
+        wfsConfig.servicePid(
+                props.get(SERVICE_PID_KEY) == null ? null : (String) props.get(SERVICE_PID_KEY));
         wfsConfig.sourceName(props.get(ID) == null ? null : (String) props.get(ID));
-        wfsConfig.sourceHostName(props.get(SOURCE_HOSTNAME) == null ? null : (String) props.get(SOURCE_HOSTNAME));
+        wfsConfig.sourceHostName(
+                props.get(SOURCE_HOSTNAME) == null ? null : (String) props.get(SOURCE_HOSTNAME));
         wfsConfig.sourcePort(props.get(PORT) == null ? 0 : (int) props.get(PORT));
         wfsConfig.endpointUrl(props.get(WFS_URL) == null ? null : (String) props.get(WFS_URL));
         wfsConfig.sourceUserName(props.get(USERNAME) == null ? null : (String) props.get(USERNAME));
-        wfsConfig.sourceUserPassword(props.get(PASSWORD) == null ? null : (String) props.get(PASSWORD));
+        wfsConfig.sourceUserPassword(
+                props.get(PASSWORD) == null ? null : (String) props.get(PASSWORD));
         return wfsConfig;
     }
 
-    public static final Map<String, Object> wfsConfigToServiceProps(WfsSourceConfiguration configuration) {
+    public static final Map<String, Object> wfsConfigToServiceProps(
+            WfsSourceConfiguration configuration) {
         HashMap<String, Object> props = new HashMap<>();
         props.put(ID, configuration.sourceName());
         props.put(WFS_URL, configuration.endpointUrl());

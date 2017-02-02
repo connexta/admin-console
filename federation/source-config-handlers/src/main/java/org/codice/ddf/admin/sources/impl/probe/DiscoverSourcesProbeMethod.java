@@ -36,32 +36,42 @@ import org.codice.ddf.admin.api.handler.report.ProbeReport;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
-public class DiscoverSourcesProbeMethod extends ProbeMethod<SourceConfiguration>{
+public class DiscoverSourcesProbeMethod extends ProbeMethod<SourceConfiguration> {
 
     public static final String CONFIG = "config";
+
     public static final String MESSAGES = "messages";
-    public static final String DESCRIPTION = "Retrieves possible configurations for the specified url. The results will be in a list of maps with the keys " + CONFIG + ", " + MESSAGES;
+
+    public static final String DESCRIPTION =
+            "Retrieves possible configurations for the specified url. The results will be in a list of maps with the keys "
+                    + CONFIG + ", " + MESSAGES;
+
     public static final List<String> REQUIRED_FIELDS = ImmutableList.of(SOURCE_HOSTNAME, PORT);
+
     public static final List<String> OPTIONAL_FIELDS = ImmutableList.of(SOURCE_USERNAME,
             SOURCE_USER_PASSWORD);
-    public static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(SUCCESSFUL_PROBE, "Successfully created one or more sources configurations from the specified host.");
-//    public static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(FAILED_PROBE, "No sources were discovered from the specified host.");
+
+    public static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(SUCCESSFUL_PROBE,
+            "Successfully created one or more sources configurations from the specified host.");
+
+    //    public static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(FAILED_PROBE, "No sources were discovered from the specified host.");
     public static final List<String> RETURN_TYPES = ImmutableList.of(DISCOVERED_SOURCES);
 
     private List<SourceConfigurationHandler> handlers;
 
     // TODO: tbatie - 2/1/17 - (Ticket) We can't return a failure type here because the frontend can't handle the error properly
     public DiscoverSourcesProbeMethod(List<SourceConfigurationHandler> handlers) {
-        super(DISCOVER_SOURCES_ID, DESCRIPTION,
+        super(DISCOVER_SOURCES_ID,
+                DESCRIPTION,
                 REQUIRED_FIELDS,
                 OPTIONAL_FIELDS,
                 SUCCESS_TYPES,
                 null,
                 null,
-                RETURN_TYPES
-                );
+                RETURN_TYPES);
         this.handlers = handlers;
     }
+
     @Override
     public ProbeReport probe(SourceConfiguration config) {
         List<ProbeReport> sourceProbeReports = handlers.stream()
@@ -70,15 +80,16 @@ public class DiscoverSourcesProbeMethod extends ProbeMethod<SourceConfiguration>
 
         List<Map<String, Object>> discoveredSources = sourceProbeReports.stream()
                 .filter(probeReport -> !probeReport.containsFailureMessages())
-                .map(probeReport -> ImmutableMap.of(CONFIG, probeReport.probeResults().get(DISCOVERED_SOURCES),
-                        MESSAGES, probeReport.messages()))
+                .map(probeReport -> ImmutableMap.of(CONFIG,
+                        probeReport.probeResults()
+                                .get(DISCOVERED_SOURCES),
+                        MESSAGES,
+                        probeReport.messages()))
                 .collect(Collectors.toList());
 
-        return createProbeReport(SUCCESS_TYPES,
-                null,
-                null,
-                SUCCESSFUL_PROBE)
-                .probeResult(DISCOVERED_SOURCES, discoveredSources);
+        return createProbeReport(SUCCESS_TYPES, null, null, SUCCESSFUL_PROBE).probeResult(
+                DISCOVERED_SOURCES,
+                discoveredSources);
     }
 
     @Override

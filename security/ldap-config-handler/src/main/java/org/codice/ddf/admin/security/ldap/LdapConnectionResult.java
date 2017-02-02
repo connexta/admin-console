@@ -20,21 +20,21 @@ import java.util.stream.Collectors;
 public enum LdapConnectionResult {
 
     //Failure types
-    CANNOT_CONNECT("Unable to reach the specified host."),
-    CANNOT_CONFIGURE("Unable to setup test environment."),
-    CANNOT_BIND("Unable to bind the user to the LDAP connection. Try a different username or password. Make sure the username is in the format of a distinguished name."),
-    BASE_USER_DN_NOT_FOUND("The specified base user DN does not appear to exist."),
-    BASE_GROUP_DN_NOT_FOUND("The specified base group DN does not appear to exist."),
-    USER_NAME_ATTRIBUTE_NOT_FOUND("No users found with the described attribute in the base user DN."),
+    CANNOT_CONNECT("Unable to reach the specified host."), CANNOT_CONFIGURE(
+            "Unable to setup test environment."), CANNOT_BIND(
+            "Unable to bind the user to the LDAP connection. Try a different username or password. Make sure the username is in the format of a distinguished name."), BASE_USER_DN_NOT_FOUND(
+            "The specified base user DN does not appear to exist."), BASE_GROUP_DN_NOT_FOUND(
+            "The specified base group DN does not appear to exist."), USER_NAME_ATTRIBUTE_NOT_FOUND(
+            "No users found with the described attribute in the base user DN."),
 
     //Warning types
-    NO_USERS_IN_BASE_USER_DN("The base user DN was found, but there are no users in it."),
-    NO_GROUPS_IN_BASE_GROUP_DN("The base group DN was found, but there are no groups in it with the specified group objectClass."),
-    NO_GROUPS_WITH_MEMBERS("No group entries were found within the base group DN with member references."),
-    NO_REFERENCED_MEMBER("No member found under base user DN as referenced from group."),
+    NO_USERS_IN_BASE_USER_DN("The base user DN was found, but there are no users in it."), NO_GROUPS_IN_BASE_GROUP_DN(
+            "The base group DN was found, but there are no groups in it with the specified group objectClass."), NO_GROUPS_WITH_MEMBERS(
+            "No group entries were found within the base group DN with member references."), NO_REFERENCED_MEMBER(
+            "No member found under base user DN as referenced from group."),
 
-    SUCCESSFUL_CONNECTION("A connection with the LDAP was successfully established."),
-    SUCCESSFUL_BIND("Successfully binded the user to the LDAP connection.");
+    SUCCESSFUL_CONNECTION("A connection with the LDAP was successfully established."), SUCCESSFUL_BIND(
+            "Successfully binded the user to the LDAP connection.");
 
     private String description;
 

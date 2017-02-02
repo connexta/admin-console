@@ -57,7 +57,7 @@ public class WfsSourceUtils {
             "http://%s:%d/wfs");
 
     public static UrlAvailability confirmEndpointUrl(WfsSourceConfiguration config) {
-        Optional<UrlAvailability> result =  URL_FORMATS.stream()
+        Optional<UrlAvailability> result = URL_FORMATS.stream()
                 .map(formatUrl -> String.format(formatUrl,
                         config.sourceHostName(),
                         config.sourcePort()))
@@ -85,12 +85,16 @@ public class WfsSourceUtils {
             contentType = ContentType.getOrDefault(response.getEntity())
                     .getMimeType();
             if (status == HTTP_OK && WFS_MIME_TYPES.contains(contentType)) {
-                return result.trustedCertAuthority(true).certError(false).available(true);
+                return result.trustedCertAuthority(true)
+                        .certError(false)
+                        .available(true);
             }
         } catch (SSLPeerUnverifiedException e) {
             // This is the hostname != cert name case - if this occurs, the URL's SSL cert configuration
             // is incorrect, or a serious network security issue has occurred.
-            return result.trustedCertAuthority(false).certError(true).available(false);
+            return result.trustedCertAuthority(false)
+                    .certError(true)
+                    .available(false);
         } catch (IOException e) {
             try {
                 SSLContext sslContext = SSLContexts.custom()
@@ -109,10 +113,14 @@ public class WfsSourceUtils {
                 contentType = ContentType.getOrDefault(response.getEntity())
                         .getMimeType();
                 if (status == HTTP_OK && WFS_MIME_TYPES.contains(contentType)) {
-                    return result.trustedCertAuthority(false).certError(false).available(true);
+                    return result.trustedCertAuthority(false)
+                            .certError(false)
+                            .available(true);
                 }
             } catch (Exception e1) {
-                return result.trustedCertAuthority(false).certError(false).available(false);
+                return result.trustedCertAuthority(false)
+                        .certError(false)
+                        .available(false);
             }
         }
         return result;

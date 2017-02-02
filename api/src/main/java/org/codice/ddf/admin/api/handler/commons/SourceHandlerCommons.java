@@ -29,12 +29,16 @@ public class SourceHandlerCommons {
 
     //Common probe, persist and test id's
     public static final String DISCOVER_SOURCES_ID = "discover-sources";
+
     public static final String CONFIG_FROM_URL_ID = "config-from-url";
+
     public static final String VALID_URL_TEST_ID = "valid-url";
 
     //Common success types
     public static final String CONFIG_CREATED = "CONFIG_CREATED";
+
     public static final String VERIFIED_URL = "VERIFIED_URL";
+
     public static final String REACHED_URL = "REACHED_URL";
 
     //Common warning types
@@ -42,17 +46,18 @@ public class SourceHandlerCommons {
 
     //Common failed types
     public static final String CANNOT_CONNECT = "CANNOT_CONNECT";
-    public static final String UNKNOWN_ENDPOINT = "UNKNOWN_ENDPOINT";
-    public static final String CERT_ERROR = "CERT_ERROR";
-    public static final String BAD_CONFIG = "BAD_CONFIG";
 
+    public static final String UNKNOWN_ENDPOINT = "UNKNOWN_ENDPOINT";
+
+    public static final String CERT_ERROR = "CERT_ERROR";
+
+    public static final String BAD_CONFIG = "BAD_CONFIG";
 
     public static final int PING_TIMEOUT = 500;
 
     public static String endpointIsReachable(String hostname, int port) {
         try (Socket connection = new Socket()) {
-            connection.connect(new InetSocketAddress(hostname,
-                    port), PING_TIMEOUT);
+            connection.connect(new InetSocketAddress(hostname, port), PING_TIMEOUT);
             connection.close();
             return REACHED_URL;
 

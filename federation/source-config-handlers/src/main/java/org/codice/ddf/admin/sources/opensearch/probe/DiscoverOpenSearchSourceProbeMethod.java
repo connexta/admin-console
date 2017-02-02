@@ -85,26 +85,36 @@ public class DiscoverOpenSearchSourceProbeMethod
 
     @Override
     public ProbeReport probe(OpenSearchSourceConfiguration configuration) {
-        ProbeReport probeReport = new ProbeReport(buildMessage(SUCCESS_TYPES, FAILURE_TYPES, WARNING_TYPES, endpointIsReachable(configuration.endpointUrl())));
-        if(probeReport.containsFailureMessages()) {
+        ProbeReport probeReport = new ProbeReport(buildMessage(SUCCESS_TYPES,
+                FAILURE_TYPES,
+                WARNING_TYPES,
+                endpointIsReachable(configuration.endpointUrl())));
+        if (probeReport.containsFailureMessages()) {
             return probeReport;
         }
 
         UrlAvailability availability = OpenSearchSourceUtils.confirmEndpointUrl(configuration);
-        if(availability == null) {
-            return probeReport.addMessage(buildMessage(SUCCESS_TYPES, FAILURE_TYPES, WARNING_TYPES, UNKNOWN_ENDPOINT));
+        if (availability == null) {
+            return probeReport.addMessage(buildMessage(SUCCESS_TYPES,
+                    FAILURE_TYPES,
+                    WARNING_TYPES,
+                    UNKNOWN_ENDPOINT));
         }
 
-        probeReport.addMessage(buildMessage(SUCCESS_TYPES, FAILURE_TYPES, WARNING_TYPES, availability.getAvailabilityResult()));
-        if(probeReport.containsFailureMessages()) {
+        probeReport.addMessage(buildMessage(SUCCESS_TYPES,
+                FAILURE_TYPES,
+                WARNING_TYPES,
+                availability.getAvailabilityResult()));
+        if (probeReport.containsFailureMessages()) {
             return probeReport;
         }
 
         Map<String, Object> probeResult = new HashMap<>();
-        OpenSearchSourceConfiguration openSearchConfig = new OpenSearchSourceConfiguration(configuration);
+        OpenSearchSourceConfiguration openSearchConfig = new OpenSearchSourceConfiguration(
+                configuration);
         openSearchConfig.endpointUrl(availability.getUrl())
-                    .factoryPid(OPENSEARCH_FACTORY_PID)
-                    .configurationHandlerId(OPENSEARCH_SOURCE_CONFIGURATION_HANDLER_ID);
+                .factoryPid(OPENSEARCH_FACTORY_PID)
+                .configurationHandlerId(OPENSEARCH_SOURCE_CONFIGURATION_HANDLER_ID);
 
         probeResult.put(DISCOVERED_SOURCES, openSearchConfig);
         return probeReport.addMessage(buildMessage(SUCCESS_TYPES,
@@ -115,7 +125,8 @@ public class DiscoverOpenSearchSourceProbeMethod
     }
 
     @Override
-    public List<ConfigurationMessage> validateOptionalFields(OpenSearchSourceConfiguration configuration) {
+    public List<ConfigurationMessage> validateOptionalFields(
+            OpenSearchSourceConfiguration configuration) {
         return validateOptionalUsernameAndPassword(configuration);
     }
 }

@@ -50,16 +50,26 @@ import com.google.common.collect.ImmutableMap;
 public class DiscoverCswSourceProbeMethod extends ProbeMethod<CswSourceConfiguration> {
 
     public static final String CSW_DISCOVER_SOURCES_ID = DISCOVER_SOURCES_ID;
-    public static final String DESCRIPTION = "Attempts to discover a CSW endpoint based on a hostname and port using optional authentication information.";
+
+    public static final String DESCRIPTION =
+            "Attempts to discover a CSW endpoint based on a hostname and port using optional authentication information.";
+
     public static final List<String> REQUIRED_FIELDS = ImmutableList.of(SOURCE_HOSTNAME, PORT);
+
     public static final List<String> OPTIONAL_FIELDS = ImmutableList.of(SOURCE_USERNAME,
             SOURCE_USER_PASSWORD);
-    public static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(CONFIG_CREATED, "Successfully created a configuration from the CSW endpoint.");
-    public static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(
-            CANNOT_CONNECT, "The URL provided could not be reached.",
-            UNKNOWN_ENDPOINT, "The endpoint does not appear to have CSW capabilities.",
-            CERT_ERROR, "The discovered source has incorrectly configured SSL certificates and is insecure.",
-            INTERNAL_ERROR, "Failed to create configuration from CSW URL.");
+
+    public static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(CONFIG_CREATED,
+            "Successfully created a configuration from the CSW endpoint.");
+
+    public static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(CANNOT_CONNECT,
+            "The URL provided could not be reached.",
+            UNKNOWN_ENDPOINT,
+            "The endpoint does not appear to have CSW capabilities.",
+            CERT_ERROR,
+            "The discovered source has incorrectly configured SSL certificates and is insecure.",
+            INTERNAL_ERROR,
+            "Failed to create configuration from CSW URL.");
 
     public static final Map<String, String> WARNING_TYPES = ImmutableMap.of(UNTRUSTED_CA,
             "The discovered URL has incorrectly configured SSL certificates and is likely insecure.");
@@ -81,27 +91,42 @@ public class DiscoverCswSourceProbeMethod extends ProbeMethod<CswSourceConfigura
     public ProbeReport probe(CswSourceConfiguration configuration) {
         // TODO: tbatie - 2/1/17 - (Ticket) There is duplicate code across all the Discover/ConfigrFromUrl methods, this can all be eliminated
         CswSourceConfiguration config = new CswSourceConfiguration(configuration);
-        ProbeReport probeReport = new ProbeReport(buildMessage(SUCCESS_TYPES, FAILURE_TYPES, WARNING_TYPES, endpointIsReachable(config.sourceHostName(), config.sourcePort())));
-        if(probeReport.containsFailureMessages()) {
+        ProbeReport probeReport = new ProbeReport(buildMessage(SUCCESS_TYPES,
+                FAILURE_TYPES,
+                WARNING_TYPES,
+                endpointIsReachable(config.sourceHostName(), config.sourcePort())));
+        if (probeReport.containsFailureMessages()) {
             return probeReport;
         }
 
         UrlAvailability availability = CswSourceUtils.confirmEndpointUrl(config);
-        if(availability == null) {
-            return probeReport.addMessage(buildMessage(SUCCESS_TYPES, FAILURE_TYPES, WARNING_TYPES, UNKNOWN_ENDPOINT));
+        if (availability == null) {
+            return probeReport.addMessage(buildMessage(SUCCESS_TYPES,
+                    FAILURE_TYPES,
+                    WARNING_TYPES,
+                    UNKNOWN_ENDPOINT));
         }
-        probeReport = createProbeReport(SUCCESS_TYPES, FAILURE_TYPES, WARNING_TYPES, availability.getAvailabilityResult());
-        if(probeReport.containsFailureMessages()) {
+        probeReport = createProbeReport(SUCCESS_TYPES,
+                FAILURE_TYPES,
+                WARNING_TYPES,
+                availability.getAvailabilityResult());
+        if (probeReport.containsFailureMessages()) {
             return probeReport;
         }
 
-        Optional<CswSourceConfiguration> createdConfig = getPreferredConfig((CswSourceConfiguration) config.endpointUrl(availability.getUrl()));
+        Optional<CswSourceConfiguration> createdConfig =
+                getPreferredConfig((CswSourceConfiguration) config.endpointUrl(availability.getUrl()));
         if (!createdConfig.isPresent()) {
-            return probeReport.addMessage(buildMessage(SUCCESS_TYPES, FAILURE_TYPES, WARNING_TYPES, INTERNAL_ERROR));
+            return probeReport.addMessage(buildMessage(SUCCESS_TYPES,
+                    FAILURE_TYPES,
+                    WARNING_TYPES,
+                    INTERNAL_ERROR));
         }
 
         Map<String, Object> probeResult = new HashMap<>();
-        probeResult.put(DISCOVERED_SOURCES, createdConfig.get().configurationHandlerId(CSW_SOURCE_CONFIGURATION_HANDLER_ID));
+        probeResult.put(DISCOVERED_SOURCES,
+                createdConfig.get()
+                        .configurationHandlerId(CSW_SOURCE_CONFIGURATION_HANDLER_ID));
 
         return probeReport.addMessage(buildMessage(SUCCESS_TYPES,
                 FAILURE_TYPES,

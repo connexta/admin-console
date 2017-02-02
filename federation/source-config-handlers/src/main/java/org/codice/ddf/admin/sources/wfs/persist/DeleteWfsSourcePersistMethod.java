@@ -35,10 +35,16 @@ public class DeleteWfsSourcePersistMethod extends PersistMethod<WfsSourceConfigu
 
     public static final String DELETE_WFS_SOURCE_ID = DELETE;
 
-    public static final String DESCRIPTION = "Attempts to delete a WFS Source with the given configuration.";
+    public static final String DESCRIPTION =
+            "Attempts to delete a WFS Source with the given configuration.";
+
     private static final List<String> REQUIRED_FIELDS = ImmutableList.of(SERVICE_PID);
-    private static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(SUCCESSFUL_PERSIST, "The CSW Source was successfully deleted.");
-    private static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(FAILED_PERSIST, "Failed to delete CSW source.");
+
+    private static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(SUCCESSFUL_PERSIST,
+            "The CSW Source was successfully deleted.");
+
+    private static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(FAILED_PERSIST,
+            "Failed to delete CSW source.");
 
     public DeleteWfsSourcePersistMethod() {
         super(DELETE_WFS_SOURCE_ID,
@@ -54,7 +60,8 @@ public class DeleteWfsSourcePersistMethod extends PersistMethod<WfsSourceConfigu
     public Report persist(WfsSourceConfiguration configuration) {
         Configurator configurator = new Configurator();
         configurator.deleteManagedService(configuration.servicePid());
-        OperationReport report = configurator.commit("WFS source deleted for servicePid: {}", configuration.servicePid());
+        OperationReport report = configurator.commit("WFS source deleted for servicePid: {}",
+                configuration.servicePid());
 
         return createReport(SUCCESS_TYPES,
                 FAILURE_TYPES,

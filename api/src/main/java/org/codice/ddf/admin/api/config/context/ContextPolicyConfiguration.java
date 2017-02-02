@@ -39,15 +39,25 @@ public class ContextPolicyConfiguration extends Configuration {
     public static final String CONFIGURATION_TYPE = "context-policy-manager";
 
     public static final String CONTEXT_POLICY_BINS = "contextPolicyBins";
-    public static final String WHITE_LIST_CONTEXTS  = "whiteListContexts";
-    public static final List<String> ALL_FIELDS = Arrays.asList(CONTEXT_POLICY_BINS, WHITE_LIST_CONTEXTS);
 
-    private static final Map<String, Function<ContextPolicyConfiguration, List<ConfigurationMessage>>> FIELD_TO_VALIDATION_FUNC = new ImmutableMap.Builder<String, Function<ContextPolicyConfiguration, List<ConfigurationMessage>>>()
-            .put(CONTEXT_POLICY_BINS, config -> validateContextPolicyBins(config.contextPolicyBins(), CONTEXT_POLICY_BINS))
-            .put(WHITE_LIST_CONTEXTS, config -> validateContextPaths(config.whiteListContexts(), WHITE_LIST_CONTEXTS))
-            .build();
+    public static final String WHITE_LIST_CONTEXTS = "whiteListContexts";
+
+    public static final List<String> ALL_FIELDS = Arrays.asList(CONTEXT_POLICY_BINS,
+            WHITE_LIST_CONTEXTS);
+
+    private static final Map<String, Function<ContextPolicyConfiguration, List<ConfigurationMessage>>>
+            FIELD_TO_VALIDATION_FUNC =
+            new ImmutableMap.Builder<String, Function<ContextPolicyConfiguration, List<ConfigurationMessage>>>().put(
+                    CONTEXT_POLICY_BINS,
+                    config -> validateContextPolicyBins(config.contextPolicyBins(),
+                            CONTEXT_POLICY_BINS))
+                    .put(WHITE_LIST_CONTEXTS,
+                            config -> validateContextPaths(config.whiteListContexts(),
+                                    WHITE_LIST_CONTEXTS))
+                    .build();
 
     private List<ContextPolicyBin> contextPolicyBins;
+
     private List<String> whiteListContexts;
 
     public List<ConfigurationMessage> validate(List<String> fields) {
@@ -63,6 +73,7 @@ public class ContextPolicyConfiguration extends Configuration {
     public List<ContextPolicyBin> contextPolicyBins() {
         return contextPolicyBins;
     }
+
     public List<String> whiteListContexts() {
         return whiteListContexts;
     }
@@ -72,6 +83,7 @@ public class ContextPolicyConfiguration extends Configuration {
         this.contextPolicyBins = contextPolicyBins;
         return this;
     }
+
     public ContextPolicyConfiguration whiteListContexts(List<String> whiteListContexts) {
         this.whiteListContexts = whiteListContexts;
         return this;

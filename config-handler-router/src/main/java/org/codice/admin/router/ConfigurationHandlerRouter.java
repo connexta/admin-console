@@ -41,9 +41,11 @@ import spark.servlet.SparkApplication;
 public class ConfigurationHandlerRouter implements SparkApplication {
 
     public static final String CONFIGURATION_TYPE_FIELD = "configurationType";
+
     public static final String APPLICATION_JSON = "application/json";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ConfigurationHandlerRouter.class);
+
     private List<ConfigurationHandler> handlers = new ArrayList<>();
 
     @Override
@@ -54,9 +56,11 @@ public class ConfigurationHandlerRouter implements SparkApplication {
             String configHandlerId = req.params("configHandlerId");
             String testId = req.params("testId");
             ConfigurationHandler configHandler = getConfigurationHandler(configHandlerId);
-            if(configHandler == null) {
+            if (configHandler == null) {
                 res.status(400);
-                return testReport.addMessage(createInvalidFieldMsg("No configuration handler with id of \"" + configHandlerId + "\" found.", CONFIGURATION_TYPE_FIELD));
+                return testReport.addMessage(createInvalidFieldMsg(
+                        "No configuration handler with id of \"" + configHandlerId + "\" found.",
+                        CONFIGURATION_TYPE_FIELD));
             }
 
             Configuration config = getGsonParser().fromJson(req.body(), Configuration.class);
@@ -74,9 +78,11 @@ public class ConfigurationHandlerRouter implements SparkApplication {
             String configHandlerId = req.params("configHandlerId");
             String persistId = req.params("persistId");
             ConfigurationHandler configHandler = getConfigurationHandler(configHandlerId);
-            if(configHandler == null) {
+            if (configHandler == null) {
                 res.status(400);
-                return persistReport.addMessage(createInvalidFieldMsg("No configuration handler with id of \"" + configHandlerId + "\" found.", CONFIGURATION_TYPE_FIELD));
+                return persistReport.addMessage(createInvalidFieldMsg(
+                        "No configuration handler with id of \"" + configHandlerId + "\" found.",
+                        CONFIGURATION_TYPE_FIELD));
             }
 
             Configuration config = getGsonParser().fromJson(req.body(), Configuration.class);
@@ -95,9 +101,11 @@ public class ConfigurationHandlerRouter implements SparkApplication {
             String probeId = req.params("probeId");
             ConfigurationHandler configHandler = getConfigurationHandler(configHandlerId);
 
-            if(configHandler == null) {
+            if (configHandler == null) {
                 res.status(400);
-                return probeReport.addMessage(createInvalidFieldMsg("No configuration handler with id of \"" + configHandlerId + "\" found.", CONFIGURATION_TYPE_FIELD));
+                return probeReport.addMessage(createInvalidFieldMsg(
+                        "No configuration handler with id of \"" + configHandlerId + "\" found.",
+                        CONFIGURATION_TYPE_FIELD));
             }
 
             Configuration config = getGsonParser().fromJson(req.body(), Configuration.class);
@@ -110,17 +118,17 @@ public class ConfigurationHandlerRouter implements SparkApplication {
             return probeReport;
         }, this::toJson);
 
-        get("/configurations/:configHandlerId",
-                (req, res) -> {
-                    String configHandlerId = req.params("configHandlerId");
-                    ConfigurationHandler configHandler = getConfigurationHandler(configHandlerId);
-                    if(configHandler == null) {
-                        res.status(400);
-                        return new Report(createInvalidFieldMsg("No configuration handler with id of \"" + configHandlerId + "\" found.", CONFIGURATION_TYPE_FIELD));
-                    }
-                    return configHandler.getConfigurations();
-                },
-                this::toJson);
+        get("/configurations/:configHandlerId", (req, res) -> {
+            String configHandlerId = req.params("configHandlerId");
+            ConfigurationHandler configHandler = getConfigurationHandler(configHandlerId);
+            if (configHandler == null) {
+                res.status(400);
+                return new Report(createInvalidFieldMsg(
+                        "No configuration handler with id of \"" + configHandlerId + "\" found.",
+                        CONFIGURATION_TYPE_FIELD));
+            }
+            return configHandler.getConfigurations();
+        }, this::toJson);
 
         get("/capabilities",
                 (req, res) -> handlers.stream()
@@ -128,17 +136,17 @@ public class ConfigurationHandlerRouter implements SparkApplication {
                         .collect(Collectors.toList()),
                 this::toFilteredJson);
 
-        get("/capabilities/:configHandlerId",
-                (req, res) -> {
-                    String configHandlerId = req.params("configHandlerId");
-                    ConfigurationHandler configHandler = getConfigurationHandler(configHandlerId);
-                    if(configHandler == null) {
-                        res.status(400);
-                        return new Report(createInvalidFieldMsg("No configuration handler with id of: " + configHandlerId + " found.", configHandlerId));
-                    }
-                    return configHandler.getCapabilities();
-                },
-                this::toFilteredJson);
+        get("/capabilities/:configHandlerId", (req, res) -> {
+            String configHandlerId = req.params("configHandlerId");
+            ConfigurationHandler configHandler = getConfigurationHandler(configHandlerId);
+            if (configHandler == null) {
+                res.status(400);
+                return new Report(createInvalidFieldMsg(
+                        "No configuration handler with id of: " + configHandlerId + " found.",
+                        configHandlerId));
+            }
+            return configHandler.getCapabilities();
+        }, this::toFilteredJson);
 
         after("/*", (req, res) -> res.type(APPLICATION_JSON));
 

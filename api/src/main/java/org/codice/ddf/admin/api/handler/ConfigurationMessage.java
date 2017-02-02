@@ -26,14 +26,21 @@ public class ConfigurationMessage {
 
     // Default error message subtypes
     public static final String NO_METHOD_FOUND = "NO_METHOD_FOUND";
+
     public static final String MISSING_REQUIRED_FIELD = "MISSING_REQUIRED_FIELD";
+
     public static final String INVALID_FIELD = "INVALID_FIELD";
+
     public static final String FAILED_PERSIST = "FAILED_PERSIST";
+
     public static final String INTERNAL_ERROR = "INTERNAL_ERROR";
 
     private MessageType type;
+
     private String subType;
+
     private String message;
+
     private String configFieldId;
 
     /**
@@ -42,12 +49,13 @@ public class ConfigurationMessage {
      * of {@param subType}. For instance, if the {@param #type}  was {@link MessageType#FAILURE}, the {@param subType}
      * could be {@link #MISSING_REQUIRED_FIELD}
      *
-     * @param type a high level description message
-     * @param subType a more specific type of the message
-     * @param message a message indicating additional details about this {@link ConfigurationMessage}
+     * @param type          a high level description message
+     * @param subType       a more specific type of the message
+     * @param message       a message indicating additional details about this {@link ConfigurationMessage}
      * @param configFieldId the id of the {@link org.codice.ddf.admin.api.config.Configuration} field being referenced in the {@link ConfigurationMessage}
      */
-    public ConfigurationMessage(MessageType type, String subType, String message, String configFieldId) {
+    public ConfigurationMessage(MessageType type, String subType, String message,
+            String configFieldId) {
         this.type = type;
         this.subType = subType;
         this.message = message;
@@ -62,27 +70,34 @@ public class ConfigurationMessage {
         SUCCESS, WARNING, FAILURE
     }
 
-    public static ConfigurationMessage buildMessage(MessageType type, String subtype, String message) {
+    public static ConfigurationMessage buildMessage(MessageType type, String subtype,
+            String message) {
         return new ConfigurationMessage(type, subtype, message);
     }
 
-    public static ConfigurationMessage buildMessage(Map<String, String> successTypes, Map<String, String> failureTypes, Map<String, String> warningTypes, String result) {
+    public static ConfigurationMessage buildMessage(Map<String, String> successTypes,
+            Map<String, String> failureTypes, Map<String, String> warningTypes, String result) {
         return buildMessage(successTypes, failureTypes, null, result, null);
     }
 
-    public static ConfigurationMessage buildMessage(Map<String, String> successTypes, Map<String, String> failureTypes, Map<String, String> warningTypes, String result, String configFieldId) {
+    public static ConfigurationMessage buildMessage(Map<String, String> successTypes,
+            Map<String, String> failureTypes, Map<String, String> warningTypes, String result,
+            String configFieldId) {
         if (successTypes != null && successTypes.containsKey(result)) {
             return new ConfigurationMessage(ConfigurationMessage.MessageType.SUCCESS,
                     result,
-                    successTypes.get(result), configFieldId);
+                    successTypes.get(result),
+                    configFieldId);
         } else if (warningTypes != null && warningTypes.containsKey(result)) {
             return new ConfigurationMessage(ConfigurationMessage.MessageType.WARNING,
                     result,
-                    warningTypes.get(result), configFieldId);
+                    warningTypes.get(result),
+                    configFieldId);
         } else if (failureTypes != null && failureTypes.containsKey(result)) {
             return new ConfigurationMessage(ConfigurationMessage.MessageType.FAILURE,
                     result,
-                    failureTypes.get(result), configFieldId);
+                    failureTypes.get(result),
+                    configFieldId);
         }
         return null;
     }
@@ -111,11 +126,15 @@ public class ConfigurationMessage {
     }
 
     //Builders
-    public static ConfigurationMessage createInvalidFieldMsg(String description, String configFieldId) {
+    public static ConfigurationMessage createInvalidFieldMsg(String description,
+            String configFieldId) {
         return new ConfigurationMessage(FAILURE, INVALID_FIELD, description, configFieldId);
     }
 
     public static ConfigurationMessage createMissingRequiredFieldMsg(String configFieldId) {
-        return new ConfigurationMessage(FAILURE, MISSING_REQUIRED_FIELD, "Missing required field.", configFieldId);
+        return new ConfigurationMessage(FAILURE,
+                MISSING_REQUIRED_FIELD,
+                "Missing required field.",
+                configFieldId);
     }
 }

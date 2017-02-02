@@ -41,12 +41,22 @@ import com.google.common.collect.ImmutableMap;
 public class CreateWfsSourcePersistMethod extends PersistMethod<WfsSourceConfiguration> {
 
     public static final String CREATE_WFS_SOURCE_ID = CREATE;
-    public static final String DESCRIPTION = "Attempts to create and persist a WFS source given a configuration.";
-    private static final List<String> REQUIRED_FIELDS = ImmutableList.of(SOURCE_NAME, ENDPOINT_URL, FACTORY_PID);
+
+    public static final String DESCRIPTION =
+            "Attempts to create and persist a WFS source given a configuration.";
+
+    private static final List<String> REQUIRED_FIELDS = ImmutableList.of(SOURCE_NAME,
+            ENDPOINT_URL,
+            FACTORY_PID);
+
     private static final List<String> OPTIONAL_FIELDS = ImmutableList.of(SOURCE_USERNAME,
             SOURCE_USER_PASSWORD);
-    private static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(SUCCESSFUL_PERSIST, "WFS Source successfully created.");
-    private static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(FAILED_PERSIST, "Failed to create WFS Source.");
+
+    private static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(SUCCESSFUL_PERSIST,
+            "WFS Source successfully created.");
+
+    private static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(FAILED_PERSIST,
+            "Failed to create WFS Source.");
 
     public CreateWfsSourcePersistMethod() {
         super(CREATE_WFS_SOURCE_ID,
@@ -61,9 +71,14 @@ public class CreateWfsSourcePersistMethod extends PersistMethod<WfsSourceConfigu
     @Override
     public Report persist(WfsSourceConfiguration configuration) {
         Configurator configurator = new Configurator();
-        configurator.createManagedService(configuration.factoryPid(), wfsConfigToServiceProps(configuration));
-        OperationReport report = configurator.commit("WFS source saved with details: {}", configuration.toString());
-        return createReport(SUCCESS_TYPES, FAILURE_TYPES, null, report.containsFailedResults() ? FAILED_PERSIST : SUCCESSFUL_PERSIST);
+        configurator.createManagedService(configuration.factoryPid(),
+                wfsConfigToServiceProps(configuration));
+        OperationReport report = configurator.commit("WFS source saved with details: {}",
+                configuration.toString());
+        return createReport(SUCCESS_TYPES,
+                FAILURE_TYPES,
+                null,
+                report.containsFailedResults() ? FAILED_PERSIST : SUCCESSFUL_PERSIST);
     }
 
     @Override

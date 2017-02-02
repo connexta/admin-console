@@ -47,31 +47,35 @@ import org.codice.ddf.admin.api.handler.report.ProbeReport;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
-public class AvailableOptionsProbeMethod extends ProbeMethod<ContextPolicyConfiguration>{
+public class AvailableOptionsProbeMethod extends ProbeMethod<ContextPolicyConfiguration> {
 
     public static final String ID = "options";
-    public static final String DESCRIPTION = "Returns the web context policy options available for configuration based on the system's state.";
+
+    public static final String DESCRIPTION =
+            "Returns the web context policy options available for configuration based on the system's state.";
 
     public static final String REALMS_KEY = "realms";
+
     public static final String AUTH_TYPES_KEY = "authenticationTypes";
+
     public static final String CLAIMS_KEY = "claims";
 
-    public static final Map<String, String> FAILED_TYPES = ImmutableMap.of(FAILED_PROBE, "Failed to retrieve context policy manager options.");
-    public static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(SUCCESSFUL_PROBE, "Successfully retrieved context policy options.");
-    public static final List<String> RETURN_TYPES = ImmutableList.of(REALMS_KEY, AUTH_TYPES_KEY, CLAIMS_KEY);
+    public static final Map<String, String> FAILED_TYPES = ImmutableMap.of(FAILED_PROBE,
+            "Failed to retrieve context policy manager options.");
+
+    public static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(SUCCESSFUL_PROBE,
+            "Successfully retrieved context policy options.");
+
+    public static final List<String> RETURN_TYPES = ImmutableList.of(REALMS_KEY,
+            AUTH_TYPES_KEY,
+            CLAIMS_KEY);
 
     private Configurator configurator = new Configurator();
+
     private ConfigurationHandler ldapConfigHandler;
 
     public AvailableOptionsProbeMethod(ConfigurationHandler ldapConfigHandler) {
-        super(ID,
-                DESCRIPTION,
-                null,
-                null,
-                SUCCESS_TYPES,
-                FAILED_TYPES,
-                null,
-                RETURN_TYPES);
+        super(ID, DESCRIPTION, null, null, SUCCESS_TYPES, FAILED_TYPES, null, RETURN_TYPES);
         this.ldapConfigHandler = ldapConfigHandler;
     }
 
@@ -82,14 +86,19 @@ public class AvailableOptionsProbeMethod extends ProbeMethod<ContextPolicyConfig
         probeResults.put(REALMS_KEY, getRealms());
         probeResults.put(CLAIMS_KEY, getClaims());
 
-        return createProbeReport(SUCCESS_TYPES, FAILED_TYPES, null, probeResults.isEmpty() ? FAILED_PROBE : SUCCESSFUL_PROBE).probeResults(probeResults);
+        return createProbeReport(SUCCESS_TYPES,
+                FAILED_TYPES,
+                null,
+                probeResults.isEmpty() ?
+                        FAILED_PROBE :
+                        SUCCESSFUL_PROBE).probeResults(probeResults);
     }
 
     public List<String> getAuthTypes() {
         // TODO: tbatie - 1/12/17 - (Ticket) need to eventually check if these handlers are running for these auth types instead of hardcoding
         List<String> authTypes = new ArrayList<>(Arrays.asList(BASIC, SAML, PKI, GUEST));
 
-        if(configurator.isBundleStarted(IDP_CLIENT_BUNDLE_NAME)) {
+        if (configurator.isBundleStarted(IDP_CLIENT_BUNDLE_NAME)) {
             authTypes.add(IDP);
         }
 
@@ -99,15 +108,14 @@ public class AvailableOptionsProbeMethod extends ProbeMethod<ContextPolicyConfig
     public List<String> getRealms() {
         List<String> realms = new ArrayList<>(Arrays.asList(KARAF));
         // If an IdpConfigurationHandler exists replace this with a service reference
-        if(configurator.isBundleStarted(IDP_SERVER_BUNDLE_NAME)) {
+        if (configurator.isBundleStarted(IDP_SERVER_BUNDLE_NAME)) {
             realms.add(IDP);
         }
 
         if (ldapConfigHandler == null || ldapConfigHandler.getConfigurations()
                 .stream()
                 .anyMatch(config -> ((LdapConfiguration) config).ldapUseCase()
-                        .equals(AUTHENTICATION)
-                        || ((LdapConfiguration) config).ldapUseCase()
+                        .equals(AUTHENTICATION) || ((LdapConfiguration) config).ldapUseCase()
                         .equals(AUTHENTICATION_AND_ATTRIBUTE_STORE))) {
             realms.add(LDAP);
         }
@@ -116,7 +124,8 @@ public class AvailableOptionsProbeMethod extends ProbeMethod<ContextPolicyConfig
     }
 
     public Object getClaims() {
-        Map<String, Object> stsConfig = new Configurator().getConfig(STS_CLAIMS_CONFIGURATION_CONFIG_ID);
-        return stsConfig == null ?  null : stsConfig.get(STS_CLAIMS_PROPS_KEY_CLAIMS);
+        Map<String, Object> stsConfig = new Configurator().getConfig(
+                STS_CLAIMS_CONFIGURATION_CONFIG_ID);
+        return stsConfig == null ? null : stsConfig.get(STS_CLAIMS_PROPS_KEY_CLAIMS);
     }
 }

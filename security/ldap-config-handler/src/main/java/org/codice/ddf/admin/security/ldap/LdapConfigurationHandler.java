@@ -60,9 +60,10 @@ public class LdapConfigurationHandler extends DefaultConfigurationHandler<LdapCo
     @Override
     public List<ProbeMethod> getProbeMethods() {
         LdapTestingCommons ldapTestingCommons = new LdapTestingCommons();
+        Configurator configurator = new Configurator();
         return ImmutableList.of(new DefaultDirectoryStructureProbe(ldapTestingCommons),
                 new LdapQueryProbe(ldapTestingCommons),
-                new SubjectAttributeProbe(ldapTestingCommons));
+                new SubjectAttributeProbe(ldapTestingCommons, configurator));
     }
 
     @Override

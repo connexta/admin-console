@@ -27,6 +27,7 @@ import static org.codice.ddf.admin.api.config.ldap.LdapConfiguration.PORT;
 import static org.codice.ddf.admin.api.services.PolicyManagerServiceProperties.STS_CLAIMS_CONFIGURATION_CONFIG_ID;
 import static org.codice.ddf.admin.api.services.PolicyManagerServiceProperties.STS_CLAIMS_PROPS_KEY_CLAIMS;
 import static org.codice.ddf.admin.api.validation.LdapValidationUtils.validateBindRealm;
+import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.SUCCESSFUL_BIND;
 
 import java.util.List;
 import java.util.Set;
@@ -48,7 +49,7 @@ import com.google.common.collect.ImmutableList;
 public class SubjectAttributeProbe extends ProbeMethod<LdapConfiguration> {
     private static final Logger LOGGER = LoggerFactory.getLogger(SubjectAttributeProbe.class);
 
-    public static final String SUBJECT_ATTRIBUTES_PROBE_ID = "subject-attributes";
+    private static final String SUBJECT_ATTRIBUTES_PROBE_ID = "subject-attributes";
 
     private static final String DESCRIPTION =
             "Searches for the subject attributes for claims mapping.";
@@ -75,7 +76,9 @@ public class SubjectAttributeProbe extends ProbeMethod<LdapConfiguration> {
 
     private final LdapTestingCommons ldapTestingCommons;
 
-    public SubjectAttributeProbe(LdapTestingCommons ldapTestingCommons) {
+    private final Configurator configurator;
+
+    public SubjectAttributeProbe(LdapTestingCommons ldapTestingCommons, Configurator configurator) {
         super(SUBJECT_ATTRIBUTES_PROBE_ID,
                 DESCRIPTION,
                 REQUIRED_FIELDS,
@@ -84,24 +87,31 @@ public class SubjectAttributeProbe extends ProbeMethod<LdapConfiguration> {
                 null,
                 null,
                 RETURN_TYPES);
+
         this.ldapTestingCommons = ldapTestingCommons;
+        this.configurator = configurator;
     }
 
     @Override
     public ProbeReport probe(LdapConfiguration configuration) {
         ProbeReport probeReport = new ProbeReport();
-        Object subjectClaims = new Configurator().getConfig(STS_CLAIMS_CONFIGURATION_CONFIG_ID)
+        Object subjectClaims = configurator.getConfig(STS_CLAIMS_CONFIGURATION_CONFIG_ID)
                 .get(STS_CLAIMS_PROPS_KEY_CLAIMS);
 
         LdapTestingCommons.LdapConnectionAttempt ldapConnectionAttempt =
                 ldapTestingCommons.bindUserToLdapConnection(configuration);
+
         Set<String> ldapEntryAttributes = null;
         try {
-            // TODO: tbatie - 1/19/17 - Don't assume the connection is available, should check result first
-            ServerGuesser serverGuesser = ServerGuesser.buildGuesser(configuration.ldapType(),
-                    ldapConnectionAttempt.connection());
-            ldapEntryAttributes =
-                    serverGuesser.getClaimAttributeOptions(configuration.baseUserDn());
+            if (ldapConnectionAttempt.result() == SUCCESSFUL_BIND) {
+                ServerGuesser serverGuesser = ServerGuesser.buildGuesser(configuration.ldapType(),
+                        ldapConnectionAttempt.connection());
+                ldapEntryAttributes =
+                        serverGuesser.getClaimAttributeOptions(configuration.baseUserDn());
+            } else {
+                LOGGER.warn("Error binding to LDAP server with config: {}",
+                        configuration.toString());
+            }
         } catch (SearchResultReferenceIOException | LdapException e) {
             LOGGER.warn("Error retrieving attributes from LDAP server; this may indicate a "
                             + "configuration issue with {}: {}, {}: {}, or {}: {}",

@@ -35,7 +35,7 @@ const Wizard = connect(null, { clearWizard })(WizardView)
   - manualEntryStage
 */
 
-let StageRouter = ({ stage }) => {
+let StageRouter = ({ stage, messages }) => {
   const stageMapping = {
     welcomeStage: <WelcomeStage />,
     discoveryStage: <DiscoveryStage />,
@@ -46,9 +46,11 @@ let StageRouter = ({ stage }) => {
   }
   return (stageMapping[stage])
 }
-StageRouter = connect((state) => ({ stage: getSourceStage(state) }))(StageRouter)
+StageRouter = connect((state) => ({
+  stage: getSourceStage(state)
+}))(StageRouter)
 
-let SourceApp = ({ isSubmitting = false, value = {}, setDefaults }) => (
+let SourceApp = ({ isSubmitting = false, value = {}, setDefaults, messages }) => (
   <Wizard id='sources'>
     <Paper className={styles.main}>
       {isSubmitting
@@ -62,6 +64,8 @@ let SourceApp = ({ isSubmitting = false, value = {}, setDefaults }) => (
     </Paper>
   </Wizard>
 )
-SourceApp = connect((state) => ({ isSubmitting: getIsSubmitting(state) }))(SourceApp)
+SourceApp = connect((state) => ({
+  isSubmitting: getIsSubmitting(state)
+}))(SourceApp)
 
 export default SourceApp

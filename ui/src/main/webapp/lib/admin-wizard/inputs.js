@@ -28,6 +28,11 @@ const messageStyles = {
 }
 
 const InputView = ({ value = '', label, onEdit, message = {}, tooltip, ...rest }) => {
+  for (let key in rest) {
+    if (rest[key] === undefined) {
+      delete rest[key]
+    }
+  }
   const { type, message: text } = message
 
   return (
@@ -66,6 +71,11 @@ const Hostname = ({ label = 'Hostname', ...rest }) => (
 
 const InputAutoView = ({ value = '', options = [], type = 'text', message = {}, onEdit, label, tooltip, ...rest }) => {
   const { type: messageType, message: text } = message
+  for (let key in rest) {
+    if (rest[key] === undefined) {
+      delete rest[key]
+    }
+  }
 
   return (
     <Flexbox flexDirection='row' style={{ position: 'relative' }}>
@@ -105,6 +115,12 @@ const Port = ({ value = 0, label = 'Port', ...rest }) => (
 
 const SelectView = ({ value = '', options = [], label = 'Select', onEdit, error, tooltip, ...rest }) => {
   const i = options.findIndex((option) => (typeof option === 'object') ? option.name === value.name : option === value)
+  for (let key in rest) {
+    if (rest[key] === undefined) {
+      delete rest[key]
+    }
+  }
+
   return (
     <Flexbox flexDirection='row' style={{ position: 'relative' }}>
       <SelectField
@@ -140,12 +156,19 @@ const SelectView = ({ value = '', options = [], label = 'Select', onEdit, error,
 
 const Select = connect(mapStateToProps, mapDispatchToProps)(SelectView)
 
-const RadioSelectionView = ({ value, disabled, options = [], onEdit, ...rest }) => (
-  <RadioButtonGroup valueSelected={value} onChange={(e, value) => onEdit(value)} {...rest}>
-    {options.map((item, i) =>
-      <RadioButton style={{ fontSize: '16px', padding: '3px' }} key={i} value={item.value} label={item.label} disabled={disabled} />)}
-  </RadioButtonGroup>
-)
+const RadioSelectionView = ({ value, disabled, options = [], onEdit, ...rest }) => {
+  for (let key in rest) {
+    if (rest[key] === undefined) {
+      delete rest[key]
+    }
+  }
+  return (
+    <RadioButtonGroup valueSelected={value} onChange={(e, value) => onEdit(value)} {...rest}>
+      {options.map((item, i) =>
+        <RadioButton style={{ fontSize: '16px', padding: '3px' }} key={i} value={item.value} label={item.label} disabled={disabled} />)}
+    </RadioButtonGroup>
+  )
+}
 
 const RadioSelection = connect(mapStateToProps, mapDispatchToProps)(RadioSelectionView)
 

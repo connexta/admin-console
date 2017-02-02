@@ -1,8 +1,8 @@
 import { combineReducers } from 'redux-immutable'
-import { fromJS, List, Map } from 'immutable'
+import { fromJS, List } from 'immutable'
 
 const emptyBin = {
-  name: 'untitled',
+  name: 'NewBin',
   realm: '',
   authenticationTypes: [],
   requiredAttributes: {},
@@ -113,16 +113,18 @@ const confirmDelete = (state = false, { type, binNumber }) => {
   }
 }
 
-const wcpmErrors = (state = Map(), { type, component, message }) => {
+const wcpmErrors = (state = fromJS({ general: [] }), { type, scope, message }) => {
   switch (type) {
     case 'WCPM/ERRORS/SET':
-      return state.set(component, message)
+      return (scope === 'general')
+        ? state.updateIn([scope], (scope) => (scope.push(message)))
+        : state.set(scope, message)
     case 'WCPM/ERRORS/CLEAR_COMPONENT':
-      return state.delete(component)
+      return state.delete(scope)
     case 'WCPM/ERRORS/CLEAR':
     case 'WCPM/EDIT_MODE_SAVE':
     case 'WCPM/EDIT_MODE_CANCEL':
-      return Map()
+      return fromJS({ general: [] })
     default:
       return state
   }

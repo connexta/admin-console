@@ -67,7 +67,8 @@ import {
   whitelistContextPathGroupStyle,
   claimsAttributeStyle,
   submitting,
-  error
+  error,
+  errorBorder
 } from './styles.less'
 
 let Edit = ({editing, binNumber, editModeOn}) => {
@@ -288,14 +289,16 @@ const WhitelistBin = ({ policyBin, binNumber, editing, editingBinNumber }) => (
   </Paper>
 )
 
-let ErrorBanner = ({ editing, message }) => {
-  return (editing && message) ? (
-    <Flexbox flexDirection='row' justifyContent='center' className={error}>{message}</Flexbox>
+let ErrorBanner = ({ editing, messages }) => {
+  return (editing && messages && messages.length > 0) ? (
+    <div className={errorBorder}>
+      { messages.map((message, i) => (<Flexbox key={i} flexDirection='row' justifyContent='center' className={error}>{message}</Flexbox>)) }
+    </div>
     ) : null
 }
 ErrorBanner = connect(
   (state) => ({
-    message: getWcpmErrors(state).general
+    messages: getWcpmErrors(state).general
   }))(ErrorBanner)
 
 const PolicyBin = ({ policyBin, binNumber, editing, editingBinNumber }) => (
@@ -319,7 +322,7 @@ const PolicyBin = ({ policyBin, binNumber, editing, editingBinNumber }) => (
     </Flexbox>
     <ErrorBanner editing={editing} />
     <Edit editing={editing} binNumber={binNumber} />
-    <ConfirmationPanel bin={policyBin} binNumber={binNumber} editing={editing} allowDelete />
+    <ConfirmationPanel bin={policyBin} binNumber={binNumber} editing={editing} allowDelete={!policyBin.name} /> { /* Named bins are special bins that are non-deletable, ex. 'Whitelist' or 'NewBin' */ }
     { (!editing && editingBinNumber !== null) ? <DisabledPanel /> : null }
   </Paper>
 )

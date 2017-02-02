@@ -80,8 +80,6 @@ export const testSources = (configType, nextStageId, id = 'general') => async (d
     dispatch(setSourceSelections(sources))
     dispatch(clearMessages(id))
     dispatch(changeStage(nextStageId))
-  } catch (e) {
-    console.log(e)
   } finally {
     dispatch(endSubmitting())
   }
@@ -110,8 +108,6 @@ export const persistConfig = (url, config, nextStageId, configType, id = 'genera
 
     dispatch(clearMessages(id))
     dispatch(changeStage(nextStageId))
-  } catch (e) {
-    console.log(e)
   } finally {
     dispatch(endSubmitting())
   }

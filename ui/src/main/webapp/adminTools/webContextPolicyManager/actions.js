@@ -27,9 +27,9 @@ export const removeAttributeMapping = (binNumber, claim) => ({ type: 'WCPM/REMOV
 export const setPolicyOptions = (options) => ({ type: 'WCPM/SET_OPTIONS', options })
 
 // Errors
-export const setError = (component, message) => ({ type: 'WCPM/ERRORS/SET', component, message })
+export const setError = ({ scope, message }) => ({ type: 'WCPM/ERRORS/SET', scope, message })
 export const clearAllErrors = () => ({ type: 'WCPM/ERRORS/CLEAR' })
-export const clearComponentError = (component) => ({ type: 'WCPM/ERRORS/CLEAR_COMPONENT', component })
+export const clearComponentError = (scope) => ({ type: 'WCPM/ERRORS/CLEAR_COMPONENT', scope })
 
 // Persist Field Validations
 export const addContextPath = (attribute, binNumber) => (dispatch, getState) => {
@@ -43,7 +43,7 @@ export const addContextPath = (attribute, binNumber) => (dispatch, getState) => 
 
   // simple test for invalid path - backend also validates paths as an additional precaution
   if (!(/^(\/[!#$&-;=?-[\]_a-z~]+)+/.test(newPath))) {
-    dispatch(setError('contextPaths', 'Invalid context path.'))
+    dispatch(setError({ scope: 'contextPaths', message: 'Invalid context path.' }))
     return
   }
 
@@ -53,10 +53,10 @@ export const addContextPath = (attribute, binNumber) => (dispatch, getState) => 
 
   if (duplicateBinNumber !== undefined) {
     if (duplicateBinNumber === 0) {
-      dispatch(setError('contextPaths', 'This path is in the Whitelist.'))
+      dispatch(setError({ scope: 'contextPaths', message: 'This path is in the Whitelist.' }))
       return
     }
-    dispatch(setError('contextPaths', 'This path is already being used in bin #' + duplicateBinNumber + '.'))
+    dispatch(setError({ scope: 'contextPaths', message: 'This path is already being used in bin #' + duplicateBinNumber + '.' }))
     return
   }
 
@@ -74,42 +74,83 @@ export const updatePolicyBins = (url) => async (dispatch) => {
   }
 }
 
-const isEmpty = (bin, key) => {
-  if (bin[key] && bin[key].trim() !== '') {
-    return false
+const isBlank = (string) => { return !string || !string.trim() }
+const errorResult = (scope, message) => ({ scope, message })
+
+const checkContextPathValidity = (bin) => {
+  let errors = []
+  if (!isBlank(bin.newcontextPaths)) {
+    errors.push(errorResult('contextPaths', 'Field edited but not added. Please add or clear before saving.'))
   }
-  return true
+  if (bin.contextPaths.length === 0) {
+    errors.push(errorResult('general', 'Must have at least 1 Context Path'))
+  } else if (bin.contextPaths.some((path) => (isBlank(path)))) {
+    errors.push(errorResult('general', 'Cannot have empty Context Paths'))
+  }
+  return errors
 }
 
-export const persistChanges = (binNumber, url) => async (dispatch, getState) => {
+const checkRealmValidity = (bin) => {
+  let errors = []
+  if (isBlank(bin.realm)) {
+    errors.push(errorResult('general', 'Realm cannot be blank.'))
+  }
+  return errors
+}
+
+const checkAuthenticationTypeValidity = (bin) => {
+  let errors = []
+  if (!isBlank(bin.newauthenticationTypes)) {
+    errors.push(errorResult('authTypes', 'Field edited but not added. Please add or clear before saving.'))
+  }
+  if (bin.authenticationTypes.length === 0) {
+    errors.push(errorResult('general', 'Must have at least 1 Authentication Type'))
+  } else if (bin.authenticationTypes.some((type) => (isBlank(type)))) {
+    errors.push(errorResult('general', 'Cannot have empty Authentication Types'))
+  }
+  return errors
+}
+
+const checkRequiredAttributesValidity = (bin) => {
+  let errors = []
+  if (!isBlank(bin.newrequiredClaim)) {
+    errors.push(errorResult('requiredClaim', 'Field edited but not added. Please add or clear before saving.'))
+  }
+  if (!isBlank(bin.newrequiredAttribute)) {
+    errors.push(errorResult('requiredAttribute', 'Field edited but not added. Please add or clear before saving.'))
+  }
+  return errors
+}
+
+export const persistChanges = (binNumber, url, isDeleting) => async (dispatch, getState) => {
   dispatch(clearAllErrors())
   // Check for non-empty edit fields
   const bin = getBins(getState())[getState().toJS().wcpm.editingBinNumber]
-  let hasErrors = false
-  if (!isEmpty(bin, 'newcontextPaths')) {
-    dispatch(setError('contextPaths', 'Field edited but not added. Please add or clear before saving.'))
-    hasErrors = true
-    console.log('contextpaths error')
+
+  // do not perform field validation checks if bin is being removed
+  if (!isDeleting) {
+    let hasErrors = false
+
+    checkContextPathValidity(bin).forEach((error) => {
+      hasErrors = true
+      dispatch(setError(error))
+    })
+    checkRealmValidity(bin).forEach((error) => {
+      hasErrors = true
+      dispatch(setError(error))
+    })
+    checkAuthenticationTypeValidity(bin).forEach((error) => {
+      hasErrors = true
+      dispatch(setError(error))
+    })
+    checkRequiredAttributesValidity(bin).forEach((error) => {
+      hasErrors = true
+      dispatch(setError(error))
+    })
+    if (hasErrors) {
+      return
+    }
   }
-  if (!isEmpty(bin, 'newauthenticationTypes')) {
-    dispatch(setError('authTypes', 'Field edited but not added. Please add or clear before saving.'))
-    hasErrors = true
-    console.log('authtypes error')
-  }
-  if (!isEmpty(bin, 'newrequiredClaim')) {
-    dispatch(setError('requiredClaim', 'Field edited but not added. Please add or clear before saving.'))
-    hasErrors = true
-    console.log('reqClaim error')
-  }
-  if (!isEmpty(bin, 'newrequiredAttribute')) {
-    dispatch(setError('requiredAttribute', 'Field edited but not added. Please add or clear before saving.'))
-    hasErrors = true
-    console.log('reqAttr error')
-  }
-  if (hasErrors) {
-    dispatch(setError('general', 'Please address marked fields above before saving.'))
-    return
-  } // do not persist if any errors are present
 
   // TODO: check for duplicate context paths
 
@@ -159,5 +200,5 @@ export const fetchOptions = (url) => async (dispatch, getState) => {
 
 export const confirmRemoveBinAndPersist = (binNumber, url) => (dispatch) => {
   dispatch(confirmRemoveBin(binNumber))
-  dispatch(persistChanges(binNumber, url))
+  dispatch(persistChanges(binNumber, url, true))
 }

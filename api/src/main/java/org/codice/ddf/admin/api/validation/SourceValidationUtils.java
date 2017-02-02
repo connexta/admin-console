@@ -57,11 +57,6 @@ public class SourceValidationUtils {
         return errors;
     }
 
-    public static List<ConfigurationMessage> validateCswOutputSchema(String outputSchema, String configId) {
-        // TODO: tbatie - 1/17/17 - Validate the output schema
-        return validateString(outputSchema, configId);
-    }
-
     public static List<ConfigurationMessage> validateOptionalUsernameAndPassword(SourceConfiguration configuration) {
         List<ConfigurationMessage> validationResults = new ArrayList<>();
         if (configuration.sourceUserName() != null) {

@@ -54,7 +54,6 @@ public class OpenSearchConfigFromUrlProbeMethod extends ProbeMethod<OpenSearchSo
     public static final List<String> REQUIRED_FIELDS = ImmutableList.of(ENDPOINT_URL);
     public static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(CONFIG_CREATED, "Created OpenSearch configuration from provided URL.");
 
-    // TODO: tbatie - 1/20/17 - Should have optional fields for username and password, don't forget to validate
     public static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(
             BAD_CONFIG, "Failed to create a configuration from the URL.",
             CANNOT_CONNECT, "THe URL provided could not be reached.",

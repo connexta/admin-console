@@ -56,14 +56,15 @@ public class WfsSourceUtils {
             "http://%s:%d/services/wfs",
             "http://%s:%d/wfs");
 
-    public static Optional<UrlAvailability> confirmEndpointUrl(WfsSourceConfiguration config) {
-        return URL_FORMATS.stream()
+    public static UrlAvailability confirmEndpointUrl(WfsSourceConfiguration config) {
+        Optional<UrlAvailability> result =  URL_FORMATS.stream()
                 .map(formatUrl -> String.format(formatUrl,
                         config.sourceHostName(),
                         config.sourcePort()))
                 .map(WfsSourceUtils::getUrlAvailability)
                 .filter(avail -> avail.isAvailable() || avail.isCertError())
                 .findFirst();
+        return result.isPresent() ? result.get() : null;
     }
 
     public static UrlAvailability getUrlAvailability(String url) {

@@ -136,7 +136,6 @@ public class LdapTestingCommons {
                 }
             }
         } catch (IOException e) {
-            // TODO: tbatie - 1/25/17 - We should be catching an invalid query exception and probably a lot more. Make sure to return the proper configuration message
             reader.close();
         }
 

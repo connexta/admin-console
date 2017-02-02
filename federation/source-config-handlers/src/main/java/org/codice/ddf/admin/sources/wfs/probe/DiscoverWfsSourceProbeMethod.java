@@ -30,6 +30,7 @@ import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.endp
 import static org.codice.ddf.admin.api.handler.report.ProbeReport.createProbeReport;
 import static org.codice.ddf.admin.api.validation.SourceValidationUtils.validateOptionalUsernameAndPassword;
 import static org.codice.ddf.admin.sources.wfs.WfsSourceConfigurationHandler.WFS_SOURCE_CONFIGURATION_HANDLER_ID;
+import static org.codice.ddf.admin.sources.wfs.WfsSourceUtils.getPreferredConfig;
 
 import java.util.HashMap;
 import java.util.List;
@@ -53,7 +54,7 @@ public class DiscoverWfsSourceProbeMethod extends ProbeMethod<WfsSourceConfigura
     public static final List<String> REQUIRED_FIELDS = ImmutableList.of(SOURCE_HOSTNAME, PORT);
     public static final List<String> OPTIONAL_FIELDS = ImmutableList.of(SOURCE_USERNAME,
             SOURCE_USER_PASSWORD);
-    public static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(CONFIG_CREATED, "Created configuration from the WFS endpoint.");
+    public static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(CONFIG_CREATED, "Successfully created a configuration from the WFS endpoint.");
     public static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(
             CANNOT_CONNECT, "The URL provided could not be reached.",
             UNKNOWN_ENDPOINT, "The endpoint does not appear to have WFS capabilities.",
@@ -72,30 +73,28 @@ public class DiscoverWfsSourceProbeMethod extends ProbeMethod<WfsSourceConfigura
                 OPTIONAL_FIELDS,
                 SUCCESS_TYPES,
                 FAILURE_TYPES,
-                null,
+                WARNING_TYPES,
                 RETURN_TYPES);
     }
 
     @Override
     public ProbeReport probe(WfsSourceConfiguration configuration) {
         WfsSourceConfiguration config = new WfsSourceConfiguration(configuration);
-        ProbeReport probeReport = createProbeReport(SUCCESS_TYPES, FAILURE_TYPES, WARNING_TYPES, endpointIsReachable(configuration.endpointUrl()));
+        ProbeReport probeReport = new ProbeReport(buildMessage(SUCCESS_TYPES, FAILURE_TYPES, WARNING_TYPES, endpointIsReachable(config.sourceHostName(), config.sourcePort())));
         if(probeReport.containsFailureMessages()) {
             return probeReport;
         }
 
-        UrlAvailability availability = WfsSourceUtils.getUrlAvailability(configuration.endpointUrl());
-
+        UrlAvailability availability = WfsSourceUtils.confirmEndpointUrl(config);
         if(availability == null) {
             return probeReport.addMessage(buildMessage(SUCCESS_TYPES, FAILURE_TYPES, WARNING_TYPES, UNKNOWN_ENDPOINT));
         }
-
-        probeReport.addMessage(buildMessage(SUCCESS_TYPES, FAILURE_TYPES, WARNING_TYPES, availability.getAvailabilityResult()));
+        probeReport = createProbeReport(SUCCESS_TYPES, FAILURE_TYPES, WARNING_TYPES, availability.getAvailabilityResult());
         if(probeReport.containsFailureMessages()) {
             return probeReport;
         }
 
-        Optional<WfsSourceConfiguration> createdConfig = WfsSourceUtils.getPreferredConfig(config);
+        Optional<WfsSourceConfiguration> createdConfig = getPreferredConfig((WfsSourceConfiguration) config.endpointUrl(availability.getUrl()));
         if (!createdConfig.isPresent()) {
             return probeReport.addMessage(buildMessage(SUCCESS_TYPES, FAILURE_TYPES, WARNING_TYPES, INTERNAL_ERROR));
         }

@@ -92,17 +92,16 @@ public class DirectoryStructTestMethod extends TestMethod<LdapConfiguration> {
     private static final Map<String, String> FAILURE_TYPES = toDescriptionMap(Arrays.asList(
             CANNOT_CONFIGURE,
             CANNOT_CONNECT,
-            CANNOT_BIND,
-            BASE_USER_DN_NOT_FOUND,
-            BASE_GROUP_DN_NOT_FOUND,
-            USER_NAME_ATTRIBUTE_NOT_FOUND));
-    // TODO: tbatie - 1/25/17 - There are additional failure types to add to this list
+            CANNOT_BIND));
 
     private static final Map<String, String> WARNING_TYPES = toDescriptionMap(Arrays.asList(
             NO_USERS_IN_BASE_USER_DN,
             NO_GROUPS_IN_BASE_GROUP_DN,
             NO_GROUPS_WITH_MEMBERS,
-            NO_REFERENCED_MEMBER));
+            NO_REFERENCED_MEMBER,
+            USER_NAME_ATTRIBUTE_NOT_FOUND,
+            BASE_USER_DN_NOT_FOUND,
+            BASE_GROUP_DN_NOT_FOUND));
 
     private final LdapTestingCommons ldapTestingCommons;
 

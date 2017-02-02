@@ -73,12 +73,13 @@ public class DiscoverCswSourceProbeMethod extends ProbeMethod<CswSourceConfigura
                 OPTIONAL_FIELDS,
                 SUCCESS_TYPES,
                 FAILURE_TYPES,
-                null,
+                WARNING_TYPES,
                 RETURN_TYPES);
     }
 
     @Override
     public ProbeReport probe(CswSourceConfiguration configuration) {
+        // TODO: tbatie - 2/1/17 - (Ticket) There is duplicate code across all the Discover/ConfigrFromUrl methods, this can all be eliminated
         CswSourceConfiguration config = new CswSourceConfiguration(configuration);
         ProbeReport probeReport = new ProbeReport(buildMessage(SUCCESS_TYPES, FAILURE_TYPES, WARNING_TYPES, endpointIsReachable(config.sourceHostName(), config.sourcePort())));
         if(probeReport.containsFailureMessages()) {

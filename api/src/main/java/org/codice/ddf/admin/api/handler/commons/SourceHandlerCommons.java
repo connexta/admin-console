@@ -35,7 +35,6 @@ public class SourceHandlerCommons {
     //Common success types
     public static final String CONFIG_CREATED = "CONFIG_CREATED";
     public static final String VERIFIED_URL = "VERIFIED_URL";
-    public static final String ENDPOINT_DISCOVERED = "ENDPOINT_DISCOVERED";
     public static final String REACHED_URL = "REACHED_URL";
 
     //Common warning types

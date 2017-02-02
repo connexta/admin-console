@@ -20,7 +20,7 @@
     <parent>
         <artifactId>admin-security</artifactId>
         <groupId>org.codice.ddf.admin.beta</groupId>
-        <version>2.10.0-SNAPSHOT</version>
+        <version>0.1.0-SNAPSHOT</version>
     </parent>
     <name>DDF :: Admin (Beta) :: Security :: LDAP Handler</name>
     <artifactId>ldap-config-handler</artifactId>
@@ -31,6 +31,11 @@
             <groupId>org.codice.ddf.admin.beta</groupId>
             <artifactId>admin-api</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
         </dependency>
 
         <!--ldap connection dependencies-->
@@ -67,10 +72,49 @@
         <!--ldap connection dependencies end-->
 
         <!--Spock dependencies-->
+        <!--
+        TODO: Replace all dependencies below this line with shaded jar at version 2.10.0
         <dependency>
             <groupId>ddf.lib</groupId>
             <artifactId>spock-shaded</artifactId>
-            <version>${project.version}</version>
+            <version>2.10.0</version>
+            <scope>test</scope>
+        </dependency>
+        -->
+        <dependency>
+            <groupId>org.ow2.asm</groupId>
+            <artifactId>asm</artifactId>
+            <version>5.0.4</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>cglib</groupId>
+            <artifactId>cglib-nodep</artifactId>
+            <version>3.2.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.objenesis</groupId>
+            <artifactId>objenesis</artifactId>
+            <version>2.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.spockframework</groupId>
+            <artifactId>spock-core</artifactId>
+            <version>1.0-groovy-2.4</version>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.codehaus.groovy</groupId>
+                    <artifactId>groovy-all</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-all</artifactId>
+            <version>${groovy.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

@@ -20,16 +20,19 @@
     <parent>
         <artifactId>admin</artifactId>
         <groupId>org.codice.ddf.admin.beta</groupId>
-        <version>2.10.0-SNAPSHOT</version>
+        <version>0.1.0-SNAPSHOT</version>
     </parent>
     <name>DDF :: Admin (Beta) :: UI</name>
     <artifactId>admin-ui</artifactId>
     <packaging>bundle</packaging>
     <dependencies>
+        <!--
+        TODO: Remove when possible
+        -->
         <dependency>
             <groupId>ddf.platform.error</groupId>
             <artifactId>platform-error-servlet</artifactId>
-            <version>${project.version}</version>
+            <version>2.9.4</version>
         </dependency>
     </dependencies>
     <build>

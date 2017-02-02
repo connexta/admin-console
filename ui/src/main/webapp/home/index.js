@@ -17,6 +17,7 @@ import VpnLockIcon from 'material-ui/svg-icons/notification/vpn-lock'
 import Divider from 'material-ui/Divider'
 import { cyan500 } from 'material-ui/styles/colors'
 import RaisedButton from 'material-ui/RaisedButton'
+import MapDisplay from 'components/MapDisplay'
 
 import * as styles from './styles.less'
 
@@ -111,7 +112,8 @@ const LdapTileView = (props) => {
     baseGroupDn,
     baseUserDn,
     onDeleteConfig,
-    ldapUseCase
+    ldapUseCase,
+    attributeMappings
   } = props
 
   return (
@@ -125,6 +127,11 @@ const LdapTileView = (props) => {
       <ConfigField fieldName='UserName Attribute' value={userNameAttribute} />
       <ConfigField fieldName='Base Group DN' value={baseGroupDn} />
       <ConfigField fieldName='Base User DN' value={baseUserDn} />
+      { ldapUseCase !== 'authentication'
+        ? (
+          <MapDisplay label='Attribute Mappings'
+            mapping={attributeMappings} />
+      ) : null }
       <RaisedButton style={{marginTop: 20}} label='Delete' secondary onClick={onDeleteConfig} />
     </Paper>
   )

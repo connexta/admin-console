@@ -10,6 +10,7 @@ import ActionGroup from 'components/ActionGroup'
 import Info from 'components/Information'
 import Spinner from 'components/Spinner'
 import Message from 'components/Message'
+import MapDisplay from 'components/MapDisplay'
 
 import { confirmationInfo } from './styles.less'
 
@@ -53,11 +54,8 @@ export default ({ disabled, prev, persist, submitting, messages = [], configs })
         </Flexbox>
         { configs.ldapUseCase !== 'authentication'
           ? (
-            <div>
-              <Info label='Attribute Mappings'
-                value={Object.keys(configs.attributeMappings)
-                  .map((key) => key + ' = ' + configs.attributeMappings[key])} />
-            </div>
+            <MapDisplay label='Attribute Mappings'
+              mapping={configs.attributeMappings} />
           ) : null }
       </Flexbox>
 

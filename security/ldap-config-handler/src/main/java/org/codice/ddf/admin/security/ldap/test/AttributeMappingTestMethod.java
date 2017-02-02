@@ -43,9 +43,7 @@ public class AttributeMappingTestMethod extends TestMethod<LdapConfiguration> {
 
     private static final String LDAP_ATTRIBUTE_MAPPING_TEST_ID = "attribute-mapping";
 
-    private static final String VALIDATED = "validated";
-
-    private static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(VALIDATED,
+    private static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(SUCCESSFUL_TEST,
             "Attribute mapping was successfully validated.");
 
     public static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(INVALID_FIELD,

@@ -35,16 +35,15 @@
             <version>2.9.4</version>
             <scope>provided</scope>
         </dependency>
-        <!---->
         <dependency>
             <groupId>ddf.admin.core</groupId>
             <artifactId>admin-core-api</artifactId>
             <version>2.9.4</version>
             <scope>provided</scope>
         </dependency>
+        <!---->
 
         <!--todo these ldap dependencies to be removed when ldap is yanked out of this module-->
-        <!--ldap connection dependencies-->
         <dependency>
             <groupId>org.codice.org.forgerock.opendj</groupId>
             <artifactId>opendj-core</artifactId>
@@ -102,53 +101,6 @@
             <artifactId>oro</artifactId>
             <version>2.0.8</version>
         </dependency>
-
-        <!--Spock dependencies-->
-        <!--
-        TODO: Replace all dependencies below this line with shaded jar at version 2.10.0
-        <dependency>
-            <groupId>ddf.lib</groupId>
-            <artifactId>spock-shaded</artifactId>
-            <version>2.10.0</version>
-            <scope>test</scope>
-        </dependency>
-        -->
-        <dependency>
-            <groupId>org.ow2.asm</groupId>
-            <artifactId>asm</artifactId>
-            <version>5.0.4</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>cglib</groupId>
-            <artifactId>cglib-nodep</artifactId>
-            <version>3.2.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.objenesis</groupId>
-            <artifactId>objenesis</artifactId>
-            <version>2.1</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.spockframework</groupId>
-            <artifactId>spock-core</artifactId>
-            <version>1.0-groovy-2.4</version>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.codehaus.groovy</groupId>
-                    <artifactId>groovy-all</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.groovy</groupId>
-            <artifactId>groovy-all</artifactId>
-            <version>${groovy.version}</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
     <build>
@@ -176,6 +128,7 @@
                     </instructions>
                 </configuration>
             </plugin>
+
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
@@ -194,17 +147,17 @@
                                         <limit>
                                             <counter>INSTRUCTION</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.00</minimum>
+                                            <minimum>0.45</minimum>
                                         </limit>
                                         <limit>
                                             <counter>BRANCH</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.00</minimum>
+                                            <minimum>0.40</minimum>
                                         </limit>
                                         <limit>
                                             <counter>COMPLEXITY</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.00</minimum>
+                                            <minimum>0.40</minimum>
                                         </limit>
                                     </limits>
                                 </rule>

@@ -27,16 +27,24 @@
     <packaging>bundle</packaging>
 
     <dependencies>
+        <!--
+        TODO: Remove when project is merged to DDF and re-parented
+        -->
         <dependency>
-            <groupId>org.codice.ddf.admin.beta</groupId>
-            <artifactId>admin-api</artifactId>
-            <version>${project.version}</version>
+            <groupId>ddf.security.policy</groupId>
+            <artifactId>security-policy-context</artifactId>
+            <version>2.9.4</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>${guava.version}</version>
+            <groupId>ddf.admin.core</groupId>
+            <artifactId>admin-core-api</artifactId>
+            <version>2.9.4</version>
+            <scope>test</scope>
         </dependency>
+        <!--
+        Remove when project is merged to DDF and re-parented
+        -->
 
         <!--ldap connection dependencies-->
         <dependency>
@@ -71,51 +79,15 @@
         </dependency>
         <!--ldap connection dependencies end-->
 
-        <!--Spock dependencies-->
-        <!--
-        TODO: Replace all dependencies below this line with shaded jar at version 2.10.0
         <dependency>
-            <groupId>ddf.lib</groupId>
-            <artifactId>spock-shaded</artifactId>
-            <version>2.10.0</version>
-            <scope>test</scope>
-        </dependency>
-        -->
-        <dependency>
-            <groupId>org.ow2.asm</groupId>
-            <artifactId>asm</artifactId>
-            <version>5.0.4</version>
-            <scope>test</scope>
+            <groupId>org.codice.ddf.admin.beta</groupId>
+            <artifactId>admin-api</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>cglib</groupId>
-            <artifactId>cglib-nodep</artifactId>
-            <version>3.2.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.objenesis</groupId>
-            <artifactId>objenesis</artifactId>
-            <version>2.1</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.spockframework</groupId>
-            <artifactId>spock-core</artifactId>
-            <version>1.0-groovy-2.4</version>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.codehaus.groovy</groupId>
-                    <artifactId>groovy-all</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.groovy</groupId>
-            <artifactId>groovy-all</artifactId>
-            <version>${groovy.version}</version>
-            <scope>test</scope>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
         </dependency>
     </dependencies>
 

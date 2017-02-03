@@ -56,13 +56,13 @@ public class WfsSourceUtils {
     private static final String ACCEPT_VERSION_PARAMS = "&AcceptVersions=2.0.0,1.0.0";
 
     private static final List<String> URL_FORMATS = ImmutableList.of("https://%s:%d/services/wfs",
-            "https://%s:%d/wfs");
-    //TODO: Add these when enabling http is an option
-//            "http://%s:%d/services/wfs",
-//            "http://%s:%d/wfs");
+            "https://%s:%d/wfs",
+            "http://%s:%d/services/wfs",
+            "http://%s:%d/wfs");
 
     public UrlAvailability confirmEndpointUrl(WfsSourceConfiguration config) {
         Optional<UrlAvailability> result = URL_FORMATS.stream()
+                .filter(url -> url.startsWith("https"))
                 .map(formatUrl -> String.format(formatUrl,
                         config.sourceHostName(),
                         config.sourcePort()))

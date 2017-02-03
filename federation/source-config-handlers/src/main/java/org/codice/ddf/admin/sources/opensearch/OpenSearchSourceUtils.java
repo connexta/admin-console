@@ -52,10 +52,9 @@ public class OpenSearchSourceUtils {
 
     private static final List<String> URL_FORMATS = ImmutableList.of(
             "https://%s:%d/services/catalog/query",
-            "https://%s:%d/catalog/query");
-    // TODO: add these when allowing http is an option
-//            "http://%s:%d/services/catalog/query",
-//            "http://%s:%d/catalog/query");
+            "https://%s:%d/catalog/query",
+            "http://%s:%d/services/catalog/query",
+            "http://%s:%d/catalog/query");
 
     private static final String SIMPLE_QUERY_PARAMS = "?q=test&mr=1";
 
@@ -64,6 +63,7 @@ public class OpenSearchSourceUtils {
     //Given a config, returns the correct URL format for the endpoint if one exists
     public UrlAvailability confirmEndpointUrl(OpenSearchSourceConfiguration config) {
         Optional<UrlAvailability> result = URL_FORMATS.stream()
+                .filter(url -> url.startsWith("https"))
                 .map(formatUrl -> String.format(formatUrl,
                         config.sourceHostName(),
                         config.sourcePort()))

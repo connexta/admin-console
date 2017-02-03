@@ -53,11 +53,9 @@ public class CswSourceUtils {
     public static final String GET_CAPABILITIES_PARAMS = "?service=CSW&request=GetCapabilities";
 
     private static final List<String> URL_FORMATS = ImmutableList.of("https://%s:%d/services/csw",
-            "https://%s:%d/csw");
-    //TODO: Add these once allowing http is an option
-//            ,
-//            "http://%s:%d/services/csw",
-//            "http://%s:%d/csw");
+            "https://%s:%d/csw",
+            "http://%s:%d/services/csw",
+            "http://%s:%d/csw");
 
     private static final List<String> CSW_MIME_TYPES = ImmutableList.of("text/xml",
             "application/xml");
@@ -163,6 +161,7 @@ public class CswSourceUtils {
     // Determines the correct CSW endpoint URL format given a config with a Hostname and Port
     public UrlAvailability confirmEndpointUrl(CswSourceConfiguration config) {
         Optional<UrlAvailability> result =  URL_FORMATS.stream()
+                .filter(url -> url.startsWith("https"))
                 .map(formatUrl -> String.format(formatUrl,
                         config.sourceHostName(),
                         config.sourcePort()))

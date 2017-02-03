@@ -72,6 +72,8 @@ public class OpenSearchConfigFromUrlProbeMethod extends ProbeMethod<OpenSearchSo
 
     public static final List<String> RETURN_TYPES = ImmutableList.of(DISCOVERED_SOURCES);
 
+    private OpenSearchSourceUtils utils;
+
     public OpenSearchConfigFromUrlProbeMethod() {
         super(OPENSEARCH_CONFIG_FROM_URL_ID,
                 DESCRIPTION,
@@ -81,6 +83,7 @@ public class OpenSearchConfigFromUrlProbeMethod extends ProbeMethod<OpenSearchSo
                 FAILURE_TYPES,
                 WARNING_TYPES,
                 RETURN_TYPES);
+        utils = new OpenSearchSourceUtils();
     }
 
     @Override
@@ -94,8 +97,7 @@ public class OpenSearchConfigFromUrlProbeMethod extends ProbeMethod<OpenSearchSo
             return report;
         }
 
-        UrlAvailability availability =
-                OpenSearchSourceUtils.getUrlAvailability(configuration.endpointUrl());
+        UrlAvailability availability = utils.getUrlAvailability(configuration.endpointUrl());
         if (availability == null) {
             return report.addMessage(buildMessage(SUCCESS_TYPES,
                     FAILURE_TYPES,

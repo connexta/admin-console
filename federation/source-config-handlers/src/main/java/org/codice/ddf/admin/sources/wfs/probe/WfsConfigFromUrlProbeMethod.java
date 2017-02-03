@@ -30,7 +30,6 @@ import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.VERI
 import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.endpointIsReachable;
 import static org.codice.ddf.admin.api.validation.SourceValidationUtils.validateOptionalUsernameAndPassword;
 import static org.codice.ddf.admin.sources.wfs.WfsSourceConfigurationHandler.WFS_SOURCE_CONFIGURATION_HANDLER_ID;
-import static org.codice.ddf.admin.sources.wfs.WfsSourceUtils.getUrlAvailability;
 
 import java.util.HashMap;
 import java.util.List;
@@ -80,6 +79,8 @@ public class WfsConfigFromUrlProbeMethod extends ProbeMethod<WfsSourceConfigurat
 
     public static final List<String> RETURN_TYPES = ImmutableList.of(DISCOVERED_SOURCES);
 
+    private WfsSourceUtils utils;
+
     public WfsConfigFromUrlProbeMethod() {
         super(WFS_CONFIG_FROM_URL_ID,
                 DESCRIPTION,
@@ -89,6 +90,7 @@ public class WfsConfigFromUrlProbeMethod extends ProbeMethod<WfsSourceConfigurat
                 FAILURE_TYPES,
                 WARNING_TYPES,
                 RETURN_TYPES);
+        utils = new WfsSourceUtils();
     }
 
     @Override
@@ -101,7 +103,7 @@ public class WfsConfigFromUrlProbeMethod extends ProbeMethod<WfsSourceConfigurat
             return report;
         }
 
-        UrlAvailability availability = getUrlAvailability(configuration.endpointUrl());
+        UrlAvailability availability = utils.getUrlAvailability(configuration.endpointUrl());
         if (availability == null) {
             return report.addMessage(buildMessage(SUCCESS_TYPES,
                     FAILURE_TYPES,
@@ -117,7 +119,7 @@ public class WfsConfigFromUrlProbeMethod extends ProbeMethod<WfsSourceConfigurat
             return report;
         }
 
-        Optional<WfsSourceConfiguration> createdConfig = WfsSourceUtils.getPreferredConfig(
+        Optional<WfsSourceConfiguration> createdConfig = utils.getPreferredConfig(
                 configuration);
         if (!createdConfig.isPresent()) {
             return report.addMessage(buildMessage(SUCCESS_TYPES,

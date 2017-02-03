@@ -30,7 +30,6 @@ import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.endp
 import static org.codice.ddf.admin.api.handler.report.ProbeReport.createProbeReport;
 import static org.codice.ddf.admin.api.validation.SourceValidationUtils.validateOptionalUsernameAndPassword;
 import static org.codice.ddf.admin.sources.csw.CswSourceConfigurationHandler.CSW_SOURCE_CONFIGURATION_HANDLER_ID;
-import static org.codice.ddf.admin.sources.csw.CswSourceUtils.getPreferredConfig;
 
 import java.util.HashMap;
 import java.util.List;
@@ -76,6 +75,8 @@ public class DiscoverCswSourceProbeMethod extends ProbeMethod<CswSourceConfigura
 
     public static final List<String> RETURN_TYPES = ImmutableList.of(DISCOVERED_SOURCES);
 
+    private CswSourceUtils utils;
+
     public DiscoverCswSourceProbeMethod() {
         super(CSW_DISCOVER_SOURCES_ID,
                 DESCRIPTION,
@@ -85,6 +86,7 @@ public class DiscoverCswSourceProbeMethod extends ProbeMethod<CswSourceConfigura
                 FAILURE_TYPES,
                 WARNING_TYPES,
                 RETURN_TYPES);
+        utils = new CswSourceUtils();
     }
 
     @Override
@@ -99,7 +101,7 @@ public class DiscoverCswSourceProbeMethod extends ProbeMethod<CswSourceConfigura
             return probeReport;
         }
 
-        UrlAvailability availability = CswSourceUtils.confirmEndpointUrl(config);
+        UrlAvailability availability = utils.confirmEndpointUrl(config);
         if (availability == null) {
             return probeReport.addMessage(buildMessage(SUCCESS_TYPES,
                     FAILURE_TYPES,
@@ -114,8 +116,7 @@ public class DiscoverCswSourceProbeMethod extends ProbeMethod<CswSourceConfigura
             return probeReport;
         }
 
-        Optional<CswSourceConfiguration> createdConfig =
-                getPreferredConfig((CswSourceConfiguration) config.endpointUrl(availability.getUrl()));
+        Optional<CswSourceConfiguration> createdConfig = utils.getPreferredConfig((CswSourceConfiguration) config.endpointUrl(availability.getUrl()));
         if (!createdConfig.isPresent()) {
             return probeReport.addMessage(buildMessage(SUCCESS_TYPES,
                     FAILURE_TYPES,

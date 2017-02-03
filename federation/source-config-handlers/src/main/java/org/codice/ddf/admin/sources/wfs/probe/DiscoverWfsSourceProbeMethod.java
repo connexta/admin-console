@@ -30,7 +30,6 @@ import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.endp
 import static org.codice.ddf.admin.api.handler.report.ProbeReport.createProbeReport;
 import static org.codice.ddf.admin.api.validation.SourceValidationUtils.validateOptionalUsernameAndPassword;
 import static org.codice.ddf.admin.sources.wfs.WfsSourceConfigurationHandler.WFS_SOURCE_CONFIGURATION_HANDLER_ID;
-import static org.codice.ddf.admin.sources.wfs.WfsSourceUtils.getPreferredConfig;
 
 import java.util.HashMap;
 import java.util.List;
@@ -76,6 +75,8 @@ public class DiscoverWfsSourceProbeMethod extends ProbeMethod<WfsSourceConfigura
 
     public static final List<String> RETURN_TYPES = ImmutableList.of(DISCOVERED_SOURCES);
 
+    private WfsSourceUtils utils;
+
     public DiscoverWfsSourceProbeMethod() {
         super(WFS_DISCOVER_SOURCES_ID,
                 DESCRIPTION,
@@ -85,6 +86,7 @@ public class DiscoverWfsSourceProbeMethod extends ProbeMethod<WfsSourceConfigura
                 FAILURE_TYPES,
                 WARNING_TYPES,
                 RETURN_TYPES);
+        utils = new WfsSourceUtils();
     }
 
     @Override
@@ -98,7 +100,7 @@ public class DiscoverWfsSourceProbeMethod extends ProbeMethod<WfsSourceConfigura
             return probeReport;
         }
 
-        UrlAvailability availability = WfsSourceUtils.confirmEndpointUrl(config);
+        UrlAvailability availability = utils.confirmEndpointUrl(config);
         if (availability == null) {
             return probeReport.addMessage(buildMessage(SUCCESS_TYPES,
                     FAILURE_TYPES,
@@ -113,8 +115,7 @@ public class DiscoverWfsSourceProbeMethod extends ProbeMethod<WfsSourceConfigura
             return probeReport;
         }
 
-        Optional<WfsSourceConfiguration> createdConfig =
-                getPreferredConfig((WfsSourceConfiguration) config.endpointUrl(availability.getUrl()));
+        Optional<WfsSourceConfiguration> createdConfig = utils.getPreferredConfig(config);
         if (!createdConfig.isPresent()) {
             return probeReport.addMessage(buildMessage(SUCCESS_TYPES,
                     FAILURE_TYPES,

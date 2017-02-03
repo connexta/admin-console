@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+/**
+ * Copyright (c) Codice Foundation
+ *
+ * This is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation, either
+ * version 3 of the License, or any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details. A copy of the GNU Lesser General Public License is distributed along with this program and can be found at
+ * <http://www.gnu.org/licenses/lgpl.html>.
+ *
+ **/
+-->
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:os="http://a9.com/-/spec/opensearch/1.1/">
+    <title type="text">Query Response</title>
+    <updated>2017-02-01T23:20:57.413Z</updated>
+    <id>urn:uuid:07273107-41d1-4d89-80fc-4171f234321d</id>
+    <link href="#" rel="self" />
+    <author>
+        <name>Codice Foundation</name>
+    </author>
+    <generator version="2.10.0-SNAPSHOT">ddf.distribution</generator>
+    <os:totalResults>0</os:totalResults>
+    <os:itemsPerPage>1</os:itemsPerPage>
+    <os:startIndex>1</os:startIndex>
+</feed>

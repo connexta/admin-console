@@ -72,6 +72,8 @@ public class DiscoverOpenSearchSourceProbeMethod
 
     public static final List<String> RETURN_TYPES = ImmutableList.of(DISCOVERED_SOURCES);
 
+    private OpenSearchSourceUtils utils;
+
     public DiscoverOpenSearchSourceProbeMethod() {
         super(OPENSEARCH_DISCOVER_SOURCES_ID,
                 DESCRIPTION,
@@ -81,6 +83,7 @@ public class DiscoverOpenSearchSourceProbeMethod
                 FAILURE_TYPES,
                 null,
                 RETURN_TYPES);
+        utils = new OpenSearchSourceUtils();
     }
 
     @Override
@@ -93,7 +96,7 @@ public class DiscoverOpenSearchSourceProbeMethod
             return probeReport;
         }
 
-        UrlAvailability availability = OpenSearchSourceUtils.confirmEndpointUrl(configuration);
+        UrlAvailability availability = utils.confirmEndpointUrl(configuration);
         if (availability == null) {
             return probeReport.addMessage(buildMessage(SUCCESS_TYPES,
                     FAILURE_TYPES,

@@ -30,7 +30,6 @@ import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.VERI
 import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.endpointIsReachable;
 import static org.codice.ddf.admin.api.validation.SourceValidationUtils.validateOptionalUsernameAndPassword;
 import static org.codice.ddf.admin.sources.csw.CswSourceConfigurationHandler.CSW_SOURCE_CONFIGURATION_HANDLER_ID;
-import static org.codice.ddf.admin.sources.csw.CswSourceUtils.getUrlAvailability;
 
 import java.util.HashMap;
 import java.util.List;
@@ -80,6 +79,8 @@ public class CswConfigFromUrlProbeMethod extends ProbeMethod<CswSourceConfigurat
 
     public static final List<String> RETURN_TYPES = ImmutableList.of(DISCOVERED_SOURCES);
 
+    private CswSourceUtils utils;
+
     public CswConfigFromUrlProbeMethod() {
         super(CSW_CONFIG_FROM_URL_ID,
                 DESCRIPTION,
@@ -89,6 +90,7 @@ public class CswConfigFromUrlProbeMethod extends ProbeMethod<CswSourceConfigurat
                 FAILURE_TYPES,
                 WARNING_TYPES,
                 RETURN_TYPES);
+        utils = new CswSourceUtils();
     }
 
     @Override
@@ -101,7 +103,7 @@ public class CswConfigFromUrlProbeMethod extends ProbeMethod<CswSourceConfigurat
             return report;
         }
 
-        UrlAvailability availability = getUrlAvailability(configuration.endpointUrl());
+        UrlAvailability availability = utils.getUrlAvailability(configuration.endpointUrl());
         if (availability == null) {
             return report.addMessage(buildMessage(SUCCESS_TYPES,
                     FAILURE_TYPES,
@@ -117,8 +119,7 @@ public class CswConfigFromUrlProbeMethod extends ProbeMethod<CswSourceConfigurat
             return report;
         }
 
-        Optional<CswSourceConfiguration> createdConfig = CswSourceUtils.getPreferredConfig(
-                configuration);
+        Optional<CswSourceConfiguration> createdConfig = utils.getPreferredConfig(configuration);
         if (!createdConfig.isPresent()) {
             return report.addMessage(buildMessage(SUCCESS_TYPES,
                     FAILURE_TYPES,

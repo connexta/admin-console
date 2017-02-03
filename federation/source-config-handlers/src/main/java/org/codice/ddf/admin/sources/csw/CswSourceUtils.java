@@ -33,6 +33,7 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
@@ -45,15 +46,18 @@ import org.codice.ddf.admin.api.handler.commons.UrlAvailability;
 import org.w3c.dom.Document;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.net.HttpHeaders;
 
 public class CswSourceUtils {
 
     public static final String GET_CAPABILITIES_PARAMS = "?service=CSW&request=GetCapabilities";
 
     private static final List<String> URL_FORMATS = ImmutableList.of("https://%s:%d/services/csw",
-            "https://%s:%d/csw",
-            "http://%s:%d/services/csw",
-            "http://%s:%d/csw");
+            "https://%s:%d/csw");
+    //TODO: Add these once allowing http is an option
+//            ,
+//            "http://%s:%d/services/csw",
+//            "http://%s:%d/csw");
 
     private static final List<String> CSW_MIME_TYPES = ImmutableList.of("text/xml",
             "application/xml");
@@ -70,12 +74,16 @@ public class CswSourceUtils {
             "//ows:OperationsMetadata/ows:Operation[@name='GetRecords']/ows:Parameter[@name='OutputSchema' or @name='outputSchema']/ows:Value[1]/text()";
 
     // Given a config with an endpoint URL, determines if that URL is a functional CSW endpoint.
-    public UrlAvailability getUrlAvailability(String url) {
+    public UrlAvailability getUrlAvailability(String url, String un, String pw) {
         UrlAvailability result = new UrlAvailability(url);
         String contentType;
         int status;
         url += GET_CAPABILITIES_PARAMS;
         HttpGet request = new HttpGet(url);
+        if (un != null && pw != null) {
+            byte[] auth = Base64.encodeBase64((un + ":" + pw).getBytes());
+            request.setHeader(HttpHeaders.AUTHORIZATION, "Basic " + new String(auth));
+        }
         try {
             HttpResponse response = getCloseableHttpClient(false).execute(request);
             status = response.getStatusLine().getStatusCode();
@@ -121,6 +129,10 @@ public class CswSourceUtils {
         CswSourceConfiguration preferred = new CswSourceConfiguration(config);
         HttpGet getCapabilitiesRequest = new HttpGet(
                 preferred.endpointUrl() + GET_CAPABILITIES_PARAMS);
+        if (config.sourceUserName() != null && config.sourceUserPassword() != null) {
+            byte[] auth = Base64.encodeBase64((config.sourceUserName() + ":" + config.sourceUserPassword()).getBytes());
+            getCapabilitiesRequest.setHeader(HttpHeaders.AUTHORIZATION, "Basic " + new String(auth));
+        }
         XPath xpath = XPathFactory.newInstance().newXPath();
         xpath.setNamespaceContext(SOURCES_NAMESPACE_CONTEXT);
         try {
@@ -154,7 +166,7 @@ public class CswSourceUtils {
                 .map(formatUrl -> String.format(formatUrl,
                         config.sourceHostName(),
                         config.sourcePort()))
-                .map(this::getUrlAvailability)
+                .map(url -> getUrlAvailability(url, config.sourceUserName(), config.sourceUserPassword()))
                 .filter(avail -> avail.isAvailable() || avail.isCertError())
                 .findFirst();
         return result.isPresent() ? result.get() : null;

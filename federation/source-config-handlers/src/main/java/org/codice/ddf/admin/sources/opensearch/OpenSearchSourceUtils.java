@@ -30,6 +30,7 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
@@ -42,6 +43,7 @@ import org.codice.ddf.admin.api.handler.commons.UrlAvailability;
 import org.w3c.dom.Document;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.net.HttpHeaders;
 
 public class OpenSearchSourceUtils {
 
@@ -50,9 +52,10 @@ public class OpenSearchSourceUtils {
 
     private static final List<String> URL_FORMATS = ImmutableList.of(
             "https://%s:%d/services/catalog/query",
-            "https://%s:%d/catalog/query",
-            "http://%s:%d/services/catalog/query",
-            "http://%s:%d/catalog/query");
+            "https://%s:%d/catalog/query");
+    // TODO: add these when allowing http is an option
+//            "http://%s:%d/services/catalog/query",
+//            "http://%s:%d/catalog/query");
 
     private static final String SIMPLE_QUERY_PARAMS = "?q=test&mr=1";
 
@@ -64,19 +67,23 @@ public class OpenSearchSourceUtils {
                 .map(formatUrl -> String.format(formatUrl,
                         config.sourceHostName(),
                         config.sourcePort()))
-                .map(this::getUrlAvailability)
+                .map(url -> getUrlAvailability(url, config.sourceUserName(), config.sourceUserPassword()))
                 .filter(avail -> avail.isAvailable() || avail.isCertError())
                 .findFirst();
         return result.isPresent() ? result.get() : null;
     }
 
     // Given a configuration with and endpointUrl, determines if that URL is available as an OS source
-    public UrlAvailability getUrlAvailability(String url) {
+    public UrlAvailability getUrlAvailability(String url, String un, String pw) {
         UrlAvailability result = new UrlAvailability(url);
         boolean queryResponse;
         int status;
         String contentType;
         HttpGet request = new HttpGet(url + SIMPLE_QUERY_PARAMS);
+        if (un != null && pw != null) {
+            byte[] auth = Base64.encodeBase64((un + ":" + pw).getBytes());
+            request.setHeader(HttpHeaders.AUTHORIZATION, "Basic " + new String(auth));
+        }
         XPath xpath = XPathFactory.newInstance().newXPath();
         xpath.setNamespaceContext(SOURCES_NAMESPACE_CONTEXT);
         try {

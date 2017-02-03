@@ -103,7 +103,10 @@ public class WfsConfigFromUrlProbeMethod extends ProbeMethod<WfsSourceConfigurat
             return report;
         }
 
-        UrlAvailability availability = utils.getUrlAvailability(configuration.endpointUrl());
+        UrlAvailability availability = utils.getUrlAvailability(
+                configuration.endpointUrl(),
+                configuration.sourceUserName(),
+                configuration.sourceUserPassword());
         if (availability == null) {
             return report.addMessage(buildMessage(SUCCESS_TYPES,
                     FAILURE_TYPES,

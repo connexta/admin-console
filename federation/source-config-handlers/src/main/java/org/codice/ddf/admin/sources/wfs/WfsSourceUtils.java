@@ -31,6 +31,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
@@ -43,6 +44,7 @@ import org.codice.ddf.admin.api.handler.commons.UrlAvailability;
 import org.w3c.dom.Document;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.net.HttpHeaders;
 
 public class WfsSourceUtils {
 
@@ -54,27 +56,32 @@ public class WfsSourceUtils {
     private static final String ACCEPT_VERSION_PARAMS = "&AcceptVersions=2.0.0,1.0.0";
 
     private static final List<String> URL_FORMATS = ImmutableList.of("https://%s:%d/services/wfs",
-            "https://%s:%d/wfs",
-            "http://%s:%d/services/wfs",
-            "http://%s:%d/wfs");
+            "https://%s:%d/wfs");
+    //TODO: Add these when enabling http is an option
+//            "http://%s:%d/services/wfs",
+//            "http://%s:%d/wfs");
 
     public UrlAvailability confirmEndpointUrl(WfsSourceConfiguration config) {
         Optional<UrlAvailability> result = URL_FORMATS.stream()
                 .map(formatUrl -> String.format(formatUrl,
                         config.sourceHostName(),
                         config.sourcePort()))
-                .map(this::getUrlAvailability)
+                .map(url -> getUrlAvailability(url, config.sourceUserName(), config.sourceUserPassword()))
                 .filter(avail -> avail.isAvailable() || avail.isCertError())
                 .findFirst();
         return result.isPresent() ? result.get() : null;
     }
 
-    public UrlAvailability getUrlAvailability(String url) {
+    public UrlAvailability getUrlAvailability(String url, String un, String pw) {
         UrlAvailability result = new UrlAvailability(url);
         int status;
         String contentType;
         url += GET_CAPABILITIES_PARAMS;
         HttpGet request = new HttpGet(url);
+        if (un != null && pw != null) {
+            byte[] auth = Base64.encodeBase64((un + ":" + pw).getBytes());
+            request.setHeader(HttpHeaders.AUTHORIZATION, "Basic " + new String(auth));
+        }
         try {
             HttpResponse response = getCloseableHttpClient(false).execute(request);
             status = response.getStatusLine()
@@ -125,6 +132,10 @@ public class WfsSourceUtils {
         String wfsVersionExp = "/wfs:WFS_Capabilities/attribute::version";
         HttpGet getCapabilitiesRequest = new HttpGet(
                 config.endpointUrl() + GET_CAPABILITIES_PARAMS + ACCEPT_VERSION_PARAMS);
+        if (config.sourceUserName() != null && config.sourceUserPassword() != null) {
+            byte[] auth = Base64.encodeBase64((config.sourceUserName() + ":" + config.sourceUserPassword()).getBytes());
+            getCapabilitiesRequest.setHeader(HttpHeaders.AUTHORIZATION, "Basic " + new String(auth));
+        }
         XPath xpath = XPathFactory.newInstance()
                 .newXPath();
         xpath.setNamespaceContext(SOURCES_NAMESPACE_CONTEXT);

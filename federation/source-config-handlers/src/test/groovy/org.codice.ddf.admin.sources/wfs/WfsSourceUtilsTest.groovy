@@ -49,7 +49,7 @@ class WfsSourceUtilsTest extends Specification {
     // Tests for getUrlAvailability
     def 'test happy path trusted CA'() {
         when:
-        def urlAvail = utils.getUrlAvailability("testUrl")
+        def urlAvail = utils.getUrlAvailability("testUrl", null, null)
 
         then:
         1 * client.execute(_) >> response
@@ -66,7 +66,7 @@ class WfsSourceUtilsTest extends Specification {
 
     def 'test bad return code noTrustClient' () {
         when:
-        def urlAvail = utils.getUrlAvailability("testUrl")
+        def urlAvail = utils.getUrlAvailability("testUrl", null, null)
 
         then:
         1 * client.execute(_) >> response
@@ -82,7 +82,7 @@ class WfsSourceUtilsTest extends Specification {
 
     def 'test bad mime type noTrustClient' () {
         when:
-        def urlAvail = utils.getUrlAvailability("testUrl")
+        def urlAvail = utils.getUrlAvailability("testUrl", null, null)
 
         then:
         1 * client.execute(_) >> response
@@ -98,7 +98,7 @@ class WfsSourceUtilsTest extends Specification {
 
     def 'test cert error with noTrustClient'() {
         when:
-        def urlAvail = utils.getUrlAvailability("testUrl")
+        def urlAvail = utils.getUrlAvailability("testUrl", null, null)
 
         then:
         1 * client.execute(_) >> {throw new SSLPeerUnverifiedException("test")}
@@ -110,7 +110,7 @@ class WfsSourceUtilsTest extends Specification {
 
     def 'test good path trustClient'() {
         when:
-        def urlAvail = utils.getUrlAvailability("testUrl")
+        def urlAvail = utils.getUrlAvailability("testUrl", null, null)
 
         then:
         2 * client.execute(_) >> {throw new IOException("exception")} >> response
@@ -127,7 +127,7 @@ class WfsSourceUtilsTest extends Specification {
 
     def 'test bad return code trustClient'() {
         when:
-        def urlAvail = utils.getUrlAvailability("testUrl")
+        def urlAvail = utils.getUrlAvailability("testUrl", null, null)
 
         then:
         2 * client.execute(_) >> {throw new IOException("exception")} >> response
@@ -143,7 +143,7 @@ class WfsSourceUtilsTest extends Specification {
 
     def 'test bad mime type trustClient'() {
         when:
-        def urlAvail = utils.getUrlAvailability("testUrl")
+        def urlAvail = utils.getUrlAvailability("testUrl", null, null)
 
         then:
         2 * client.execute(_) >> {throw new IOException("exception")} >> response
@@ -159,7 +159,7 @@ class WfsSourceUtilsTest extends Specification {
 
     def 'test failure to connect'() {
         when:
-        def urlAvail = utils.getUrlAvailability("testUrl")
+        def urlAvail = utils.getUrlAvailability("testUrl", null, null)
 
         then:
         2 * client.execute(_) >> {throw new IOException("exception")}

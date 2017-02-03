@@ -173,6 +173,7 @@ class CswSourceUtilsTest extends Specification {
         def config = utils.getPreferredConfig(configuration)
 
         then:
+        configuration.endpointUrl() >> "test"
         1 * client.execute(_) >> response
         1 * response.getEntity() >> entity
         1 * entity.getContent() >> ""
@@ -185,6 +186,7 @@ class CswSourceUtilsTest extends Specification {
         def config = utils.getPreferredConfig(configuration)
 
         then:
+        configuration.endpointUrl() >> "test"
         1 * client.execute(_) >> response
         1 * response.getEntity() >> entity
         1 * entity.getContent() >> metacardXml
@@ -198,6 +200,7 @@ class CswSourceUtilsTest extends Specification {
         def config = utils.getPreferredConfig(configuration)
 
         then:
+        configuration.endpointUrl() >> "test"
         1 * client.execute(_) >> response
         1 * response.getEntity() >> entity
         1 * entity.getContent() >> gmdXml
@@ -211,6 +214,7 @@ class CswSourceUtilsTest extends Specification {
         def config = utils.getPreferredConfig(configuration)
 
         then:
+        configuration.endpointUrl() >> "test"
         1 * client.execute(_) >> response
         1 * response.getEntity() >> entity
         1 * entity.getContent() >> specXml

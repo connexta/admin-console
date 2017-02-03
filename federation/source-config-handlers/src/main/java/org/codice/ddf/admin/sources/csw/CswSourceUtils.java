@@ -78,7 +78,7 @@ public class CswSourceUtils {
         int status;
         url += GET_CAPABILITIES_PARAMS;
         HttpGet request = new HttpGet(url);
-        if (un != null && pw != null) {
+        if (url.startsWith("https") && un != null && pw != null) {
             byte[] auth = Base64.encodeBase64((un + ":" + pw).getBytes());
             request.setHeader(HttpHeaders.AUTHORIZATION, "Basic " + new String(auth));
         }
@@ -127,7 +127,7 @@ public class CswSourceUtils {
         CswSourceConfiguration preferred = new CswSourceConfiguration(config);
         HttpGet getCapabilitiesRequest = new HttpGet(
                 preferred.endpointUrl() + GET_CAPABILITIES_PARAMS);
-        if (config.sourceUserName() != null && config.sourceUserPassword() != null) {
+        if (config.endpointUrl().startsWith("https") && config.sourceUserName() != null && config.sourceUserPassword() != null) {
             byte[] auth = Base64.encodeBase64((config.sourceUserName() + ":" + config.sourceUserPassword()).getBytes());
             getCapabilitiesRequest.setHeader(HttpHeaders.AUTHORIZATION, "Basic " + new String(auth));
         }
@@ -161,7 +161,6 @@ public class CswSourceUtils {
     // Determines the correct CSW endpoint URL format given a config with a Hostname and Port
     public UrlAvailability confirmEndpointUrl(CswSourceConfiguration config) {
         Optional<UrlAvailability> result =  URL_FORMATS.stream()
-                .filter(url -> url.startsWith("https"))
                 .map(formatUrl -> String.format(formatUrl,
                         config.sourceHostName(),
                         config.sourcePort()))

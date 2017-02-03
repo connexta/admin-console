@@ -175,6 +175,7 @@ class WfsSourceUtilsTest extends Specification {
         def config = utils.getPreferredConfig(configuration)
 
         then:
+        configuration.endpointUrl() >> "test"
         1 * client.execute(_) >> response
         1 * response.getEntity() >> entity
         1 * entity.getContent() >> ""

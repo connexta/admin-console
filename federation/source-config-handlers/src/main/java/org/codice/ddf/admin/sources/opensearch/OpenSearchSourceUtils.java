@@ -63,7 +63,6 @@ public class OpenSearchSourceUtils {
     //Given a config, returns the correct URL format for the endpoint if one exists
     public UrlAvailability confirmEndpointUrl(OpenSearchSourceConfiguration config) {
         Optional<UrlAvailability> result = URL_FORMATS.stream()
-                .filter(url -> url.startsWith("https"))
                 .map(formatUrl -> String.format(formatUrl,
                         config.sourceHostName(),
                         config.sourcePort()))
@@ -80,7 +79,7 @@ public class OpenSearchSourceUtils {
         int status;
         String contentType;
         HttpGet request = new HttpGet(url + SIMPLE_QUERY_PARAMS);
-        if (un != null && pw != null) {
+        if (url.startsWith("https") && un != null && pw != null) {
             byte[] auth = Base64.encodeBase64((un + ":" + pw).getBytes());
             request.setHeader(HttpHeaders.AUTHORIZATION, "Basic " + new String(auth));
         }

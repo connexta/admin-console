@@ -53,7 +53,7 @@ public class SourceHandlerCommons {
 
     public static final String BAD_CONFIG = "BAD_CONFIG";
 
-    public static final int PING_TIMEOUT = 500;
+    public static final int PING_TIMEOUT = 2000;
 
     public static String endpointIsReachable(String hostname, int port) {
         try (Socket connection = new Socket()) {

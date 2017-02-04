@@ -15,6 +15,9 @@ import { Link } from 'react-router'
 import AppBar from 'material-ui/AppBar'
 import Flexbox from 'flexbox-react'
 
+import Banners from 'system-usage/Banners'
+import Modal from 'system-usage/Modal'
+
 var DevTools
 
 if (process.env.NODE_ENV === 'production') {
@@ -26,7 +29,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 const fixed = {
-  position: 'fixed',
+  position: 'relative',
   top: 0,
   left: 0,
   bottom: 0,
@@ -42,7 +45,8 @@ const LinkHomeIcon = (props) => (
 const App = ({ children }) => (
   <MuiThemeProvider>
     <Provider store={store}>
-      <div>
+      <Banners>
+        <Modal />
         <Flexbox flexDirection='column' height='100vh' style={fixed}>
           <AppBar
             title='Admin Console (BETA)'
@@ -57,7 +61,7 @@ const App = ({ children }) => (
           <Exception />
         </Flexbox>
         <DevTools />
-      </div>
+      </Banners>
     </Provider>
   </MuiThemeProvider>
 )

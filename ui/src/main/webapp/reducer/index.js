@@ -20,6 +20,7 @@ import wizard, * as ldap from 'admin-wizard/reducer'
 import sourceWizard from '../wizards/sources/reducer'
 import home from '../home'
 import wcpm, * as webContext from '../adminTools/webContextPolicyManager/reducer'
+import systemUsage from 'system-usage/reducer'
 
 import fetch, * as fetchSelectors from 'redux-fetch'
 
@@ -39,4 +40,4 @@ export const getEditingBinNumber = (state) => webContext.getEditingBinNumber(sta
 export const getConfirmDelete = (state) => webContext.getConfirmDelete(state.get('wcpm'))
 export const getWcpmErrors = (state) => webContext.getWcpmErrors(state.get('wcpm'))
 
-export default combineReducers({ fetch, wizard, backendError, sourceWizard, home, wcpm, polling })
+export default combineReducers({ fetch, wizard, backendError, sourceWizard, home, wcpm, polling, systemUsage })

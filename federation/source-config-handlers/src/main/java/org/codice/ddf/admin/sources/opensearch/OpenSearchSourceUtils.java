@@ -14,12 +14,10 @@
 package org.codice.ddf.admin.sources.opensearch;
 
 import static java.net.HttpURLConnection.HTTP_OK;
-import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.PING_TIMEOUT;
 import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.SOURCES_NAMESPACE_CONTEXT;
+import static org.codice.ddf.admin.sources.SourcesCommons.closeClientAndResponse;
+import static org.codice.ddf.admin.sources.SourcesCommons.getCloseableHttpClient;
 
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,13 +29,9 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.ssl.SSLContexts;
 import org.codice.ddf.admin.api.config.sources.OpenSearchSourceConfiguration;
 import org.codice.ddf.admin.api.handler.commons.UrlAvailability;
 import org.w3c.dom.Document;
@@ -79,6 +73,9 @@ public class OpenSearchSourceUtils {
         int status;
         String contentType;
         HttpGet request = new HttpGet(url + SIMPLE_QUERY_PARAMS);
+        CloseableHttpResponse response = null;
+        CloseableHttpClient client = null;
+
         if (url.startsWith("https") && un != null && pw != null) {
             byte[] auth = Base64.encodeBase64((un + ":" + pw).getBytes());
             request.setHeader(HttpHeaders.AUTHORIZATION, "Basic " + new String(auth));
@@ -86,7 +83,8 @@ public class OpenSearchSourceUtils {
         XPath xpath = XPathFactory.newInstance().newXPath();
         xpath.setNamespaceContext(SOURCES_NAMESPACE_CONTEXT);
         try {
-            HttpResponse response = getCloseableHttpClient(false).execute(request);
+            client = getCloseableHttpClient(false);
+            response = client.execute(request);
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             factory.setNamespaceAware(true);
             DocumentBuilder builder = factory.newDocumentBuilder();
@@ -111,7 +109,9 @@ public class OpenSearchSourceUtils {
                     .available(false);
         } catch (Exception e) {
             try {
-                HttpResponse response = getCloseableHttpClient(true).execute(request);
+                closeClientAndResponse(client, response);
+                client = getCloseableHttpClient(true);
+                response = client.execute(request);
                 status = response.getStatusLine()
                         .getStatusCode();
                 contentType = response.getEntity()
@@ -134,19 +134,9 @@ public class OpenSearchSourceUtils {
                         .certError(false)
                         .available(false);
             }
+        } finally {
+            closeClientAndResponse(client, response);
         }
         return result;
-    }
-
-    CloseableHttpClient getCloseableHttpClient(boolean trustAnyCA)
-            throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
-        HttpClientBuilder builder = HttpClientBuilder.create().setDefaultRequestConfig(
-                RequestConfig.custom().setConnectTimeout(PING_TIMEOUT).build());
-        if (trustAnyCA) {
-            builder.setSSLSocketFactory(new SSLConnectionSocketFactory(SSLContexts.custom()
-                    .loadTrustMaterial(null, (chain, authType) -> true)
-                    .build()));
-        }
-        return builder.build();
     }
 }

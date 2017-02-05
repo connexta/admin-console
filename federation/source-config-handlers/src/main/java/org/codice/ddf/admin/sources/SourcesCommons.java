@@ -17,7 +17,7 @@ public class SourcesCommons {
 
     public static CloseableHttpClient getCloseableHttpClient(boolean trustAnyCA)
             throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
-        HttpClientBuilder builder = HttpClientBuilder.create().setDefaultRequestConfig(
+        HttpClientBuilder builder = HttpClientBuilder.create().disableAutomaticRetries().setDefaultRequestConfig(
                 RequestConfig.custom().setConnectTimeout(PING_TIMEOUT).build());
         if (trustAnyCA) {
             builder.setSSLSocketFactory(new SSLConnectionSocketFactory(SSLContexts.custom()

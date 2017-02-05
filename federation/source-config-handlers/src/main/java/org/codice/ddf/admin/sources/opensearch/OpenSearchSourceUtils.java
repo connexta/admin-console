@@ -50,7 +50,7 @@ public class OpenSearchSourceUtils {
             "http://%s:%d/services/catalog/query",
             "http://%s:%d/catalog/query");
 
-    private static final String SIMPLE_QUERY_PARAMS = "?q=test&mr=1";
+    private static final String SIMPLE_QUERY_PARAMS = "?q=test&mr=1&src=local";
 
     private static final String TOTAL_RESULTS_XPATH = "//os:totalResults|//opensearch:totalResults";
 

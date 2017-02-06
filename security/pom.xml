@@ -18,7 +18,7 @@
     <parent>
         <artifactId>admin</artifactId>
         <groupId>org.codice.ddf.admin.beta</groupId>
-        <version>0.1.0</version>
+        <version>0.1.1-SNAPSHOT</version>
     </parent>
     <artifactId>admin-security</artifactId>
     <name>DDF :: Admin (Beta) :: Security</name>

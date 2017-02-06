@@ -43,7 +43,65 @@
         <commons-lang.version>2.6</commons-lang.version>
         <node.version>v7.1.0</node.version>
         <yarn.version>v0.19.1</yarn.version>
+        <ddf.scm.connection.url/>
+        <snapshots.repository.url/>
+        <reports.repository.url/>
     </properties>
+
+    <scm>
+        <url>https://github.com/connexta/admin-console-beta</url>
+        <connection>scm:git:https://github.com/connexta/admin-console-beta.git</connection>
+        <developerConnection>scm:git:https://github.com/connexta/admin-console-beta.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+    <distributionManagement>
+        <snapshotRepository>
+            <id>snapshots</id>
+            <url>${snapshots.repository.url}</url>
+        </snapshotRepository>
+        <repository>
+            <id>releases</id>
+            <url>${releases.repository.url}</url>
+        </repository>
+        <site>
+            <id>reports</id>
+            <url>${reports.repository.url}</url>
+        </site>
+    </distributionManagement>
+    <profiles>
+        <profile>
+            <id>release</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
     <dependencies>
     <!--

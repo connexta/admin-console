@@ -12,14 +12,12 @@
  *
  **/
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.codice.ddf.admin.beta</groupId>
     <artifactId>admin</artifactId>
     <name>DDF Admin (Beta)</name>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>0.1.0</version>
     <packaging>pom</packaging>
 
     <!--
@@ -43,16 +41,16 @@
         <commons-lang.version>2.6</commons-lang.version>
         <node.version>v7.1.0</node.version>
         <yarn.version>v0.19.1</yarn.version>
-        <ddf.scm.connection.url/>
-        <snapshots.repository.url/>
-        <reports.repository.url/>
+        <ddf.scm.connection.url />
+        <snapshots.repository.url />
+        <reports.repository.url />
     </properties>
 
     <scm>
         <url>https://github.com/connexta/admin-console-beta</url>
         <connection>scm:git:https://github.com/connexta/admin-console-beta.git</connection>
         <developerConnection>scm:git:https://github.com/connexta/admin-console-beta.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>admin-0.1.0</tag>
     </scm>
     <distributionManagement>
         <snapshotRepository>

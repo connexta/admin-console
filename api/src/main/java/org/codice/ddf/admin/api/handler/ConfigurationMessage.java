@@ -45,8 +45,8 @@ public class ConfigurationMessage {
 
     /**
      * Creates a new {@link ConfigurationMessage}. A {@link ConfigurationMessage} is structured such that
-     * it has a high level description of the problem of {@param #type} {@link MessageType} and a more detailed description
-     * of {@param subType}. For instance, if the {@param #type}  was {@link MessageType#FAILURE}, the {@param subType}
+     * it has a high level description of the problem of {@code type} {@link MessageType} and a more detailed description
+     * of {@code subType}. For instance, if the {@code type}  was {@link MessageType#FAILURE}, the {@code subType}
      * could be {@link #MISSING_REQUIRED_FIELD}
      *
      * @param type          a high level description message

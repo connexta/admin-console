@@ -125,7 +125,7 @@ public abstract class ManagedServiceOperation
      * @param configs     the configuration properties to apply to the service
      * @param configAdmin service wrapper needed for OSGi interaction
      * @param cfgAdmMbean mbean needed for saving configuration data
-     * @return
+     * @return a service operation object
      */
     public static ManagedServiceOperation forCreate(String factoryPid,
             @NotNull Map<String, Object> configs, ConfigurationAdmin configAdmin,
@@ -139,7 +139,7 @@ public abstract class ManagedServiceOperation
      * @param pid         the PID of the instance to be deleted
      * @param configAdmin service wrapper needed for OSGi interaction
      * @param cfgAdmMbean mbean needed for saving configuration data
-     * @return
+     * @return a service operation object
      */
     public static ManagedServiceOperation forDelete(String pid, ConfigurationAdmin configAdmin,
             ConfigurationAdminMBean cfgAdmMbean) {

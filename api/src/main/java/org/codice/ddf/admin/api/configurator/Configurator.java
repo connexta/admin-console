@@ -318,7 +318,7 @@ public class Configurator {
      *
      * @param serviceClass - Class of service to retrieve
      * @return first found service reference of serviceClass
-     * @throws ConfiguratorException
+     * @throws ConfiguratorException if any errors occur
      */
     public <S> S getServiceReference(Class<S> serviceClass) throws ConfiguratorException {
         BundleContext context = getBundleContext();

@@ -15,8 +15,10 @@ package org.codice.admin.router
 
 import org.codice.ddf.admin.api.config.Configuration
 import org.codice.ddf.admin.api.config.ConfigurationType
+import org.codice.ddf.admin.api.config.sources.SourceConfiguration
 import org.codice.ddf.admin.api.config.sources.WfsSourceConfiguration
 import org.codice.ddf.admin.api.handler.ConfigurationHandler
+import org.codice.ddf.admin.api.handler.ConfigurationMessage
 import org.codice.ddf.admin.api.handler.report.CapabilitiesReport
 import org.codice.ddf.admin.api.handler.report.ProbeReport
 import org.codice.ddf.admin.api.handler.report.Report
@@ -25,8 +27,6 @@ import spark.Response
 import spock.lang.Specification
 
 class ConfigurationHandlerRouterTest extends Specification {
-    
-    static final FAILURE_MESSAGE = String.format(ConfigurationHandlerRouter.NO_CONFIG_ID_MSG, NON_MATCHING_ID)
 
     static final CONFIGURATION_TYPE = "configurationType"
 
@@ -50,7 +50,7 @@ class ConfigurationHandlerRouterTest extends Specification {
 
     def 'test test(Request, Response) config handler success'() {
         setup:
-        prepareConfigHandler(MATCHING_ID, ConfigurationHandlerRouter.TEST_ID)
+        prepareMocks(MATCHING_ID, METHOD_ID, ConfigurationHandlerRouter.TEST_ID)
 
         def report = mockReport(false)
 
@@ -63,17 +63,39 @@ class ConfigurationHandlerRouterTest extends Specification {
         0 * response.status(400)
     }
 
-    def 'test test(Request, Response) no config handler'() {
+    def 'test test(Request, Response) with no available config handlers'() {
         setup:
-        prepareConfigHandler(NON_MATCHING_ID, ConfigurationHandlerRouter.TEST_ID)
+        response = Mock(Response)
+        request = mockRequest(NON_MATCHING_ID, METHOD_ID, ConfigurationHandlerRouter.TEST_ID)
+
+        when:
+        def report = configurationHandlerRouter.test(request, response)
+
+
+        then:
+        report.messages().size() == 1
+        report.messages().get(0).message() == getFailureMessage(NON_MATCHING_ID)
+        report.messages().get(0).configFieldId() == ConfigurationHandlerRouter.CONFIGURATION_TYPE_FIELD
+        report.messages().get(0).type() == ConfigurationMessage.MessageType.FAILURE
+        report.messages().get(0).subtype() == ConfigurationMessage.INVALID_FIELD
+        report.containsFailureMessages()
+        0 * configurationHandler.test(_ as String, _ as Configuration)
+        1 * response.status(400)
+    }
+
+    def 'test test(Request, Response) with no matching config handler'() {
+        setup:
+        prepareMocks(NON_MATCHING_ID, METHOD_ID, ConfigurationHandlerRouter.TEST_ID)
 
         when:
         def report = configurationHandlerRouter.test(request, response)
 
         then:
         report.messages().size() == 1
-        report.messages().get(0).message() == FAILURE_MESSAGE
+        report.messages().get(0).message() == getFailureMessage(NON_MATCHING_ID)
         report.messages().get(0).configFieldId() == ConfigurationHandlerRouter.CONFIGURATION_TYPE_FIELD
+        report.messages().get(0).type() == ConfigurationMessage.MessageType.FAILURE
+        report.messages().get(0).subtype() == ConfigurationMessage.INVALID_FIELD
         report.containsFailureMessages()
         0 * configurationHandler.test(_ as String, _ as Configuration)
         1 * response.status(400)
@@ -81,7 +103,7 @@ class ConfigurationHandlerRouterTest extends Specification {
 
     def 'test test(Request, Response) config handler but fail test'() {
         setup:
-        prepareConfigHandler(MATCHING_ID, ConfigurationHandlerRouter.TEST_ID)
+        prepareMocks(MATCHING_ID, METHOD_ID, ConfigurationHandlerRouter.TEST_ID)
 
         def report = mockReport(true)
 
@@ -94,9 +116,45 @@ class ConfigurationHandlerRouterTest extends Specification {
         1 * response.status(400)
     }
 
+    def 'test test(Request, Response) with null configHandlerId request param'() {
+        setup:
+        prepareMocks(null, METHOD_ID, ConfigurationHandlerRouter.TEST_ID)
+
+        when:
+        def report = configurationHandlerRouter.test(request, response)
+
+
+        then:
+        report.messages().size() == 1
+        report.messages().get(0).message() == getFailureMessage(null)
+        report.messages().get(0).configFieldId() == ConfigurationHandlerRouter.CONFIGURATION_TYPE_FIELD
+        report.messages().get(0).type() == ConfigurationMessage.MessageType.FAILURE
+        report.messages().get(0).subtype() == ConfigurationMessage.INVALID_FIELD
+        report.containsFailureMessages()
+        0 * configurationHandler.test(_ as String, _ as Configuration)
+        1 * response.status(400)
+    }
+
+    /**
+     * This test does not indicate the behavior of the method throwing the throwable. Some exceptions
+     * during runtime are not handled by the Spark exception handling since Spark only handles {@link Exception}s
+     * and not {@link Throwable}s.
+     */
+    def 'test test(Request, Response) unexpected throwable'() {
+        setup:
+        prepareMocks(MATCHING_ID, METHOD_ID, ConfigurationHandlerRouter.TEST_ID)
+
+        when:
+        configurationHandlerRouter.test(request, response)
+
+        then:
+        1 * configurationHandler.test(METHOD_ID, _ as Configuration) >> new Throwable()
+        thrown(ConfigurationHandlerRouterException)
+    }
+
     def 'test persist(Request, Response) config handler success'() {
         setup:
-        prepareConfigHandler(MATCHING_ID, ConfigurationHandlerRouter.PERSIST_ID)
+        prepareMocks(MATCHING_ID, METHOD_ID, ConfigurationHandlerRouter.PERSIST_ID)
 
         def report = mockReport(false)
 
@@ -109,25 +167,66 @@ class ConfigurationHandlerRouterTest extends Specification {
         0 * response.status(400)
     }
 
-    def 'test persist(Request, Response) no config handler'() {
+    def 'test persist(Request, Response) with no available config handlers'() {
         setup:
-        prepareConfigHandler(NON_MATCHING_ID, ConfigurationHandlerRouter.PERSIST_ID)
+        response = Mock(Response)
+        request = mockRequest(NON_MATCHING_ID, METHOD_ID, ConfigurationHandlerRouter.PERSIST_ID)
+
+        when:
+        def report = configurationHandlerRouter.persist(request, response)
+
+
+        then:
+        report.messages().size() == 1
+        report.messages().get(0).message() == getFailureMessage(NON_MATCHING_ID)
+        report.messages().get(0).configFieldId() == ConfigurationHandlerRouter.CONFIGURATION_TYPE_FIELD
+        report.messages().get(0).type() == ConfigurationMessage.MessageType.FAILURE
+        report.messages().get(0).subtype() == ConfigurationMessage.INVALID_FIELD
+        report.containsFailureMessages()
+        0 * configurationHandler.test(_ as String, _ as Configuration)
+        1 * response.status(400)
+    }
+
+    def 'test persist(Request, Response) with no matching config handler'() {
+        setup:
+        prepareMocks(NON_MATCHING_ID, METHOD_ID, ConfigurationHandlerRouter.PERSIST_ID)
 
         when:
         def report = configurationHandlerRouter.persist(request, response)
 
         then:
         report.messages().size() == 1
-        report.messages().get(0).message() == FAILURE_MESSAGE
+        report.messages().get(0).message() == getFailureMessage(NON_MATCHING_ID)
         report.messages().get(0).configFieldId() == ConfigurationHandlerRouter.CONFIGURATION_TYPE_FIELD
+        report.messages().get(0).type() == ConfigurationMessage.MessageType.FAILURE
+        report.messages().get(0).subtype() == ConfigurationMessage.INVALID_FIELD
         report.containsFailureMessages()
         0 * configurationHandler.persist(_ as String, _ as Configuration)
         1 * response.status(400)
     }
 
+    def 'test persist(Request, Response) with null configHandlerId request param'() {
+        setup:
+        prepareMocks(null, METHOD_ID, ConfigurationHandlerRouter.PERSIST_ID)
+
+        when:
+        def report = configurationHandlerRouter.persist(request, response)
+
+
+        then:
+        report.messages().size() == 1
+        report.messages().get(0).message() == getFailureMessage(null)
+        report.messages().get(0).configFieldId() == ConfigurationHandlerRouter.CONFIGURATION_TYPE_FIELD
+        report.messages().get(0).type() == ConfigurationMessage.MessageType.FAILURE
+        report.messages().get(0).subtype() == ConfigurationMessage.INVALID_FIELD
+        report.containsFailureMessages()
+        0 * configurationHandler.test(_ as String, _ as Configuration)
+        1 * response.status(400)
+    }
+
     def 'test persist(Request, Response) config handler but fail persist'() {
         setup:
-        prepareConfigHandler(MATCHING_ID, ConfigurationHandlerRouter.PERSIST_ID)
+        prepareMocks(MATCHING_ID, METHOD_ID, ConfigurationHandlerRouter.PERSIST_ID)
 
         def report = mockReport(true)
 
@@ -139,9 +238,26 @@ class ConfigurationHandlerRouterTest extends Specification {
         1 * response.status(400)
     }
 
+    /**
+     * This test does not indicate the behavior of the method throwing the throwable. Some exceptions
+     * during runtime are not handled by the Spark exception handling since Spark only handles {@link Exception}s
+     * and not {@link Throwable}s.
+     */
+    def 'test persist(Request, Response) unexpected throwable'() {
+        setup:
+        prepareMocks(MATCHING_ID, METHOD_ID, ConfigurationHandlerRouter.PERSIST_ID)
+
+        when:
+        configurationHandlerRouter.persist(request, response)
+
+        then:
+        1 * configurationHandler.persist(METHOD_ID, _ as Configuration) >> new Throwable()
+        thrown(ConfigurationHandlerRouterException)
+    }
+
     def 'test probe(Request, Response) config handler success'() {
         setup:
-        prepareConfigHandler(MATCHING_ID, ConfigurationHandlerRouter.PROBE_ID)
+        prepareMocks(MATCHING_ID, METHOD_ID, ConfigurationHandlerRouter.PROBE_ID)
 
         def report = Mock(ProbeReport) {
             containsUnsuccessfulMessages() >> false
@@ -156,25 +272,66 @@ class ConfigurationHandlerRouterTest extends Specification {
         0 * response.status(400)
     }
 
-    def 'test probe(Request, Response) no config handler'() {
+    def 'test probe(Request, Response) with no available config handlers'() {
         setup:
-        prepareConfigHandler(NON_MATCHING_ID, ConfigurationHandlerRouter.PROBE_ID)
+        response = Mock(Response)
+        request = mockRequest(NON_MATCHING_ID, METHOD_ID, ConfigurationHandlerRouter.PROBE_ID)
+
+        when:
+        def report = configurationHandlerRouter.probe(request, response)
+
+
+        then:
+        report.messages().size() == 1
+        report.messages().get(0).message() == getFailureMessage(NON_MATCHING_ID)
+        report.messages().get(0).configFieldId() == ConfigurationHandlerRouter.CONFIGURATION_TYPE_FIELD
+        report.messages().get(0).type() == ConfigurationMessage.MessageType.FAILURE
+        report.messages().get(0).subtype() == ConfigurationMessage.INVALID_FIELD
+        report.containsFailureMessages()
+        0 * configurationHandler.test(_ as String, _ as Configuration)
+        1 * response.status(400)
+    }
+
+    def 'test probe(Request, Response) with no matching config handler'() {
+        setup:
+        prepareMocks(NON_MATCHING_ID, METHOD_ID, ConfigurationHandlerRouter.PROBE_ID)
 
         when:
         def report = configurationHandlerRouter.probe(request, response)
 
         then:
         report.messages().size() == 1
-        report.messages().get(0).message() == FAILURE_MESSAGE
+        report.messages().get(0).message() == getFailureMessage(NON_MATCHING_ID)
         report.messages().get(0).configFieldId() == ConfigurationHandlerRouter.CONFIGURATION_TYPE_FIELD
+        report.messages().get(0).type() == ConfigurationMessage.MessageType.FAILURE
+        report.messages().get(0).subtype() == ConfigurationMessage.INVALID_FIELD
         report.containsFailureMessages()
         0 * configurationHandler.probe(_ as String, _ as Configuration)
         1 * response.status(400)
     }
 
+    def 'test probe(Request, Response) with null configHandlerId request param'() {
+        setup:
+        prepareMocks(null, METHOD_ID, ConfigurationHandlerRouter.PROBE_ID)
+
+        when:
+        def report = configurationHandlerRouter.probe(request, response)
+
+
+        then:
+        report.messages().size() == 1
+        report.messages().get(0).message() == getFailureMessage(null)
+        report.messages().get(0).configFieldId() == ConfigurationHandlerRouter.CONFIGURATION_TYPE_FIELD
+        report.messages().get(0).type() == ConfigurationMessage.MessageType.FAILURE
+        report.messages().get(0).subtype() == ConfigurationMessage.INVALID_FIELD
+        report.containsFailureMessages()
+        0 * configurationHandler.test(_ as String, _ as Configuration)
+        1 * response.status(400)
+    }
+
     def 'test probe(Request, Response) config handler but fail persist'() {
         setup:
-        prepareConfigHandler(MATCHING_ID, ConfigurationHandlerRouter.PROBE_ID)
+        prepareMocks(MATCHING_ID, METHOD_ID, ConfigurationHandlerRouter.PROBE_ID)
 
         def report = Mock(ProbeReport) {
             containsUnsuccessfulMessages() >> true
@@ -189,9 +346,26 @@ class ConfigurationHandlerRouterTest extends Specification {
         1 * response.status(400)
     }
 
+    /**
+     * This test does not indicate the behavior of the method throwing the throwable. Some exceptions
+     * during runtime are not handled by the Spark exception handling since Spark only handles {@link Exception}s
+     * and not {@link Throwable}s.
+     */
+    def 'test probe(Request, Response) unexpected throwable'() {
+        setup:
+        prepareMocks(MATCHING_ID, METHOD_ID, ConfigurationHandlerRouter.PROBE_ID)
+
+        when:
+        configurationHandlerRouter.probe(request, response)
+
+        then:
+        1 * configurationHandler.probe(METHOD_ID, _ as Configuration) >> new Throwable()
+        thrown(ConfigurationHandlerRouterException)
+    }
+
     def 'test getCapabilities()'() {
         setup:
-        prepareConfigHandler(NON_MATCHING_ID, ConfigurationHandlerRouter.TEST_ID)
+        prepareMocks(NON_MATCHING_ID, METHOD_ID, ConfigurationHandlerRouter.TEST_ID)
 
         when:
         def reports = (List<CapabilitiesReport>)configurationHandlerRouter.getCapabilities()
@@ -203,7 +377,7 @@ class ConfigurationHandlerRouterTest extends Specification {
 
     def 'test configCapabilties(Request, Response) success'() {
         setup:
-        prepareConfigHandler(MATCHING_ID, ConfigurationHandlerRouter.TEST_ID)
+        prepareMocks(MATCHING_ID, METHOD_ID, ConfigurationHandlerRouter.TEST_ID)
 
         when:
         configurationHandlerRouter.configCapabilities(request, response)
@@ -213,9 +387,9 @@ class ConfigurationHandlerRouterTest extends Specification {
         configurationHandler.getCapabilities().configurationType == CONFIGURATION_TYPE
     }
 
-    def 'test configCapabilties(Request, Response) null config handler'() {
+    def 'test configCapabilties(Request, Response) with no matching config handler'() {
         setup:
-        prepareConfigHandler(NON_MATCHING_ID, ConfigurationHandlerRouter.TEST_ID)
+        prepareMocks(NON_MATCHING_ID, METHOD_ID, ConfigurationHandlerRouter.TEST_ID)
 
         when:
         def report = (Report) configurationHandlerRouter.configCapabilities(request, response)
@@ -224,14 +398,16 @@ class ConfigurationHandlerRouterTest extends Specification {
         1 * response.status(400)
         0 * configurationHandler.getCapabilities()
         report.messages().size() == 1
-        report.messages().get(0).message() == FAILURE_MESSAGE
+        report.messages().get(0).message() == getFailureMessage(NON_MATCHING_ID)
         report.messages().get(0).configFieldId() == ConfigurationHandlerRouter.CONFIGURATION_TYPE_FIELD
+        report.messages().get(0).type() == ConfigurationMessage.MessageType.FAILURE
+        report.messages().get(0).subtype() == ConfigurationMessage.INVALID_FIELD
         report.containsFailureMessages()
     }
 
     def 'test configurations(Request, Response) success'() {
         setup:
-        prepareConfigHandler(MATCHING_ID, ConfigurationHandlerRouter.TEST_ID)
+        prepareMocks(MATCHING_ID, METHOD_ID, ConfigurationHandlerRouter.TEST_ID)
 
         when:
         configurationHandlerRouter.configurations(request, response)
@@ -241,26 +417,28 @@ class ConfigurationHandlerRouterTest extends Specification {
         configurationHandler.getCapabilities().configurationType == CONFIGURATION_TYPE
     }
 
-    def 'test configurations(Request, Response) null config handler'() {
+    def 'test configurations(Request, Response) with no matching config handler'() {
         setup:
-        prepareConfigHandler(NON_MATCHING_ID, ConfigurationHandlerRouter.TEST_ID)
+        prepareMocks(NON_MATCHING_ID, METHOD_ID, ConfigurationHandlerRouter.TEST_ID)
 
         when:
         def report = (Report) configurationHandlerRouter.configurations(request, response)
 
         then:
         1 * response.status(400)
-        0 * configurationHandler.configurations()
+        0 * configurationHandler.getConfigurations()
         report.messages().size() == 1
-        report.messages().get(0).message() == FAILURE_MESSAGE
+        report.messages().get(0).message() == getFailureMessage(NON_MATCHING_ID)
         report.messages().get(0).configFieldId() == ConfigurationHandlerRouter.CONFIGURATION_TYPE_FIELD
+        report.messages().get(0).type() == ConfigurationMessage.MessageType.FAILURE
+        report.messages().get(0).subtype() == ConfigurationMessage.INVALID_FIELD
         report.containsFailureMessages()
     }
 
-    def prepareConfigHandler(String configHandlerId, String id) {
+    def prepareMocks(String configHandlerId, String methodId, String paramId) {
         response = Mock(Response)
         configurationHandler = mockConfigurationHandler()
-        request = mockRequest(configHandlerId, id)
+        request = mockRequest(configHandlerId, methodId, paramId)
 
         configurationHandlerRouter.setConfigurationHandlers([configurationHandler])
     }
@@ -278,10 +456,16 @@ class ConfigurationHandlerRouterTest extends Specification {
         }
     }
 
-    def mockRequest(String configHandlerId, String id) {
+    def mockRequest(String configHandlerId, String methodId, String paramId) {
         return Mock(Request) {
+            def baseConfiguration = new SourceConfiguration()
+            baseConfiguration.configurationType
+
+            def configuration = new WfsSourceConfiguration()
+            configuration.configurationType
+
             params(ConfigurationHandlerRouter.CONFIG_HANDLER_ID) >> configHandlerId
-            params(id) >> METHOD_ID
+            params(paramId) >> methodId
             body() >> "{\"configurationType\":\"sources\",\"sourceHostName\":\"localhost\",\"sourcePort\":8993}"
         }
     }
@@ -289,6 +473,16 @@ class ConfigurationHandlerRouterTest extends Specification {
     def mockReport(boolean containsUnsuccessfulMessage) {
         return Mock(Report) {
             containsUnsuccessfulMessages() >> containsUnsuccessfulMessage
+        }
+    }
+
+    def getFailureMessage(String configHandlerId) {
+        return String.format(ConfigurationHandlerRouter.NO_CONFIG_ID_MSG, configHandlerId)
+    }
+
+    def mockBadTestIdReport() {
+        return mock(Report) >> {
+
         }
     }
 }

@@ -42,6 +42,8 @@ import spark.servlet.SparkApplication;
 
 public class ConfigurationHandlerRouter implements SparkApplication {
 
+    public static final String UNKNOWN_ERROR_MSG = "Unknown error occurred while handling request.";
+
     public static final String CONFIGURATION_TYPE_FIELD = "configurationType";
 
     public static final String APPLICATION_JSON = "application/json";
@@ -54,7 +56,8 @@ public class ConfigurationHandlerRouter implements SparkApplication {
 
     public static final String PROBE_ID = "probeId";
 
-    public static final String NO_CONFIG_ID_MSG = "No configuration handler with id of \"%s\" found.";
+    public static final String NO_CONFIG_ID_MSG =
+            "No configuration handler with id of \"%s\" found.";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ConfigurationHandlerRouter.class);
 
@@ -65,15 +68,23 @@ public class ConfigurationHandlerRouter implements SparkApplication {
 
         post(String.format("/test/:%s/:%s", CONFIG_HANDLER_ID, TEST_ID), this::test, this::toJson);
 
-        post(String.format("/persist/:%s/:%s", CONFIG_HANDLER_ID, PERSIST_ID), this::persist, this::toJson);
+        post(String.format("/persist/:%s/:%s", CONFIG_HANDLER_ID, PERSIST_ID),
+                this::persist,
+                this::toJson);
 
-        post(String.format("/probe/:%s/:%s", CONFIG_HANDLER_ID, PROBE_ID), this::probe, this::toJson);
+        post(String.format("/probe/:%s/:%s", CONFIG_HANDLER_ID, PROBE_ID),
+                this::probe,
+                this::toJson);
 
-        get(String.format("/configurations/:%s", CONFIG_HANDLER_ID), this::configurations, this::toJson);
+        get(String.format("/configurations/:%s", CONFIG_HANDLER_ID),
+                this::configurations,
+                this::toJson);
 
         get("/capabilities", (req, res) -> getCapabilities(), this::toFilteredJson);
 
-        get(String.format("/capabilities/:%s", CONFIG_HANDLER_ID), this::configCapabilities, this::toFilteredJson);
+        get(String.format("/capabilities/:%s", CONFIG_HANDLER_ID),
+                this::configCapabilities,
+                this::toFilteredJson);
 
         after("/*", (req, res) -> res.type(APPLICATION_JSON));
 
@@ -85,69 +96,85 @@ public class ConfigurationHandlerRouter implements SparkApplication {
         });
     }
 
-    protected Report test(Request req, Response res) {
+    protected Report test(Request req, Response res) throws ConfigurationHandlerRouterException {
         Report testReport = new Report();
 
         String configHandlerId = req.params(CONFIG_HANDLER_ID);
         String testId = req.params(TEST_ID);
+
         ConfigurationHandler configHandler = getConfigurationHandler(configHandlerId);
-        if(configHandler == null) {
+        if (configHandler == null) {
             res.status(400);
-            return testReport.addMessage(createInvalidFieldMsg(String.format(NO_CONFIG_ID_MSG, configHandlerId), CONFIGURATION_TYPE_FIELD));
+            return testReport.addMessage(createInvalidFieldMsg(getNoConfigMsg(configHandlerId),
+                    CONFIGURATION_TYPE_FIELD));
         }
 
-        Configuration config = getGsonParser().fromJson(req.body(), Configuration.class);
-        testReport = configHandler.test(testId, config);
+        try {
+            Configuration config = getGsonParser().fromJson(req.body(), Configuration.class);
+            testReport = configHandler.test(testId, config);
 
-        if (testReport.containsUnsuccessfulMessages()) {
-            res.status(400);
+            if (testReport.containsUnsuccessfulMessages()) {
+                res.status(400);
+            }
+
+            return testReport;
+        } catch (Throwable t) {
+            throw new ConfigurationHandlerRouterException(UNKNOWN_ERROR_MSG, t);
         }
-
-        return testReport;
     }
 
-    protected Report persist(Request req, Response res) {
+    protected Report persist(Request req, Response res) throws ConfigurationHandlerRouterException {
         Report persistReport = new Report();
 
         String configHandlerId = req.params(CONFIG_HANDLER_ID);
         String persistId = req.params(PERSIST_ID);
 
         ConfigurationHandler configHandler = getConfigurationHandler(configHandlerId);
-        if(configHandler == null) {
+        if (configHandler == null) {
             res.status(400);
-            return persistReport.addMessage(createInvalidFieldMsg(String.format(NO_CONFIG_ID_MSG, configHandlerId), CONFIGURATION_TYPE_FIELD));
+            return persistReport.addMessage(createInvalidFieldMsg(getNoConfigMsg(configHandlerId),
+                    CONFIGURATION_TYPE_FIELD));
         }
 
-        Configuration config = getGsonParser().fromJson(req.body(), Configuration.class);
-        persistReport = configHandler.persist(persistId, config);
+        try {
+            Configuration config = getGsonParser().fromJson(req.body(), Configuration.class);
+            persistReport = configHandler.persist(persistId, config);
 
-        if (persistReport.containsUnsuccessfulMessages()) {
-            res.status(400);
+            if (persistReport.containsUnsuccessfulMessages()) {
+                res.status(400);
+            }
+
+            return persistReport;
+        } catch (Throwable t) {
+            throw new ConfigurationHandlerRouterException(UNKNOWN_ERROR_MSG, t);
         }
-
-        return persistReport;
     }
 
-    protected Report probe(Request req, Response res) {
+    protected Report probe(Request req, Response res) throws ConfigurationHandlerRouterException {
         Report probeReport = new ProbeReport();
 
         String configHandlerId = req.params(CONFIG_HANDLER_ID);
         String probeId = req.params(PROBE_ID);
+
         ConfigurationHandler configHandler = getConfigurationHandler(configHandlerId);
-
-        if(configHandler == null) {
+        if (configHandler == null) {
             res.status(400);
-            return probeReport.addMessage(createInvalidFieldMsg(String.format(NO_CONFIG_ID_MSG, configHandlerId), CONFIGURATION_TYPE_FIELD));
+            return probeReport.addMessage(createInvalidFieldMsg(getNoConfigMsg(configHandlerId),
+                    CONFIGURATION_TYPE_FIELD));
         }
 
-        Configuration config = getGsonParser().fromJson(req.body(), Configuration.class);
-        probeReport = configHandler.probe(probeId, config);
+        try {
+            Configuration config = getGsonParser().fromJson(req.body(), Configuration.class);
+            probeReport = configHandler.probe(probeId, config);
 
-        if (probeReport.containsUnsuccessfulMessages()) {
-            res.status(400);
+            if (probeReport.containsUnsuccessfulMessages()) {
+                res.status(400);
+            }
+
+            return probeReport;
+        } catch (Throwable t) {
+            throw new ConfigurationHandlerRouterException(UNKNOWN_ERROR_MSG, t);
         }
-
-        return probeReport;
     }
 
     protected Object getCapabilities() {
@@ -159,9 +186,10 @@ public class ConfigurationHandlerRouter implements SparkApplication {
     protected Object configCapabilities(Request req, Response res) {
         String configHandlerId = req.params(CONFIG_HANDLER_ID);
         ConfigurationHandler configHandler = getConfigurationHandler(configHandlerId);
-        if(configHandler == null) {
+        if (configHandler == null) {
             res.status(400);
-            return new Report(createInvalidFieldMsg(String.format(NO_CONFIG_ID_MSG, configHandlerId), CONFIGURATION_TYPE_FIELD));
+            return new Report(createInvalidFieldMsg(getNoConfigMsg(configHandlerId),
+                    CONFIGURATION_TYPE_FIELD));
         }
         return configHandler.getCapabilities();
     }
@@ -169,9 +197,10 @@ public class ConfigurationHandlerRouter implements SparkApplication {
     protected Object configurations(Request req, Response res) {
         String configHandlerId = req.params(CONFIG_HANDLER_ID);
         ConfigurationHandler configHandler = getConfigurationHandler(configHandlerId);
-        if(configHandler == null) {
+        if (configHandler == null) {
             res.status(400);
-            return new Report(createInvalidFieldMsg(String.format(NO_CONFIG_ID_MSG, configHandlerId), CONFIGURATION_TYPE_FIELD));
+            return new Report(createInvalidFieldMsg(getNoConfigMsg(configHandlerId),
+                    CONFIGURATION_TYPE_FIELD));
         }
         return configHandler.getConfigurations();
     }
@@ -217,4 +246,7 @@ public class ConfigurationHandlerRouter implements SparkApplication {
         handlers = configurationHandlers;
     }
 
+    private String getNoConfigMsg(String configHandlerId) {
+        return String.format(NO_CONFIG_ID_MSG, configHandlerId);
+    }
 }

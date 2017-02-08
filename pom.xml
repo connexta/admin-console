@@ -42,10 +42,13 @@
         <commons-lang.version>2.6</commons-lang.version>
         <node.version>v7.1.0</node.version>
         <yarn.version>v0.19.1</yarn.version>
+        <junit.version>4.12</junit.version>
 
         <ddf.scm.connection.url />
         <snapshots.repository.url />
         <reports.repository.url />
+
+        <project.report.output.directory>project-info</project.report.output.directory>
     </properties>
 
     <scm>
@@ -109,6 +112,14 @@
             <groupId>ddf.lib</groupId>
             <artifactId>spock-shaded</artifactId>
             <version>${ddf.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!--TODO: remove when project is merged into DDF-->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

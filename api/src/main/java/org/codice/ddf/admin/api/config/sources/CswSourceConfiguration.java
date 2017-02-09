@@ -14,6 +14,8 @@
 
 package org.codice.ddf.admin.api.config.sources;
 
+import static org.codice.ddf.admin.api.services.CswServiceProperties.CSW_FACTORY_PIDS;
+import static org.codice.ddf.admin.api.validation.SourceValidationUtils.validateSourceFactoryPid;
 import static org.codice.ddf.admin.api.validation.ValidationUtils.validateStringNoWhiteSpace;
 
 import java.util.List;
@@ -45,11 +47,9 @@ public class CswSourceConfiguration extends SourceConfiguration {
             new ImmutableMap.Builder<String, Function<CswSourceConfiguration, List<ConfigurationMessage>>>().putAll(
                     getBaseFieldValidationMap())
                     .put(FACTORY_PID,
-                            config -> new SourceValidationUtils().validateCswFactoryPid(config.factoryPid(),
-                                    FACTORY_PID))
+                            config -> validateSourceFactoryPid(config.factoryPid(), CSW_FACTORY_PIDS, FACTORY_PID))
                     .put(OUTPUT_SCHEMA,
-                            config -> validateStringNoWhiteSpace(config.outputSchema(),
-                                    OUTPUT_SCHEMA))
+                            config -> validateStringNoWhiteSpace(config.outputSchema(), OUTPUT_SCHEMA))
                     .build();
 
     public CswSourceConfiguration() {

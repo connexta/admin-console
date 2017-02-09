@@ -12,39 +12,20 @@
  *
  **/
 -->
-
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
+        <artifactId>admin</artifactId>
         <groupId>org.codice.ddf.admin.beta</groupId>
-        <artifactId>admin-federation</artifactId>
-        <version>0.1.2-SNAPSHOT</version>
+        <version>0.1.1-SNAPSHOT</version>
     </parent>
-    <name>DDF :: Admin (Beta) :: Federation :: Source Config Handlers</name>
-    <artifactId>sources-config-handler</artifactId>
-    <packaging>bundle</packaging>
+
+    <artifactId>admin-commons</artifactId>
+    <name>DDF :: Admin (Beta) :: Commons</name>
 
     <dependencies>
-        <dependency>
-            <groupId>org.codice.ddf.admin.beta</groupId>
-            <artifactId>sources-commons</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.codice.ddf.admin.beta</groupId>
-            <artifactId>admin-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.codice.ddf.admin.beta</groupId>
-            <artifactId>admin-commons</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>${guava.version}</version>
-        </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpcore</artifactId>
@@ -56,27 +37,18 @@
             <version>4.5.2</version>
         </dependency>
         <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
-            <version>${commons-lang.version}</version>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codice.ddf.admin.beta</groupId>
+            <artifactId>admin-api</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
-
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <configuration>
-                    <instructions>
-                        <Bundle-SymbolicName>${project.artifactId}-beta</Bundle-SymbolicName>
-                        <Embed-Dependency>
-                            admin-commons,
-                            sources-commons
-                        </Embed-Dependency>
-                    </instructions>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>

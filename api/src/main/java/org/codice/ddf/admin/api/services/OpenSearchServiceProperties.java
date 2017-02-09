@@ -18,7 +18,9 @@ import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE
 import static org.codice.ddf.admin.api.validation.ValidationUtils.FACTORY_PID_KEY;
 import static org.codice.ddf.admin.api.validation.ValidationUtils.SERVICE_PID_KEY;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.codice.ddf.admin.api.config.sources.OpenSearchSourceConfiguration;
@@ -27,6 +29,8 @@ public class OpenSearchServiceProperties {
 
     // --- OpenSearch service properties
     public static final String OPENSEARCH_FACTORY_PID = "OpenSearchSource";
+
+    public static final List<String> OPENSEARCH_FACTORY_PIDS = Collections.singletonList(OPENSEARCH_FACTORY_PID);
 
     public static final String ID = "id";
 

@@ -75,9 +75,10 @@ public class ConfigurationMessage {
         return new ConfigurationMessage(type, subtype, message);
     }
 
+    // TODO: tbatie - 2/2/17 - Move the result and configFieldId to the front of this message signature
     public static ConfigurationMessage buildMessage(Map<String, String> successTypes,
             Map<String, String> failureTypes, Map<String, String> warningTypes, String result) {
-        return buildMessage(successTypes, failureTypes, null, result, null);
+        return buildMessage(successTypes, failureTypes, warningTypes, result, null);
     }
 
     public static ConfigurationMessage buildMessage(Map<String, String> successTypes,
@@ -129,6 +130,10 @@ public class ConfigurationMessage {
     public static ConfigurationMessage createInvalidFieldMsg(String description,
             String configFieldId) {
         return new ConfigurationMessage(FAILURE, INVALID_FIELD, description, configFieldId);
+    }
+
+    public static ConfigurationMessage createInternalErrorMsg(String description) {
+        return new ConfigurationMessage(FAILURE, INTERNAL_ERROR, description);
     }
 
     public static ConfigurationMessage createMissingRequiredFieldMsg(String configFieldId) {

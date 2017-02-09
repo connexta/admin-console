@@ -14,9 +14,9 @@
 package org.codice.ddf.admin.sources.opensearch.persist;
 
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SERVICE_PID;
-import static org.codice.ddf.admin.api.handler.ConfigurationMessage.FAILED_PERSIST;
 import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.DELETE;
-import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.SUCCESSFUL_PERSIST;
+import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.FAILED_DELETE;
+import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.SUCCESSFUL_DELETE;
 import static org.codice.ddf.admin.api.handler.report.Report.createReport;
 
 import java.util.List;
@@ -41,10 +41,10 @@ public class DeleteOpenSearchSourcePersistMethod
 
     private static final List<String> REQUIRED_FIELDS = ImmutableList.of(SERVICE_PID);
 
-    private static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(SUCCESSFUL_PERSIST,
+    private static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(SUCCESSFUL_DELETE,
             "The CSW Source was successfully deleted.");
 
-    private static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(FAILED_PERSIST,
+    private static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(FAILED_DELETE,
             "Failed to delete CSW source.");
 
     public DeleteOpenSearchSourcePersistMethod() {
@@ -61,13 +61,13 @@ public class DeleteOpenSearchSourcePersistMethod
     public Report persist(OpenSearchSourceConfiguration configuration) {
         Configurator configurator = new Configurator();
         configurator.deleteManagedService(configuration.servicePid());
-        OperationReport report = configurator.commit("Opensearch source deleted for servicePid: {}",
+        OperationReport report = configurator.commit("OpenSearch source deleted for servicePid: {}",
                 configuration.servicePid());
 
         return createReport(SUCCESS_TYPES,
                 FAILURE_TYPES,
                 null,
-                report.containsFailedResults() ? FAILED_PERSIST : SUCCESSFUL_PERSIST);
+                report.containsFailedResults() ? FAILED_DELETE : SUCCESSFUL_DELETE);
     }
 
 }

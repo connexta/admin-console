@@ -26,5 +26,6 @@
 
     <modules>
         <module>source-config-handlers</module>
+        <module>commons</module>
     </modules>
 </project>

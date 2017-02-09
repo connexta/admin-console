@@ -18,8 +18,8 @@ import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_USERNAME;
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_USER_PASSWORD;
 import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.CREATE;
-import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.FAILED_PERSIST;
-import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.SUCCESSFUL_PERSIST;
+import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.FAILED_CREATE;
+import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.SUCCESSFUL_CREATE;
 import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.SOURCE_NAME_EXISTS_TEST_ID;
 import static org.codice.ddf.admin.api.handler.report.Report.createReport;
 import static org.codice.ddf.admin.api.services.OpenSearchServiceProperties.openSearchConfigToServiceProps;
@@ -51,10 +51,10 @@ public class CreateOpenSearchSourcePersistMethod
     private static final List<String> OPTIONAL_FIELDS = ImmutableList.of(SOURCE_USERNAME,
             SOURCE_USER_PASSWORD);
 
-    private static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(SUCCESSFUL_PERSIST,
+    private static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(SUCCESSFUL_CREATE,
             "OpenSearch Source successfully created.");
 
-    private static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(FAILED_PERSIST,
+    private static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(FAILED_CREATE,
             "Failed to create OpenSearch Source.");
 
     private final SourceValidationUtils sourceValidationUtils;
@@ -85,8 +85,8 @@ public class CreateOpenSearchSourcePersistMethod
                 FAILURE_TYPES,
                 null,
                 report.containsFailedResults() ?
-                        ConfigurationMessage.FAILED_PERSIST :
-                        SUCCESSFUL_PERSIST);
+                        FAILED_CREATE :
+                        SUCCESSFUL_CREATE);
     }
 
     @Override

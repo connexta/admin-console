@@ -74,8 +74,18 @@ public class ProbeReport extends Report {
         return probeResults;
     }
 
+    public <T> T getProbeResult(String key) {
+        if(probeResults.get(key) != null) {
+            return (T) probeResults.get(key);
+        }
+        return null;
+    }
+
     public ProbeReport addMessage(ConfigurationMessage message) {
-        super.addMessage(message);
-        return this;
+        return (ProbeReport) super.addMessage(message);
+    }
+
+    public ProbeReport addMessages(List<ConfigurationMessage> messages) {
+        return (ProbeReport) super.addMessages(messages);
     }
 }

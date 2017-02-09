@@ -170,7 +170,7 @@ class CswSourceUtilsTest extends Specification {
 //
 //    def 'test empty response'() {
 //        when:
-//        def config = utils.getPreferredConfig(configuration)
+//        def config = utils.getPreferredCswConfig(configuration)
 //
 //        then:
 //        configuration.endpointUrl() >> "test"
@@ -197,7 +197,7 @@ class CswSourceUtilsTest extends Specification {
 //
 //    def 'test parse GMD config'() {
 //        when:
-//        def config = utils.getPreferredConfig(configuration)
+//        def config = utils.getPreferredCswConfig(configuration)
 //
 //        then:
 //        configuration.endpointUrl() >> "test"

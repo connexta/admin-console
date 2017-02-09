@@ -14,38 +14,39 @@
 package org.codice.ddf.admin.sources.wfs;
 
 import static java.net.HttpURLConnection.HTTP_OK;
-import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.SOURCES_NAMESPACE_CONTEXT;
+import static org.codice.ddf.admin.api.handler.ConfigurationMessage.createInternalErrorMsg;
 import static org.codice.ddf.admin.api.services.WfsServiceProperties.WFS1_FACTORY_PID;
 import static org.codice.ddf.admin.api.services.WfsServiceProperties.WFS2_FACTORY_PID;
-import static org.codice.ddf.admin.sources.SourcesCommons.closeClientAndResponse;
-import static org.codice.ddf.admin.sources.SourcesCommons.getCloseableHttpClient;
+import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.DISCOVERED_SOURCES;
+import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.SOURCES_NAMESPACE_CONTEXT;
+import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.UNKNOWN_ENDPOINT;
+import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.VERIFIED_CAPABILITIES;
+import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.createCommonSourceConfigMsg;
+import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.createDocument;
+import static org.codice.ddf.admin.sources.wfs.WfsSourceConfigurationHandler.WFS_SOURCE_CONFIGURATION_HANDLER_ID;
 
 import java.util.List;
-import java.util.Optional;
 
-import javax.net.ssl.SSLPeerUnverifiedException;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.apache.commons.codec.binary.Base64;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
 import org.codice.ddf.admin.api.config.sources.WfsSourceConfiguration;
-import org.codice.ddf.admin.api.handler.commons.UrlAvailability;
+import org.codice.ddf.admin.api.handler.report.ProbeReport;
+import org.codice.ddf.admin.commons.requests.RequestUtils;
 import org.w3c.dom.Document;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.net.HttpHeaders;
 
 public class WfsSourceUtils {
 
     public static final String GET_CAPABILITIES_PARAMS = "?service=WFS&request=GetCapabilities";
 
     private static final List<String> WFS_MIME_TYPES = ImmutableList.of("text/xml",
-            "application/xml");
+            "application/xml",
+            "text/xml; charset=UTF-8",
+            "application/xml; charset=UTF-8"
+    );
 
     private static final String ACCEPT_VERSION_PARAMS = "&AcceptVersions=2.0.0,1.0.0";
 
@@ -54,118 +55,104 @@ public class WfsSourceUtils {
             "http://%s:%d/services/wfs",
             "http://%s:%d/wfs");
 
-    public UrlAvailability confirmEndpointUrl(WfsSourceConfiguration config) {
-        Optional<UrlAvailability> result = URL_FORMATS.stream()
-                .map(formatUrl -> String.format(formatUrl,
-                        config.sourceHostName(),
-                        config.sourcePort()))
-                .map(url -> getUrlAvailability(url, config.sourceUserName(), config.sourceUserPassword()))
-                .filter(avail -> avail.isAvailable() || avail.isCertError())
-                .findFirst();
-        return result.isPresent() ? result.get() : null;
+    private static final String WFS_VERSION_EXP = "/wfs:WFS_Capabilities/attribute::version";
+
+    /**
+     * Attempts to verify the given URL as a functional WFS endpoint
+     * SUCCESS TYPES - VERIFIED_CAPABILITIES,
+     * FAILURE TYPES - CANNOT_CONNECT, CERT_ERROR, UNKNOWN_ENDPOINT
+     * WARNING TYPES - UNTRUSTED_CA
+     * RETURN TYPES -  CONTENT_TYPE, CONTENT, STATUS_CODE
+     * @param url
+     * @param username
+     * @param password
+     * @return report
+     */
+    public static ProbeReport sendWfsCapabilitiesRequest(String url, String username, String password) {
+        ProbeReport requestResults = RequestUtils.sendGetRequest(url, username, password);
+        if (requestResults.containsFailureMessages()) {
+            return requestResults;
+        }
+        ProbeReport capabilitiesReport = new ProbeReport();
+        int statusCode = requestResults.getProbeResult(RequestUtils.STATUS_CODE);
+        String contentType = requestResults.getProbeResult(RequestUtils.CONTENT_TYPE);
+
+        if (statusCode == HTTP_OK && WFS_MIME_TYPES.contains(contentType)) {
+            return capabilitiesReport.addMessage(createCommonSourceConfigMsg(VERIFIED_CAPABILITIES))
+                    .probeResults(requestResults.probeResults());
+        }
+        return capabilitiesReport.addMessage(createCommonSourceConfigMsg(UNKNOWN_ENDPOINT));
     }
 
-    public UrlAvailability getUrlAvailability(String url, String un, String pw) {
-        UrlAvailability result = new UrlAvailability(url);
-        int status;
-        String contentType;
-        url += GET_CAPABILITIES_PARAMS;
-        HttpGet request = new HttpGet(url);
-        CloseableHttpResponse response = null;
-        CloseableHttpClient client = null;
-        if (url.startsWith("https") && un != null && pw != null) {
-            byte[] auth = Base64.encodeBase64((un + ":" + pw).getBytes());
-            request.setHeader(HttpHeaders.AUTHORIZATION, "Basic " + new String(auth));
+    /**
+     * Attempts to discover a WFS endpoint at a given hostname and port
+     * SUCCESS TYPES - VERIFIED_CAPABILITIES,
+     * FAILURE TYPES - UNKNOWN_ENDPOINT
+     * WARNING TYPES - UNTRUSTED_CA
+     * RETURN TYPES - DISCOVERED_URL
+     * @param hostname
+     * @param port
+     * @param username
+     * @param password
+     * @return
+     */
+    public static ProbeReport discoverWfsUrl(String hostname, int port, String username, String password) {
+        return URL_FORMATS.stream()
+                .map(formatUrl -> String.format(formatUrl, hostname, port))
+                .map(url -> sendWfsCapabilitiesRequest(url + GET_CAPABILITIES_PARAMS, username, password))
+                .filter(report -> !report.containsFailureMessages())
+                .findFirst()
+                .orElse(new ProbeReport(createCommonSourceConfigMsg(UNKNOWN_ENDPOINT)));
+    }
+
+    /**
+     * Attempts to create a WFS configuration from the given url.
+     * SUCCESS TYPES - CONFIG_CREATED
+     * FAILURE TYPES - CERT_ERROR, UNKNOWN_ENDPOINT, CANNOT_CONNECT
+     * WARNING TYPES - UNTRUSTED_CA
+     * RETURN TYPES - DISCOVERED_SOURCES
+     *
+     * @param url
+     * @param username
+     * @param password
+     * @return report
+     */
+    public static ProbeReport getPreferredWfsConfig(String url, String username, String password) {
+        ProbeReport requestReport = sendWfsCapabilitiesRequest(
+                url + GET_CAPABILITIES_PARAMS + ACCEPT_VERSION_PARAMS, username, password);
+
+        if (requestReport.containsFailureMessages()) {
+            return requestReport;
         }
+
+        ProbeReport results = new ProbeReport();
+        String requestBody = requestReport.getProbeResult(RequestUtils.CONTENT);
+        Document capabilitiesXml;
         try {
-            client = getCloseableHttpClient(false);
-            response = client.execute(request);
-            status = response.getStatusLine()
-                    .getStatusCode();
-            contentType = response.getEntity()
-                    .getContentType()
-                    .getValue();
-            if (status == HTTP_OK && WFS_MIME_TYPES.contains(contentType)) {
-                return result.trustedCertAuthority(true)
-                        .certError(false)
-                        .available(true);
-            } else {
-                return result.trustedCertAuthority(true)
-                        .certError(false)
-                        .available(false);
-            }
-        } catch (SSLPeerUnverifiedException e) {
-            // This is the hostname != cert name case - if this occurs, the URL's SSL cert configuration
-            // is incorrect, or a serious network security issue has occurred.
-            return result.trustedCertAuthority(false)
-                    .certError(true)
-                    .available(false);
+            capabilitiesXml = createDocument(requestBody);
         } catch (Exception e) {
-            try {
-                closeClientAndResponse(client, response);
-                client = getCloseableHttpClient(true);
-                response = client.execute(request);
-                status = response.getStatusLine()
-                        .getStatusCode();
-                contentType = response.getEntity()
-                        .getContentType()
-                        .getValue();
-                if (status == HTTP_OK && WFS_MIME_TYPES.contains(contentType)) {
-                    return result.trustedCertAuthority(false)
-                            .certError(false)
-                            .available(true);
-                }
-            } catch (Exception e1) {
-                return result.trustedCertAuthority(false)
-                        .certError(false)
-                        .available(false);
-            }
-        } finally {
-            closeClientAndResponse(client, response);
+            return results.addMessage(createInternalErrorMsg("Unable to read response from endpoint."));
         }
-        return result;
-    }
 
-    public Optional<WfsSourceConfiguration> getPreferredConfig(
-            WfsSourceConfiguration configuration) {
-        WfsSourceConfiguration config = new WfsSourceConfiguration(configuration);
-        String wfsVersionExp = "/wfs:WFS_Capabilities/attribute::version";
-        HttpGet getCapabilitiesRequest = new HttpGet(
-                config.endpointUrl() + GET_CAPABILITIES_PARAMS + ACCEPT_VERSION_PARAMS);
-        if (configuration.endpointUrl().startsWith("https")
-                && config.sourceUserName() != null
-                && config.sourceUserPassword() != null) {
-            byte[] auth = Base64.encodeBase64((config.sourceUserName() + ":" + config.sourceUserPassword()).getBytes());
-            getCapabilitiesRequest.setHeader(HttpHeaders.AUTHORIZATION, "Basic " + new String(auth));
-        }
-        XPath xpath = XPathFactory.newInstance()
-                .newXPath();
+        WfsSourceConfiguration preferredConfig = new WfsSourceConfiguration();
+        preferredConfig.configurationHandlerId(WFS_SOURCE_CONFIGURATION_HANDLER_ID);
+        preferredConfig.endpointUrl(url).sourceUserName(username).sourceUserPassword(password);
+
+        XPath xpath = XPathFactory.newInstance().newXPath();
         xpath.setNamespaceContext(SOURCES_NAMESPACE_CONTEXT);
-        CloseableHttpClient client = null;
-        CloseableHttpResponse response = null;
+        String wfsVersion;
         try {
-            client = getCloseableHttpClient(true);
-            response = client.execute(getCapabilitiesRequest);
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            factory.setNamespaceAware(true);
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            Document capabilitiesXml = builder.parse(response
-                    .getEntity()
-                    .getContent());
-            String wfsVersion = xpath.compile(wfsVersionExp)
-                    .evaluate(capabilitiesXml);
-            switch (wfsVersion) {
-            case "2.0.0":
-                return Optional.of((WfsSourceConfiguration) config.factoryPid(WFS2_FACTORY_PID));
-            case "1.0.0":
-                return Optional.of((WfsSourceConfiguration) config.factoryPid(WFS1_FACTORY_PID));
-            default:
-                return Optional.empty();
-            }
-        } catch (Exception e) {
-            return Optional.empty();
-        } finally {
-            closeClientAndResponse(client, response);
+            wfsVersion = xpath.compile(WFS_VERSION_EXP).evaluate(capabilitiesXml);
+        } catch (XPathExpressionException e) {
+            return results.addMessage(createInternalErrorMsg("Unable to parse XML response."));
+        }
+        switch (wfsVersion) {
+        case "2.0.0":
+            return results.probeResult(DISCOVERED_SOURCES, preferredConfig.factoryPid(WFS2_FACTORY_PID));
+        case "1.0.0":
+            return results.probeResult(DISCOVERED_SOURCES, preferredConfig.factoryPid(WFS1_FACTORY_PID));
+        default:
+            return results.addMessage(createCommonSourceConfigMsg(UNKNOWN_ENDPOINT));
         }
     }
 }

@@ -37,7 +37,6 @@ import org.codice.ddf.admin.api.services.OpenSearchServiceProperties;
 import org.codice.ddf.admin.sources.opensearch.persist.CreateOpenSearchSourcePersistMethod;
 import org.codice.ddf.admin.sources.opensearch.persist.DeleteOpenSearchSourcePersistMethod;
 import org.codice.ddf.admin.sources.opensearch.probe.DiscoverOpenSearchSourceProbeMethod;
-import org.codice.ddf.admin.sources.opensearch.probe.OpenSearchConfigFromUrlProbeMethod;
 import org.codice.ddf.admin.sources.opensearch.test.SourceNameExistsOpenSearchTestMethod;
 
 public class OpenSearchSourceConfigurationHandler
@@ -55,8 +54,7 @@ public class OpenSearchSourceConfigurationHandler
 
     @Override
     public List<ProbeMethod> getProbeMethods() {
-        return Arrays.asList(new DiscoverOpenSearchSourceProbeMethod(),
-                new OpenSearchConfigFromUrlProbeMethod());
+        return Collections.singletonList(new DiscoverOpenSearchSourceProbeMethod());
     }
 
     @Override

@@ -17,10 +17,12 @@ import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.PORT;
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_HOSTNAME;
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_USERNAME;
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_USER_PASSWORD;
-import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.SUCCESSFUL_PROBE;
-import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.DISCOVERED_SOURCES;
-import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.DISCOVER_SOURCES_ID;
 import static org.codice.ddf.admin.api.handler.report.ProbeReport.createProbeReport;
+import static org.codice.ddf.admin.api.validation.SourceValidationUtils.validateOptionalUsernameAndPassword;
+import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.CREATED_SOURCE;
+import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.DISCOVERED_SOURCES;
+import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.DISCOVER_SOURCES_ID;
+import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.getCommonSourceSubtypeDescriptions;
 
 import java.util.List;
 import java.util.Map;
@@ -38,28 +40,18 @@ import com.google.common.collect.ImmutableMap;
 
 public class DiscoverSourcesProbeMethod extends ProbeMethod<SourceConfiguration> {
 
+    //Return types
     public static final String CONFIG = "config";
-
     public static final String MESSAGES = "messages";
-
-    public static final String DESCRIPTION =
-            "Retrieves possible configurations for the specified url. The results will be in a list of maps with the keys "
-                    + CONFIG + ", " + MESSAGES;
+    public static final String DESCRIPTION = "Retrieves possible configurations for the specified url. The results will be in a list of maps with the keys " + CONFIG + ", " + MESSAGES;
 
     public static final List<String> REQUIRED_FIELDS = ImmutableList.of(SOURCE_HOSTNAME, PORT);
-
-    public static final List<String> OPTIONAL_FIELDS = ImmutableList.of(SOURCE_USERNAME,
-            SOURCE_USER_PASSWORD);
-
-    public static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(SUCCESSFUL_PROBE,
-            "Successfully created one or more sources configurations from the specified host.");
+    public static final List<String> OPTIONAL_FIELDS = ImmutableList.of(SOURCE_USERNAME, SOURCE_USER_PASSWORD);
+    public static final Map<String, String> SUCCESS_TYPES =  getCommonSourceSubtypeDescriptions(CREATED_SOURCE);
 
     //    public static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(FAILED_PROBE, "No sources were discovered from the specified host.");
     public static final List<String> RETURN_TYPES = ImmutableList.of(DISCOVERED_SOURCES);
-
     private List<SourceConfigurationHandler> handlers;
-
-    private final SourceValidationUtils sourceValidationUtils;
 
     // TODO: tbatie - 2/1/17 - (Ticket) We can't return a failure type here because the frontend can't handle the error properly
     public DiscoverSourcesProbeMethod(List<SourceConfigurationHandler> handlers) {
@@ -73,7 +65,6 @@ public class DiscoverSourcesProbeMethod extends ProbeMethod<SourceConfiguration>
                 RETURN_TYPES);
 
         this.handlers = handlers;
-        sourceValidationUtils = new SourceValidationUtils();
     }
 
     @Override
@@ -85,19 +76,18 @@ public class DiscoverSourcesProbeMethod extends ProbeMethod<SourceConfiguration>
         List<Map<String, Object>> discoveredSources = sourceProbeReports.stream()
                 .filter(probeReport -> !probeReport.containsFailureMessages())
                 .map(probeReport -> ImmutableMap.of(CONFIG,
-                        probeReport.probeResults()
-                                .get(DISCOVERED_SOURCES),
+                        probeReport.probeResults().get(DISCOVERED_SOURCES),
                         MESSAGES,
                         probeReport.messages()))
                 .collect(Collectors.toList());
 
-        return createProbeReport(SUCCESS_TYPES, null, null, SUCCESSFUL_PROBE).probeResult(
+        return createProbeReport(SUCCESS_TYPES, null, null, CREATED_SOURCE).probeResult(
                 DISCOVERED_SOURCES,
                 discoveredSources);
     }
 
     @Override
     public List<ConfigurationMessage> validateOptionalFields(SourceConfiguration configuration) {
-        return sourceValidationUtils.validateOptionalUsernameAndPassword(configuration);
+        return validateOptionalUsernameAndPassword(configuration);
     }
 }

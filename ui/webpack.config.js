@@ -44,6 +44,13 @@ var config = {
             }
           }
         ]
+      },
+      {
+        test: /\.css$/,
+        use: [
+          'style-loader',
+          'css-loader'
+        ]
       }
     ]
   },
@@ -210,6 +217,10 @@ if (process.env.NODE_ENV === 'production') {
       host: '0.0.0.0',
       proxy: {
         '/admin': {
+          target: 'https://localhost:8993',
+          secure: false
+        },
+        '/graphql': {
           target: 'https://localhost:8993',
           secure: false
         }

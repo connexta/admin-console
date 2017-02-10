@@ -23,6 +23,7 @@
         <feature>admin-beta-federation</feature>
         <feature>admin-beta-security</feature>
         <feature>admin-beta-embedded-ldap</feature>
+        <feature>admin-beta-query</feature>
     </feature>
 
     <feature name="admin-beta-temp-configurator" install="auto" version="${project.version}"
@@ -74,5 +75,23 @@
         <feature prerequisite="true">admin-beta-core</feature>
         <bundle>mvn:org.codice.ddf.admin.beta/admin-ui/${project.version}</bundle>
         <bundle>mvn:org.codice.ddf.admin.beta/admin-module/${project.version}</bundle>
+    </feature>
+
+    <feature name="admin-beta-query" install="auto" version="${project.version}"
+             description="DDF Admin Query (Beta) ">
+        <feature prerequisite="true">scr</feature>
+        <bundle>mvn:com.graphql-java/graphql-java-servlet/0.7.0</bundle>
+        <bundle>mvn:com.fasterxml.jackson.core/jackson-core/2.7.3</bundle>
+        <bundle>mvn:com.fasterxml.jackson.core/jackson-annotations/2.7.3</bundle>
+        <bundle>mvn:com.fasterxml.jackson.core/jackson-databind/2.7.3</bundle>
+        <bundle>mvn:com.fasterxml.jackson.datatype/jackson-datatype-jdk8/2.7.3</bundle>
+        <bundle>mvn:commons-io/commons-io/2.2</bundle>
+        <bundle>wrap:mvn:com.google.guava/guava/19.0</bundle>
+        <bundle>wrap:mvn:com.graphql-java/graphql-java/2.2.0</bundle>
+        <bundle>mvn:com.graphql-java/graphql-java-annotations/0.13.1</bundle>
+        <bundle>wrap:mvn:org.projectlombok/lombok/1.16.6</bundle>
+        <bundle>mvn:commons-fileupload/commons-fileupload/1.3.2</bundle>
+        <bundle>wrap:mvn:org.antlr/antlr4-runtime/4.5.1</bundle>
+        <bundle>mvn:org.codice.ddf.admin.beta/admin-query/${project.version}</bundle>
     </feature>
 </features>

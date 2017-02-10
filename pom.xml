@@ -381,6 +381,7 @@
         <module>security</module>
         <module>federation</module>
         <module>ui</module>
+        <module>query</module>
         <module>app</module>
         <module>commons</module>
         <module>admin-module</module>

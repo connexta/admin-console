@@ -1,0 +1,7 @@
+sudo: false
+language: java
+cache: yarn
+install: true
+script: mvn clean install
+jdk:
+  - oraclejdk8

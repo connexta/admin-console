@@ -3,12 +3,12 @@ package org.codice.ddf.admin.query.api;
 import java.util.List;
 import java.util.Map;
 
-public interface ActionType {
+public interface Action {
     String description();
-    ActionReport process();
-    ActionType setArguments(Map<String, Object> args);
+    String getActionId();
+    ActionReport process(Map<String, Object> args);
+    ActionReport validate(List<Field> args);
     List<Field> getRequiredFields();
     List<Field> getOptionalFields();
-    List<ActionMessage> validate();
-    Field getActionId();
+    List<Field> getReturnTypes();
 }

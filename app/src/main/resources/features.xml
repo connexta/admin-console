@@ -79,7 +79,7 @@
 
     <feature name="admin-beta-query" install="auto" version="${project.version}"
              description="DDF Admin Query (Beta) ">
-        <feature prerequisite="true">scr</feature>
+        <feature>scr</feature>
         <bundle>mvn:com.graphql-java/graphql-java-servlet/0.7.0</bundle>
         <bundle>mvn:com.fasterxml.jackson.core/jackson-core/2.7.3</bundle>
         <bundle>mvn:com.fasterxml.jackson.core/jackson-annotations/2.7.3</bundle>

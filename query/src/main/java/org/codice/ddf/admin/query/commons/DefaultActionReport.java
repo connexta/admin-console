@@ -12,10 +12,6 @@ import org.codice.ddf.admin.query.api.ActionReport;
 
 public class DefaultActionReport implements ActionReport {
 
-    public static final String SUCCESSES = "successes";
-    public static final String FAILURES = "failures";
-    public static final String WARNINGS = "warnings";
-
     private List<ActionMessage> successes;
     private List<ActionMessage> warnings;
     private List<ActionMessage> failures;

@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.codice.ddf.admin.query.api.ActionReport;
-import org.codice.ddf.admin.query.api.Field;
+import org.codice.ddf.admin.query.api.field.Field;
 import org.codice.ddf.admin.query.commons.DefaultActionReport;
 
 public abstract class GetAction extends DefaultAction {
@@ -31,7 +31,7 @@ public abstract class GetAction extends DefaultAction {
     }
 
     @Override
-    public ActionReport validate(List<Field> args) {
+    public ActionReport validate(Map<String, Object> args) {
         return new DefaultActionReport();
     }
 }

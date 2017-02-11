@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.codice.ddf.admin.query.api.ActionMessage;
 import org.codice.ddf.admin.query.api.ActionReport;
-import org.codice.ddf.admin.query.api.Field;
+import org.codice.ddf.admin.query.api.field.Field;
 import org.codice.ddf.admin.query.commons.DefaultActionReport;
 import org.codice.ddf.admin.query.commons.action.GetAction;
 import org.codice.ddf.admin.query.commons.message.FailureMessage;

@@ -13,6 +13,8 @@
  */
 package org.codice.ddf.admin.query;
 
+import static graphql.Scalars.GraphQLBigDecimal;
+import static graphql.Scalars.GraphQLInt;
 import static graphql.Scalars.GraphQLString;
 import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
 import static graphql.schema.GraphQLObjectType.newObject;
@@ -20,13 +22,18 @@ import static graphql.schema.GraphQLObjectType.newObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.codice.ddf.admin.query.api.Action;
 import org.codice.ddf.admin.query.api.ActionHandler;
-import org.codice.ddf.admin.query.api.Field;
+import org.codice.ddf.admin.query.api.ActionMessage;
+import org.codice.ddf.admin.query.api.ActionReport;
+import org.codice.ddf.admin.query.api.field.Field;
 import org.codice.ddf.admin.query.sample.SampleActionHandler;
+
+import com.google.common.collect.ImmutableMap;
 
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLArgument;
@@ -35,14 +42,10 @@ import graphql.schema.GraphQLInputType;
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
+import graphql.schema.GraphQLType;
 import graphql.servlet.GraphQLQueryProvider;
 
 public class Query implements GraphQLQueryProvider {
-
-    public static final GraphQLObjectType MESSAGE_OBJECT = newObject().name("message")
-            .field(newFieldDefinition().type(GraphQLString).name("code"))
-            .field(newFieldDefinition().type(GraphQLString).name("description"))
-            .build();
 
     //https://github.com/graphql-java/graphql-java/blob/master/src/main/java/graphql/schema/PropertyDataFetcher.java
     @Override
@@ -100,7 +103,7 @@ public class Query implements GraphQLQueryProvider {
 
     public GraphQLArgument fieldToGraphQLArgument(Field field) {
         return new GraphQLArgument(field.getFieldName(),
-                fieldTypeToGraphQLInputType(field.getFieldType()));
+                fieldTypeToGraphQLInputType(field));
     }
 
     public GraphQLFieldDefinition fieldToGraphQLFieldDefinition(Field field) {
@@ -110,6 +113,7 @@ public class Query implements GraphQLQueryProvider {
     }
 
     public GraphQLObjectType actionToGraphQLReturnType(String actionHandlerId, Action action) {
+        // TODO: tbatie - 2/11/17 - Have to generate a unqiue report
         String reportName = new StringBuilder()
                 .append(actionHandlerId)
                 .append(StringUtils.capitalize(action.getActionId()))
@@ -128,19 +132,35 @@ public class Query implements GraphQLQueryProvider {
         return report.build();
     }
 
-    public GraphQLOutputType fieldTypeToGraphQLType(String fieldType) {
+    // TODO: tbatie - 2/11/17 - Don't hardcode versions, implements more difficult cases
+    public GraphQLOutputType fieldTypeToGraphQLType(Field.FieldType fieldType) {
         return GraphQLString;
     }
 
-    public GraphQLInputType fieldTypeToGraphQLInputType(String fieldType) {
+    public GraphQLInputType fieldTypeToGraphQLInputType(Field field) {
+//        switch (field.getFieldType()) {
+//            case INTEGER:
+//                return GraphQLInt;
+//            case DECIMAL:
+//                return GraphQLBigDecimal;
+//            case STRING:
+//                return GraphQLString;
+//            case LIST:
+//
+//        }
         return GraphQLString;
     }
+
+    public static final GraphQLObjectType MESSAGE_OBJECT = newObject().name(ActionMessage.MESSAGE)
+            .field(newFieldDefinition().type(GraphQLString).name(ActionMessage.CODE))
+            .field(newFieldDefinition().type(GraphQLString).name(ActionMessage.DESCRIPTION))
+            .build();
 
     public GraphQLObjectType.Builder getBaseActionReport(String reportName){
         return newObject()
                 .name(reportName)
-                .field(newFieldDefinition().name("successes").type(new GraphQLList(MESSAGE_OBJECT)))
-                .field(newFieldDefinition().name("failures").type(new GraphQLList(MESSAGE_OBJECT)))
-                .field(newFieldDefinition().name("warnings").type(new GraphQLList(MESSAGE_OBJECT)));
+                .field(newFieldDefinition().name(ActionReport.SUCCESSES).type(new GraphQLList(MESSAGE_OBJECT)))
+                .field(newFieldDefinition().name(ActionReport.FAILURES).type(new GraphQLList(MESSAGE_OBJECT)))
+                .field(newFieldDefinition().name(ActionReport.WARNINGS).type(new GraphQLList(MESSAGE_OBJECT)));
     }
 }

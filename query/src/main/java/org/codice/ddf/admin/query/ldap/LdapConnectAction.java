@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.codice.ddf.admin.query.api.ActionReport;
-import org.codice.ddf.admin.query.api.Field;
+import org.codice.ddf.admin.query.api.field.Field;
 import org.codice.ddf.admin.query.commons.action.DefaultAction;
 import org.codice.ddf.admin.query.commons.DefaultActionReport;
 import org.codice.ddf.admin.query.commons.DefaultFields;
@@ -13,6 +13,8 @@ import com.google.common.collect.ImmutableList;
 
 public class LdapConnectAction extends DefaultAction{
 
+    public static final String ACTION_ID = "connect";
+    public static final String ACTION_DESCRIPTION = "Connect to a given LDAP.";
     public static final String SOME_RETURN_TYPE = "someReturnField";
     public static final String SOME_RETURN_TYPE_2 = "someReturnField2";
 
@@ -26,7 +28,7 @@ public class LdapConnectAction extends DefaultAction{
     ), new DefaultFields.IntegerField(LDAP_PORT));
 
     public LdapConnectAction() {
-        super("connect", "Connect to a given LDAP. ", REQUIRED_FIELDS, null, RETURN_TYPES);
+        super(ACTION_ID, ACTION_DESCRIPTION, REQUIRED_FIELDS, null, RETURN_TYPES);
     }
 
     @Override
@@ -35,15 +37,5 @@ public class LdapConnectAction extends DefaultAction{
         report.addValue(SOME_RETURN_TYPE, "Sample field addValue");
         report.addValue(SOME_RETURN_TYPE_2, 666);
         return report;
-    }
-
-    @Override
-    public ActionReport validate(List<Field> args) {
-        return new DefaultActionReport();
-    }
-
-    @Override
-    public List<Field> getReturnTypes() {
-        return RETURN_TYPES;
     }
 }

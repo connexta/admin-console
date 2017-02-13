@@ -18,7 +18,7 @@ export const isPolling = (state, id) => pollingSelectors.isPolling(state.get('po
 
 import wizard, * as ldap from 'admin-wizard/reducer'
 import sourceWizard from '../wizards/sources/reducer'
-import home from '../home'
+import home from '../home/reducer'
 import wcpm, * as webContext from '../adminTools/webContextPolicyManager/reducer'
 import systemUsage from 'system-usage/reducer'
 

@@ -6,7 +6,7 @@ import CircularProgress from 'material-ui/CircularProgress'
 import * as styles from './styles.less'
 
 export default ({ submitting = false, children }) => (
-  <div>
+  <div style={{ position: 'relative' }}>
     {submitting
       ? <div className={styles.submitting}>
         <Flexbox justifyContent='center' alignItems='center' width='100%'>

@@ -15,7 +15,6 @@ let Banners = ({ settings, fetchSystemUsageProperties, children }) => {
       color: settings.textColor,
       backgroundColor: settings.style
     }
-    console.log('should be the banners')
 
     return (
       <div>
@@ -37,7 +36,6 @@ let Banners = ({ settings, fetchSystemUsageProperties, children }) => {
       </div>
     )
   } else {
-    console.log('not the banners')
     return (
       <div>
         <Mount

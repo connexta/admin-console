@@ -19,7 +19,6 @@ public class SampleAction extends GetAction {
 
     private static final List<Field> RETURN_TYPES = Arrays.asList(new SampleFields.SampleStringField());
 
-    // TODO: tbatie - 2/6/17 - Req and optional fields
     public SampleAction() {
         super(ACTION_ID, DESCRIPTION);
     }

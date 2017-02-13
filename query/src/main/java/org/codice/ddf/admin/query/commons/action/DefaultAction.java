@@ -71,6 +71,15 @@ public abstract class DefaultAction implements Action {
         return validationReport;
     }
 
+    public List<Field> populateFields(Map<String, Object> args, List<Field> fields) {
+        List<Field> allFields = new ArrayList<>();
+        if(fields != null) {
+            allFields.addAll(getRequiredFields());
+        }
+        allFields.stream().forEach(field -> field.setValue(args.get(field.getFieldName())));
+        return allFields;
+    }
+
     public ActionReport validateRequiredFields(List<Field> fields){
         DefaultActionReport validationReport = new DefaultActionReport();
         List<ActionMessage> messages = fields.stream()
@@ -83,14 +92,5 @@ public abstract class DefaultAction implements Action {
 
     public ActionReport validateOptionalFields(List<Field> fields){
         return new DefaultActionReport();
-    }
-
-    public List<Field> populateFields(Map<String, Object> args, List<Field> fields) {
-        List<Field> allFields = new ArrayList<>();
-        if(fields != null) {
-            allFields.addAll(getRequiredFields());
-        }
-        allFields.stream().forEach(field -> field.setValue(args.get(field.getFieldName())));
-        return allFields;
     }
 }

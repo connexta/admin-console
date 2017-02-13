@@ -13,8 +13,6 @@
  */
 package org.codice.ddf.admin.query;
 
-import static graphql.Scalars.GraphQLBigDecimal;
-import static graphql.Scalars.GraphQLInt;
 import static graphql.Scalars.GraphQLString;
 import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
 import static graphql.schema.GraphQLObjectType.newObject;
@@ -22,7 +20,6 @@ import static graphql.schema.GraphQLObjectType.newObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
@@ -33,8 +30,6 @@ import org.codice.ddf.admin.query.api.ActionReport;
 import org.codice.ddf.admin.query.api.field.Field;
 import org.codice.ddf.admin.query.sample.SampleActionHandler;
 
-import com.google.common.collect.ImmutableMap;
-
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLArgument;
 import graphql.schema.GraphQLFieldDefinition;
@@ -42,12 +37,10 @@ import graphql.schema.GraphQLInputType;
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
-import graphql.schema.GraphQLType;
 import graphql.servlet.GraphQLQueryProvider;
 
 public class Query implements GraphQLQueryProvider {
 
-    //https://github.com/graphql-java/graphql-java/blob/master/src/main/java/graphql/schema/PropertyDataFetcher.java
     @Override
     public GraphQLObjectType getQuery() {
         return handlerToGraphQLObject(new SampleActionHandler());
@@ -98,6 +91,12 @@ public class Query implements GraphQLQueryProvider {
     }
 
     public Object dataFetch(Action action, DataFetchingEnvironment env) {
+        // TODO: tbatie - 2/12/17 - Check if validation works - Should move this to the default action handler actually
+//        ActionReport report = action.validate(env.getArguments());
+//        if(report.getFailureMessages() == null || !report.getFailureMessages().isEmpty()) {
+//            return report.toMap();
+//        }
+
         return action.process(env.getArguments()).toMap();
     }
 
@@ -113,7 +112,6 @@ public class Query implements GraphQLQueryProvider {
     }
 
     public GraphQLObjectType actionToGraphQLReturnType(String actionHandlerId, Action action) {
-        // TODO: tbatie - 2/11/17 - Have to generate a unqiue report
         String reportName = new StringBuilder()
                 .append(actionHandlerId)
                 .append(StringUtils.capitalize(action.getActionId()))
@@ -132,8 +130,17 @@ public class Query implements GraphQLQueryProvider {
         return report.build();
     }
 
-    // TODO: tbatie - 2/11/17 - Don't hardcode versions, implements more difficult cases
     public GraphQLOutputType fieldTypeToGraphQLType(Field.FieldType fieldType) {
+//        switch (field.getFieldType()) {
+//            case INTEGER:
+//                return GraphQLInt;
+//            case DECIMAL:
+//                return GraphQLBigDecimal;
+//            case STRING:
+//                return GraphQLString;
+//            case LIST:
+//
+//        }
         return GraphQLString;
     }
 

@@ -15,15 +15,14 @@ public class LdapConnectAction extends DefaultAction{
 
     public static final String ACTION_ID = "connect";
     public static final String ACTION_DESCRIPTION = "Connect to a given LDAP.";
+
     public static final String SOME_RETURN_TYPE = "someReturnField";
     public static final String SOME_RETURN_TYPE_2 = "someReturnField2";
-
-    public static final String LDAP_HOST_NAME = "ldapHostname";
-    public static final String LDAP_PORT = "ldapPort";
-
     private static final List<Field> RETURN_TYPES = ImmutableList.of(new DefaultFields.StringField(SOME_RETURN_TYPE
             ), new DefaultFields.IntegerField(SOME_RETURN_TYPE_2));
 
+    public static final String LDAP_HOST_NAME = "ldapHostname";
+    public static final String LDAP_PORT = "ldapPort";
     private static final List<Field> REQUIRED_FIELDS = ImmutableList.of(new DefaultFields.StringField(LDAP_HOST_NAME
     ), new DefaultFields.IntegerField(LDAP_PORT));
 

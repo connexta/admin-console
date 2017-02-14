@@ -30,7 +30,7 @@
         <dependency>
             <groupId>ddf.platform.error</groupId>
             <artifactId>platform-error-servlet</artifactId>
-            <version>2.9.4</version>
+            <version>${ddf.version}</version>
         </dependency>
         <!--
         Remove when possible

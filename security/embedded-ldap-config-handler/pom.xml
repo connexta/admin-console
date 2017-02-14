@@ -31,13 +31,13 @@
         <dependency>
             <groupId>ddf.security.policy</groupId>
             <artifactId>security-policy-context</artifactId>
-            <version>2.9.4</version>
+            <version>${ddf.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>ddf.admin.core</groupId>
             <artifactId>admin-core-api</artifactId>
-            <version>2.9.4</version>
+            <version>${ddf.version}</version>
             <scope>test</scope>
         </dependency>
         <!--

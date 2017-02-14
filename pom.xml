@@ -35,12 +35,14 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
 
+        <ddf.version>2.10.0</ddf.version>
         <guava.version>18.0</guava.version>
         <karaf.version>4.0.7</karaf.version>
         <groovy.version>2.4.7</groovy.version>
         <commons-lang.version>2.6</commons-lang.version>
         <node.version>v7.1.0</node.version>
         <yarn.version>v0.19.1</yarn.version>
+
         <ddf.scm.connection.url />
         <snapshots.repository.url />
         <reports.repository.url />
@@ -102,52 +104,11 @@
     </profiles>
 
     <dependencies>
-    <!--
-    TODO: Replace all dependencies below this line with shaded jar at version 2.10.0
-    -->
         <!--Spock dependencies-->
-        <!--
         <dependency>
             <groupId>ddf.lib</groupId>
             <artifactId>spock-shaded</artifactId>
-            <version>2.10.0</version>
-            <scope>test</scope>
-        </dependency>
-        -->
-        <dependency>
-            <groupId>org.ow2.asm</groupId>
-            <artifactId>asm</artifactId>
-            <version>5.0.4</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>cglib</groupId>
-            <artifactId>cglib-nodep</artifactId>
-            <version>3.2.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.objenesis</groupId>
-            <artifactId>objenesis</artifactId>
-            <version>2.1</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.spockframework</groupId>
-            <artifactId>spock-core</artifactId>
-            <version>1.0-groovy-2.4</version>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.codehaus.groovy</groupId>
-                    <artifactId>groovy-all</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.groovy</groupId>
-            <artifactId>groovy-all</artifactId>
-            <version>${groovy.version}</version>
+            <version>${ddf.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

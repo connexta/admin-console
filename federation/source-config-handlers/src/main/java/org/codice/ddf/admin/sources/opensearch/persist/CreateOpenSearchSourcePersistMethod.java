@@ -22,7 +22,6 @@ import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.FAILED_PER
 import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.SUCCESSFUL_PERSIST;
 import static org.codice.ddf.admin.api.handler.report.Report.createReport;
 import static org.codice.ddf.admin.api.services.OpenSearchServiceProperties.openSearchConfigToServiceProps;
-import static org.codice.ddf.admin.api.validation.SourceValidationUtils.validateOptionalUsernameAndPassword;
 
 import java.util.List;
 import java.util.Map;
@@ -33,6 +32,7 @@ import org.codice.ddf.admin.api.configurator.OperationReport;
 import org.codice.ddf.admin.api.handler.ConfigurationMessage;
 import org.codice.ddf.admin.api.handler.method.PersistMethod;
 import org.codice.ddf.admin.api.handler.report.Report;
+import org.codice.ddf.admin.api.validation.SourceValidationUtils;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -55,6 +55,8 @@ public class CreateOpenSearchSourcePersistMethod
     private static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(FAILED_PERSIST,
             "Failed to create OpenSearch Source.");
 
+    private SourceValidationUtils sourceValidationUtils;
+
     public CreateOpenSearchSourcePersistMethod() {
         super(CREATE_OPENSEARCH_SOURCE_ID,
                 DESCRIPTION,
@@ -63,6 +65,8 @@ public class CreateOpenSearchSourcePersistMethod
                 SUCCESS_TYPES,
                 FAILURE_TYPES,
                 null);
+
+        sourceValidationUtils = new SourceValidationUtils();
     }
 
     @Override
@@ -83,6 +87,6 @@ public class CreateOpenSearchSourcePersistMethod
     @Override
     public List<ConfigurationMessage> validateOptionalFields(
             OpenSearchSourceConfiguration configuration) {
-        return validateOptionalUsernameAndPassword(configuration);
+        return sourceValidationUtils.validateOptionalUsernameAndPassword(configuration);
     }
 }

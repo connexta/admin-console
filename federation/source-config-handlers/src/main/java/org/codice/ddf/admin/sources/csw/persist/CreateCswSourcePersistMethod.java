@@ -24,7 +24,6 @@ import static org.codice.ddf.admin.api.handler.ConfigurationMessage.FAILED_PERSI
 import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.CREATE;
 import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.SUCCESSFUL_PERSIST;
 import static org.codice.ddf.admin.api.services.CswServiceProperties.cswConfigToServiceProps;
-import static org.codice.ddf.admin.api.validation.SourceValidationUtils.validateOptionalUsernameAndPassword;
 
 import java.util.Arrays;
 import java.util.List;
@@ -36,6 +35,7 @@ import org.codice.ddf.admin.api.configurator.OperationReport;
 import org.codice.ddf.admin.api.handler.ConfigurationMessage;
 import org.codice.ddf.admin.api.handler.method.PersistMethod;
 import org.codice.ddf.admin.api.handler.report.Report;
+import org.codice.ddf.admin.api.validation.SourceValidationUtils;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -62,6 +62,8 @@ public class CreateCswSourcePersistMethod extends PersistMethod<CswSourceConfigu
     private static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(FAILED_PERSIST,
             "Failed to create CSW Source.");
 
+    private SourceValidationUtils sourceValidationUtils;
+
     public CreateCswSourcePersistMethod() {
         super(CREATE_CSW_SOURCE_ID,
                 DESCRIPTION,
@@ -70,6 +72,8 @@ public class CreateCswSourcePersistMethod extends PersistMethod<CswSourceConfigu
                 SUCCESS_TYPES,
                 FAILURE_TYPES,
                 null);
+
+        sourceValidationUtils = new SourceValidationUtils();
     }
 
     @Override
@@ -87,8 +91,8 @@ public class CreateCswSourcePersistMethod extends PersistMethod<CswSourceConfigu
 
     @Override
     public List<ConfigurationMessage> validateOptionalFields(CswSourceConfiguration configuration) {
-        List<ConfigurationMessage> validationResults = validateOptionalUsernameAndPassword(
-                configuration);
+        List<ConfigurationMessage> validationResults =
+                sourceValidationUtils.validateOptionalUsernameAndPassword(configuration);
         if (configuration.outputSchema() != null) {
             validationResults.addAll(configuration.validate(Arrays.asList(OUTPUT_SCHEMA)));
         }

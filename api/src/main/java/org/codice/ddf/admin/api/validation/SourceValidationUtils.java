@@ -17,21 +17,55 @@ import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_USER_PASSWORD;
 import static org.codice.ddf.admin.api.handler.ConfigurationMessage.createInvalidFieldMsg;
 import static org.codice.ddf.admin.api.services.CswServiceProperties.CSW_FACTORY_PIDS;
+import static org.codice.ddf.admin.api.services.CswServiceProperties.CSW_GMD_FACTORY_PID;
+import static org.codice.ddf.admin.api.services.CswServiceProperties.CSW_PROFILE_FACTORY_PID;
+import static org.codice.ddf.admin.api.services.CswServiceProperties.CSW_SPEC_FACTORY_PID;
 import static org.codice.ddf.admin.api.services.OpenSearchServiceProperties.OPENSEARCH_FACTORY_PID;
+import static org.codice.ddf.admin.api.services.WfsServiceProperties.WFS1_FACTORY_PID;
+import static org.codice.ddf.admin.api.services.WfsServiceProperties.WFS2_FACTORY_PID;
 import static org.codice.ddf.admin.api.services.WfsServiceProperties.WFS_FACTORY_PIDS;
 import static org.codice.ddf.admin.api.validation.ValidationUtils.validateString;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
+import org.apache.commons.lang.StringUtils;
 import org.codice.ddf.admin.api.config.sources.SourceConfiguration;
+import org.codice.ddf.admin.api.configurator.Configurator;
 import org.codice.ddf.admin.api.handler.ConfigurationMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.ImmutableList;
 
 public class SourceValidationUtils {
 
-    public static List<ConfigurationMessage> validateWfsFactoryPid(String factoryPid,
-            String configId) {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SourceValidationUtils.class);
+
+    private static final List<String> FACTORY_PIDS = ImmutableList.of(CSW_GMD_FACTORY_PID,
+            CSW_PROFILE_FACTORY_PID,
+            CSW_SPEC_FACTORY_PID,
+            OPENSEARCH_FACTORY_PID,
+            WFS1_FACTORY_PID,
+            WFS2_FACTORY_PID);
+
+    private Configurator configurator;
+
+    public SourceValidationUtils() {
+        configurator = new Configurator();
+    }
+
+    /*
+        For testing purposes only.
+     */
+    protected SourceValidationUtils(Configurator configurator) {
+        this.configurator = configurator;
+    }
+
+    public List<ConfigurationMessage> validateWfsFactoryPid(String factoryPid, String configId) {
         List<ConfigurationMessage> errors = validateString(factoryPid, configId);
         if (errors.isEmpty() && !WFS_FACTORY_PIDS.contains(factoryPid)) {
             errors.add(createInvalidFieldMsg("Unknown factory PID type \"" + factoryPid
@@ -41,8 +75,7 @@ public class SourceValidationUtils {
         return errors;
     }
 
-    public static List<ConfigurationMessage> validateCswFactoryPid(String factoryPid,
-            String configId) {
+    public List<ConfigurationMessage> validateCswFactoryPid(String factoryPid, String configId) {
         List<ConfigurationMessage> errors = validateString(factoryPid, configId);
         if (errors.isEmpty() && !CSW_FACTORY_PIDS.contains(factoryPid)) {
             errors.add(createInvalidFieldMsg("Unknown factory PID type \"" + factoryPid
@@ -52,7 +85,7 @@ public class SourceValidationUtils {
         return errors;
     }
 
-    public static List<ConfigurationMessage> validateOpensearchFactoryPid(String factoryPid,
+    public List<ConfigurationMessage> validateOpensearchFactoryPid(String factoryPid,
             String configId) {
         List<ConfigurationMessage> errors = validateString(factoryPid, configId);
         if (errors.isEmpty() && !OPENSEARCH_FACTORY_PID.equals(factoryPid)) {
@@ -62,13 +95,51 @@ public class SourceValidationUtils {
         return errors;
     }
 
-    public static List<ConfigurationMessage> validateOptionalUsernameAndPassword(
+    public List<ConfigurationMessage> validateOptionalUsernameAndPassword(
             SourceConfiguration configuration) {
         List<ConfigurationMessage> validationResults = new ArrayList<>();
         if (configuration.sourceUserName() != null) {
             validationResults.addAll(configuration.validate(Arrays.asList(SOURCE_USERNAME,
                     SOURCE_USER_PASSWORD)));
         }
+        return validationResults;
+    }
+
+    public List<ConfigurationMessage> validateNonDuplicateSourceName(String sourceName,
+            String configFieldId) {
+        List<ConfigurationMessage> validationResults = validateString(sourceName, configFieldId);
+        if (validationResults.isEmpty()) {
+            List<Map<String, Map<String, Object>>> configurations = FACTORY_PIDS.stream()
+                    .map(configurator::getManagedServiceConfigs)
+                    .filter(config -> !config.isEmpty())
+                    .collect(Collectors.toList());
+
+            for (Map<String, Map<String, Object>> config : configurations) {
+                for (Map<String, Object> entry : config.values()) {
+                    Object id = entry.get("id");
+                    if (id instanceof String) {
+                        String name = (String) id;
+                        if (StringUtils.isNotEmpty(name) && sourceName.equals(name)) {
+                            LOGGER.debug(
+                                    "Found duplicate existing source name when creating source with name \"{}\"",
+                                    sourceName);
+                            validationResults.add(createInvalidFieldMsg(String.format(
+                                    "A source with the name \"%s\" is already in use. Please choose another name.",
+                                    sourceName), configFieldId));
+                            break;
+                        }
+                    } else {
+                        LOGGER.debug(
+                                "Unable to validate duplicity of the incoming configuration's source name \"{}\"",
+                                sourceName);
+                        validationResults.add(createInvalidFieldMsg(String.format(String.format(
+                                "Error validating \"%s\" against existing source names.",
+                                sourceName), sourceName), configFieldId));
+                    }
+                }
+            }
+        }
+
         return validationResults;
     }
 }

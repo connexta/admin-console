@@ -23,7 +23,6 @@ import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.CREATE;
 import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.SUCCESSFUL_PERSIST;
 import static org.codice.ddf.admin.api.handler.report.Report.createReport;
 import static org.codice.ddf.admin.api.services.WfsServiceProperties.wfsConfigToServiceProps;
-import static org.codice.ddf.admin.api.validation.SourceValidationUtils.validateOptionalUsernameAndPassword;
 
 import java.util.List;
 import java.util.Map;
@@ -34,6 +33,7 @@ import org.codice.ddf.admin.api.configurator.OperationReport;
 import org.codice.ddf.admin.api.handler.ConfigurationMessage;
 import org.codice.ddf.admin.api.handler.method.PersistMethod;
 import org.codice.ddf.admin.api.handler.report.Report;
+import org.codice.ddf.admin.api.validation.SourceValidationUtils;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -58,6 +58,8 @@ public class CreateWfsSourcePersistMethod extends PersistMethod<WfsSourceConfigu
     private static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(FAILED_PERSIST,
             "Failed to create WFS Source.");
 
+    private SourceValidationUtils sourceValidationUtils;
+
     public CreateWfsSourcePersistMethod() {
         super(CREATE_WFS_SOURCE_ID,
                 DESCRIPTION,
@@ -66,6 +68,8 @@ public class CreateWfsSourcePersistMethod extends PersistMethod<WfsSourceConfigu
                 SUCCESS_TYPES,
                 FAILURE_TYPES,
                 null);
+
+        sourceValidationUtils = new SourceValidationUtils();
     }
 
     @Override
@@ -83,6 +87,6 @@ public class CreateWfsSourcePersistMethod extends PersistMethod<WfsSourceConfigu
 
     @Override
     public List<ConfigurationMessage> validateOptionalFields(WfsSourceConfiguration configuration) {
-        return validateOptionalUsernameAndPassword(configuration);
+        return sourceValidationUtils.validateOptionalUsernameAndPassword(configuration);
     }
 }

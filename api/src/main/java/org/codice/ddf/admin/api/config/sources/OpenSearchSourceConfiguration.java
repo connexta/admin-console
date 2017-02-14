@@ -14,14 +14,13 @@
 
 package org.codice.ddf.admin.api.config.sources;
 
-import static org.codice.ddf.admin.api.validation.SourceValidationUtils.validateOpensearchFactoryPid;
-
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
 import org.codice.ddf.admin.api.config.ConfigurationType;
 import org.codice.ddf.admin.api.handler.ConfigurationMessage;
+import org.codice.ddf.admin.api.validation.SourceValidationUtils;
 import org.codice.ddf.admin.api.validation.ValidationUtils;
 
 import com.google.common.collect.ImmutableMap;
@@ -30,16 +29,19 @@ public class OpenSearchSourceConfiguration extends SourceConfiguration {
 
     public static final String CONFIGURATION_TYPE = "opensearch-source";
 
-    private static final Map<String, Function<OpenSearchSourceConfiguration, List<ConfigurationMessage>>>
+    private SourceValidationUtils sourceValidationUtils;
+
+    private final Map<String, Function<OpenSearchSourceConfiguration, List<ConfigurationMessage>>>
             FIELDS_TO_VALIDATION_FUNC =
             new ImmutableMap.Builder<String, Function<OpenSearchSourceConfiguration, List<ConfigurationMessage>>>().putAll(
                     getBaseFieldValidationMap())
                     .put(FACTORY_PID,
-                            config -> validateOpensearchFactoryPid(config.factoryPid(),
+                            config -> sourceValidationUtils.validateOpensearchFactoryPid(config.factoryPid(),
                                     FACTORY_PID))
                     .build();
 
     public OpenSearchSourceConfiguration() {
+        sourceValidationUtils = new SourceValidationUtils();
     }
 
     public OpenSearchSourceConfiguration(SourceConfiguration baseConfig) {

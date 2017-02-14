@@ -21,7 +21,6 @@ import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.SUCCESSFUL
 import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.DISCOVERED_SOURCES;
 import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.DISCOVER_SOURCES_ID;
 import static org.codice.ddf.admin.api.handler.report.ProbeReport.createProbeReport;
-import static org.codice.ddf.admin.api.validation.SourceValidationUtils.validateOptionalUsernameAndPassword;
 
 import java.util.List;
 import java.util.Map;
@@ -32,6 +31,7 @@ import org.codice.ddf.admin.api.handler.ConfigurationMessage;
 import org.codice.ddf.admin.api.handler.SourceConfigurationHandler;
 import org.codice.ddf.admin.api.handler.method.ProbeMethod;
 import org.codice.ddf.admin.api.handler.report.ProbeReport;
+import org.codice.ddf.admin.api.validation.SourceValidationUtils;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -59,6 +59,8 @@ public class DiscoverSourcesProbeMethod extends ProbeMethod<SourceConfiguration>
 
     private List<SourceConfigurationHandler> handlers;
 
+    private SourceValidationUtils sourceValidationUtils;
+
     // TODO: tbatie - 2/1/17 - (Ticket) We can't return a failure type here because the frontend can't handle the error properly
     public DiscoverSourcesProbeMethod(List<SourceConfigurationHandler> handlers) {
         super(DISCOVER_SOURCES_ID,
@@ -70,6 +72,7 @@ public class DiscoverSourcesProbeMethod extends ProbeMethod<SourceConfiguration>
                 null,
                 RETURN_TYPES);
         this.handlers = handlers;
+        sourceValidationUtils = new SourceValidationUtils();
     }
 
     @Override
@@ -94,6 +97,6 @@ public class DiscoverSourcesProbeMethod extends ProbeMethod<SourceConfiguration>
 
     @Override
     public List<ConfigurationMessage> validateOptionalFields(SourceConfiguration configuration) {
-        return validateOptionalUsernameAndPassword(configuration);
+        return sourceValidationUtils.validateOptionalUsernameAndPassword(configuration);
     }
 }

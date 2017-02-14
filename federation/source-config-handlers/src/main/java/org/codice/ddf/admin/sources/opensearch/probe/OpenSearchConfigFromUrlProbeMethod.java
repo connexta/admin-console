@@ -28,7 +28,6 @@ import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.UNTR
 import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.endpointIsReachable;
 import static org.codice.ddf.admin.api.handler.report.ProbeReport.createProbeReport;
 import static org.codice.ddf.admin.api.services.OpenSearchServiceProperties.OPENSEARCH_FACTORY_PID;
-import static org.codice.ddf.admin.api.validation.SourceValidationUtils.validateOptionalUsernameAndPassword;
 import static org.codice.ddf.admin.sources.opensearch.OpenSearchSourceConfigurationHandler.OPENSEARCH_SOURCE_CONFIGURATION_HANDLER_ID;
 
 import java.util.HashMap;
@@ -40,6 +39,7 @@ import org.codice.ddf.admin.api.handler.ConfigurationMessage;
 import org.codice.ddf.admin.api.handler.commons.UrlAvailability;
 import org.codice.ddf.admin.api.handler.method.ProbeMethod;
 import org.codice.ddf.admin.api.handler.report.ProbeReport;
+import org.codice.ddf.admin.api.validation.SourceValidationUtils;
 import org.codice.ddf.admin.sources.opensearch.OpenSearchSourceUtils;
 
 import com.google.common.collect.ImmutableList;
@@ -72,7 +72,9 @@ public class OpenSearchConfigFromUrlProbeMethod extends ProbeMethod<OpenSearchSo
 
     public static final List<String> RETURN_TYPES = ImmutableList.of(DISCOVERED_SOURCES);
 
-    private OpenSearchSourceUtils utils;
+    private OpenSearchSourceUtils openSearchSourceUtils;
+
+    private SourceValidationUtils sourceValidationUtils;
 
     public OpenSearchConfigFromUrlProbeMethod() {
         super(OPENSEARCH_CONFIG_FROM_URL_ID,
@@ -83,7 +85,8 @@ public class OpenSearchConfigFromUrlProbeMethod extends ProbeMethod<OpenSearchSo
                 FAILURE_TYPES,
                 WARNING_TYPES,
                 RETURN_TYPES);
-        utils = new OpenSearchSourceUtils();
+        openSearchSourceUtils = new OpenSearchSourceUtils();
+        sourceValidationUtils = new SourceValidationUtils();
     }
 
     @Override
@@ -97,10 +100,10 @@ public class OpenSearchConfigFromUrlProbeMethod extends ProbeMethod<OpenSearchSo
             return report;
         }
 
-        UrlAvailability availability = utils.getUrlAvailability(
-                configuration.endpointUrl(),
-                configuration.sourceUserName(),
-                configuration.sourceUserPassword());
+        UrlAvailability availability =
+                openSearchSourceUtils.getUrlAvailability(configuration.endpointUrl(),
+                        configuration.sourceUserName(),
+                        configuration.sourceUserPassword());
         if (availability == null) {
             return report.addMessage(buildMessage(SUCCESS_TYPES,
                     FAILURE_TYPES,
@@ -128,6 +131,6 @@ public class OpenSearchConfigFromUrlProbeMethod extends ProbeMethod<OpenSearchSo
     @Override
     public List<ConfigurationMessage> validateOptionalFields(
             OpenSearchSourceConfiguration configuration) {
-        return validateOptionalUsernameAndPassword(configuration);
+        return sourceValidationUtils.validateOptionalUsernameAndPassword(configuration);
     }
 }

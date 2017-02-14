@@ -94,9 +94,12 @@ public abstract class ServerGuesser {
 
             ArrayList<String> contexts = new ArrayList<>();
             while (reader.hasNext()) {
-                contexts.add(reader.readEntry()
-                        .getAttribute("namingContexts")
-                        .firstValueAsString());
+                SearchResultEntry entry = reader.readEntry();
+                if (entry.containsAttribute("namingContexts")) {
+                    contexts.add(entry
+                            .getAttribute("namingContexts")
+                            .firstValueAsString());
+                }
             }
 
             if (contexts.isEmpty()) {
@@ -233,9 +236,14 @@ public abstract class ServerGuesser {
                         "rootDomainNamingContext");
 
                 if (reader.hasNext()) {
-                    return Collections.singletonList(reader.readEntry()
-                            .getAttribute("rootDomainNamingContext")
-                            .firstValueAsString());
+                    SearchResultEntry entry = reader.readEntry();
+                    if (entry.containsAttribute("rootDomainNamingContext")) {
+                        return Collections.singletonList(entry.getAttribute(
+                                "rootDomainNamingContext")
+                                .firstValueAsString());
+                    } else {
+                        return Collections.singletonList("");
+                    }
                 } else {
                     return Collections.singletonList("");
                 }

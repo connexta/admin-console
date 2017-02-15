@@ -75,9 +75,9 @@ public class DiscoverCswSourceProbeMethod extends ProbeMethod<CswSourceConfigura
 
     public static final List<String> RETURN_TYPES = ImmutableList.of(DISCOVERED_SOURCES);
 
-    private CswSourceUtils cswSourceUtils;
+    private final CswSourceUtils cswSourceUtils;
 
-    private SourceValidationUtils sourceValidationUtils;
+    private final SourceValidationUtils sourceValidationUtils;
 
     public DiscoverCswSourceProbeMethod() {
         super(CSW_DISCOVER_SOURCES_ID,
@@ -88,6 +88,7 @@ public class DiscoverCswSourceProbeMethod extends ProbeMethod<CswSourceConfigura
                 FAILURE_TYPES,
                 WARNING_TYPES,
                 RETURN_TYPES);
+
         cswSourceUtils = new CswSourceUtils();
         sourceValidationUtils = new SourceValidationUtils();
     }
@@ -119,7 +120,9 @@ public class DiscoverCswSourceProbeMethod extends ProbeMethod<CswSourceConfigura
             return probeReport;
         }
 
-        Optional<CswSourceConfiguration> createdConfig = cswSourceUtils.getPreferredConfig((CswSourceConfiguration) config.endpointUrl(availability.getUrl()));
+        Optional<CswSourceConfiguration> createdConfig =
+                cswSourceUtils.getPreferredConfig((CswSourceConfiguration) config.endpointUrl(
+                        availability.getUrl()));
         if (!createdConfig.isPresent()) {
             return probeReport.addMessage(buildMessage(SUCCESS_TYPES,
                     FAILURE_TYPES,

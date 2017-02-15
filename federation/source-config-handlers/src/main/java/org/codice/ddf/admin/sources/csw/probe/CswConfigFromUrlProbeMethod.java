@@ -79,9 +79,9 @@ public class CswConfigFromUrlProbeMethod extends ProbeMethod<CswSourceConfigurat
 
     public static final List<String> RETURN_TYPES = ImmutableList.of(DISCOVERED_SOURCES);
 
-    private CswSourceUtils cswSourceUtils;
+    private final CswSourceUtils cswSourceUtils;
 
-    private SourceValidationUtils sourceValidationUtils;
+    private final SourceValidationUtils sourceValidationUtils;
 
     public CswConfigFromUrlProbeMethod() {
         super(CSW_CONFIG_FROM_URL_ID,
@@ -92,6 +92,7 @@ public class CswConfigFromUrlProbeMethod extends ProbeMethod<CswSourceConfigurat
                 FAILURE_TYPES,
                 WARNING_TYPES,
                 RETURN_TYPES);
+
         cswSourceUtils = new CswSourceUtils();
         sourceValidationUtils = new SourceValidationUtils();
     }

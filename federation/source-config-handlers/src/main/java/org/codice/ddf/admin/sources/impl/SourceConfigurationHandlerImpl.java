@@ -26,6 +26,7 @@ import org.codice.ddf.admin.api.handler.method.ProbeMethod;
 import org.codice.ddf.admin.api.handler.method.TestMethod;
 import org.codice.ddf.admin.sources.impl.probe.DiscoverSourcesProbeMethod;
 import org.codice.ddf.admin.sources.impl.probe.GetConfigHandlersProbeMethod;
+import org.codice.ddf.admin.sources.impl.test.SourceNameExistsTestMethod;
 import org.codice.ddf.admin.sources.impl.test.ValidUrlTestMethod;
 
 import com.google.common.collect.ImmutableList;
@@ -46,7 +47,8 @@ public class SourceConfigurationHandlerImpl
 
     @Override
     public List<TestMethod> getTestMethods() {
-        return ImmutableList.of(new ValidUrlTestMethod());
+        return ImmutableList.of(new ValidUrlTestMethod(),
+                new SourceNameExistsTestMethod(srcHandlers));
     }
 
     @Override

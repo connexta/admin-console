@@ -26,7 +26,6 @@ import java.util.function.Function;
 import org.codice.ddf.admin.api.config.Configuration;
 import org.codice.ddf.admin.api.config.ConfigurationType;
 import org.codice.ddf.admin.api.handler.ConfigurationMessage;
-import org.codice.ddf.admin.api.validation.SourceValidationUtils;
 import org.codice.ddf.admin.api.validation.ValidationUtils;
 
 import com.google.common.base.MoreObjects;
@@ -60,10 +59,7 @@ public class SourceConfiguration extends Configuration {
 
     private String sourceUserPassword;
 
-    private SourceValidationUtils sourceValidationUtils;
-
     public SourceConfiguration() {
-        sourceValidationUtils = new SourceValidationUtils();
     }
 
     public SourceConfiguration(SourceConfiguration sourceConfiguration) {
@@ -76,11 +72,10 @@ public class SourceConfiguration extends Configuration {
         this.endpointUrl = sourceConfiguration.endpointUrl;
     }
 
-    public <T extends SourceConfiguration> Map<String, Function<T, List<ConfigurationMessage>>> getBaseFieldValidationMap() {
+    public static <T extends SourceConfiguration> Map<String, Function<T, List<ConfigurationMessage>>> getBaseFieldValidationMap() {
         return new ImmutableMap.Builder<String, Function<T, List<ConfigurationMessage>>>().put(
                 SOURCE_NAME,
-                config -> sourceValidationUtils.validateNonDuplicateSourceName(config.sourceName(),
-                        SOURCE_NAME))
+                config -> validateString(config.sourceName(), SOURCE_NAME))
                 .put(SOURCE_HOSTNAME,
                         config -> validateHostName(config.sourceHostName(), SOURCE_HOSTNAME))
                 .put(PORT, config -> validatePort(config.sourcePort(), PORT))

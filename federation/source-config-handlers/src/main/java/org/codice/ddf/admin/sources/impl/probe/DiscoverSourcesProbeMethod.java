@@ -59,7 +59,7 @@ public class DiscoverSourcesProbeMethod extends ProbeMethod<SourceConfiguration>
 
     private List<SourceConfigurationHandler> handlers;
 
-    private SourceValidationUtils sourceValidationUtils;
+    private final SourceValidationUtils sourceValidationUtils;
 
     // TODO: tbatie - 2/1/17 - (Ticket) We can't return a failure type here because the frontend can't handle the error properly
     public DiscoverSourcesProbeMethod(List<SourceConfigurationHandler> handlers) {
@@ -71,6 +71,7 @@ public class DiscoverSourcesProbeMethod extends ProbeMethod<SourceConfiguration>
                 null,
                 null,
                 RETURN_TYPES);
+
         this.handlers = handlers;
         sourceValidationUtils = new SourceValidationUtils();
     }

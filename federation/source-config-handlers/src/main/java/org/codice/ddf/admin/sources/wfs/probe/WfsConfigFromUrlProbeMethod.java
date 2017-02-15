@@ -79,9 +79,9 @@ public class WfsConfigFromUrlProbeMethod extends ProbeMethod<WfsSourceConfigurat
 
     public static final List<String> RETURN_TYPES = ImmutableList.of(DISCOVERED_SOURCES);
 
-    private WfsSourceUtils wfsSourceUtils;
+    private final WfsSourceUtils wfsSourceUtils;
 
-    private SourceValidationUtils sourceValidationUtils;
+    private final SourceValidationUtils sourceValidationUtils;
 
     public WfsConfigFromUrlProbeMethod() {
         super(WFS_CONFIG_FROM_URL_ID,

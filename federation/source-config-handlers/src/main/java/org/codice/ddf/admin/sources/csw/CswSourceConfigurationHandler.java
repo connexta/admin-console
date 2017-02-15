@@ -11,12 +11,12 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  */
-
 package org.codice.ddf.admin.sources.csw;
 
 import static org.codice.ddf.admin.api.services.CswServiceProperties.CSW_FACTORY_PIDS;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,6 +36,7 @@ import org.codice.ddf.admin.sources.csw.persist.CreateCswSourcePersistMethod;
 import org.codice.ddf.admin.sources.csw.persist.DeleteCswSourcePersistMethod;
 import org.codice.ddf.admin.sources.csw.probe.CswConfigFromUrlProbeMethod;
 import org.codice.ddf.admin.sources.csw.probe.DiscoverCswSourceProbeMethod;
+import org.codice.ddf.admin.sources.csw.test.SourceNameExistsCswTestMethod;
 
 public class CswSourceConfigurationHandler extends DefaultConfigurationHandler<SourceConfiguration>
         implements SourceConfigurationHandler<SourceConfiguration> {
@@ -50,7 +51,7 @@ public class CswSourceConfigurationHandler extends DefaultConfigurationHandler<S
 
     @Override
     public List<TestMethod> getTestMethods() {
-        return null;
+        return Collections.singletonList(new SourceNameExistsCswTestMethod(new Configurator()));
     }
 
     @Override

@@ -17,6 +17,7 @@ package org.codice.ddf.admin.sources.opensearch;
 import static org.codice.ddf.admin.api.services.OpenSearchServiceProperties.OPENSEARCH_FACTORY_PID;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,6 +37,7 @@ import org.codice.ddf.admin.sources.opensearch.persist.CreateOpenSearchSourcePer
 import org.codice.ddf.admin.sources.opensearch.persist.DeleteOpenSearchSourcePersistMethod;
 import org.codice.ddf.admin.sources.opensearch.probe.DiscoverOpenSearchSourceProbeMethod;
 import org.codice.ddf.admin.sources.opensearch.probe.OpenSearchConfigFromUrlProbeMethod;
+import org.codice.ddf.admin.sources.opensearch.test.SourceNameExistsOpenSearchTestMethod;
 
 public class OpenSearchSourceConfigurationHandler
         extends DefaultConfigurationHandler<SourceConfiguration>
@@ -52,7 +54,7 @@ public class OpenSearchSourceConfigurationHandler
 
     @Override
     public List<TestMethod> getTestMethods() {
-        return null;
+        return Collections.singletonList(new SourceNameExistsOpenSearchTestMethod(new Configurator()));
     }
 
     @Override

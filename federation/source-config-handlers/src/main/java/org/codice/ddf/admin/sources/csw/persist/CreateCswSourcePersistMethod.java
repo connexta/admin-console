@@ -62,7 +62,7 @@ public class CreateCswSourcePersistMethod extends PersistMethod<CswSourceConfigu
     private static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(FAILED_PERSIST,
             "Failed to create CSW Source.");
 
-    private SourceValidationUtils sourceValidationUtils;
+    private final SourceValidationUtils sourceValidationUtils;
 
     public CreateCswSourcePersistMethod() {
         super(CREATE_CSW_SOURCE_ID,

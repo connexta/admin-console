@@ -36,18 +36,16 @@ public class CswSourceConfiguration extends SourceConfiguration {
 
     public static final String FORCE_SPATIAL_FILTER = "forceSpatialFilter";
 
-    private SourceValidationUtils sourceValidationUtils;
-
     private String outputSchema;
 
     private String forceSpatialFilter;
 
-    private final Map<String, Function<CswSourceConfiguration, List<ConfigurationMessage>>>
+    private static final Map<String, Function<CswSourceConfiguration, List<ConfigurationMessage>>>
             FIELDS_TO_VALIDATION_FUNC =
             new ImmutableMap.Builder<String, Function<CswSourceConfiguration, List<ConfigurationMessage>>>().putAll(
                     getBaseFieldValidationMap())
                     .put(FACTORY_PID,
-                            config -> sourceValidationUtils.validateCswFactoryPid(config.factoryPid(),
+                            config -> new SourceValidationUtils().validateCswFactoryPid(config.factoryPid(),
                                     FACTORY_PID))
                     .put(OUTPUT_SCHEMA,
                             config -> validateStringNoWhiteSpace(config.outputSchema(),
@@ -55,7 +53,6 @@ public class CswSourceConfiguration extends SourceConfiguration {
                     .build();
 
     public CswSourceConfiguration() {
-        sourceValidationUtils = new SourceValidationUtils();
     }
 
     public CswSourceConfiguration(SourceConfiguration baseConfig) {

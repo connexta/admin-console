@@ -29,19 +29,16 @@ public class WfsSourceConfiguration extends SourceConfiguration {
 
     public static final String CONFIGURATION_TYPE = "wfs-source";
 
-    private SourceValidationUtils sourceValidationUtils;
-
-    private final Map<String, Function<SourceConfiguration, List<ConfigurationMessage>>>
+    private static final Map<String, Function<SourceConfiguration, List<ConfigurationMessage>>>
             FIELDS_TO_VALIDATION_FUNC =
             new ImmutableMap.Builder<String, Function<SourceConfiguration, List<ConfigurationMessage>>>().putAll(
                     getBaseFieldValidationMap())
                     .put(FACTORY_PID,
-                            config -> sourceValidationUtils.validateWfsFactoryPid(config.factoryPid(),
+                            config -> new SourceValidationUtils().validateWfsFactoryPid(config.factoryPid(),
                                     FACTORY_PID))
                     .build();
 
     public WfsSourceConfiguration() {
-        sourceValidationUtils = new SourceValidationUtils();
     }
 
     public WfsSourceConfiguration(SourceConfiguration baseConfig) {

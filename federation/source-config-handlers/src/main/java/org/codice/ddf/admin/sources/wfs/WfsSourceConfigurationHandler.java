@@ -17,6 +17,7 @@ package org.codice.ddf.admin.sources.wfs;
 import static org.codice.ddf.admin.api.services.WfsServiceProperties.WFS_FACTORY_PIDS;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,6 +37,7 @@ import org.codice.ddf.admin.sources.wfs.persist.CreateWfsSourcePersistMethod;
 import org.codice.ddf.admin.sources.wfs.persist.DeleteWfsSourcePersistMethod;
 import org.codice.ddf.admin.sources.wfs.probe.DiscoverWfsSourceProbeMethod;
 import org.codice.ddf.admin.sources.wfs.probe.WfsConfigFromUrlProbeMethod;
+import org.codice.ddf.admin.sources.wfs.test.SourceNameExistsWfsTestMethod;
 
 public class WfsSourceConfigurationHandler extends DefaultConfigurationHandler<SourceConfiguration>
         implements SourceConfigurationHandler<SourceConfiguration> {
@@ -50,7 +52,7 @@ public class WfsSourceConfigurationHandler extends DefaultConfigurationHandler<S
 
     @Override
     public List<TestMethod> getTestMethods() {
-        return null;
+        return Collections.singletonList(new SourceNameExistsWfsTestMethod(new Configurator()));
     }
 
     @Override

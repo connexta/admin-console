@@ -55,7 +55,7 @@ public class CreateOpenSearchSourcePersistMethod
     private static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(FAILED_PERSIST,
             "Failed to create OpenSearch Source.");
 
-    private SourceValidationUtils sourceValidationUtils;
+    private final SourceValidationUtils sourceValidationUtils;
 
     public CreateOpenSearchSourcePersistMethod() {
         super(CREATE_OPENSEARCH_SOURCE_ID,

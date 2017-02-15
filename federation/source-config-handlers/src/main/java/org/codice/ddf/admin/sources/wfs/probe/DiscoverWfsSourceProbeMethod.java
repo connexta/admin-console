@@ -88,6 +88,7 @@ public class DiscoverWfsSourceProbeMethod extends ProbeMethod<WfsSourceConfigura
                 FAILURE_TYPES,
                 WARNING_TYPES,
                 RETURN_TYPES);
+
         wfsSourceUtils = new WfsSourceUtils();
         sourceValidationUtils = new SourceValidationUtils();
     }

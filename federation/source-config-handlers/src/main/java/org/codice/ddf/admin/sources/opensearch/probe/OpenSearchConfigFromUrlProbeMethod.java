@@ -72,9 +72,9 @@ public class OpenSearchConfigFromUrlProbeMethod extends ProbeMethod<OpenSearchSo
 
     public static final List<String> RETURN_TYPES = ImmutableList.of(DISCOVERED_SOURCES);
 
-    private OpenSearchSourceUtils openSearchSourceUtils;
+    private final OpenSearchSourceUtils openSearchSourceUtils;
 
-    private SourceValidationUtils sourceValidationUtils;
+    private final SourceValidationUtils sourceValidationUtils;
 
     public OpenSearchConfigFromUrlProbeMethod() {
         super(OPENSEARCH_CONFIG_FROM_URL_ID,
@@ -85,6 +85,7 @@ public class OpenSearchConfigFromUrlProbeMethod extends ProbeMethod<OpenSearchSo
                 FAILURE_TYPES,
                 WARNING_TYPES,
                 RETURN_TYPES);
+
         openSearchSourceUtils = new OpenSearchSourceUtils();
         sourceValidationUtils = new SourceValidationUtils();
     }

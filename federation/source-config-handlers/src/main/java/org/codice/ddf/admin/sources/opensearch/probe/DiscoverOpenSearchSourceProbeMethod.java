@@ -72,9 +72,9 @@ public class DiscoverOpenSearchSourceProbeMethod
 
     public static final List<String> RETURN_TYPES = ImmutableList.of(DISCOVERED_SOURCES);
 
-    private OpenSearchSourceUtils openSearchSourceUtils;
+    private final OpenSearchSourceUtils openSearchSourceUtils;
 
-    private SourceValidationUtils sourceValidationUtils;
+    private final SourceValidationUtils sourceValidationUtils;
 
     public DiscoverOpenSearchSourceProbeMethod() {
         super(OPENSEARCH_DISCOVER_SOURCES_ID,
@@ -85,6 +85,7 @@ public class DiscoverOpenSearchSourceProbeMethod
                 FAILURE_TYPES,
                 null,
                 RETURN_TYPES);
+
         openSearchSourceUtils = new OpenSearchSourceUtils();
         sourceValidationUtils = new SourceValidationUtils();
     }

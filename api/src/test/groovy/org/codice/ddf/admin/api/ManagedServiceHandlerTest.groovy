@@ -1,5 +1,6 @@
 package org.codice.ddf.admin.api
 
+import org.codice.ddf.admin.api.configurator.ConfiguratorException
 import org.codice.ddf.admin.api.configurator.operations.ManagedServiceOperation
 import org.codice.ddf.ui.admin.api.ConfigurationAdmin
 import org.codice.ddf.ui.admin.api.ConfigurationAdminMBean
@@ -54,5 +55,19 @@ class ManagedServiceHandlerTest extends Specification {
         1 * configAdmin.createFactoryConfiguration('factoryPid') >> 'newPid'
         1 * cfgAdmMbean.update('newPid', configs)
         key == 'newPid'
+    }
+
+    def 'test delete of pid with unknown factory pid fails'() {
+        setup:
+        def configs = [k1: 'v1', k2: 'v2']
+        cfgAdmMbean.getFactoryPid('xxx') >> null
+        cfgAdmMbean.getProperties('xxx') >> configs
+        def handler = ManagedServiceOperation.forDelete('xxx', configAdmin, cfgAdmMbean)
+
+        when:
+        handler.commit()
+
+        then:
+        thrown ConfiguratorException
     }
 }

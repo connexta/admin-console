@@ -173,6 +173,11 @@ public abstract class ManagedServiceOperation
 
     protected void deleteByPid(String configPid) {
         try {
+            if (factoryPid == null) {
+                ManagedServiceOperation.LOGGER.debug("Error getting factory for pid {}",
+                        configPid);
+                throw new ConfiguratorException("Internal error");
+            }
             cfgAdmMbean.delete(configPid);
         } catch (IOException e) {
             LOGGER.debug("Error deleting managed service with pid {}", configPid, e);

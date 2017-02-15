@@ -13,7 +13,6 @@
  */
 package org.codice.ddf.admin.api.validation;
 
-import static org.apache.commons.lang.Validate.notNull;
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_NAME;
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_USERNAME;
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_USER_PASSWORD;

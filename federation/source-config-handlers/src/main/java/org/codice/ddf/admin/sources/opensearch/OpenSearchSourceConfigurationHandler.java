@@ -25,6 +25,7 @@ import org.codice.ddf.admin.api.config.ConfigurationType;
 import org.codice.ddf.admin.api.config.sources.OpenSearchSourceConfiguration;
 import org.codice.ddf.admin.api.config.sources.SourceConfiguration;
 import org.codice.ddf.admin.api.configurator.Configurator;
+import org.codice.ddf.admin.api.handler.ConfigurationHandler;
 import org.codice.ddf.admin.api.handler.DefaultConfigurationHandler;
 import org.codice.ddf.admin.api.handler.SourceConfigurationHandler;
 import org.codice.ddf.admin.api.handler.method.PersistMethod;
@@ -46,6 +47,12 @@ public class OpenSearchSourceConfigurationHandler
     public static final String OPENSEARCH_SOURCE_CONFIGURATION_HANDLER_ID =
             OpenSearchSourceConfiguration.CONFIGURATION_TYPE;
 
+    private final ConfigurationHandler handler;
+
+    public OpenSearchSourceConfigurationHandler(ConfigurationHandler handler) {
+        this.handler = handler;
+    }
+
     @Override
     public List<ProbeMethod> getProbeMethods() {
         return Arrays.asList(new DiscoverOpenSearchSourceProbeMethod(),
@@ -59,7 +66,7 @@ public class OpenSearchSourceConfigurationHandler
 
     @Override
     public List<PersistMethod> getPersistMethods() {
-        return Arrays.asList(new CreateOpenSearchSourcePersistMethod(),
+        return Arrays.asList(new CreateOpenSearchSourcePersistMethod(handler),
                 new DeleteOpenSearchSourcePersistMethod());
     }
 

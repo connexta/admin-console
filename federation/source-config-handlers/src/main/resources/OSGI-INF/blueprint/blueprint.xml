@@ -19,10 +19,15 @@
         </bean>
     <service ref="sourceConfigurationHandler"
              interface="org.codice.ddf.admin.api.handler.ConfigurationHandler">
+        <service-properties>
+            <entry key="id" value="SourceConfigurationHandler"/>
+        </service-properties>
     </service>
 
     <bean id="cswConfigurationHandler"
-          class="org.codice.ddf.admin.sources.csw.CswSourceConfigurationHandler"/>
+          class="org.codice.ddf.admin.sources.csw.CswSourceConfigurationHandler">
+        <argument ref="sourceConfigurationHandler"/>
+    </bean>
     <service ref="cswConfigurationHandler">
         <interfaces>
             <value>org.codice.ddf.admin.api.handler.SourceConfigurationHandler</value>
@@ -31,7 +36,9 @@
     </service>
 
     <bean id="wfsConfigurationHandler"
-          class="org.codice.ddf.admin.sources.wfs.WfsSourceConfigurationHandler"/>
+          class="org.codice.ddf.admin.sources.wfs.WfsSourceConfigurationHandler">
+        <argument ref="sourceConfigurationHandler"/>
+    </bean>
     <service ref="wfsConfigurationHandler">
         <interfaces>
             <value>org.codice.ddf.admin.api.handler.SourceConfigurationHandler</value>
@@ -40,7 +47,9 @@
     </service>
 
     <bean id="openSearchConfigurationHandler"
-          class="org.codice.ddf.admin.sources.opensearch.OpenSearchSourceConfigurationHandler"/>
+          class="org.codice.ddf.admin.sources.opensearch.OpenSearchSourceConfigurationHandler">
+        <argument ref="sourceConfigurationHandler"/>
+    </bean>
     <service ref="openSearchConfigurationHandler">
         <interfaces>
             <value>org.codice.ddf.admin.api.handler.SourceConfigurationHandler</value>

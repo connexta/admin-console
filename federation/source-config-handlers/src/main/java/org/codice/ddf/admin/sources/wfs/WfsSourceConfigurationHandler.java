@@ -25,6 +25,7 @@ import org.codice.ddf.admin.api.config.ConfigurationType;
 import org.codice.ddf.admin.api.config.sources.SourceConfiguration;
 import org.codice.ddf.admin.api.config.sources.WfsSourceConfiguration;
 import org.codice.ddf.admin.api.configurator.Configurator;
+import org.codice.ddf.admin.api.handler.ConfigurationHandler;
 import org.codice.ddf.admin.api.handler.DefaultConfigurationHandler;
 import org.codice.ddf.admin.api.handler.SourceConfigurationHandler;
 import org.codice.ddf.admin.api.handler.method.PersistMethod;
@@ -45,6 +46,12 @@ public class WfsSourceConfigurationHandler extends DefaultConfigurationHandler<S
     public static final String WFS_SOURCE_CONFIGURATION_HANDLER_ID =
             WfsSourceConfiguration.CONFIGURATION_TYPE;
 
+    private final ConfigurationHandler handler;
+
+    public WfsSourceConfigurationHandler(ConfigurationHandler handler) {
+        this.handler = handler;
+    }
+
     @Override
     public List<ProbeMethod> getProbeMethods() {
         return Arrays.asList(new DiscoverWfsSourceProbeMethod(), new WfsConfigFromUrlProbeMethod());
@@ -57,7 +64,7 @@ public class WfsSourceConfigurationHandler extends DefaultConfigurationHandler<S
 
     @Override
     public List<PersistMethod> getPersistMethods() {
-        return Arrays.asList(new CreateWfsSourcePersistMethod(),
+        return Arrays.asList(new CreateWfsSourcePersistMethod(handler),
                 new DeleteWfsSourcePersistMethod());
     }
 

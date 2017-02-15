@@ -20,6 +20,7 @@ import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE
 import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.CREATE;
 import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.FAILED_PERSIST;
 import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.SUCCESSFUL_PERSIST;
+import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.SOURCE_NAME_EXISTS_TEST_ID;
 import static org.codice.ddf.admin.api.handler.report.Report.createReport;
 import static org.codice.ddf.admin.api.services.OpenSearchServiceProperties.openSearchConfigToServiceProps;
 
@@ -29,6 +30,7 @@ import java.util.Map;
 import org.codice.ddf.admin.api.config.sources.OpenSearchSourceConfiguration;
 import org.codice.ddf.admin.api.configurator.Configurator;
 import org.codice.ddf.admin.api.configurator.OperationReport;
+import org.codice.ddf.admin.api.handler.ConfigurationHandler;
 import org.codice.ddf.admin.api.handler.ConfigurationMessage;
 import org.codice.ddf.admin.api.handler.method.PersistMethod;
 import org.codice.ddf.admin.api.handler.report.Report;
@@ -57,7 +59,9 @@ public class CreateOpenSearchSourcePersistMethod
 
     private final SourceValidationUtils sourceValidationUtils;
 
-    public CreateOpenSearchSourcePersistMethod() {
+    private final ConfigurationHandler handler;
+
+    public CreateOpenSearchSourcePersistMethod(ConfigurationHandler handler) {
         super(CREATE_OPENSEARCH_SOURCE_ID,
                 DESCRIPTION,
                 REQUIRED_FIELDS,
@@ -67,6 +71,7 @@ public class CreateOpenSearchSourcePersistMethod
                 null);
 
         sourceValidationUtils = new SourceValidationUtils();
+        this.handler = handler;
     }
 
     @Override
@@ -74,7 +79,7 @@ public class CreateOpenSearchSourcePersistMethod
         Configurator configurator = new Configurator();
         configurator.createManagedService(configuration.factoryPid(),
                 openSearchConfigToServiceProps(configuration));
-        OperationReport report = configurator.commit("Opensearch source saved with details: {}",
+        OperationReport report = configurator.commit("OpenSearch source saved with details: {}",
                 configuration.toString());
         return createReport(SUCCESS_TYPES,
                 FAILURE_TYPES,
@@ -88,5 +93,16 @@ public class CreateOpenSearchSourcePersistMethod
     public List<ConfigurationMessage> validateOptionalFields(
             OpenSearchSourceConfiguration configuration) {
         return sourceValidationUtils.validateOptionalUsernameAndPassword(configuration);
+    }
+
+    @Override
+    public List<ConfigurationMessage> validateRequiredFields(
+            OpenSearchSourceConfiguration configuration) {
+        Report report = handler.test(SOURCE_NAME_EXISTS_TEST_ID, configuration);
+        if(report.containsFailureMessages()) {
+            return report.messages();
+        }
+
+        return super.validateRequiredFields(configuration);
     }
 }

@@ -14,8 +14,10 @@
 package org.codice.ddf.admin.sources.impl.test;
 
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_NAME;
+import static org.codice.ddf.admin.api.handler.ConfigurationMessage.INVALID_FIELD;
 import static org.codice.ddf.admin.api.handler.ConfigurationMessage.buildMessage;
 import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.SUCCESSFUL_TEST;
+import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.SOURCE_NAME_EXISTS_TEST_ID;
 
 import java.util.List;
 import java.util.Map;
@@ -31,22 +33,15 @@ import com.google.common.collect.ImmutableMap;
 
 public class SourceNameExistsTestMethod extends TestMethod<SourceConfiguration> {
 
-    public static final String SOURCE_NAME_EXISTS_TEST_ID = "source-name-exists";
-
-    public static final String SOURCE_NAME_EXISTS_SUCCESS = "SOURCE_NAME_EXISTS_SUCCESS";
-
-    public static final String SOURCE_NAME_EXISTS_FAIL = "SOURCE_NAME_EXISTS_FAIL";
-
     public static final String DESCRIPTION =
-            "Verifies incoming configuration's source name against all existing configuration's source names.";
+            "Checks for duplicated source names and fails if there is an existing configuration with the incoming source name exists.";
 
     public static final List<String> REQUIRED_FIELDS = ImmutableList.of(SOURCE_NAME);
 
-    public static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(
-            SOURCE_NAME_EXISTS_SUCCESS,
+    public static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(SUCCESSFUL_TEST,
             "Source name does not exist.");
 
-    public static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(SOURCE_NAME_EXISTS_FAIL,
+    public static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(INVALID_FIELD,
             "Source name already exists.");
 
     private List<SourceConfigurationHandler> handlers;

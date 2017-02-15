@@ -21,6 +21,7 @@ import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE
 import static org.codice.ddf.admin.api.handler.ConfigurationMessage.FAILED_PERSIST;
 import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.CREATE;
 import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.SUCCESSFUL_PERSIST;
+import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.SOURCE_NAME_EXISTS_TEST_ID;
 import static org.codice.ddf.admin.api.handler.report.Report.createReport;
 import static org.codice.ddf.admin.api.services.WfsServiceProperties.wfsConfigToServiceProps;
 
@@ -30,6 +31,7 @@ import java.util.Map;
 import org.codice.ddf.admin.api.config.sources.WfsSourceConfiguration;
 import org.codice.ddf.admin.api.configurator.Configurator;
 import org.codice.ddf.admin.api.configurator.OperationReport;
+import org.codice.ddf.admin.api.handler.ConfigurationHandler;
 import org.codice.ddf.admin.api.handler.ConfigurationMessage;
 import org.codice.ddf.admin.api.handler.method.PersistMethod;
 import org.codice.ddf.admin.api.handler.report.Report;
@@ -60,7 +62,9 @@ public class CreateWfsSourcePersistMethod extends PersistMethod<WfsSourceConfigu
 
     private final SourceValidationUtils sourceValidationUtils;
 
-    public CreateWfsSourcePersistMethod() {
+    private final ConfigurationHandler handler;
+
+    public CreateWfsSourcePersistMethod(ConfigurationHandler handler) {
         super(CREATE_WFS_SOURCE_ID,
                 DESCRIPTION,
                 REQUIRED_FIELDS,
@@ -69,6 +73,7 @@ public class CreateWfsSourcePersistMethod extends PersistMethod<WfsSourceConfigu
                 FAILURE_TYPES,
                 null);
 
+        this.handler = handler;
         sourceValidationUtils = new SourceValidationUtils();
     }
 
@@ -88,5 +93,15 @@ public class CreateWfsSourcePersistMethod extends PersistMethod<WfsSourceConfigu
     @Override
     public List<ConfigurationMessage> validateOptionalFields(WfsSourceConfiguration configuration) {
         return sourceValidationUtils.validateOptionalUsernameAndPassword(configuration);
+    }
+
+    @Override
+    public List<ConfigurationMessage> validateRequiredFields(WfsSourceConfiguration configuration) {
+        Report report = handler.test(SOURCE_NAME_EXISTS_TEST_ID, configuration);
+        if (report.containsFailureMessages()) {
+            return report.messages();
+        }
+
+        return super.validateRequiredFields(configuration);
     }
 }

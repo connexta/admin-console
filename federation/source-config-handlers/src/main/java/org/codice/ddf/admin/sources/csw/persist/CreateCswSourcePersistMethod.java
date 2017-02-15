@@ -23,6 +23,7 @@ import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE
 import static org.codice.ddf.admin.api.handler.ConfigurationMessage.FAILED_PERSIST;
 import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.CREATE;
 import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.SUCCESSFUL_PERSIST;
+import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.SOURCE_NAME_EXISTS_TEST_ID;
 import static org.codice.ddf.admin.api.services.CswServiceProperties.cswConfigToServiceProps;
 
 import java.util.Arrays;
@@ -32,6 +33,7 @@ import java.util.Map;
 import org.codice.ddf.admin.api.config.sources.CswSourceConfiguration;
 import org.codice.ddf.admin.api.configurator.Configurator;
 import org.codice.ddf.admin.api.configurator.OperationReport;
+import org.codice.ddf.admin.api.handler.ConfigurationHandler;
 import org.codice.ddf.admin.api.handler.ConfigurationMessage;
 import org.codice.ddf.admin.api.handler.method.PersistMethod;
 import org.codice.ddf.admin.api.handler.report.Report;
@@ -64,7 +66,9 @@ public class CreateCswSourcePersistMethod extends PersistMethod<CswSourceConfigu
 
     private final SourceValidationUtils sourceValidationUtils;
 
-    public CreateCswSourcePersistMethod() {
+    private final ConfigurationHandler handler;
+
+    public CreateCswSourcePersistMethod(ConfigurationHandler handler) {
         super(CREATE_CSW_SOURCE_ID,
                 DESCRIPTION,
                 REQUIRED_FIELDS,
@@ -74,6 +78,7 @@ public class CreateCswSourcePersistMethod extends PersistMethod<CswSourceConfigu
                 null);
 
         sourceValidationUtils = new SourceValidationUtils();
+        this.handler = handler;
     }
 
     @Override
@@ -100,5 +105,16 @@ public class CreateCswSourcePersistMethod extends PersistMethod<CswSourceConfigu
             validationResults.addAll(configuration.validate(Arrays.asList(FORCE_SPATIAL_FILTER)));
         }
         return validationResults;
+    }
+
+    @Override
+    public List<ConfigurationMessage> validateRequiredFields(
+            CswSourceConfiguration configuration) {
+        Report report = handler.test(SOURCE_NAME_EXISTS_TEST_ID, configuration);
+        if(report.containsFailureMessages()) {
+            return report.messages();
+        }
+
+        return super.validateRequiredFields(configuration);
     }
 }

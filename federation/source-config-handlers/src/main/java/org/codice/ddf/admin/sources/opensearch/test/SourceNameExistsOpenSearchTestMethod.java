@@ -14,12 +14,12 @@
 package org.codice.ddf.admin.sources.opensearch.test;
 
 import static org.codice.ddf.admin.api.handler.ConfigurationMessage.buildMessage;
+import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.SUCCESSFUL_TEST;
+import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.SOURCE_NAME_EXISTS_TEST_ID;
 import static org.codice.ddf.admin.api.services.OpenSearchServiceProperties.OPENSEARCH_FACTORY_PID;
 import static org.codice.ddf.admin.sources.impl.test.SourceNameExistsTestMethod.DESCRIPTION;
 import static org.codice.ddf.admin.sources.impl.test.SourceNameExistsTestMethod.FAILURE_TYPES;
 import static org.codice.ddf.admin.sources.impl.test.SourceNameExistsTestMethod.REQUIRED_FIELDS;
-import static org.codice.ddf.admin.sources.impl.test.SourceNameExistsTestMethod.SOURCE_NAME_EXISTS_SUCCESS;
-import static org.codice.ddf.admin.sources.impl.test.SourceNameExistsTestMethod.SOURCE_NAME_EXISTS_TEST_ID;
 import static org.codice.ddf.admin.sources.impl.test.SourceNameExistsTestMethod.SUCCESS_TYPES;
 
 import java.util.Collections;
@@ -66,10 +66,7 @@ public class SourceNameExistsOpenSearchTestMethod extends TestMethod<SourceConfi
                         configurator);
 
         if (results.isEmpty()) {
-            return new Report(buildMessage(SUCCESS_TYPES,
-                    FAILURE_TYPES,
-                    null,
-                    SOURCE_NAME_EXISTS_SUCCESS));
+            return new Report(buildMessage(SUCCESS_TYPES, FAILURE_TYPES, null, SUCCESSFUL_TEST));
         }
 
         Report report = new Report();

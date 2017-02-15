@@ -97,17 +97,8 @@ export const persistConfig = (url, config, nextStageId, configType, id = 'genera
     }
     const body = JSON.stringify(configuration)
 
-    let res = await dispatch(post('/admin/beta/config/test/sources/source-name-exists', { body }))
+    let res = await dispatch(post(url, { body }))
     let json = await res.json()
-
-    if (containsErrors(json)) {
-      dispatch(clearMessages(id))
-      dispatch(setMessages(id, filterErrors(json.messages)))
-      return
-    }
-
-    res = await dispatch(post(url, { body }))
-    json = await res.json()
 
     if (containsErrors(json)) {
       dispatch(clearMessages(id))

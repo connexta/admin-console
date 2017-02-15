@@ -24,6 +24,7 @@ import org.codice.ddf.admin.api.config.ConfigurationType;
 import org.codice.ddf.admin.api.config.sources.CswSourceConfiguration;
 import org.codice.ddf.admin.api.config.sources.SourceConfiguration;
 import org.codice.ddf.admin.api.configurator.Configurator;
+import org.codice.ddf.admin.api.handler.ConfigurationHandler;
 import org.codice.ddf.admin.api.handler.DefaultConfigurationHandler;
 import org.codice.ddf.admin.api.handler.SourceConfigurationHandler;
 import org.codice.ddf.admin.api.handler.method.PersistMethod;
@@ -44,6 +45,12 @@ public class CswSourceConfigurationHandler extends DefaultConfigurationHandler<S
     public static final String CSW_SOURCE_CONFIGURATION_HANDLER_ID =
             CswSourceConfiguration.CONFIGURATION_TYPE;
 
+    private final ConfigurationHandler handler;
+
+    public CswSourceConfigurationHandler(ConfigurationHandler handler) {
+        this.handler = handler;
+    }
+
     @Override
     public List<ProbeMethod> getProbeMethods() {
         return Arrays.asList(new DiscoverCswSourceProbeMethod(), new CswConfigFromUrlProbeMethod());
@@ -56,7 +63,7 @@ public class CswSourceConfigurationHandler extends DefaultConfigurationHandler<S
 
     @Override
     public List<PersistMethod> getPersistMethods() {
-        return Arrays.asList(new CreateCswSourcePersistMethod(),
+        return Arrays.asList(new CreateCswSourcePersistMethod(handler),
                 new DeleteCswSourcePersistMethod());
     }
 

@@ -73,7 +73,7 @@ public class LdapConfigurationHandler extends DefaultConfigurationHandler<LdapCo
         return ImmutableList.of(new ConnectTestMethod(ldapTestingCommons),
                 new BindUserTestMethod(ldapTestingCommons),
                 new DirectoryStructTestMethod(ldapTestingCommons),
-                new AttributeMappingTestMethod(new Configurator()));
+                new AttributeMappingTestMethod(ldapTestingCommons, new Configurator()));
     }
 
     @Override

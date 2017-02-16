@@ -3,20 +3,18 @@ package org.codice.ddf.admin.query.commons.action;
 import java.util.List;
 import java.util.Map;
 
-import org.codice.ddf.admin.query.api.ActionReport;
 import org.codice.ddf.admin.query.api.field.Field;
-import org.codice.ddf.admin.query.commons.DefaultActionReport;
 
-public abstract class GetAction extends DefaultAction {
+public abstract class GetAction<T extends Field> extends DefaultAction<T> {
 
-    public GetAction(String actionId, String description) {
-        super(actionId, description, null, null);
+    public GetAction(String actionId, String description, T returnType) {
+        super(actionId, description, null, null, returnType);
     }
 
-    public abstract ActionReport process();
+    public abstract T process();
 
     @Override
-    public ActionReport process(Map<String, Object> args) {
+    public T process(Map<String, Object> args) {
         return process();
     }
 
@@ -30,8 +28,4 @@ public abstract class GetAction extends DefaultAction {
         return null;
     }
 
-    @Override
-    public ActionReport validate(Map<String, Object> args) {
-        return new DefaultActionReport();
-    }
 }

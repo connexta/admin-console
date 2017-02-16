@@ -1,43 +1,29 @@
 package org.codice.ddf.admin.query.commons.action;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.query.api.Action;
-import org.codice.ddf.admin.query.api.ActionMessage;
-import org.codice.ddf.admin.query.api.ActionReport;
 import org.codice.ddf.admin.query.api.field.Field;
-import org.codice.ddf.admin.query.commons.DefaultActionReport;
 
-public abstract class DefaultAction implements Action {
+public abstract class DefaultAction<T extends Field> implements Action<T> {
 
     private String actionId;
     private String description;
     private List<Field> requiredFields;
     private List<Field> optionalFields;
-    private List<Field> returnTypes;
+    private T returnType;
 
     public DefaultAction(String actionId, String description, List<Field> requiredFields,
-            List<Field> optionalFields) {
+            List<Field> optionalFields, T returnType) {
         this.actionId = actionId;
         this.description = description;
         this.requiredFields = requiredFields;
         this.optionalFields = optionalFields;
-    }
-
-    public DefaultAction(String actionId, String description, List<Field> requiredFields,
-            List<Field> optionalFields, List<Field> returnTypes) {
-        this.actionId = actionId;
-        this.description = description;
-        this.requiredFields = requiredFields;
-        this.optionalFields = optionalFields;
-        this.returnTypes = returnTypes;
+        this.returnType = returnType;
     }
 
     @Override
-    public String getActionId() {
+    public String getActionName() {
         return actionId;
     }
 
@@ -47,8 +33,8 @@ public abstract class DefaultAction implements Action {
     }
 
     @Override
-    public List<Field> getReturnTypes() {
-        return returnTypes;
+    public T getReturnType() {
+        return returnType;
     }
 
     @Override
@@ -59,38 +45,5 @@ public abstract class DefaultAction implements Action {
     @Override
     public List<Field> getOptionalFields() {
         return optionalFields;
-    }
-
-    @Override
-    public ActionReport validate(Map<String, Object> args) {
-        DefaultActionReport validationReport = new DefaultActionReport();
-        ActionReport requiredFieldsReport = validateRequiredFields(populateFields(args, getRequiredFields()));
-        ActionReport optionalFieldsReport = validateOptionalFields(populateFields(args, getOptionalFields()));
-        validationReport.messages(requiredFieldsReport.getMessages());
-        validationReport.messages(optionalFieldsReport.getMessages());
-        return validationReport;
-    }
-
-    public List<Field> populateFields(Map<String, Object> args, List<Field> fields) {
-        List<Field> allFields = new ArrayList<>();
-        if(fields != null) {
-            allFields.addAll(getRequiredFields());
-        }
-        allFields.stream().forEach(field -> field.setValue(args.get(field.getFieldName())));
-        return allFields;
-    }
-
-    public ActionReport validateRequiredFields(List<Field> fields){
-        DefaultActionReport validationReport = new DefaultActionReport();
-        List<ActionMessage> messages = fields.stream()
-                .flatMap(field -> field.validate()
-                        .getMessages()
-                        .stream())
-                .collect(Collectors.toList());
-        return validationReport.messages(messages);
-    }
-
-    public ActionReport validateOptionalFields(List<Field> fields){
-        return new DefaultActionReport();
     }
 }

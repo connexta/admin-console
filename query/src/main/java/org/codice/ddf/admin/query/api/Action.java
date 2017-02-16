@@ -5,12 +5,11 @@ import java.util.Map;
 
 import org.codice.ddf.admin.query.api.field.Field;
 
-public interface Action {
+public interface Action<T extends Field> {
     String description();
-    String getActionId();
-    ActionReport process(Map<String, Object> args);
-    ActionReport validate(Map<String, Object> args);
+    String getActionName();
+    T getReturnType();
+    T process(Map<String, Object> args);
     List<Field> getRequiredFields();
     List<Field> getOptionalFields();
-    List<Field> getReturnTypes();
 }

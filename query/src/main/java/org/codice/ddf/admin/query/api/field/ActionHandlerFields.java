@@ -1,4 +1,4 @@
-package org.codice.ddf.admin.query.api;
+package org.codice.ddf.admin.query.api.field;
 
 import java.util.List;
 

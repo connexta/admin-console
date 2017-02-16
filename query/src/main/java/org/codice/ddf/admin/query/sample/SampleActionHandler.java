@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.codice.ddf.admin.query.api.Action;
 import org.codice.ddf.admin.query.commons.DefaultActionHandler;
-import org.codice.ddf.admin.query.ldap.LdapConnectAction;
 
 public class SampleActionHandler extends DefaultActionHandler {
 
@@ -25,6 +24,6 @@ public class SampleActionHandler extends DefaultActionHandler {
     @Override
     public List<Action> getSupportedActions() {
         //new LdapConnectAction(),
-        return Arrays.asList( new SampleAction(), new LdapConnectAction());
+        return Arrays.asList( new SampleAction());
     }
 }

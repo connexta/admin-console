@@ -43,12 +43,11 @@ public class GraphQLCommons {
 
         // TODO: tbatie - 2/15/17 - Need to figure out how to make the required args required
         if (reqFields != null) {
-            reqFields.stream()
-                    .forEach(f -> requiredArgs.add(fieldToGraphQLArgument(f)));
+            reqFields.forEach(f -> requiredArgs.add(fieldToGraphQLArgument(f)));
         }
 
         if (optFields != null) {
-            optFields.stream()
+            optFields
                     .forEach(f -> optionalArgs.add(fieldToGraphQLArgument(f)));
         }
 
@@ -67,7 +66,6 @@ public class GraphQLCommons {
                 .description(field.description());
 
         field.getEnumValues()
-                .stream()
                 .forEach(val -> builder.value(((BaseFields.EnumValue) val).getName(),
                         ((BaseFields.EnumValue) val).getValue(),
                         ((BaseFields.EnumValue) val).getDescription()));

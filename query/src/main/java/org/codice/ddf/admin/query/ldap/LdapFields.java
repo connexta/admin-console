@@ -9,14 +9,14 @@ import org.codice.ddf.admin.query.commons.CommonFields;
 
 import com.google.common.collect.ImmutableList;
 
-public class LdapFields implements ActionHandlerFields{
+public class LdapFields implements ActionHandlerFields {
     @Override
     public List<Field> allFields() {
         return null;
     }
 
     public static class LdapEncryptionMethod extends BaseFields.EnumField<String> {
-        public static final String ENCRYPTION_METHOD = "encryptionMethod";
+        public static final String ENCRYPTION_METHOD = "EncryptionMethod";
 
         public static final BaseFields.EnumValue NONE = new BaseFields.EnumValue<>("none", "none", "No encryption enabled for LDAP connection");
         public static final BaseFields.EnumValue LDAPS = new BaseFields.EnumValue<>("ldaps", "LDAPS", "Secure LDAPS encryption.");
@@ -24,7 +24,7 @@ public class LdapFields implements ActionHandlerFields{
         private static final List<BaseFields.EnumValue<String>> ENCRYPTION_METHODS = ImmutableList.of(NONE, LDAPS, START_TLS);
 
         public LdapEncryptionMethod() {
-            super(ENCRYPTION_METHOD);
+            super("encryption", ENCRYPTION_METHOD);
         }
 
         @Override
@@ -41,10 +41,10 @@ public class LdapFields implements ActionHandlerFields{
     }
 
     public static class LdapConnection extends BaseFields.ObjectField {
-        public static final String LDAP_CONNECTION = "ldapConnection";
+        public static final String LDAP_CONNECTION = "LdapConnection";
         public static final List<Field> FIELDS = ImmutableList.of(new CommonFields.HostnameField(), new CommonFields.PortField(), new LdapEncryptionMethod());
         public LdapConnection() {
-            super(LDAP_CONNECTION);
+            super("connection", LDAP_CONNECTION);
         }
 
         @Override
@@ -59,14 +59,14 @@ public class LdapFields implements ActionHandlerFields{
     }
 
     public static class LdapCredentials extends BaseFields.ObjectField {
-        public static final String LDAP_CREDENTIALS = "ldapCredentials";
+        public static final String LDAP_CREDENTIALS = "LdapCredentials";
         public static final String USERNAME = "username";
         public static final String PASSWORD = "password";
 
         public static final List<Field> FIELDS = ImmutableList.of(new BaseFields.StringField(USERNAME), new BaseFields.StringField(PASSWORD));
 
         public LdapCredentials() {
-            super(LDAP_CREDENTIALS);
+            super("credentials", LDAP_CREDENTIALS);
         }
 
         @Override
@@ -82,11 +82,11 @@ public class LdapFields implements ActionHandlerFields{
 
     public static class LdapAttributeMap extends BaseFields.ObjectField {
 
-        public static final String ATTRIBUTE_MAPPING  = "attributeMapping";
+        public static final String ATTRIBUTE_MAPPING  = "AttributeMapping";
         private List<Field> FIELDS = ImmutableList.of(new BaseFields.StringField("stsClaim"), new BaseFields.StringField("userAttribute"));
 
         public LdapAttributeMap() {
-            super(ATTRIBUTE_MAPPING);
+            super("attributeMap", ATTRIBUTE_MAPPING);
         }
 
         @Override
@@ -100,7 +100,7 @@ public class LdapFields implements ActionHandlerFields{
         }
     }
 
-    public static class LdapAttributeMappings extends BaseFields.List {
+    public static class LdapAttributeMappings extends BaseFields.ListField {
 
         public static final String MAPPING = "mapping";
 
@@ -110,7 +110,7 @@ public class LdapFields implements ActionHandlerFields{
 
         @Override
         public String description() {
-            return "A map containing STS claim to user attribute mapping";
+            return "A map containing STS claims to user attributes. Only 1 sts claim is allowed to be mapped to a single user attribute.";
         }
 
         @Override
@@ -122,17 +122,23 @@ public class LdapFields implements ActionHandlerFields{
 
     public static final class LdapSettings extends BaseFields.ObjectField {
 
-        public static final String LDAP_SETTINGS = "ldapSettings";
+        public static final String LDAP_SETTINGS = "LdapSettings";
+
+        // TODO: tbatie - 2/16/17 - Need to assess these fields again, FIELD class contains a T value that should be used instead
+        private String userBaseDn;
+        private String groupBaseDn;
+        private String groupObjectCLass;
+        private String groupMembershipAttribute;
 
         public static final List<Field> FIELDS = ImmutableList.of(new BaseFields.StringField("userNameAttribute"),
                 new BaseFields.StringField("userBaseDn"),
                 new BaseFields.StringField("groupBaseDn"),
                 new BaseFields.StringField("groupObjectClass"),
-                new BaseFields.StringField("groupMemberShipAttribute"),
+                new BaseFields.StringField("groupMembershipAttribute"),
                 new LdapAttributeMappings());
 
         public LdapSettings() {
-            super(LDAP_SETTINGS);
+            super("settings", LDAP_SETTINGS);
         }
 
         @Override
@@ -144,18 +150,50 @@ public class LdapFields implements ActionHandlerFields{
         public List<Field> getFields() {
             return FIELDS;
         }
+
+        public String getUserBaseDn() {
+            return userBaseDn;
+        }
+
+        public String getGroupBaseDn() {
+            return groupBaseDn;
+        }
+
+        public String getGroupObjectClass() {
+            return groupObjectCLass;
+        }
+
+        public String getGroupMembershipAttribute() {
+            return groupMembershipAttribute;
+        }
+
+        public void setUserBaseDn(String userBaseDn) {
+            this.userBaseDn = userBaseDn;
+        }
+
+        public void setGroupBaseDn(String groupBaseDn) {
+            this.groupBaseDn = groupBaseDn;
+        }
+
+        public void setGroupObjectClass(String groupObjectCLass) {
+            this.groupObjectCLass = groupObjectCLass;
+        }
+
+        public void setGroupMembershipAttribute(String groupMembershipAttribute) {
+            this.groupMembershipAttribute = groupMembershipAttribute;
+        }
     }
 
     public static final class LdapConfiguration extends BaseFields.ObjectField {
 
-        public static final String LDAP_CONFIGURATION = "ldapConfiguration";
+        public static final String LDAP_CONFIGURATION = "LdapConfiguration";
         public static final List<Field> FIELDS = ImmutableList.of(new BaseFields.Pid(),
                 new LdapConnection(),
                 new LdapCredentials(),
                 new LdapSettings());
 
         public LdapConfiguration() {
-            super(LDAP_CONFIGURATION);
+            super("config", LDAP_CONFIGURATION);
         }
 
         @Override

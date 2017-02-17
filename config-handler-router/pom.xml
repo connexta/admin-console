@@ -44,6 +44,12 @@
             <artifactId>commons-lang</artifactId>
             <version>${commons-lang.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -90,6 +96,12 @@
                             <goal>check</goal>
                         </goals>
                         <configuration>
+                            <!--The RuntimeTypeAdapterFactory and SparkServlet were copied verbatim from other locations-->
+                            <!--and are unchanged and should not ever change.-->
+                            <excludes>
+                                <exclude>**/RuntimeTypeAdapterFactory.class</exclude>
+                                <exclude>**/SparkServlet.class</exclude>
+                            </excludes>
                             <haltOnFailure>true</haltOnFailure>
                             <rules>
                                 <rule>
@@ -98,17 +110,17 @@
                                         <limit>
                                             <counter>INSTRUCTION</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.00</minimum>
+                                            <minimum>0.49</minimum>
                                         </limit>
                                         <limit>
                                             <counter>BRANCH</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.00</minimum>
+                                            <minimum>0.67</minimum>
                                         </limit>
                                         <limit>
                                             <counter>COMPLEXITY</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.00</minimum>
+                                            <minimum>0.52</minimum>
                                         </limit>
                                     </limits>
                                 </rule>

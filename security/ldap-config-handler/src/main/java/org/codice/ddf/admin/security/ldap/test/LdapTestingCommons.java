@@ -41,8 +41,12 @@ import org.forgerock.opendj.ldap.requests.DigestMD5SASLBindRequest;
 import org.forgerock.opendj.ldap.requests.Requests;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
 import org.forgerock.opendj.ldif.ConnectionEntryReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LdapTestingCommons {
+    private static final Logger LOGGER = LoggerFactory.getLogger(LdapTestingCommons.class);
+
     public LdapConnectionAttempt getLdapConnection(LdapConfiguration ldapConfiguration) {
         LDAPOptions ldapOptions = new LDAPOptions();
 
@@ -64,6 +68,7 @@ public class LdapTestingCommons {
             ldapOptions.setProviderClassLoader(LdapTestingCommons.class.getClassLoader());
 
         } catch (Exception e) {
+            LOGGER.debug("Error prepping LDAP connection", e);
             return new LdapConnectionAttempt(CANNOT_CONFIGURE);
         }
 
@@ -74,6 +79,9 @@ public class LdapTestingCommons {
                     ldapConfiguration.port(),
                     ldapOptions).getConnection();
         } catch (Exception e) {
+            LOGGER.debug("Error opening LDAP connection to [{}:{}]",
+                    ldapConfiguration.hostName(),
+                    ldapConfiguration.port());
             return new LdapConnectionAttempt(CANNOT_CONNECT);
         }
 
@@ -81,7 +89,6 @@ public class LdapTestingCommons {
     }
 
     public LdapConnectionAttempt bindUserToLdapConnection(LdapConfiguration ldapConfiguration) {
-
         LdapConnectionAttempt ldapConnectionResult = getLdapConnection(ldapConfiguration);
         if (ldapConnectionResult.result() != SUCCESSFUL_CONNECTION) {
             return ldapConnectionResult;
@@ -97,6 +104,7 @@ public class LdapTestingCommons {
                     null);
             connection.bind(bindRequest);
         } catch (Exception e) {
+            LOGGER.debug("Error binding to LDAP", e);
             return new LdapConnectionAttempt(CANNOT_BIND);
         }
 

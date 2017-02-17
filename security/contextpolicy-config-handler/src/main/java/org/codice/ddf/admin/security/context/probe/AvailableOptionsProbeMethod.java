@@ -33,6 +33,7 @@ import static org.codice.ddf.admin.api.validation.SecurityValidationUtils.SAML;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,11 +44,14 @@ import org.codice.ddf.admin.api.configurator.Configurator;
 import org.codice.ddf.admin.api.handler.ConfigurationHandler;
 import org.codice.ddf.admin.api.handler.method.ProbeMethod;
 import org.codice.ddf.admin.api.handler.report.ProbeReport;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 public class AvailableOptionsProbeMethod extends ProbeMethod<ContextPolicyConfiguration> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AvailableOptionsProbeMethod.class);
 
     public static final String ID = "options";
 
@@ -81,17 +85,21 @@ public class AvailableOptionsProbeMethod extends ProbeMethod<ContextPolicyConfig
 
     @Override
     public ProbeReport probe(ContextPolicyConfiguration config) {
-        Map<String, Object> probeResults = new HashMap();
+        Map<String, Object> probeResults = new HashMap<>();
         probeResults.put(AUTH_TYPES_KEY, getAuthTypes());
         probeResults.put(REALMS_KEY, getRealms());
         probeResults.put(CLAIMS_KEY, getClaims());
 
-        return createProbeReport(SUCCESS_TYPES,
-                FAILED_TYPES,
-                null,
-                probeResults.isEmpty() ?
-                        FAILED_PROBE :
-                        SUCCESSFUL_PROBE).probeResults(probeResults);
+        if (probeResults.isEmpty()) {
+            LOGGER.debug("No probe results found for config [{}]", config);
+            return createProbeReport(SUCCESS_TYPES, FAILED_TYPES, null, FAILED_PROBE).probeResults(
+                    probeResults);
+        } else {
+            return createProbeReport(SUCCESS_TYPES,
+                    FAILED_TYPES,
+                    null,
+                    SUCCESSFUL_PROBE).probeResults(probeResults);
+        }
     }
 
     public List<String> getAuthTypes() {
@@ -106,16 +114,16 @@ public class AvailableOptionsProbeMethod extends ProbeMethod<ContextPolicyConfig
     }
 
     public List<String> getRealms() {
-        List<String> realms = new ArrayList<>(Arrays.asList(KARAF));
+        List<String> realms = new ArrayList<>(Collections.singletonList(KARAF));
         // If an IdpConfigurationHandler exists replace this with a service reference
         if (configurator.isBundleStarted(IDP_SERVER_BUNDLE_NAME)) {
             realms.add(IDP);
         }
 
-        if (ldapConfigHandler == null || ldapConfigHandler.getConfigurations()
-                .stream()
-                .anyMatch(config -> ((LdapConfiguration) config).ldapUseCase()
-                        .equals(AUTHENTICATION) || ((LdapConfiguration) config).ldapUseCase()
+        if (ldapConfigHandler == null
+                || ((List<LdapConfiguration>) ldapConfigHandler.getConfigurations()).stream()
+                .anyMatch(config -> config.ldapUseCase()
+                        .equals(AUTHENTICATION) || config.ldapUseCase()
                         .equals(AUTHENTICATION_AND_ATTRIBUTE_STORE))) {
             realms.add(LDAP);
         }

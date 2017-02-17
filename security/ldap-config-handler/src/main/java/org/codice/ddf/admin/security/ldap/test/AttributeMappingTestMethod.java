@@ -19,10 +19,17 @@ import static org.codice.ddf.admin.api.handler.ConfigurationMessage.INVALID_FIEL
 import static org.codice.ddf.admin.api.handler.ConfigurationMessage.buildMessage;
 import static org.codice.ddf.admin.api.handler.ConfigurationMessage.createInvalidFieldMsg;
 import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.SUCCESSFUL_TEST;
+import static org.codice.ddf.admin.api.handler.report.Report.createReport;
 import static org.codice.ddf.admin.api.services.PolicyManagerServiceProperties.STS_CLAIMS_CONFIGURATION_CONFIG_ID;
 import static org.codice.ddf.admin.api.services.PolicyManagerServiceProperties.STS_CLAIMS_PROPS_KEY_CLAIMS;
+import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.CANNOT_BIND;
+import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.CANNOT_CONFIGURE;
+import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.CANNOT_CONNECT;
+import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.SUCCESSFUL_BIND;
+import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.toDescriptionMap;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -31,6 +38,10 @@ import org.codice.ddf.admin.api.config.ldap.LdapConfiguration;
 import org.codice.ddf.admin.api.configurator.Configurator;
 import org.codice.ddf.admin.api.handler.method.TestMethod;
 import org.codice.ddf.admin.api.handler.report.Report;
+import org.forgerock.opendj.ldap.Connection;
+import org.forgerock.opendj.ldap.Filter;
+import org.forgerock.opendj.ldap.SearchScope;
+import org.forgerock.opendj.ldap.responses.SearchResultEntry;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -46,12 +57,20 @@ public class AttributeMappingTestMethod extends TestMethod<LdapConfiguration> {
     private static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(SUCCESSFUL_TEST,
             "Attribute mapping was successfully validated.");
 
-    public static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(INVALID_FIELD,
-            "The given attribute mapping is invalid.");
+    public static final Map<String, String> FAILURE_TYPES =
+            new ImmutableMap.Builder<String, String>().putAll(toDescriptionMap(Arrays.asList(
+                    CANNOT_CONFIGURE,
+                    CANNOT_CONNECT,
+                    CANNOT_BIND)))
+                    .put(INVALID_FIELD, "The given attribute mapping is invalid.")
+                    .build();
 
     private final Configurator configurator;
 
-    public AttributeMappingTestMethod(Configurator configurator) {
+    private final LdapTestingCommons ldapTestingCommons;
+
+    public AttributeMappingTestMethod(LdapTestingCommons ldapTestingCommons,
+            Configurator configurator) {
         super(LDAP_ATTRIBUTE_MAPPING_TEST_ID,
                 DESCRIPTION,
                 REQUIRED_FIELDS,
@@ -60,11 +79,14 @@ public class AttributeMappingTestMethod extends TestMethod<LdapConfiguration> {
                 FAILURE_TYPES,
                 null);
 
+        this.ldapTestingCommons = ldapTestingCommons;
         this.configurator = configurator;
     }
 
     @Override
     public Report test(LdapConfiguration configuration) {
+        // First check for any unknown claims. This should never happen in a correctly configured
+        // system. Bail out on first unknown claim.
         List stsClaims = Arrays.asList((String[]) configurator.getConfig(
                 STS_CLAIMS_CONFIGURATION_CONFIG_ID)
                 .get(STS_CLAIMS_PROPS_KEY_CLAIMS));
@@ -80,7 +102,47 @@ public class AttributeMappingTestMethod extends TestMethod<LdapConfiguration> {
                     unknownStsClaim.get()), ATTRIBUTE_MAPPINGS));
         }
 
+        // If all claims were present, check the attributes provided. Search the user base for
+        // user entries that have each of the mapped attributes. If at least one is found for
+        // each attribute, that is a success condition; else, it is a warning that should be
+        // reported to the user.
+        LdapTestingCommons.LdapConnectionAttempt connectionAttempt =
+                ldapTestingCommons.bindUserToLdapConnection(configuration);
+
+        if (connectionAttempt.result() != SUCCESSFUL_BIND) {
+            return createReport(SUCCESS_TYPES,
+                    FAILURE_TYPES,
+                    Collections.emptyMap(),
+                    Collections.singletonList(connectionAttempt.result()
+                            .name()));
+        }
+
+        try (Connection ldapConnection = connectionAttempt.connection()) {
+            Optional<String> unknownAttribute = configuration.attributeMappings()
+                    .values()
+                    .stream()
+                    .filter(s -> !checkClaimAttr(s, configuration, ldapConnection))
+                    .findFirst();
+
+            if (unknownAttribute.isPresent()) {
+                return new Report(createInvalidFieldMsg(String.format(
+                        "No user found with attribute [%s].",
+                        unknownAttribute.get()), ATTRIBUTE_MAPPINGS));
+            }
+        }
+
         return new Report(buildMessage(SUCCESS_TYPES, FAILURE_TYPES, null, SUCCESSFUL_TEST));
     }
 
+    private boolean checkClaimAttr(String attr, LdapConfiguration configuration,
+            Connection ldapConnection) {
+        List<SearchResultEntry> userWithAttrResults = ldapTestingCommons.getLdapQueryResults(
+                ldapConnection,
+                configuration.baseUserDn(),
+                Filter.and(Filter.present(configuration.userNameAttribute()), Filter.present(attr))
+                        .toString(),
+                SearchScope.SUBORDINATES,
+                1);
+        return !userWithAttrResults.isEmpty();
+    }
 }

@@ -1,10 +1,10 @@
 package org.codice.ddf.admin.query.commons.field;
 
-import static org.codice.ddf.admin.query.api.field.Field.FieldType.ENUM;
-import static org.codice.ddf.admin.query.api.field.Field.FieldType.INTEGER;
-import static org.codice.ddf.admin.query.api.field.Field.FieldType.LIST;
-import static org.codice.ddf.admin.query.api.field.Field.FieldType.OBJECT;
-import static org.codice.ddf.admin.query.api.field.Field.FieldType.STRING;
+import static org.codice.ddf.admin.query.api.field.Field.FieldBaseType.ENUM;
+import static org.codice.ddf.admin.query.api.field.Field.FieldBaseType.INTEGER;
+import static org.codice.ddf.admin.query.api.field.Field.FieldBaseType.LIST;
+import static org.codice.ddf.admin.query.api.field.Field.FieldBaseType.OBJECT;
+import static org.codice.ddf.admin.query.api.field.Field.FieldBaseType.STRING;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,7 +29,7 @@ public class BaseFields implements ActionHandlerFields {
     public static class IntegerField extends BaseField<Integer> {
 
         public IntegerField(String fieldName) {
-            super(fieldName, INTEGER);
+            super(fieldName, null, INTEGER);
         }
 
         @Override
@@ -46,7 +46,7 @@ public class BaseFields implements ActionHandlerFields {
     public static class StringField extends BaseField<String> {
 
         public StringField(String fieldName) {
-            super(fieldName, STRING);
+            super(fieldName, null, STRING);
         }
 
         @Override
@@ -55,10 +55,10 @@ public class BaseFields implements ActionHandlerFields {
         }
     }
 
-    public abstract static class List<T extends Field> extends BaseField<T> {
+    public abstract static class ListField<T extends Field> extends BaseField<T> {
 
-        public List(String fieldName) {
-            super(fieldName, LIST);
+        public ListField(String fieldName) {
+            super(fieldName, null, LIST);
         }
 
         public abstract Field getListValueField();
@@ -66,8 +66,8 @@ public class BaseFields implements ActionHandlerFields {
 
     public static abstract class ObjectField extends BaseField {
 
-        public ObjectField(String fieldName) {
-            super(fieldName, OBJECT);
+        public ObjectField(String fieldName, String fieldTypeName) {
+            super(fieldName, fieldTypeName, OBJECT);
         }
 
         public abstract java.util.List<Field> getFields();
@@ -99,28 +99,32 @@ public class BaseFields implements ActionHandlerFields {
 
     public static abstract class EnumField<T> extends BaseField<EnumValue<T>> {
 
-        public EnumField(String fieldName) {
-            super(fieldName, ENUM);
+        public EnumField(String fieldName, String fieldTypeName) {
+            super(fieldName, fieldTypeName, ENUM);
         }
 
         public abstract java.util.List<EnumValue<T>> getEnumValues();
     }
 
+
+    //Move these to CommonFields
+
     public static class MessageField extends BaseFields.ObjectField implements Message {
 
         public static final String MESSAGE = "message";
         public static final String CODE = "code";
-        public static final String DESCRIPTION = "description";
-        public static final java.util.List<Field> FIELDS = ImmutableList.of(new BaseFields.StringField(CODE), new BaseFields.StringField(DESCRIPTION));
+        public static final String CONTENT = "content";
+        public static final java.util.List<Field> FIELDS = ImmutableList.of(new BaseFields.StringField(CODE), new BaseFields.StringField(
+                CONTENT));
 
         private String code;
         private String description;
         private MessageType messageType;
 
-        public MessageField(String code, String description, MessageType messageType) {
-            super(MESSAGE);
+        public MessageField(String code, String content, MessageType messageType) {
+            super(MESSAGE, "Message");
             this.code = code;
-            this.description = description;
+            this.description = content;
             this.messageType = messageType;
         }
 
@@ -135,13 +139,18 @@ public class BaseFields implements ActionHandlerFields {
         }
 
         @Override
-        public String description() {
+        public String getContent() {
             return description;
         }
 
         @Override
         public MessageType getMessageType() {
             return messageType;
+        }
+
+        @Override
+        public String description() {
+            return "A message containing a code with a summary of the message and content will a more in depth description.";
         }
     }
 
@@ -165,9 +174,9 @@ public class BaseFields implements ActionHandlerFields {
         }
     }
 
-    public static class MessageList extends BaseFields.List {
+    public static class MessageListField extends ListField {
 
-        public MessageList(String fieldName) {
+        public MessageListField(String fieldName) {
             super(fieldName);
         }
 
@@ -187,12 +196,12 @@ public class BaseFields implements ActionHandlerFields {
         private java.util.List<Message> warnings;
         private java.util.List<Message> failures;
 
-        public static final java.util.List<Field> FIELDS = ImmutableList.of(new MessageList(SUCCESSES),
-                new MessageList(FAILURES),
-                new MessageList(WARNINGS));
+        public static final java.util.List<Field> FIELDS = ImmutableList.of(new MessageListField(SUCCESSES),
+                new MessageListField(FAILURES),
+                new MessageListField(WARNINGS));
 
         public BaseReport() {
-            super(REPORT);
+            super("report", REPORT);
             this.successes = new ArrayList<>();
             this.warnings = new ArrayList<>();
             this.failures = new ArrayList<>();

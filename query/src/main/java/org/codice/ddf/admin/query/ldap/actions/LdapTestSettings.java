@@ -4,8 +4,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.codice.ddf.admin.query.api.field.Field;
+import org.codice.ddf.admin.query.api.field.Message;
 import org.codice.ddf.admin.query.api.field.Report;
 import org.codice.ddf.admin.query.commons.action.TestAction;
+import org.codice.ddf.admin.query.commons.field.BaseFields;
 import org.codice.ddf.admin.query.ldap.LdapFields;
 
 import com.google.common.collect.ImmutableList;
@@ -21,6 +23,9 @@ public class LdapTestSettings extends TestAction {
 
     @Override
     public Report process(Map<String, Object> args) {
-        return null;
+        Message successMsg = new BaseFields.SuccessMessage("SUCCESS", "All fields have been successfully validated.");
+        Message warningMsg = new BaseFields.WarningMessage("WARNING", "No users in baseDN with the given attributes");
+        Message failureMsg = new BaseFields.FailureMessage("CANNOT_BIND", "The specified user DN does not exist.");
+        return new BaseFields.BaseReport().messages(successMsg, warningMsg, failureMsg);
     }
 }

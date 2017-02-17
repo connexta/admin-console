@@ -3,12 +3,13 @@ package org.codice.ddf.admin.query.api.field;
 public interface Field<T> {
 
     String fieldName();
+    String fieldTypeName();
+    FieldBaseType fieldBaseType();
     String description();
-    FieldType fieldType();
     <S extends T> S getValue();
-    Field setValue(T value);
+    Field addValue(T value);
 
-    enum FieldType {
+    enum FieldBaseType {
         STRING, INTEGER, LIST, OBJECT, ENUM
     }
 }

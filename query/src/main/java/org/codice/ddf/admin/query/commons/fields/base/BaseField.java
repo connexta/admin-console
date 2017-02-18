@@ -1,6 +1,6 @@
-package org.codice.ddf.admin.query.commons.field;
+package org.codice.ddf.admin.query.commons.fields.base;
 
-import org.codice.ddf.admin.query.api.field.Field;
+import org.codice.ddf.admin.query.api.fields.Field;
 
 public abstract class BaseField<T> implements Field<T> {
 

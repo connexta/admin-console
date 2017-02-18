@@ -3,7 +3,7 @@ package org.codice.ddf.admin.query.api;
 import java.util.List;
 import java.util.Map;
 
-import org.codice.ddf.admin.query.api.field.Field;
+import org.codice.ddf.admin.query.api.fields.Field;
 
 public interface ActionHandler {
     String getActionHandlerId();

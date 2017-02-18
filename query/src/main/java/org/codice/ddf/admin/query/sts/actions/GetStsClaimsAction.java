@@ -1,19 +1,20 @@
 package org.codice.ddf.admin.query.sts.actions;
 
-import org.codice.ddf.admin.query.api.field.Field;
-import org.codice.ddf.admin.query.commons.action.GetAction;
+import org.codice.ddf.admin.query.api.fields.Field;
+import org.codice.ddf.admin.query.commons.actions.GetAction;
+import org.codice.ddf.admin.query.sts.field.StsClaimsField;
 
 public class GetStsClaimsAction extends GetAction {
 
     public static final String ACTION_ID = "claims";
-    public static final String DESCRIPTION = "Retrieves the currently configured claims for the STS supports.";
+    public static final String DESCRIPTION = "All currently configured claims the STS supports.";
 
-    public GetStsClaimsAction(Field returnType) {
-        super(ACTION_ID, DESCRIPTION, returnType);
+    public GetStsClaimsAction() {
+        super(ACTION_ID, DESCRIPTION, new StsClaimsField());
     }
 
     @Override
     public Field process() {
-        return null;
+        return new StsClaimsField();
     }
 }

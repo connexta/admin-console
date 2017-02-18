@@ -1,7 +1,8 @@
-package org.codice.ddf.admin.query.api.field;
+package org.codice.ddf.admin.query.api.fields;
 
 public interface Field<T> {
 
+    // TODO: tbatie - 2/17/17 - Add setRequired field
     String fieldName();
     String fieldTypeName();
     FieldBaseType fieldBaseType();
@@ -10,6 +11,6 @@ public interface Field<T> {
     Field addValue(T value);
 
     enum FieldBaseType {
-        STRING, INTEGER, LIST, OBJECT, ENUM
+        STRING, INTEGER, FLOAT, LIST, OBJECT, ENUM
     }
 }

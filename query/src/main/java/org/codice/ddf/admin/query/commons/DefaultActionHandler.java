@@ -5,7 +5,7 @@ import java.util.Optional;
 
 import org.codice.ddf.admin.query.api.ActionHandler;
 import org.codice.ddf.admin.query.api.Action;
-import org.codice.ddf.admin.query.api.field.Field;
+import org.codice.ddf.admin.query.api.fields.Field;
 
 public abstract class DefaultActionHandler implements ActionHandler {
 

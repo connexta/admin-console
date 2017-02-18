@@ -11,8 +11,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.codice.ddf.admin.query.api.field.Field;
-import org.codice.ddf.admin.query.commons.field.BaseFields;
+import org.codice.ddf.admin.query.api.fields.Field;
+import org.codice.ddf.admin.query.commons.fields.base.EnumField;
+import org.codice.ddf.admin.query.commons.fields.base.ListField;
+import org.codice.ddf.admin.query.commons.fields.base.ObjectField;
 
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLList;
@@ -30,11 +32,11 @@ public class GraphQLOutput {
     public static GraphQLOutputType fieldToGraphQLOutputType(Field field) {
         switch (field.fieldBaseType()) {
         case OBJECT:
-            return objectFieldToGraphQLOutputType((BaseFields.ObjectField) field);
+            return objectFieldToGraphQLOutputType((ObjectField) field);
         case ENUM:
-            return enumFieldToGraphQLEnumType((BaseFields.EnumField) field);
+            return enumFieldToGraphQLEnumType((EnumField) field);
         case LIST:
-            return listFieldToGraphQLOutputType((BaseFields.ListField)field);
+            return listFieldToGraphQLOutputType((ListField)field);
         case INTEGER:
             return GraphQLInt;
         case STRING:
@@ -43,7 +45,7 @@ public class GraphQLOutput {
         return GraphQLString;
     }
 
-    public static GraphQLOutputType objectFieldToGraphQLOutputType(BaseFields.ObjectField field) {
+    public static GraphQLOutputType objectFieldToGraphQLOutputType(ObjectField field) {
         List<GraphQLFieldDefinition> fieldDefinitions = new ArrayList<>();
         if(field.getFields() != null) {
             fieldDefinitions = field.getFields()
@@ -57,7 +59,7 @@ public class GraphQLOutput {
                 .build();
     }
 
-    public static GraphQLOutputType listFieldToGraphQLOutputType(BaseFields.ListField listField) {
+    public static GraphQLOutputType listFieldToGraphQLOutputType(ListField listField) {
         return new GraphQLList(fieldToGraphQLOutputType(listField.getListValueField()));
     }
 }

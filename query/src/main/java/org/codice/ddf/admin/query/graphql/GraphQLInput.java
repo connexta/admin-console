@@ -12,8 +12,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.codice.ddf.admin.query.api.field.Field;
-import org.codice.ddf.admin.query.commons.field.BaseFields;
+import org.codice.ddf.admin.query.api.fields.Field;
+import org.codice.ddf.admin.query.commons.fields.base.EnumField;
+import org.codice.ddf.admin.query.commons.fields.base.ListField;
+import org.codice.ddf.admin.query.commons.fields.base.ObjectField;
 
 import graphql.schema.GraphQLArgument;
 import graphql.schema.GraphQLInputObjectField;
@@ -40,11 +42,11 @@ public class GraphQLInput {
     public static GraphQLInputType fieldTypeToGraphQLInputType(Field field) {
         switch (field.fieldBaseType()) {
         case OBJECT:
-            return objectFieldToGraphQLInputType((BaseFields.ObjectField) field);
+            return objectFieldToGraphQLInputType((ObjectField) field);
         case ENUM:
-            return enumFieldToGraphQLEnumType((BaseFields.EnumField) field);
+            return enumFieldToGraphQLEnumType((EnumField) field);
         case LIST:
-            return listFieldToGraphQLInputType((BaseFields.ListField)field);
+            return listFieldToGraphQLInputType((ListField)field);
         case INTEGER:
             return GraphQLInt;
         case STRING:
@@ -54,7 +56,7 @@ public class GraphQLInput {
     }
 
     public static GraphQLInputType objectFieldToGraphQLInputType(
-            BaseFields.ObjectField field) {
+            ObjectField field) {
         List<GraphQLInputObjectField> fieldDefinitions = new ArrayList<>();
         if(field.getFields() != null) {
             fieldDefinitions = field.getFields()
@@ -69,7 +71,7 @@ public class GraphQLInput {
                 .build();
     }
 
-    public static GraphQLInputType listFieldToGraphQLInputType(BaseFields.ListField listField) {
+    public static GraphQLInputType listFieldToGraphQLInputType(ListField listField) {
         return new GraphQLList(fieldTypeToGraphQLInputType(listField.getListValueField()));
     }
 }

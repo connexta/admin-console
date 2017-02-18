@@ -1,4 +1,4 @@
-package org.codice.ddf.admin.query.api.field;
+package org.codice.ddf.admin.query.api.fields;
 
 public interface Message extends Field{
     String getCode();

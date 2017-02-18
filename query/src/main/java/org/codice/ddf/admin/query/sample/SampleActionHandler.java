@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.codice.ddf.admin.query.api.Action;
 import org.codice.ddf.admin.query.commons.DefaultActionHandler;
+import org.codice.ddf.admin.query.sample.actions.SampleAction;
 
 public class SampleActionHandler extends DefaultActionHandler {
 

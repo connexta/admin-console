@@ -1,9 +1,9 @@
-package org.codice.ddf.admin.query.commons.action;
+package org.codice.ddf.admin.query.commons.actions;
 
 import java.util.List;
 
 import org.codice.ddf.admin.query.api.Action;
-import org.codice.ddf.admin.query.api.field.Field;
+import org.codice.ddf.admin.query.api.fields.Field;
 
 public abstract class DefaultAction<T extends Field> implements Action<T> {
 

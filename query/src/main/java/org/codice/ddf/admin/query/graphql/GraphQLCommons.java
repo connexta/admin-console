@@ -13,9 +13,11 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang.StringUtils;
 import org.codice.ddf.admin.query.api.Action;
 import org.codice.ddf.admin.query.api.ActionHandler;
-import org.codice.ddf.admin.query.api.field.Field;
-import org.codice.ddf.admin.query.commons.field.BaseFields;
+import org.codice.ddf.admin.query.api.fields.Field;
+import org.codice.ddf.admin.query.commons.fields.base.EnumField;
+import org.codice.ddf.admin.query.commons.fields.base.EnumFieldValue;
 
+import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLArgument;
 import graphql.schema.GraphQLEnumType;
 import graphql.schema.GraphQLFieldDefinition;
@@ -56,22 +58,25 @@ public class GraphQLCommons {
                 .description(action.description())
                 .argument(requiredArgs)
                 .argument(optionalArgs)
-                .dataFetcher(env -> action.process(env.getArguments()))
+                .dataFetcher(env -> dataFetch(env, action))
                 .build();
     }
 
-    public static GraphQLEnumType enumFieldToGraphQLEnumType(BaseFields.EnumField field) {
+    public static GraphQLEnumType enumFieldToGraphQLEnumType(EnumField field) {
         GraphQLEnumType.Builder builder = newEnum()
                 .name(capitalize(field.fieldName()))
                 .description(field.description());
 
         field.getEnumValues()
-                .forEach(val -> builder.value(((BaseFields.EnumValue) val).getName(),
-                        ((BaseFields.EnumValue) val).getValue(),
-                        ((BaseFields.EnumValue) val).getDescription()));
+                .forEach(val -> builder.value(((EnumFieldValue) val).getName(),
+                        ((EnumFieldValue) val).getValue(),
+                        ((EnumFieldValue) val).getDescription()));
         return builder.build();
     }
 
+    public static Object dataFetch(DataFetchingEnvironment env, Action action) {
+        return action.process(env.getArguments());
+    }
     public static String capitalize(String str){
         return StringUtils.capitalize(str);
     }

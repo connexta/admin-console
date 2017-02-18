@@ -21,4 +21,8 @@
         <bean class="org.codice.ddf.admin.query.ldap.LdapQuery" />
     </service>
 
+    <service interface="graphql.servlet.GraphQLQueryProvider" >
+        <bean class="org.codice.ddf.admin.query.sts.StsQuery" />
+    </service>
+
 </blueprint>

@@ -11,10 +11,9 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.api
+package org.codice.ddf.admin.api.configurator.operations
 
 import org.codice.ddf.admin.api.configurator.ConfiguratorException
-import org.codice.ddf.admin.api.configurator.operations.PropertyOperation
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import spock.lang.Shared

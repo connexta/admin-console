@@ -15,7 +15,9 @@ package org.codice.ddf.admin.security.ldap.embedded
 
 import org.codice.ddf.admin.api.config.ldap.EmbeddedLdapConfiguration
 import org.codice.ddf.admin.api.configurator.Configurator
+import org.codice.ddf.admin.api.handler.method.PersistMethod
 import org.codice.ddf.admin.api.services.EmbeddedLdapServiceProperties
+import org.codice.ddf.admin.security.ldap.embedded.persist.DefaultEmbeddedLdapPersistMethod
 import spock.lang.Specification
 
 class EmbeddedLdapConfigurationHandlerTest extends Specification {
@@ -62,9 +64,19 @@ class EmbeddedLdapConfigurationHandlerTest extends Specification {
         configurationType.configClass() == EmbeddedLdapConfiguration.class
     }
 
-    def 'test there are no probe or test methods'() {
-        expect:
+    def 'test methods available'() {
+        when:
+        def persistMethods = embeddedLdapConfigurationHandler.getPersistMethods()
+
+        then:
         embeddedLdapConfigurationHandler.getTestMethods() == null
         embeddedLdapConfigurationHandler.getProbeMethods() == null
+        persistMethods.size() == 1
+        persistMethods.first().class == DefaultEmbeddedLdapPersistMethod.class
+    }
+
+    def 'test config handler id'() {
+        expect:
+        embeddedLdapConfigurationHandler.getConfigurationHandlerId() == EmbeddedLdapConfiguration.CONFIGURATION_TYPE
     }
 }

@@ -1,14 +1,11 @@
 import React from 'react'
 
 import { connect } from 'react-redux'
-import { Map } from 'immutable'
 import Flexbox from 'flexbox-react'
 import { Link } from 'react-router'
 
-import { poll, stopPolling } from 'redux-polling'
+import { stopPolling } from 'redux-polling'
 import Mount from 'react-mount'
-
-import { get, post } from 'redux-fetch'
 
 import Paper from 'material-ui/Paper'
 import AccountIcon from 'material-ui/svg-icons/action/account-circle'
@@ -18,61 +15,12 @@ import Divider from 'material-ui/Divider'
 import { cyan500 } from 'material-ui/styles/colors'
 import RaisedButton from 'material-ui/RaisedButton'
 import MapDisplay from 'components/MapDisplay'
+import Spinner from 'components/Spinner'
 
+import * as selectors from './reducer'
+import * as actions from './actions'
 import * as styles from './styles.less'
 
-// actions
-
-const setConfigs = (id, value) => ({type: 'SET_CONFIGS', id, value})
-
-// async actions
-
-const retrieve = (id) => async (dispatch) => {
-  const res = await dispatch(get('/admin/beta/config/configurations/' + id))
-  const json = await res.json()
-
-  if (res.status === 200) {
-    dispatch(setConfigs(id, json))
-  }
-}
-
-const refresh = poll('home', () => (dispatch) =>
-  Promise.all([
-    dispatch(retrieve('sources')),
-    dispatch(retrieve('ldap'))
-  ])
-)
-
-export const deleteConfig = ({ configurationType, factoryPid, servicePid }) => async (dispatch) => {
-  const url = '/admin/beta/config/persist/' + configurationType + '/delete'
-  const body = JSON.stringify({ configurationType, factoryPid, servicePid })
-
-  const res = await dispatch(post(url, { body }))
-
-  if (res.status === 200) {
-    dispatch(refresh())
-  }
-}
-
-// selectors
-
-const getSourceConfigs = (state) => state.getIn(['home', 'sources'])
-const getLdapConfigs = (state) => state.getIn(['home', 'ldap'])
-
-// reducers
-
-const configs = (state = Map(), { type, id, value = [] }) => {
-  switch (type) {
-    case 'SET_CONFIGS':
-      return state.set(id, value)
-    default:
-      return state
-  }
-}
-
-export default configs
-
-// views
 const getSourceTypeFromFactoryPid = (factoryPid) => {
   return factoryPid.replace(/_/g, ' ')
 }
@@ -83,23 +31,33 @@ const SourceTileView = (props) => {
     factoryPid,
     sourceUserName,
     endpointUrl,
-    onDeleteConfig
+    onDeleteConfig,
+    submitting,
+    messages = []
   } = props
 
   return (
-    <Paper className={styles.config}>
-      <div className={styles.tileTitle}>{sourceName}</div>
-      <ConfigField fieldName='Source Type' value={getSourceTypeFromFactoryPid(factoryPid)} />
-      <ConfigField fieldName='Endpoint' value={endpointUrl} />
-      <ConfigField fieldName='Username' value={sourceUserName || 'none'} />
-      <ConfigField fieldName='Password' value={sourceUserName || '******'} />
-      <RaisedButton style={{marginTop: 20}} label='Delete' secondary onClick={onDeleteConfig} />
+    <Paper className={styles.outerSpinner}>
+      <Spinner submitting={submitting}>
+        <div className={styles.innerSpinner}>
+          <div className={styles.tileTitle}>{sourceName}</div>
+          <ConfigField fieldName='Source Type' value={getSourceTypeFromFactoryPid(factoryPid)} />
+          <ConfigField fieldName='Endpoint' value={endpointUrl} />
+          <ConfigField fieldName='Username' value={sourceUserName || 'none'} />
+          <ConfigField fieldName='Password' value={sourceUserName || '******'} />
+          <RaisedButton style={{marginTop: 20}} label='Delete' secondary onClick={onDeleteConfig} />
+          {messages.map((message, i) => (
+            <Flexbox key={i} flexDirection='row' justifyContent='center' className={styles.error}>{message.message}</Flexbox>))}
+        </div>
+      </Spinner>
     </Paper>
   )
 }
 
-export const SourceTile = connect(null, (dispatch, props) => ({
-  onDeleteConfig: () => dispatch(deleteConfig(props))
+export const SourceTile = connect((state, { servicePid }) => ({
+  messages: selectors.getConfigErrors(state, servicePid)
+}), (dispatch, props) => ({
+  onDeleteConfig: () => dispatch(actions.deleteConfig({configurationHandlerId: props.configurationType, ...props, id: 'sources'}))
 }))(SourceTileView)
 
 const LdapTileView = (props) => {
@@ -113,31 +71,41 @@ const LdapTileView = (props) => {
     baseUserDn,
     onDeleteConfig,
     ldapUseCase,
-    attributeMappings
+    attributeMappings,
+    submitting,
+    messages = []
   } = props
 
   return (
-    <Paper className={styles.config}>
-      <div className={styles.tileTitle}>{ldapUseCase === 'authentication' ? 'LDAP Authentication Source' : 'LDAP Attribute Store'}</div>
-      <ConfigField fieldName='Hostname' value={hostName} />
-      <ConfigField fieldName='Port' value={port} />
-      <ConfigField fieldName='Encryption Method' value={encryptionMethod} />
-      <ConfigField fieldName='Bind User' value={bindUser} />
-      <ConfigField fieldName='Bind User Password' value='******' />
-      <ConfigField fieldName='UserName Attribute' value={userNameAttribute} />
-      <ConfigField fieldName='Base Group DN' value={baseGroupDn} />
-      <ConfigField fieldName='Base User DN' value={baseUserDn} />
-      { ldapUseCase !== 'authentication'
-        ? (
-          <MapDisplay label='Attribute Mappings'
-            mapping={attributeMappings} />
-      ) : null }
-      <RaisedButton style={{marginTop: 20}} label='Delete' secondary onClick={onDeleteConfig} />
+    <Paper className={styles.outerSpinner}>
+      <Spinner submitting={submitting}>
+        <div className={styles.innerSpinner}>
+          <div className={styles.tileTitle}>{ldapUseCase === 'authentication' ? 'LDAP Authentication Source' : 'LDAP Attribute Store'}</div>
+          <ConfigField fieldName='Hostname' value={hostName} />
+          <ConfigField fieldName='Port' value={port} />
+          <ConfigField fieldName='Encryption Method' value={encryptionMethod} />
+          <ConfigField fieldName='Bind User' value={bindUser} />
+          <ConfigField fieldName='Bind User Password' value='******' />
+          <ConfigField fieldName='UserName Attribute' value={userNameAttribute} />
+          <ConfigField fieldName='Base Group DN' value={baseGroupDn} />
+          <ConfigField fieldName='Base User DN' value={baseUserDn} />
+          { ldapUseCase !== 'authentication'
+            ? (
+              <MapDisplay label='Attribute Mappings'
+                mapping={attributeMappings} />
+          ) : null }
+          <RaisedButton style={{marginTop: 20}} label='Delete' secondary onClick={onDeleteConfig} />
+          {messages.map((message, i) => (
+            <Flexbox key={i} flexDirection='row' justifyContent='center' className={styles.error}>{message.message}</Flexbox>))}
+        </div>
+      </Spinner>
     </Paper>
   )
 }
-export const LdapTile = connect(null, (dispatch, props) => ({
-  onDeleteConfig: () => dispatch(deleteConfig(props))
+export const LdapTile = connect((state, { servicePid }) => ({
+  messages: selectors.getConfigErrors(state, servicePid)
+}), (dispatch, props) => ({
+  onDeleteConfig: () => dispatch(actions.deleteConfig({configurationHandlerId: props.configurationType, ...props, id: 'sources'}))
 }))(LdapTileView)
 
 const TileLink = ({ to, title, subtitle, children }) => (
@@ -166,26 +134,26 @@ const ConfigField = ({fieldName, value}) => (
   <div className={styles.configField}>{fieldName}: {value}</div>
 )
 
-const SourceConfigTiles = ({ sourceConfigs }) => {
+const SourceConfigTiles = ({ sourceConfigs, submittingPids }) => {
   if (sourceConfigs.length === 0) {
     return <div style={{margin: '20px'}}>No Sources Configured </div>
   }
 
   return (
     <Flexbox flexDirection='row' flexWrap='wrap' style={{width: '100%'}}>
-      {sourceConfigs.map((v, i) => (<SourceTile key={i} {...v} />))}
+      {sourceConfigs.map((v, i) => (<SourceTile key={i} {...v} submitting={submittingPids[v.servicePid]} />))}
     </Flexbox>
   )
 }
 
-const LdapConfigTiles = ({ ldapConfigs }) => {
+const LdapConfigTiles = ({ ldapConfigs, submittingPids }) => {
   if (ldapConfigs.length === 0) {
-    return <div style={{margin: '20px'}}>No LDAP's Configured</div>
+    return <div style={{margin: '20px'}}>No LDAP Servers Configured</div>
   }
 
   return (
     <Flexbox flexDirection='row' flexWrap='wrap' style={{width: '100%'}}>
-      {ldapConfigs.map((v, i) => (<LdapTile key={i} {...v} />))}
+      {ldapConfigs.map((v, i) => (<LdapTile key={i} {...v} submitting={submittingPids[v.servicePid]} />))}
     </Flexbox>
   )
 }
@@ -194,7 +162,7 @@ const Title = ({ children }) => (
   <h1 className={styles.title}>{children}</h1>
 )
 
-const SourcesHomeView = ({ sourceConfigs = [], ldapConfigs = [], onRefresh, offRefresh }) => (
+const SourcesHomeView = ({ sourceConfigs = [], ldapConfigs = [], submittingPids = {}, onRefresh, offRefresh }) => (
   <div style={{width: '100%'}}>
     <Mount on={onRefresh} off={offRefresh} id='home' />
 
@@ -228,17 +196,18 @@ const SourcesHomeView = ({ sourceConfigs = [], ldapConfigs = [], onRefresh, offR
     <Divider />
 
     <Title>Source Configurations</Title>
-    <SourceConfigTiles sourceConfigs={sourceConfigs} />
+    <SourceConfigTiles sourceConfigs={sourceConfigs} submittingPids={submittingPids} />
 
     <Divider />
 
     <Title>LDAP Configurations</Title>
-    <LdapConfigTiles ldapConfigs={ldapConfigs} />
+    <LdapConfigTiles ldapConfigs={ldapConfigs} submittingPids={submittingPids} />
   </div>
 )
 
 export const Home = connect((state) => ({
-  sourceConfigs: getSourceConfigs(state),
-  ldapConfigs: getLdapConfigs(state)
-}), { onRefresh: refresh, offRefresh: stopPolling })(SourcesHomeView)
+  sourceConfigs: selectors.getSourceConfigs(state),
+  ldapConfigs: selectors.getLdapConfigs(state),
+  submittingPids: selectors.getSubmittingPids(state)
+}), { onRefresh: actions.refresh, offRefresh: stopPolling })(SourcesHomeView)
 

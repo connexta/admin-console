@@ -7,7 +7,6 @@ import { editConfig } from 'admin-wizard/actions'
 import Mount from 'react-mount'
 
 import Stage from 'components/Stage'
-import Spinner from 'components/Spinner'
 import Title from 'components/Title'
 import Description from 'components/Description'
 import Action from 'components/Action'
@@ -136,33 +135,31 @@ const LdapAttributeMappingStage = (props) => {
   } = props
 
   return (
-    <Stage>
+    <Stage submitting={submitting}>
       <Mount probeId='subject-attributes' on={probe} />
-      <Spinner submitting={submitting}>
-        <Title>LDAP User Attribute Mapping</Title>
-        <Description>
-          In order to authorize users, their attributes must be mapped to the Security Token
-          Service (STS) claims. Not all attributes must be mapped but any unmapped attributes
-          will not be used for authorization.
-        </Description>
+      <Title>LDAP User Attribute Mapping</Title>
+      <Description>
+        In order to authorize users, their attributes must be mapped to the Security Token
+        Service (STS) claims. Not all attributes must be mapped but any unmapped attributes
+        will not be used for authorization.
+      </Description>
 
-        <AttributeMapper disabled={disabled} configs={configs} />
+      <AttributeMapper disabled={disabled} configs={configs} />
 
-        <ActionGroup>
-          <Action
-            secondary
-            label='back'
-            onClick={prev}
-            disabled={disabled} />
-          <Action
-            primary
-            label='next'
-            onClick={test}
-            disabled={disabled || Object.keys(attributeMappings).length === 0}
-            testId='attribute-mapping'
-            nextStageId='confirm' />
-        </ActionGroup>
-      </Spinner>
+      <ActionGroup>
+        <Action
+          secondary
+          label='back'
+          onClick={prev}
+          disabled={disabled} />
+        <Action
+          primary
+          label='next'
+          onClick={test}
+          disabled={disabled || Object.keys(attributeMappings).length === 0}
+          testId='attribute-mapping'
+          nextStageId='confirm' />
+      </ActionGroup>
     </Stage>
   )
 }

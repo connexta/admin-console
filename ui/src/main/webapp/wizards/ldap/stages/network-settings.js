@@ -8,7 +8,6 @@ import Description from 'components/Description'
 import Action from 'components/Action'
 import ActionGroup from 'components/ActionGroup'
 import Message from 'components/Message'
-import Spinner from 'components/Spinner'
 
 import {
   Hostname,
@@ -27,44 +26,42 @@ const NetworkSettings = (props) => {
   } = props
 
   return (
-    <Stage>
+    <Stage submitting={submitting}>
       <Mount
         on={setDefaults}
         port={636}
         encryptionMethod='LDAPS' />
-      <Spinner submitting={submitting}>
-        <Title>LDAP Network Settings</Title>
-        <Description>
-          To establish a connection to the remote LDAP store, we need the hostname of the
-          LDAP machine, the port number that the LDAP service is running on, and the
-          encryption method. Typically, port 636 uses LDAPS encryption and port 389 uses
-          StartTLS.
-        </Description>
+      <Title>LDAP Network Settings</Title>
+      <Description>
+        To establish a connection to the remote LDAP store, we need the hostname of the
+        LDAP machine, the port number that the LDAP service is running on, and the
+        encryption method. Typically, port 636 uses LDAPS encryption and port 389 uses
+        StartTLS.
+      </Description>
 
-        <Hostname id='hostName' disabled={disabled} />
-        <Port id='port' disabled={disabled} options={[389, 636]} />
-        <Select id='encryptionMethod'
-          label='Encryption Method'
+      <Hostname id='hostName' disabled={disabled} />
+      <Port id='port' disabled={disabled} options={[389, 636]} />
+      <Select id='encryptionMethod'
+        label='Encryption Method'
+        disabled={disabled}
+        options={[ 'None', 'LDAPS', 'StartTLS' ]} />
+
+      <ActionGroup>
+        <Action
+          secondary
+          label='back'
+          onClick={prev}
+          disabled={disabled} />
+        <Action
+          primary
+          label='next'
+          onClick={test}
           disabled={disabled}
-          options={[ 'None', 'LDAPS', 'StartTLS' ]} />
+          nextStageId='bind-settings'
+          testId='connection' />
+      </ActionGroup>
 
-        <ActionGroup>
-          <Action
-            secondary
-            label='back'
-            onClick={prev}
-            disabled={disabled} />
-          <Action
-            primary
-            label='next'
-            onClick={test}
-            disabled={disabled}
-            nextStageId='bind-settings'
-            testId='connection' />
-        </ActionGroup>
-
-        {messages.map((msg, i) => <Message key={i} {...msg} />)}
-      </Spinner>
+      {messages.map((msg, i) => <Message key={i} {...msg} />)}
     </Stage>
   )
 }

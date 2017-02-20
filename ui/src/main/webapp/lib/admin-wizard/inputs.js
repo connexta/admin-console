@@ -27,7 +27,7 @@ const messageStyles = {
   WARNING: { color: orange500 }
 }
 
-const InputView = ({ value = '', label, onEdit, message = {}, tooltip, ...rest }) => {
+const InputView = ({ value = '', label, onEdit, message = {}, tooltip, visible = true, ...rest }) => {
   for (let key in rest) {
     if (rest[key] === undefined) {
       delete rest[key]
@@ -35,28 +35,31 @@ const InputView = ({ value = '', label, onEdit, message = {}, tooltip, ...rest }
   }
   const { type, message: text } = message
 
-  return (
-    <Flexbox flexDirection='row' style={{ position: 'relative' }}>
-      <TextField
-        fullWidth
-        errorText={text}
-        errorStyle={messageStyles[type]}
-        value={value}
-        floatingLabelText={label}
-        onChange={(e) => onEdit(e.target.value)}
-        {...rest} />
-      {(tooltip)
-        ? (<IconButton style={{ position: 'absolute', right: '10px', bottom: '0px' }}
-          iconStyle={{ width: '20px', height: '20px' }}
-          tooltip={tooltip}
-          touch
-          tooltipPosition='top-left'>
-          <InfoIcon />
-        </IconButton>)
-        : null
-      }
-    </Flexbox>
-  )
+  if (visible) {
+    return (
+      <Flexbox flexDirection='row' style={{position: 'relative'}}>
+        <TextField
+          fullWidth
+          errorText={text}
+          errorStyle={messageStyles[type]}
+          value={value}
+          floatingLabelText={label}
+          onChange={(e) => onEdit(e.target.value)}
+          {...rest} />
+        {(tooltip)
+          ? (<IconButton style={{position: 'absolute', right: '10px', bottom: '0px'}}
+            iconStyle={{width: '20px', height: '20px'}}
+            tooltip={tooltip}
+            touch
+            tooltipPosition='top-left'>
+            <InfoIcon />
+          </IconButton>)
+          : null
+        }
+      </Flexbox>
+    )
+  }
+  return null
 }
 
 const Input = connect(mapStateToProps, mapDispatchToProps)(InputView)
@@ -69,7 +72,7 @@ const Hostname = ({ label = 'Hostname', ...rest }) => (
   <Input label={label} {...rest} />
 )
 
-const InputAutoView = ({ value = '', options = [], type = 'text', message = {}, onEdit, label, tooltip, ...rest }) => {
+const InputAutoView = ({ value = '', options = [], type = 'text', message = {}, onEdit, label, tooltip, visible = true, ...rest }) => {
   const { type: messageType, message: text } = message
   for (let key in rest) {
     if (rest[key] === undefined) {
@@ -77,34 +80,41 @@ const InputAutoView = ({ value = '', options = [], type = 'text', message = {}, 
     }
   }
 
-  return (
-    <Flexbox flexDirection='row' style={{ position: 'relative' }}>
-      <AutoComplete
-        menuStyle={{ maxHeight: 200, overflowY: 'scroll' }}
-        fullWidth
-        openOnFocus
-        dataSource={options.map((value) => ({ text: String(value), value }))}
-        filter={AutoComplete.noFilter}
-        type={type}
-        errorText={text}
-        errorStyle={messageStyles[messageType]}
-        floatingLabelText={label}
-        searchText={String(value)}
-        onNewRequest={({ value }) => { onEdit(value) }}
-        onUpdateInput={(value) => { onEdit(type === 'number' ? Number(value) : value) }}
-        {...rest} />
-      {(tooltip)
-        ? (<IconButton style={{ position: 'absolute', right: '10px', bottom: '0px' }}
-          iconStyle={{ width: '20px', height: '20px' }}
-          tooltip={tooltip}
-          touch
-          tooltipPosition='top-left'>
-          <InfoIcon />
-        </IconButton>)
-        : null
-      }
-    </Flexbox>
-  )
+  if (visible) {
+    return (
+      <Flexbox flexDirection='row' style={{position: 'relative'}}>
+        <AutoComplete
+          menuStyle={{maxHeight: 200, overflowY: 'scroll'}}
+          fullWidth
+          openOnFocus
+          dataSource={options.map((value) => ({text: String(value), value}))}
+          filter={AutoComplete.noFilter}
+          type={type}
+          errorText={text}
+          errorStyle={messageStyles[messageType]}
+          floatingLabelText={label}
+          searchText={String(value)}
+          onNewRequest={({value}) => {
+            onEdit(value)
+          }}
+          onUpdateInput={(value) => {
+            onEdit(type === 'number' ? Number(value) : value)
+          }}
+          {...rest} />
+        {(tooltip)
+          ? (<IconButton style={{position: 'absolute', right: '10px', bottom: '0px'}}
+            iconStyle={{width: '20px', height: '20px'}}
+            tooltip={tooltip}
+            touch
+            tooltipPosition='top-left'>
+            <InfoIcon />
+          </IconButton>)
+          : null
+        }
+      </Flexbox>
+    )
+  }
+  return null
 }
 
 const InputAuto = connect(mapStateToProps, mapDispatchToProps)(InputAutoView)
@@ -113,7 +123,7 @@ const Port = ({ value = 0, label = 'Port', ...rest }) => (
   <InputAuto type='number' value={value} label={label} {...rest} />
 )
 
-const SelectView = ({ value = '', options = [], label = 'Select', onEdit, error, tooltip, ...rest }) => {
+const SelectView = ({ value = '', options = [], label = 'Select', onEdit, error, tooltip, visible = true, ...rest }) => {
   const i = options.findIndex((option) => (typeof option === 'object') ? option.name === value.name : option === value)
   for (let key in rest) {
     if (rest[key] === undefined) {
@@ -121,53 +131,60 @@ const SelectView = ({ value = '', options = [], label = 'Select', onEdit, error,
     }
   }
 
-  return (
-    <Flexbox flexDirection='row' style={{ position: 'relative' }}>
-      <SelectField
-        fullWidth
-        errorText={error}
-        value={i}
-        onChange={(e, i) => onEdit(options[i])}
-        floatingLabelText={label}
-        {...rest}>
-        {options.map((d, i) => {
-          if (typeof d === 'string') {
-            return <MenuItem key={i} value={i} primaryText={d} />
-          } else if (typeof d === 'object') {
-            return <MenuItem key={i} value={i} primaryText={d.name} />
-          } else {
-            return null
-          }
-        })}
-      </SelectField>
-      {(tooltip)
-        ? (<IconButton style={{ position: 'absolute', right: '10px', bottom: '0px' }}
-          iconStyle={{ width: '20px', height: '20px' }}
-          tooltip={tooltip}
-          touch
-          tooltipPosition='top-left'>
-          <InfoIcon />
-        </IconButton>)
-        : null
-      }
-    </Flexbox>
-  )
+  if (visible) {
+    return (
+      <Flexbox flexDirection='row' style={{position: 'relative'}}>
+        <SelectField
+          fullWidth
+          errorText={error}
+          value={i}
+          onChange={(e, i) => onEdit(options[i])}
+          floatingLabelText={label}
+          {...rest}>
+          {options.map((d, i) => {
+            if (typeof d === 'string') {
+              return <MenuItem key={i} value={i} primaryText={d} />
+            } else if (typeof d === 'object') {
+              return <MenuItem key={i} value={i} primaryText={d.name} />
+            } else {
+              return null
+            }
+          })}
+        </SelectField>
+        {(tooltip)
+          ? (<IconButton style={{position: 'absolute', right: '10px', bottom: '0px'}}
+            iconStyle={{width: '20px', height: '20px'}}
+            tooltip={tooltip}
+            touch
+            tooltipPosition='top-left'>
+            <InfoIcon />
+          </IconButton>)
+          : null
+        }
+      </Flexbox>
+    )
+  }
+  return null
 }
 
 const Select = connect(mapStateToProps, mapDispatchToProps)(SelectView)
 
-const RadioSelectionView = ({ value, disabled, options = [], onEdit, ...rest }) => {
+const RadioSelectionView = ({ value, disabled, options = [], onEdit, visible = true, ...rest }) => {
   for (let key in rest) {
     if (rest[key] === undefined) {
       delete rest[key]
     }
   }
-  return (
-    <RadioButtonGroup valueSelected={value} onChange={(e, value) => onEdit(value)} {...rest}>
-      {options.map((item, i) =>
-        <RadioButton style={{ fontSize: '16px', padding: '3px' }} key={i} value={item.value} label={item.label} disabled={disabled} />)}
-    </RadioButtonGroup>
-  )
+  if (visible) {
+    return (
+      <RadioButtonGroup valueSelected={value} onChange={(e, value) => onEdit(value)} {...rest}>
+        {options.map((item, i) =>
+          <RadioButton style={{fontSize: '16px', padding: '3px'}} key={i} value={item.value}
+            label={item.label} disabled={disabled} />)}
+      </RadioButtonGroup>
+    )
+  }
+  return null
 }
 
 const RadioSelection = connect(mapStateToProps, mapDispatchToProps)(RadioSelectionView)

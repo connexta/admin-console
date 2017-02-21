@@ -1,9 +1,8 @@
-package org.codice.ddf.admin.api
+package org.codice.ddf.admin.api.configurator.operations
 
 import org.apache.karaf.features.Feature
 import org.apache.karaf.features.FeatureState
 import org.apache.karaf.features.FeaturesService
-import org.codice.ddf.admin.api.configurator.operations.FeatureOperation
 import org.osgi.framework.BundleContext
 import org.osgi.framework.ServiceReference
 import spock.lang.Specification

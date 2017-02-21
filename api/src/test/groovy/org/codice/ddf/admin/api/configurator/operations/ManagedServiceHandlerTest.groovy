@@ -1,7 +1,6 @@
-package org.codice.ddf.admin.api
+package org.codice.ddf.admin.api.configurator.operations
 
 import org.codice.ddf.admin.api.configurator.ConfiguratorException
-import org.codice.ddf.admin.api.configurator.operations.ManagedServiceOperation
 import org.codice.ddf.ui.admin.api.ConfigurationAdmin
 import org.codice.ddf.ui.admin.api.ConfigurationAdminMBean
 import spock.lang.Specification

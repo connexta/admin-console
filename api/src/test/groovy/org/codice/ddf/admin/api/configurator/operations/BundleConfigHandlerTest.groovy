@@ -1,9 +1,8 @@
-package org.codice.ddf.admin.api
+package org.codice.ddf.admin.api.configurator.operations
 
 import org.apache.karaf.bundle.core.BundleState
 import org.apache.karaf.bundle.core.BundleStateService
 import org.codice.ddf.admin.api.configurator.ConfiguratorException
-import org.codice.ddf.admin.api.configurator.operations.BundleOperation
 import org.osgi.framework.Bundle
 import org.osgi.framework.BundleContext
 import org.osgi.framework.ServiceReference

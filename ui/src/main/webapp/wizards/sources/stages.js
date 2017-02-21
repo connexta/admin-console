@@ -74,7 +74,8 @@ const DiscoveryStageView = ({ messages, testSources, setDefaults, configs }) => 
       </Description>
       <ConstrainedHostnameInput
         id='sourceHostName'
-        label='Hostname' />
+        label='Hostname'
+        autoFocus />
       <ConstrainedPortInput
         id='sourcePort'
         label='Port'
@@ -162,7 +163,7 @@ const ConfirmationStageView = ({ messages, selectedSource, persistConfig, source
     <Description>
         Please give your source a unique name, confirm details, and press finish to create source.
       </Description>
-    <ConstrainedInput id='sourceName' label='Source Name' />
+    <ConstrainedInput id='sourceName' label='Source Name' autoFocus />
     <ConstrainedInfo label='Source Address' value={selectedSource.endpointUrl} />
     <ConstrainedInfo label='Username' value={selectedSource.sourceUserName || 'none'} />
     <ConstrainedInfo label='Password' value={selectedSource.sourceUserPassword ? '*****' : 'none'} />

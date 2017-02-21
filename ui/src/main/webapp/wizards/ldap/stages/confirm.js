@@ -50,11 +50,9 @@ export default ({ disabled, prev, persist, submitting, messages = [], configs })
             value={configs.memberAttributeReferencedInGroup} />
         </Flexbox>
       </Flexbox>
-      { configs.ldapUseCase !== 'authentication'
-        ? (
-          <MapDisplay label='Attribute Mappings'
-            mapping={configs.attributeMappings} />
-        ) : null }
+      <MapDisplay visible={configs.ldapUseCase !== 'authentication'}
+        label='Attribute Mappings'
+        mapping={configs.attributeMappings} />
     </Flexbox>
 
     <ActionGroup>

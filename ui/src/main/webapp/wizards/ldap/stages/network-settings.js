@@ -39,7 +39,7 @@ const NetworkSettings = (props) => {
         StartTLS.
       </Description>
 
-      <Hostname id='hostName' disabled={disabled} />
+      <Hostname id='hostName' disabled={disabled} autoFocus />
       <Port id='port' disabled={disabled} options={[389, 636]} />
       <Select id='encryptionMethod'
         label='Encryption Method'

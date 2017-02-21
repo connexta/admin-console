@@ -73,11 +73,7 @@ import {
 
 let Edit = ({editing, binNumber, editModeOn}) => {
   return !editing ? (
-    <div style={{ width: '100%' }}>
-      <Flexbox className={editPaneStyle} justifyContent='flex-end' alignItems='flex-start'>
-        <FloatingActionButton onClick={editModeOn}><EditModeIcon /></FloatingActionButton>
-      </Flexbox>
-    </div>
+    <FloatingActionButton className={editPaneStyle} onClick={editModeOn}><EditModeIcon /></FloatingActionButton>
   ) : null
 }
 
@@ -129,7 +125,7 @@ let NewSelectItem = ({ binNumber, addPath, onEdit, newPath, attribute, options, 
       <SelectField hintStyle={{ padding: '0px 10px' }} inputStyle={{ padding: '0px 10px' }} style={{ width: '100%' }} id='name' hintText='Add New Path' onChange={(event, i, value) => onEdit(value)} value={newPath || ''} errorText={error}>
         { options.map((item, key) => (<MenuItem value={item} key={key} primaryText={item} />)) }
       </SelectField>
-      {(addButtonVisible) ? (<IconButton style={{ position: 'absolute', right: '0px' }} tooltip={'Add Item'} tooltipPosition='top-center' onClick={addPath}><AddIcon color={cyanA700} /></IconButton>) : null }
+      {(addButtonVisible) ? (<IconButton style={{ position: 'absolute', right: '0px' }} tooltip={'Add'} tooltipPosition='top-center' onClick={addPath}><AddIcon color={cyanA700} /></IconButton>) : null }
       {(newPath && newPath.trim() !== '')
         ? <IconButton style={{ position: 'absolute', left: '-15px', width: '10px', height: '10px' }} iconStyle={{ width: '10px', height: '10px' }} onClick={() => onEdit('')}><ClearIcon /></IconButton>
         : null
@@ -224,7 +220,7 @@ let AttributeTableGroup = ({ bin, binNumber, policyOptions, editAttribute, remov
           <TableRowColumn style={{ width: 120, position: 'relative' }}>
             <span>{bin.requiredAttributes[key]}</span>
             {editing ? (
-              <IconButton style={{ position: 'absolute', right: 0, top: 0 }} tooltip={'Add This Path'} tooltipPosition='top-center' onClick={() => removeAttributeMapping(key)}><CancelIcon /></IconButton>
+              <IconButton style={{ position: 'absolute', right: 0, top: 0 }} tooltip={'Remove'} tooltipPosition='top-center' onClick={() => removeAttributeMapping(key)}><CancelIcon /></IconButton>
             ) : null }
           </TableRowColumn>
         </TableRow>)}
@@ -241,7 +237,7 @@ let AttributeTableGroup = ({ bin, binNumber, policyOptions, editAttribute, remov
           </TableRowColumn>
           <TableRowColumn style={{ width: 120, position: 'relative' }}>
             <TextField fullWidth style={{ margin: '0px', fontSize: '14px' }} id='claims' value={bin.newrequiredAttribute || ''} onChange={(event, value) => editAttribute('requiredAttribute', value)} hintText='Claim' errorText={attrError} />
-            <IconButton style={{ position: 'absolute', right: 0, top: 0 }} tooltip={'Add Item'} tooltipPosition='top-center' onClick={addAttributeMapping}><AddIcon color={cyanA700} /></IconButton>
+            <IconButton style={{ position: 'absolute', right: 0, top: 0 }} tooltip={'Add'} tooltipPosition='top-center' onClick={addAttributeMapping}><AddIcon color={cyanA700} /></IconButton>
             {(bin.newrequiredAttribute && bin.newrequiredAttribute.trim() !== '')
               ? <IconButton style={{ position: 'absolute', left: '-5px', width: '10px', height: '10px' }} iconStyle={{ width: '10px', height: '10px' }} onClick={() => editAttribute('requiredAttribute', '')}><ClearIcon /></IconButton>
               : null

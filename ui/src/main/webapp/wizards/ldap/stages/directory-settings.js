@@ -96,6 +96,8 @@ const DirectorySettings = (props) => {
     test
   } = props
 
+  const isAttrStore = ldapUseCase === 'authenticationAndAttributeStore' || ldapUseCase === 'attributeStore'
+
   return (
     <Stage submitting={submitting}>
       <Mount on={probe} probeId='dir-struct' />
@@ -111,21 +113,17 @@ const DirectorySettings = (props) => {
         tooltip='Distinguished name of the LDAP directory in which users can be found.' />
       <InputAuto id='userNameAttribute' disabled={disabled} label='User Name Attribute'
         tooltip='Attribute used to designate the user’s name in LDAP. Typically uid or cn.' />
+      <InputAuto visible={isAttrStore} id='memberAttributeReferencedInGroup' disabled={disabled}
+        label='Member Attribute Referenced in Groups'
+        tooltip='The attribute of the user entry that, when combined with the Base User DN,
+                 forms the reference value, e.g. XXX=jsmith,ou=users,dc=example,dc=com' />
       <InputAuto id='baseGroupDn' disabled={disabled} label='Base Group DN'
         tooltip='Distinguished name of the LDAP directory in which groups can be found.' />
-      {ldapUseCase === 'authenticationAndAttributeStore' || ldapUseCase === 'attributeStore'
-        ? <div>
-          <InputAuto id='groupObjectClass' disabled={disabled} label='LDAP Group ObjectClass'
-            tooltip='ObjectClass that defines the structure for group membership in LDAP. Typically groupOfNames.' />
-          <InputAuto id='groupAttributeHoldingMember' disabled={disabled}
-            label='Group Attribute Holding Member References'
-            tooltip='Multivalued-attribute on the group entry that holds references to users.' />
-          <InputAuto id='memberAttributeReferencedInGroup' disabled={disabled}
-            label='Member Attribute Referenced in Groups'
-            tooltip='The attribute of the user entry that, when combined with the Base User DN,
-            forms the reference value, e.g. XXX=jsmith,ou=users,dc=example,dc=com' />
-        </div>
-        : null}
+      <InputAuto visible={isAttrStore} id='groupObjectClass' disabled={disabled} label='LDAP Group ObjectClass'
+        tooltip='ObjectClass that defines the structure for group membership in LDAP. Typically groupOfNames.' />
+      <InputAuto visible={isAttrStore} id='groupAttributeHoldingMember' disabled={disabled}
+        label='Group Attribute Holding Member References'
+        tooltip='Multivalued-attribute on the group entry that holds references to users.' />
 
       <LdapQueryTool disabled={disabled} />
 

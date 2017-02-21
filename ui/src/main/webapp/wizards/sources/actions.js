@@ -149,9 +149,9 @@ export const testManualUrl = (endpointUrl, configType, nextStageId, id = 'genera
   dispatch(startSubmitting())
   try {
     const configuration = {
+      ...getAllConfig(getState()),
       configurationType: configType,
-      endpointUrl: endpointUrl,
-      ...getAllConfig(getState())
+      endpointUrl: endpointUrl.trim()
     }
     for (let key in configuration) {
       if (!configuration[key]) {

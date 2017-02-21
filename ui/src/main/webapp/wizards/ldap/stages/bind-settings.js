@@ -69,11 +69,8 @@ const BindSettings = (props) => {
       {/* <Input id='bindKdcAddress' disabled={disabled} label='KDC Address (for Kerberos authentication)' /> */}
       {/* TODO GSSAPI and Digest MD5 SASL only */}
       {/* Realm is needed for Kerberos and MD5 auth, currently only MD5 is supported by the wizard */}
-      {
-        (bindUserMethod === 'Digest MD5 SASL')
-          ? (<Input id='bindRealm' disabled={disabled} label='Realm (for Digest MD5 authentication)' />)
-          : null
-      }
+      <Input visible={bindUserMethod === 'Digest MD5 SASL'} id='bindRealm'
+        disabled={disabled} label='Realm (for Digest MD5 authentication)' />
 
       <ActionGroup>
         <Action

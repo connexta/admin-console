@@ -33,10 +33,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.codice.ddf.admin.api.config.ldap.LdapConfiguration;
-import org.codice.ddf.admin.api.configurator.Configurator;
 import org.codice.ddf.admin.api.handler.ConfigurationMessage;
 import org.codice.ddf.admin.api.handler.method.ProbeMethod;
 import org.codice.ddf.admin.api.handler.report.ProbeReport;
+import org.codice.ddf.admin.configurator.Configurator;
 import org.codice.ddf.admin.security.ldap.ServerGuesser;
 import org.codice.ddf.admin.security.ldap.test.LdapTestingCommons;
 import org.forgerock.opendj.ldap.LdapException;

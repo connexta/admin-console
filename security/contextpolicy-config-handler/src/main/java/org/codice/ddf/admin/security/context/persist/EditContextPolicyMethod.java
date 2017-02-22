@@ -26,10 +26,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.codice.ddf.admin.api.config.context.ContextPolicyConfiguration;
-import org.codice.ddf.admin.api.configurator.Configurator;
-import org.codice.ddf.admin.api.configurator.OperationReport;
 import org.codice.ddf.admin.api.handler.method.PersistMethod;
 import org.codice.ddf.admin.api.handler.report.Report;
+import org.codice.ddf.admin.configurator.Configurator;
+import org.codice.ddf.admin.configurator.ConfiguratorFactory;
+import org.codice.ddf.admin.configurator.OperationReport;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -49,7 +50,9 @@ public class EditContextPolicyMethod extends PersistMethod<ContextPolicyConfigur
     public static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(FAILED_PERSIST,
             "Unable to persist changes");
 
-    public EditContextPolicyMethod() {
+    private final ConfiguratorFactory configuratorFactory;
+
+    public EditContextPolicyMethod(ConfiguratorFactory configuratorFactory) {
         super(PERSIST_CONTEXT_POLICY_ID,
                 DESCRIPTION,
                 REQUIRED_FIELDS,
@@ -57,11 +60,12 @@ public class EditContextPolicyMethod extends PersistMethod<ContextPolicyConfigur
                 SUCCESS_TYPES,
                 FAILURE_TYPES,
                 null);
+        this.configuratorFactory = configuratorFactory;
     }
 
     @Override
     public Report persist(ContextPolicyConfiguration config) {
-        Configurator configurator = new Configurator();
+        Configurator configurator = configuratorFactory.getConfigurator();
         configurator.updateConfigFile(POLICY_MANAGER_PID,
                 configToPolicyManagerProps(config),
                 false);

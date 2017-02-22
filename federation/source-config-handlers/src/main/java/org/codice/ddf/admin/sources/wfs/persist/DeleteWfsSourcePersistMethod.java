@@ -24,10 +24,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.codice.ddf.admin.api.config.sources.WfsSourceConfiguration;
-import org.codice.ddf.admin.api.configurator.Configurator;
-import org.codice.ddf.admin.api.configurator.OperationReport;
 import org.codice.ddf.admin.api.handler.method.PersistMethod;
 import org.codice.ddf.admin.api.handler.report.Report;
+import org.codice.ddf.admin.configurator.Configurator;
+import org.codice.ddf.admin.configurator.ConfiguratorFactory;
+import org.codice.ddf.admin.configurator.OperationReport;
 
 import com.google.common.collect.ImmutableList;
 
@@ -40,10 +41,15 @@ public class DeleteWfsSourcePersistMethod extends PersistMethod<WfsSourceConfigu
 
     private static final List<String> REQUIRED_FIELDS = ImmutableList.of(SERVICE_PID);
 
-    private static final Map<String, String> SUCCESS_TYPES = getCommonSourceSubtypeDescriptions(SUCCESSFUL_DELETE);
-    private static final Map<String, String> FAILURE_TYPES = getCommonSourceSubtypeDescriptions(FAILED_DELETE);
+    private static final Map<String, String> SUCCESS_TYPES = getCommonSourceSubtypeDescriptions(
+            SUCCESSFUL_DELETE);
 
-    public DeleteWfsSourcePersistMethod() {
+    private static final Map<String, String> FAILURE_TYPES = getCommonSourceSubtypeDescriptions(
+            FAILED_DELETE);
+
+    private final ConfiguratorFactory configuratorFactory;
+
+    public DeleteWfsSourcePersistMethod(ConfiguratorFactory configuratorFactory) {
         super(DELETE_WFS_SOURCE_ID,
                 DESCRIPTION,
                 REQUIRED_FIELDS,
@@ -51,11 +57,12 @@ public class DeleteWfsSourcePersistMethod extends PersistMethod<WfsSourceConfigu
                 SUCCESS_TYPES,
                 FAILURE_TYPES,
                 null);
+        this.configuratorFactory = configuratorFactory;
     }
 
     @Override
     public Report persist(WfsSourceConfiguration configuration) {
-        Configurator configurator = new Configurator();
+        Configurator configurator = configuratorFactory.getConfigurator();
         configurator.deleteManagedService(configuration.servicePid());
         OperationReport report = configurator.commit("WFS source deleted for servicePid: {}",
                 configuration.servicePid());

@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 import org.codice.ddf.admin.api.config.ConfigurationType;
 import org.codice.ddf.admin.api.config.sources.SourceConfiguration;
 import org.codice.ddf.admin.api.config.sources.WfsSourceConfiguration;
-import org.codice.ddf.admin.api.configurator.Configurator;
 import org.codice.ddf.admin.api.handler.ConfigurationHandler;
 import org.codice.ddf.admin.api.handler.DefaultConfigurationHandler;
 import org.codice.ddf.admin.api.handler.SourceConfigurationHandler;
@@ -34,6 +33,8 @@ import org.codice.ddf.admin.api.handler.method.TestMethod;
 import org.codice.ddf.admin.api.handler.report.ProbeReport;
 import org.codice.ddf.admin.api.handler.report.Report;
 import org.codice.ddf.admin.api.services.WfsServiceProperties;
+import org.codice.ddf.admin.configurator.Configurator;
+import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.sources.wfs.persist.CreateWfsSourcePersistMethod;
 import org.codice.ddf.admin.sources.wfs.persist.DeleteWfsSourcePersistMethod;
 import org.codice.ddf.admin.sources.wfs.probe.DiscoverWfsSourceProbeMethod;
@@ -47,8 +48,12 @@ public class WfsSourceConfigurationHandler extends DefaultConfigurationHandler<S
 
     private final ConfigurationHandler handler;
 
-    public WfsSourceConfigurationHandler(ConfigurationHandler handler) {
+    private final ConfiguratorFactory configuratorFactory;
+
+    public WfsSourceConfigurationHandler(ConfigurationHandler handler,
+            ConfiguratorFactory configuratorFactory) {
         this.handler = handler;
+        this.configuratorFactory = configuratorFactory;
     }
 
     @Override
@@ -58,13 +63,13 @@ public class WfsSourceConfigurationHandler extends DefaultConfigurationHandler<S
 
     @Override
     public List<TestMethod> getTestMethods() {
-        return Collections.singletonList(new SourceNameExistsWfsTestMethod(new Configurator()));
+        return Collections.singletonList(new SourceNameExistsWfsTestMethod(configuratorFactory));
     }
 
     @Override
     public List<PersistMethod> getPersistMethods() {
-        return Arrays.asList(new CreateWfsSourcePersistMethod(handler),
-                new DeleteWfsSourcePersistMethod());
+        return Arrays.asList(new CreateWfsSourcePersistMethod(handler, configuratorFactory),
+                new DeleteWfsSourcePersistMethod(configuratorFactory));
     }
 
     @Override
@@ -84,7 +89,7 @@ public class WfsSourceConfigurationHandler extends DefaultConfigurationHandler<S
 
     @Override
     public List<SourceConfiguration> getConfigurations() {
-        Configurator configurator = new Configurator();
+        Configurator configurator = configuratorFactory.getConfigurator();
         return WFS_FACTORY_PIDS.stream()
                 .flatMap(factoryPid -> configurator.getManagedServiceConfigs(factoryPid)
                         .values()

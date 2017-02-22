@@ -23,22 +23,32 @@ import java.util.List;
 import java.util.Map;
 
 import org.codice.ddf.admin.api.config.sources.CswSourceConfiguration;
-import org.codice.ddf.admin.api.configurator.Configurator;
-import org.codice.ddf.admin.api.configurator.OperationReport;
 import org.codice.ddf.admin.api.handler.method.PersistMethod;
 import org.codice.ddf.admin.api.handler.report.Report;
+import org.codice.ddf.admin.configurator.Configurator;
+import org.codice.ddf.admin.configurator.ConfiguratorFactory;
+import org.codice.ddf.admin.configurator.OperationReport;
 
 import com.google.common.collect.ImmutableList;
 
 public class DeleteCswSourcePersistMethod extends PersistMethod<CswSourceConfiguration> {
 
     public static final String DELETE_CSW_SOURCE_ID = DELETE;
-    public static final String DESCRIPTION = "Attempts to delete a CSW source with the given configuration.";
-    private static final List<String> REQUIRED_FIELDS = ImmutableList.of(SERVICE_PID);
-    private static final Map<String, String> SUCCESS_TYPES = getCommonSourceSubtypeDescriptions(SUCCESSFUL_DELETE);
-    private static final Map<String, String> FAILURE_TYPES = getCommonSourceSubtypeDescriptions(FAILED_DELETE);
 
-    public DeleteCswSourcePersistMethod() {
+    public static final String DESCRIPTION =
+            "Attempts to delete a CSW source with the given configuration.";
+
+    private static final List<String> REQUIRED_FIELDS = ImmutableList.of(SERVICE_PID);
+
+    private static final Map<String, String> SUCCESS_TYPES = getCommonSourceSubtypeDescriptions(
+            SUCCESSFUL_DELETE);
+
+    private static final Map<String, String> FAILURE_TYPES = getCommonSourceSubtypeDescriptions(
+            FAILED_DELETE);
+
+    private final ConfiguratorFactory configuratorFactory;
+
+    public DeleteCswSourcePersistMethod(ConfiguratorFactory configuratorFactory) {
         super(DELETE_CSW_SOURCE_ID,
                 DESCRIPTION,
                 REQUIRED_FIELDS,
@@ -46,11 +56,12 @@ public class DeleteCswSourcePersistMethod extends PersistMethod<CswSourceConfigu
                 SUCCESS_TYPES,
                 FAILURE_TYPES,
                 null);
+        this.configuratorFactory = configuratorFactory;
     }
 
     @Override
     public Report persist(CswSourceConfiguration configuration) {
-        Configurator configurator = new Configurator();
+        Configurator configurator = configuratorFactory.getConfigurator();
         configurator.deleteManagedService(configuration.servicePid());
         OperationReport report = configurator.commit("CSW source deleted for servicePid: {}",
                 configuration.servicePid());

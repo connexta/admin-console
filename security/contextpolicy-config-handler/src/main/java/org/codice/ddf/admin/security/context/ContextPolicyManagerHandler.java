@@ -16,7 +16,7 @@ package org.codice.ddf.admin.security.context;
 
 import static org.codice.ddf.admin.api.services.PolicyManagerServiceProperties.contextPolicyServiceToContextPolicyConfig;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.codice.ddf.admin.api.config.ConfigurationType;
@@ -26,16 +26,25 @@ import org.codice.ddf.admin.api.handler.DefaultConfigurationHandler;
 import org.codice.ddf.admin.api.handler.method.PersistMethod;
 import org.codice.ddf.admin.api.handler.method.ProbeMethod;
 import org.codice.ddf.admin.api.handler.method.TestMethod;
+import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.security.context.persist.EditContextPolicyMethod;
 import org.codice.ddf.admin.security.context.probe.AvailableOptionsProbeMethod;
 
 public class ContextPolicyManagerHandler
         extends DefaultConfigurationHandler<ContextPolicyConfiguration> {
 
-    private ConfigurationHandler ldapConfigHandler;
+    private final ConfigurationHandler ldapConfigHandler;
+
+    private final ConfiguratorFactory configuratorFactory;
 
     public static final String CONTEXT_POLICY_MANAGER_HANDLER_ID =
             ContextPolicyConfiguration.CONFIGURATION_TYPE;
+
+    public ContextPolicyManagerHandler(ConfigurationHandler ldapConfigHandler,
+            ConfiguratorFactory configuratorFactory) {
+        this.ldapConfigHandler = ldapConfigHandler;
+        this.configuratorFactory = configuratorFactory;
+    }
 
     @Override
     public String getConfigurationHandlerId() {
@@ -44,7 +53,8 @@ public class ContextPolicyManagerHandler
 
     @Override
     public List<ProbeMethod> getProbeMethods() {
-        return Arrays.asList(new AvailableOptionsProbeMethod(ldapConfigHandler));
+        return Collections.singletonList(new AvailableOptionsProbeMethod(ldapConfigHandler,
+                configuratorFactory));
     }
 
     @Override
@@ -54,20 +64,17 @@ public class ContextPolicyManagerHandler
 
     @Override
     public List<PersistMethod> getPersistMethods() {
-        return Arrays.asList(new EditContextPolicyMethod());
+        return Collections.singletonList(new EditContextPolicyMethod(configuratorFactory));
     }
 
     @Override
     public List<ContextPolicyConfiguration> getConfigurations() {
-        return Arrays.asList(contextPolicyServiceToContextPolicyConfig());
+        return Collections.singletonList(contextPolicyServiceToContextPolicyConfig(
+                configuratorFactory.getConfigurator()));
     }
 
     @Override
     public ConfigurationType getConfigurationType() {
         return new ContextPolicyConfiguration().getConfigurationType();
-    }
-
-    public void setLdapConfigHandler(ConfigurationHandler ldapConfigHandler) {
-        this.ldapConfigHandler = ldapConfigHandler;
     }
 }

@@ -25,7 +25,16 @@
         <feature>admin-beta-embedded-ldap</feature>
     </feature>
 
-    <feature name="admin-beta-core" install="auto" version="${project.version}" description="DDF Admin Core (Beta)">
+    <feature name="admin-beta-temp-configurator" install="auto" version="${project.version}"
+             description="Temporary version of the Configurator (Beta)">
+        <!-- TODO switch to DDF dependencies after available in a release -->
+        <bundle>mvn:org.codice.ddf.admin.beta/configurator-api/${project.version}</bundle>
+        <bundle>mvn:org.codice.ddf.admin.beta/configurator-impl/${project.version}</bundle>
+    </feature>
+
+    <feature name="admin-beta-core" install="auto" version="${project.version}"
+             description="DDF Admin Core (Beta)">
+        <feature prerequisite="true">admin-beta-temp-configurator</feature>
         <bundle>mvn:com.google.code.gson/gson/${gson.version}</bundle>
         <bundle>mvn:org.codice.ddf.admin.beta/admin-api/${project.version}</bundle>
         <bundle>mvn:org.codice.ddf.admin.beta/config-handler-router/${project.version}</bundle>
@@ -43,7 +52,8 @@
              description="DDF Admin Security (Beta)">
         <feature prerequisite="true">admin-beta-core</feature>
         <feature>admin-beta-ldap-handler</feature>
-        <bundle>mvn:org.codice.ddf.admin.beta/contextpolicy-config-handler/${project.version}</bundle>
+        <bundle>mvn:org.codice.ddf.admin.beta/contextpolicy-config-handler/${project.version}
+        </bundle>
     </feature>
 
     <feature name="admin-beta-ldap-handler" install="auto" version="${project.version}"
@@ -55,10 +65,12 @@
     <feature name="admin-beta-embedded-ldap" install="auto" version="${project.version}"
              description="DDF Admin Security (Beta) :: Embedded LDAP Handler ">
         <feature prerequisite="true">admin-beta-core</feature>
-        <bundle>mvn:org.codice.ddf.admin.beta/embedded-ldap-config-handler/${project.version}</bundle>
+        <bundle>mvn:org.codice.ddf.admin.beta/embedded-ldap-config-handler/${project.version}
+        </bundle>
     </feature>
-    
-    <feature name="admin-beta-ui" install="auto" version="${project.version}" description="DDF Admin UI (Beta)">
+
+    <feature name="admin-beta-ui" install="auto" version="${project.version}"
+             description="DDF Admin UI (Beta)">
         <feature prerequisite="true">admin-beta-core</feature>
         <bundle>mvn:org.codice.ddf.admin.beta/admin-ui/${project.version}</bundle>
     </feature>

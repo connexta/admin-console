@@ -32,20 +32,24 @@ import java.util.List;
 import java.util.Map;
 
 import org.codice.ddf.admin.api.config.sources.CswSourceConfiguration;
-import org.codice.ddf.admin.api.configurator.Configurator;
-import org.codice.ddf.admin.api.configurator.OperationReport;
 import org.codice.ddf.admin.api.handler.ConfigurationHandler;
 import org.codice.ddf.admin.api.handler.ConfigurationMessage;
 import org.codice.ddf.admin.api.handler.method.PersistMethod;
 import org.codice.ddf.admin.api.handler.report.Report;
 import org.codice.ddf.admin.api.validation.SourceValidationUtils;
+import org.codice.ddf.admin.configurator.Configurator;
+import org.codice.ddf.admin.configurator.ConfiguratorFactory;
+import org.codice.ddf.admin.configurator.OperationReport;
 
 import com.google.common.collect.ImmutableList;
 
 public class CreateCswSourcePersistMethod extends PersistMethod<CswSourceConfiguration> {
 
     public static final String CREATE_CSW_SOURCE_ID = CREATE;
-    public static final String DESCRIPTION = "Attempts to create and persist a CSW source given a configuration.";
+
+    public static final String DESCRIPTION =
+            "Attempts to create and persist a CSW source given a configuration.";
+
     public static final List<String> REQUIRED_FIELDS = ImmutableList.of(SOURCE_NAME,
             ENDPOINT_URL,
             FACTORY_PID);
@@ -55,14 +59,20 @@ public class CreateCswSourcePersistMethod extends PersistMethod<CswSourceConfigu
             OUTPUT_SCHEMA,
             FORCE_SPATIAL_FILTER);
 
-    private static final Map<String, String> SUCCESS_TYPES = getCommonSourceSubtypeDescriptions(SUCCESSFUL_CREATE);
-    private static final Map<String, String> FAILURE_TYPES = getCommonSourceSubtypeDescriptions(FAILED_CREATE);
+    private static final Map<String, String> SUCCESS_TYPES = getCommonSourceSubtypeDescriptions(
+            SUCCESSFUL_CREATE);
+
+    private static final Map<String, String> FAILURE_TYPES = getCommonSourceSubtypeDescriptions(
+            FAILED_CREATE);
 
     private final SourceValidationUtils sourceValidationUtils;
 
     private final ConfigurationHandler handler;
 
-    public CreateCswSourcePersistMethod(ConfigurationHandler handler) {
+    private final ConfiguratorFactory configuratorFactory;
+
+    public CreateCswSourcePersistMethod(ConfigurationHandler handler,
+            ConfiguratorFactory configuratorFactory) {
         super(CREATE_CSW_SOURCE_ID,
                 DESCRIPTION,
                 REQUIRED_FIELDS,
@@ -70,6 +80,7 @@ public class CreateCswSourcePersistMethod extends PersistMethod<CswSourceConfigu
                 SUCCESS_TYPES,
                 FAILURE_TYPES,
                 null);
+        this.configuratorFactory = configuratorFactory;
 
         sourceValidationUtils = new SourceValidationUtils();
         this.handler = handler;
@@ -77,7 +88,7 @@ public class CreateCswSourcePersistMethod extends PersistMethod<CswSourceConfigu
 
     @Override
     public Report persist(CswSourceConfiguration configuration) {
-        Configurator configurator = new Configurator();
+        Configurator configurator = configuratorFactory.getConfigurator();
         configurator.createManagedService(configuration.factoryPid(),
                 cswConfigToServiceProps(configuration));
         OperationReport report = configurator.commit("CSW source saved with details: {}",
@@ -96,14 +107,14 @@ public class CreateCswSourcePersistMethod extends PersistMethod<CswSourceConfigu
             validationResults.addAll(configuration.validate(Collections.singletonList(OUTPUT_SCHEMA)));
         }
         if (configuration.forceSpatialFilter() != null) {
-            validationResults.addAll(configuration.validate(Collections.singletonList(FORCE_SPATIAL_FILTER)));
+            validationResults.addAll(configuration.validate(Collections.singletonList(
+                    FORCE_SPATIAL_FILTER)));
         }
         return validationResults;
     }
 
     @Override
-    public List<ConfigurationMessage> validateRequiredFields(
-            CswSourceConfiguration configuration) {
+    public List<ConfigurationMessage> validateRequiredFields(CswSourceConfiguration configuration) {
         Report report = handler.test(SOURCE_NAME_EXISTS_TEST_ID, configuration);
         report.addMessages(super.validateRequiredFields(configuration));
         return report.messages();

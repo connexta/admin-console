@@ -41,15 +41,24 @@ public class DiscoverSourcesProbeMethod extends ProbeMethod<SourceConfiguration>
 
     //Return types
     public static final String CONFIG = "config";
+
     public static final String MESSAGES = "messages";
-    public static final String DESCRIPTION = "Retrieves possible configurations for the specified url. The results will be in a list of maps with the keys " + CONFIG + ", " + MESSAGES;
+
+    public static final String DESCRIPTION =
+            "Retrieves possible configurations for the specified url. The results will be in a list of maps with the keys "
+                    + CONFIG + ", " + MESSAGES;
 
     public static final List<String> REQUIRED_FIELDS = ImmutableList.of(SOURCE_HOSTNAME, PORT);
-    public static final List<String> OPTIONAL_FIELDS = ImmutableList.of(SOURCE_USERNAME, SOURCE_USER_PASSWORD);
-    public static final Map<String, String> SUCCESS_TYPES =  getCommonSourceSubtypeDescriptions(DISCOVERED_SOURCE);
+
+    public static final List<String> OPTIONAL_FIELDS = ImmutableList.of(SOURCE_USERNAME,
+            SOURCE_USER_PASSWORD);
+
+    public static final Map<String, String> SUCCESS_TYPES = getCommonSourceSubtypeDescriptions(
+            DISCOVERED_SOURCE);
 
     //    public static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(FAILED_PROBE, "No sources were discovered from the specified host.");
     public static final List<String> RETURN_TYPES = ImmutableList.of(DISCOVERED_SOURCES);
+
     private List<SourceConfigurationHandler> handlers;
 
     // TODO: tbatie - 2/1/17 - (Ticket) We can't return a failure type here because the frontend can't handle the error properly
@@ -75,7 +84,8 @@ public class DiscoverSourcesProbeMethod extends ProbeMethod<SourceConfiguration>
         List<Map<String, Object>> discoveredSources = sourceProbeReports.stream()
                 .filter(probeReport -> !probeReport.containsFailureMessages())
                 .map(probeReport -> ImmutableMap.of(CONFIG,
-                        probeReport.probeResults().get(DISCOVERED_SOURCES),
+                        probeReport.probeResults()
+                                .get(DISCOVERED_SOURCES),
                         MESSAGES,
                         probeReport.messages()))
                 .collect(Collectors.toList());

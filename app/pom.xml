@@ -30,6 +30,18 @@
     </properties>
 
     <dependencies>
+        <!--TODO: switch this to DDF-provided version of service when available-->
+        <dependency>
+            <groupId>org.codice.ddf.admin.beta</groupId>
+            <artifactId>configurator-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codice.ddf.admin.beta</groupId>
+            <artifactId>configurator-impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>org.codice.ddf.admin.beta</groupId>
             <artifactId>admin-api</artifactId>

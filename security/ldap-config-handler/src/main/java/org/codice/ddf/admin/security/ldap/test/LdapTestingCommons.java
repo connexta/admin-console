@@ -36,6 +36,7 @@ import javax.net.ssl.SSLContext;
 import org.codice.ddf.admin.api.config.ldap.LdapConfiguration;
 import org.codice.ddf.admin.api.handler.ConfigurationMessage;
 import org.codice.ddf.admin.api.validation.LdapValidationUtils;
+import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.security.ldap.LdapConfigurationHandler;
 import org.codice.ddf.admin.security.ldap.LdapConnectionResult;
 import org.forgerock.opendj.ldap.Connection;
@@ -205,12 +206,15 @@ public class LdapTestingCommons {
      * If there is an existing configuration, warnings will be returned. If there are no existing configurations
      * an empty {@code List} will be returned.
      *
-     * @param configuration configuration to check for existing configurations for
+     * @param configuration       configuration to check for existing configurations for
+     * @param configuratorFactory
      * @return {@code List} with {@link ConfigurationMessage}s containing warnings if there are existing configurations that match
      * the {@code configuration}, or empty {@code List} if no matches
      */
-    public static List<ConfigurationMessage> ldapConnectionExists(LdapConfiguration configuration) {
-        LdapConfigurationHandler ldapConfigurationHandler = new LdapConfigurationHandler();
+    public static List<ConfigurationMessage> ldapConnectionExists(LdapConfiguration configuration,
+            ConfiguratorFactory configuratorFactory) {
+        LdapConfigurationHandler ldapConfigurationHandler = new LdapConfigurationHandler(
+                configuratorFactory);
         List<LdapConfiguration> ldapConfigs = ldapConfigurationHandler.getConfigurations();
 
         String ldapUseCase = configuration.ldapUseCase();

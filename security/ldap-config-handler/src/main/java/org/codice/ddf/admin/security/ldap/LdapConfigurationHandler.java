@@ -23,13 +23,14 @@ import java.util.stream.Stream;
 
 import org.codice.ddf.admin.api.config.ConfigurationType;
 import org.codice.ddf.admin.api.config.ldap.LdapConfiguration;
-import org.codice.ddf.admin.api.configurator.Configurator;
 import org.codice.ddf.admin.api.handler.DefaultConfigurationHandler;
 import org.codice.ddf.admin.api.handler.method.PersistMethod;
 import org.codice.ddf.admin.api.handler.method.ProbeMethod;
 import org.codice.ddf.admin.api.handler.method.TestMethod;
 import org.codice.ddf.admin.api.services.LdapClaimsHandlerServiceProperties;
 import org.codice.ddf.admin.api.services.LdapLoginServiceProperties;
+import org.codice.ddf.admin.configurator.Configurator;
+import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.security.ldap.persist.CreateLdapConfigMethod;
 import org.codice.ddf.admin.security.ldap.persist.DeleteLdapConfigMethod;
 import org.codice.ddf.admin.security.ldap.probe.DefaultDirectoryStructureProbe;
@@ -44,9 +45,14 @@ import org.codice.ddf.admin.security.ldap.test.LdapTestingCommons;
 import com.google.common.collect.ImmutableList;
 
 public class LdapConfigurationHandler extends DefaultConfigurationHandler<LdapConfiguration> {
-
     private static final String LDAP_CONFIGURATION_HANDLER_ID =
             LdapConfiguration.CONFIGURATION_TYPE;
+
+    private final ConfiguratorFactory configuratorFactory;
+
+    public LdapConfigurationHandler(ConfiguratorFactory configuratorFactory) {
+        this.configuratorFactory = configuratorFactory;
+    }
 
     @Override
     public String getConfigurationHandlerId() {
@@ -61,7 +67,7 @@ public class LdapConfigurationHandler extends DefaultConfigurationHandler<LdapCo
     @Override
     public List<ProbeMethod> getProbeMethods() {
         LdapTestingCommons ldapTestingCommons = new LdapTestingCommons();
-        Configurator configurator = new Configurator();
+        Configurator configurator = configuratorFactory.getConfigurator();
         return ImmutableList.of(new DefaultDirectoryStructureProbe(ldapTestingCommons),
                 new LdapQueryProbe(ldapTestingCommons),
                 new SubjectAttributeProbe(ldapTestingCommons, configurator));
@@ -73,30 +79,33 @@ public class LdapConfigurationHandler extends DefaultConfigurationHandler<LdapCo
         return ImmutableList.of(new ConnectTestMethod(ldapTestingCommons),
                 new BindUserTestMethod(ldapTestingCommons),
                 new DirectoryStructTestMethod(ldapTestingCommons),
-                new AttributeMappingTestMethod(ldapTestingCommons, new Configurator()));
+                new AttributeMappingTestMethod(ldapTestingCommons,
+                        configuratorFactory.getConfigurator()));
     }
 
     @Override
     public List<PersistMethod> getPersistMethods() {
-        return ImmutableList.of(new CreateLdapConfigMethod(), new DeleteLdapConfigMethod());
+        return ImmutableList.of(new CreateLdapConfigMethod(configuratorFactory),
+                new DeleteLdapConfigMethod(configuratorFactory));
     }
 
     @Override
     public List<LdapConfiguration> getConfigurations() {
-        List<LdapConfiguration> ldapLoginConfigs = new Configurator().getManagedServiceConfigs(
-                LDAP_LOGIN_MANAGED_SERVICE_FACTORY_PID)
+        List<LdapConfiguration> ldapLoginConfigs = configuratorFactory.getConfigurator()
+                .getManagedServiceConfigs(LDAP_LOGIN_MANAGED_SERVICE_FACTORY_PID)
                 .values()
                 .stream()
                 .map(LdapLoginServiceProperties::ldapLoginServiceToLdapConfiguration)
                 .collect(Collectors.toList());
 
-        List<LdapConfiguration> ldapClaimsHandlerConfigs =
-                new Configurator().getManagedServiceConfigs(
-                        LDAP_CLAIMS_HANDLER_MANAGED_SERVICE_FACTORY_PID)
-                        .values()
-                        .stream()
-                        .map(LdapClaimsHandlerServiceProperties::ldapClaimsHandlerServiceToLdapConfig)
-                        .collect(Collectors.toList());
+        List<LdapConfiguration> ldapClaimsHandlerConfigs = configuratorFactory.getConfigurator()
+                .getManagedServiceConfigs(LDAP_CLAIMS_HANDLER_MANAGED_SERVICE_FACTORY_PID)
+                .values()
+                .stream()
+                .map((props) -> LdapClaimsHandlerServiceProperties.ldapClaimsHandlerServiceToLdapConfig(
+                        props,
+                        configuratorFactory.getConfigurator()))
+                .collect(Collectors.toList());
 
         return Stream.concat(ldapLoginConfigs.stream(), ldapClaimsHandlerConfigs.stream())
                 .map(config -> config.bindUserPassword("*******"))

@@ -30,13 +30,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.codice.ddf.admin.api.config.sources.WfsSourceConfiguration;
-import org.codice.ddf.admin.api.configurator.Configurator;
-import org.codice.ddf.admin.api.configurator.OperationReport;
 import org.codice.ddf.admin.api.handler.ConfigurationHandler;
 import org.codice.ddf.admin.api.handler.ConfigurationMessage;
 import org.codice.ddf.admin.api.handler.method.PersistMethod;
 import org.codice.ddf.admin.api.handler.report.Report;
 import org.codice.ddf.admin.api.validation.SourceValidationUtils;
+import org.codice.ddf.admin.configurator.Configurator;
+import org.codice.ddf.admin.configurator.ConfiguratorFactory;
+import org.codice.ddf.admin.configurator.OperationReport;
 
 import com.google.common.collect.ImmutableList;
 
@@ -54,14 +55,20 @@ public class CreateWfsSourcePersistMethod extends PersistMethod<WfsSourceConfigu
     private static final List<String> OPTIONAL_FIELDS = ImmutableList.of(SOURCE_USERNAME,
             SOURCE_USER_PASSWORD);
 
-    private static final Map<String, String> SUCCESS_TYPES = getCommonSourceSubtypeDescriptions(SUCCESSFUL_CREATE);
-    private static final Map<String, String> FAILURE_TYPES = getCommonSourceSubtypeDescriptions(FAILED_CREATE);
+    private static final Map<String, String> SUCCESS_TYPES = getCommonSourceSubtypeDescriptions(
+            SUCCESSFUL_CREATE);
+
+    private static final Map<String, String> FAILURE_TYPES = getCommonSourceSubtypeDescriptions(
+            FAILED_CREATE);
 
     private final SourceValidationUtils sourceValidationUtils;
 
     private final ConfigurationHandler handler;
 
-    public CreateWfsSourcePersistMethod(ConfigurationHandler handler) {
+    private final ConfiguratorFactory configuratorFactory;
+
+    public CreateWfsSourcePersistMethod(ConfigurationHandler handler,
+            ConfiguratorFactory configuratorFactory) {
         super(CREATE_WFS_SOURCE_ID,
                 DESCRIPTION,
                 REQUIRED_FIELDS,
@@ -71,12 +78,13 @@ public class CreateWfsSourcePersistMethod extends PersistMethod<WfsSourceConfigu
                 null);
 
         this.handler = handler;
+        this.configuratorFactory = configuratorFactory;
         sourceValidationUtils = new SourceValidationUtils();
     }
 
     @Override
     public Report persist(WfsSourceConfiguration configuration) {
-        Configurator configurator = new Configurator();
+        Configurator configurator = configuratorFactory.getConfigurator();
         configurator.createManagedService(configuration.factoryPid(),
                 wfsConfigToServiceProps(configuration));
         OperationReport report = configurator.commit("WFS source saved with details: {}",

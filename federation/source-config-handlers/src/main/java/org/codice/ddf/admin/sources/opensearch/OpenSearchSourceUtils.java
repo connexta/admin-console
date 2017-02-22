@@ -84,9 +84,12 @@ public class OpenSearchSourceUtils {
         return results;
     }
 
-    public static ProbeReport verifyOpenSearchCapabilities(String url, String username, String password) {
-        ProbeReport requestResults = RequestUtils.sendGetRequest(url + SIMPLE_QUERY_PARAMS, username, password);
-        if(requestResults.containsFailureMessages()) {
+    public static ProbeReport verifyOpenSearchCapabilities(String url, String username,
+            String password) {
+        ProbeReport requestResults = RequestUtils.sendGetRequest(url + SIMPLE_QUERY_PARAMS,
+                username,
+                password);
+        if (requestResults.containsFailureMessages()) {
             return requestResults;
         }
 
@@ -101,15 +104,18 @@ public class OpenSearchSourceUtils {
         try {
             capabilitiesXml = createDocument(requestResults.getProbeResult(RequestUtils.CONTENT));
         } catch (Exception e) {
-            return requestResults.addMessage(createInternalErrorMsg("Unable to read response from endpoint."));
+            return requestResults.addMessage(createInternalErrorMsg(
+                    "Unable to read response from endpoint."));
         }
 
-        XPath xpath = XPathFactory.newInstance().newXPath();
+        XPath xpath = XPathFactory.newInstance()
+                .newXPath();
         xpath.setNamespaceContext(SOURCES_NAMESPACE_CONTEXT);
         try {
-            if((Boolean) xpath.compile(TOTAL_RESULTS_XPATH).evaluate(capabilitiesXml, XPathConstants.BOOLEAN)) {
+            if ((Boolean) xpath.compile(TOTAL_RESULTS_XPATH)
+                    .evaluate(capabilitiesXml, XPathConstants.BOOLEAN)) {
                 return requestResults.addMessage(createCommonSourceConfigMsg(VERIFIED_CAPABILITIES))
-                         .probeResult(DISCOVERED_URL, url);
+                        .probeResult(DISCOVERED_URL, url);
             }
         } catch (XPathExpressionException e) {
             return requestResults.addMessage(createInternalErrorMsg("Failed to compile XPath."));
@@ -123,13 +129,15 @@ public class OpenSearchSourceUtils {
      * FAILURE TYPES - UNKNOWN_ENDPOINT
      * WARNING TYPES - UNTRUSTED_CA
      * RETURN TYPES - DISCOVERED_URL
+     *
      * @param hostname
      * @param port
      * @param username
      * @param password
      * @return report
      */
-    public static ProbeReport discoverOpenSearchUrl(String hostname, int port, String username, String password) {
+    public static ProbeReport discoverOpenSearchUrl(String hostname, int port, String username,
+            String password) {
         return URL_FORMATS.stream()
                 .map(formatUrl -> String.format(formatUrl, hostname, port))
                 .map(url -> verifyOpenSearchCapabilities(url, username, password))

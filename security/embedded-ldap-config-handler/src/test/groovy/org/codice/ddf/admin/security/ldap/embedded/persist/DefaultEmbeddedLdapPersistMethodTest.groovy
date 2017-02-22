@@ -14,10 +14,11 @@
 package org.codice.ddf.admin.security.ldap.embedded.persist
 
 import org.codice.ddf.admin.api.config.ldap.EmbeddedLdapConfiguration
-import org.codice.ddf.admin.api.configurator.Configurator
-import org.codice.ddf.admin.api.configurator.OperationReport
 import org.codice.ddf.admin.api.services.LdapClaimsHandlerServiceProperties
 import org.codice.ddf.admin.api.validation.LdapValidationUtils
+import org.codice.ddf.admin.configurator.Configurator
+import org.codice.ddf.admin.configurator.ConfiguratorFactory
+import org.codice.ddf.admin.configurator.OperationReport
 import spock.lang.Specification
 
 import static org.codice.ddf.admin.api.services.EmbeddedLdapServiceProperties.*
@@ -29,15 +30,15 @@ class DefaultEmbeddedLdapPersistMethodTest extends Specification {
 
     EmbeddedLdapConfiguration embeddedLdapConfiguration
 
-    Configurator configurator
+    ConfiguratorFactory configuratorFactory
 
     def setup() {
-        configurator = Mock(Configurator) {
-            startFeature(_ as String) >> ""
-        }
+        def configurator = Mock(Configurator)
+        configurator.startFeature(_ as String) >> ""
+        configuratorFactory = Mock(ConfiguratorFactory)
+        configuratorFactory.getConfigurator() >> configurator
 
-        defaultEmbeddedLdapPersistMethod = new DefaultEmbeddedLdapPersistMethod()
-        defaultEmbeddedLdapPersistMethod.setConfigurator(configurator)
+        defaultEmbeddedLdapPersistMethod = new DefaultEmbeddedLdapPersistMethod(configuratorFactory)
 
         embeddedLdapConfiguration = new EmbeddedLdapConfiguration()
     }
@@ -53,7 +54,7 @@ class DefaultEmbeddedLdapPersistMethodTest extends Specification {
     def 'test persist(EmbeddedLdapConfiguration) ldap is authentication'() {
         setup:
         embeddedLdapConfiguration.ldapUseCase(LdapValidationUtils.AUTHENTICATION)
-
+        def configurator = configuratorFactory.getConfigurator()
         configurator.commit(_ as String, _ as String) >> createMockReport(false)
 
         when:
@@ -70,7 +71,7 @@ class DefaultEmbeddedLdapPersistMethodTest extends Specification {
     def 'test persist(EmbeddedLdapConfiguration) ldap is attribute store'() {
         setup:
         embeddedLdapConfiguration.ldapUseCase(LdapValidationUtils.ATTRIBUTE_STORE)
-
+        def configurator = configuratorFactory.getConfigurator()
         configurator.commit(_ as String, _ as String) >> createMockReport(false)
 
         when:
@@ -87,7 +88,7 @@ class DefaultEmbeddedLdapPersistMethodTest extends Specification {
     def 'test persist(EmbeddedLdapConfiguration) ldap is authentication and attribute store'() {
         setup:
         embeddedLdapConfiguration.ldapUseCase(LdapValidationUtils.AUTHENTICATION_AND_ATTRIBUTE_STORE)
-
+        def configurator = configuratorFactory.getConfigurator()
         configurator.commit(_ as String, _ as String) >> createMockReport(false)
 
         when:
@@ -105,7 +106,7 @@ class DefaultEmbeddedLdapPersistMethodTest extends Specification {
     def 'test persist(EmbeddedLdapConfiguration) report contains failures'() {
         setup:
         embeddedLdapConfiguration.ldapUseCase(LdapValidationUtils.AUTHENTICATION_AND_ATTRIBUTE_STORE)
-
+        def configurator = configuratorFactory.getConfigurator()
         configurator.commit(_ as String, _ as String) >> createMockReport(true)
 
         when:

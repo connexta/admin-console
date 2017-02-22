@@ -14,11 +14,18 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
     <bean id="ldapConfigurationHandler"
-          class="org.codice.ddf.admin.security.ldap.LdapConfigurationHandler"/>
+          class="org.codice.ddf.admin.security.ldap.LdapConfigurationHandler">
+        <argument ref="configuratorFactory"/>
+    </bean>
+
     <service ref="ldapConfigurationHandler"
              interface="org.codice.ddf.admin.api.handler.ConfigurationHandler">
         <service-properties>
             <entry key="configHandlerId" value="ldap"/>
         </service-properties>
     </service>
+
+    <reference id="configuratorFactory"
+               interface="org.codice.ddf.admin.configurator.ConfiguratorFactory"
+               availability="mandatory" filter="(type=txact)"/>
 </blueprint>

@@ -1,8 +1,8 @@
 package org.codice.ddf.admin.security.ldap.test
 
 import org.codice.ddf.admin.api.config.ldap.LdapConfiguration
-import org.codice.ddf.admin.api.configurator.Configurator
 import org.codice.ddf.admin.api.handler.report.Report
+import org.codice.ddf.admin.configurator.Configurator
 import org.forgerock.opendj.ldap.Connection
 import spock.lang.Specification
 

@@ -14,43 +14,41 @@
 package org.codice.ddf.admin.security.ldap.embedded
 
 import org.codice.ddf.admin.api.config.ldap.EmbeddedLdapConfiguration
-import org.codice.ddf.admin.api.configurator.Configurator
-import org.codice.ddf.admin.api.handler.method.PersistMethod
 import org.codice.ddf.admin.api.services.EmbeddedLdapServiceProperties
+import org.codice.ddf.admin.configurator.Configurator
+import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.security.ldap.embedded.persist.DefaultEmbeddedLdapPersistMethod
 import spock.lang.Specification
 
 class EmbeddedLdapConfigurationHandlerTest extends Specification {
 
     EmbeddedLdapConfigurationHandler embeddedLdapConfigurationHandler
+    ConfiguratorFactory configuratorFactory;
 
     def setup() {
-        embeddedLdapConfigurationHandler = new EmbeddedLdapConfigurationHandler()
+        configuratorFactory = Mock(ConfiguratorFactory)
+        def configurator = Mock(Configurator)
+        configuratorFactory.getConfigurator() >> configurator
+        embeddedLdapConfigurationHandler = new EmbeddedLdapConfigurationHandler(configuratorFactory)
     }
 
     def 'test getConfigurations() no service properties'() {
-        setup:
-        def configurator = Mock(Configurator)
-        embeddedLdapConfigurationHandler.setConfigurator(configurator)
-
         when:
         def configurations = embeddedLdapConfigurationHandler.getConfigurations()
 
         then:
-        1 * configurator.getConfig(EmbeddedLdapServiceProperties.EMBEDDED_LDAP_MANAGER_SERVICE_PID) >> null
+        1 * configuratorFactory.getConfigurator()
+                .getConfig(EmbeddedLdapServiceProperties.EMBEDDED_LDAP_MANAGER_SERVICE_PID) >> null
         configurations == Collections.emptyList()
     }
 
     def 'test getConfigurations() service properties available'() {
-        setup:
-        def configurator = Mock(Configurator)
-        embeddedLdapConfigurationHandler.setConfigurator(configurator)
-
         when:
         def configurations = embeddedLdapConfigurationHandler.getConfigurations()
 
         then:
-        1 * configurator.getConfig(EmbeddedLdapServiceProperties.EMBEDDED_LDAP_MANAGER_SERVICE_PID) >> [(EmbeddedLdapConfiguration.EMBEDDED_LDAP_PORT): 123]
+        1 * configuratorFactory.getConfigurator()
+                .getConfig(EmbeddedLdapServiceProperties.EMBEDDED_LDAP_MANAGER_SERVICE_PID) >> [(EmbeddedLdapConfiguration.EMBEDDED_LDAP_PORT): 123]
         configurations.size() == 1
         configurations.get(0).toString().contains("123")
     }

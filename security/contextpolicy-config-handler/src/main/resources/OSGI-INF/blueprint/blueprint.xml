@@ -16,9 +16,16 @@
     <service id="policyManagerConfigurationHandler"
              interface="org.codice.ddf.admin.api.handler.ConfigurationHandler">
         <bean class="org.codice.ddf.admin.security.context.ContextPolicyManagerHandler">
-            <property name="ldapConfigHandler" ref="ldapConfigHandler"/>
+            <argument ref="ldapConfigHandler"/>
+            <argument ref="configuratorFactory"/>
         </bean>
     </service>
 
-    <reference id="ldapConfigHandler" interface="org.codice.ddf.admin.api.handler.ConfigurationHandler" availability="optional" filter="(configHandlerId=ldap)"/>
+    <reference id="ldapConfigHandler"
+               interface="org.codice.ddf.admin.api.handler.ConfigurationHandler"
+               availability="optional" filter="(configHandlerId=ldap)"/>
+
+    <reference id="configuratorFactory"
+               interface="org.codice.ddf.admin.configurator.ConfiguratorFactory"
+               availability="mandatory" filter="(type=txact)"/>
 </blueprint>

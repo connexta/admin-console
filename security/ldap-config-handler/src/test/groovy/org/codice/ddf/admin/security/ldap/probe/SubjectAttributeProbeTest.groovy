@@ -1,8 +1,8 @@
 package org.codice.ddf.admin.security.ldap.probe
 
 import org.codice.ddf.admin.api.config.ldap.LdapConfiguration
-import org.codice.ddf.admin.api.configurator.Configurator
 import org.codice.ddf.admin.api.handler.report.ProbeReport
+import org.codice.ddf.admin.configurator.Configurator
 import org.codice.ddf.admin.security.ldap.LdapConnectionResult
 import org.codice.ddf.admin.security.ldap.test.LdapTestingCommons
 import org.forgerock.opendj.ldap.SearchResultReferenceIOException

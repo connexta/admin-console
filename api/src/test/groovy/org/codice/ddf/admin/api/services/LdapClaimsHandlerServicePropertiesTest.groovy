@@ -16,11 +16,16 @@ package org.codice.ddf.admin.api.services
 import org.codice.ddf.admin.api.config.ldap.LdapConfiguration
 import org.codice.ddf.admin.api.validation.LdapValidationUtils
 import org.codice.ddf.admin.api.validation.ValidationUtils
+import org.codice.ddf.admin.configurator.Configurator
 import spock.lang.Specification
+
+import java.nio.file.Paths
 
 class LdapClaimsHandlerServicePropertiesTest extends Specification {
 
     LdapClaimsHandlerServiceProperties ldapClaimsHandlerServiceProperties
+
+    Configurator configurator
 
     static final TEST_SERVICE_PID = "someServicePid"
 
@@ -54,6 +59,10 @@ class LdapClaimsHandlerServicePropertiesTest extends Specification {
 
     def setup() {
         ldapClaimsHandlerServiceProperties = new LdapClaimsHandlerServiceProperties()
+        configurator = Mock(Configurator)
+        def props = new Properties()
+        props.load(new FileReader(Paths.get(TEST_PROPERTY_FILE_LOCATION).toFile()))
+        configurator.getProperties(Paths.get(TEST_PROPERTY_FILE_LOCATION)) >> props
     }
 
     def 'test ldapClaimsHandlerServiceToLdapConfig(Map<String, Object>) all present values success'() {
@@ -74,7 +83,7 @@ class LdapClaimsHandlerServicePropertiesTest extends Specification {
                 .toSpreadMap()
 
         when:
-        LdapConfiguration ldapConfiguration = ldapClaimsHandlerServiceProperties.ldapClaimsHandlerServiceToLdapConfig(properties)
+        LdapConfiguration ldapConfiguration = ldapClaimsHandlerServiceProperties.ldapClaimsHandlerServiceToLdapConfig(properties, configurator)
 
         then:
         ldapConfiguration.servicePid() == TEST_SERVICE_PID
@@ -114,7 +123,7 @@ class LdapClaimsHandlerServicePropertiesTest extends Specification {
                 .toSpreadMap()
 
         when:
-        LdapConfiguration ldapConfiguration = ldapClaimsHandlerServiceProperties.ldapClaimsHandlerServiceToLdapConfig(properties)
+        LdapConfiguration ldapConfiguration = ldapClaimsHandlerServiceProperties.ldapClaimsHandlerServiceToLdapConfig(properties, configurator)
 
         then:
         ldapConfiguration.servicePid() == null
@@ -142,7 +151,7 @@ class LdapClaimsHandlerServicePropertiesTest extends Specification {
                 .toSpreadMap()
 
         when:
-        LdapConfiguration ldapConfiguration = ldapClaimsHandlerServiceProperties.ldapClaimsHandlerServiceToLdapConfig(properties)
+        LdapConfiguration ldapConfiguration = ldapClaimsHandlerServiceProperties.ldapClaimsHandlerServiceToLdapConfig(properties, configurator)
 
         then:
         ldapConfiguration.encryptionMethod() == TEST_URI_SCHEME

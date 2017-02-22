@@ -77,8 +77,11 @@ public class CswSourceUtils {
      * @param password
      * @return report
      */
-    public static ProbeReport sendCswCapabilitiesRequest(String url, String username, String password) {
-        ProbeReport requestResults = RequestUtils.sendGetRequest(url + GET_CAPABILITIES_PARAMS, username, password);
+    public static ProbeReport sendCswCapabilitiesRequest(String url, String username,
+            String password) {
+        ProbeReport requestResults = RequestUtils.sendGetRequest(url + GET_CAPABILITIES_PARAMS,
+                username,
+                password);
         if (requestResults.containsFailureMessages()) {
             return requestResults;
         }
@@ -107,7 +110,8 @@ public class CswSourceUtils {
      * @param password
      * @return report
      */
-    public static ProbeReport discoverCswUrl(String hostname, int port, String username, String password) {
+    public static ProbeReport discoverCswUrl(String hostname, int port, String username,
+            String password) {
         return URL_FORMATS.stream()
                 .map(format -> String.format(format, hostname, port))
                 .map(url -> sendCswCapabilitiesRequest(url, username, password))
@@ -140,7 +144,8 @@ public class CswSourceUtils {
         try {
             capabilitiesXml = createDocument(requestBody);
         } catch (Exception e) {
-            return results.addMessage(createInternalErrorMsg("Unable to read response from endpoint."));
+            return results.addMessage(createInternalErrorMsg(
+                    "Unable to read response from endpoint."));
         }
 
         CswSourceConfiguration preferred = new CswSourceConfiguration();
@@ -149,14 +154,16 @@ public class CswSourceUtils {
         preferred.sourceUserPassword(password);
         preferred.configurationHandlerId(CSW_SOURCE_CONFIGURATION_HANDLER_ID);
 
-        XPath xpath = XPathFactory.newInstance().newXPath();
+        XPath xpath = XPathFactory.newInstance()
+                .newXPath();
         xpath.setNamespaceContext(SOURCES_NAMESPACE_CONTEXT);
 
         try {
             if ((Boolean) xpath.compile(HAS_CATALOG_METACARD_EXP)
                     .evaluate(capabilitiesXml, XPathConstants.BOOLEAN)) {
                 results.addMessage(createCommonSourceConfigMsg(DISCOVERED_SOURCE));
-                return results.probeResult(DISCOVERED_SOURCES, preferred.factoryPid(CSW_PROFILE_FACTORY_PID));
+                return results.probeResult(DISCOVERED_SOURCES,
+                        preferred.factoryPid(CSW_PROFILE_FACTORY_PID));
             }
         } catch (Exception e) {
         }
@@ -165,8 +172,9 @@ public class CswSourceUtils {
             if ((Boolean) xpath.compile(HAS_GMD_ISO_EXP)
                     .evaluate(capabilitiesXml, XPathConstants.BOOLEAN)) {
                 results.addMessage(createCommonSourceConfigMsg(DISCOVERED_SOURCE));
-                return results.probeResult(DISCOVERED_SOURCES, preferred.outputSchema(GMD_OUTPUT_SCHEMA)
-                        .factoryPid(CSW_PROFILE_FACTORY_PID));
+                return results.probeResult(DISCOVERED_SOURCES,
+                        preferred.outputSchema(GMD_OUTPUT_SCHEMA)
+                                .factoryPid(CSW_PROFILE_FACTORY_PID));
             }
         } catch (Exception e) {
         }
@@ -175,10 +183,13 @@ public class CswSourceUtils {
             String outputSchema = xpath.compile(GET_FIRST_OUTPUT_SCHEMA)
                     .evaluate(capabilitiesXml);
             results.addMessage(createCommonSourceConfigMsg(DISCOVERED_SOURCE));
-            return results.probeResult(DISCOVERED_SOURCES, preferred.outputSchema(outputSchema).factoryPid(CSW_SPEC_FACTORY_PID));
+            return results.probeResult(DISCOVERED_SOURCES,
+                    preferred.outputSchema(outputSchema)
+                            .factoryPid(CSW_SPEC_FACTORY_PID));
         } catch (Exception e) {
         }
 
-        return results.addMessage(createInternalErrorMsg("Failed to create a CSW source configuration from the URL."));
+        return results.addMessage(createInternalErrorMsg(
+                "Failed to create a CSW source configuration from the URL."));
     }
 }

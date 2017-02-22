@@ -25,27 +25,26 @@ import static org.codice.ddf.admin.sources.impl.test.SourceNameExistsTestMethod.
 import java.util.List;
 
 import org.codice.ddf.admin.api.config.sources.SourceConfiguration;
-import org.codice.ddf.admin.api.configurator.Configurator;
 import org.codice.ddf.admin.api.handler.ConfigurationMessage;
 import org.codice.ddf.admin.api.handler.method.TestMethod;
 import org.codice.ddf.admin.api.handler.report.Report;
 import org.codice.ddf.admin.api.validation.SourceValidationUtils;
+import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.sources.opensearch.test.SourceNameExistsOpenSearchTestMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SourceNameExistsCswTestMethod extends TestMethod<SourceConfiguration> {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(
             SourceNameExistsOpenSearchTestMethod.class);
 
     public static final String CSW_SOURCE_EXISTS_ID = SOURCE_NAME_EXISTS_TEST_ID;
 
-    private final Configurator configurator;
+    private final ConfiguratorFactory configuratorFactory;
 
     private final SourceValidationUtils sourceValidationUtils;
 
-    public SourceNameExistsCswTestMethod(Configurator configurator) {
+    public SourceNameExistsCswTestMethod(ConfiguratorFactory configuratorFactory) {
         super(CSW_SOURCE_EXISTS_ID,
                 DESCRIPTION,
                 REQUIRED_FIELDS,
@@ -56,11 +55,7 @@ public class SourceNameExistsCswTestMethod extends TestMethod<SourceConfiguratio
 
         sourceValidationUtils = new SourceValidationUtils();
 
-        if (configurator == null) {
-            this.configurator = new Configurator();
-        } else {
-            this.configurator = configurator;
-        }
+        this.configuratorFactory = configuratorFactory;
     }
 
     @Override
@@ -68,7 +63,7 @@ public class SourceNameExistsCswTestMethod extends TestMethod<SourceConfiguratio
         List<ConfigurationMessage> results =
                 sourceValidationUtils.validateSourceName(configuration.sourceName(),
                         CSW_FACTORY_PIDS,
-                        configurator);
+                        configuratorFactory.getConfigurator());
 
         if (results.isEmpty()) {
             return new Report(buildMessage(SUCCESS_TYPES, FAILURE_TYPES, null, SUCCESSFUL_TEST));

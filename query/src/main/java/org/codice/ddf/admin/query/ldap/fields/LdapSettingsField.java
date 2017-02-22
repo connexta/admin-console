@@ -10,61 +10,76 @@ import com.google.common.collect.ImmutableList;
 
 public class LdapSettingsField extends ObjectField {
 
-    public static final String FIELD_NAME = "settings";
+    public static final String DEFAULT_FIELD_NAME = "settings";
     public static final String FIELD_TYPE_NAME = "LdapSettings";
     public static final String DESCRIPTION = "Contains information about the LDAP structure and various attributes required to setup.";
 
     // TODO: tbatie - 2/16/17 - Need to assess these fields again, FIELD class contains a T value that should be used instead
-    private String userBaseDn;
-    private String groupBaseDn;
-    private String groupObjectCLass;
-    private String groupMembershipAttribute;
+    private String USER_NAME_ATTRIBUTE = "userNameAttribute";
+    private String USER_BASE_DN = "userBaseDn";
+    private String GROUP_BASE_DN = "groupBaseDn";
+    private String GROUP_OBJECT_CLASS = "groupObjectClass";
+    private String GROUP_MEMBERSHIP_ATTRIBUTE = "groupMembershipAttribute";
 
-    public static final List<Field> FIELDS = ImmutableList.of(new StringField("userNameAttribute"),
-            new LdapDn("userBaseDn"),
-            new LdapDn("groupBaseDn"),
-            new StringField("groupObjectClass"),
-            new StringField("groupMembershipAttribute"),
-            new LdapAttributeMappingField());
+    private StringField usernameAttribute;
+    private LdapDn userBaseDn;
+    private LdapDn groupBaseDn;
+    private StringField groupObjectClass;
+    private StringField groupMembershipAttribute;
+    private LdapAttributeMappingField mapping;
 
     public LdapSettingsField() {
-        super(FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
+        super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
+        this.usernameAttribute = new StringField(USER_NAME_ATTRIBUTE);
+        this.userBaseDn = new LdapDn(USER_BASE_DN);
+        this.groupBaseDn = new LdapDn(GROUP_BASE_DN);
+        this.groupObjectClass = new StringField(GROUP_OBJECT_CLASS);
+        this.groupMembershipAttribute = new StringField(GROUP_MEMBERSHIP_ATTRIBUTE);
+        this.mapping = new LdapAttributeMappingField();
     }
 
     @Override
     public List<Field> getFields() {
-        return FIELDS;
+        return ImmutableList.of(usernameAttribute, userBaseDn, groupBaseDn, groupObjectClass, groupMembershipAttribute, mapping);
     }
 
-    public String getUserBaseDn() {
-        return userBaseDn;
+    public String userBaseDn() {
+        return userBaseDn.getValue();
     }
 
-    public String getGroupBaseDn() {
-        return groupBaseDn;
+    public String groupBaseDn() {
+        return groupBaseDn.getValue();
     }
 
-    public String getGroupObjectClass() {
-        return groupObjectCLass;
+    public String groupObjectClass() {
+        return groupObjectClass.getValue();
     }
 
-    public String getGroupMembershipAttribute() {
-        return groupMembershipAttribute;
+    public String groupMembershipAttribute() {
+        return groupMembershipAttribute.getValue();
     }
 
-    public void setUserBaseDn(String userBaseDn) {
-        this.userBaseDn = userBaseDn;
+    public String usernameAttribute() {
+        return usernameAttribute.getValue();
     }
 
-    public void setGroupBaseDn(String groupBaseDn) {
-        this.groupBaseDn = groupBaseDn;
+    public void userBaseDn(String userBaseDn) {
+        this.userBaseDn.setValue(userBaseDn);
     }
 
-    public void setGroupObjectClass(String groupObjectCLass) {
-        this.groupObjectCLass = groupObjectCLass;
+    public void groupBaseDn(String groupBaseDn) {
+        this.groupBaseDn.setValue(groupBaseDn);
     }
 
-    public void setGroupMembershipAttribute(String groupMembershipAttribute) {
-        this.groupMembershipAttribute = groupMembershipAttribute;
+    public void groupObjectClass(String groupObjectCLass) {
+        this.groupObjectClass.setValue(groupObjectCLass);
+    }
+
+    public void groupMembershipAttribute(String groupMembershipAttribute) {
+        this.groupMembershipAttribute.setValue(groupMembershipAttribute);
+    }
+
+    public void usernameAttribute(String usernameAttribute) {
+        this.usernameAttribute.setValue(usernameAttribute);
     }
 }

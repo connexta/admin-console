@@ -23,13 +23,6 @@ import graphql.schema.GraphQLScalarType;
 
 public class GraphQLOutput {
 
-    public static GraphQLFieldDefinition fieldToGraphQLFieldDefinition(Field field) {
-        return newFieldDefinition().name(field.fieldName())
-                .description(field.description())
-                .type(fieldToGraphQLOutputType(field))
-                .build();
-    }
-
     public static GraphQLOutputType fieldToGraphQLOutputType(Field field) {
         switch (field.fieldBaseType()) {
         case OBJECT:
@@ -62,7 +55,8 @@ public class GraphQLOutput {
                     .map(GraphQLOutput::fieldToGraphQLFieldDefinition)
                     .collect(Collectors.toList());
         }
-        return newObject().name(capitalize(field.fieldTypeName()))
+
+        return newObject().name(capitalize(field.fieldTypeName()) + "Payload")
                 .description(field.description())
                 .fields(fieldDefinitions)
                 .build();
@@ -70,5 +64,12 @@ public class GraphQLOutput {
 
     public static GraphQLOutputType listFieldToGraphQLOutputType(ListField listField) {
         return new GraphQLList(fieldToGraphQLOutputType(listField.getListValueField()));
+    }
+
+    public static GraphQLFieldDefinition fieldToGraphQLFieldDefinition(Field field) {
+        return newFieldDefinition().name(field.fieldName())
+                .description(field.description())
+                .type(fieldToGraphQLOutputType(field))
+                .build();
     }
 }

@@ -2,7 +2,9 @@ package org.codice.ddf.admin.query.commons.fields.base;
 
 import static org.codice.ddf.admin.query.api.fields.Field.FieldBaseType.OBJECT;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.query.api.fields.Field;
@@ -17,7 +19,8 @@ public abstract class ObjectField extends BaseField {
 
     @Override
     public Object getValue() {
-        return getFields().stream()
-                .collect(Collectors.toMap(Field::fieldName, Field::getValue));
+        Map<String, Object> value = new HashMap<>();
+        getFields().forEach(field -> value.put(field.fieldName(), field.getValue()));
+        return value;
     }
 }

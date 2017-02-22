@@ -42,17 +42,17 @@ public class ReportField extends ObjectField implements Report {
 
     @Override
     public List<Message> getSuccesses() {
-        return successes.getValue();
+        return successes.getMessages();
     }
 
     @Override
     public  List<Message> getWarnings() {
-        return warnings.getValue();
+        return warnings.getMessages();
     }
 
     @Override
     public  List<Message> getFailures() {
-        return failures.getValue();
+        return failures.getMessages();
     }
 
     @Override

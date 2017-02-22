@@ -8,8 +8,9 @@ public class StringField extends ScalarBaseField<String>{
         super(fieldName, null, null, STRING);
     }
 
-    protected StringField(String fieldName, String description) {
-        super(fieldName, null, description, STRING);
+
+    protected StringField(String fieldName, String fieldTypeName, String description) {
+        super(fieldName, fieldTypeName, description, STRING);
     }
 
     @Override

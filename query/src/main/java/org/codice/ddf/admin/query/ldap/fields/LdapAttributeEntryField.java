@@ -5,6 +5,7 @@ import java.util.List;
 import org.codice.ddf.admin.query.api.fields.Field;
 import org.codice.ddf.admin.query.commons.fields.base.ObjectField;
 import org.codice.ddf.admin.query.commons.fields.base.StringField;
+import org.codice.ddf.admin.query.sts.field.StsClaimField;
 
 import com.google.common.collect.ImmutableList;
 
@@ -16,12 +17,12 @@ public class LdapAttributeEntryField extends ObjectField {
 
     public static final String STS_CLAIM = "stsClaim";
     public static final String USER_ATTRIBUTE = "userAttribute";
-    private StringField stsClaim;
+    private StsClaimField stsClaim;
     private StringField userAttribute;
 
     public LdapAttributeEntryField() {
         super(FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
-        stsClaim = new StringField(STS_CLAIM);
+        stsClaim = new StsClaimField(STS_CLAIM);
         userAttribute = new StringField(USER_ATTRIBUTE);
     }
 

@@ -19,6 +19,7 @@ import org.codice.ddf.admin.query.commons.fields.base.ObjectField;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLOutputType;
+import graphql.schema.GraphQLScalarType;
 
 public class GraphQLOutput {
 
@@ -38,9 +39,17 @@ public class GraphQLOutput {
         case LIST:
             return listFieldToGraphQLOutputType((ListField)field);
         case INTEGER:
-            return GraphQLInt;
+            if(field.fieldTypeName() == null) {
+                return GraphQLInt;
+            }
+            return new GraphQLScalarType(field.fieldTypeName(), field.description(), GraphQLInt.getCoercing());
+
         case STRING:
-            return GraphQLString;
+            if(field.fieldTypeName() == null) {
+                return GraphQLString;
+            }
+            return new GraphQLScalarType(field.fieldTypeName(), field.description(), GraphQLString.getCoercing());
+
         }
         return GraphQLString;
     }

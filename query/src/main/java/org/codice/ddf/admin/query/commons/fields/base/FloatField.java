@@ -6,5 +6,10 @@ public class FloatField extends ScalarBaseField<Float>{
     public FloatField(String fieldName) {
         super(fieldName, null, null, FLOAT);
     }
+
+    protected FloatField(String fieldName, String fieldTypeName, String description) {
+        super(fieldName, fieldTypeName, description, FLOAT);
+    }
+
 }
 

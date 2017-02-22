@@ -16,11 +16,14 @@ import org.codice.ddf.admin.query.api.fields.Field;
 import org.codice.ddf.admin.query.commons.fields.base.EnumField;
 import org.codice.ddf.admin.query.commons.fields.base.ListField;
 import org.codice.ddf.admin.query.commons.fields.base.ObjectField;
+import org.codice.ddf.admin.query.ldap.fields.LdapConnectionField;
 
 import graphql.schema.GraphQLArgument;
 import graphql.schema.GraphQLInputObjectField;
 import graphql.schema.GraphQLInputType;
 import graphql.schema.GraphQLList;
+import graphql.schema.GraphQLNonNull;
+import graphql.schema.GraphQLScalarType;
 
 public class GraphQLInput {
 
@@ -48,11 +51,17 @@ public class GraphQLInput {
         case LIST:
             return listFieldToGraphQLInputType((ListField)field);
         case INTEGER:
-            return GraphQLInt;
+            if(field.fieldTypeName() == null) {
+                return GraphQLInt;
+            }
+            return new GraphQLScalarType(field.fieldTypeName(), field.description(), GraphQLInt.getCoercing());
         case STRING:
-            return GraphQLString;
+            if(field.fieldTypeName() == null) {
+                return GraphQLString;
+            }
+            return new GraphQLScalarType(field.fieldTypeName(), field.description(), GraphQLString.getCoercing());
         }
-        return GraphQLString;
+        return null;
     }
 
     public static GraphQLInputType objectFieldToGraphQLInputType(

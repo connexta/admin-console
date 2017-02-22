@@ -21,8 +21,8 @@ public class LdapSettingsField extends ObjectField {
     private String groupMembershipAttribute;
 
     public static final List<Field> FIELDS = ImmutableList.of(new StringField("userNameAttribute"),
-            new StringField("userBaseDn"),
-            new StringField("groupBaseDn"),
+            new LdapDn("userBaseDn"),
+            new LdapDn("groupBaseDn"),
             new StringField("groupObjectClass"),
             new StringField("groupMembershipAttribute"),
             new LdapAttributeMappingField());

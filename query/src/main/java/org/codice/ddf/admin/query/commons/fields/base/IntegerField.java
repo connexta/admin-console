@@ -7,4 +7,8 @@ public class IntegerField extends ScalarBaseField<Integer> {
     public IntegerField(String fieldName) {
         super(fieldName, null, null, INTEGER);
     }
+
+    protected IntegerField(String fieldName, String fieldTypeName, String description) {
+        super(fieldName, fieldTypeName, description, INTEGER);
+    }
 }

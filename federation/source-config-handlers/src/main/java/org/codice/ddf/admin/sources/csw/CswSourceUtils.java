@@ -35,7 +35,6 @@ import javax.xml.xpath.XPathFactory;
 
 import org.codice.ddf.admin.api.config.sources.CswSourceConfiguration;
 import org.codice.ddf.admin.api.handler.report.ProbeReport;
-import org.codice.ddf.admin.api.handler.report.Report;
 import org.codice.ddf.admin.commons.requests.RequestUtils;
 import org.w3c.dom.Document;
 
@@ -88,7 +87,8 @@ public class CswSourceUtils {
         String contentType = requestResults.getProbeResult(RequestUtils.CONTENT_TYPE);
 
         if (statusCode == HTTP_OK && CSW_MIME_TYPES.contains(contentType)) {
-            return requestResults.addMessage(createCommonSourceConfigMsg(VERIFIED_CAPABILITIES));
+            return requestResults.addMessage(createCommonSourceConfigMsg(VERIFIED_CAPABILITIES))
+                    .probeResult(DISCOVERED_URL, url);
         }
 
         return requestResults.addMessage(createCommonSourceConfigMsg(UNKNOWN_ENDPOINT));
@@ -108,14 +108,12 @@ public class CswSourceUtils {
      * @return report
      */
     public static ProbeReport discoverCswUrl(String hostname, int port, String username, String password) {
-        for (String urlFormat : URL_FORMATS) {
-            String testUrl = String.format(urlFormat, hostname, port);
-            Report testReport = sendCswCapabilitiesRequest(testUrl, username, password);
-            if (!testReport.containsFailureMessages()) {
-                return new ProbeReport(testReport.messages()).probeResult(DISCOVERED_URL, testUrl);
-            }
-        }
-        return new ProbeReport(createCommonSourceConfigMsg(UNKNOWN_ENDPOINT));
+        return URL_FORMATS.stream()
+                .map(format -> String.format(format, hostname, port))
+                .map(url -> sendCswCapabilitiesRequest(url, username, password))
+                .filter(report -> !report.containsFailureMessages())
+                .findFirst()
+                .orElse(new ProbeReport(createCommonSourceConfigMsg(UNKNOWN_ENDPOINT)));
     }
 
     /**

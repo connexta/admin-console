@@ -64,15 +64,17 @@ public class DiscoverCswSourceProbeMethod extends ProbeMethod<CswSourceConfigura
 
     @Override
     public ProbeReport probe(CswSourceConfiguration configuration) {
+        String un = configuration.sourceUserName();
+        String pw = configuration.sourceUserPassword();
         String testUrl = configuration.endpointUrl();
         if (testUrl == null) {
-            ProbeReport discoverEndpointReport = discoverCswUrl(configuration.sourceHostName(), configuration.sourcePort(), configuration.sourceUserName(), configuration.sourceUserPassword());
+            ProbeReport discoverEndpointReport = discoverCswUrl(configuration.sourceHostName(), configuration.sourcePort(), un, pw);
             if (discoverEndpointReport.containsFailureMessages()) {
                 return discoverEndpointReport;
             }
             testUrl = discoverEndpointReport.getProbeResult(DISCOVERED_URL);
         }
-        return getPreferredCswConfig(testUrl, configuration.sourceUserName(), configuration.sourceUserPassword());
+        return getPreferredCswConfig(testUrl, un, pw);
     }
 
     @Override

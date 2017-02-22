@@ -66,17 +66,18 @@ public class DiscoverWfsSourceProbeMethod extends ProbeMethod<WfsSourceConfigura
 
     @Override
     public ProbeReport probe(WfsSourceConfiguration configuration) {
+        String un = configuration.sourceUserName();
+        String pw = configuration.sourceUserPassword();
         String testUrl = configuration.endpointUrl();
         if (testUrl == null) {
             ProbeReport discoverEndpointReport = discoverWfsUrl(
-                    configuration.sourceHostName(), configuration.sourcePort(),
-                    configuration.sourceUserName(), configuration.sourceUserPassword());
+                    configuration.sourceHostName(), configuration.sourcePort(), un, pw);
             if (discoverEndpointReport.containsFailureMessages()) {
                 return discoverEndpointReport;
             }
             testUrl = discoverEndpointReport.getProbeResult(DISCOVERED_URL);
         }
-        return getPreferredWfsConfig(testUrl, configuration.sourceUserName(), configuration.sourceUserPassword());
+        return getPreferredWfsConfig(testUrl, un, pw);
     }
 
     @Override

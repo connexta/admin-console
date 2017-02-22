@@ -24,11 +24,12 @@ import static org.codice.ddf.admin.commons.requests.RequestUtils.CERT_ERROR;
 import static org.codice.ddf.admin.commons.requests.RequestUtils.UNTRUSTED_CA;
 import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.CREATED_SOURCE;
 import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.DISCOVERED_SOURCES;
+import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.DISCOVERED_URL;
 import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.DISCOVER_SOURCES_ID;
 import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.UNKNOWN_ENDPOINT;
 import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.getCommonSourceSubtypeDescriptions;
 import static org.codice.ddf.admin.sources.opensearch.OpenSearchSourceUtils.discoverOpenSearchUrl;
-import static org.codice.ddf.admin.sources.opensearch.OpenSearchSourceUtils.verifyOpenSearchCapabilities;
+import static org.codice.ddf.admin.sources.opensearch.OpenSearchSourceUtils.getOpenSearchConfig;
 
 import java.util.List;
 import java.util.Map;
@@ -64,11 +65,19 @@ public class DiscoverOpenSearchSourceProbeMethod extends ProbeMethod<OpenSearchS
     @Override
     public ProbeReport probe(OpenSearchSourceConfiguration configuration) {
         String testUrl = configuration.endpointUrl();
-        return testUrl == null ?
-                discoverOpenSearchUrl(configuration.sourceHostName(), configuration.sourcePort(),
-                        configuration.sourceUserName(), configuration.sourceUserPassword()) :
-                verifyOpenSearchCapabilities(testUrl, configuration.sourceUserName(),
-                        configuration.sourceUserPassword());
+        String un = configuration.sourceUserName();
+        String pw = configuration.sourceUserPassword();
+        if (testUrl == null) {
+            ProbeReport discoveryReport = discoverOpenSearchUrl(configuration.sourceHostName(),
+                    configuration.sourcePort(),
+                    un,
+                    pw);
+            if (discoveryReport.containsFailureMessages()) {
+                return discoveryReport;
+            }
+            testUrl = discoveryReport.getProbeResult(DISCOVERED_URL);
+        }
+        return getOpenSearchConfig(testUrl, un, pw);
     }
 
     @Override

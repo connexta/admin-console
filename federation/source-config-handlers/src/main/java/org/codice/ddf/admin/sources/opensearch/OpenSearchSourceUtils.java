@@ -17,6 +17,7 @@ import static java.net.HttpURLConnection.HTTP_OK;
 import static org.codice.ddf.admin.api.handler.ConfigurationMessage.createInternalErrorMsg;
 import static org.codice.ddf.admin.api.services.OpenSearchServiceProperties.OPENSEARCH_FACTORY_PID;
 import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.DISCOVERED_SOURCES;
+import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.DISCOVERED_URL;
 import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.SOURCES_NAMESPACE_CONTEXT;
 import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.UNKNOWN_ENDPOINT;
 import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.VERIFIED_CAPABILITIES;
@@ -66,6 +67,23 @@ public class OpenSearchSourceUtils {
      * @param password
      * @return report
      */
+    public static ProbeReport getOpenSearchConfig(String url, String username, String password) {
+        ProbeReport results = verifyOpenSearchCapabilities(url, username, password);
+        if (results.containsFailureMessages()) {
+            return results;
+        }
+
+        OpenSearchSourceConfiguration config = new OpenSearchSourceConfiguration();
+        config.sourceUserName(username)
+                .sourceUserPassword(password)
+                .endpointUrl(url)
+                .factoryPid(OPENSEARCH_FACTORY_PID)
+                .configurationHandlerId(OPENSEARCH_SOURCE_CONFIGURATION_HANDLER_ID);
+
+        results.probeResult(DISCOVERED_SOURCES, config);
+        return results;
+    }
+
     public static ProbeReport verifyOpenSearchCapabilities(String url, String username, String password) {
         ProbeReport requestResults = RequestUtils.sendGetRequest(url + SIMPLE_QUERY_PARAMS, username, password);
         if(requestResults.containsFailureMessages()) {
@@ -86,29 +104,17 @@ public class OpenSearchSourceUtils {
             return requestResults.addMessage(createInternalErrorMsg("Unable to read response from endpoint."));
         }
 
-        boolean isOpenSearchResponse;
         XPath xpath = XPathFactory.newInstance().newXPath();
         xpath.setNamespaceContext(SOURCES_NAMESPACE_CONTEXT);
         try {
-            isOpenSearchResponse = (Boolean) xpath.compile(TOTAL_RESULTS_XPATH).evaluate(capabilitiesXml, XPathConstants.BOOLEAN);
-        } catch (XPathExpressionException e1) {
-            return requestResults.addMessage(createCommonSourceConfigMsg(UNKNOWN_ENDPOINT));
+             if((Boolean) xpath.compile(TOTAL_RESULTS_XPATH).evaluate(capabilitiesXml, XPathConstants.BOOLEAN)) {
+                 return requestResults.addMessage(createCommonSourceConfigMsg(VERIFIED_CAPABILITIES))
+                         .probeResult(DISCOVERED_URL, url);
+             }
+        } catch (XPathExpressionException e) {
+            return requestResults.addMessage(createInternalErrorMsg("Failed to compile XPath."));
         }
-
-        OpenSearchSourceConfiguration config = new OpenSearchSourceConfiguration();
-        config.sourceUserName(username)
-                .sourceUserPassword(password)
-                .endpointUrl(url)
-                .factoryPid(OPENSEARCH_FACTORY_PID)
-                .configurationHandlerId(OPENSEARCH_SOURCE_CONFIGURATION_HANDLER_ID);
-
-        if (isOpenSearchResponse) {
-            requestResults.addMessage(createCommonSourceConfigMsg(VERIFIED_CAPABILITIES))
-                    .probeResult(DISCOVERED_SOURCES, config);
-        } else {
-            requestResults.addMessage(createCommonSourceConfigMsg(UNKNOWN_ENDPOINT));
-        }
-        return requestResults;
+        return requestResults.addMessage(createCommonSourceConfigMsg(UNKNOWN_ENDPOINT));
     }
 
     /**

@@ -18,6 +18,7 @@ import static org.codice.ddf.admin.api.handler.ConfigurationMessage.createIntern
 import static org.codice.ddf.admin.api.services.WfsServiceProperties.WFS1_FACTORY_PID;
 import static org.codice.ddf.admin.api.services.WfsServiceProperties.WFS2_FACTORY_PID;
 import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.DISCOVERED_SOURCES;
+import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.DISCOVERED_URL;
 import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.SOURCES_NAMESPACE_CONTEXT;
 import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.UNKNOWN_ENDPOINT;
 import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.VERIFIED_CAPABILITIES;
@@ -79,7 +80,7 @@ public class WfsSourceUtils {
 
         if (statusCode == HTTP_OK && WFS_MIME_TYPES.contains(contentType)) {
             return capabilitiesReport.addMessage(createCommonSourceConfigMsg(VERIFIED_CAPABILITIES))
-                    .probeResults(requestResults.probeResults());
+                    .probeResult(DISCOVERED_URL, url);
         }
         return capabilitiesReport.addMessage(createCommonSourceConfigMsg(UNKNOWN_ENDPOINT));
     }

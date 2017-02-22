@@ -4,17 +4,13 @@ import org.codice.ddf.admin.query.commons.fields.base.StringField;
 
 public class PidField extends StringField {
     public static final String PID = "pid";
+    public static final String DESCRIPTION = "A unique id used for persisting.";
 
     public PidField() {
-        super(PID);
+        super(PID, DESCRIPTION);
     }
 
     public PidField(String fieldName) {
-        super(fieldName);
-    }
-
-    @Override
-    public String description() {
-        return "A unique id used for persisting.";
+        super(fieldName, DESCRIPTION);
     }
 }

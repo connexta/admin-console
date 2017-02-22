@@ -2,6 +2,7 @@ package org.codice.ddf.admin.query.sts.actions;
 
 import org.codice.ddf.admin.query.api.fields.Field;
 import org.codice.ddf.admin.query.commons.actions.GetAction;
+import org.codice.ddf.admin.query.sts.field.StsClaimField;
 import org.codice.ddf.admin.query.sts.field.StsClaimsField;
 
 public class GetStsClaimsAction extends GetAction {
@@ -15,6 +16,6 @@ public class GetStsClaimsAction extends GetAction {
 
     @Override
     public Field process() {
-        return new StsClaimsField();
+        return new StsClaimsField().addField(new StsClaimField().setValue("testClaim"));
     }
 }

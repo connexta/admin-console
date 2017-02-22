@@ -4,10 +4,20 @@ import static org.codice.ddf.admin.query.api.fields.Field.FieldBaseType.ENUM;
 
 import java.util.List;
 
-public abstract class EnumField<T> extends BaseField<EnumFieldValue<T>> {
+public abstract class EnumField<T> extends BaseField {
 
-    public EnumField(String fieldName, String fieldTypeName) {
-        super(fieldName, fieldTypeName, ENUM);
+    private EnumFieldValue<T> value;
+
+    public EnumField(String fieldName, String fieldTypeName, String description) {
+        super(fieldName, fieldTypeName, description, ENUM);
+    }
+
+    public T getValue() {
+        return value.getValue();
+    }
+
+    public void setValue(T value) {
+        this.value.setValue(value);
     }
 
     public abstract List<EnumFieldValue<T>> getEnumValues();

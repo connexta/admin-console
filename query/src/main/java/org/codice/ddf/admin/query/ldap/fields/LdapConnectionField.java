@@ -12,18 +12,20 @@ import com.google.common.collect.ImmutableList;
 public class LdapConnectionField extends ObjectField {
     public static final String FIELD_NAME = "connection";
     public static final String FIELD_TYPE_NAME = "LdapConnection";
-    public static final List<Field> FIELDS = ImmutableList.of(new HostnameField(), new PortField(), new LdapEncryptionMethodField());
-    public LdapConnectionField() {
-        super(FIELD_NAME, FIELD_TYPE_NAME);
-    }
+    public static final String DESCRIPTION = "Contains the required information to establish an LDAP connection.";
+    private HostnameField hostname;
+    private PortField port;
+    private LdapEncryptionMethodField encryptionMethod;
 
-    @Override
-    public String description() {
-        return "Contains the required information to establish an LDAP connection.";
+    public LdapConnectionField() {
+        super(FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
+        hostname = new HostnameField();
+        port = new PortField();
+        encryptionMethod = new LdapEncryptionMethodField();
     }
 
     @Override
     public List<Field> getFields() {
-        return FIELDS;
+        return ImmutableList.of(hostname, port, encryptionMethod);
     }
 }

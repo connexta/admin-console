@@ -75,7 +75,7 @@ public class GraphQLCommons {
     }
 
     public static Object dataFetch(DataFetchingEnvironment env, Action action) {
-        return action.process(env.getArguments());
+        return action.process(env.getArguments()).getValue();
     }
     public static String capitalize(String str){
         return StringUtils.capitalize(str);

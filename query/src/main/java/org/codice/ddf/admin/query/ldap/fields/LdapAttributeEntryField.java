@@ -11,22 +11,22 @@ import com.google.common.collect.ImmutableList;
 public class LdapAttributeEntryField extends ObjectField {
 
     public static final String FIELD_NAME = "attributeMapping";
+    public static final String FIELD_TYPE_NAME = "AttributeMapping";
+    public static final String DESCRIPTION = "A mapping from an STS claim to a user attribute.";
+
     public static final String STS_CLAIM = "stsClaim";
     public static final String USER_ATTRIBUTE = "userAttribute";
-
-    private List<Field> FIELDS = ImmutableList.of(new StringField(STS_CLAIM), new StringField(USER_ATTRIBUTE));
+    private StringField stsClaim;
+    private StringField userAttribute;
 
     public LdapAttributeEntryField() {
-        super(FIELD_NAME, FIELD_NAME);
-    }
-
-    @Override
-    public String description() {
-        return "A mapping from an STS claim to a user attribute.";
+        super(FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
+        stsClaim = new StringField(STS_CLAIM);
+        userAttribute = new StringField(USER_ATTRIBUTE);
     }
 
     @Override
     public List<Field> getFields() {
-        return FIELDS;
+        return ImmutableList.of(stsClaim, userAttribute);
     }
 }

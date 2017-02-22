@@ -20,6 +20,10 @@ public class EnumFieldValue<T> {
         return value;
     }
 
+    public void setValue(T value) {
+        this.value = value;
+    }
+
     public String getDescription() {
         return description;
     }

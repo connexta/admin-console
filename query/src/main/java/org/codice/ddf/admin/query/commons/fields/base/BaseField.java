@@ -2,17 +2,18 @@ package org.codice.ddf.admin.query.commons.fields.base;
 
 import org.codice.ddf.admin.query.api.fields.Field;
 
-public abstract class BaseField<T> implements Field<T> {
+public abstract class BaseField implements Field {
 
     private String fieldName;
     private String fieldTypeName;
+    private String description;
     private FieldBaseType fieldBaseType;
-    private T value;
 
-    public BaseField(String fieldName, String fieldTypeName, FieldBaseType fieldBaseType) {
+    public BaseField(String fieldName, String fieldTypeName, String description, FieldBaseType fieldBaseType) {
         this.fieldName = fieldName;
         this.fieldTypeName = fieldTypeName;
         this.fieldBaseType = fieldBaseType;
+        this.description = description;
     }
 
     @Override
@@ -26,19 +27,12 @@ public abstract class BaseField<T> implements Field<T> {
     }
 
     @Override
+    public String description() {
+        return description;
+    }
 
+    @Override
     public FieldBaseType fieldBaseType() {
         return fieldBaseType;
-    }
-
-    @Override
-    public <S extends T> S getValue() {
-        return (S) value;
-    }
-
-    @Override
-    public Field addValue(T value) {
-        this.value = value;
-        return this;
     }
 }

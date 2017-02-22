@@ -19,15 +19,10 @@ public class LdapEncryptionMethodField extends EnumField<String> {
   private static final List<EnumFieldValue<String>> ENCRYPTION_METHODS = ImmutableList.of(NONE, LDAPS, START_TLS);
 
   public LdapEncryptionMethodField() {
-    super(FIELD_NAME, FIELD_TYPE_NAME);
+    super(FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
   }
 
-  @Override
-  public String description() {
-      return DESCRIPTION;
-  }
-
-  @Override
+    @Override
   public List<EnumFieldValue<String>> getEnumValues() {
     return ENCRYPTION_METHODS;
   }

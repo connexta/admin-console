@@ -11,22 +11,21 @@ import com.google.common.collect.ImmutableList;
 public class LdapCredentialsField extends ObjectField {
     public static final String FIELD_NAME = "credentials";
     public static final String FIELD_TYPE_NAME = "LdapCredentials";
+    public static final String DESCRIPTION = "Contains the required credentials to bind a user to an LDAP connection.";
+
     public static final String USERNAME = "username";
     public static final String PASSWORD = "password";
-
-    public static final List<Field> FIELDS = ImmutableList.of(new StringField(USERNAME), new StringField(PASSWORD));
+    private StringField username;
+    private StringField password;
 
     public LdapCredentialsField() {
-        super(FIELD_NAME, FIELD_TYPE_NAME);
-    }
-
-    @Override
-    public String description() {
-        return "Contains the required credentials to bind a user to an LDAP connection.";
+        super(FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
+        this.username = new StringField(USERNAME);
+        this.password = new StringField(PASSWORD);
     }
 
     @Override
     public List<Field> getFields() {
-        return FIELDS;
+        return ImmutableList.of(username, password);
     }
 }

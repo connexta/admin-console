@@ -1,5 +1,7 @@
 package org.codice.ddf.admin.query.commons.fields.common.message;
 
+import java.util.List;
+
 import org.codice.ddf.admin.query.api.fields.Field;
 import org.codice.ddf.admin.query.api.fields.Message;
 import org.codice.ddf.admin.query.commons.fields.base.ObjectField;
@@ -13,42 +15,35 @@ public class MessageField extends ObjectField implements Message {
     public static final String DESCRIPTION = "A message containing a code with a summary of the message and content will a more in depth description.";
     public static final String CODE = "code";
     public static final String CONTENT = "content";
-    public static final java.util.List<Field> FIELDS = ImmutableList.of(new StringField(CODE), new StringField(
-            CONTENT));
 
-    private String code;
-    private String content;
+    private StringField code;
+    private StringField content;
     private MessageType messageType;
 
     public MessageField(String code, String content, MessageType messageType) {
-        super(FIELD_NAME, FIELD_NAME);
-        this.code = code;
-        this.content = content;
+        super(FIELD_NAME, FIELD_NAME, DESCRIPTION);
+        this.code = new StringField(CODE).setValue(code);
+        this.content = new StringField(CONTENT).setValue(content);
         this.messageType = messageType;
     }
 
     @Override
-    public java.util.List<Field> getFields() {
-        return FIELDS;
+    public List<Field> getFields() {
+        return ImmutableList.of(code, content);
     }
 
     @Override
     public String getCode() {
-        return code;
+        return code.getValue();
     }
 
     @Override
     public String getContent() {
-        return content;
+        return content.getValue();
     }
 
     @Override
     public MessageType getMessageType() {
         return messageType;
-    }
-
-    @Override
-    public String description() {
-        return DESCRIPTION;
     }
 }

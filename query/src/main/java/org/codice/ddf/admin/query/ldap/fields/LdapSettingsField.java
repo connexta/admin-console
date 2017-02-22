@@ -28,12 +28,7 @@ public class LdapSettingsField extends ObjectField {
             new LdapAttributeMappingField());
 
     public LdapSettingsField() {
-        super(FIELD_NAME, FIELD_TYPE_NAME);
-    }
-
-    @Override
-    public String description() {
-        return DESCRIPTION;
+        super(FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
     }
 
     @Override

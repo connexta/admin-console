@@ -12,22 +12,22 @@ public class LdapConfigurationField extends ObjectField {
 
     public static final String FIELD_NAME = "config";
     public static final String FIELD_TYPE_NAME = "LdapConfiguration";
-    public static final List<Field> FIELDS = ImmutableList.of(new PidField(),
-            new LdapConnectionField(),
-            new LdapCredentialsField(),
-            new LdapSettingsField());
+    public static final String DESCRIPTION = "A configuration containing all the required fields for saving LDAP settings";
+    private PidField pid;
+    private LdapConnectionField connection;
+    private LdapCredentialsField credentials;
+    private LdapSettingsField settings;
 
     public LdapConfigurationField() {
-        super(FIELD_NAME, FIELD_TYPE_NAME);
-    }
-
-    @Override
-    public String description() {
-        return "A configuration containing all the required fields for saving LDAP settings";
+        super(FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
+        this.pid = new PidField();
+        this.connection = new LdapConnectionField();
+        this.credentials = new LdapCredentialsField();
+        this.settings = new LdapSettingsField();
     }
 
     @Override
     public List<Field> getFields() {
-        return FIELDS;
+        return ImmutableList.of(pid, connection, credentials, settings);
     }
 }

@@ -1,6 +1,5 @@
 package org.codice.ddf.admin.query.commons.fields.common;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -11,78 +10,78 @@ import org.codice.ddf.admin.query.api.fields.Field;
 import org.codice.ddf.admin.query.api.fields.Message;
 import org.codice.ddf.admin.query.api.fields.Report;
 import org.codice.ddf.admin.query.commons.fields.base.ObjectField;
+import org.codice.ddf.admin.query.commons.fields.common.message.MessageField;
 import org.codice.ddf.admin.query.commons.fields.common.message.MessageListField;
 
 import com.google.common.collect.ImmutableList;
 
 public class ReportField extends ObjectField implements Report {
-    private List<Message> successes;
-    private List<Message> warnings;
-    private List<Message> failures;
 
-    public static final List<Field> FIELDS = ImmutableList.of(new MessageListField(SUCCESSES),
-            new MessageListField(FAILURES),
-            new MessageListField(WARNINGS));
+    public static final String FIELD_NAME = "report";
+    public static final String FIELD_TYPE_NAME = "Report";
+    public static final String DESCRIPTION = "A report containing the results of the task requested.";
+
+    String SUCCESSES = "successes";
+    String FAILURES  = "failures";
+    String WARNINGS = "warnings";
+    private MessageListField successes;
+    private MessageListField warnings;
+    private MessageListField failures;
 
     public ReportField() {
-        super("report", REPORT);
-        this.successes = new ArrayList<>();
-        this.warnings = new ArrayList<>();
-        this.failures = new ArrayList<>();
-    }
-
-    @Override
-    public String description() {
-        return "A report containing the results of the task requested.";
+        super(FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
+        this.successes = new MessageListField(SUCCESSES);
+        this.warnings = new MessageListField(FAILURES);
+        this.failures = new MessageListField(WARNINGS);
     }
 
     @Override
     public List<Field> getFields() {
-        return FIELDS;
+        return ImmutableList.of(successes, warnings, failures);
     }
 
     @Override
     public List<Message> getSuccesses() {
-        return successes;
+        return successes.getValue();
     }
 
     @Override
-    public List<Message> getWarnings() {
-        return warnings;
+    public  List<Message> getWarnings() {
+        return warnings.getValue();
     }
 
     @Override
-    public List<Message> getFailures() {
-        return failures;
+    public  List<Message> getFailures() {
+        return failures.getValue();
     }
 
     @Override
-    public List<Message> getMessages() {
-        return Stream.of(successes, failures, warnings)
+    public  List<Message> getMessages() {
+        return Stream.of(successes.getMessages(), failures.getMessages(), warnings.getMessages())
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList());
     }
 
-    public ReportField messages(List<Message> messages) {
+    public ReportField messages(List<MessageField> messages) {
         messages.stream().forEach(this::message);
         return this;
     }
 
-    public ReportField messages(Message... messages) {
+    public ReportField messages(MessageField... messages) {
         Arrays.asList(messages).stream().forEach(this::message);
         return this;
     }
 
-    public ReportField message(Message message) {
+    public ReportField message(MessageField message) {
         switch (message.getMessageType()) {
         case SUCCESS:
-            successes.add(message);
+            successes.addField(message);
             break;
         case FAILURE:
-            failures.add(message);
+            failures.addField(message);
             break;
         case WARNING:
-            warnings.add(message);
+            warnings.addField(message);
             break;
         }
         return this;

@@ -68,8 +68,6 @@ public class SourceNameExistsWfsTestMethod extends TestMethod<SourceConfiguratio
             return new Report(buildMessage(SUCCESS_TYPES, FAILURE_TYPES, null, SUCCESSFUL_TEST));
         }
 
-        Report report = new Report();
-        results.forEach(report::addMessage);
-        return report;
+        return new Report(results);
     }
 }

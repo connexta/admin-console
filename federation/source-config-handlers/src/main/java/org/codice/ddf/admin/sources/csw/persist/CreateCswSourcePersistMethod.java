@@ -111,10 +111,7 @@ public class CreateCswSourcePersistMethod extends PersistMethod<CswSourceConfigu
     public List<ConfigurationMessage> validateRequiredFields(
             CswSourceConfiguration configuration) {
         Report report = handler.test(SOURCE_NAME_EXISTS_TEST_ID, configuration);
-        if(report.containsFailureMessages()) {
-            return report.messages();
-        }
-
-        return super.validateRequiredFields(configuration);
+        report.addMessages(super.validateRequiredFields(configuration));
+        return report.messages();
     }
 }

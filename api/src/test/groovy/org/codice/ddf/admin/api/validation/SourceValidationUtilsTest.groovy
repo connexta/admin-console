@@ -52,8 +52,7 @@ class SourceValidationUtilsTest extends Specification {
         then:
         results.size() == 1
         results.get(0).type() == ConfigurationMessage.MessageType.FAILURE
-        results.get(0).configFieldId() == CONFIG_FIELD_ID
-        results.get(0).subtype() == ConfigurationMessage.INVALID_FIELD
+        results.get(0).subtype() == ConfigurationMessage.INTERNAL_ERROR
     }
 
     def mockConfigurator(Object sourceName) {

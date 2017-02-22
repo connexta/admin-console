@@ -99,10 +99,7 @@ public class CreateOpenSearchSourcePersistMethod
     public List<ConfigurationMessage> validateRequiredFields(
             OpenSearchSourceConfiguration configuration) {
         Report report = handler.test(SOURCE_NAME_EXISTS_TEST_ID, configuration);
-        if(report.containsFailureMessages()) {
-            return report.messages();
-        }
-
-        return super.validateRequiredFields(configuration);
+        report.addMessages(super.validateRequiredFields(configuration));
+        return report.messages();
     }
 }

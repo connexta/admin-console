@@ -16,6 +16,7 @@ package org.codice.ddf.admin.api.validation;
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_NAME;
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_USERNAME;
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_USER_PASSWORD;
+import static org.codice.ddf.admin.api.handler.ConfigurationMessage.buildMessage;
 import static org.codice.ddf.admin.api.handler.ConfigurationMessage.createInvalidFieldMsg;
 import static org.codice.ddf.admin.api.services.CswServiceProperties.CSW_FACTORY_PIDS;
 import static org.codice.ddf.admin.api.services.OpenSearchServiceProperties.OPENSEARCH_FACTORY_PID;
@@ -86,17 +87,18 @@ public class SourceValidationUtils {
      * Validates the {@param sourceName} against the existing source names of the configuration's for
      * the given {@param factoryPids} using the {@param configurator}. An empty {@link List} will be returned
      * if there are no existing source names with with name {@param sourceName}, or a {@link List} containing
-     * {@link ConfigurationMessage}s if there are errors.
+     * {@link ConfigurationMessage}s if there are errors. If the {@param configurator} is {@code null}, one will
+     * be created.
      *
-     * @param  sourceName a non null name to validate
-     * @param  factoryPids a list of non null factory pids of the configuration to validate names against
-     * @param  configurator configurator to fetch configurations for the given {@param factoryPids}
+     * @param sourceName   a non null name to validate
+     * @param factoryPids  a list of non null factory pids of the configuration to validate names against
+     * @param configurator configurator to fetch configurations for the given {@param factoryPids}
      * @return a {@link List} of {@link ConfigurationMessage}s containing failure messages, or empty {@link List}
-     *         if there are no duplicate source names found
+     * if there are no duplicate source names found
      */
     public List<ConfigurationMessage> validateSourceName(@Nonnull String sourceName,
             @Nonnull List<String> factoryPids, Configurator configurator) {
-        if(configurator == null) {
+        if (configurator == null) {
             configurator = new Configurator();
         }
 
@@ -114,6 +116,7 @@ public class SourceValidationUtils {
                         LOGGER.debug(
                                 "Found duplicate existing source name when creating source with name \"{}\"",
                                 sourceName);
+
                         return Collections.singletonList(createInvalidFieldMsg(String.format(
                                 "A source with the name \"%s\" is already in use. Please choose another name.",
                                 sourceName), SOURCE_NAME));
@@ -122,9 +125,10 @@ public class SourceValidationUtils {
                     LOGGER.debug(
                             "Unable to validate duplicity of the incoming configuration's source name \"{}\"",
                             sourceName);
-                    return Collections.singletonList(createInvalidFieldMsg(String.format(String.format(
-                            "Error validating \"%s\" against existing source names.",
-                            sourceName), sourceName), SOURCE_NAME));
+                    return Collections.singletonList(buildMessage(ConfigurationMessage.MessageType.FAILURE,
+                            ConfigurationMessage.INTERNAL_ERROR,
+                            String.format("Error validating \"%s\" against existing source names.",
+                                    sourceName)));
                 }
             }
         }

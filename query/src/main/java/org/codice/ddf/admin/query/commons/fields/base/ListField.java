@@ -10,23 +10,27 @@ import org.codice.ddf.admin.query.api.fields.Field;
 
 public abstract class ListField<T extends Field> extends BaseField {
 
-    protected List<T> values;
+    protected List<T> fields;
 
     public ListField(String fieldName, String description) {
         super(fieldName, null, description, LIST);
-        values = new ArrayList<T>();
+        fields = new ArrayList<T>();
     }
 
     @Override
     public List getValue() {
-        return values.stream()
+        return fields.stream()
                 .map(value ->  value.getValue())
                 .collect(Collectors.toList());
     }
 
     public Field addField(T value) {
-        values.add(value);
+        fields.add(value);
         return this;
+    }
+
+    public List<T> getFields() {
+        return fields;
     }
 
     public abstract Field getListValueField();

@@ -22,12 +22,12 @@ public class LdapRecommendedSettings extends DefaultAction<LdapSettingsField> {
 
     @Override
     public LdapSettingsField process(Map<String, Object> args) {
-        LdapSettingsField settings = new LdapSettingsField();
-        settings.userBaseDn("exampleUserBaseDn");
-        settings.groupBaseDn("exampleBaseDn");
-        settings.groupObjectClass("exampleGroupObjectClass");
-        settings.groupMembershipAttribute("exampleMembershipAttribute");
-        settings.usernameAttribute("exampleUsernameAttribute");
-        return settings;
+        return new LdapSettingsField().userBaseDn("exampleUserBaseDn")
+                .groupBaseDn("exampleBaseDn")
+                .groupObjectClass("exampleGroupObjectClass")
+                .groupMembershipAttribute("exampleMembershipAttribute")
+                .usernameAttribute("exampleUsernameAttribute")
+                .mappingEntry("exampleClaim", "exampleAttribute")
+                .mappingEntry("exampleClaim2", "exampleAttribute2");
     }
 }

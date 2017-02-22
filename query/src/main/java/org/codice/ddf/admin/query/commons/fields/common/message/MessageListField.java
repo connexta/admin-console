@@ -14,7 +14,7 @@ public class MessageListField extends ListField<Message>{
     }
 
     public List<Message> getMessages() {
-        return values;
+        return fields;
     }
 
     @Override

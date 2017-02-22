@@ -26,6 +26,16 @@ public class LdapAttributeEntryField extends ObjectField {
         userAttribute = new StringField(USER_ATTRIBUTE);
     }
 
+    public LdapAttributeEntryField stsClaim(String claim) {
+        stsClaim.setValue(claim);
+        return this;
+    }
+
+    public LdapAttributeEntryField userAttribute(String userAttribute) {
+        this.userAttribute.setValue(userAttribute);
+        return this;
+    }
+
     @Override
     public List<Field> getFields() {
         return ImmutableList.of(stsClaim, userAttribute);

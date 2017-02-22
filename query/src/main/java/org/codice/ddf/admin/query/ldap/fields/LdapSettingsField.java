@@ -63,23 +63,38 @@ public class LdapSettingsField extends ObjectField {
         return usernameAttribute.getValue();
     }
 
-    public void userBaseDn(String userBaseDn) {
+    public List<LdapAttributeEntryField> mapping() {
+        return mapping.getFields();
+    }
+
+    public LdapSettingsField userBaseDn(String userBaseDn) {
         this.userBaseDn.setValue(userBaseDn);
+        return this;
     }
 
-    public void groupBaseDn(String groupBaseDn) {
+    public LdapSettingsField groupBaseDn(String groupBaseDn) {
         this.groupBaseDn.setValue(groupBaseDn);
+        return this;
     }
 
-    public void groupObjectClass(String groupObjectCLass) {
+    public LdapSettingsField groupObjectClass(String groupObjectCLass) {
         this.groupObjectClass.setValue(groupObjectCLass);
+        return this;
     }
 
-    public void groupMembershipAttribute(String groupMembershipAttribute) {
+    public LdapSettingsField groupMembershipAttribute(String groupMembershipAttribute) {
         this.groupMembershipAttribute.setValue(groupMembershipAttribute);
+        return this;
     }
 
-    public void usernameAttribute(String usernameAttribute) {
+    public LdapSettingsField usernameAttribute(String usernameAttribute) {
         this.usernameAttribute.setValue(usernameAttribute);
+        return this;
+    }
+
+    public LdapSettingsField mappingEntry(String claim, String attribute) {
+        mapping.addField(claim, attribute);
+        return this;
+
     }
 }

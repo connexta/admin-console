@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.codice.ddf.admin.query.api.Action;
 import org.codice.ddf.admin.query.commons.DefaultActionHandler;
+import org.codice.ddf.admin.query.ldap.actions.LdapRecommendedSettings;
 import org.codice.ddf.admin.query.ldap.actions.LdapTestBind;
 import org.codice.ddf.admin.query.ldap.actions.LdapTestConnection;
 import org.codice.ddf.admin.query.ldap.actions.LdapTestSettings;
@@ -26,6 +27,6 @@ public class LdapActionHandler extends DefaultActionHandler {
 
     @Override
     public List<Action> getSupportedActions() {
-        return Arrays.asList(new LdapTestConnection(), new LdapTestBind(), new LdapTestSettings());
+        return Arrays.asList(new LdapRecommendedSettings(), new LdapTestConnection(), new LdapTestBind(), new LdapTestSettings());
     }
 }

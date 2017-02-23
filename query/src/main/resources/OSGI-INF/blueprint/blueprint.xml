@@ -18,7 +18,7 @@
     </service>
 
     <service interface="graphql.servlet.GraphQLQueryProvider" >
-        <bean class="org.codice.ddf.admin.query.ldap.LdapQuery" />
+        <bean class="org.codice.ddf.admin.query.ldap.LdapQueryProvider" />
     </service>
 
     <service interface="graphql.servlet.GraphQLQueryProvider" >

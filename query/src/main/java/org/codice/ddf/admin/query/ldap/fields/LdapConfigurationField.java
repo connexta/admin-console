@@ -26,6 +26,22 @@ public class LdapConfigurationField extends ObjectField {
         this.settings = new LdapSettingsField();
     }
 
+
+    public LdapConfigurationField connection(LdapConnectionField connection) {
+        this. connection = connection;
+        return this;
+    }
+
+    public LdapConfigurationField credentials(LdapCredentialsField credentials) {
+        this.credentials = credentials;
+        return this;
+    }
+
+    public LdapConfigurationField settings(LdapSettingsField settings) {
+        this.settings = settings;
+        return this;
+    }
+
     @Override
     public List<Field> getFields() {
         return ImmutableList.of(pid, connection, credentials, settings);

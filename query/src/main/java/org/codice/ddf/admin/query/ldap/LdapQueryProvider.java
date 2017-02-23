@@ -7,7 +7,7 @@ import java.util.HashMap;
 import graphql.schema.GraphQLObjectType;
 import graphql.servlet.GraphQLQueryProvider;
 
-public class LdapQuery implements GraphQLQueryProvider {
+public class LdapQueryProvider implements GraphQLQueryProvider {
 
     @Override
     public GraphQLObjectType getQuery() {

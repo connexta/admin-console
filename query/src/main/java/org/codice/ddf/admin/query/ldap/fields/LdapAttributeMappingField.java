@@ -6,7 +6,7 @@ import org.codice.ddf.admin.query.commons.fields.base.ListField;
 public class LdapAttributeMappingField extends ListField<LdapAttributeEntryField> {
 
     public static final String DEFAULT_FIELD_NAME = "mapping";
-    public static final String DESCRIPTION = "A map containing STS claims to user attributes. Only 1 sts claim is allowed to be mapped to a single user attribute.";
+    public static final String DESCRIPTION = "A map containing STS claims to user attributes. Only 1 sts claim is allowed to be mapped to a single user setValue.";
 
     public LdapAttributeMappingField() {
         super(DEFAULT_FIELD_NAME, DESCRIPTION);

@@ -3,6 +3,7 @@ package org.codice.ddf.admin.query.ldap.fields;
 import java.util.List;
 
 import org.codice.ddf.admin.query.api.fields.Field;
+import org.codice.ddf.admin.query.commons.fields.base.EnumFieldValue;
 import org.codice.ddf.admin.query.commons.fields.base.ObjectField;
 import org.codice.ddf.admin.query.commons.fields.common.HostnameField;
 import org.codice.ddf.admin.query.commons.fields.common.PortField;
@@ -22,6 +23,21 @@ public class LdapConnectionField extends ObjectField {
         hostname = new HostnameField();
         port = new PortField();
         encryptionMethod = new LdapEncryptionMethodField();
+    }
+
+    public LdapConnectionField hostname(String hostname) {
+        this.hostname.setValue(hostname);
+        return this;
+    }
+
+    public LdapConnectionField port(int port){
+        this.port.setValue(port);
+        return this;
+    }
+
+    public LdapConnectionField encryptionMethod(LdapEncryptionMethodField encryptionMethod) {
+        this.encryptionMethod.setValue(encryptionMethod.getValue());
+        return this;
     }
 
     @Override

@@ -13,7 +13,7 @@ public abstract class DefaultAction<T extends Field> implements Action<T> {
     private List<Field> optionalFields;
     private T returnType;
 
-    public DefaultAction(String actionId, String description, List<Field> requiredFields,
+    protected DefaultAction(String actionId, String description, List<Field> requiredFields,
             List<Field> optionalFields, T returnType) {
         this.actionId = actionId;
         this.description = description;

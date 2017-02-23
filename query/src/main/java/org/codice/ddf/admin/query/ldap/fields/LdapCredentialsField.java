@@ -24,6 +24,16 @@ public class LdapCredentialsField extends ObjectField {
         this.password = new StringField(PASSWORD);
     }
 
+    public LdapCredentialsField username(String username) {
+        this.username.setValue(username);
+        return this;
+    }
+
+    public LdapCredentialsField password(String password) {
+        this.password.setValue(password);
+        return this;
+    }
+
     @Override
     public List<Field> getFields() {
         return ImmutableList.of(username, password);

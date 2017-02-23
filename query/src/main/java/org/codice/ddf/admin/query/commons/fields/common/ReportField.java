@@ -31,8 +31,8 @@ public class ReportField extends ObjectField implements Report {
     public ReportField() {
         super(FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
         this.successes = new MessageListField(SUCCESSES);
-        this.warnings = new MessageListField(FAILURES);
-        this.failures = new MessageListField(WARNINGS);
+        this.warnings = new MessageListField(WARNINGS);
+        this.failures = new MessageListField(FAILURES);
     }
 
     @Override

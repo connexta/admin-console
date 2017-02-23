@@ -26,9 +26,9 @@ import graphql.schema.GraphQLObjectType;
 public class GraphQLCommons {
 
     public static GraphQLObjectType handlerToGraphQLObject(ActionHandler handler) {
-        List<GraphQLFieldDefinition> actionObjects = handler.getSupportedActions()
+        List<GraphQLFieldDefinition> actionObjects = handler.getDiscoveryActions()
                 .stream()
-                .map(a -> handlerActionToGraphQLObject(a))
+                .map(a -> handlerActionToGraphQLFieldDefinition(a))
                 .collect(Collectors.toList());
 
         return newObject().name(handler.getActionHandlerId())
@@ -37,7 +37,11 @@ public class GraphQLCommons {
                 .build();
     }
 
-    public static GraphQLFieldDefinition handlerActionToGraphQLObject(Action action) {
+    public static List<GraphQLFieldDefinition> handlerActionsToGraphQLFieldDefinition(List<Action> actions) {
+        return actions.stream().map(action -> handlerActionToGraphQLFieldDefinition(action)).collect(
+                Collectors.toList());
+    }
+    public static GraphQLFieldDefinition handlerActionToGraphQLFieldDefinition(Action action) {
         List<Field> reqFields = action.getRequiredFields();
         List<Field> optFields = action.getOptionalFields();
         List<GraphQLArgument> requiredArgs = new ArrayList<>();

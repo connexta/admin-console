@@ -5,13 +5,14 @@ import java.util.List;
 
 import org.codice.ddf.admin.query.api.Action;
 import org.codice.ddf.admin.query.commons.DefaultActionHandler;
-import org.codice.ddf.admin.query.ldap.actions.LdapConfigurations;
-import org.codice.ddf.admin.query.ldap.actions.LdapQuery;
-import org.codice.ddf.admin.query.ldap.actions.LdapRecommendedSettings;
-import org.codice.ddf.admin.query.ldap.actions.LdapTestBind;
-import org.codice.ddf.admin.query.ldap.actions.LdapTestConnection;
-import org.codice.ddf.admin.query.ldap.actions.LdapTestSettings;
-import org.codice.ddf.admin.query.ldap.actions.LdapUserAttributes;
+import org.codice.ddf.admin.query.ldap.actions.discover.LdapConfigurations;
+import org.codice.ddf.admin.query.ldap.actions.discover.LdapQuery;
+import org.codice.ddf.admin.query.ldap.actions.discover.LdapRecommendedSettings;
+import org.codice.ddf.admin.query.ldap.actions.discover.LdapTestBind;
+import org.codice.ddf.admin.query.ldap.actions.discover.LdapTestConnection;
+import org.codice.ddf.admin.query.ldap.actions.discover.LdapTestSettings;
+import org.codice.ddf.admin.query.ldap.actions.discover.LdapUserAttributes;
+import org.codice.ddf.admin.query.ldap.actions.persist.SaveLdapConfiguration;
 
 public class LdapActionHandler extends DefaultActionHandler {
 
@@ -29,7 +30,7 @@ public class LdapActionHandler extends DefaultActionHandler {
     }
 
     @Override
-    public List<Action> getSupportedActions() {
+    public List<Action> getDiscoveryActions() {
         return Arrays.asList(new LdapRecommendedSettings(),
                 new LdapTestConnection(),
                 new LdapTestBind(),
@@ -37,5 +38,10 @@ public class LdapActionHandler extends DefaultActionHandler {
                 new LdapQuery(),
                 new LdapUserAttributes(),
                 new LdapConfigurations());
+    }
+
+    @Override
+    public List<Action> getPersistActions() {
+        return Arrays.asList(new SaveLdapConfiguration());
     }
 }

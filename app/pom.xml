@@ -22,6 +22,7 @@
     </parent>
     <artifactId>admin-beta-app</artifactId>
     <name>DDF :: Admin (Beta) :: App</name>
+    <packaging>pom</packaging>
 
     <dependencies>
         <dependency>

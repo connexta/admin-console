@@ -208,6 +208,7 @@ public class RequestUtils {
                 .disableAutomaticRetries()
                 .setDefaultRequestConfig(RequestConfig.custom()
                         .setConnectTimeout(PING_TIMEOUT)
+                        .setSocketTimeout(PING_TIMEOUT)
                         .build());
         if (trustAnyCA) {
             try {

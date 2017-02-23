@@ -21,9 +21,9 @@ import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE
 import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.CREATE;
 import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.FAILED_CREATE;
 import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.SUCCESSFUL_CREATE;
-import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.SOURCE_NAME_EXISTS_TEST_ID;
 import static org.codice.ddf.admin.api.handler.report.Report.createReport;
 import static org.codice.ddf.admin.api.services.WfsServiceProperties.wfsConfigToServiceProps;
+import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.SOURCE_NAME_EXISTS_TEST_ID;
 
 import java.util.List;
 import java.util.Map;

@@ -42,6 +42,8 @@ public class SourceHandlerCommons {
 
     //Common probe id's
     public static final String DISCOVER_SOURCES_ID = "discover-sources";
+    public static final String SOURCE_NAME_EXISTS_TEST_ID = "source-name-exists";
+
 
     //Common failure types
     public static final String UNKNOWN_ENDPOINT = "UNKNOWN_ENDPOINT";

@@ -13,9 +13,9 @@
  */
 package org.codice.ddf.admin.api.validation;
 
-import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_NAME;
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.PORT;
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_HOSTNAME;
+import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_NAME;
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_USERNAME;
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_USER_PASSWORD;
 import static org.codice.ddf.admin.api.handler.ConfigurationMessage.buildMessage;

@@ -24,7 +24,6 @@ import java.util.function.Function;
 
 import org.codice.ddf.admin.api.config.ConfigurationType;
 import org.codice.ddf.admin.api.handler.ConfigurationMessage;
-import org.codice.ddf.admin.api.validation.SourceValidationUtils;
 import org.codice.ddf.admin.api.validation.ValidationUtils;
 
 import com.google.common.base.MoreObjects;

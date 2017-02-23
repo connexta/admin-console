@@ -20,9 +20,10 @@ import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE
 import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.CREATE;
 import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.FAILED_CREATE;
 import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.SUCCESSFUL_CREATE;
-import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.SOURCE_NAME_EXISTS_TEST_ID;
 import static org.codice.ddf.admin.api.handler.report.Report.createReport;
 import static org.codice.ddf.admin.api.services.OpenSearchServiceProperties.openSearchConfigToServiceProps;
+import static org.codice.ddf.admin.api.validation.SourceValidationUtils.validateOptionalUsernameAndPassword;
+import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.SOURCE_NAME_EXISTS_TEST_ID;
 
 import java.util.List;
 import java.util.Map;
@@ -34,7 +35,6 @@ import org.codice.ddf.admin.api.handler.ConfigurationHandler;
 import org.codice.ddf.admin.api.handler.ConfigurationMessage;
 import org.codice.ddf.admin.api.handler.method.PersistMethod;
 import org.codice.ddf.admin.api.handler.report.Report;
-import org.codice.ddf.admin.api.validation.SourceValidationUtils;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -57,8 +57,6 @@ public class CreateOpenSearchSourcePersistMethod
     private static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(FAILED_CREATE,
             "Failed to create OpenSearch Source.");
 
-    private final SourceValidationUtils sourceValidationUtils;
-
     private final ConfigurationHandler handler;
 
     public CreateOpenSearchSourcePersistMethod(ConfigurationHandler handler) {
@@ -70,7 +68,6 @@ public class CreateOpenSearchSourcePersistMethod
                 FAILURE_TYPES,
                 null);
 
-        sourceValidationUtils = new SourceValidationUtils();
         this.handler = handler;
     }
 
@@ -92,7 +89,7 @@ public class CreateOpenSearchSourcePersistMethod
     @Override
     public List<ConfigurationMessage> validateOptionalFields(
             OpenSearchSourceConfiguration configuration) {
-        return sourceValidationUtils.validateOptionalUsernameAndPassword(configuration);
+        return validateOptionalUsernameAndPassword(configuration);
     }
 
     @Override

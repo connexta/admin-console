@@ -38,8 +38,6 @@ import org.codice.ddf.admin.api.config.sources.WfsSourceConfiguration;
 import org.codice.ddf.admin.api.handler.ConfigurationMessage;
 import org.codice.ddf.admin.api.handler.method.ProbeMethod;
 import org.codice.ddf.admin.api.handler.report.ProbeReport;
-import org.codice.ddf.admin.api.validation.SourceValidationUtils;
-import org.codice.ddf.admin.sources.wfs.WfsSourceUtils;
 
 import com.google.common.collect.ImmutableList;
 

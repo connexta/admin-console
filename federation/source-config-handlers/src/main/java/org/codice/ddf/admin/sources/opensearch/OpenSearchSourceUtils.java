@@ -107,10 +107,10 @@ public class OpenSearchSourceUtils {
         XPath xpath = XPathFactory.newInstance().newXPath();
         xpath.setNamespaceContext(SOURCES_NAMESPACE_CONTEXT);
         try {
-             if((Boolean) xpath.compile(TOTAL_RESULTS_XPATH).evaluate(capabilitiesXml, XPathConstants.BOOLEAN)) {
-                 return requestResults.addMessage(createCommonSourceConfigMsg(VERIFIED_CAPABILITIES))
+            if((Boolean) xpath.compile(TOTAL_RESULTS_XPATH).evaluate(capabilitiesXml, XPathConstants.BOOLEAN)) {
+                return requestResults.addMessage(createCommonSourceConfigMsg(VERIFIED_CAPABILITIES))
                          .probeResult(DISCOVERED_URL, url);
-             }
+            }
         } catch (XPathExpressionException e) {
             return requestResults.addMessage(createInternalErrorMsg("Failed to compile XPath."));
         }

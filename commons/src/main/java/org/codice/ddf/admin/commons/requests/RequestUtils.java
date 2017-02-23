@@ -1,3 +1,16 @@
+/**
+ * Copyright (c) Codice Foundation
+ * <p>
+ * This is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser
+ * General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or any later version.
+ * <p>
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details. A copy of the GNU Lesser General Public License
+ * is distributed along with this program and can be found at
+ * <http://www.gnu.org/licenses/lgpl.html>.
+ */
 package org.codice.ddf.admin.commons.requests;
 
 import static java.net.HttpURLConnection.HTTP_OK;
@@ -133,8 +146,7 @@ public class RequestUtils {
             if (response.getStatusLine().getStatusCode() == HTTP_OK) {
                 return new ProbeReport().addMessage(createRequestConfigMsg(EXECUTED_REQUEST))
                         .probeResults(responseToMap(response));
-            }
-            else {
+            } else {
                 return new ProbeReport().addMessage(createRequestConfigMsg(CANNOT_CONNECT));
             }
         } catch (SSLPeerUnverifiedException e) {
@@ -147,7 +159,7 @@ public class RequestUtils {
                 results.addMessage(createRequestConfigMsg(UNTRUSTED_CA));
                 results.addMessage(createRequestConfigMsg(EXECUTED_REQUEST));
                 return results.probeResults(responseToMap(response));
-            } catch (Exception e1){
+            } catch (Exception e1) {
                 return results.addMessage(createRequestConfigMsg(CANNOT_CONNECT));
             }
         } finally {

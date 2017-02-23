@@ -1,5 +1,7 @@
 package org.codice.ddf.admin.query.ldap.actions;
 
+import static org.codice.ddf.admin.query.ldap.sample.SampleFields.SAMPLE_LDAP_SETTINGS;
+
 import java.util.List;
 import java.util.Map;
 
@@ -22,12 +24,6 @@ public class LdapRecommendedSettings extends DefaultAction<LdapSettingsField> {
 
     @Override
     public LdapSettingsField process(Map<String, Object> args) {
-        return new LdapSettingsField().userBaseDn("exampleUserBaseDn")
-                .groupBaseDn("exampleBaseDn")
-                .groupObjectClass("exampleGroupObjectClass")
-                .groupMembershipAttribute("exampleMembershipAttribute")
-                .usernameAttribute("exampleUsernameAttribute")
-                .mappingEntry("exampleClaim", "exampleAttribute")
-                .mappingEntry("exampleClaim2", "exampleAttribute2");
+        return SAMPLE_LDAP_SETTINGS;
     }
 }

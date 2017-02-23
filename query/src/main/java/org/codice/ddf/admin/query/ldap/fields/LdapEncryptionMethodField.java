@@ -22,7 +22,7 @@ public class LdapEncryptionMethodField extends EnumField<String> {
     super(FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
   }
 
-    @Override
+  @Override
   public List<EnumFieldValue<String>> getEnumValues() {
     return ENCRYPTION_METHODS;
   }

@@ -1,6 +1,6 @@
 package org.codice.ddf.admin.query.commons.fields.base;
 
-public class EnumFieldValue<T> {
+public class EnumFieldValue<T>{
 
     private String name;
     private T value;

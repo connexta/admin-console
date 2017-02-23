@@ -5,10 +5,13 @@ import java.util.List;
 
 import org.codice.ddf.admin.query.api.Action;
 import org.codice.ddf.admin.query.commons.DefaultActionHandler;
+import org.codice.ddf.admin.query.ldap.actions.LdapConfigurations;
+import org.codice.ddf.admin.query.ldap.actions.LdapQuery;
 import org.codice.ddf.admin.query.ldap.actions.LdapRecommendedSettings;
 import org.codice.ddf.admin.query.ldap.actions.LdapTestBind;
 import org.codice.ddf.admin.query.ldap.actions.LdapTestConnection;
 import org.codice.ddf.admin.query.ldap.actions.LdapTestSettings;
+import org.codice.ddf.admin.query.ldap.actions.LdapUserAttributes;
 
 public class LdapActionHandler extends DefaultActionHandler {
 
@@ -27,6 +30,12 @@ public class LdapActionHandler extends DefaultActionHandler {
 
     @Override
     public List<Action> getSupportedActions() {
-        return Arrays.asList(new LdapRecommendedSettings(), new LdapTestConnection(), new LdapTestBind(), new LdapTestSettings());
+        return Arrays.asList(new LdapRecommendedSettings(),
+                new LdapTestConnection(),
+                new LdapTestBind(),
+                new LdapTestSettings(),
+                new LdapQuery(),
+                new LdapUserAttributes(),
+                new LdapConfigurations());
     }
 }

@@ -13,7 +13,7 @@ public class LdapAttributeEntryField extends ObjectField {
 
     public static final String FIELD_NAME = "attributeMapping";
     public static final String FIELD_TYPE_NAME = "AttributeMapping";
-    public static final String DESCRIPTION = "A mapping from an STS claim to a user attribute.";
+    public static final String DESCRIPTION = "A mapping from an STS claim to a user setValue.";
 
     public static final String STS_CLAIM = "stsClaim";
     public static final String USER_ATTRIBUTE = "userAttribute";

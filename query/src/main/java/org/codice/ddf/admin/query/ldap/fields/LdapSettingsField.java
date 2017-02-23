@@ -22,8 +22,8 @@ public class LdapSettingsField extends ObjectField {
     private String GROUP_MEMBERSHIP_ATTRIBUTE = "groupMembershipAttribute";
 
     private StringField usernameAttribute;
-    private LdapDn userBaseDn;
-    private LdapDn groupBaseDn;
+    private LdapDistinguishedName userBaseDn;
+    private LdapDistinguishedName groupBaseDn;
     private StringField groupObjectClass;
     private StringField groupMembershipAttribute;
     private LdapAttributeMappingField mapping;
@@ -31,8 +31,8 @@ public class LdapSettingsField extends ObjectField {
     public LdapSettingsField() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
         this.usernameAttribute = new StringField(USER_NAME_ATTRIBUTE);
-        this.userBaseDn = new LdapDn(USER_BASE_DN);
-        this.groupBaseDn = new LdapDn(GROUP_BASE_DN);
+        this.userBaseDn = new LdapDistinguishedName(USER_BASE_DN);
+        this.groupBaseDn = new LdapDistinguishedName(GROUP_BASE_DN);
         this.groupObjectClass = new StringField(GROUP_OBJECT_CLASS);
         this.groupMembershipAttribute = new StringField(GROUP_MEMBERSHIP_ATTRIBUTE);
         this.mapping = new LdapAttributeMappingField();

@@ -1,4 +1,4 @@
-package org.codice.ddf.admin.query.ldap.actions;
+package org.codice.ddf.admin.query.ldap.actions.discover;
 
 import static org.codice.ddf.admin.query.ldap.sample.SampleFields.SAMPLE_LDAP_CONFIGURATION;
 

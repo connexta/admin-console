@@ -11,7 +11,7 @@ public abstract class DefaultActionHandler implements ActionHandler {
 
     @Override
     public Field process(Action action, Map<String, Object> args) {
-        Optional<Action> foundAction = getSupportedActions().stream()
+        Optional<Action> foundAction = getDiscoveryActions().stream()
                 .filter(actionType -> actionType.getActionName()
                         .equals(action.getActionName()))
                 .findFirst();

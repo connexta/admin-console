@@ -1,5 +1,6 @@
 package org.codice.ddf.admin.query.sts;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -7,7 +8,7 @@ import org.codice.ddf.admin.query.api.Action;
 import org.codice.ddf.admin.query.commons.DefaultActionHandler;
 import org.codice.ddf.admin.query.sts.actions.GetStsClaimsAction;
 
-public class StsActionHandler extends DefaultActionHandler{
+public class StsActionHandler extends DefaultActionHandler {
 
     public static final String ACTION_HANDLER_ID = "sts";
 
@@ -24,7 +25,12 @@ public class StsActionHandler extends DefaultActionHandler{
     }
 
     @Override
-    public List<Action> getSupportedActions() {
+    public List<Action> getDiscoveryActions() {
         return Arrays.asList(new GetStsClaimsAction());
+    }
+
+    @Override
+    public List<Action> getPersistActions() {
+        return new ArrayList<>();
     }
 }

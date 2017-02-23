@@ -1,5 +1,6 @@
 package org.codice.ddf.admin.query.sample;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -23,8 +24,13 @@ public class SampleActionHandler extends DefaultActionHandler {
     }
 
     @Override
-    public List<Action> getSupportedActions() {
+    public List<Action> getDiscoveryActions() {
         //new LdapConnectAction(),
         return Arrays.asList( new SampleAction());
+    }
+
+    @Override
+    public List<Action> getPersistActions() {
+        return new ArrayList<>();
     }
 }

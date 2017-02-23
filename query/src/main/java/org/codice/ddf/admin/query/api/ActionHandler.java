@@ -9,5 +9,6 @@ public interface ActionHandler {
     String getActionHandlerId();
     String description();
     Field process(Action action, Map<String, Object> args);
-    List<Action> getSupportedActions();
+    List<Action> getDiscoveryActions();
+    List<Action> getPersistActions();
 }

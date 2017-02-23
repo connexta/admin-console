@@ -1,4 +1,4 @@
-package org.codice.ddf.admin.query.ldap.actions;
+package org.codice.ddf.admin.query.ldap.actions.discover;
 
 import java.util.Arrays;
 import java.util.List;

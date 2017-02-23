@@ -34,6 +34,8 @@ public class SourceHandlerCommons {
 
     public static final String VALID_URL_TEST_ID = "valid-url";
 
+    public static final String SOURCE_NAME_EXISTS_TEST_ID = "source-name-exists";
+
     //Common success types
     public static final String CONFIG_CREATED = "CONFIG_CREATED";
 

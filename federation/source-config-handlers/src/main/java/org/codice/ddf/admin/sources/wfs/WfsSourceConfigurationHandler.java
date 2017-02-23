@@ -17,6 +17,7 @@ package org.codice.ddf.admin.sources.wfs;
 import static org.codice.ddf.admin.api.services.WfsServiceProperties.WFS_FACTORY_PIDS;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,6 +25,7 @@ import org.codice.ddf.admin.api.config.ConfigurationType;
 import org.codice.ddf.admin.api.config.sources.SourceConfiguration;
 import org.codice.ddf.admin.api.config.sources.WfsSourceConfiguration;
 import org.codice.ddf.admin.api.configurator.Configurator;
+import org.codice.ddf.admin.api.handler.ConfigurationHandler;
 import org.codice.ddf.admin.api.handler.DefaultConfigurationHandler;
 import org.codice.ddf.admin.api.handler.SourceConfigurationHandler;
 import org.codice.ddf.admin.api.handler.method.PersistMethod;
@@ -36,12 +38,19 @@ import org.codice.ddf.admin.sources.wfs.persist.CreateWfsSourcePersistMethod;
 import org.codice.ddf.admin.sources.wfs.persist.DeleteWfsSourcePersistMethod;
 import org.codice.ddf.admin.sources.wfs.probe.DiscoverWfsSourceProbeMethod;
 import org.codice.ddf.admin.sources.wfs.probe.WfsConfigFromUrlProbeMethod;
+import org.codice.ddf.admin.sources.wfs.test.SourceNameExistsWfsTestMethod;
 
 public class WfsSourceConfigurationHandler extends DefaultConfigurationHandler<SourceConfiguration>
         implements SourceConfigurationHandler<SourceConfiguration> {
 
     public static final String WFS_SOURCE_CONFIGURATION_HANDLER_ID =
             WfsSourceConfiguration.CONFIGURATION_TYPE;
+
+    private final ConfigurationHandler handler;
+
+    public WfsSourceConfigurationHandler(ConfigurationHandler handler) {
+        this.handler = handler;
+    }
 
     @Override
     public List<ProbeMethod> getProbeMethods() {
@@ -50,12 +59,12 @@ public class WfsSourceConfigurationHandler extends DefaultConfigurationHandler<S
 
     @Override
     public List<TestMethod> getTestMethods() {
-        return null;
+        return Collections.singletonList(new SourceNameExistsWfsTestMethod(new Configurator()));
     }
 
     @Override
     public List<PersistMethod> getPersistMethods() {
-        return Arrays.asList(new CreateWfsSourcePersistMethod(),
+        return Arrays.asList(new CreateWfsSourcePersistMethod(handler),
                 new DeleteWfsSourcePersistMethod());
     }
 

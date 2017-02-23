@@ -60,7 +60,6 @@ public class SourceConfiguration extends Configuration {
     private String sourceUserPassword;
 
     public SourceConfiguration() {
-
     }
 
     public SourceConfiguration(SourceConfiguration sourceConfiguration) {

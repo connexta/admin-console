@@ -17,6 +17,7 @@ package org.codice.ddf.admin.sources.opensearch;
 import static org.codice.ddf.admin.api.services.OpenSearchServiceProperties.OPENSEARCH_FACTORY_PID;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,6 +25,7 @@ import org.codice.ddf.admin.api.config.ConfigurationType;
 import org.codice.ddf.admin.api.config.sources.OpenSearchSourceConfiguration;
 import org.codice.ddf.admin.api.config.sources.SourceConfiguration;
 import org.codice.ddf.admin.api.configurator.Configurator;
+import org.codice.ddf.admin.api.handler.ConfigurationHandler;
 import org.codice.ddf.admin.api.handler.DefaultConfigurationHandler;
 import org.codice.ddf.admin.api.handler.SourceConfigurationHandler;
 import org.codice.ddf.admin.api.handler.method.PersistMethod;
@@ -36,6 +38,7 @@ import org.codice.ddf.admin.sources.opensearch.persist.CreateOpenSearchSourcePer
 import org.codice.ddf.admin.sources.opensearch.persist.DeleteOpenSearchSourcePersistMethod;
 import org.codice.ddf.admin.sources.opensearch.probe.DiscoverOpenSearchSourceProbeMethod;
 import org.codice.ddf.admin.sources.opensearch.probe.OpenSearchConfigFromUrlProbeMethod;
+import org.codice.ddf.admin.sources.opensearch.test.SourceNameExistsOpenSearchTestMethod;
 
 public class OpenSearchSourceConfigurationHandler
         extends DefaultConfigurationHandler<SourceConfiguration>
@@ -43,6 +46,12 @@ public class OpenSearchSourceConfigurationHandler
 
     public static final String OPENSEARCH_SOURCE_CONFIGURATION_HANDLER_ID =
             OpenSearchSourceConfiguration.CONFIGURATION_TYPE;
+
+    private final ConfigurationHandler handler;
+
+    public OpenSearchSourceConfigurationHandler(ConfigurationHandler handler) {
+        this.handler = handler;
+    }
 
     @Override
     public List<ProbeMethod> getProbeMethods() {
@@ -52,12 +61,12 @@ public class OpenSearchSourceConfigurationHandler
 
     @Override
     public List<TestMethod> getTestMethods() {
-        return null;
+        return Collections.singletonList(new SourceNameExistsOpenSearchTestMethod(new Configurator()));
     }
 
     @Override
     public List<PersistMethod> getPersistMethods() {
-        return Arrays.asList(new CreateOpenSearchSourcePersistMethod(),
+        return Arrays.asList(new CreateOpenSearchSourcePersistMethod(handler),
                 new DeleteOpenSearchSourcePersistMethod());
     }
 

@@ -23,8 +23,8 @@ import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE
 import static org.codice.ddf.admin.api.handler.ConfigurationMessage.FAILED_PERSIST;
 import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.CREATE;
 import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.SUCCESSFUL_PERSIST;
+import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.SOURCE_NAME_EXISTS_TEST_ID;
 import static org.codice.ddf.admin.api.services.CswServiceProperties.cswConfigToServiceProps;
-import static org.codice.ddf.admin.api.validation.SourceValidationUtils.validateOptionalUsernameAndPassword;
 
 import java.util.Arrays;
 import java.util.List;
@@ -33,9 +33,11 @@ import java.util.Map;
 import org.codice.ddf.admin.api.config.sources.CswSourceConfiguration;
 import org.codice.ddf.admin.api.configurator.Configurator;
 import org.codice.ddf.admin.api.configurator.OperationReport;
+import org.codice.ddf.admin.api.handler.ConfigurationHandler;
 import org.codice.ddf.admin.api.handler.ConfigurationMessage;
 import org.codice.ddf.admin.api.handler.method.PersistMethod;
 import org.codice.ddf.admin.api.handler.report.Report;
+import org.codice.ddf.admin.api.validation.SourceValidationUtils;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -62,7 +64,11 @@ public class CreateCswSourcePersistMethod extends PersistMethod<CswSourceConfigu
     private static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(FAILED_PERSIST,
             "Failed to create CSW Source.");
 
-    public CreateCswSourcePersistMethod() {
+    private final SourceValidationUtils sourceValidationUtils;
+
+    private final ConfigurationHandler handler;
+
+    public CreateCswSourcePersistMethod(ConfigurationHandler handler) {
         super(CREATE_CSW_SOURCE_ID,
                 DESCRIPTION,
                 REQUIRED_FIELDS,
@@ -70,6 +76,9 @@ public class CreateCswSourcePersistMethod extends PersistMethod<CswSourceConfigu
                 SUCCESS_TYPES,
                 FAILURE_TYPES,
                 null);
+
+        sourceValidationUtils = new SourceValidationUtils();
+        this.handler = handler;
     }
 
     @Override
@@ -87,8 +96,8 @@ public class CreateCswSourcePersistMethod extends PersistMethod<CswSourceConfigu
 
     @Override
     public List<ConfigurationMessage> validateOptionalFields(CswSourceConfiguration configuration) {
-        List<ConfigurationMessage> validationResults = validateOptionalUsernameAndPassword(
-                configuration);
+        List<ConfigurationMessage> validationResults =
+                sourceValidationUtils.validateOptionalUsernameAndPassword(configuration);
         if (configuration.outputSchema() != null) {
             validationResults.addAll(configuration.validate(Arrays.asList(OUTPUT_SCHEMA)));
         }
@@ -96,5 +105,13 @@ public class CreateCswSourcePersistMethod extends PersistMethod<CswSourceConfigu
             validationResults.addAll(configuration.validate(Arrays.asList(FORCE_SPATIAL_FILTER)));
         }
         return validationResults;
+    }
+
+    @Override
+    public List<ConfigurationMessage> validateRequiredFields(
+            CswSourceConfiguration configuration) {
+        Report report = handler.test(SOURCE_NAME_EXISTS_TEST_ID, configuration);
+        report.addMessages(super.validateRequiredFields(configuration));
+        return report.messages();
     }
 }

@@ -27,7 +27,6 @@ import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.UNKN
 import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.UNTRUSTED_CA;
 import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.endpointIsReachable;
 import static org.codice.ddf.admin.api.services.OpenSearchServiceProperties.OPENSEARCH_FACTORY_PID;
-import static org.codice.ddf.admin.api.validation.SourceValidationUtils.validateOptionalUsernameAndPassword;
 import static org.codice.ddf.admin.sources.opensearch.OpenSearchSourceConfigurationHandler.OPENSEARCH_SOURCE_CONFIGURATION_HANDLER_ID;
 
 import java.util.HashMap;
@@ -39,6 +38,7 @@ import org.codice.ddf.admin.api.handler.ConfigurationMessage;
 import org.codice.ddf.admin.api.handler.commons.UrlAvailability;
 import org.codice.ddf.admin.api.handler.method.ProbeMethod;
 import org.codice.ddf.admin.api.handler.report.ProbeReport;
+import org.codice.ddf.admin.api.validation.SourceValidationUtils;
 import org.codice.ddf.admin.sources.opensearch.OpenSearchSourceUtils;
 
 import com.google.common.collect.ImmutableList;
@@ -72,7 +72,9 @@ public class DiscoverOpenSearchSourceProbeMethod
 
     public static final List<String> RETURN_TYPES = ImmutableList.of(DISCOVERED_SOURCES);
 
-    private OpenSearchSourceUtils utils;
+    private final OpenSearchSourceUtils openSearchSourceUtils;
+
+    private final SourceValidationUtils sourceValidationUtils;
 
     public DiscoverOpenSearchSourceProbeMethod() {
         super(OPENSEARCH_DISCOVER_SOURCES_ID,
@@ -83,7 +85,9 @@ public class DiscoverOpenSearchSourceProbeMethod
                 FAILURE_TYPES,
                 null,
                 RETURN_TYPES);
-        utils = new OpenSearchSourceUtils();
+
+        openSearchSourceUtils = new OpenSearchSourceUtils();
+        sourceValidationUtils = new SourceValidationUtils();
     }
 
     @Override
@@ -96,7 +100,7 @@ public class DiscoverOpenSearchSourceProbeMethod
             return probeReport;
         }
 
-        UrlAvailability availability = utils.confirmEndpointUrl(configuration);
+        UrlAvailability availability = openSearchSourceUtils.confirmEndpointUrl(configuration);
         if (availability == null) {
             return probeReport.addMessage(buildMessage(SUCCESS_TYPES,
                     FAILURE_TYPES,
@@ -130,6 +134,6 @@ public class DiscoverOpenSearchSourceProbeMethod
     @Override
     public List<ConfigurationMessage> validateOptionalFields(
             OpenSearchSourceConfiguration configuration) {
-        return validateOptionalUsernameAndPassword(configuration);
+        return sourceValidationUtils.validateOptionalUsernameAndPassword(configuration);
     }
 }

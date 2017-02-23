@@ -28,7 +28,6 @@ import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.UNKN
 import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.UNTRUSTED_CA;
 import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.endpointIsReachable;
 import static org.codice.ddf.admin.api.handler.report.ProbeReport.createProbeReport;
-import static org.codice.ddf.admin.api.validation.SourceValidationUtils.validateOptionalUsernameAndPassword;
 import static org.codice.ddf.admin.sources.wfs.WfsSourceConfigurationHandler.WFS_SOURCE_CONFIGURATION_HANDLER_ID;
 
 import java.util.HashMap;
@@ -41,6 +40,7 @@ import org.codice.ddf.admin.api.handler.ConfigurationMessage;
 import org.codice.ddf.admin.api.handler.commons.UrlAvailability;
 import org.codice.ddf.admin.api.handler.method.ProbeMethod;
 import org.codice.ddf.admin.api.handler.report.ProbeReport;
+import org.codice.ddf.admin.api.validation.SourceValidationUtils;
 import org.codice.ddf.admin.sources.wfs.WfsSourceUtils;
 
 import com.google.common.collect.ImmutableList;
@@ -75,7 +75,9 @@ public class DiscoverWfsSourceProbeMethod extends ProbeMethod<WfsSourceConfigura
 
     public static final List<String> RETURN_TYPES = ImmutableList.of(DISCOVERED_SOURCES);
 
-    private WfsSourceUtils utils;
+    private WfsSourceUtils wfsSourceUtils;
+
+    private SourceValidationUtils sourceValidationUtils;
 
     public DiscoverWfsSourceProbeMethod() {
         super(WFS_DISCOVER_SOURCES_ID,
@@ -86,7 +88,9 @@ public class DiscoverWfsSourceProbeMethod extends ProbeMethod<WfsSourceConfigura
                 FAILURE_TYPES,
                 WARNING_TYPES,
                 RETURN_TYPES);
-        utils = new WfsSourceUtils();
+
+        wfsSourceUtils = new WfsSourceUtils();
+        sourceValidationUtils = new SourceValidationUtils();
     }
 
     @Override
@@ -100,7 +104,7 @@ public class DiscoverWfsSourceProbeMethod extends ProbeMethod<WfsSourceConfigura
             return probeReport;
         }
 
-        UrlAvailability availability = utils.confirmEndpointUrl(config);
+        UrlAvailability availability = wfsSourceUtils.confirmEndpointUrl(config);
         if (availability == null) {
             return probeReport.addMessage(buildMessage(SUCCESS_TYPES,
                     FAILURE_TYPES,
@@ -115,7 +119,7 @@ public class DiscoverWfsSourceProbeMethod extends ProbeMethod<WfsSourceConfigura
             return probeReport;
         }
 
-        Optional<WfsSourceConfiguration> createdConfig = utils.getPreferredConfig(config);
+        Optional<WfsSourceConfiguration> createdConfig = wfsSourceUtils.getPreferredConfig(config);
         if (!createdConfig.isPresent()) {
             return probeReport.addMessage(buildMessage(SUCCESS_TYPES,
                     FAILURE_TYPES,
@@ -137,7 +141,7 @@ public class DiscoverWfsSourceProbeMethod extends ProbeMethod<WfsSourceConfigura
 
     @Override
     public List<ConfigurationMessage> validateOptionalFields(WfsSourceConfiguration configuration) {
-        return validateOptionalUsernameAndPassword(configuration);
+        return sourceValidationUtils.validateOptionalUsernameAndPassword(configuration);
     }
 }
 

@@ -14,7 +14,6 @@
 
 package org.codice.ddf.admin.api.config.sources;
 
-import static org.codice.ddf.admin.api.validation.SourceValidationUtils.validateCswFactoryPid;
 import static org.codice.ddf.admin.api.validation.ValidationUtils.validateStringNoWhiteSpace;
 
 import java.util.List;
@@ -23,6 +22,7 @@ import java.util.function.Function;
 
 import org.codice.ddf.admin.api.config.ConfigurationType;
 import org.codice.ddf.admin.api.handler.ConfigurationMessage;
+import org.codice.ddf.admin.api.validation.SourceValidationUtils;
 import org.codice.ddf.admin.api.validation.ValidationUtils;
 
 import com.google.common.base.MoreObjects;
@@ -36,20 +36,21 @@ public class CswSourceConfiguration extends SourceConfiguration {
 
     public static final String FORCE_SPATIAL_FILTER = "forceSpatialFilter";
 
+    private String outputSchema;
+
+    private String forceSpatialFilter;
+
     private static final Map<String, Function<CswSourceConfiguration, List<ConfigurationMessage>>>
             FIELDS_TO_VALIDATION_FUNC =
             new ImmutableMap.Builder<String, Function<CswSourceConfiguration, List<ConfigurationMessage>>>().putAll(
                     getBaseFieldValidationMap())
                     .put(FACTORY_PID,
-                            config -> validateCswFactoryPid(config.factoryPid(), FACTORY_PID))
+                            config -> new SourceValidationUtils().validateCswFactoryPid(config.factoryPid(),
+                                    FACTORY_PID))
                     .put(OUTPUT_SCHEMA,
                             config -> validateStringNoWhiteSpace(config.outputSchema(),
                                     OUTPUT_SCHEMA))
                     .build();
-
-    private String outputSchema;
-
-    private String forceSpatialFilter;
 
     public CswSourceConfiguration() {
     }

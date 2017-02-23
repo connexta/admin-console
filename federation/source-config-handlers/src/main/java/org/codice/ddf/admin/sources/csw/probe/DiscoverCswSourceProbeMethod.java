@@ -28,7 +28,6 @@ import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.UNKN
 import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.UNTRUSTED_CA;
 import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.endpointIsReachable;
 import static org.codice.ddf.admin.api.handler.report.ProbeReport.createProbeReport;
-import static org.codice.ddf.admin.api.validation.SourceValidationUtils.validateOptionalUsernameAndPassword;
 import static org.codice.ddf.admin.sources.csw.CswSourceConfigurationHandler.CSW_SOURCE_CONFIGURATION_HANDLER_ID;
 
 import java.util.HashMap;
@@ -41,6 +40,7 @@ import org.codice.ddf.admin.api.handler.ConfigurationMessage;
 import org.codice.ddf.admin.api.handler.commons.UrlAvailability;
 import org.codice.ddf.admin.api.handler.method.ProbeMethod;
 import org.codice.ddf.admin.api.handler.report.ProbeReport;
+import org.codice.ddf.admin.api.validation.SourceValidationUtils;
 import org.codice.ddf.admin.sources.csw.CswSourceUtils;
 
 import com.google.common.collect.ImmutableList;
@@ -75,7 +75,9 @@ public class DiscoverCswSourceProbeMethod extends ProbeMethod<CswSourceConfigura
 
     public static final List<String> RETURN_TYPES = ImmutableList.of(DISCOVERED_SOURCES);
 
-    private CswSourceUtils utils;
+    private final CswSourceUtils cswSourceUtils;
+
+    private final SourceValidationUtils sourceValidationUtils;
 
     public DiscoverCswSourceProbeMethod() {
         super(CSW_DISCOVER_SOURCES_ID,
@@ -86,7 +88,9 @@ public class DiscoverCswSourceProbeMethod extends ProbeMethod<CswSourceConfigura
                 FAILURE_TYPES,
                 WARNING_TYPES,
                 RETURN_TYPES);
-        utils = new CswSourceUtils();
+
+        cswSourceUtils = new CswSourceUtils();
+        sourceValidationUtils = new SourceValidationUtils();
     }
 
     @Override
@@ -101,7 +105,7 @@ public class DiscoverCswSourceProbeMethod extends ProbeMethod<CswSourceConfigura
             return probeReport;
         }
 
-        UrlAvailability availability = utils.confirmEndpointUrl(config);
+        UrlAvailability availability = cswSourceUtils.confirmEndpointUrl(config);
         if (availability == null) {
             return probeReport.addMessage(buildMessage(SUCCESS_TYPES,
                     FAILURE_TYPES,
@@ -116,7 +120,9 @@ public class DiscoverCswSourceProbeMethod extends ProbeMethod<CswSourceConfigura
             return probeReport;
         }
 
-        Optional<CswSourceConfiguration> createdConfig = utils.getPreferredConfig((CswSourceConfiguration) config.endpointUrl(availability.getUrl()));
+        Optional<CswSourceConfiguration> createdConfig =
+                cswSourceUtils.getPreferredConfig((CswSourceConfiguration) config.endpointUrl(
+                        availability.getUrl()));
         if (!createdConfig.isPresent()) {
             return probeReport.addMessage(buildMessage(SUCCESS_TYPES,
                     FAILURE_TYPES,
@@ -138,6 +144,6 @@ public class DiscoverCswSourceProbeMethod extends ProbeMethod<CswSourceConfigura
 
     @Override
     public List<ConfigurationMessage> validateOptionalFields(CswSourceConfiguration configuration) {
-        return validateOptionalUsernameAndPassword(configuration);
+        return sourceValidationUtils.validateOptionalUsernameAndPassword(configuration);
     }
 }

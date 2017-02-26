@@ -28,7 +28,7 @@
         </interfaces>
     </service>
 
-    <bean id="stsProvider" class="org.codice.ddf.admin.query.sts.StsQuery" />
+    <bean id="stsProvider" class="org.codice.ddf.admin.query.sts.StsGraphQLProvider" />
     <service ref="stsProvider">
         <interfaces>
             <value>graphql.servlet.GraphQLQueryProvider</value>

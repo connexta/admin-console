@@ -7,7 +7,7 @@ import java.util.HashMap;
 import graphql.schema.GraphQLObjectType;
 import graphql.servlet.GraphQLQueryProvider;
 
-public class StsQuery implements GraphQLQueryProvider {
+public class StsGraphQLProvider implements GraphQLQueryProvider {
     @Override
     public GraphQLObjectType getQuery() {
         return handlerToGraphQLObject(new StsActionHandler());

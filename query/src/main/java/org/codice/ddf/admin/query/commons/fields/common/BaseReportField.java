@@ -7,15 +7,15 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.codice.ddf.admin.query.api.fields.Field;
-import org.codice.ddf.admin.query.api.fields.Message;
-import org.codice.ddf.admin.query.api.fields.Report;
-import org.codice.ddf.admin.query.commons.fields.base.ObjectField;
-import org.codice.ddf.admin.query.commons.fields.common.message.MessageField;
+import org.codice.ddf.admin.query.api.fields.MessageField;
+import org.codice.ddf.admin.query.api.fields.ReportField;
+import org.codice.ddf.admin.query.commons.fields.base.BaseObjectField;
+import org.codice.ddf.admin.query.commons.fields.common.message.BaseMessageField;
 import org.codice.ddf.admin.query.commons.fields.common.message.MessageListField;
 
 import com.google.common.collect.ImmutableList;
 
-public class ReportField extends ObjectField implements Report {
+public class BaseReportField extends BaseObjectField implements ReportField {
 
     public static final String FIELD_NAME = "report";
     public static final String FIELD_TYPE_NAME = "Report";
@@ -28,7 +28,7 @@ public class ReportField extends ObjectField implements Report {
     private MessageListField warnings;
     private MessageListField failures;
 
-    public ReportField() {
+    public BaseReportField() {
         super(FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
         this.successes = new MessageListField(SUCCESSES);
         this.warnings = new MessageListField(WARNINGS);
@@ -41,38 +41,38 @@ public class ReportField extends ObjectField implements Report {
     }
 
     @Override
-    public List<Message> getSuccesses() {
+    public List<MessageField> getSuccesses() {
         return successes.getMessages();
     }
 
     @Override
-    public  List<Message> getWarnings() {
+    public  List<MessageField> getWarnings() {
         return warnings.getMessages();
     }
 
     @Override
-    public  List<Message> getFailures() {
+    public  List<MessageField> getFailures() {
         return failures.getMessages();
     }
 
     @Override
-    public  List<Message> getMessages() {
+    public  List<MessageField> getMessages() {
         return Stream.of(successes.getMessages(), failures.getMessages(), warnings.getMessages())
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList());
     }
 
-    public ReportField messages(List<MessageField> messages) {
+    public BaseReportField messages(List<BaseMessageField> messages) {
         messages.stream().forEach(this::message);
         return this;
     }
 
-    public ReportField messages(MessageField... messages) {
+    public BaseReportField messages(BaseMessageField... messages) {
         Arrays.asList(messages).stream().forEach(this::message);
         return this;
     }
 
-    public ReportField message(MessageField message) {
+    public BaseReportField message(BaseMessageField message) {
         switch (message.getMessageType()) {
         case SUCCESS:
             successes.addField(message);

@@ -1,6 +1,6 @@
 package org.codice.ddf.admin.query.ldap.fields.query;
 
-import org.codice.ddf.admin.query.commons.fields.base.StringField;
+import org.codice.ddf.admin.query.commons.fields.base.scalar.StringField;
 
 public class LdapAttributeField extends StringField {
 

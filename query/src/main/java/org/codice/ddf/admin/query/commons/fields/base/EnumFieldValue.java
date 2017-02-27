@@ -2,6 +2,9 @@ package org.codice.ddf.admin.query.commons.fields.base;
 
 public class EnumFieldValue<T>{
 
+    // TODO: tbatie - 2/26/17 - Looks identical to a scalar... wink wink
+    // Implement the EnumField interface, remove this class and replace with scalarType field
+
     private String name;
     private T value;
     private String description;

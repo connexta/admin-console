@@ -35,4 +35,11 @@
         </interfaces>
     </service>
 
+    <bean id="sourcesProvider" class="org.codice.ddf.admin.query.sources.delegate.SourceGraphQLProvider" />
+    <service ref="sourcesProvider">
+        <interfaces>
+            <value>graphql.servlet.GraphQLQueryProvider</value>
+        </interfaces>
+    </service>
+
 </blueprint>

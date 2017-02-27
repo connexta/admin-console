@@ -2,12 +2,12 @@ package org.codice.ddf.admin.query.ldap.fields;
 
 import java.util.List;
 
-import org.codice.ddf.admin.query.commons.fields.base.EnumField;
+import org.codice.ddf.admin.query.commons.fields.base.BaseEnumField;
 import org.codice.ddf.admin.query.commons.fields.base.EnumFieldValue;
 
 import com.google.common.collect.ImmutableList;
 
-public class LdapEncryptionMethodField extends EnumField<String> {
+public class LdapEncryptionMethodField extends BaseEnumField<String> {
 
   public static final String FIELD_NAME = "encryption";
   public static final String FIELD_TYPE_NAME = "EncryptionMethod";

@@ -3,14 +3,13 @@ package org.codice.ddf.admin.query.ldap.fields;
 import java.util.List;
 
 import org.codice.ddf.admin.query.api.fields.Field;
-import org.codice.ddf.admin.query.commons.fields.base.EnumFieldValue;
-import org.codice.ddf.admin.query.commons.fields.base.ObjectField;
+import org.codice.ddf.admin.query.commons.fields.base.BaseObjectField;
 import org.codice.ddf.admin.query.commons.fields.common.HostnameField;
 import org.codice.ddf.admin.query.commons.fields.common.PortField;
 
 import com.google.common.collect.ImmutableList;
 
-public class LdapConnectionField extends ObjectField {
+public class LdapConnectionField extends BaseObjectField {
     public static final String FIELD_NAME = "connection";
     public static final String FIELD_TYPE_NAME = "LdapConnection";
     public static final String DESCRIPTION = "Contains the required information to establish an LDAP connection.";

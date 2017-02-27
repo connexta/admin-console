@@ -13,16 +13,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.query.api.fields.Field;
-import org.codice.ddf.admin.query.commons.fields.base.EnumField;
+import org.codice.ddf.admin.query.commons.fields.base.BaseEnumField;
 import org.codice.ddf.admin.query.commons.fields.base.ListField;
-import org.codice.ddf.admin.query.commons.fields.base.ObjectField;
-import org.codice.ddf.admin.query.ldap.fields.LdapConnectionField;
+import org.codice.ddf.admin.query.commons.fields.base.BaseObjectField;
 
 import graphql.schema.GraphQLArgument;
 import graphql.schema.GraphQLInputObjectField;
 import graphql.schema.GraphQLInputType;
 import graphql.schema.GraphQLList;
-import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLScalarType;
 
 public class GraphQLInput {
@@ -45,9 +43,9 @@ public class GraphQLInput {
     public static GraphQLInputType fieldTypeToGraphQLInputType(Field field) {
         switch (field.fieldBaseType()) {
         case OBJECT:
-            return objectFieldToGraphQLInputType((ObjectField) field);
+            return objectFieldToGraphQLInputType((BaseObjectField) field);
         case ENUM:
-            return enumFieldToGraphQLEnumType((EnumField) field);
+            return enumFieldToGraphQLEnumType((BaseEnumField) field);
         case LIST:
             return listFieldToGraphQLInputType((ListField)field);
         case INTEGER:
@@ -65,7 +63,7 @@ public class GraphQLInput {
     }
 
     public static GraphQLInputType objectFieldToGraphQLInputType(
-            ObjectField field) {
+            BaseObjectField field) {
         List<GraphQLInputObjectField> fieldDefinitions = new ArrayList<>();
         if(field.getFields() != null) {
             fieldDefinitions = field.getFields()

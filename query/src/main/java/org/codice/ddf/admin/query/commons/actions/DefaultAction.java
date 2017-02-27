@@ -11,10 +11,10 @@ public abstract class DefaultAction<T extends Field> implements Action<T> {
     private String description;
     private List<Field> requiredFields;
     private List<Field> optionalFields;
-    private T returnType;
+    private Field returnType;
 
     protected DefaultAction(String actionId, String description, List<Field> requiredFields,
-            List<Field> optionalFields, T returnType) {
+            List<Field> optionalFields, Field returnType) {
         this.actionId = actionId;
         this.description = description;
         this.requiredFields = requiredFields;
@@ -33,7 +33,7 @@ public abstract class DefaultAction<T extends Field> implements Action<T> {
     }
 
     @Override
-    public T getReturnType() {
+    public Field getReturnType() {
         return returnType;
     }
 

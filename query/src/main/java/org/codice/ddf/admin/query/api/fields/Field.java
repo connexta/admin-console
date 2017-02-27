@@ -9,6 +9,6 @@ public interface Field {
     Object getValue();
 
     enum FieldBaseType {
-        STRING, INTEGER, FLOAT, LIST, OBJECT, ENUM
+        STRING, INTEGER, FLOAT, LIST, OBJECT, ENUM, INTERFACE, UNION
     }
 }

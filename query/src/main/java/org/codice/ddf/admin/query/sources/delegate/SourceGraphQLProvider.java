@@ -19,12 +19,12 @@ public class SourceGraphQLProvider implements GraphQLQueryProvider, GraphQLMutat
 
     @Override
     public Collection<GraphQLFieldDefinition> getMutations() {
-        return handlerActionsToGraphQLFieldDefinition(new LdapActionHandler().getPersistActions());
+        return handlerActionsToGraphQLFieldDefinition(new SourceDelegateActionHandler().getPersistActions());
     }
 
     @Override
     public GraphQLObjectType getQuery() {
-        return handlerToGraphQLObject(new LdapActionHandler());
+        return handlerToGraphQLObject(new SourceDelegateActionHandler());
     }
 
     @Override

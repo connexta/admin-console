@@ -1,6 +1,6 @@
 package org.codice.ddf.admin.query.commons.fields.common;
 
-import org.codice.ddf.admin.query.commons.fields.base.StringField;
+import org.codice.ddf.admin.query.commons.fields.base.scalar.StringField;
 
 public class PidField extends StringField {
     public static final String DEFAULT_FIELD_NAME = "pid";

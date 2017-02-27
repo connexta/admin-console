@@ -5,12 +5,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.codice.ddf.admin.query.api.fields.Field;
-import org.codice.ddf.admin.query.api.fields.Message;
-import org.codice.ddf.admin.query.api.fields.Report;
+import org.codice.ddf.admin.query.api.fields.ReportField;
 import org.codice.ddf.admin.query.commons.actions.TestAction;
-import org.codice.ddf.admin.query.commons.fields.common.ReportField;
+import org.codice.ddf.admin.query.commons.fields.common.BaseReportField;
 import org.codice.ddf.admin.query.commons.fields.common.message.FailureMessageField;
-import org.codice.ddf.admin.query.commons.fields.common.message.MessageField;
+import org.codice.ddf.admin.query.commons.fields.common.message.BaseMessageField;
 import org.codice.ddf.admin.query.commons.fields.common.message.SuccessMessageField;
 import org.codice.ddf.admin.query.commons.fields.common.message.WarningMessageField;
 import org.codice.ddf.admin.query.ldap.fields.LdapConnectionField;
@@ -25,10 +24,10 @@ public class LdapTestConnection  extends TestAction {
     }
 
     @Override
-    public Report process(Map<String, Object> args) {
-        MessageField succesMsg = new SuccessMessageField("SUCCESS", "Successfully connected to LDAP");
-        MessageField warningMsg = new WarningMessageField("NO_ENCRYPTION", "The established connection was not upgraded to LDAPS. The connection is not secure.");
-        MessageField failureMsg = new FailureMessageField("CANNOT_CONNECT", "Failed to connect to the specified LDAP");
-        return new ReportField().messages(succesMsg, warningMsg, failureMsg);
+    public ReportField process(Map<String, Object> args) {
+        BaseMessageField succesMsg = new SuccessMessageField("SUCCESS", "Successfully connected to LDAP");
+        BaseMessageField warningMsg = new WarningMessageField("NO_ENCRYPTION", "The established connection was not upgraded to LDAPS. The connection is not secure.");
+        BaseMessageField failureMsg = new FailureMessageField("CANNOT_CONNECT", "Failed to connect to the specified LDAP");
+        return new BaseReportField().messages(succesMsg, warningMsg, failureMsg);
     }
 }

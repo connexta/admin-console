@@ -3,13 +3,13 @@ package org.codice.ddf.admin.query.ldap.fields;
 import java.util.List;
 
 import org.codice.ddf.admin.query.api.fields.Field;
-import org.codice.ddf.admin.query.commons.fields.base.ObjectField;
-import org.codice.ddf.admin.query.commons.fields.base.StringField;
+import org.codice.ddf.admin.query.commons.fields.base.BaseObjectField;
+import org.codice.ddf.admin.query.commons.fields.base.scalar.StringField;
 import org.codice.ddf.admin.query.sts.field.StsClaimField;
 
 import com.google.common.collect.ImmutableList;
 
-public class LdapAttributeEntryField extends ObjectField {
+public class LdapAttributeEntryField extends BaseObjectField {
 
     public static final String FIELD_NAME = "attributeMapping";
     public static final String FIELD_TYPE_NAME = "AttributeMapping";

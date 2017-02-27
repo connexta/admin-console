@@ -14,8 +14,11 @@ import org.apache.commons.lang.StringUtils;
 import org.codice.ddf.admin.query.api.Action;
 import org.codice.ddf.admin.query.api.ActionHandler;
 import org.codice.ddf.admin.query.api.fields.Field;
-import org.codice.ddf.admin.query.commons.fields.base.EnumField;
+import org.codice.ddf.admin.query.api.fields.UnionField;
+import org.codice.ddf.admin.query.api.fields.UnionValueField;
+import org.codice.ddf.admin.query.commons.fields.base.BaseEnumField;
 import org.codice.ddf.admin.query.commons.fields.base.EnumFieldValue;
+import org.codice.ddf.admin.query.commons.fields.base.ListField;
 
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLArgument;
@@ -66,7 +69,7 @@ public class GraphQLCommons {
                 .build();
     }
 
-    public static GraphQLEnumType enumFieldToGraphQLEnumType(EnumField field) {
+    public static GraphQLEnumType enumFieldToGraphQLEnumType(BaseEnumField field) {
         GraphQLEnumType.Builder builder = newEnum()
                 .name(capitalize(field.fieldName()))
                 .description(field.description());
@@ -79,8 +82,18 @@ public class GraphQLCommons {
     }
 
     public static Object dataFetch(DataFetchingEnvironment env, Action action) {
-        return action.process(env.getArguments()).getValue();
+        Field fieldResult = action.process(env.getArguments());
+
+        //Union values are handled by the union data fetcher
+        if(fieldResult instanceof UnionValueField) {
+            return fieldResult;
+        } else if(fieldResult instanceof ListField && ((ListField) fieldResult).getListValueField() instanceof UnionField) {
+            return ((ListField) fieldResult).getFields();
+        }
+
+        return fieldResult.getValue();
     }
+
     public static String capitalize(String str){
         return StringUtils.capitalize(str);
     }

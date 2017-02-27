@@ -1,6 +1,5 @@
 package org.codice.ddf.admin.query.ldap.fields.query;
 
-import org.codice.ddf.admin.query.api.fields.Field;
 import org.codice.ddf.admin.query.commons.fields.base.ListField;
 
 public class LdapAttributeListField extends ListField<LdapAttributeField> {

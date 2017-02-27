@@ -1,8 +1,8 @@
-package org.codice.ddf.admin.query.commons.fields.base;
+package org.codice.ddf.admin.query.commons.fields.base.scalar;
 
 import static org.codice.ddf.admin.query.api.fields.Field.FieldBaseType.STRING;
 
-public class StringField extends ScalarBaseField<String>{
+public class StringField extends BaseScalarField<String> {
 
     public StringField(String fieldName) {
         super(fieldName, null, null, STRING);

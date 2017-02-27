@@ -27,12 +27,13 @@ public abstract class BaseField implements Field {
     }
 
     @Override
+    public FieldBaseType fieldBaseType() {
+        return fieldBaseType;
+    }
+
+    @Override
     public String description() {
         return description;
     }
 
-    @Override
-    public FieldBaseType fieldBaseType() {
-        return fieldBaseType;
-    }
 }

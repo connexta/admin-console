@@ -1,6 +1,6 @@
 package org.codice.ddf.admin.query.sample.fields;
 
-import org.codice.ddf.admin.query.commons.fields.base.StringField;
+import org.codice.ddf.admin.query.commons.fields.base.scalar.StringField;
 
 public class SampleStringField extends StringField {
 

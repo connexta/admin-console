@@ -3,12 +3,12 @@ package org.codice.ddf.admin.query.ldap.fields;
 import java.util.List;
 
 import org.codice.ddf.admin.query.api.fields.Field;
-import org.codice.ddf.admin.query.commons.fields.base.ObjectField;
+import org.codice.ddf.admin.query.commons.fields.base.BaseObjectField;
 import org.codice.ddf.admin.query.commons.fields.common.PidField;
 
 import com.google.common.collect.ImmutableList;
 
-public class LdapConfigurationField extends ObjectField {
+public class LdapConfigurationField extends BaseObjectField {
 
     public static final String FIELD_NAME = "config";
     public static final String FIELD_TYPE_NAME = "LdapConfiguration";

@@ -1,6 +1,6 @@
 package org.codice.ddf.admin.query.commons.fields.common;
 
-import org.codice.ddf.admin.query.commons.fields.base.IntegerField;
+import org.codice.ddf.admin.query.commons.fields.base.scalar.IntegerField;
 
 public class PortField extends IntegerField {
 

@@ -4,12 +4,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.codice.ddf.admin.query.api.fields.Field;
-import org.codice.ddf.admin.query.api.fields.Message;
-import org.codice.ddf.admin.query.api.fields.Report;
+import org.codice.ddf.admin.query.api.fields.ReportField;
 import org.codice.ddf.admin.query.commons.actions.TestAction;
-import org.codice.ddf.admin.query.commons.fields.common.ReportField;
+import org.codice.ddf.admin.query.commons.fields.common.BaseReportField;
 import org.codice.ddf.admin.query.commons.fields.common.message.FailureMessageField;
-import org.codice.ddf.admin.query.commons.fields.common.message.MessageField;
+import org.codice.ddf.admin.query.commons.fields.common.message.BaseMessageField;
 import org.codice.ddf.admin.query.commons.fields.common.message.SuccessMessageField;
 import org.codice.ddf.admin.query.commons.fields.common.message.WarningMessageField;
 import org.codice.ddf.admin.query.ldap.fields.LdapSettingsField;
@@ -26,10 +25,10 @@ public class LdapTestSettings extends TestAction {
     }
 
     @Override
-    public Report process(Map<String, Object> args) {
-        MessageField successMsg = new SuccessMessageField("SUCCESS", "All fields have been successfully validated.");
-        MessageField warningMsg = new WarningMessageField("WARNING", "No users in baseDN with the given attributes");
-        MessageField failureMsg = new FailureMessageField("CANNOT_BIND", "The specified user DN does not exist.");
-        return new ReportField().messages(successMsg, warningMsg, failureMsg);
+    public ReportField process(Map<String, Object> args) {
+        BaseMessageField successMsg = new SuccessMessageField("SUCCESS", "All fields have been successfully validated.");
+        BaseMessageField warningMsg = new WarningMessageField("WARNING", "No users in baseDN with the given attributes");
+        BaseMessageField failureMsg = new FailureMessageField("CANNOT_BIND", "The specified user DN does not exist.");
+        return new BaseReportField().messages(successMsg, warningMsg, failureMsg);
     }
 }

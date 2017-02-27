@@ -8,7 +8,7 @@ import org.codice.ddf.admin.query.api.fields.Field;
 public interface Action<T extends Field> {
     String description();
     String getActionName();
-    T getReturnType();
+    Field getReturnType();
     T process(Map<String, Object> args);
     List<Field> getRequiredFields();
     List<Field> getOptionalFields();

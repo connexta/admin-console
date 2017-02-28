@@ -13,13 +13,6 @@
 -->
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-    <bean id="sampleProvider" class="org.codice.ddf.admin.query.sample.SampleQuery" />
-    <service ref="sampleProvider">
-        <interfaces>
-            <value>graphql.servlet.GraphQLQueryProvider</value>
-        </interfaces>
-    </service>
-
     <bean id="ldapProvider" class="org.codice.ddf.admin.query.ldap.LdapGraphQLProvider" />
     <service ref="ldapProvider">
         <interfaces>

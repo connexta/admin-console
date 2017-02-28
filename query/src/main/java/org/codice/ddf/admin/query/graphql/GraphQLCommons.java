@@ -1,19 +1,22 @@
 package org.codice.ddf.admin.query.graphql;
 
-import static org.codice.ddf.admin.query.graphql.GraphQLInput.fieldToGraphQLArgument;
+import static org.codice.ddf.admin.query.graphql.GraphQLInput.fieldTypeToGraphQLInputType;
 import static org.codice.ddf.admin.query.graphql.GraphQLOutput.fieldToGraphQLOutputType;
+import static graphql.schema.GraphQLArgument.newArgument;
 import static graphql.schema.GraphQLEnumType.newEnum;
 import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
 import static graphql.schema.GraphQLObjectType.newObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
-import org.codice.ddf.admin.query.api.Action;
 import org.codice.ddf.admin.query.api.ActionHandler;
+import org.codice.ddf.admin.query.api.fields.ActionField;
 import org.codice.ddf.admin.query.api.fields.Field;
+import org.codice.ddf.admin.query.api.fields.ObjectField;
 import org.codice.ddf.admin.query.api.fields.UnionField;
 import org.codice.ddf.admin.query.api.fields.UnionValueField;
 import org.codice.ddf.admin.query.commons.fields.base.BaseEnumField;
@@ -25,47 +28,63 @@ import graphql.schema.GraphQLArgument;
 import graphql.schema.GraphQLEnumType;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLObjectType;
+import graphql.schema.TypeResolver;
 
 public class GraphQLCommons {
 
     public static GraphQLObjectType handlerToGraphQLObject(ActionHandler handler) {
-        List<GraphQLFieldDefinition> actionObjects = handler.getDiscoveryActions()
-                .stream()
-                .map(a -> handlerActionToGraphQLFieldDefinition(a))
-                .collect(Collectors.toList());
-
         return newObject().name(handler.getActionHandlerId())
                 .description(handler.description())
-                .fields(actionObjects)
+                .fields(fieldsToGraphQLFieldDefinition(handler.getDiscoveryActions()))
                 .build();
     }
 
-    public static List<GraphQLFieldDefinition> handlerActionsToGraphQLFieldDefinition(List<Action> actions) {
-        return actions.stream().map(action -> handlerActionToGraphQLFieldDefinition(action)).collect(
-                Collectors.toList());
+    public static List<GraphQLFieldDefinition> fieldsToGraphQLFieldDefinition(List<? extends Field> fields) {
+        if(fields == null) {
+            return new ArrayList<>();
+        }
+        return fields.stream()
+                .map(field -> fieldToGraphQLFieldDefinition(field))
+                .collect(Collectors.toList());
     }
-    public static GraphQLFieldDefinition handlerActionToGraphQLFieldDefinition(Action action) {
-        List<Field> reqFields = action.getRequiredFields();
-        List<Field> optFields = action.getOptionalFields();
-        List<GraphQLArgument> requiredArgs = new ArrayList<>();
-        List<GraphQLArgument> optionalArgs = new ArrayList<>();
 
-        // TODO: tbatie - 2/15/17 - Need to figure out how to make the required args required
-        if (reqFields != null) {
-            reqFields.forEach(f -> requiredArgs.add(fieldToGraphQLArgument(f)));
+    public static GraphQLFieldDefinition fieldToGraphQLFieldDefinition(Field field) {
+        switch (field.fieldBaseType()) {
+        case ACTION:
+            return handlerActionToGraphQLFieldDefinition((ActionField) field);
+        case UNION:
+            return newFieldDefinition().name(field.fieldName())
+                    .description(field.description())
+                    .type(fieldToGraphQLOutputType(field))
+                    .dataFetcher(fetcher -> dataFetchWithUnionTypes(field))
+                    .build();
+        default:
+            return newFieldDefinition().name(field.fieldName())
+                    .description(field.description())
+                    .type(fieldToGraphQLOutputType(field))
+                    .build();
+        }
+    }
+
+    public static GraphQLFieldDefinition handlerActionToGraphQLFieldDefinition(ActionField action) {
+        List<GraphQLArgument> graphQLArgs = new ArrayList<>();
+
+        if (action.getArguments() != null) {
+            action.getArguments().forEach(f -> graphQLArgs.add(fieldToGraphQLArgument((Field)f)));
         }
 
-        if (optFields != null) {
-            optFields
-                    .forEach(f -> optionalArgs.add(fieldToGraphQLArgument(f)));
-        }
-
-        return newFieldDefinition().name(action.getActionName())
-                .type(fieldToGraphQLOutputType(action.getReturnType()))
+        return newFieldDefinition().name(action.fieldName())
+                .type(fieldToGraphQLOutputType(action.getReturnField()))
                 .description(action.description())
-                .argument(requiredArgs)
-                .argument(optionalArgs)
-                .dataFetcher(env -> dataFetch(env, action))
+                .argument(graphQLArgs)
+                .dataFetcher(env -> actionFieldDataFetch(env, action))
+                .build();
+    }
+
+    public static GraphQLArgument fieldToGraphQLArgument(Field field) {
+        return newArgument().name(field.fieldName())
+                .description(field.description())
+                .type(fieldTypeToGraphQLInputType(field))
                 .build();
     }
 
@@ -81,7 +100,7 @@ public class GraphQLCommons {
         return builder.build();
     }
 
-    public static Object dataFetch(DataFetchingEnvironment env, Action action) {
+    public static Object actionFieldDataFetch(DataFetchingEnvironment env, ActionField action) {
         Field fieldResult = action.process(env.getArguments());
 
         //Union values are handled by the union data fetcher
@@ -92,6 +111,39 @@ public class GraphQLCommons {
         }
 
         return fieldResult.getValue();
+    }
+
+    //This method is used to break the recursion cycle of "actionFieldDataFetch"
+    public static Object dataFetchWithUnionTypes(Field field) {
+        return field.getValue();
+    }
+
+    public static class UnionTypeResolver implements TypeResolver {
+
+        List<GraphQLObjectType> supportedTypes;
+
+        public UnionTypeResolver(GraphQLObjectType... supportedTypes) {
+            this.supportedTypes = Arrays.asList(supportedTypes);
+        }
+
+        @Override
+        public GraphQLObjectType getType(Object object) {
+            if(object instanceof UnionValueField){
+                return getMatchingUnionType((UnionValueField) object);
+            } else {
+                throw new RuntimeException("UNKNONW UNION TYPE: " + ((Field)object).fieldTypeName());
+            }
+        }
+
+        public GraphQLObjectType getMatchingUnionType(UnionValueField field) {
+            for(GraphQLObjectType type : supportedTypes) {
+                String fieldTypeName = ((ObjectField)field).fieldTypeName() + "Payload";
+                if(type.getName().equals(fieldTypeName)) {
+                    return type;
+                }
+            }
+            throw new RuntimeException("NO MATCHING UNION TYPE FOR: " + ((ObjectField)field).fieldTypeName() + "Payload");
+        }
     }
 
     public static String capitalize(String str){

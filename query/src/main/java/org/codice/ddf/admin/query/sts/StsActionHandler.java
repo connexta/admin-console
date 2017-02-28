@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.codice.ddf.admin.query.api.Action;
+import org.codice.ddf.admin.query.api.fields.ActionField;
 import org.codice.ddf.admin.query.commons.DefaultActionHandler;
 import org.codice.ddf.admin.query.sts.actions.GetStsClaimsAction;
 
@@ -25,12 +26,12 @@ public class StsActionHandler extends DefaultActionHandler {
     }
 
     @Override
-    public List<Action> getDiscoveryActions() {
+    public List<ActionField> getDiscoveryActions() {
         return Arrays.asList(new GetStsClaimsAction());
     }
 
     @Override
-    public List<Action> getPersistActions() {
+    public List<ActionField> getPersistActions() {
         return new ArrayList<>();
     }
 }

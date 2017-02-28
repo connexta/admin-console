@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.codice.ddf.admin.query.api.fields.Field;
-import org.codice.ddf.admin.query.commons.actions.DefaultAction;
+import org.codice.ddf.admin.query.commons.actions.BaseActionField;
 import org.codice.ddf.admin.query.ldap.fields.LdapDistinguishedName;
 import org.codice.ddf.admin.query.ldap.fields.query.LdapAttributeField;
 import org.codice.ddf.admin.query.ldap.fields.query.LdapEntriesListField;
@@ -13,16 +13,17 @@ import org.codice.ddf.admin.query.ldap.fields.query.LdapQueryField;
 
 import com.google.common.collect.ImmutableList;
 
-public class LdapQuery extends DefaultAction<LdapEntriesListField>{
+public class LdapQuery extends BaseActionField<LdapEntriesListField> {
 
-    //	entries(baseDn: !String, query: LdapQuery): [LdapEntry]
-
-    public static final String ACTION_ID = "query";
+    public static final String FIELD_NAME = "query";
     public static final String DESCRIPTION = "Executes a query against LDAP.";
-    public static final List<Field> REQUIRED_FIELDS = ImmutableList.of(new LdapDistinguishedName(), new LdapQueryField());
+
+    private LdapDistinguishedName dn =  new LdapDistinguishedName();
+    private LdapQueryField query = new LdapQueryField();
+    private List<Field> arguments = ImmutableList.of(dn, query);
 
     public LdapQuery() {
-        super(ACTION_ID, DESCRIPTION, REQUIRED_FIELDS, null, new LdapEntriesListField());
+        super(FIELD_NAME, DESCRIPTION, new LdapEntriesListField());
     }
 
     @Override
@@ -32,5 +33,10 @@ public class LdapQuery extends DefaultAction<LdapEntriesListField>{
         LdapEntryField outterEntry = new LdapEntryField().addAttribute(attri)
                 .addEntry(entry);
         return new LdapEntriesListField().addField(outterEntry);
+    }
+
+    @Override
+    public List<Field> getArguments() {
+        return arguments;
     }
 }

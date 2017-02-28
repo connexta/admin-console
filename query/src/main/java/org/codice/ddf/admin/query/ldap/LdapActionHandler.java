@@ -3,7 +3,6 @@ package org.codice.ddf.admin.query.ldap;
 import java.util.Arrays;
 import java.util.List;
 
-import org.codice.ddf.admin.query.api.Action;
 import org.codice.ddf.admin.query.api.fields.ActionField;
 import org.codice.ddf.admin.query.commons.DefaultActionHandler;
 import org.codice.ddf.admin.query.ldap.actions.discover.LdapConfigurations;
@@ -17,17 +16,11 @@ import org.codice.ddf.admin.query.ldap.actions.persist.SaveLdapConfiguration;
 
 public class LdapActionHandler extends DefaultActionHandler {
 
-    public static final String ACTION_HANDLER_ID = "ldap";
-    public static final String ACTION_HANDLER_DESCRIPTION = "Facilities for interacting with LDAP servers.";
+    public static final String FIELD_NAME = "ldap";
+    public static final String DESCRIPTION = "Facilities for interacting with LDAP servers.";
 
-    @Override
-    public String getActionHandlerId() {
-        return ACTION_HANDLER_ID;
-    }
-
-    @Override
-    public String description() {
-        return ACTION_HANDLER_DESCRIPTION;
+    public LdapActionHandler() {
+        super(FIELD_NAME, DESCRIPTION);
     }
 
     @Override

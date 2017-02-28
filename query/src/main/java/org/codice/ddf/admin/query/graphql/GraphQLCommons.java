@@ -8,12 +8,11 @@ import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
 import static graphql.schema.GraphQLObjectType.newObject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
-import org.codice.ddf.admin.query.api.ActionHandler;
+import org.codice.ddf.admin.query.api.fields.ActionHandlerField;
 import org.codice.ddf.admin.query.api.fields.ActionField;
 import org.codice.ddf.admin.query.api.fields.Field;
 import org.codice.ddf.admin.query.api.fields.ObjectField;
@@ -28,15 +27,27 @@ import graphql.schema.GraphQLArgument;
 import graphql.schema.GraphQLEnumType;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLObjectType;
-import graphql.schema.TypeResolver;
 
 public class GraphQLCommons {
 
-    public static GraphQLObjectType handlerToGraphQLObject(ActionHandler handler) {
-        return newObject().name(handler.getActionHandlerId())
-                .description(handler.description())
-                .fields(fieldsToGraphQLFieldDefinition(handler.getDiscoveryActions()))
-                .build();
+    public static GraphQLObjectType fieldToGraphQLObjectType(Field field) {
+        switch (field.fieldBaseType()) {
+        case OBJECT:
+            //Add on Payload to avoid collision between an input and output field type name;
+            return newObject().name(capitalize(field.fieldTypeName()) + "Payload")
+                    .description(field.description())
+                    .fields(fieldsToGraphQLFieldDefinition(((ObjectField)field).getFields()))
+                    .build();
+
+        case ACTION_HANDLER:
+            //Because this only be transformed into a top level sub query, there is no need to add Payload
+            return newObject().name(field.fieldName())
+                    .description(field.description())
+                    .fields(fieldsToGraphQLFieldDefinition(((ActionHandlerField)field).getDiscoveryActions()))
+                    .build();
+        default:
+            throw new RuntimeException("Unknown ObjectType: " + field.fieldBaseType());
+        }
     }
 
     public static List<GraphQLFieldDefinition> fieldsToGraphQLFieldDefinition(List<? extends Field> fields) {
@@ -51,12 +62,25 @@ public class GraphQLCommons {
     public static GraphQLFieldDefinition fieldToGraphQLFieldDefinition(Field field) {
         switch (field.fieldBaseType()) {
         case ACTION:
-            return handlerActionToGraphQLFieldDefinition((ActionField) field);
+            ActionField actionField = (ActionField) field;
+            List<GraphQLArgument> graphQLArgs = new ArrayList<>();
+
+            if (actionField.getArguments() != null) {
+                actionField.getArguments().forEach(f -> graphQLArgs.add(fieldToGraphQLArgument((Field)f)));
+            }
+
+            return newFieldDefinition().name(actionField.fieldName())
+                    .type(fieldToGraphQLOutputType(actionField.getReturnField()))
+                    .description(actionField.description())
+                    .argument(graphQLArgs)
+                    .dataFetcher(env -> actionFieldDataFetch(env, actionField))
+                    .build();
+
         case UNION:
             return newFieldDefinition().name(field.fieldName())
                     .description(field.description())
                     .type(fieldToGraphQLOutputType(field))
-                    .dataFetcher(fetcher -> dataFetchWithUnionTypes(field))
+                    .dataFetcher(fetcher -> unionTypeDataFetch(field))
                     .build();
         default:
             return newFieldDefinition().name(field.fieldName())
@@ -64,21 +88,6 @@ public class GraphQLCommons {
                     .type(fieldToGraphQLOutputType(field))
                     .build();
         }
-    }
-
-    public static GraphQLFieldDefinition handlerActionToGraphQLFieldDefinition(ActionField action) {
-        List<GraphQLArgument> graphQLArgs = new ArrayList<>();
-
-        if (action.getArguments() != null) {
-            action.getArguments().forEach(f -> graphQLArgs.add(fieldToGraphQLArgument((Field)f)));
-        }
-
-        return newFieldDefinition().name(action.fieldName())
-                .type(fieldToGraphQLOutputType(action.getReturnField()))
-                .description(action.description())
-                .argument(graphQLArgs)
-                .dataFetcher(env -> actionFieldDataFetch(env, action))
-                .build();
     }
 
     public static GraphQLArgument fieldToGraphQLArgument(Field field) {
@@ -114,36 +123,8 @@ public class GraphQLCommons {
     }
 
     //This method is used to break the recursion cycle of "actionFieldDataFetch"
-    public static Object dataFetchWithUnionTypes(Field field) {
+    public static Object unionTypeDataFetch(Field field) {
         return field.getValue();
-    }
-
-    public static class UnionTypeResolver implements TypeResolver {
-
-        List<GraphQLObjectType> supportedTypes;
-
-        public UnionTypeResolver(GraphQLObjectType... supportedTypes) {
-            this.supportedTypes = Arrays.asList(supportedTypes);
-        }
-
-        @Override
-        public GraphQLObjectType getType(Object object) {
-            if(object instanceof UnionValueField){
-                return getMatchingUnionType((UnionValueField) object);
-            } else {
-                throw new RuntimeException("UNKNONW UNION TYPE: " + ((Field)object).fieldTypeName());
-            }
-        }
-
-        public GraphQLObjectType getMatchingUnionType(UnionValueField field) {
-            for(GraphQLObjectType type : supportedTypes) {
-                String fieldTypeName = ((ObjectField)field).fieldTypeName() + "Payload";
-                if(type.getName().equals(fieldTypeName)) {
-                    return type;
-                }
-            }
-            throw new RuntimeException("NO MATCHING UNION TYPE FOR: " + ((ObjectField)field).fieldTypeName() + "Payload");
-        }
     }
 
     public static String capitalize(String str){

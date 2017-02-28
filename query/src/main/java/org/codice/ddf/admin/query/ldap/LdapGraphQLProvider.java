@@ -1,7 +1,7 @@
 package org.codice.ddf.admin.query.ldap;
 
+import static org.codice.ddf.admin.query.graphql.GraphQLCommons.fieldToGraphQLObjectType;
 import static org.codice.ddf.admin.query.graphql.GraphQLCommons.fieldsToGraphQLFieldDefinition;
-import static org.codice.ddf.admin.query.graphql.GraphQLCommons.handlerToGraphQLObject;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -20,7 +20,7 @@ public class LdapGraphQLProvider implements GraphQLQueryProvider, GraphQLMutatio
 
     @Override
     public GraphQLObjectType getQuery() {
-        return handlerToGraphQLObject(new LdapActionHandler());
+        return fieldToGraphQLObjectType(new LdapActionHandler());
     }
 
     @Override

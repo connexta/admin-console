@@ -1,6 +1,6 @@
 package org.codice.ddf.admin.query.sts;
 
-import static org.codice.ddf.admin.query.graphql.GraphQLCommons.handlerToGraphQLObject;
+import static org.codice.ddf.admin.query.graphql.GraphQLCommons.fieldToGraphQLObjectType;
 
 import java.util.HashMap;
 
@@ -10,7 +10,7 @@ import graphql.servlet.GraphQLQueryProvider;
 public class StsGraphQLProvider implements GraphQLQueryProvider {
     @Override
     public GraphQLObjectType getQuery() {
-        return handlerToGraphQLObject(new StsActionHandler());
+        return fieldToGraphQLObjectType(new StsActionHandler());
     }
 
     @Override

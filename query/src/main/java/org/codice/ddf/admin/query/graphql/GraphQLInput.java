@@ -4,7 +4,6 @@ import static org.codice.ddf.admin.query.graphql.GraphQLCommons.capitalize;
 import static org.codice.ddf.admin.query.graphql.GraphQLCommons.enumFieldToGraphQLEnumType;
 import static graphql.Scalars.GraphQLInt;
 import static graphql.Scalars.GraphQLString;
-import static graphql.schema.GraphQLArgument.newArgument;
 import static graphql.schema.GraphQLInputObjectField.newInputObjectField;
 import static graphql.schema.GraphQLInputObjectType.newInputObject;
 
@@ -17,21 +16,12 @@ import org.codice.ddf.admin.query.commons.fields.base.BaseEnumField;
 import org.codice.ddf.admin.query.commons.fields.base.ListField;
 import org.codice.ddf.admin.query.commons.fields.base.BaseObjectField;
 
-import graphql.schema.GraphQLArgument;
 import graphql.schema.GraphQLInputObjectField;
 import graphql.schema.GraphQLInputType;
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLScalarType;
 
 public class GraphQLInput {
-
-
-    public static GraphQLArgument fieldToGraphQLArgument(Field field) {
-        return newArgument().name(field.fieldName())
-                .description(field.description())
-                .type(fieldTypeToGraphQLInputType(field))
-                .build();
-    }
 
     public static GraphQLInputObjectField fieldToGraphQLInputFieldDefinition(Field field) {
         return newInputObjectField().name(field.fieldName())

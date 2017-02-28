@@ -1,6 +1,6 @@
 package org.codice.ddf.admin.query.ldap;
 
-import static org.codice.ddf.admin.query.graphql.GraphQLCommons.handlerActionsToGraphQLFieldDefinition;
+import static org.codice.ddf.admin.query.graphql.GraphQLCommons.fieldsToGraphQLFieldDefinition;
 import static org.codice.ddf.admin.query.graphql.GraphQLCommons.handlerToGraphQLObject;
 
 import java.util.Collection;
@@ -15,7 +15,7 @@ public class LdapGraphQLProvider implements GraphQLQueryProvider, GraphQLMutatio
 
     @Override
     public Collection<GraphQLFieldDefinition> getMutations() {
-        return handlerActionsToGraphQLFieldDefinition(new LdapActionHandler().getPersistActions());
+        return fieldsToGraphQLFieldDefinition(new LdapActionHandler().getPersistActions());
     }
 
     @Override

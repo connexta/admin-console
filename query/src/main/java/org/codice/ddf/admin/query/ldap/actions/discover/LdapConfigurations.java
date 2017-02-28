@@ -6,20 +6,21 @@ import java.util.List;
 import java.util.Map;
 
 import org.codice.ddf.admin.query.api.fields.Field;
-import org.codice.ddf.admin.query.commons.actions.DefaultAction;
+import org.codice.ddf.admin.query.commons.actions.BaseActionField;
 import org.codice.ddf.admin.query.commons.fields.common.PidField;
 import org.codice.ddf.admin.query.ldap.fields.LdapConfigurationsField;
 
 import com.google.common.collect.ImmutableList;
 
-public class LdapConfigurations extends DefaultAction<LdapConfigurationsField> {
+public class LdapConfigurations extends BaseActionField<LdapConfigurationsField> {
 
     public static final String ACTION_ID = "configs";
     public static final String DESCRIPTION = "Retrieves all currently configured LDAP settings.";
-    public static final List<Field> OPTIONAL_FIELDS = ImmutableList.of(new PidField());
+    private PidField pid = new PidField();
+    private List<Field> arguements = ImmutableList.of(pid);
 
     public LdapConfigurations() {
-        super(ACTION_ID, DESCRIPTION, null, OPTIONAL_FIELDS, new LdapConfigurationsField());
+        super(ACTION_ID, DESCRIPTION, new LdapConfigurationsField());
     }
 
     @Override
@@ -27,5 +28,10 @@ public class LdapConfigurations extends DefaultAction<LdapConfigurationsField> {
         return new LdapConfigurationsField()
                 .addField(SAMPLE_LDAP_CONFIGURATION)
                 .addField(SAMPLE_LDAP_CONFIGURATION);
+    }
+
+    @Override
+    public List<Field> getArguments() {
+        return arguements;
     }
 }

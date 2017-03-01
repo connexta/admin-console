@@ -17,7 +17,6 @@ import org.codice.ddf.admin.query.api.fields.ActionHandlerField;
 import org.codice.ddf.admin.query.api.fields.Field;
 import org.codice.ddf.admin.query.api.fields.ObjectField;
 import org.codice.ddf.admin.query.commons.fields.base.BaseEnumField;
-import org.codice.ddf.admin.query.commons.fields.base.EnumFieldValue;
 import org.codice.ddf.admin.query.commons.fields.base.ListField;
 
 import graphql.schema.DataFetchingEnvironment;
@@ -108,9 +107,9 @@ public class GraphQLCommons {
                 .description(field.description());
 
         field.getEnumValues()
-                .forEach(val -> builder.value(((EnumFieldValue) val).getName(),
-                        ((EnumFieldValue) val).getValue(),
-                        ((EnumFieldValue) val).getDescription()));
+                .forEach(val -> builder.value(((Field) val).fieldName(),
+                        ((Field) val).getValue(),
+                        ((Field) val).description()));
         return builder.build();
     }
 
@@ -135,11 +134,6 @@ public class GraphQLCommons {
         default:
             throw new RuntimeException("Unhandled base transform type [" + field.fieldBaseType() + "] with field name of [" + field.fieldName() + "] ");
         }
-    }
-
-    //This method is used to break the recursion cycle of "actionFieldDataFetch"
-    public static Object unionTypeDataFetch(Field field) {
-        return field.getValue();
     }
 
     public static String capitalize(String str){

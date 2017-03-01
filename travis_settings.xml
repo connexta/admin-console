@@ -1,0 +1,25 @@
+<settings>
+    <servers>
+        <server>
+            <id>codice</id>
+            <username>${env.CODICE_USERNAME}</username>
+            <password>${env.CODICE_PASSWORD}</password>
+        </server>
+    </servers>
+
+    <profiles>
+        <profile>
+            <id>codice</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <repository.host>artifacts.codice.org</repository.host>
+                <snapshots.repository.url>http://${repository.host}/content/repositories/snapshots
+                </snapshots.repository.url>
+                <releases.repository.url>http://${repository.host}/content/repositories/releases
+                </releases.repository.url>
+            </properties>
+        </profile>
+    </profiles>
+</settings>

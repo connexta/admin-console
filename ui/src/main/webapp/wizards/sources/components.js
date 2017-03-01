@@ -8,94 +8,22 @@ import IconButton from 'material-ui/IconButton'
 import {RadioButton, RadioButtonGroup} from 'material-ui/RadioButton'
 import Flexbox from 'flexbox-react'
 import AlertIcon from 'material-ui/svg-icons/alert/warning'
-import InfoIcon from 'material-ui/svg-icons/action/info'
 import { editConfigs } from 'admin-wizard/actions'
 
 import LeftIcon from 'material-ui/svg-icons/hardware/keyboard-arrow-left'
 import RightIcon from 'material-ui/svg-icons/hardware/keyboard-arrow-right'
 
-import Info from 'components/Information'
-
 import {
-  descriptionIconStyle,
-  widthConstraintStyle,
   animated,
   fadeIn,
   navButtonStyles,
   navButtonStylesDisabled
 } from './styles.less'
 
-import {
-  Input,
-  Password,
-  Hostname,
-  Port,
-  Select
-} from 'admin-wizard/inputs'
-
-export const WidthConstraint = ({ children }) => (
-  <div className={widthConstraintStyle}>
-    {children}
-  </div>
-)
-
-export const ConstrainedInput = ({ id, label, description, value, ...rest }) => (
-  <WidthConstraint>
-    <Input id={id} label={label} {...rest} />
-    <DescriptionIcon description={description} />
-  </WidthConstraint>
-)
-
-export const ConstrainedPasswordInput = ({ id, label, description, ...rest }) => (
-  <WidthConstraint>
-    <Password id={id} label={label} {...rest} />
-    <DescriptionIcon description={description} />
-  </WidthConstraint>
-)
-
-export const ConstrainedHostnameInput = ({ id, label, description, ...rest }) => (
-  <WidthConstraint>
-    <Hostname id={id} label={label} {...rest} />
-    <DescriptionIcon description={description} />
-  </WidthConstraint>
-)
-
-export const ConstrainedPortInput = ({ id, label, description, ...rest }) => (
-  <WidthConstraint>
-    <Port id={id} label={label} value={8993} {...rest} />
-    <DescriptionIcon description={description} />
-  </WidthConstraint>
-)
-
-export const ConstrainedSelectInput = ({ id, label, description, options, ...rest }) => (
-  <WidthConstraint>
-    <Select id={id} label={label} options={options} {...rest} />
-    <DescriptionIcon description={description} />
-  </WidthConstraint>
-)
-
-const DescriptionIcon = ({ description }) => {
-  if (description) {
-    return (
-      <span className={descriptionIconStyle}>
-        <IconButton tooltip={description} touch tooltipPosition='top-left'><InfoIcon /></IconButton>
-      </span>
-    )
-  } else {
-    return null
-  }
-}
-
 export const CenteredElements = ({ children, stageIndex, style }) => (
   <div style={style} className={[animated, fadeIn].join(' ')}>
     {children}
   </div>
-)
-
-export const ConstrainedInfo = ({ id, value, label, ...rest }) => (
-  <WidthConstraint>
-    <Info id={id} value={value} label={label} {...rest} />
-  </WidthConstraint>
 )
 
 const prettyName = (id) => id.replace('-', ' ')

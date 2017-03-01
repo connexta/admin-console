@@ -5,3 +5,13 @@ install: true
 script: mvn clean install
 jdk:
   - oraclejdk8
+
+env:
+  global:
+    - CODICE_USERNAME=ddf
+    - secure: YNWGLO7uPvbtEvOSHCEWu0ORE2ux+pgicSn4ZS8MnjpJXCXOO2LlCKgnjA/OwDqrR6iYXoD3PipoSjpriqVmt5CUZv3WniG9+6EZJc4Xlf0cc/8rtRDaMI3FUTGCG/kvLaibru7olkpZEQuEjSoLWuUPqoW/zoWT1JutdERXFd2oJeeMu0CgH7seNsvMesSdn4Hy5vaVE+GWHqjbwbnHyh5Pm1I4oU+u37czak0TLirKb6AwCxnoQ1rt8kkCbl851gXcVNpnoW5ldgtNJWg80vkIcibW1vqKXPmvtOC/U38J7EOE7lw0ub4HMErm0/+xihmSZLFha2MHdU/LAw5pWDmlYhS5NGvI9rA+5qy9VRXgbwPMt3vgA3mfd5fq8GpbpCqoYNSI6Pjkb4sGLjByKXhXwY0zAeM9ucFVxce4GPJ4v25DJ4lkMwpKeNR3eohAMZpLXRqfZrZFqfza6/fDOLS2cQiZNMgjR0L5+OiGuZO2f/GlnvFocRrrsPft3zBkPnCQDXIc89pZGDhfD56g1gh0KquKySa968bxGum+ix4DTTz7rFERr9ivoryKupQmZDI5dJLZ2S9PebEr9uqWCbIWNg+TKVxAeZIQHoV1+u+tg7ohIsg9sCg4r1ZvTkMocKs7UDm/W49F4vaAxptIzAoGfG2iUrAEf2tDuJePA/Q=
+
+after_success:
+  - echo $CODICE_USERNAME
+  - echo $CODICE_PASSWORD
+  - mvn clean deploy --settings ./travis_settings.xml

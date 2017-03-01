@@ -20,11 +20,11 @@ public abstract class ListField<T extends Field> extends BaseField {
     @Override
     public List getValue() {
         return fields.stream()
-                .map(value ->  value.getValue())
+                .map(field -> field.getValue())
                 .collect(Collectors.toList());
     }
 
-    public Field addField(T value) {
+    public ListField addField(T value) {
         fields.add(value);
         return this;
     }

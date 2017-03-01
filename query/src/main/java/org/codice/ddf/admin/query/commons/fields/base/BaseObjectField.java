@@ -23,6 +23,14 @@ public abstract class BaseObjectField extends BaseField implements ObjectField, 
         }
     }
 
+    protected BaseObjectField(String fieldName, String fieldTypeName, String description, FieldBaseType baseType, InterfaceField... interfaces) {
+        super(fieldName, fieldTypeName, description, baseType);
+        this.interfaces = new ArrayList<>();
+        if(interfaces != null) {
+            this.interfaces.addAll(Arrays.asList(interfaces));
+        }
+    }
+
     @Override
     public Map<String, Object> getValue() {
         Map<String, Object> value = new HashMap<>();

@@ -1,4 +1,4 @@
-package org.codice.ddf.admin.query.ldap;
+package org.codice.ddf.admin.query.connection;
 
 import static org.codice.ddf.admin.query.graphql.GraphQLCommons.fieldToGraphQLObjectType;
 import static org.codice.ddf.admin.query.graphql.GraphQLCommons.fieldsToGraphQLFieldDefinition;
@@ -11,21 +11,21 @@ import graphql.schema.GraphQLObjectType;
 import graphql.servlet.GraphQLMutationProvider;
 import graphql.servlet.GraphQLQueryProvider;
 
-public class LdapGraphQLProvider implements GraphQLQueryProvider, GraphQLMutationProvider {
+public class ConnectionGraphQLProvider implements GraphQLQueryProvider, GraphQLMutationProvider {
 
     @Override
     public Collection<GraphQLFieldDefinition> getMutations() {
-        return fieldsToGraphQLFieldDefinition(new LdapActionHandler().getPersistActions());
+        return fieldsToGraphQLFieldDefinition(new ConnectionActionHandler().getPersistActions());
     }
 
     @Override
     public GraphQLObjectType getQuery() {
-        return fieldToGraphQLObjectType(new LdapActionHandler());
+        return fieldToGraphQLObjectType(new ConnectionActionHandler());
     }
 
     @Override
     public String getName() {
-        return new LdapActionHandler().fieldName();
+        return new ConnectionActionHandler().fieldName();
     }
 
     @Override

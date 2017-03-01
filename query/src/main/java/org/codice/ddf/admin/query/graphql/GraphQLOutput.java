@@ -1,8 +1,9 @@
 package org.codice.ddf.admin.query.graphql;
 
+import static org.codice.ddf.admin.query.commons.fields.base.BaseUnionField.FIELD_TYPE_NAME_KEY;
 import static org.codice.ddf.admin.query.graphql.GraphQLCommons.enumFieldToGraphQLEnumType;
-import static org.codice.ddf.admin.query.graphql.GraphQLCommons.fieldsToGraphQLFieldDefinition;
 import static org.codice.ddf.admin.query.graphql.GraphQLCommons.fieldToGraphQLObjectType;
+import static org.codice.ddf.admin.query.graphql.GraphQLCommons.fieldsToGraphQLFieldDefinition;
 import static graphql.Scalars.GraphQLInt;
 import static graphql.Scalars.GraphQLString;
 import static graphql.schema.GraphQLInterfaceType.newInterface;
@@ -10,14 +11,16 @@ import static graphql.schema.GraphQLUnionType.newUnionType;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import org.codice.ddf.admin.query.api.fields.Field;
 import org.codice.ddf.admin.query.api.fields.InterfaceField;
-import org.codice.ddf.admin.query.api.fields.ObjectField;
 import org.codice.ddf.admin.query.api.fields.UnionField;
-import org.codice.ddf.admin.query.api.fields.UnionValueField;
 import org.codice.ddf.admin.query.commons.fields.base.BaseEnumField;
 import org.codice.ddf.admin.query.commons.fields.base.ListField;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLObjectType;
@@ -26,6 +29,8 @@ import graphql.schema.GraphQLScalarType;
 import graphql.schema.TypeResolver;
 
 public class GraphQLOutput {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(GraphQLOutput.class);
 
     public static GraphQLOutputType fieldToGraphQLOutputType(Field field) {
         switch (field.fieldBaseType()) {
@@ -80,27 +85,32 @@ public class GraphQLOutput {
 
         List<GraphQLObjectType> supportedTypes;
 
+        //The graphql library requires the same object reference it was given to build the schema
+        //So we have to keep track of the objects and match them after being processed by the action datafetcher
         public UnionTypeResolver(GraphQLObjectType... supportedTypes) {
             this.supportedTypes = Arrays.asList(supportedTypes);
         }
 
         @Override
         public GraphQLObjectType getType(Object object) {
-            if(object instanceof UnionValueField){
-                return getMatchingUnionType((UnionValueField) object);
-            } else {
-                throw new RuntimeException("UNKNOWN UNION TYPE: " + ((Field)object).fieldTypeName());
+            if(!(object instanceof Map) || ((Map)object).get(FIELD_TYPE_NAME_KEY) == null) {
+                LOGGER.error("Cannot handle supposed union object: " + object.toString());
+                throw new RuntimeException("Cannot handle supposed union object: " + object.toString());
             }
-        }
 
-        public GraphQLObjectType getMatchingUnionType(UnionValueField field) {
-            for(GraphQLObjectType type : supportedTypes) {
-                String fieldTypeName = ((ObjectField)field).fieldTypeName() + "Payload";
-                if(type.getName().equals(fieldTypeName)) {
-                    return type;
-                }
+            String fieldTypeName = (String) ((Map<String, Object>) object).get(FIELD_TYPE_NAME_KEY);
+            String payloadFieldTypeName = fieldTypeName + "Payload";
+            Optional<GraphQLObjectType> foundUnionType = supportedTypes.stream()
+                    .filter(type -> type.getName()
+                            .equals(payloadFieldTypeName))
+                    .findFirst();
+
+            if(!foundUnionType.isPresent()) {
+                LOGGER.error("UNKNOWN UNION TYPE: " + fieldTypeName);
+                throw new RuntimeException("UNKNOWN UNION TYPE: " + payloadFieldTypeName);
             }
-            throw new RuntimeException("NO MATCHING UNION TYPE FOR: " + ((ObjectField)field).fieldTypeName() + "Payload");
+
+            return foundUnionType.get();
         }
     }
 }

@@ -28,10 +28,19 @@
         </interfaces>
     </service>
 
-    <bean id="sourcesProvider" class="org.codice.ddf.admin.query.sources.delegate.SourceGraphQLProvider" />
+    <bean id="sourcesProvider" class="org.codice.ddf.admin.query.sources.SourceGraphQLProvider" />
     <service ref="sourcesProvider">
         <interfaces>
             <value>graphql.servlet.GraphQLQueryProvider</value>
+            <value>graphql.servlet.GraphQLMutationProvider</value>
+        </interfaces>
+    </service>
+
+    <bean id="connectionProvider" class="org.codice.ddf.admin.query.connection.ConnectionGraphQLProvider" />
+    <service ref="connectionProvider">
+        <interfaces>
+            <value>graphql.servlet.GraphQLQueryProvider</value>
+            <value>graphql.servlet.GraphQLMutationProvider</value>
         </interfaces>
     </service>
 

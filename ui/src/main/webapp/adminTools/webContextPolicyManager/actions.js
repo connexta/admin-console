@@ -31,6 +31,13 @@ export const setError = ({ scope, message }) => ({ type: 'WCPM/ERRORS/SET', scop
 export const clearAllErrors = () => ({ type: 'WCPM/ERRORS/CLEAR' })
 export const clearComponentError = (scope) => ({ type: 'WCPM/ERRORS/CLEAR_COMPONENT', scope })
 
+// checks for a preceding "/" and that there are only URI-valid characters
+// ex PASS: '/', '/abc/def', '/abc123#$!'
+// ex FAIL: '', 'abc/', '/^^^'
+const isValidContextPath = (path) => {
+  return /^(\/[A-Za-z0-9-._~:/?#[\]@!$&'()*+,;=`.%]*)+$/g.test(path)
+}
+
 // Persist Field Validations
 export const addContextPath = (attribute, binNumber) => (dispatch, getState) => {
   dispatch(clearComponentError('contextPaths'))
@@ -42,7 +49,7 @@ export const addContextPath = (attribute, binNumber) => (dispatch, getState) => 
   if (!newPath || newPath.trim() === '') { return }
 
   // simple test for invalid path - backend also validates paths as an additional precaution
-  if (!(/^(\/[!#$&-;=?-[\]_a-z~]+)+/.test(newPath))) {
+  if (!isValidContextPath(newPath)) {
     dispatch(setError({ scope: 'contextPaths', message: 'Invalid context path.' }))
     return
   }
@@ -79,6 +86,7 @@ const errorResult = (scope, message) => ({ scope, message })
 
 const checkContextPathValidity = (bin) => {
   let errors = []
+
   if (!isBlank(bin.newcontextPaths)) {
     errors.push(errorResult('contextPaths', 'Field edited but not added. Please add or clear before saving.'))
   }
@@ -92,6 +100,8 @@ const checkContextPathValidity = (bin) => {
 
 const checkRealmValidity = (bin) => {
   let errors = []
+  if (bin.name === 'WHITELIST') return errors
+
   if (isBlank(bin.realm)) {
     errors.push(errorResult('general', 'Realm cannot be blank.'))
   }
@@ -100,6 +110,8 @@ const checkRealmValidity = (bin) => {
 
 const checkAuthenticationTypeValidity = (bin) => {
   let errors = []
+  if (bin.name === 'WHITELIST') return errors
+
   if (!isBlank(bin.newauthenticationTypes)) {
     errors.push(errorResult('authTypes', 'Field edited but not added. Please add or clear before saving.'))
   }
@@ -113,6 +125,8 @@ const checkAuthenticationTypeValidity = (bin) => {
 
 const checkRequiredAttributesValidity = (bin) => {
   let errors = []
+  if (bin.name === 'WHITELIST') return errors
+
   if (!isBlank(bin.newrequiredClaim)) {
     errors.push(errorResult('requiredClaim', 'Field edited but not added. Please add or clear before saving.'))
   }
@@ -169,7 +183,7 @@ export const persistChanges = (binNumber, url, isDeleting) => async (dispatch, g
 
   // check for server exceptions
   if (json.messages[0].exceptions && json.messages[0].exceptions.length > 0) {
-    dispatch(setError('general', 'The server encountered an error. Please check the server logs for more information.'))
+    dispatch(setError({ scope: 'general', message: 'The server encountered an error. Please check the server logs for more information.' }))
     return
   }
   // handle responses
@@ -177,7 +191,7 @@ export const persistChanges = (binNumber, url, isDeleting) => async (dispatch, g
   if (result === 'SUCCESSFUL_PERSIST') {
     dispatch(editModeSave(binNumber))
   } else {
-    dispatch(setError('general', 'Could not save. Reason for issue: ' + json.messages[0].message))
+    dispatch(setError({ scope: 'general', message: 'Could not save. Reason for issue: ' + json.messages[0].message }))
   }
 }
 

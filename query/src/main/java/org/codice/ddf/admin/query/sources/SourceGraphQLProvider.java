@@ -1,4 +1,4 @@
-package org.codice.ddf.admin.query.sources.delegate;
+package org.codice.ddf.admin.query.sources;
 
 import static org.codice.ddf.admin.query.graphql.GraphQLCommons.fieldToGraphQLObjectType;
 import static org.codice.ddf.admin.query.graphql.GraphQLCommons.fieldsToGraphQLFieldDefinition;
@@ -21,6 +21,11 @@ public class SourceGraphQLProvider implements GraphQLQueryProvider, GraphQLMutat
     @Override
     public GraphQLObjectType getQuery() {
         return fieldToGraphQLObjectType(new SourceDelegateActionHandler());
+    }
+
+    @Override
+    public String getName() {
+        return new SourceDelegateActionHandler().fieldName();
     }
 
     @Override

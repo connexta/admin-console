@@ -14,6 +14,11 @@ public class StsGraphQLProvider implements GraphQLQueryProvider {
     }
 
     @Override
+    public String getName() {
+        return new StsActionHandler().fieldName();
+    }
+
+    @Override
     public Object context() {
         return new HashMap<>();
     }

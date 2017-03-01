@@ -8,10 +8,10 @@ import org.codice.ddf.admin.query.api.fields.ActionField;
 import org.codice.ddf.admin.query.api.fields.Field;
 import org.codice.ddf.admin.query.commons.fields.base.BaseField;
 
-public abstract class DefaultActionHandler extends BaseField implements ActionHandlerField {
+public abstract class BaseActionHandler extends BaseField implements ActionHandlerField {
 
-    public DefaultActionHandler(String fieldName, String description) {
-        super(fieldName, null, description, FieldBaseType.ACTION_HANDLER);
+    public BaseActionHandler(String fieldName, String fieldTypeName, String description) {
+        super(fieldName, fieldTypeName, description, FieldBaseType.ACTION_HANDLER);
     }
 
     @Override

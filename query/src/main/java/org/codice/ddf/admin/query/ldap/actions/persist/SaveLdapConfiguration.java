@@ -14,7 +14,7 @@ import com.google.common.collect.ImmutableList;
 
 public class SaveLdapConfiguration extends BaseActionField<BaseReportField> {
 
-    public static final String FIELD_NAME = "save";
+    public static final String FIELD_NAME = "saveLdap";
     public static final String DESCRIPTION = "Saves the LDAP configuration.";
     private LdapConfigurationField config = new LdapConfigurationField();
     private List<Field> arguments = ImmutableList.of(config);

@@ -14,17 +14,27 @@ public class CredentialsField extends BaseObjectField {
     public static final String FIELD_TYPE_NAME  = "Credentials";
     public static final String DESCRIPTION = "Credentials required for base64 authentication.";
 
-    private StringField hostname;
+    private StringField username;
     private StringField password;
 
     public CredentialsField() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
-        this.hostname = new StringField("username");
+        this.username = new StringField("username");
         this.password = new StringField("password");
+    }
+
+    public CredentialsField username(String username) {
+        this.username.setValue(username);
+        return this;
+    }
+
+    public CredentialsField password(String password) {
+        this.password.setValue(password);
+        return this;
     }
 
     @Override
     public List<Field> getFields() {
-        return ImmutableList.of(hostname, password);
+        return ImmutableList.of(username, password);
     }
 }

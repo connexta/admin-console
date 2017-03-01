@@ -8,8 +8,8 @@ import org.codice.ddf.admin.query.api.fields.Field;
 
 public abstract class GetAction<T extends Field> extends BaseActionField<T> {
 
-    public GetAction(String actionId, String description, T returnType) {
-        super(actionId, description, returnType);
+    public GetAction(String fieldName, String description, T returnType) {
+        super(fieldName, description, returnType);
     }
 
     public abstract T process();

@@ -12,12 +12,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
-import org.codice.ddf.admin.query.api.fields.ActionHandlerField;
 import org.codice.ddf.admin.query.api.fields.ActionField;
+import org.codice.ddf.admin.query.api.fields.ActionHandlerField;
 import org.codice.ddf.admin.query.api.fields.Field;
 import org.codice.ddf.admin.query.api.fields.ObjectField;
-import org.codice.ddf.admin.query.api.fields.UnionField;
-import org.codice.ddf.admin.query.api.fields.UnionValueField;
 import org.codice.ddf.admin.query.commons.fields.base.BaseEnumField;
 import org.codice.ddf.admin.query.commons.fields.base.EnumFieldValue;
 import org.codice.ddf.admin.query.commons.fields.base.ListField;
@@ -30,6 +28,13 @@ import graphql.schema.GraphQLObjectType;
 
 public class GraphQLCommons {
 
+    public static GraphQLObjectType actionHandlerToGraphQLObjectType(ActionHandlerField actionHandler) {
+        return newObject().name(actionHandler.fieldName())
+                .description(actionHandler.description())
+                .fields(fieldsToGraphQLFieldDefinition(((ActionHandlerField)actionHandler).getDiscoveryActions()))
+                .build();
+    }
+
     public static GraphQLObjectType fieldToGraphQLObjectType(Field field) {
         switch (field.fieldBaseType()) {
         case OBJECT:
@@ -41,7 +46,7 @@ public class GraphQLCommons {
 
         case ACTION_HANDLER:
             //Because this only be transformed into a top level sub query, there is no need to add Payload
-            return newObject().name(field.fieldName())
+            return newObject().name(field.fieldTypeName())
                     .description(field.description())
                     .fields(fieldsToGraphQLFieldDefinition(((ActionHandlerField)field).getDiscoveryActions()))
                     .build();
@@ -80,7 +85,7 @@ public class GraphQLCommons {
             return newFieldDefinition().name(field.fieldName())
                     .description(field.description())
                     .type(fieldToGraphQLOutputType(field))
-                    .dataFetcher(fetcher -> unionTypeDataFetch(field))
+//                    .dataFetcher(fetcher -> unionTypeDataFetch(field))
                     .build();
         default:
             return newFieldDefinition().name(field.fieldName())
@@ -110,16 +115,26 @@ public class GraphQLCommons {
     }
 
     public static Object actionFieldDataFetch(DataFetchingEnvironment env, ActionField action) {
-        Field fieldResult = action.process(env.getArguments());
+        return action.process(env.getArguments()).getValue();
+    }
 
-        //Union values are handled by the union data fetcher
-        if(fieldResult instanceof UnionValueField) {
-            return fieldResult;
-        } else if(fieldResult instanceof ListField && ((ListField) fieldResult).getListValueField() instanceof UnionField) {
-            return ((ListField) fieldResult).getFields();
+    public static Object transformFieldToValue(Field field){
+        switch(field.fieldBaseType()) {
+        case ENUM:
+        case STRING:
+        case INTEGER:
+        case FLOAT:
+            return field.getValue();
+        case LIST:
+            return ((ListField) field).getFields()
+                    .stream()
+                    .map(f -> transformFieldToValue((Field) f))
+                    .collect(Collectors.toList());
+        case OBJECT:
+
+        default:
+            throw new RuntimeException("Unhandled base transform type [" + field.fieldBaseType() + "] with field name of [" + field.fieldName() + "] ");
         }
-
-        return fieldResult.getValue();
     }
 
     //This method is used to break the recursion cycle of "actionFieldDataFetch"

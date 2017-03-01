@@ -9,7 +9,7 @@ public class StringField extends BaseScalarField<String> {
     }
 
 
-    protected StringField(String fieldName, String fieldTypeName, String description) {
+    public StringField(String fieldName, String fieldTypeName, String description) {
         super(fieldName, fieldTypeName, description, STRING);
     }
 

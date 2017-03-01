@@ -34,8 +34,8 @@ public class LdapConnectionField extends BaseObjectField {
         return this;
     }
 
-    public LdapConnectionField encryptionMethod(LdapEncryptionMethodField encryptionMethod) {
-        this.encryptionMethod.setValue(encryptionMethod.getValue());
+    public LdapConnectionField encryptionMethod(Field encryptionMethod) {
+        this.encryptionMethod.setValue(encryptionMethod);
         return this;
     }
 

@@ -12,6 +12,7 @@ public abstract class ListField<T extends Field> extends BaseField {
 
     protected List<T> fields;
 
+    // TODO: tbatie - 2/28/17 - Remove the description field, we can't provide a description for arrays
     public ListField(String fieldName, String description) {
         super(fieldName, null, description, LIST);
         fields = new ArrayList<T>();
@@ -24,7 +25,7 @@ public abstract class ListField<T extends Field> extends BaseField {
                 .collect(Collectors.toList());
     }
 
-    public ListField addField(T value) {
+    public Field addField(T value) {
         fields.add(value);
         return this;
     }

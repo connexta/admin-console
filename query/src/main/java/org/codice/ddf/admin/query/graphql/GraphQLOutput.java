@@ -4,6 +4,7 @@ import static org.codice.ddf.admin.query.commons.fields.base.BaseUnionField.FIEL
 import static org.codice.ddf.admin.query.graphql.GraphQLCommons.enumFieldToGraphQLEnumType;
 import static org.codice.ddf.admin.query.graphql.GraphQLCommons.fieldToGraphQLObjectType;
 import static org.codice.ddf.admin.query.graphql.GraphQLCommons.fieldsToGraphQLFieldDefinition;
+import static graphql.Scalars.GraphQLBoolean;
 import static graphql.Scalars.GraphQLInt;
 import static graphql.Scalars.GraphQLString;
 import static graphql.schema.GraphQLInterfaceType.newInterface;
@@ -46,7 +47,11 @@ public class GraphQLOutput {
                 return GraphQLInt;
             }
             return new GraphQLScalarType(field.fieldTypeName(), field.description(), GraphQLInt.getCoercing());
-
+        case BOOLEAN:
+            if(field.fieldTypeName() == null) {
+                return GraphQLBoolean;
+            }
+            return new GraphQLScalarType(field.fieldTypeName(), field.description(), GraphQLBoolean.getCoercing());
         case STRING:
             if(field.fieldTypeName() == null) {
                 return GraphQLString;

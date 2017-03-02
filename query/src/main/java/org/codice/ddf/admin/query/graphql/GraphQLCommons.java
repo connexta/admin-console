@@ -28,13 +28,6 @@ import graphql.schema.GraphQLObjectType;
 
 public class GraphQLCommons {
 
-    public static GraphQLObjectType actionHandlerToGraphQLObjectType(ActionHandlerField actionHandler) {
-        return newObject().name(actionHandler.fieldName())
-                .description(actionHandler.description())
-                .fields(fieldsToGraphQLFieldDefinition(((ActionHandlerField)actionHandler).getDiscoveryActions()))
-                .build();
-    }
-
     public static GraphQLObjectType fieldToGraphQLObjectType(Field field) {
         switch (field.fieldBaseType()) {
         case OBJECT:

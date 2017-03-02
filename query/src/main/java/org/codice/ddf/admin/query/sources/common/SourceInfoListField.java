@@ -1,8 +1,8 @@
 package org.codice.ddf.admin.query.sources.common;
 
-import org.codice.ddf.admin.query.commons.fields.base.ListField;
+import org.codice.ddf.admin.query.commons.fields.base.BaseListField;
 
-public class SourceInfoListField extends ListField<SourceInfoField> {
+public class SourceInfoListField extends BaseListField<SourceInfoField> {
 
     public static final String DEFAULT_FIELD_NAME = "sourceConfigs";
     public static final String DESCRIPTION = "A list of source configurations";

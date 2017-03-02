@@ -44,7 +44,7 @@
         </interfaces>
     </service>
 
-    <bean id="wcpmProvder" class="org.codice.ddf.admin.query.wcpm.WCPMGraphQLProvider" />
+    <bean id="wcpmProvder" class="org.codice.ddf.admin.query.wcpm.WcpmGraphQLProvider" />
     <service ref="wcpmProvder">
         <interfaces>
             <value>graphql.servlet.GraphQLQueryProvider</value>

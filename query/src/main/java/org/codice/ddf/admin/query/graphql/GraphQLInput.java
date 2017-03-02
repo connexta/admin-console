@@ -12,8 +12,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.query.api.fields.Field;
+import org.codice.ddf.admin.query.api.fields.ListField;
 import org.codice.ddf.admin.query.commons.fields.base.BaseEnumField;
-import org.codice.ddf.admin.query.commons.fields.base.ListField;
+import org.codice.ddf.admin.query.commons.fields.base.BaseListField;
 import org.codice.ddf.admin.query.commons.fields.base.BaseObjectField;
 
 import graphql.schema.GraphQLInputObjectField;

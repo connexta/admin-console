@@ -5,8 +5,8 @@ import java.util.List;
 import org.codice.ddf.admin.query.api.fields.Field;
 import org.codice.ddf.admin.query.commons.fields.base.BaseObjectField;
 import org.codice.ddf.admin.query.commons.fields.base.scalar.StringField;
-import org.codice.ddf.admin.query.commons.fields.common.ContextPathField;
-import org.codice.ddf.admin.query.commons.fields.common.ContextPathList;
+import org.codice.ddf.admin.query.commons.fields.common.ContextPath;
+import org.codice.ddf.admin.query.commons.fields.common.ContextPaths;
 
 import com.google.common.collect.ImmutableList;
 
@@ -16,14 +16,14 @@ public class ContextPolicyBin extends BaseObjectField {
     public static final String FIELD_TYPE_NAME  ="ContextPolicyBin";
     public static final String DESCRIPTION = "Represents a policy being applied to a set of context paths.";
 
-    private ContextPathList contexts;
+    private ContextPaths contexts;
     private AuthTypeList authTypes;
     private Realm realm;
     private ClaimsMapping claimsMapping;
 
     public ContextPolicyBin() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
-        contexts = new ContextPathList();
+        contexts = new ContextPaths();
         authTypes = new AuthTypeList();
         realm = new Realm();
         claimsMapping = new ClaimsMapping();
@@ -34,7 +34,7 @@ public class ContextPolicyBin extends BaseObjectField {
         return this;
     }
 
-    public ContextPolicyBin addContextPath(ContextPathField contextPath) {
+    public ContextPolicyBin addContextPath(ContextPath contextPath) {
         contexts.addField(contextPath);
         return this;
     }

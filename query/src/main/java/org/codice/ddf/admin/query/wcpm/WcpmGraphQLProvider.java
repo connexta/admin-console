@@ -1,8 +1,8 @@
 package org.codice.ddf.admin.query.wcpm;
 
 import static org.codice.ddf.admin.query.graphql.GraphQLCommons.fieldToGraphQLObjectType;
+import static org.codice.ddf.admin.query.graphql.GraphQLCommons.fieldsToGraphQLFieldDefinition;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
@@ -17,6 +17,10 @@ public class WcpmGraphQLProvider implements GraphQLQueryProvider, GraphQLMutatio
         return fieldToGraphQLObjectType(new WcpmActionHandler());
     }
 
+    public Collection<GraphQLFieldDefinition> getMutations() {
+        return fieldsToGraphQLFieldDefinition(new WcpmActionHandler().getPersistActions());
+    }
+
     @Override
     public Object context() {
         return new HashMap<>();
@@ -25,10 +29,5 @@ public class WcpmGraphQLProvider implements GraphQLQueryProvider, GraphQLMutatio
     @Override
     public String getName() {
         return new WcpmActionHandler().fieldName();
-    }
-
-    @Override
-    public Collection<GraphQLFieldDefinition> getMutations() {
-        return new ArrayList<>();
     }
 }

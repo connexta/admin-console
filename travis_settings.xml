@@ -5,11 +5,6 @@
             <username>${env.CODICE_USERNAME}</username>
             <password>${env.CODICE_PASSWORD}</password>
         </server>
-        <server>
-            <id>releases</id>
-            <username>${env.CODICE_USERNAME}</username>
-            <password>${env.CODICE_PASSWORD}</password>
-        </server>
     </servers>
 
     <profiles>

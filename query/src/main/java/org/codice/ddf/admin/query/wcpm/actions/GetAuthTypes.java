@@ -1,5 +1,7 @@
 package org.codice.ddf.admin.query.wcpm.actions;
 
+import static org.codice.ddf.admin.query.wcpm.sample.SampleFields.SAMPLE_AUTH_TYPES_LIST;
+
 import org.codice.ddf.admin.query.commons.actions.GetAction;
 import org.codice.ddf.admin.query.wcpm.fields.AuthType;
 import org.codice.ddf.admin.query.wcpm.fields.AuthTypeList;
@@ -15,12 +17,6 @@ public class GetAuthTypes extends GetAction<AuthTypeList> {
 
     @Override
     public AuthTypeList process() {
-        AuthTypeList authTypes = new AuthTypeList();
-        authTypes.addField(AuthType.BASIC_AUTH);
-        authTypes.addField(AuthType.IDP_AUTH);
-        authTypes.addField(AuthType.PKI_AUTH);
-        authTypes.addField(AuthType.SAML_AUTH);
-        authTypes.addField(AuthType.GUEST_AUTH);
-        return authTypes;
+        return SAMPLE_AUTH_TYPES_LIST;
     }
 }

@@ -4,9 +4,9 @@ import java.util.List;
 
 import org.codice.ddf.admin.query.api.fields.Field;
 import org.codice.ddf.admin.query.api.fields.MessageField;
-import org.codice.ddf.admin.query.commons.fields.base.ListField;
+import org.codice.ddf.admin.query.commons.fields.base.BaseListField;
 
-public class MessageListField extends ListField<MessageField> {
+public class MessageListField extends BaseListField<MessageField> {
 
     public static final String DESCRIPTION = "A list containing messages.";
     public MessageListField(String fieldName) {

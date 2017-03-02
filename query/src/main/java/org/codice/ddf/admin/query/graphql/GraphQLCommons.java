@@ -15,9 +15,10 @@ import org.apache.commons.lang.StringUtils;
 import org.codice.ddf.admin.query.api.fields.ActionField;
 import org.codice.ddf.admin.query.api.fields.ActionHandlerField;
 import org.codice.ddf.admin.query.api.fields.Field;
+import org.codice.ddf.admin.query.api.fields.ListField;
 import org.codice.ddf.admin.query.api.fields.ObjectField;
 import org.codice.ddf.admin.query.commons.fields.base.BaseEnumField;
-import org.codice.ddf.admin.query.commons.fields.base.ListField;
+import org.codice.ddf.admin.query.commons.fields.base.BaseListField;
 
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLArgument;

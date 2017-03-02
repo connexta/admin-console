@@ -16,9 +16,10 @@ import java.util.Optional;
 
 import org.codice.ddf.admin.query.api.fields.Field;
 import org.codice.ddf.admin.query.api.fields.InterfaceField;
+import org.codice.ddf.admin.query.api.fields.ListField;
 import org.codice.ddf.admin.query.api.fields.UnionField;
 import org.codice.ddf.admin.query.commons.fields.base.BaseEnumField;
-import org.codice.ddf.admin.query.commons.fields.base.ListField;
+import org.codice.ddf.admin.query.commons.fields.base.BaseListField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

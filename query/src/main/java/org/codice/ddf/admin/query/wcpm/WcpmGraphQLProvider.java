@@ -11,10 +11,10 @@ import graphql.schema.GraphQLObjectType;
 import graphql.servlet.GraphQLMutationProvider;
 import graphql.servlet.GraphQLQueryProvider;
 
-public class WCPMGraphQLProvider implements GraphQLQueryProvider, GraphQLMutationProvider {
+public class WcpmGraphQLProvider implements GraphQLQueryProvider, GraphQLMutationProvider {
     @Override
     public GraphQLObjectType getQuery() {
-        return fieldToGraphQLObjectType(new WCPMActionHandler());
+        return fieldToGraphQLObjectType(new WcpmActionHandler());
     }
 
     @Override
@@ -24,7 +24,7 @@ public class WCPMGraphQLProvider implements GraphQLQueryProvider, GraphQLMutatio
 
     @Override
     public String getName() {
-        return new WCPMActionHandler().fieldName();
+        return new WcpmActionHandler().fieldName();
     }
 
     @Override

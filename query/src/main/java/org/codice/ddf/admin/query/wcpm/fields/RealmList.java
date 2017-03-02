@@ -4,22 +4,22 @@ import org.codice.ddf.admin.query.api.fields.Field;
 import org.codice.ddf.admin.query.commons.fields.base.BaseListField;
 import org.codice.ddf.admin.query.commons.fields.base.scalar.StringField;
 
-public class AuthTypeList extends BaseListField<StringField> {
+public class RealmList extends BaseListField<StringField> {
 
-    public static final String DEFAULT_FIELD_NAME = "authTypes";
-    public static final String DESCRIPTION = "A list of authentication types";
+    public static final String DEFAULT_FIELD_NAME = "realms";
+    public static final String DESCRIPTION = "A list of Realms";
 
-    public AuthTypeList() {
+    public RealmList() {
         super(DEFAULT_FIELD_NAME, DESCRIPTION);
     }
 
     @Override
-    public AuthType getListValueField() {
-        return new AuthType();
+    public Realm getListValueField() {
+        return new Realm();
     }
 
     @Override
-    public AuthTypeList addField(StringField value) {
+    public RealmList addField(StringField value) {
         super.addField(value);
         return this;
     }

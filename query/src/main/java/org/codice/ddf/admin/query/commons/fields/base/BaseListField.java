@@ -7,13 +7,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.query.api.fields.Field;
+import org.codice.ddf.admin.query.api.fields.ListField;
 
-public abstract class ListField<T extends Field> extends BaseField {
+public abstract class BaseListField<T extends Field> extends BaseField implements ListField<T> {
 
     protected List<T> fields;
 
-    // TODO: tbatie - 2/28/17 - Remove the description field, we can't provide a description for arrays
-    public ListField(String fieldName, String description) {
+    public BaseListField(String fieldName, String description) {
         super(fieldName, null, description, LIST);
         fields = new ArrayList<T>();
     }
@@ -33,6 +33,4 @@ public abstract class ListField<T extends Field> extends BaseField {
     public List<T> getFields() {
         return fields;
     }
-
-    public abstract Field getListValueField();
 }

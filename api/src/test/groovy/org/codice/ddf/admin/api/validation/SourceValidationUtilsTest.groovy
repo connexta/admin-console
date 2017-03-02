@@ -24,7 +24,7 @@ class SourceValidationUtilsTest extends Specification {
         sourceValidationUtils = new SourceValidationUtils()
     }
 
-    def 'test validateSourceName(String, String) with no existing config with source name'() {
+    def 'test validateSourceName(String, String, Configurator) with no existing config with source name'() {
         when:
         List<ConfigurationMessage> results = sourceValidationUtils.validateSourceName(NEW_SOURCE_NAME, FACTORY_IDS, configurator)
 
@@ -32,7 +32,18 @@ class SourceValidationUtilsTest extends Specification {
         results.isEmpty()
     }
 
-    def 'test validateSourceName(String, String) with duplicate source name'() {
+    def 'test validateSourceName(String, String, Configurator) failure with empty source name'() {
+        when:
+        List<ConfigurationMessage> results = sourceValidationUtils.validateSourceName("", FACTORY_IDS, configurator)
+
+        then:
+        results.size() == 1
+        results.get(0).type() == ConfigurationMessage.MessageType.FAILURE
+        results.get(0).configFieldId() == CONFIG_FIELD_ID
+        results.get(0).subtype() == ConfigurationMessage.MISSING_REQUIRED_FIELD
+    }
+
+    def 'test validateSourceName(String, String, Configurator) with duplicate source name'() {
         when:
         List<ConfigurationMessage> results = sourceValidationUtils.validateSourceName(EXISTING_SOURCE_NAME, FACTORY_IDS, configurator)
 
@@ -43,7 +54,7 @@ class SourceValidationUtilsTest extends Specification {
         results.get(0).subtype() == ConfigurationMessage.INVALID_FIELD
     }
 
-    def 'test validateSourceName(String, String) with invalid existing config id property'() {
+    def 'test validateSourceName(String, String, Configurator) with invalid existing config id property'() {
         when:
         configurator = mockConfigurator(true)
         sourceValidationUtils = new SourceValidationUtils()

@@ -98,6 +98,11 @@ public class SourceValidationUtils {
      */
     public List<ConfigurationMessage> validateSourceName(@Nonnull String sourceName,
             @Nonnull List<String> factoryPids, Configurator configurator) {
+        List<ConfigurationMessage> errors = validateString(sourceName, SOURCE_NAME);
+        if(!errors.isEmpty()) {
+            return errors;
+        }
+
         if (configurator == null) {
             configurator = new Configurator();
         }

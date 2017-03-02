@@ -144,8 +144,15 @@ public class CreateLdapConfigMethod extends PersistMethod<LdapConfiguration> {
     public List<ConfigurationMessage> validateOptionalFields(LdapConfiguration configuration) {
         List<ConfigurationMessage> validationResults = validateBindRealm(configuration);
         if (configuration.ldapUseCase()
-                .equals(AUTHENTICATION) || configuration.ldapUseCase()
-                .equals(AUTHENTICATION_AND_ATTRIBUTE_STORE)) {
+                .equals(AUTHENTICATION)) {
+            validationResults.addAll(configuration.validate(ImmutableList.of(GROUP_OBJECT_CLASS,
+                    GROUP_ATTRIBUTE_HOLDING_MEMBER,
+                    MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP)));
+        }
+
+        if (configuration.ldapUseCase()
+                .equals(AUTHENTICATION_AND_ATTRIBUTE_STORE) || configuration.ldapUseCase()
+                .equals(ATTRIBUTE_STORE)) {
             validationResults.addAll(configuration.validate(ImmutableList.of(GROUP_OBJECT_CLASS,
                     GROUP_ATTRIBUTE_HOLDING_MEMBER,
                     MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP,

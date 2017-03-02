@@ -15,11 +15,12 @@ package org.codice.ddf.admin.api.services;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections.ListUtils;
 import org.codice.ddf.admin.api.config.context.ContextPolicyBin;
 import org.codice.ddf.admin.api.config.context.ContextPolicyConfiguration;
 import org.codice.ddf.admin.api.configurator.Configurator;
@@ -62,8 +63,9 @@ public class PolicyManagerServiceProperties {
             //Check if bin containing an identical context policy exists already, if so add the context path to it
             for (ContextPolicyBin bin : bins) {
                 if (bin.realm()
-                        .equals(policy.getRealm()) && bin.authenticationTypes()
-                        .equals(policy.getAuthenticationMethods()) && hasSameRequiredAttributes(bin,
+                        .equals(policy.getRealm())
+                        && ListUtils.isEqualList(bin.authenticationTypes(),
+                        policy.getAuthenticationMethods()) && hasSameRequiredAttributes(bin,
                         policyRequiredAttributes)) {
                     bin.contextPaths(policy.getContextPath());
                     foundBin = true;
@@ -73,7 +75,7 @@ public class PolicyManagerServiceProperties {
             if (!foundBin) {
                 bins.add(new ContextPolicyBin().realm(policy.getRealm())
                         .requiredAttributes(policyRequiredAttributes)
-                        .authenticationTypes(new HashSet<>(policy.getAuthenticationMethods()))
+                        .authenticationTypes(new LinkedHashSet<>(policy.getAuthenticationMethods()))
                         .contextPaths(policy.getContextPath()));
             }
         }

@@ -19,7 +19,7 @@ public class SampleFields {
 
     public static final SourceInfoField SAMPLE_CSW_SOURCE_INFO = new SourceInfoField()
             .sourceHandlerName("cswHandler")
-            .isAvaliable("true")
+            .isAvaliable(true)
             .configuration(SAMPLE_CSW_CONFIG);
 
     public static final SourceConfigUnionField SAMPLE_WFS_CONFIG = new WfsSourceConfigurationField()
@@ -30,7 +30,7 @@ public class SampleFields {
 
     public static final SourceInfoField SAMPLE_WFS_SOURCE_INFO = new SourceInfoField()
             .sourceHandlerName("wfsHandler")
-            .isAvaliable("true")
+            .isAvaliable(true)
             .configuration(SAMPLE_WFS_CONFIG);
 
     public static final SourceConfigUnionField SAMPLE_OPENSEARCH_CONFIG = new OpensearchSourceConfigurationField()
@@ -41,7 +41,7 @@ public class SampleFields {
 
     public static final SourceInfoField SAMPLE_OPENSEARCH_SOURCE_INFO = new SourceInfoField()
             .sourceHandlerName("opensearchHandler")
-            .isAvaliable("true")
+            .isAvaliable(true)
             .configuration(SAMPLE_OPENSEARCH_CONFIG);
 
     public static final SourceInfoListField SAMPLE_SOURCES_INFO_LIST = new SourceInfoListField().addField(SAMPLE_CSW_SOURCE_INFO)

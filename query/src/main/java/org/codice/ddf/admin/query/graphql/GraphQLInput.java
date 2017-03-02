@@ -2,6 +2,7 @@ package org.codice.ddf.admin.query.graphql;
 
 import static org.codice.ddf.admin.query.graphql.GraphQLCommons.capitalize;
 import static org.codice.ddf.admin.query.graphql.GraphQLCommons.enumFieldToGraphQLEnumType;
+import static graphql.Scalars.GraphQLBoolean;
 import static graphql.Scalars.GraphQLInt;
 import static graphql.Scalars.GraphQLString;
 import static graphql.schema.GraphQLInputObjectField.newInputObjectField;
@@ -44,6 +45,11 @@ public class GraphQLInput {
                 return GraphQLInt;
             }
             return new GraphQLScalarType(field.fieldTypeName(), field.description(), GraphQLInt.getCoercing());
+        case BOOLEAN:
+            if(field.fieldTypeName() == null) {
+                return GraphQLBoolean;
+            }
+            return new GraphQLScalarType(field.fieldTypeName(), field.description(), GraphQLBoolean.getCoercing());
         case STRING:
             if(field.fieldTypeName() == null) {
                 return GraphQLString;

@@ -32,14 +32,14 @@
             <artifactId>platform-error-servlet</artifactId>
             <version>${ddf.version}</version>
         </dependency>
+                <!--
+        Remove when possible
+        -->
         <dependency>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-dependency-plugin</artifactId>
             <version>3.0.0</version>
         </dependency>
-        <!--
-        Remove when possible
-        -->
     </dependencies>
     <build>
         <plugins>

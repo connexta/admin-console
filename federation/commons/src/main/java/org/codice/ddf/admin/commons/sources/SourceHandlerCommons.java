@@ -59,7 +59,7 @@ public class SourceHandlerCommons {
     //Common success types
     public static final String DISCOVERED_SOURCE = "DISCOVERED_SOURCE";
     public static final String DELETED_SOURCE = "DELETED_SOURCE";
-    public static final String CREATED_SOURCE = "CREATED_SOURCE";
+
     public static final String VERIFIED_CAPABILITIES = "VERIFIED_CAPABILITIES";
     private static final Map<String, String> SUCCESS_DESCRIPTIONS = ImmutableMap.of(DISCOVERED_SOURCE, "Successfully discovered source from a url.",
             VERIFIED_CAPABILITIES, "Verified endpoint has specified capabilities",

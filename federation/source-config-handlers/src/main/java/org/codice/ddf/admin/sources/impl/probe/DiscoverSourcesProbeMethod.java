@@ -19,7 +19,7 @@ import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_USER_PASSWORD;
 import static org.codice.ddf.admin.api.handler.report.ProbeReport.createProbeReport;
 import static org.codice.ddf.admin.api.validation.SourceValidationUtils.validateOptionalUsernameAndPassword;
-import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.CREATED_SOURCE;
+import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.DISCOVERED_SOURCE;
 import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.DISCOVERED_SOURCES;
 import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.DISCOVER_SOURCES_ID;
 import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.getCommonSourceSubtypeDescriptions;
@@ -46,7 +46,7 @@ public class DiscoverSourcesProbeMethod extends ProbeMethod<SourceConfiguration>
 
     public static final List<String> REQUIRED_FIELDS = ImmutableList.of(SOURCE_HOSTNAME, PORT);
     public static final List<String> OPTIONAL_FIELDS = ImmutableList.of(SOURCE_USERNAME, SOURCE_USER_PASSWORD);
-    public static final Map<String, String> SUCCESS_TYPES =  getCommonSourceSubtypeDescriptions(CREATED_SOURCE);
+    public static final Map<String, String> SUCCESS_TYPES =  getCommonSourceSubtypeDescriptions(DISCOVERED_SOURCE);
 
     //    public static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(FAILED_PROBE, "No sources were discovered from the specified host.");
     public static final List<String> RETURN_TYPES = ImmutableList.of(DISCOVERED_SOURCES);
@@ -80,7 +80,7 @@ public class DiscoverSourcesProbeMethod extends ProbeMethod<SourceConfiguration>
                         probeReport.messages()))
                 .collect(Collectors.toList());
 
-        return createProbeReport(SUCCESS_TYPES, null, null, CREATED_SOURCE).probeResult(
+        return createProbeReport(SUCCESS_TYPES, null, null, DISCOVERED_SOURCE).probeResult(
                 DISCOVERED_SOURCES,
                 discoveredSources);
     }

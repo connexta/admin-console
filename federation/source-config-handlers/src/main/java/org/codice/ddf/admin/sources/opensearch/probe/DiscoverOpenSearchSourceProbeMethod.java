@@ -22,7 +22,7 @@ import static org.codice.ddf.admin.api.validation.SourceValidationUtils.validate
 import static org.codice.ddf.admin.commons.requests.RequestUtils.CANNOT_CONNECT;
 import static org.codice.ddf.admin.commons.requests.RequestUtils.CERT_ERROR;
 import static org.codice.ddf.admin.commons.requests.RequestUtils.UNTRUSTED_CA;
-import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.CREATED_SOURCE;
+import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.DISCOVERED_SOURCE;
 import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.DISCOVERED_SOURCES;
 import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.DISCOVERED_URL;
 import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.DISCOVER_SOURCES_ID;
@@ -46,7 +46,7 @@ public class DiscoverOpenSearchSourceProbeMethod extends ProbeMethod<OpenSearchS
     public static final String OPENSEARCH_DISCOVER_SOURCES_ID = DISCOVER_SOURCES_ID;
     public static final String DESCRIPTION = "Attempts to discover an OpenSearch endpoint based on a hostname and port using optional authentication information. If the \"endpointUrl\" is specified it will use this to create a configuration instead of discovering the url.";
     public static final List<String> OPTIONAL_FIELDS = ImmutableList.of(SOURCE_HOSTNAME, PORT, ENDPOINT_URL, SOURCE_USERNAME, SOURCE_USER_PASSWORD);
-    public static final Map<String, String> SUCCESS_TYPES = getCommonSourceSubtypeDescriptions(CREATED_SOURCE);
+    public static final Map<String, String> SUCCESS_TYPES = getCommonSourceSubtypeDescriptions(DISCOVERED_SOURCE);
     public static final Map<String, String> FAILURE_TYPES = getCommonSourceSubtypeDescriptions(CERT_ERROR, UNKNOWN_ENDPOINT, CANNOT_CONNECT);
     public static final Map<String, String> WARNING_TYPES = getCommonSourceSubtypeDescriptions(UNTRUSTED_CA);
     public static final List<String> RETURN_TYPES = ImmutableList.of(DISCOVERED_SOURCES);

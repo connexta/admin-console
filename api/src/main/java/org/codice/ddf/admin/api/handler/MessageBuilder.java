@@ -14,8 +14,9 @@
 package org.codice.ddf.admin.api.handler;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -34,10 +35,8 @@ public class MessageBuilder {
     }
 
     public Map<String, String> getDescriptions(String... subtypeKeys) {
-        Map<String, String> descriptions = new HashMap<>();
-        Arrays.stream(subtypeKeys)
-                .forEach(key -> descriptions.put(key, allTypes.get(key)));
-        return descriptions;
+        return Arrays.stream(subtypeKeys)
+                .collect(Collectors.toMap(Function.identity(), allTypes::get));
     }
     public ConfigurationMessage buildMessage(String result) {
         return ConfigurationMessage.buildMessage(successTypes, failureTypes, warningTypes, result);

@@ -2,18 +2,18 @@ package org.codice.ddf.admin.query.commons.fields.common;
 
 import org.codice.ddf.admin.query.commons.fields.base.scalar.StringField;
 
-public class ContextPathField extends StringField {
+public class ContextPath extends StringField {
 
     public static final String DEFAULT_FIELD_NAME = "path";
     public static final String FIELD_TYPE_NAME = "ContextPath";
     public static final String DESCRIPTION = "The context path is the prefix of a URL path that is used to select the context(s) to which an incoming request is passed. For example, http://hostname.com/<contextPath>.";
 
-    public ContextPathField() {
+    public ContextPath() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
     }
 
     @Override
-    public ContextPathField setValue(String value) {
+    public ContextPath setValue(String value) {
         super.setValue(value);
         return this;
     }

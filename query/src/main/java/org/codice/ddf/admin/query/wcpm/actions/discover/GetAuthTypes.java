@@ -1,4 +1,4 @@
-package org.codice.ddf.admin.query.wcpm.actions;
+package org.codice.ddf.admin.query.wcpm.actions.discover;
 
 import static org.codice.ddf.admin.query.wcpm.sample.SampleFields.SAMPLE_AUTH_TYPES_LIST;
 

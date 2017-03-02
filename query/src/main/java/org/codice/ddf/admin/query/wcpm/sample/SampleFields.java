@@ -1,7 +1,7 @@
 package org.codice.ddf.admin.query.wcpm.sample;
 
-import org.codice.ddf.admin.query.commons.fields.common.ContextPathField;
-import org.codice.ddf.admin.query.commons.fields.common.ContextPathList;
+import org.codice.ddf.admin.query.commons.fields.common.ContextPath;
+import org.codice.ddf.admin.query.commons.fields.common.ContextPaths;
 import org.codice.ddf.admin.query.wcpm.fields.AuthType;
 import org.codice.ddf.admin.query.wcpm.fields.AuthTypeList;
 import org.codice.ddf.admin.query.wcpm.fields.ClaimsMapEntry;
@@ -23,9 +23,9 @@ public class SampleFields {
             .addField(Realm.KARAF_REALM)
             .addField(Realm.LDAP_REALM);
 
-    public static final ContextPathField SAMPLE_CONTEXT_PATH = new ContextPathField().setValue("/example/path");
+    public static final ContextPath SAMPLE_CONTEXT_PATH = new ContextPath().setValue("/example/path");
 
-    public static final ContextPathList SAMPLE_CONTEXT_PATH_LIST = new ContextPathList()
+    public static final ContextPaths SAMPLE_CONTEXT_PATHS = new ContextPaths()
             .addField(SAMPLE_CONTEXT_PATH)
             .addField(SAMPLE_CONTEXT_PATH)
             .addField(SAMPLE_CONTEXT_PATH)

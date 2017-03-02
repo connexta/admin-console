@@ -4,10 +4,12 @@ import java.util.List;
 
 import org.codice.ddf.admin.query.api.fields.ActionField;
 import org.codice.ddf.admin.query.commons.BaseActionHandler;
-import org.codice.ddf.admin.query.wcpm.actions.GetAuthTypes;
-import org.codice.ddf.admin.query.wcpm.actions.GetContextPolicies;
-import org.codice.ddf.admin.query.wcpm.actions.GetRealms;
-import org.codice.ddf.admin.query.wcpm.actions.GetWhiteListContexts;
+import org.codice.ddf.admin.query.wcpm.actions.discover.GetAuthTypes;
+import org.codice.ddf.admin.query.wcpm.actions.discover.GetContextPolicies;
+import org.codice.ddf.admin.query.wcpm.actions.discover.GetRealms;
+import org.codice.ddf.admin.query.wcpm.actions.discover.GetWhiteListContexts;
+import org.codice.ddf.admin.query.wcpm.actions.persist.SaveContextPolices;
+import org.codice.ddf.admin.query.wcpm.actions.persist.SaveWhitelistedContexts;
 
 import com.google.common.collect.ImmutableList;
 
@@ -27,6 +29,6 @@ public class WcpmActionHandler extends BaseActionHandler {
 
     @Override
     public List<ActionField> getPersistActions() {
-        return ImmutableList.of();
+        return ImmutableList.of(new SaveContextPolices(), new SaveWhitelistedContexts());
     }
 }

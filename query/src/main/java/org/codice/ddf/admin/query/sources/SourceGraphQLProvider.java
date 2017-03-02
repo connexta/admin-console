@@ -14,13 +14,13 @@ import graphql.servlet.GraphQLQueryProvider;
 public class SourceGraphQLProvider implements GraphQLQueryProvider, GraphQLMutationProvider {
 
     @Override
-    public Collection<GraphQLFieldDefinition> getMutations() {
-        return fieldsToGraphQLFieldDefinition(new SourceDelegateActionHandler().getPersistActions());
+    public GraphQLObjectType getQuery() {
+        return fieldToGraphQLObjectType(new SourceDelegateActionHandler());
     }
 
     @Override
-    public GraphQLObjectType getQuery() {
-        return fieldToGraphQLObjectType(new SourceDelegateActionHandler());
+    public Collection<GraphQLFieldDefinition> getMutations() {
+        return fieldsToGraphQLFieldDefinition(new SourceDelegateActionHandler().getPersistActions());
     }
 
     @Override

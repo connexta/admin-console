@@ -317,6 +317,7 @@ public class Configurator {
      * any changes should be done through a commit
      *
      * @param serviceClass - Class of service to retrieve
+     * @param <S> type to be returned
      * @return first found service reference of serviceClass
      * @throws ConfiguratorException if any errors occur
      */

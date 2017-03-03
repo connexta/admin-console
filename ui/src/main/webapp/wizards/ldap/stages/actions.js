@@ -1,11 +1,13 @@
 import { post } from 'redux-fetch'
 
 import { getAllConfig } from '../../../reducer'
-import { setMessages } from 'admin-wizard/actions'
+import { setMessages, clearMessages } from 'admin-wizard/actions'
 
 export const setProbeValue = (value) => ({ type: 'SET_PROBE_VALUE', value })
 
 export const probe = (url) => async (dispatch, getState) => {
+  dispatch(clearMessages())
+
   const config = getAllConfig(getState())
   const body = JSON.stringify({ configurationType: 'ldap', ...config })
 

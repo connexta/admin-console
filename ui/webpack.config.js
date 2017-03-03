@@ -187,8 +187,13 @@ if (process.env.NODE_ENV === 'production') {
   config = merge.smart(config, {
     entry: [
       'react-hot-loader/patch',
+      'stack-source-map/register',
       './src/main/webapp'
     ],
+    output: {
+      devtoolModuleFilenameTemplate: '~[resource-path]?[loaders]',
+      devtoolFallbackModuleFilenameTemplate: '~[resource-path]?[loaders]'
+    },
     devServer: {
       noInfo: true,
       contentBase: 'src/main/resources/',
@@ -205,7 +210,9 @@ if (process.env.NODE_ENV === 'production') {
       }
     },
     plugins: [
-      new webpack.HotModuleReplacementPlugin()
+      new webpack.HotModuleReplacementPlugin(),
+      new webpack.NamedModulesPlugin(),
+      new webpack.NoEmitOnErrorsPlugin()
     ]
   })
 }

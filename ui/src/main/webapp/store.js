@@ -11,13 +11,22 @@ if (process.env.NODE_ENV === 'production') {
   enhancer = applyMiddleware(thunk)
 }
 
+const asyncExceptionLoggger = (store) => (next) => async (action) => {
+  try {
+    return await next(action)
+  } catch (e) {
+    console.error(e)
+    throw e
+  }
+}
+
 if (process.env.NODE_ENV !== 'production') {
   const DevTools = require('./containers/dev-tools').default
   const persistState = require('redux-devtools').persistState
   const debugSession =
     (window.location.href.match(/[?&]debug_session=([^&#]+)\b/) || [])[1]
   enhancer = compose(
-    applyMiddleware(thunk),
+    applyMiddleware(asyncExceptionLoggger, thunk),
     DevTools.instrument(),
     persistState(debugSession, fromJS)
   )

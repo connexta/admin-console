@@ -84,15 +84,15 @@ public class SourceValidationUtils {
     }
 
     /**
-     * Validates the {@param sourceName} against the existing source names of the configuration's for
-     * the given {@param factoryPids} using the {@param configurator}. An empty {@link List} will be returned
-     * if there are no existing source names with with name {@param sourceName}, or a {@link List} containing
-     * {@link ConfigurationMessage}s if there are errors. If the {@param configurator} is {@code null}, one will
+     * Validates the {@code sourceName} against the existing source names of the configuration's for
+     * the given {@code factoryPids} using the {@code configurator}. An empty {@link List} will be returned
+     * if there are no existing source names with with name {@code sourceName}, or a {@link List} containing
+     * {@link ConfigurationMessage}s if there are errors. If the {@code configurator} is {@code null}, one will
      * be created.
      *
      * @param sourceName   a non null name to validate
      * @param factoryPids  a list of non null factory pids of the configuration to validate names against
-     * @param configurator configurator to fetch configurations for the given {@param factoryPids}
+     * @param configurator configurator to fetch configurations for the given {@code factoryPids}
      * @return a {@link List} of {@link ConfigurationMessage}s containing failure messages, or empty {@link List}
      * if there are no duplicate source names found
      */

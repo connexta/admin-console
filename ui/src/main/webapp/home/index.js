@@ -16,10 +16,13 @@ import { cyan500 } from 'material-ui/styles/colors'
 import RaisedButton from 'material-ui/RaisedButton'
 import MapDisplay from 'components/MapDisplay'
 import Spinner from 'components/Spinner'
+import confirmable from 'react-confirmable'
 
 import * as selectors from './reducer'
 import * as actions from './actions'
 import * as styles from './styles.less'
+
+const ConfirmableButton = confirmable(RaisedButton)
 
 const getSourceTypeFromFactoryPid = (factoryPid) => {
   return factoryPid.replace(/_/g, ' ')
@@ -45,7 +48,10 @@ const SourceTileView = (props) => {
           <ConfigField fieldName='Endpoint' value={endpointUrl} />
           <ConfigField fieldName='Username' value={sourceUserName || 'none'} />
           <ConfigField fieldName='Password' value={sourceUserName || '******'} />
-          <RaisedButton style={{marginTop: 20}} label='Delete' secondary onClick={onDeleteConfig} />
+          <div style={{ textAlign: 'center' }}>
+            <ConfirmableButton confirmableMessage='Confirm delete?' style={{ marginTop: 20 }}
+              label='Delete' secondary onClick={onDeleteConfig} />
+          </div>
           {messages.map((message, i) => (
             <Flexbox key={i} flexDirection='row' justifyContent='center' className={styles.error}>{message.message}</Flexbox>))}
         </div>
@@ -94,7 +100,10 @@ const LdapTileView = (props) => {
               <MapDisplay label='Attribute Mappings'
                 mapping={attributeMappings} />
           ) : null }
-          <RaisedButton style={{marginTop: 20}} label='Delete' secondary onClick={onDeleteConfig} />
+          <div style={{ textAlign: 'center' }}>
+            <ConfirmableButton confirmableMessage='Confirm delete?' style={{ marginTop: 20 }}
+              label='Delete' secondary onClick={onDeleteConfig} />
+          </div>
           {messages.map((message, i) => (
             <Flexbox key={i} flexDirection='row' justifyContent='center' className={styles.error}>{message.message}</Flexbox>))}
         </div>

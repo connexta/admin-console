@@ -74,15 +74,14 @@ public class WfsSourceUtils {
         if (requestResults.containsFailureMessages()) {
             return requestResults;
         }
-        ProbeReport capabilitiesReport = new ProbeReport();
         int statusCode = requestResults.getProbeResult(RequestUtils.STATUS_CODE);
         String contentType = requestResults.getProbeResult(RequestUtils.CONTENT_TYPE);
 
         if (statusCode == HTTP_OK && WFS_MIME_TYPES.contains(contentType)) {
-            return capabilitiesReport.addMessage(createCommonSourceConfigMsg(VERIFIED_CAPABILITIES))
+            return requestResults.addMessage(createCommonSourceConfigMsg(VERIFIED_CAPABILITIES))
                     .probeResult(DISCOVERED_URL, url);
         }
-        return capabilitiesReport.addMessage(createCommonSourceConfigMsg(UNKNOWN_ENDPOINT));
+        return requestResults.addMessage(createCommonSourceConfigMsg(UNKNOWN_ENDPOINT));
     }
 
     /**

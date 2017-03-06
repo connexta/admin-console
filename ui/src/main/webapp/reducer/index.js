@@ -33,6 +33,7 @@ export const getProbeValue = (state) => ldap.getProbeValue(state.get('wizard'))
 export const getStep = (state) => ldap.getStep(state.get('wizard'))
 export const getMessages = (state, id) => ldap.getMessages(state.get('wizard'), id)
 export const getDisplayedLdapStage = (state) => ldap.getDisplayedLdapStage(state.get('wizard'))
+export const getAllowSkip = (state, stageId) => ldap.getAllowSkip(state.get('wizard'), stageId)
 
 export const getBins = (state) => webContext.getBins(state.get('wcpm'))
 export const getOptions = (state) => webContext.getOptions(state.get('wcpm'))

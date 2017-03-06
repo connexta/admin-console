@@ -7,6 +7,7 @@ import { getProbeValue } from '../../../reducer'
 import { List, ListItem } from 'material-ui/List'
 import { Card, CardActions, CardHeader } from 'material-ui/Card'
 import FlatButton from 'material-ui/FlatButton'
+import NextIcon from 'material-ui/svg-icons/image/navigate-next'
 
 import Mount from 'react-mount'
 
@@ -16,6 +17,8 @@ import Description from 'components/Description'
 import Action from 'components/Action'
 import ActionGroup from 'components/ActionGroup'
 import Message from 'components/Message'
+import ActionMessage from 'components/ActionMessage'
+import visible from 'react-visible'
 
 import { InputAuto } from 'admin-wizard/inputs'
 
@@ -24,6 +27,8 @@ import { probe } from './actions'
 import * as styles from './styles.less'
 
 import muiThemeable from 'material-ui/styles/muiThemeable'
+
+const VisibleActionMessage = visible(ActionMessage)
 
 const QueryResultView = (props) => {
   const { muiTheme: { palette }, ...rest } = props
@@ -92,11 +97,14 @@ const DirectorySettings = (props) => {
     messages = [],
 
     prev,
+    next,
     probe,
-    test
+    test,
+    allowSkip
   } = props
 
   const isAttrStore = ldapUseCase === 'authenticationAndAttributeStore' || ldapUseCase === 'attributeStore'
+  const nextStageId = isAttrStore ? 'attribute-mapping' : 'confirm'
 
   return (
     <Stage submitting={submitting}>
@@ -139,8 +147,16 @@ const DirectorySettings = (props) => {
           onClick={test}
           disabled={disabled}
           testId='dir-struct'
-          nextStageId={ldapUseCase === 'authenticationAndAttributeStore' || ldapUseCase === 'attributeStore' ? 'attribute-mapping' : 'confirm'} />
+          nextStageId={nextStageId} />
       </ActionGroup>
+
+      <VisibleActionMessage visible={allowSkip || false}
+        type='WARNING'
+        message='There are warnings, would you like to ignore warnings and continue anyway?'
+        label='Skip Warnings'
+        labelPosition='before'
+        icon={<NextIcon />}
+        onClick={() => next({ nextStageId })} />
 
       {messages.map((msg, i) => <Message key={i} {...msg} />)}
     </Stage>

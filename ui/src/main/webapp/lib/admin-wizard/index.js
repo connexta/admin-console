@@ -3,7 +3,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import Mount from 'react-mount'
 
-import { getDisplayedLdapStage, getAllConfig, isSubmitting, getMessages } from '../../reducer'
+import { getDisplayedLdapStage, getAllConfig, isSubmitting, getMessages, getAllowSkip } from '../../reducer'
 
 import {
   // sync
@@ -42,7 +42,8 @@ const mapStateToProps = (state, { wizardId }) => {
     stageId,
     configs: getAllConfig(state),
     submitting: isSubmitting(state, stageId),
-    messages: getMessages(state, stageId)
+    messages: getMessages(state, stageId),
+    allowSkip: getAllowSkip(state, stageId)
   }
 }
 

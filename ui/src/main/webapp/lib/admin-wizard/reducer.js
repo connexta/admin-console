@@ -6,6 +6,7 @@ export const getAllConfig = (state) => state.get('config').map((config) => confi
 export const getMessages = (state, id) => state.getIn(['messages', id], List()).toJS()
 export const getProbeValue = (state) => state.getIn(['probeValue'])
 export const getDisplayedLdapStage = (state) => state.getIn(['ldapDisplayedStages']).last()
+export const getAllowSkip = (state, stageId) => state.getIn(['allowSkip', stageId])
 
 // TODO: add reducer checks for the wizardClear action to reset the state to defaults
 const config = (state = Map(), { type, id, value, values, messages, options }) => {
@@ -75,10 +76,25 @@ const ldapDisplayedStages = (state = List.of('introduction-stage'), { type, stag
   }
 }
 
+const allowSkip = (state = Map(), { type, stageId }) => {
+  switch (type) {
+    case 'ALLOW_SKIP':
+      return state.set(stageId, true)
+    case 'DONT_ALLOW_SKIP':
+    case 'EDIT_CONFIG':
+    case 'LDAP_ADD_STAGE':
+    case 'LDAP_REMOVE_STAGE':
+      return Map()
+    default:
+      return state
+  }
+}
+
 export default combineReducers({
   config,
   probeValue,
   messages,
-  ldapDisplayedStages
+  ldapDisplayedStages,
+  allowSkip
 })
 

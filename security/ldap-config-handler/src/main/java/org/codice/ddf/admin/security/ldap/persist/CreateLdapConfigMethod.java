@@ -56,6 +56,7 @@ import org.codice.ddf.admin.api.configurator.OperationReport;
 import org.codice.ddf.admin.api.handler.ConfigurationMessage;
 import org.codice.ddf.admin.api.handler.method.PersistMethod;
 import org.codice.ddf.admin.api.handler.report.Report;
+import org.codice.ddf.admin.security.ldap.test.LdapTestingCommons;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -102,6 +103,13 @@ public class CreateLdapConfigMethod extends PersistMethod<LdapConfiguration> {
 
     @Override
     public Report persist(LdapConfiguration config) {
+        if (!config.ignoreWarnings()) {
+            List<ConfigurationMessage> warnings = LdapTestingCommons.ldapConnectionExists(config);
+            if (!warnings.isEmpty()) {
+                return new Report(warnings);
+            }
+        }
+
         OperationReport report;
         Configurator configurator = new Configurator();
         if (config.ldapUseCase()

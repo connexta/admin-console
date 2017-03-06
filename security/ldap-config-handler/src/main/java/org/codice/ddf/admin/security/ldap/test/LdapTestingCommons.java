@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.BiPredicate;
 
 import javax.net.ssl.SSLContext;
 
@@ -202,47 +203,48 @@ public class LdapTestingCommons {
     /**
      * Checks for existing LDAP configurations with the same hostname and port of the {@code configuration}.
      * If there is an existing configuration, warnings will be returned. If there are no existing configurations
-     * an empty {@link List} will be returned.
+     * an empty {@code List} will be returned.
      *
      * @param configuration configuration to check for existing configurations for
-     * @return {@link List} with {@link ConfigurationMessage}s containing warnings if there are existing configurations that match
-     * the {@code configuration}, or empty {@link List} if no matches
+     * @return {@code List} with {@link ConfigurationMessage}s containing warnings if there are existing configurations that match
+     * the {@code configuration}, or empty {@code List} if no matches
      */
     public static List<ConfigurationMessage> ldapConnectionExists(LdapConfiguration configuration) {
         LdapConfigurationHandler ldapConfigurationHandler = new LdapConfigurationHandler();
         List<LdapConfiguration> ldapConfigs = ldapConfigurationHandler.getConfigurations();
 
         String ldapUseCase = configuration.ldapUseCase();
-        String msg = null;
+        String msg;
         switch (ldapUseCase) {
         case LdapValidationUtils.ATTRIBUTE_STORE:
             msg = "LDAP Attribute Store";
+            break;
         case LdapValidationUtils.AUTHENTICATION:
-            if (msg == null) {
-                msg = "LDAP Authentication Source";
-            }
-
-            for (LdapConfiguration ldapConfig : ldapConfigs) {
-                if (ldapConfig.ldapUseCase()
-                        .equals(ldapUseCase) && configurationExists(ldapConfig, configuration)) {
-                    return createDuplicationWarning(msg, ldapConfig.hostName(), ldapConfig.port());
-                }
-            }
+            msg = "LDAP Authentication Source";
             break;
         case LdapValidationUtils.AUTHENTICATION_AND_ATTRIBUTE_STORE:
-            for (LdapConfiguration ldapConfig : ldapConfigs) {
-                if (configurationExists(ldapConfig, configuration)) {
-                    return createDuplicationWarning(msg, ldapConfig.hostName(), ldapConfig.port());
-                }
-            }
+            msg = "Ldap Attribute Store and Authentication";
             break;
         default:
             LOGGER.debug(
-                    "Failed to validate against existing configurations. Invalid use case \"{}\".",
+                    "Failed to validate against existing configurations. Invalid use case [{}].",
                     ldapUseCase);
             return Collections.singletonList(buildMessage(ConfigurationMessage.MessageType.FAILURE,
                     ConfigurationMessage.INVALID_FIELD,
                     "Unrecognized ldapUseCase"));
+        }
+
+        BiPredicate<String, String> typeTest =
+                ldapUseCase.equals(LdapValidationUtils.AUTHENTICATION_AND_ATTRIBUTE_STORE) ?
+                        (uc1, uc2) -> true :
+                        String::equals;
+
+        for (LdapConfiguration ldapConfig : ldapConfigs) {
+            if (typeTest.test(ldapConfig.ldapUseCase(), ldapUseCase) && configurationExists(
+                    ldapConfig,
+                    configuration)) {
+                return createDuplicationWarning(msg, ldapConfig.hostName(), ldapConfig.port());
+            }
         }
 
         return Collections.emptyList();
@@ -272,6 +274,7 @@ public class LdapTestingCommons {
         }
     }
 
+    // TODO: ping host names to see if the they resolve to the same host
     private static boolean configurationExists(LdapConfiguration existingConfiguration,
             LdapConfiguration newConfiguration) {
         return existingConfiguration.hostName()
@@ -282,7 +285,7 @@ public class LdapTestingCommons {
     private static List<ConfigurationMessage> createDuplicationWarning(String ldapUseCase,
             String hostName, int port) {
         List<ConfigurationMessage> warnings = new ArrayList<>();
-        LOGGER.debug("Found existing {} with same hostname and port \"{}:{}\". Returning warning.",
+        LOGGER.debug("Found existing {} with same hostname and port [{}:{}]. Returning warning.",
                 ldapUseCase,
                 hostName,
                 port);

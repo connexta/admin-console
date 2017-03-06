@@ -103,9 +103,11 @@ public class CreateLdapConfigMethod extends PersistMethod<LdapConfiguration> {
 
     @Override
     public Report persist(LdapConfiguration config) {
-        if(!config.ignoreWarnings()) {
+        if (!config.ignoreWarnings()) {
             List<ConfigurationMessage> warnings = LdapTestingCommons.ldapConnectionExists(config);
-            return new Report(warnings);
+            if (!warnings.isEmpty()) {
+                return new Report(warnings);
+            }
         }
 
         OperationReport report;

@@ -160,7 +160,7 @@ export const testManualUrl = (endpointUrl, configType, nextStageId, id = 'genera
     }
     const body = JSON.stringify(configuration)
 
-    const url = '/admin/beta/config/probe/' + configType + '/config-from-url'
+    const url = '/admin/beta/config/probe/' + configType + '/discover-sources'
     const res = await dispatch(post(url, { body }))
     const json = await res.json()
 

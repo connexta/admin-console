@@ -14,13 +14,15 @@
 
 package org.codice.ddf.admin.api.config.sources;
 
+import static org.codice.ddf.admin.api.services.WfsServiceProperties.WFS_FACTORY_PIDS;
+import static org.codice.ddf.admin.api.validation.SourceValidationUtils.validateSourceFactoryPid;
+
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
 import org.codice.ddf.admin.api.config.ConfigurationType;
 import org.codice.ddf.admin.api.handler.ConfigurationMessage;
-import org.codice.ddf.admin.api.validation.SourceValidationUtils;
 import org.codice.ddf.admin.api.validation.ValidationUtils;
 
 import com.google.common.collect.ImmutableMap;
@@ -34,8 +36,7 @@ public class WfsSourceConfiguration extends SourceConfiguration {
             new ImmutableMap.Builder<String, Function<SourceConfiguration, List<ConfigurationMessage>>>().putAll(
                     getBaseFieldValidationMap())
                     .put(FACTORY_PID,
-                            config -> new SourceValidationUtils().validateWfsFactoryPid(config.factoryPid(),
-                                    FACTORY_PID))
+                            config -> validateSourceFactoryPid(config.factoryPid(), WFS_FACTORY_PIDS, FACTORY_PID))
                     .build();
 
     public WfsSourceConfiguration() {

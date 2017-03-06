@@ -34,6 +34,8 @@
     <feature name="admin-beta-federation" install="auto" version="${project.version}"
              description="DDF Admin Federation (Beta)">
         <feature prerequisite="true">admin-beta-core</feature>
+        <bundle>mvn:org.apache.httpcomponents/httpcore-osgi/${httpcore.version}</bundle>
+        <bundle>mvn:org.apache.httpcomponents/httpclient-osgi/${httpclient.version}</bundle>
         <bundle>mvn:org.codice.ddf.admin.beta/sources-config-handler/${project.version}</bundle>
     </feature>
 

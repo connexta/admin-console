@@ -20,13 +20,14 @@ import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.FACTOR
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_NAME;
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_USERNAME;
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_USER_PASSWORD;
-import static org.codice.ddf.admin.api.handler.ConfigurationMessage.FAILED_PERSIST;
 import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.CREATE;
-import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.SUCCESSFUL_PERSIST;
-import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.SOURCE_NAME_EXISTS_TEST_ID;
+import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.FAILED_CREATE;
+import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.SUCCESSFUL_CREATE;
 import static org.codice.ddf.admin.api.services.CswServiceProperties.cswConfigToServiceProps;
+import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.SOURCE_NAME_EXISTS_TEST_ID;
+import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.getCommonSourceSubtypeDescriptions;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -40,15 +41,11 @@ import org.codice.ddf.admin.api.handler.report.Report;
 import org.codice.ddf.admin.api.validation.SourceValidationUtils;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 
 public class CreateCswSourcePersistMethod extends PersistMethod<CswSourceConfiguration> {
 
     public static final String CREATE_CSW_SOURCE_ID = CREATE;
-
-    public static final String DESCRIPTION =
-            "Attempts to create and persist a CSW source given a configuration.";
-
+    public static final String DESCRIPTION = "Attempts to create and persist a CSW source given a configuration.";
     public static final List<String> REQUIRED_FIELDS = ImmutableList.of(SOURCE_NAME,
             ENDPOINT_URL,
             FACTORY_PID);
@@ -58,11 +55,8 @@ public class CreateCswSourcePersistMethod extends PersistMethod<CswSourceConfigu
             OUTPUT_SCHEMA,
             FORCE_SPATIAL_FILTER);
 
-    private static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(SUCCESSFUL_PERSIST,
-            "CSW Source successfully created.");
-
-    private static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(FAILED_PERSIST,
-            "Failed to create CSW Source.");
+    private static final Map<String, String> SUCCESS_TYPES = getCommonSourceSubtypeDescriptions(SUCCESSFUL_CREATE);
+    private static final Map<String, String> FAILURE_TYPES = getCommonSourceSubtypeDescriptions(FAILED_CREATE);
 
     private final SourceValidationUtils sourceValidationUtils;
 
@@ -91,7 +85,7 @@ public class CreateCswSourcePersistMethod extends PersistMethod<CswSourceConfigu
         return Report.createReport(SUCCESS_TYPES,
                 FAILURE_TYPES,
                 null,
-                report.containsFailedResults() ? FAILED_PERSIST : SUCCESSFUL_PERSIST);
+                report.containsFailedResults() ? FAILED_CREATE : SUCCESSFUL_CREATE);
     }
 
     @Override
@@ -99,10 +93,10 @@ public class CreateCswSourcePersistMethod extends PersistMethod<CswSourceConfigu
         List<ConfigurationMessage> validationResults =
                 sourceValidationUtils.validateOptionalUsernameAndPassword(configuration);
         if (configuration.outputSchema() != null) {
-            validationResults.addAll(configuration.validate(Arrays.asList(OUTPUT_SCHEMA)));
+            validationResults.addAll(configuration.validate(Collections.singletonList(OUTPUT_SCHEMA)));
         }
         if (configuration.forceSpatialFilter() != null) {
-            validationResults.addAll(configuration.validate(Arrays.asList(FORCE_SPATIAL_FILTER)));
+            validationResults.addAll(configuration.validate(Collections.singletonList(FORCE_SPATIAL_FILTER)));
         }
         return validationResults;
     }

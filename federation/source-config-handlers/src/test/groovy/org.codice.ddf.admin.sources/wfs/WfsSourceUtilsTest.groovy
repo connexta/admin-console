@@ -197,7 +197,7 @@ class WfsSourceUtilsTest extends Specification {
 //
 //    def 'test WFS 2.0 config properly discovered'() {
 //        when:
-//        def config = utils.getPreferredConfig(configuration)
+//        def config = utils.getPreferredCswConfig(configuration)
 //
 //        then:
 //        configuration.endpointUrl() >> "test"

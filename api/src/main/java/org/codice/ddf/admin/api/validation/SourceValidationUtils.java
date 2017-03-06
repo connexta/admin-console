@@ -13,14 +13,14 @@
  */
 package org.codice.ddf.admin.api.validation;
 
+import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.PORT;
+import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_HOSTNAME;
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_NAME;
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_USERNAME;
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_USER_PASSWORD;
 import static org.codice.ddf.admin.api.handler.ConfigurationMessage.buildMessage;
 import static org.codice.ddf.admin.api.handler.ConfigurationMessage.createInvalidFieldMsg;
-import static org.codice.ddf.admin.api.services.CswServiceProperties.CSW_FACTORY_PIDS;
-import static org.codice.ddf.admin.api.services.OpenSearchServiceProperties.OPENSEARCH_FACTORY_PID;
-import static org.codice.ddf.admin.api.services.WfsServiceProperties.WFS_FACTORY_PIDS;
+import static org.codice.ddf.admin.api.services.OpenSearchServiceProperties.ENDPOINT_URL;
 import static org.codice.ddf.admin.api.validation.ValidationUtils.validateString;
 
 import java.util.ArrayList;
@@ -43,37 +43,17 @@ public class SourceValidationUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SourceValidationUtils.class);
 
-    public List<ConfigurationMessage> validateWfsFactoryPid(String factoryPid, String configId) {
+    public static List<ConfigurationMessage> validateSourceFactoryPid(String factoryPid,
+            List<String> pidList, String configId) {
         List<ConfigurationMessage> errors = validateString(factoryPid, configId);
-        if (errors.isEmpty() && !WFS_FACTORY_PIDS.contains(factoryPid)) {
-            errors.add(createInvalidFieldMsg("Unknown factory PID type \"" + factoryPid
-                            + "\". Wfs factory pid must be one of: " + String.join(",", WFS_FACTORY_PIDS),
-                    configId));
+        if (errors.isEmpty() && !pidList.contains(factoryPid)) {
+            errors.add(createInvalidFieldMsg("Unknown factory PID type <" + factoryPid + ">."
+                    + "FactoryPid must be one of: " + String.join(",", pidList), configId));
         }
         return errors;
     }
 
-    public List<ConfigurationMessage> validateCswFactoryPid(String factoryPid, String configId) {
-        List<ConfigurationMessage> errors = validateString(factoryPid, configId);
-        if (errors.isEmpty() && !CSW_FACTORY_PIDS.contains(factoryPid)) {
-            errors.add(createInvalidFieldMsg("Unknown factory PID type \"" + factoryPid
-                            + "\". CSW factory pid must be one of: " + String.join(",", CSW_FACTORY_PIDS),
-                    configId));
-        }
-        return errors;
-    }
-
-    public List<ConfigurationMessage> validateOpensearchFactoryPid(String factoryPid,
-            String configId) {
-        List<ConfigurationMessage> errors = validateString(factoryPid, configId);
-        if (errors.isEmpty() && !OPENSEARCH_FACTORY_PID.equals(factoryPid)) {
-            errors.add(createInvalidFieldMsg("Unknown factory PID type \"" + factoryPid
-                    + "\". OpenSearch factory pid must be " + OPENSEARCH_FACTORY_PID, configId));
-        }
-        return errors;
-    }
-
-    public List<ConfigurationMessage> validateOptionalUsernameAndPassword(
+    public static List<ConfigurationMessage> validateOptionalUsernameAndPassword(
             SourceConfiguration configuration) {
         List<ConfigurationMessage> validationResults = new ArrayList<>();
         if (configuration.sourceUserName() != null) {
@@ -139,5 +119,34 @@ public class SourceValidationUtils {
         }
 
         return Collections.emptyList();
+    }
+
+    public static List<ConfigurationMessage> validateForSourceDiscovery(
+            SourceConfiguration configuration) {
+        List<ConfigurationMessage> results = configuration.endpointUrl() == null ?
+                validateHostnameAndPort(configuration) :
+                validateEndpointUrl(configuration);
+        results.addAll(validateOptionalUsernameAndPassword(configuration));
+        return results;
+    }
+
+    private static List<ConfigurationMessage> validateHostnameAndPort(SourceConfiguration configuration) {
+        List<ConfigurationMessage> validationResults = new ArrayList<>();
+        if (configuration.sourceHostName() != null) {
+            validationResults.addAll(configuration.validate(Arrays.asList(SOURCE_HOSTNAME, PORT)));
+        } else {
+            validationResults.add(createInvalidFieldMsg("No hostname provided.", SOURCE_HOSTNAME));
+        }
+        return validationResults;
+    }
+
+    private static List<ConfigurationMessage> validateEndpointUrl(SourceConfiguration configuration) {
+        List<ConfigurationMessage> validationResults = new ArrayList<>();
+        if (configuration.endpointUrl() != null) {
+            validationResults.addAll(configuration.validate(Collections.singletonList(ENDPOINT_URL)));
+        } else {
+            validationResults.add(createInvalidFieldMsg("No URL provided.", ENDPOINT_URL));
+        }
+        return validationResults;
     }
 }

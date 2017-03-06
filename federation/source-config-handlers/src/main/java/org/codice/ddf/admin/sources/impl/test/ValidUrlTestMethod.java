@@ -15,33 +15,29 @@ package org.codice.ddf.admin.sources.impl.test;
 
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.PORT;
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_HOSTNAME;
-import static org.codice.ddf.admin.api.handler.ConfigurationMessage.buildMessage;
-import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.CANNOT_CONNECT;
-import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.REACHED_URL;
-import static org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons.VALID_URL_TEST_ID;
+import static org.codice.ddf.admin.commons.requests.RequestUtils.CANNOT_CONNECT;
+import static org.codice.ddf.admin.commons.requests.RequestUtils.CONNECTED;
+import static org.codice.ddf.admin.commons.requests.RequestUtils.endpointIsReachable;
+import static org.codice.ddf.admin.commons.requests.RequestUtils.getRequestSubtypeDescriptions;
 
 import java.util.List;
 import java.util.Map;
 
 import org.codice.ddf.admin.api.config.sources.SourceConfiguration;
-import org.codice.ddf.admin.api.handler.commons.SourceHandlerCommons;
 import org.codice.ddf.admin.api.handler.method.TestMethod;
 import org.codice.ddf.admin.api.handler.report.Report;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 
+// TODO: tbatie - 2/2/17 - (Ticket) This class should eventually be removed once the frontend is capable of handle errors messages from a probe report
 public class ValidUrlTestMethod extends TestMethod<SourceConfiguration> {
 
     private static final String DESCRIPTION = "Attempts to connect to a given hostname and port";
+    public static final String VALID_URL_TEST_ID = "valid-url";
 
     private static final List<String> REQUIRED_FIELDS = ImmutableList.of(SOURCE_HOSTNAME, PORT);
-
-    private static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(REACHED_URL,
-            "Connected to hostname and port.");
-
-    private static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(CANNOT_CONNECT,
-            "Unable to connect to hostname and port.");
+    private static final Map<String, String> SUCCESS_TYPES = getRequestSubtypeDescriptions(CONNECTED);
+    private static final Map<String, String> FAILURE_TYPES = getRequestSubtypeDescriptions(CANNOT_CONNECT);
 
     public ValidUrlTestMethod() {
         super(VALID_URL_TEST_ID,
@@ -55,10 +51,6 @@ public class ValidUrlTestMethod extends TestMethod<SourceConfiguration> {
 
     @Override
     public Report test(SourceConfiguration configuration) {
-        return new Report(buildMessage(SUCCESS_TYPES,
-                FAILURE_TYPES,
-                null,
-                SourceHandlerCommons.endpointIsReachable(configuration.sourceHostName(),
-                        configuration.sourcePort())));
+        return endpointIsReachable(configuration.sourceHostName(), configuration.sourcePort());
     }
 }

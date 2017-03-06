@@ -375,5 +375,6 @@
         <module>federation</module>
         <module>ui</module>
         <module>app</module>
+        <module>commons</module>
     </modules>
 </project>

@@ -35,7 +35,6 @@ import org.codice.ddf.admin.api.handler.report.Report;
 import org.codice.ddf.admin.api.services.CswServiceProperties;
 import org.codice.ddf.admin.sources.csw.persist.CreateCswSourcePersistMethod;
 import org.codice.ddf.admin.sources.csw.persist.DeleteCswSourcePersistMethod;
-import org.codice.ddf.admin.sources.csw.probe.CswConfigFromUrlProbeMethod;
 import org.codice.ddf.admin.sources.csw.probe.DiscoverCswSourceProbeMethod;
 import org.codice.ddf.admin.sources.csw.test.SourceNameExistsCswTestMethod;
 
@@ -53,7 +52,7 @@ public class CswSourceConfigurationHandler extends DefaultConfigurationHandler<S
 
     @Override
     public List<ProbeMethod> getProbeMethods() {
-        return Arrays.asList(new DiscoverCswSourceProbeMethod(), new CswConfigFromUrlProbeMethod());
+        return Collections.singletonList(new DiscoverCswSourceProbeMethod());
     }
 
     @Override

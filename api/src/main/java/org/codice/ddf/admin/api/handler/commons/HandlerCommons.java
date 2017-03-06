@@ -22,14 +22,23 @@ public class HandlerCommons {
 
     public static final String DELETE = "delete";
 
-    // Common Result subTypes
+    // Common success types
     public static final String SUCCESSFUL_PERSIST = "SUCCESSFUL_PERSIST";
+
+    public static final String SUCCESSFUL_CREATE = "SUCCESSFUL_CREATE";
+
+    public static final String SUCCESSFUL_DELETE = "SUCCESSFUL_DELETE";
 
     public static final String SUCCESSFUL_PROBE = "SUCCESSFUL_PROBE";
 
     public static final String SUCCESSFUL_TEST = "SUCCESSFUL_TEST";
 
+    // Common failure types
     public static final String FAILED_PERSIST = "FAILED_PERSIST";
+
+    public static final String FAILED_CREATE = "FAILED_CREATE";
+
+    public static final String FAILED_DELETE = "FAILED_DELETE";
 
     public static final String FAILED_PROBE = "FAILED_PROBE";
 

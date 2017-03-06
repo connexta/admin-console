@@ -14,10 +14,11 @@
 package org.codice.ddf.admin.sources.opensearch.persist;
 
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SERVICE_PID;
-import static org.codice.ddf.admin.api.handler.ConfigurationMessage.FAILED_PERSIST;
 import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.DELETE;
-import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.SUCCESSFUL_PERSIST;
+import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.FAILED_DELETE;
+import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.SUCCESSFUL_DELETE;
 import static org.codice.ddf.admin.api.handler.report.Report.createReport;
+import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.getCommonSourceSubtypeDescriptions;
 
 import java.util.List;
 import java.util.Map;
@@ -29,7 +30,6 @@ import org.codice.ddf.admin.api.handler.method.PersistMethod;
 import org.codice.ddf.admin.api.handler.report.Report;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 
 public class DeleteOpenSearchSourcePersistMethod
         extends PersistMethod<OpenSearchSourceConfiguration> {
@@ -41,11 +41,8 @@ public class DeleteOpenSearchSourcePersistMethod
 
     private static final List<String> REQUIRED_FIELDS = ImmutableList.of(SERVICE_PID);
 
-    private static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(SUCCESSFUL_PERSIST,
-            "The CSW Source was successfully deleted.");
-
-    private static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(FAILED_PERSIST,
-            "Failed to delete CSW source.");
+    private static final Map<String, String> SUCCESS_TYPES = getCommonSourceSubtypeDescriptions(SUCCESSFUL_DELETE);
+    private static final Map<String, String> FAILURE_TYPES = getCommonSourceSubtypeDescriptions(FAILED_DELETE);
 
     public DeleteOpenSearchSourcePersistMethod() {
         super(DELETE_OPENSEARCH_SOURCE_ID,
@@ -61,13 +58,13 @@ public class DeleteOpenSearchSourcePersistMethod
     public Report persist(OpenSearchSourceConfiguration configuration) {
         Configurator configurator = new Configurator();
         configurator.deleteManagedService(configuration.servicePid());
-        OperationReport report = configurator.commit("Opensearch source deleted for servicePid: {}",
+        OperationReport report = configurator.commit("OpenSearch source deleted for servicePid: {}",
                 configuration.servicePid());
 
         return createReport(SUCCESS_TYPES,
                 FAILURE_TYPES,
                 null,
-                report.containsFailedResults() ? FAILED_PERSIST : SUCCESSFUL_PERSIST);
+                report.containsFailedResults() ? FAILED_DELETE : SUCCESSFUL_DELETE);
     }
 
 }

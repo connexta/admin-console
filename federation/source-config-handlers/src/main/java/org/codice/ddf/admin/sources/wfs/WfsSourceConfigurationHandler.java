@@ -37,7 +37,6 @@ import org.codice.ddf.admin.api.services.WfsServiceProperties;
 import org.codice.ddf.admin.sources.wfs.persist.CreateWfsSourcePersistMethod;
 import org.codice.ddf.admin.sources.wfs.persist.DeleteWfsSourcePersistMethod;
 import org.codice.ddf.admin.sources.wfs.probe.DiscoverWfsSourceProbeMethod;
-import org.codice.ddf.admin.sources.wfs.probe.WfsConfigFromUrlProbeMethod;
 import org.codice.ddf.admin.sources.wfs.test.SourceNameExistsWfsTestMethod;
 
 public class WfsSourceConfigurationHandler extends DefaultConfigurationHandler<SourceConfiguration>
@@ -54,7 +53,7 @@ public class WfsSourceConfigurationHandler extends DefaultConfigurationHandler<S
 
     @Override
     public List<ProbeMethod> getProbeMethods() {
-        return Arrays.asList(new DiscoverWfsSourceProbeMethod(), new WfsConfigFromUrlProbeMethod());
+        return Collections.singletonList(new DiscoverWfsSourceProbeMethod());
     }
 
     @Override

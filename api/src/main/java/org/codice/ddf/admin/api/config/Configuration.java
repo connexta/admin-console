@@ -33,11 +33,15 @@ public abstract class Configuration {
 
     public static final String SERVICE_PID = "servicePid";
 
+    public static final String IGNORE_WARNINGS = "ignoreWarnings";
+
     private String factoryPid;
 
     private String servicePid;
 
     private String configurationHandlerId;
+
+    private boolean ignoreWarnings = true;
 
     public Configuration() {
     }
@@ -65,6 +69,10 @@ public abstract class Configuration {
         return factoryPid;
     }
 
+    public boolean ignoreWarnings() {
+        return ignoreWarnings;
+    }
+
     //Setters
     public Configuration configurationHandlerId(String configurationHandlerId) {
         this.configurationHandlerId = configurationHandlerId;
@@ -78,6 +86,11 @@ public abstract class Configuration {
 
     public Configuration factoryPid(String factoryPid) {
         this.factoryPid = factoryPid;
+        return this;
+    }
+
+    public Configuration ignoreWarnings(boolean ignoreWarnings) {
+        this.ignoreWarnings = ignoreWarnings;
         return this;
     }
 

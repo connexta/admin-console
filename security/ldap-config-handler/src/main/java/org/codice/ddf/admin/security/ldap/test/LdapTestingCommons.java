@@ -14,6 +14,7 @@
 
 package org.codice.ddf.admin.security.ldap.test;
 
+import static org.codice.ddf.admin.api.handler.ConfigurationMessage.buildMessage;
 import static org.codice.ddf.admin.api.validation.LdapValidationUtils.DIGEST_MD5_SASL;
 import static org.codice.ddf.admin.api.validation.LdapValidationUtils.LDAPS;
 import static org.codice.ddf.admin.api.validation.LdapValidationUtils.SIMPLE;
@@ -26,11 +27,15 @@ import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.SUCCESSFUL
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.net.ssl.SSLContext;
 
 import org.codice.ddf.admin.api.config.ldap.LdapConfiguration;
+import org.codice.ddf.admin.api.handler.ConfigurationMessage;
+import org.codice.ddf.admin.api.validation.LdapValidationUtils;
+import org.codice.ddf.admin.security.ldap.LdapConfigurationHandler;
 import org.codice.ddf.admin.security.ldap.LdapConnectionResult;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.LDAPConnectionFactory;
@@ -194,6 +199,55 @@ public class LdapTestingCommons {
         return request;
     }
 
+    /**
+     * Checks for existing LDAP configurations with the same hostname and port of the {@code configuration}.
+     * If there is an existing configuration, warnings will be returned. If there are no existing configurations
+     * an empty {@link List} will be returned.
+     *
+     * @param configuration configuration to check for existing configurations for
+     * @return {@link List} with {@link ConfigurationMessage}s containing warnings if there are existing configurations that match
+     * the {@code configuration}, or empty {@link List} if no matches
+     */
+    public static List<ConfigurationMessage> ldapConnectionExists(LdapConfiguration configuration) {
+        LdapConfigurationHandler ldapConfigurationHandler = new LdapConfigurationHandler();
+        List<LdapConfiguration> ldapConfigs = ldapConfigurationHandler.getConfigurations();
+
+        String ldapUseCase = configuration.ldapUseCase();
+        String msg = null;
+        switch (ldapUseCase) {
+        case LdapValidationUtils.ATTRIBUTE_STORE:
+            msg = "LDAP Attribute Store";
+        case LdapValidationUtils.AUTHENTICATION:
+            if (msg == null) {
+                msg = "LDAP Authentication Source";
+            }
+
+            for (LdapConfiguration ldapConfig : ldapConfigs) {
+                if (ldapConfig.ldapUseCase()
+                        .equals(ldapUseCase) && configurationExists(ldapConfig, configuration)) {
+                    return createDuplicationWarning(msg, ldapConfig.hostName(), ldapConfig.port());
+                }
+            }
+            break;
+        case LdapValidationUtils.AUTHENTICATION_AND_ATTRIBUTE_STORE:
+            for (LdapConfiguration ldapConfig : ldapConfigs) {
+                if (configurationExists(ldapConfig, configuration)) {
+                    return createDuplicationWarning(msg, ldapConfig.hostName(), ldapConfig.port());
+                }
+            }
+            break;
+        default:
+            LOGGER.debug(
+                    "Failed to validate against existing configurations. Invalid use case \"{}\".",
+                    ldapUseCase);
+            return Collections.singletonList(buildMessage(ConfigurationMessage.MessageType.FAILURE,
+                    ConfigurationMessage.INVALID_FIELD,
+                    "Unrecognized ldapUseCase"));
+        }
+
+        return Collections.emptyList();
+    }
+
     public static class LdapConnectionAttempt {
 
         private LdapConnectionResult result;
@@ -216,5 +270,25 @@ public class LdapTestingCommons {
         public LdapConnectionResult result() {
             return result;
         }
+    }
+
+    private static boolean configurationExists(LdapConfiguration existingConfiguration,
+            LdapConfiguration newConfiguration) {
+        return existingConfiguration.hostName()
+                .equals(newConfiguration.hostName())
+                && existingConfiguration.port() == existingConfiguration.port();
+    }
+
+    private static List<ConfigurationMessage> createDuplicationWarning(String ldapUseCase,
+            String hostName, int port) {
+        List<ConfigurationMessage> warnings = new ArrayList<>();
+        LOGGER.debug("Found existing {} with same hostname and port \"{}:{}\". Returning warning.",
+                ldapUseCase,
+                hostName,
+                port);
+        warnings.add(buildMessage(ConfigurationMessage.MessageType.WARNING,
+                ConfigurationMessage.DUPLICATE_ERROR,
+                String.format("Found existing %s Configuration.", ldapUseCase)));
+        return warnings;
     }
 }

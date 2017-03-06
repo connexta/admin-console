@@ -35,6 +35,8 @@ public class ConfigurationMessage {
 
     public static final String INTERNAL_ERROR = "INTERNAL_ERROR";
 
+    public static final String DUPLICATE_ERROR = "DUPLICATE_CONFIGURATION_ERROR";
+
     private MessageType type;
 
     private String subType;

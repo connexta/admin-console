@@ -13,6 +13,7 @@
  */
 package org.codice.ddf.admin.api.services;
 
+import static org.codice.ddf.admin.api.config.Configuration.IGNORE_WARNINGS;
 import static org.codice.ddf.admin.api.validation.LdapValidationUtils.AUTHENTICATION;
 import static org.codice.ddf.admin.api.validation.LdapValidationUtils.LDAPS;
 import static org.codice.ddf.admin.api.validation.ValidationUtils.FACTORY_PID_KEY;
@@ -69,6 +70,9 @@ public class LdapLoginServiceProperties {
         ldapConfiguration.baseUserDn(mapStringValue(USER_BASE_DN, props));
         ldapConfiguration.baseGroupDn(mapStringValue(GROUP_BASE_DN, props));
         URI ldapUri = getUriFromProperty(mapStringValue(LDAP_URL, props));
+        ldapConfiguration.ignoreWarnings(props.get(IGNORE_WARNINGS) == null ?
+                ldapConfiguration.ignoreWarnings() :
+                (boolean) props.get(IGNORE_WARNINGS));
 
         if (ldapUri != null) {
             ldapConfiguration.encryptionMethod(ldapUri.getScheme());

@@ -19,15 +19,17 @@
     "start": "webpack-dev-server --progress --open",
     "start:test": "cross-env NODE_ENV=test webpack-dev-server --progress --open",
     "pretest": "standard ./src/**/*.js && node ./node_modules/phantomjs-prebuilt/install.js && cross-env NODE_ENV=ci webpack --bail",
-    "test": "phantomjs ./node_modules/mocha-phantomjs-core/mocha-phantomjs-core.js target/ci/index.html",
+    "test": "phantomjs ./node_modules/mocha-phantomjs-core/mocha-phantomjs-core.js target/ci/index.html spec '{\"hooks\": \"mocha-phantomjs-istanbul\", \"coverageFile\": \"target/coverage.json\"}'",
+    "posttest": "istanbul check-coverage",
+    "coverage:report": "istanbul report html && opn ./target/coverage/index.html",
     "format": "standard --fix ./src/**/*.js",
     "dist": "cross-env NODE_ENV=production webpack --bail --progress",
     "dist:stat": "cross-env NODE_ENV=production webpack --json | webpack-bundle-size-analyzer"
   },
   "peerDependencies": {
+    "less": "^2.7.1",
     "react": "^15.1.0",
-    "redux": "^3.5.2",
-    "less": "^2.7.1"
+    "redux": "^3.5.2"
   },
   "dependencies": {
     "es6-promise": "^4.0.5",
@@ -47,6 +49,7 @@
   "devDependencies": {
     "babel-core": "^6.22.1",
     "babel-loader": "^6.2.4",
+    "babel-plugin-istanbul": "^4.0.0",
     "babel-plugin-transform-react-jsx-source": "^6.22.0",
     "babel-polyfill": "^6.22.0",
     "babel-preset-latest": "^6.22.0",
@@ -60,12 +63,15 @@
     "extract-text-webpack-plugin": "^2.0.0-rc.2",
     "glob": "^7.1.1",
     "html-webpack-plugin": "^2.28.0",
+    "istanbul": "^0.4.5",
     "json-loader": "^0.5.4",
     "less": "^2.7.1",
     "less-loader": "^2.2.3",
     "mocha": "^3.2.0",
     "mocha-loader": "^1.0.0",
     "mocha-phantomjs-core": "^2.1.1",
+    "mocha-phantomjs-istanbul": "^0.0.2",
+    "opn-cli": "^3.1.0",
     "phantomjs-prebuilt": "^2.1.14",
     "react-addons-test-utils": "^15.4.1",
     "react-hot-loader": "^3.0.0-beta.3",

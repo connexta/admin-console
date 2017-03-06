@@ -7,5 +7,16 @@
   "plugins": [
     "react-hot-loader/babel",
     "transform-react-jsx-source"
-  ]
+  ],
+  "env": {
+    "ci": {
+      "plugins": [
+        ["istanbul", {
+          "exclude": [
+            "**/*spec.js"
+          ]
+        }]
+      ]
+    }
+  }
 }

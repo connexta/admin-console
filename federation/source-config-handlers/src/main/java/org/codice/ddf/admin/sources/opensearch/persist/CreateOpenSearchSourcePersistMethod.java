@@ -24,6 +24,7 @@ import static org.codice.ddf.admin.api.handler.report.Report.createReport;
 import static org.codice.ddf.admin.api.services.OpenSearchServiceProperties.openSearchConfigToServiceProps;
 import static org.codice.ddf.admin.api.validation.SourceValidationUtils.validateOptionalUsernameAndPassword;
 import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.SOURCE_NAME_EXISTS_TEST_ID;
+import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.getCommonSourceSubtypeDescriptions;
 
 import java.util.List;
 import java.util.Map;
@@ -37,7 +38,6 @@ import org.codice.ddf.admin.api.handler.method.PersistMethod;
 import org.codice.ddf.admin.api.handler.report.Report;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 
 public class CreateOpenSearchSourcePersistMethod
         extends PersistMethod<OpenSearchSourceConfiguration> {
@@ -51,11 +51,8 @@ public class CreateOpenSearchSourcePersistMethod
     private static final List<String> OPTIONAL_FIELDS = ImmutableList.of(SOURCE_USERNAME,
             SOURCE_USER_PASSWORD);
 
-    private static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(SUCCESSFUL_CREATE,
-            "OpenSearch Source successfully created.");
-
-    private static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(FAILED_CREATE,
-            "Failed to create OpenSearch Source.");
+    private static final Map<String, String> SUCCESS_TYPES = getCommonSourceSubtypeDescriptions(SUCCESSFUL_CREATE);
+    private static final Map<String, String> FAILURE_TYPES = getCommonSourceSubtypeDescriptions(FAILED_CREATE);
 
     private final ConfigurationHandler handler;
 

@@ -24,6 +24,7 @@ import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.SUCCESSFUL
 import static org.codice.ddf.admin.api.handler.report.Report.createReport;
 import static org.codice.ddf.admin.api.services.WfsServiceProperties.wfsConfigToServiceProps;
 import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.SOURCE_NAME_EXISTS_TEST_ID;
+import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.getCommonSourceSubtypeDescriptions;
 
 import java.util.List;
 import java.util.Map;
@@ -38,7 +39,6 @@ import org.codice.ddf.admin.api.handler.report.Report;
 import org.codice.ddf.admin.api.validation.SourceValidationUtils;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 
 public class CreateWfsSourcePersistMethod extends PersistMethod<WfsSourceConfiguration> {
 
@@ -54,11 +54,8 @@ public class CreateWfsSourcePersistMethod extends PersistMethod<WfsSourceConfigu
     private static final List<String> OPTIONAL_FIELDS = ImmutableList.of(SOURCE_USERNAME,
             SOURCE_USER_PASSWORD);
 
-    private static final Map<String, String> SUCCESS_TYPES = ImmutableMap.of(SUCCESSFUL_CREATE,
-            "WFS Source successfully created.");
-
-    private static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(FAILED_CREATE,
-            "Failed to create WFS Source.");
+    private static final Map<String, String> SUCCESS_TYPES = getCommonSourceSubtypeDescriptions(SUCCESSFUL_CREATE);
+    private static final Map<String, String> FAILURE_TYPES = getCommonSourceSubtypeDescriptions(FAILED_CREATE);
 
     private final SourceValidationUtils sourceValidationUtils;
 

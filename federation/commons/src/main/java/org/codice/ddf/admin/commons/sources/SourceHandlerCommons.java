@@ -14,7 +14,9 @@
 package org.codice.ddf.admin.commons.sources;
 
 import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.FAILED_CREATE;
+import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.FAILED_DELETE;
 import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.SUCCESSFUL_CREATE;
+import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.SUCCESSFUL_DELETE;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -50,7 +52,9 @@ public class SourceHandlerCommons {
     private static final Map<String, String> FAILURE_DESCRIPTIONS = ImmutableMap.<String, String>builder().putAll(
             RequestUtils.getRequestSubtypeDescriptions(RequestUtils.CANNOT_CONNECT, RequestUtils.CERT_ERROR))
                     .put(UNKNOWN_ENDPOINT, "The endpoint does not appear to have the specified capabilities.")
-                    .put(FAILED_CREATE, "Failed to create source configuration.").build();
+                    .put(FAILED_CREATE, "Failed to create source configuration.")
+                    .put(FAILED_DELETE, "Failed to delete source configuration.")
+            .build();
 
     //Common warning types
     private static final Map<String, String> WARNING_DESCRIPTIONS = ImmutableMap.copyOf(
@@ -58,13 +62,12 @@ public class SourceHandlerCommons {
 
     //Common success types
     public static final String DISCOVERED_SOURCE = "DISCOVERED_SOURCE";
-    public static final String DELETED_SOURCE = "DELETED_SOURCE";
 
     public static final String VERIFIED_CAPABILITIES = "VERIFIED_CAPABILITIES";
     private static final Map<String, String> SUCCESS_DESCRIPTIONS = ImmutableMap.of(DISCOVERED_SOURCE, "Successfully discovered source from a url.",
             VERIFIED_CAPABILITIES, "Verified endpoint has specified capabilities",
             SUCCESSFUL_CREATE, "Successfully created a source configuration.",
-            DELETED_SOURCE, "Successfully deleted source configuration.");
+            SUCCESSFUL_DELETE, "Successfully deleted source configuration.");
 
     private static final MessageBuilder SOURCES_MESSAGE_BUILDER = new MessageBuilder(
             SUCCESS_DESCRIPTIONS,

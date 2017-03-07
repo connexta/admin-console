@@ -26,6 +26,8 @@ import javax.net.ssl.SSLPeerUnverifiedException
 import static org.codice.ddf.admin.api.services.CswServiceProperties.*
 
 class CswSourceUtilsTest extends Specification {
+    def utils
+
 
 //    def utils
 //    def client = Mock(CloseableHttpClient);

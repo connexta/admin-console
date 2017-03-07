@@ -28,8 +28,6 @@ import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.DISCOVER
 import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.DISCOVER_SOURCES_ID;
 import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.UNKNOWN_ENDPOINT;
 import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.getCommonSourceSubtypeDescriptions;
-import static org.codice.ddf.admin.sources.csw.CswSourceUtils.discoverCswUrl;
-import static org.codice.ddf.admin.sources.csw.CswSourceUtils.getPreferredCswConfig;
 
 import java.util.List;
 import java.util.Map;
@@ -38,6 +36,7 @@ import org.codice.ddf.admin.api.config.sources.CswSourceConfiguration;
 import org.codice.ddf.admin.api.handler.ConfigurationMessage;
 import org.codice.ddf.admin.api.handler.method.ProbeMethod;
 import org.codice.ddf.admin.api.handler.report.ProbeReport;
+import org.codice.ddf.admin.sources.csw.CswSourceUtils;
 
 import com.google.common.collect.ImmutableList;
 
@@ -67,6 +66,7 @@ public class DiscoverCswSourceProbeMethod extends ProbeMethod<CswSourceConfigura
             UNTRUSTED_CA);
 
     public static final List<String> RETURN_TYPES = ImmutableList.of(DISCOVERED_SOURCES);
+    private final CswSourceUtils cswSourceUtils;
 
     public DiscoverCswSourceProbeMethod() {
         super(CSW_DISCOVER_SOURCES_ID,
@@ -77,6 +77,7 @@ public class DiscoverCswSourceProbeMethod extends ProbeMethod<CswSourceConfigura
                 FAILURE_TYPES,
                 WARNING_TYPES,
                 RETURN_TYPES);
+        cswSourceUtils = new CswSourceUtils();
     }
 
     @Override
@@ -85,7 +86,7 @@ public class DiscoverCswSourceProbeMethod extends ProbeMethod<CswSourceConfigura
         String pw = configuration.sourceUserPassword();
         String testUrl = configuration.endpointUrl();
         if (testUrl == null) {
-            ProbeReport discoverEndpointReport = discoverCswUrl(configuration.sourceHostName(),
+            ProbeReport discoverEndpointReport = cswSourceUtils.discoverCswUrl(configuration.sourceHostName(),
                     configuration.sourcePort(),
                     un,
                     pw);
@@ -94,7 +95,7 @@ public class DiscoverCswSourceProbeMethod extends ProbeMethod<CswSourceConfigura
             }
             testUrl = discoverEndpointReport.getProbeResult(DISCOVERED_URL);
         }
-        return getPreferredCswConfig(testUrl, un, pw);
+        return cswSourceUtils.getPreferredCswConfig(testUrl, un, pw);
     }
 
     @Override

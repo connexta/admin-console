@@ -17,8 +17,6 @@ import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.PORT;
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_HOSTNAME;
 import static org.codice.ddf.admin.commons.requests.RequestUtils.CANNOT_CONNECT;
 import static org.codice.ddf.admin.commons.requests.RequestUtils.CONNECTED;
-import static org.codice.ddf.admin.commons.requests.RequestUtils.endpointIsReachable;
-import static org.codice.ddf.admin.commons.requests.RequestUtils.getRequestSubtypeDescriptions;
 
 import java.util.List;
 import java.util.Map;
@@ -26,23 +24,24 @@ import java.util.Map;
 import org.codice.ddf.admin.api.config.sources.SourceConfiguration;
 import org.codice.ddf.admin.api.handler.method.TestMethod;
 import org.codice.ddf.admin.api.handler.report.Report;
+import org.codice.ddf.admin.commons.requests.RequestUtils;
 
 import com.google.common.collect.ImmutableList;
 
 // TODO: tbatie - 2/2/17 - (Ticket) This class should eventually be removed once the frontend is capable of handle errors messages from a probe report
 public class ValidUrlTestMethod extends TestMethod<SourceConfiguration> {
 
+    private static final RequestUtils requestUtils = new RequestUtils();
+
     private static final String DESCRIPTION = "Attempts to connect to a given hostname and port";
 
     public static final String VALID_URL_TEST_ID = "valid-url";
 
     private static final List<String> REQUIRED_FIELDS = ImmutableList.of(SOURCE_HOSTNAME, PORT);
-
-    private static final Map<String, String> SUCCESS_TYPES =
+    private static final Map<String, String> SUCCESS_TYPES = requestUtils.
             getRequestSubtypeDescriptions(CONNECTED);
-
-    private static final Map<String, String> FAILURE_TYPES = getRequestSubtypeDescriptions(
-            CANNOT_CONNECT);
+    private static final Map<String, String> FAILURE_TYPES = requestUtils.
+            getRequestSubtypeDescriptions(CANNOT_CONNECT);
 
     public ValidUrlTestMethod() {
         super(VALID_URL_TEST_ID,
@@ -56,6 +55,6 @@ public class ValidUrlTestMethod extends TestMethod<SourceConfiguration> {
 
     @Override
     public Report test(SourceConfiguration configuration) {
-        return endpointIsReachable(configuration.sourceHostName(), configuration.sourcePort());
+        return requestUtils.endpointIsReachable(configuration.sourceHostName(), configuration.sourcePort());
     }
 }

@@ -38,6 +38,8 @@ import com.google.common.collect.ImmutableMap;
 
 public class SourceHandlerCommons {
 
+    private static final RequestUtils requestUtils = new RequestUtils();
+
     //Common probe keys
     public static final String DISCOVERED_SOURCES = "discoveredSources";
     public static final String DISCOVERED_URL = "discoveredUrl";
@@ -50,7 +52,7 @@ public class SourceHandlerCommons {
     //Common failure types
     public static final String UNKNOWN_ENDPOINT = "UNKNOWN_ENDPOINT";
     private static final Map<String, String> FAILURE_DESCRIPTIONS = ImmutableMap.<String, String>builder().putAll(
-            RequestUtils.getRequestSubtypeDescriptions(RequestUtils.CANNOT_CONNECT, RequestUtils.CERT_ERROR))
+            requestUtils.getRequestSubtypeDescriptions(RequestUtils.CANNOT_CONNECT, RequestUtils.CERT_ERROR))
                     .put(UNKNOWN_ENDPOINT, "The endpoint does not appear to have the specified capabilities.")
                     .put(FAILED_CREATE, "Failed to create source configuration.")
                     .put(FAILED_DELETE, "Failed to delete source configuration.")
@@ -58,7 +60,7 @@ public class SourceHandlerCommons {
 
     //Common warning types
     private static final Map<String, String> WARNING_DESCRIPTIONS = ImmutableMap.copyOf(
-            RequestUtils.getRequestSubtypeDescriptions(RequestUtils.UNTRUSTED_CA));
+            requestUtils.getRequestSubtypeDescriptions(RequestUtils.UNTRUSTED_CA));
 
     //Common success types
     public static final String DISCOVERED_SOURCE = "DISCOVERED_SOURCE";

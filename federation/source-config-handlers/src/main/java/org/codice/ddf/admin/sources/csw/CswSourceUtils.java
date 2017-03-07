@@ -65,6 +65,8 @@ public class CswSourceUtils {
     private static final String GET_FIRST_OUTPUT_SCHEMA =
             "//ows:OperationsMetadata/ows:Operation[@name='GetRecords']/ows:Parameter[@name='OutputSchema' or @name='outputSchema']/ows:Value[1]/text()";
 
+    private static final RequestUtils requestUtils = new RequestUtils();
+
     /**
      * Confirms whether or not an endpoint has CSW capabilities.
      * SUCCESS TYPES - VERIFIED_CAPABILITIES,
@@ -79,7 +81,7 @@ public class CswSourceUtils {
      */
     public static ProbeReport sendCswCapabilitiesRequest(String url, String username,
             String password) {
-        ProbeReport requestResults = RequestUtils.sendGetRequest(url + GET_CAPABILITIES_PARAMS,
+        ProbeReport requestResults = requestUtils.sendGetRequest(url + GET_CAPABILITIES_PARAMS,
                 username,
                 password);
         if (requestResults.containsFailureMessages()) {

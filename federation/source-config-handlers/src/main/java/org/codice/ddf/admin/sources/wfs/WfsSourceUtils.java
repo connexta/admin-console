@@ -57,6 +57,8 @@ public class WfsSourceUtils {
 
     private static final String WFS_VERSION_EXP = "/wfs:WFS_Capabilities/attribute::version";
 
+    private static final RequestUtils requestUtils = new RequestUtils();
+
     /**
      * Attempts to verify the given URL as a functional WFS endpoint
      * SUCCESS TYPES - VERIFIED_CAPABILITIES,
@@ -71,7 +73,7 @@ public class WfsSourceUtils {
      */
     public static ProbeReport sendWfsCapabilitiesRequest(String url, String username,
             String password) {
-        ProbeReport requestResults = RequestUtils.sendGetRequest(url, username, password);
+        ProbeReport requestResults = requestUtils.sendGetRequest(url, username, password);
         if (requestResults.containsFailureMessages()) {
             return requestResults;
         }
@@ -158,8 +160,7 @@ public class WfsSourceUtils {
         }
         switch (wfsVersion) {
         case "2.0.0":
-            return results.probeResult(DISCOVERED_SOURCES,
-                    preferredConfig.factoryPid(WFS2_FACTORY_PID));
+            return results.probeResult(DISCOVERED_SOURCES, preferredConfig.factoryPid(WFS2_FACTORY_PID));
         case "1.0.0":
             return results.probeResult(DISCOVERED_SOURCES,
                     preferredConfig.factoryPid(WFS1_FACTORY_PID));

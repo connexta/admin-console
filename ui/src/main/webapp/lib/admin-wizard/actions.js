@@ -12,6 +12,8 @@ export const editConfig = (id, value) => ({ type: 'EDIT_CONFIG', id, value })
 export const editConfigs = (values) => ({ type: 'EDIT_CONFIGS', values })
 export const setDefaults = (values) => ({ type: 'SET_DEFAULTS', values })
 export const clearWizard = () => ({ type: 'CLEAR_WIZARD' })
+export const setSkippable = (stageId) => ({ type: 'ALLOW_SKIP', stageId })
+export const setNotSkippable = () => ({ type: 'DONT_ALLOW_SKIP' })
 
 export const probe = (options) => async (dispatch, getState) => {
   const { stageId, ...opts } = options
@@ -58,11 +60,21 @@ export const test = (options) => async (dispatch, getState) => {
 
   if (res.status === 400) {
     dispatch(setMessages(stageId, json.messages))
+    if (onlyHasWarnings(json.messages)) {
+      dispatch(setSkippable(stageId))
+    } else {
+      dispatch(setNotSkippable())
+    }
   } else if (res.status === 200) {
     dispatch(setMessages(stageId, json.messages))
     if (nextStageId !== undefined) {
       dispatch(nextStage({ nextStageId }))
     }
   }
+}
+
+const onlyHasWarnings = (messages) => {
+  messages.forEach((message) => { if (message.type !== 'WARNING') return false })
+  return true
 }
 

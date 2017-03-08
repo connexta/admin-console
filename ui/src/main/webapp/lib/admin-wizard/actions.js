@@ -33,15 +33,25 @@ export const probe = (options) => async (dispatch, getState) => {
 }
 
 export const persist = (options) => async (dispatch, getState) => {
-  const { stageId, nextStageId, ...opts } = options
+  const {
+    stageId,
+    nextStageId,
+    ignoreWarnings = false,
+    ...opts
+  } = options
   dispatch(clearMessages(stageId))
 
-  const config = getAllConfig(getState())
+  const config = { ...getAllConfig(getState()), ignoreWarnings }
   const res = await dispatch(api.persist({ config, id: stageId, ...opts }))
   const json = await res.json()
 
   if (res.status === 400) {
     dispatch(setMessages(stageId, json.messages))
+    if (onlyHasWarnings(json.messages)) {
+      dispatch(setSkippable(stageId))
+    } else {
+      dispatch(setNotSkippable())
+    }
   } else if (res.status === 200) {
     dispatch(setMessages(stageId, json.messages))
     if (nextStageId !== undefined) {

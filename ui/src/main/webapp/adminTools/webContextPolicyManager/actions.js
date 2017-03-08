@@ -6,6 +6,7 @@ export const replaceAllBins = (bins, whitelistContexts) => ({ type: 'WCPM/REPLAC
 export const removeBin = () => ({ type: 'WCPM/REMOVE_BIN' })
 export const addNewBin = (binNumber) => ({ type: 'WCPM/ADD_BIN', binNumber })
 export const editModeOn = (binNumber) => ({ type: 'WCPM/EDIT_MODE_ON', binNumber })
+export const editModeOff = () => ({ type: 'WCPM/EDIT_MODE_OFF' })
 export const editModeCancel = (binNumber) => ({ type: 'WCPM/EDIT_MODE_CANCEL', binNumber })
 export const editModeSave = (binNumber) => ({ type: 'WCPM/EDIT_MODE_SAVE', binNumber })
 export const confirmRemoveBin = (binNumber) => ({ type: 'WCPM/CONFIRM_REMOVE_BIN', binNumber })
@@ -16,11 +17,20 @@ export const editRealm = (binNumber, value) => ({ type: 'WCPM/EDIT_REALM', binNu
 
 // Attribute Lists
 export const removeAttribute = (attribute) => (binNumber, pathNumber) => ({ type: 'WCPM/REMOVE_ATTRIBUTE_LIST', attribute, binNumber, pathNumber })
-export const addAttribute = (attribute) => (binNumber, path) => ({ type: 'WCPM/ADD_ATTRIBUTE_LIST', attribute, binNumber, path })
+const addAttributeObject = (attribute) => (binNumber, path) => ({ type: 'WCPM/ADD_ATTRIBUTE_LIST', attribute, binNumber, path })
+export const addAttribute = (attribute) => (binNumber, path) => (dispatch) => {
+  dispatch(clearComponentError(attribute))
+  dispatch(addAttributeObject(attribute)(binNumber, path))
+}
 export const editAttribute = (attribute) => (binNumber, value) => ({ type: 'WCPM/EDIT_ATTRIBUTE_LIST', attribute, binNumber, value })
 
 // Attribute mapping reducers
-export const addAttributeMapping = (binNumber) => ({ type: 'WCPM/ADD_ATTRIBUTE_MAPPING', binNumber })
+const addAttributeMappingObject = (binNumber) => ({ type: 'WCPM/ADD_ATTRIBUTE_MAPPING', binNumber })
+export const addAttributeMapping = (binNumber) => (dispatch) => {
+  dispatch(clearComponentError('requiredClaim'))
+  dispatch(clearComponentError('requiredAttribute'))
+  dispatch(addAttributeMappingObject(binNumber))
+}
 export const removeAttributeMapping = (binNumber, claim) => ({ type: 'WCPM/REMOVE_ATTRIBUTE_MAPPING', binNumber, claim })
 
 // Set Options
@@ -60,10 +70,10 @@ export const addContextPath = (attribute, binNumber) => (dispatch, getState) => 
 
   if (duplicateBinNumber !== undefined) {
     if (duplicateBinNumber === 0) {
-      dispatch(setError({ scope: 'contextPaths', message: 'This path is in the Whitelist.' }))
+      dispatch(setError(errorResult('contextPaths', 'This path is in the Whitelist.')))
       return
     }
-    dispatch(setError({ scope: 'contextPaths', message: 'This path is already being used in bin #' + duplicateBinNumber + '.' }))
+    dispatch(setError(errorResult('contextPaths', 'This path is already being used in bin #' + duplicateBinNumber + '.')))
     return
   }
 
@@ -113,7 +123,7 @@ const checkAuthenticationTypeValidity = (bin) => {
   if (bin.name === 'WHITELIST') return errors
 
   if (!isBlank(bin.newauthenticationTypes)) {
-    errors.push(errorResult('authTypes', 'Field edited but not added. Please add or clear before saving.'))
+    errors.push(errorResult('authenticationTypes', 'Field edited but not added. Please add or clear before saving.'))
   }
   if (bin.authenticationTypes.length === 0) {
     errors.push(errorResult('general', 'Must have at least 1 Authentication Type'))
@@ -166,8 +176,6 @@ export const persistChanges = (binNumber, url, isDeleting) => async (dispatch, g
     }
   }
 
-  // TODO: check for duplicate context paths
-
   // dispatch(editModeSave(binNumber))
 
   const formattedBody = {
@@ -183,15 +191,19 @@ export const persistChanges = (binNumber, url, isDeleting) => async (dispatch, g
 
   // check for server exceptions
   if (json.messages[0].exceptions && json.messages[0].exceptions.length > 0) {
-    dispatch(setError({ scope: 'general', message: 'The server encountered an error. Please check the server logs for more information.' }))
+    dispatch(setError(errorResult('general', 'The server encountered an error. Please check the server logs for more information.')))
     return
   }
   // handle responses
   const result = json.messages[0].subType
   if (result === 'SUCCESSFUL_PERSIST') {
-    dispatch(editModeSave(binNumber))
+    if (isDeleting) {
+      dispatch(editModeOff())
+    } else {
+      dispatch(editModeSave(binNumber))
+    }
   } else {
-    dispatch(setError({ scope: 'general', message: 'Could not save. Reason for issue: ' + json.messages[0].message }))
+    dispatch(setError(errorResult('general', 'Could not save. Reason for issue: ' + json.messages[0].message)))
   }
 }
 

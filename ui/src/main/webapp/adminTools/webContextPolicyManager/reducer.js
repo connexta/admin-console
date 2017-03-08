@@ -29,7 +29,7 @@ const bins = (state = List(), { type, bin, bins, whitelistContexts, path, binNum
         return state.delete(binNumber)
       }
     case 'WCPM/EDIT_MODE_SAVE':
-      return state.update(binNumber, (bin) => bin.delete('beforeEdit'))
+      return state.update(binNumber, (bin) => bin.delete('beforeEdit')).update(binNumber, (bin) => bin.delete('name'))
 
     // Realm
     case 'WCPM/EDIT_REALM':
@@ -83,6 +83,8 @@ const editingBinNumber = (state = null, { type, binNumber }) => {
   switch (type) {
     case 'WCPM/EDIT_MODE_ON':
       return binNumber
+    case 'WCPM/EDIT_MODE_OFF':
+      return null
     case 'WCPM/EDIT_MODE_CANCEL':
       return null
     case 'WCPM/EDIT_MODE_SAVE':

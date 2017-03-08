@@ -11,7 +11,6 @@ import {
   isSubmitting
 } from '../../reducer'
 import {
-  removeBin,
   addAttribute,
   editAttribute,
   removeAttribute,
@@ -24,7 +23,6 @@ import {
   addAttributeMapping,
   removeAttributeMapping,
   confirmRemoveBinAndPersist,
-  cancelRemoveBin,
   addContextPath
 } from './actions'
 import Flexbox from 'flexbox-react'
@@ -70,6 +68,8 @@ import {
   error,
   errorBorder
 } from './styles.less'
+
+import confirmable from 'react-confirmable'
 
 let Edit = ({editing, binNumber, editModeOn}) => {
   return !editing ? (
@@ -122,14 +122,29 @@ let NewSelectItem = ({ binNumber, addPath, onEdit, newPath, attribute, options, 
   <div>
     <Divider />
     <Flexbox style={{ position: 'relative' }} flexDirection='row' justifyContent='space-between'>
-      <SelectField hintStyle={{ padding: '0px 10px' }} inputStyle={{ padding: '0px 10px' }} style={{ width: '100%' }} id='name' hintText='Add New Path' onChange={(event, i, value) => onEdit(value)} value={newPath || ''} errorText={error}>
+      <SelectField hintStyle={{ padding: '0px 10px' }}
+        inputStyle={{ padding: '0px 10px' }}
+        style={{ width: '100%' }} id='name'
+        hintText='Add New Type'
+        onChange={(event, i, value) => onEdit(value)}
+        value={newPath || ''}
+        errorText={error}>
         { options.map((item, key) => (<MenuItem value={item} key={key} primaryText={item} />)) }
       </SelectField>
-      {(addButtonVisible) ? (<IconButton style={{ position: 'absolute', right: '0px' }} tooltip={'Add'} tooltipPosition='top-center' onClick={addPath}><AddIcon color={cyanA700} /></IconButton>) : null }
-      {(newPath && newPath.trim() !== '')
-        ? <IconButton style={{ position: 'absolute', left: '-15px', width: '10px', height: '10px' }} iconStyle={{ width: '10px', height: '10px' }} onClick={() => onEdit('')}><ClearIcon /></IconButton>
-        : null
-      }
+      {(addButtonVisible) ? (
+        <IconButton style={{ position: 'absolute', right: '0px' }}
+          tooltip={'Add'} tooltipPosition='top-center'
+          onClick={addPath}>
+          <AddIcon color={cyanA700} />
+        </IconButton>
+      ) : null }
+      {(newPath && newPath.trim() !== '') ? (
+        <IconButton style={{ position: 'absolute', left: '-15px', width: '10px', height: '10px' }}
+          iconStyle={{ width: '10px', height: '10px' }}
+          onClick={() => onEdit('')}>
+          <ClearIcon />
+        </IconButton>
+      ) : null }
     </Flexbox>
   </div>
 )
@@ -158,23 +173,24 @@ Realm = connect(
   }))(Realm)
 
 let ConfirmationPanel = ({ bin, binNumber, removeBin, saveAndPersist, editModeCancel, editing, confirmRemoveBinAndPersist, confirmDelete, cancelRemoveBin, allowDelete }) => {
+  const ConfirmDelete = confirmable(IconButton)
+
   return editing ? (
     <Flexbox flexDirection='row' justifyContent='center' style={{ padding: '10px 0px 5px' }}>
       <FlatButton style={{ margin: '0 10' }} label='Cancel' labelPosition='after' secondary onClick={editModeCancel} />
       <RaisedButton style={{ margin: '0 10' }} label='Save' primary onClick={saveAndPersist} />
-      {
-        (confirmDelete && allowDelete) ? (
-          <Flexbox style={{ position: 'absolute', right: '0px', bottom: '0px', margin: '5px' }} flexDirection='column' alignItems='center' >
-            <p className={infoSubtitleLeft}>Confirm delete all?</p>
-            <Flexbox flexDirection='row'>
-              <RaisedButton label='Yes' primary onClick={confirmRemoveBinAndPersist} />
-              <RaisedButton label='No' secondary onClick={cancelRemoveBin} />
-            </Flexbox>
-          </Flexbox>
-        ) : (
-          (allowDelete) ? <IconButton style={{ position: 'absolute', right: '0px', bottom: '0px' }} onClick={removeBin} tooltip={'Delete'} tooltipPosition='top-center' ><DeleteIcon /></IconButton> : null
-        )
-      }
+      { (allowDelete) ? (
+        <div style={{ position: 'absolute', right: '0px', bottom: '0px' }}>
+          <ConfirmDelete
+            onClick={removeBin}
+            confirmableMessage={'Confirm delete bin?'}
+            confirmableStyle={{ margin: '5px' }}
+            tooltip={'Delete'}
+            tooltipPosition='top-center'>
+            <DeleteIcon />
+          </ConfirmDelete>
+        </div>)
+        : null }
     </Flexbox>
   ) : null
 }
@@ -182,11 +198,9 @@ let ConfirmationPanel = ({ bin, binNumber, removeBin, saveAndPersist, editModeCa
 ConfirmationPanel = connect((state) => ({
   confirmDelete: getConfirmDelete(state)
 }), (dispatch, { binNumber }) => ({
-  removeBin: () => dispatch(removeBin(binNumber)),
-  cancelRemoveBin: () => dispatch(cancelRemoveBin()),
   saveAndPersist: () => dispatch(persistChanges(binNumber, '/admin/beta/config/persist/context-policy-manager/edit')),
   editModeCancel: () => dispatch(editModeCancel(binNumber)),
-  confirmRemoveBinAndPersist: () => dispatch(confirmRemoveBinAndPersist(binNumber, '/admin/beta/config/persist/context-policy-manager/edit'))
+  removeBin: () => dispatch(confirmRemoveBinAndPersist(binNumber, '/admin/beta/config/persist/context-policy-manager/edit'))
 }))(ConfirmationPanel)
 
 let AuthTypesGroup = ({ bin, binNumber, policyOptions, editing, error }) => (
@@ -199,7 +213,7 @@ let AuthTypesGroup = ({ bin, binNumber, policyOptions, editing, error }) => (
 )
 AuthTypesGroup = connect(
   (state) => ({
-    error: getWcpmErrors(state).authTypes,
+    error: getWcpmErrors(state).authenticationTypes,
     policyOptions: getOptions(state)
   }))(AuthTypesGroup)
 
@@ -208,7 +222,7 @@ let AttributeTableGroup = ({ bin, binNumber, policyOptions, editAttribute, remov
     <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
       <TableRow>
         <TableHeaderColumn>STS Claim</TableHeaderColumn>
-        <TableHeaderColumn style={{ width: 120 }}>Attribute Mapping</TableHeaderColumn>
+        <TableHeaderColumn style={{ width: 120 }}>Claim Value</TableHeaderColumn>
       </TableRow>
     </TableHeader>
     <TableBody displayRowCheckbox={false}>
@@ -227,7 +241,7 @@ let AttributeTableGroup = ({ bin, binNumber, policyOptions, editAttribute, remov
       {editing ? (
         <TableRow>
           <TableRowColumn style={{ position: 'relative' }}>
-            <SelectField style={{ margin: '0px', width: '100%', fontSize: '14px' }} id='claims' value={bin.newrequiredClaim || ''} onChange={(event, i, value) => editAttribute('requiredClaim', value)} hintText='Attribute' errorText={claimError}>
+            <SelectField style={{ margin: '0px', width: '100%', fontSize: '14px' }} id='claims' value={bin.newrequiredClaim || ''} onChange={(event, i, value) => editAttribute('requiredClaim', value)} hintText='Claim' errorText={claimError}>
               {policyOptions.claims.map((claim, i) => (<MenuItem style={{ fontSize: '12px' }} value={claim} primaryText={claim} key={i} />))}
             </SelectField>
             {(bin.newrequiredClaim && bin.newrequiredClaim.trim() !== '')
@@ -236,7 +250,7 @@ let AttributeTableGroup = ({ bin, binNumber, policyOptions, editAttribute, remov
             }
           </TableRowColumn>
           <TableRowColumn style={{ width: 120, position: 'relative' }}>
-            <TextField fullWidth style={{ margin: '0px', fontSize: '14px' }} id='claims' value={bin.newrequiredAttribute || ''} onChange={(event, value) => editAttribute('requiredAttribute', value)} hintText='Claim' errorText={attrError} />
+            <TextField fullWidth style={{ margin: '0px', fontSize: '14px' }} id='attributes' value={bin.newrequiredAttribute || ''} onChange={(event, value) => editAttribute('requiredAttribute', value)} hintText='Claim Value' errorText={attrError} />
             <IconButton style={{ position: 'absolute', right: 0, top: 0 }} tooltip={'Add'} tooltipPosition='top-center' onClick={addAttributeMapping}><AddIcon color={cyanA700} /></IconButton>
             {(bin.newrequiredAttribute && bin.newrequiredAttribute.trim() !== '')
               ? <IconButton style={{ position: 'absolute', left: '-5px', width: '10px', height: '10px' }} iconStyle={{ width: '10px', height: '10px' }} onClick={() => editAttribute('requiredAttribute', '')}><ClearIcon /></IconButton>
@@ -279,6 +293,7 @@ const WhitelistBin = ({ policyBin, binNumber, editing, editingBinNumber }) => (
         </div>
       </Flexbox>
     </Flexbox>
+    <ErrorBanner editing={editing} />
     <Edit editing={editing} binNumber={binNumber} />
     <ConfirmationPanel bin={policyBin} binNumber={binNumber} editing={editing} allowDelete={false} />
     { (!editing && editingBinNumber !== null) ? <DisabledPanel /> : null }
@@ -309,7 +324,7 @@ const PolicyBin = ({ policyBin, binNumber, editing, editingBinNumber }) => (
         <AuthTypesGroup bin={policyBin} binNumber={binNumber} editing={editing} />
       </div>
       <div style={{ width: '60%', padding: '5px', boxSizing: 'border-box' }}>
-        <p className={infoSubtitleLeft}>{(editing) ? 'Required Attributes (Optional)' : 'Required Attributes'}</p>
+        <p className={infoSubtitleLeft}>{(editing) ? 'Required Subject Claims (Optional)' : 'Required Subject Claims'}</p>
         <Divider />
         <div>
           <AttributeTableGroup bin={policyBin} binNumber={binNumber} editing={editing} />

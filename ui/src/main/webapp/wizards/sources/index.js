@@ -11,14 +11,12 @@ import styles from './styles.less'
 import Mount from 'react-mount'
 import { clearWizard } from 'admin-wizard/actions'
 
-import {
-  WelcomeStage,
-  DiscoveryStage,
-  SourceSelectionStage,
-  ConfirmationStage,
-  CompletedStage,
-  ManualEntryStage
-} from './stages'
+import WelcomeStage from './stages/welcome'
+import DiscoveryStage from './stages/discovery'
+import SourceSelectionStage from './stages/source-selection'
+import ConfirmationStage from './stages/confirmation'
+import CompletedStage from './stages/completed'
+import ManualEntryStage from './stages/manual-entry'
 
 const WizardView = ({ id, children, clearWizard }) => (
   <Mount key={id}>{children}</Mount>

@@ -55,7 +55,7 @@ public class OpenSearchSourceUtils {
 
     private static final String TOTAL_RESULTS_XPATH = "//os:totalResults|//opensearch:totalResults";
 
-    private static final RequestUtils requestUtils = new RequestUtils();
+    private static final RequestUtils REQUEST_UTILS = new RequestUtils();
 
     /**
      * Confirms whether or not an endpoint has OpenSearch capabilities.
@@ -88,7 +88,7 @@ public class OpenSearchSourceUtils {
 
     public static ProbeReport verifyOpenSearchCapabilities(String url, String username,
             String password) {
-        ProbeReport requestResults = requestUtils.sendGetRequest(url + SIMPLE_QUERY_PARAMS,
+        ProbeReport requestResults = REQUEST_UTILS.sendGetRequest(url + SIMPLE_QUERY_PARAMS,
                 username,
                 password);
         if (requestResults.containsFailureMessages()) {

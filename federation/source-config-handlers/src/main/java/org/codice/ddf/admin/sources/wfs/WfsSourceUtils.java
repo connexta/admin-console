@@ -57,7 +57,7 @@ public class WfsSourceUtils {
 
     private static final String WFS_VERSION_EXP = "/wfs:WFS_Capabilities/attribute::version";
 
-    private static final RequestUtils requestUtils = new RequestUtils();
+    private static final RequestUtils REQUEST_UTILS = new RequestUtils();
 
     /**
      * Attempts to verify the given URL as a functional WFS endpoint
@@ -73,7 +73,7 @@ public class WfsSourceUtils {
      */
     public static ProbeReport sendWfsCapabilitiesRequest(String url, String username,
             String password) {
-        ProbeReport requestResults = requestUtils.sendGetRequest(url, username, password);
+        ProbeReport requestResults = REQUEST_UTILS.sendGetRequest(url, username, password);
         if (requestResults.containsFailureMessages()) {
             return requestResults;
         }

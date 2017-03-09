@@ -13,241 +13,184 @@
  */
 package org.codice.ddf.admin.sources.wfs
 
-import org.apache.http.Header
-import org.apache.http.HttpEntity
-import org.apache.http.StatusLine
-import org.apache.http.client.methods.CloseableHttpResponse
-import org.apache.http.impl.client.CloseableHttpClient
 import org.codice.ddf.admin.api.config.sources.WfsSourceConfiguration
+import org.codice.ddf.admin.api.handler.ConfigurationMessage
+import org.codice.ddf.admin.api.handler.report.ProbeReport
+import org.codice.ddf.admin.api.services.WfsServiceProperties
+import org.codice.ddf.admin.commons.requests.RequestUtils
+import org.codice.ddf.admin.commons.sources.SourceHandlerCommons
+import spock.lang.Shared
 import spock.lang.Specification
 
-import javax.net.ssl.SSLPeerUnverifiedException
-
-import static org.codice.ddf.admin.api.services.WfsServiceProperties.WFS1_FACTORY_PID
-import static org.codice.ddf.admin.api.services.WfsServiceProperties.WFS2_FACTORY_PID
+import static org.codice.ddf.admin.api.handler.ConfigurationMessage.MessageType.FAILURE
+import static org.codice.ddf.admin.api.handler.ConfigurationMessage.MessageType.SUCCESS
 
 class WfsSourceUtilsTest extends Specification {
 
-//    def client = Mock(CloseableHttpClient)
-//    def response = Mock(CloseableHttpResponse)
-//    def statusLine = Mock(StatusLine)
-//    def entity = Mock(HttpEntity)
-//    def cType = Mock(Header)
-//    def configuration = Mock(WfsSourceConfiguration)
-//
-//    def wfs20Xml = this.getClass().getClassLoader().getResourceAsStream('wfs20GetCapabilities.xml')
-//    def wfs10Xml = this.getClass().getClassLoader().getResourceAsStream('wfs10GetCapabilities.xml')
-//    def wfsBadXml = this.getClass().getClassLoader().getResourceAsStream('unsupportedWfsGetCapabilities.xml')
-//
-//    def utils
-//    def setup() {
-//        utils = Spy(WfsSourceUtils) {
-//            getCloseableHttpClient(_) >> client
-//        }
-//    }
-//
-//    // Tests for getUrlAvailability
-//    def 'test happy path trusted CA'() {
-//        when:
-//        def urlAvail = utils.getUrlAvailability("testUrl", null, null)
-//
-//        then:
-//        1 * client.execute(_) >> response
-//        1 * response.getStatusLine() >> statusLine
-//        1 * statusLine.getStatusCode() >> 200
-//        1 * response.getEntity() >> entity
-//        1 * entity.getContentType() >> cType
-//        1 * cType.getValue() >> "text/xml"
-//
-//        assert urlAvail.isAvailable()
-//        assert !urlAvail.isCertError()
-//        assert urlAvail.isTrustedCertAuthority()
-//    }
-//
-//    def 'test bad return code noTrustClient' () {
-//        when:
-//        def urlAvail = utils.getUrlAvailability("testUrl", null, null)
-//
-//        then:
-//        1 * client.execute(_) >> response
-//        1 * response.getStatusLine() >> statusLine
-//        1 * statusLine.getStatusCode() >> 405
-//        1 * response.getEntity() >> entity
-//        1 * entity.getContentType() >> cType
-//        1 * cType.getValue() >> "application/xml"
-//        assert !urlAvail.isAvailable()
-//        assert !urlAvail.isCertError()
-//        assert urlAvail.isTrustedCertAuthority()
-//    }
-//
-//    def 'test bad mime type noTrustClient' () {
-//        when:
-//        def urlAvail = utils.getUrlAvailability("testUrl", null, null)
-//
-//        then:
-//        1 * client.execute(_) >> response
-//        1 * response.getStatusLine() >> statusLine
-//        1 * statusLine.getStatusCode() >> 200
-//        1 * response.getEntity() >> entity
-//        1 * entity.getContentType() >> cType
-//        1 * cType.getValue() >> "application/json"
-//        assert !urlAvail.isAvailable()
-//        assert !urlAvail.isCertError()
-//        assert urlAvail.isTrustedCertAuthority()
-//    }
-//
-//    def 'test cert error with noTrustClient'() {
-//        when:
-//        def urlAvail = utils.getUrlAvailability("testUrl", null, null)
-//
-//        then:
-//        1 * client.execute(_) >> {throw new SSLPeerUnverifiedException("test")}
-//        assert !urlAvail.isAvailable()
-//        assert urlAvail.isCertError()
-//        assert !urlAvail.isTrustedCertAuthority()
-//
-//    }
-//
-//    def 'test good path trustClient'() {
-//        when:
-//        def urlAvail = utils.getUrlAvailability("testUrl", null, null)
-//
-//        then:
-//        2 * client.execute(_) >> {throw new IOException("exception")} >> response
-//        1 * response.getStatusLine() >> statusLine
-//        1 * statusLine.getStatusCode() >> 200
-//        1 * response.getEntity() >> entity
-//        1 * entity.getContentType() >> cType
-//        1 * cType.getValue() >> "text/xml"
-//
-//        assert urlAvail.isAvailable()
-//        assert !urlAvail.isCertError()
-//        assert !urlAvail.isTrustedCertAuthority()
-//    }
-//
-//    def 'test bad return code trustClient'() {
-//        when:
-//        def urlAvail = utils.getUrlAvailability("testUrl", null, null)
-//
-//        then:
-//        2 * client.execute(_) >> {throw new IOException("exception")} >> response
-//        1 * response.getStatusLine() >> statusLine
-//        1 * statusLine.getStatusCode() >> 405
-//        1 * response.getEntity() >> entity
-//        1 * entity.getContentType() >> cType
-//        1 * cType.getValue() >> "application/xml"
-//        assert !urlAvail.isAvailable()
-//        assert !urlAvail.isCertError()
-//        assert !urlAvail.isTrustedCertAuthority()
-//    }
-//
-//    def 'test bad mime type trustClient'() {
-//        when:
-//        def urlAvail = utils.getUrlAvailability("testUrl", null, null)
-//
-//        then:
-//        2 * client.execute(_) >> {throw new IOException("exception")} >> response
-//        1 * response.getStatusLine() >> statusLine
-//        1 * statusLine.getStatusCode() >> 200
-//        1 * response.getEntity() >> entity
-//        1 * entity.getContentType() >> cType
-//        1 * cType.getValue() >> "application/json"
-//        assert !urlAvail.isAvailable()
-//        assert !urlAvail.isCertError()
-//        assert !urlAvail.isTrustedCertAuthority()
-//    }
-//
-//    def 'test failure to connect'() {
-//        when:
-//        def urlAvail = utils.getUrlAvailability("testUrl", null, null)
-//
-//        then:
-//        2 * client.execute(_) >> {throw new IOException("exception")}
-//        assert !urlAvail.isAvailable()
-//        assert !urlAvail.isCertError()
-//        assert !urlAvail.isTrustedCertAuthority()
-//    }
-//
-//    // Tests for getPreferredConfig
-//
-//    def 'test empty config with empty response'() {
-//        when:
-//        def config = utils.getPreferredConfig(configuration)
-//
-//        then:
-//        configuration.endpointUrl() >> "test"
-//        1 * client.execute(_) >> response
-//        1 * response.getEntity() >> entity
-//        1 * entity.getContent() >> ""
-//        config == Optional.empty()
-//    }
-//
-//    def 'test WFS 1.0 config properly discovered'() {
-//        when:
-//        def config = utils.getPreferredConfig(configuration)
-//
-//        then:
-//        configuration.endpointUrl() >> "test"
-//        1 * client.execute(_) >> response
-//        1 * response.getEntity() >> entity
-//        1 * entity.getContent() >> wfs10Xml
-//        assert config.isPresent()
-//        config.get().factoryPid() == WFS1_FACTORY_PID
-//    }
-//
-//    def 'test WFS 2.0 config properly discovered'() {
-//        when:
-//        def config = utils.getPreferredCswConfig(configuration)
-//
-//        then:
-//        configuration.endpointUrl() >> "test"
-//        1 * client.execute(_) >> response
-//        1 * response.getEntity() >> entity
-//        1 * entity.getContent() >> wfs20Xml
-//        assert config.isPresent()
-//        config.get().factoryPid() == WFS2_FACTORY_PID
-//    }
-//
-//    def 'test unsupported version returns no config'() {
-//        when:
-//        def config = utils.getPreferredConfig(configuration)
-//
-//        then:
-//        configuration.endpointUrl() >> "test"
-//        1 * client.execute(_) >> response
-//        1 * response.getEntity() >> entity
-//        1 * entity.getContent() >> wfsBadXml
-//        assert !config.isPresent()
-//    }
+    WfsSourceUtils utils
+    RequestUtils requestUtils
 
-    // Tests for confirmEndpointUrl
+    static TEST_URL = "testUrl"
+    def TEST_USER = "testUser"
+    def TEST_PW = "hunter2"
+    def TEST_HOST = "testHost"
+    def TEST_PORT = 1234
 
-//    def 'test no url created with bad hostname/port'() {
-//        when:
-//        def endpointUrl = utils.confirmEndpointUrl(configuration)
-//
-//        then:
-//        _ * configuration.sourceHostName() >> "test"
-//        _ * configuration.sourcePort() >> 443
-//        _ * client.execute(_) >> {throw new IOException()}
-//        endpointUrl == null
-//    }
-//
-//    def 'test URL created with no cert error'() {
-//        when:
-//        def endpointUrl = utils.confirmEndpointUrl(configuration)
-//
-//        then:
-//        _ * configuration.sourceHostName() >> "test"
-//        _ * configuration.sourcePort() >> 443
-//        1 * client.execute(_) >> response
-//        1 * response.getStatusLine() >> statusLine
-//        1 * statusLine.getStatusCode() >> 200
-//        1 * response.getEntity() >> entity
-//        1 * entity.getContentType() >> cType
-//        1 * cType.getValue() >> "text/xml"
-//
-//        endpointUrl != null
-//        endpointUrl.getUrl() == "https://test:443/services/wfs"
-//    }
+    @Shared xml10 = this.getClass().getClassLoader().getResource('wfs10GetCapabilities.xml').text
+    @Shared xml20 = this.getClass().getClassLoader().getResource('wfs20GetCapabilities.xml').text
+    @Shared xmlBad = this.getClass().getClassLoader().getResource('unsupportedWfsGetCapabilities.xml').text
+    @Shared plntxt = this.getClass().getClassLoader().getResource('plainText.txt').text
+
+    def setup() {
+        requestUtils = Mock(RequestUtils)
+        utils = Spy(WfsSourceUtils, constructorArgs : [requestUtils])
+    }
+
+    def 'test discoverWfsUrl good args'() {
+        setup:
+        def report = Mock(ProbeReport) {
+            1 * containsFailureMessages() >> false
+            1 * getProbeResult(SourceHandlerCommons.DISCOVERED_URL) >> TEST_URL
+        }
+        utils.sendWfsCapabilitiesRequest(_, TEST_USER, TEST_PW) >> report
+
+        when:
+        def result = utils.discoverWfsUrl(TEST_HOST, TEST_PORT, TEST_USER, TEST_PW)
+
+        then:
+        report == result
+        result.getProbeResult(SourceHandlerCommons.DISCOVERED_URL) == TEST_URL
+    }
+
+    def 'test discoverWfsUrl bad args'() {
+        setup:
+        def report = Mock(ProbeReport) {
+            containsFailureMessages() >> true
+        }
+        utils.sendWfsCapabilitiesRequest(_, TEST_USER, TEST_PW) >> report
+
+        when:
+        def result = utils.discoverWfsUrl(TEST_HOST, TEST_PORT, TEST_USER, TEST_PW)
+
+        then:
+        result.messages().find {it.type() == FAILURE && it.subtype() == SourceHandlerCommons.UNKNOWN_ENDPOINT}
+    }
+
+    def 'test sendWfsCapabilitiesRequest request failure'() {
+        setup:
+        def report = Mock(ProbeReport) {
+            containsFailureMessages() >> true
+        }
+        requestUtils.sendGetRequest(_, TEST_USER, TEST_PW) >> report
+
+        when:
+        def result = utils.sendWfsCapabilitiesRequest(TEST_URL, TEST_USER, TEST_PW)
+
+        then:
+        result == report
+        result.containsFailureMessages()
+    }
+
+    def 'test sendWfsCapabilitiesRequest with bad response'(code, type) {
+        setup:
+        def response = Spy(ProbeReport) {
+            containsFailureMessages() >> false
+            getProbeResult(RequestUtils.STATUS_CODE) >> code
+            getProbeResult(RequestUtils.CONTENT_TYPE) >> type
+        }
+        requestUtils.sendGetRequest(_,TEST_USER, TEST_PW) >> response
+
+        when:
+        def result = utils.sendWfsCapabilitiesRequest(TEST_URL, TEST_USER, TEST_PW)
+
+        then:
+        result == response
+        result.messages().find {it.type() == FAILURE && it.subtype() == SourceHandlerCommons.UNKNOWN_ENDPOINT}
+
+        where:
+        code    | type
+        401     | "text/xml"
+        405     | "application/xml"
+        404     | "text/xml; charset=UTF-8"
+        200     | "application/json"
+        200     | "image/jpg"
+        200     | "application/xml; charset=UTF-16"
+    }
+
+    def 'test sendWfsCapabilitiesRequest with xml'() {
+        setup:
+        def report = Spy(ProbeReport) {
+            containsFailureMessages() >> false
+            getProbeResult(RequestUtils.STATUS_CODE) >> 200
+            getProbeResult(RequestUtils.CONTENT_TYPE) >> "text/xml"
+        }
+        requestUtils.sendGetRequest(_, TEST_USER, TEST_PW) >> report
+
+        when:
+        def result = utils.sendWfsCapabilitiesRequest(TEST_URL, TEST_USER, TEST_PW)
+
+        then:
+        result.messages().find {it.type() == SUCCESS && it.subtype() == SourceHandlerCommons.VERIFIED_CAPABILITIES}
+        result.getProbeResult(SourceHandlerCommons.DISCOVERED_URL) == TEST_URL
+    }
+
+    def 'test getPreferredWfsConfig bad request'() {
+        setup:
+        def report = Mock(ProbeReport) {
+            containsFailureMessages() >> true
+        }
+        utils.sendWfsCapabilitiesRequest(_, TEST_USER, TEST_PW) >> report
+
+        when:
+        def result = utils.getPreferredWfsConfig(TEST_URL, TEST_USER, TEST_PW)
+
+        then:
+        result == report
+        result.containsFailureMessages()
+    }
+
+    def 'test getPreferredWfsConfig with good xml'(xml, factoryPid) {
+        setup:
+        def report = Mock(ProbeReport) {
+            containsFailureMessages() >> false
+            getProbeResult(RequestUtils.CONTENT) >> xml
+        }
+        utils.sendWfsCapabilitiesRequest(_, TEST_USER, TEST_PW) >> report
+
+        when:
+        def result = utils.getPreferredWfsConfig(TEST_URL, TEST_USER, TEST_PW)
+        WfsSourceConfiguration config = result.getProbeResult(SourceHandlerCommons.DISCOVERED_SOURCES)
+
+        then:
+        result.messages().find {it.type() == SUCCESS && it.subtype() == SourceHandlerCommons.DISCOVERED_SOURCE}
+        config.sourceUserName() == TEST_USER
+        config.sourceUserPassword() == TEST_PW
+        config.endpointUrl() == TEST_URL
+        config.factoryPid() == factoryPid
+
+        where:
+        xml     | factoryPid
+        xml10   | WfsServiceProperties.WFS1_FACTORY_PID
+        xml20   | WfsServiceProperties.WFS2_FACTORY_PID
+    }
+
+    def 'test getPreferredWfsConfig failure cases'(input, subtype) {
+        setup:
+        def report = Mock(ProbeReport) {
+            containsFailureMessages() >> false
+            getProbeResult(RequestUtils.CONTENT) >> input
+        }
+        utils.sendWfsCapabilitiesRequest(_, TEST_USER, TEST_PW) >> report
+
+        when:
+        def result = utils.getPreferredWfsConfig(TEST_URL, TEST_USER, TEST_PW)
+
+        then:
+        result.messages().find {it.type() == FAILURE && it.subtype() == subtype}
+
+        where:
+        input   | subtype
+        xmlBad  | SourceHandlerCommons.UNKNOWN_ENDPOINT
+        plntxt  | ConfigurationMessage.INTERNAL_ERROR
+    }
 }

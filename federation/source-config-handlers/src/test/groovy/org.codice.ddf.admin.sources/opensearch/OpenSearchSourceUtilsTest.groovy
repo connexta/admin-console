@@ -22,7 +22,8 @@ import org.codice.ddf.admin.commons.sources.SourceHandlerCommons
 import spock.lang.Shared
 import spock.lang.Specification
 
-import static org.codice.ddf.admin.api.handler.ConfigurationMessage.MessageType.*
+import static org.codice.ddf.admin.api.handler.ConfigurationMessage.MessageType.FAILURE
+import static org.codice.ddf.admin.api.handler.ConfigurationMessage.MessageType.SUCCESS
 
 class OpenSearchSourceUtilsTest extends Specification {
 
@@ -82,16 +83,16 @@ class OpenSearchSourceUtilsTest extends Specification {
         setup:
         def report = Mock(ProbeReport) {
             1 * containsFailureMessages() >> false
-            1 * getProbeResult(SourceHandlerCommons.DISCOVERED_URL) >> "resultUrl"
+            1 * getProbeResult(SourceHandlerCommons.DISCOVERED_URL) >> TEST_URL
         }
-        utils.verifyOpenSearchCapabilities(_, "un", "pw") >> report
+        utils.verifyOpenSearchCapabilities(_, TEST_USER, TEST_PW) >> report
 
         when:
-        def result = utils.discoverOpenSearchUrl(TEST_HOST, TEST_PORT, "un", "pw")
+        def result = utils.discoverOpenSearchUrl(TEST_HOST, TEST_PORT, TEST_USER, TEST_PW)
 
         then:
         report == result
-        result.getProbeResult(SourceHandlerCommons.DISCOVERED_URL) == "resultUrl"
+        result.getProbeResult(SourceHandlerCommons.DISCOVERED_URL) == TEST_URL
     }
 
     def 'test discoverOpenSearchUrl bad args'() {

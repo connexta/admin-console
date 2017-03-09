@@ -21,7 +21,8 @@ import org.codice.ddf.admin.commons.sources.SourceHandlerCommons
 import spock.lang.Shared
 import spock.lang.Specification
 
-import static org.codice.ddf.admin.api.handler.ConfigurationMessage.MessageType.*
+import static org.codice.ddf.admin.api.handler.ConfigurationMessage.MessageType.FAILURE
+import static org.codice.ddf.admin.api.handler.ConfigurationMessage.MessageType.SUCCESS
 
 class CswSourceUtilsTest extends Specification {
     CswSourceUtils utils

@@ -55,6 +55,11 @@ To run all tests as part of a CI build in a headless browser, do:
 
     yarn test
 
+After all tests have passed, coverage checks are run. The thresholds for
+coverage are specificed in `.istanbul.yml`. To view an html report, do:
+
+    yarn run coverage:report
+
 ## helpful links
 
 Some useful information to help team members get acquainted with the

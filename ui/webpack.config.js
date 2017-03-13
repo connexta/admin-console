@@ -113,7 +113,8 @@ if (process.env.NODE_ENV === 'production') {
       path: path.resolve(__dirname, 'target', 'ci')
     },
     entry: glob.sync('./src/main/webapp/**/*spec.js')
-        .map(function (spec) { return path.resolve(spec) }),
+      .concat('./src/main/webapp/app.js')
+      .map(function (spec) { return path.resolve(spec) }),
     plugins: [new HtmlWebpackPlugin()],
     module: {
       rules: [

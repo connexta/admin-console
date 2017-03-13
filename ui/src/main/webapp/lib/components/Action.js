@@ -23,5 +23,7 @@ export default (props) => {
     return <RaisedButton primary disabled={disabled} label={label} onClick={handleClick} />
   } else if (secondary) {
     return <FlatButton secondary disabled={disabled} label={label} onClick={handleClick} />
+  } else {
+    return <RaisedButton disabled={disabled} label={label} onClick={handleClick} />
   }
 }

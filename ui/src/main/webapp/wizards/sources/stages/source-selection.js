@@ -1,9 +1,9 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { getSourceSelections, getConfigurationHandlerId } from '../reducer'
+import { getSourceSelections, getConfigurationHandlerId, getDiscoveryType } from '../reducer'
 import { getMessages } from '../../../reducer'
-import { changeStage, fetchConfigTypes } from '../actions'
+import { changeStage, testSources } from '../actions'
 
 import Title from 'components/Title'
 import Description from 'components/Description'
@@ -13,7 +13,7 @@ import Message from 'components/Message'
 
 import { NavPanes, SourceRadioButtons } from '../components'
 
-const SourceSelectionStageView = ({ messages, sourceSelections = [], selectedSourceConfigHandlerId, changeStage, fetchConfigTypes }) => {
+const SourceSelectionStageView = ({ messages, sourceSelections = [], selectedSourceConfigHandlerId, changeStage, testSources, discoveryType }) => {
   if (sourceSelections.length !== 0) {
     return (
       <NavPanes backClickTarget='discoveryStage' forwardClickTarget='confirmationStage'>
@@ -37,11 +37,11 @@ const SourceSelectionStageView = ({ messages, sourceSelections = [], selectedSou
           No Sources Found
         </Title>
         <Description>
-          Click below to enter source information manually, or go back to enter a different hostname/port.
+          No sources were found at the given location. Try again or go back to enter a different address.
         </Description>
         {messages.map((msg, i) => <Message key={i} {...msg} />)}
         <ActionGroup>
-          <Action primary label='Enter Information Manually' onClick={fetchConfigTypes} />
+          <Action primary label='Try Again' onClick={() => testSources('sources', 'sourceSelectionStage', 'discoveryStage', discoveryType)} />
         </ActionGroup>
       </NavPanes>
     )
@@ -50,8 +50,9 @@ const SourceSelectionStageView = ({ messages, sourceSelections = [], selectedSou
 export default connect((state) => ({
   sourceSelections: getSourceSelections(state),
   selectedSourceConfigHandlerId: getConfigurationHandlerId(state),
-  messages: getMessages(state, 'sourceSelectionStage')
+  messages: getMessages(state, 'sourceSelectionStage'),
+  discoveryType: getDiscoveryType(state)
 }), {
   changeStage,
-  fetchConfigTypes: () => fetchConfigTypes('manualEntryStage', 'sourceSelectionStage')
+  testSources
 })(SourceSelectionStageView)

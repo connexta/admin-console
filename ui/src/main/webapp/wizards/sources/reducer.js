@@ -52,10 +52,6 @@ export const getStagesClean = (state) => state.getIn(['sourceWizard', 'sourceSta
 
 export const getConfig = (state, id) => state.getIn(['wizard', 'config', id], Map()).toJS()
 
-export const getSelectedSourceDisplayName = (state, id) => state.getIn(['wizard', 'sourceWizard', ''])
-
-export const getProbeValue = (state) => state.getIn(['probeValue'])
-
 const sourceSelections = (state = Map(), { type, sourceConfigs }) => {
   switch (type) {
     case 'SET_SOURCE_SELECTIONS':
@@ -84,7 +80,15 @@ const configTypes = (state = fromJS([]), { type, types }) => {
   switch (type) {
     case 'SOURCES/SET_CONFIG_IDS':
       return fromJS(types)
+    default:
+      return state
+  }
+}
 
+const discoveryType = (state = 'hostnamePort', { type, value }) => {
+  switch (type) {
+    case 'SOURCES/DISCOVERY_TYPE/SET':
+      return value
     default:
       return state
   }
@@ -100,6 +104,36 @@ export const getConfigTypeById = (state, id) => {
   }
 }
 
+export const getDiscoveryConfigs = (state) => (type) => {
+  const sourceUserName = state.getIn(['wizard', 'config', 'sourceUserName', 'value'])
+  const sourceUserPassword = state.getIn(['wizard', 'config', 'sourceUserPassword', 'value'])
+  switch (type) {
+    case 'hostnamePort':
+      const sourceHostName = state.getIn(['wizard', 'config', 'sourceHostName', 'value'])
+      const sourcePort = state.getIn(['wizard', 'config', 'sourcePort', 'value'])
+      return {
+        sourceUserName,
+        sourceUserPassword,
+        sourceHostName,
+        sourcePort
+      }
+
+    case 'url':
+      const endpointUrl = state.getIn(['wizard', 'config', 'endpointUrl', 'value'])
+      return {
+        sourceUserName,
+        sourceUserPassword,
+        endpointUrl
+      }
+
+    default:
+      return {
+        sourceUserName,
+        sourceUserPassword
+      }
+  }
+}
+
 export const getSourceSelections = (state) => state.getIn(['sourceWizard', 'sourceSelections'])
 
 export const getConfigurationHandlerId = (state) => state.getIn(['wizard', 'config', 'configurationHandlerId'])
@@ -108,5 +142,7 @@ export const getSourceName = (state) => state.getIn(['wizard', 'config', 'source
 
 export const getIsSubmitting = (state) => state.getIn(['sourceWizard', 'isSubmitting'])
 
-export default combineReducers({ sourceStage, sourceStagesClean, sourceStageProgress, sourceSelections, isSubmitting, configTypes })
+export const getDiscoveryType = (state) => state.getIn(['sourceWizard', 'discoveryType'])
+
+export default combineReducers({ sourceStage, sourceStagesClean, sourceStageProgress, sourceSelections, isSubmitting, configTypes, discoveryType })
 

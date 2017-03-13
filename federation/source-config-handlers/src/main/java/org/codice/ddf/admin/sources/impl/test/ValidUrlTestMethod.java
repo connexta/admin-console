@@ -13,8 +13,11 @@
  */
 package org.codice.ddf.admin.sources.impl.test;
 
+import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.ENDPOINT_URL;
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.PORT;
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_HOSTNAME;
+import static org.codice.ddf.admin.api.validation.SourceValidationUtils.validateEndpointUrl;
+import static org.codice.ddf.admin.api.validation.SourceValidationUtils.validateHostnameAndPort;
 import static org.codice.ddf.admin.commons.requests.RequestUtils.CANNOT_CONNECT;
 import static org.codice.ddf.admin.commons.requests.RequestUtils.CONNECTED;
 import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.getCommonSourceSubtypeDescriptions;
@@ -23,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.codice.ddf.admin.api.config.sources.SourceConfiguration;
+import org.codice.ddf.admin.api.handler.ConfigurationMessage;
 import org.codice.ddf.admin.api.handler.method.TestMethod;
 import org.codice.ddf.admin.api.handler.report.Report;
 import org.codice.ddf.admin.commons.requests.RequestUtils;
@@ -33,20 +37,18 @@ import com.google.common.collect.ImmutableList;
 public class ValidUrlTestMethod extends TestMethod<SourceConfiguration> {
 
     private final RequestUtils requestUtils = new RequestUtils();
-
-    private static final String DESCRIPTION = "Attempts to connect to a given hostname and port";
-
+    private static final String DESCRIPTION = "Attempts to connect to a given hostname and port or url";
     public static final String VALID_URL_TEST_ID = "valid-url";
 
-    private static final List<String> REQUIRED_FIELDS = ImmutableList.of(SOURCE_HOSTNAME, PORT);
+    private static final List<String> OPTIONAL_FIELDS = ImmutableList.of(SOURCE_HOSTNAME, PORT, ENDPOINT_URL);
     private static final Map<String, String> SUCCESS_TYPES = getCommonSourceSubtypeDescriptions(CONNECTED);
     private static final Map<String, String> FAILURE_TYPES = getCommonSourceSubtypeDescriptions(CANNOT_CONNECT);
 
     public ValidUrlTestMethod() {
         super(VALID_URL_TEST_ID,
                 DESCRIPTION,
-                REQUIRED_FIELDS,
                 null,
+                OPTIONAL_FIELDS,
                 SUCCESS_TYPES,
                 FAILURE_TYPES,
                 null);
@@ -54,6 +56,14 @@ public class ValidUrlTestMethod extends TestMethod<SourceConfiguration> {
 
     @Override
     public Report test(SourceConfiguration configuration) {
-        return requestUtils.endpointIsReachable(configuration.sourceHostName(), configuration.sourcePort());
+        return configuration.endpointUrl() != null ?
+                requestUtils.endpointIsReachable(configuration.endpointUrl()) :
+                requestUtils.endpointIsReachable(configuration.sourceHostName(), configuration.sourcePort());
+    }
+    @Override
+    public List<ConfigurationMessage> validateOptionalFields(SourceConfiguration configuration){
+        return configuration.endpointUrl() == null ?
+                validateHostnameAndPort(configuration) :
+                validateEndpointUrl(configuration);
     }
 }

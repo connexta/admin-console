@@ -58,10 +58,10 @@ public class WfsSourceUtils {
 
     private static final String WFS_VERSION_EXP = "/wfs:WFS_Capabilities/attribute::version";
 
-    private RequestUtils requestUtils;
+    private final RequestUtils requestUtils;
 
     public WfsSourceUtils() {
-        requestUtils = new RequestUtils();
+        this(new RequestUtils());
     }
 
     public WfsSourceUtils(RequestUtils requestUtils) {

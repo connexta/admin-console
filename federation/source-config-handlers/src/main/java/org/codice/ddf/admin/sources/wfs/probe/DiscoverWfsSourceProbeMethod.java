@@ -66,7 +66,7 @@ public class DiscoverWfsSourceProbeMethod extends ProbeMethod<WfsSourceConfigura
 
     public static final List<String> RETURN_TYPES = ImmutableList.of(DISCOVERED_SOURCES);
 
-    private WfsSourceUtils wfsSourceUtils;
+    private final WfsSourceUtils wfsSourceUtils;
 
     public DiscoverWfsSourceProbeMethod() {
         super(WFS_DISCOVER_SOURCES_ID,

@@ -55,9 +55,10 @@ public class OpenSearchSourceUtils {
 
     private static final String TOTAL_RESULTS_XPATH = "//os:totalResults|//opensearch:totalResults";
 
-    private RequestUtils requestUtils = new RequestUtils();
+    private final RequestUtils requestUtils;
 
     public OpenSearchSourceUtils() {
+        this(new RequestUtils());
     }
 
     public OpenSearchSourceUtils(RequestUtils requestUtils) {

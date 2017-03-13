@@ -66,10 +66,13 @@ public class SourceHandlerCommons {
     public static final String DISCOVERED_SOURCE = "DISCOVERED_SOURCE";
 
     public static final String VERIFIED_CAPABILITIES = "VERIFIED_CAPABILITIES";
-    private static final Map<String, String> SUCCESS_DESCRIPTIONS = ImmutableMap.of(DISCOVERED_SOURCE, "Successfully discovered source from a url.",
-            VERIFIED_CAPABILITIES, "Verified endpoint has specified capabilities",
-            SUCCESSFUL_CREATE, "Successfully created a source configuration.",
-            SUCCESSFUL_DELETE, "Successfully deleted source configuration.");
+    private static final Map<String, String> SUCCESS_DESCRIPTIONS = ImmutableMap.<String, String>builder()
+            .putAll(REQUEST_UTILS.getRequestSubtypeDescriptions(RequestUtils.CONNECTED))
+            .put(DISCOVERED_SOURCE, "Successfully discovered source from a url.")
+            .put(VERIFIED_CAPABILITIES, "Verified endpoint has specified capabilities")
+            .put(SUCCESSFUL_CREATE, "Successfully created a source configuration.")
+            .put(SUCCESSFUL_DELETE, "Successfully deleted source configuration.")
+            .build();
 
     private static final MessageBuilder SOURCES_MESSAGE_BUILDER = new MessageBuilder(
             SUCCESS_DESCRIPTIONS,

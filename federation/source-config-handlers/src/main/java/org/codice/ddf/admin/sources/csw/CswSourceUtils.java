@@ -15,6 +15,7 @@ package org.codice.ddf.admin.sources.csw;
 
 import static java.net.HttpURLConnection.HTTP_OK;
 import static org.codice.ddf.admin.api.handler.ConfigurationMessage.createInternalErrorMsg;
+import static org.codice.ddf.admin.api.services.CswServiceProperties.CSW_GMD_FACTORY_PID;
 import static org.codice.ddf.admin.api.services.CswServiceProperties.CSW_PROFILE_FACTORY_PID;
 import static org.codice.ddf.admin.api.services.CswServiceProperties.CSW_SPEC_FACTORY_PID;
 import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.DISCOVERED_SOURCE;
@@ -54,7 +55,7 @@ public class CswSourceUtils {
             "application/xml; charset=UTF-8",
             "text/xml; charset=UTF-8");
 
-    private static final String GMD_OUTPUT_SCHEMA = "http://www.isotc211.org/2005/gmd";
+    protected static final String GMD_OUTPUT_SCHEMA = "http://www.isotc211.org/2005/gmd";
 
     private static final String HAS_CATALOG_METACARD_EXP =
             "//ows:OperationsMetadata//ows:Operation[@name='GetRecords']/ows:Parameter[@name='OutputSchema' or @name='outputSchema']/ows:Value/text()='urn:catalog:metacard'";
@@ -64,6 +65,16 @@ public class CswSourceUtils {
 
     private static final String GET_FIRST_OUTPUT_SCHEMA =
             "//ows:OperationsMetadata/ows:Operation[@name='GetRecords']/ows:Parameter[@name='OutputSchema' or @name='outputSchema']/ows:Value[1]/text()";
+
+    private final RequestUtils requestUtils;
+
+    public CswSourceUtils() {
+        this(new RequestUtils());
+    }
+
+    public CswSourceUtils(RequestUtils requestUtils) {
+        this.requestUtils = requestUtils;
+    }
 
     /**
      * Confirms whether or not an endpoint has CSW capabilities.
@@ -77,9 +88,9 @@ public class CswSourceUtils {
      * @param password
      * @return report
      */
-    public static ProbeReport sendCswCapabilitiesRequest(String url, String username,
+    public ProbeReport sendCswCapabilitiesRequest(String url, String username,
             String password) {
-        ProbeReport requestResults = RequestUtils.sendGetRequest(url + GET_CAPABILITIES_PARAMS,
+        ProbeReport requestResults = requestUtils.sendGetRequest(url + GET_CAPABILITIES_PARAMS,
                 username,
                 password);
         if (requestResults.containsFailureMessages()) {
@@ -110,7 +121,7 @@ public class CswSourceUtils {
      * @param password
      * @return report
      */
-    public static ProbeReport discoverCswUrl(String hostname, int port, String username,
+    public ProbeReport discoverCswUrl(String hostname, int port, String username,
             String password) {
         return URL_FORMATS.stream()
                 .map(format -> String.format(format, hostname, port))
@@ -132,7 +143,7 @@ public class CswSourceUtils {
      * @param password
      * @return report
      */
-    public static ProbeReport getPreferredCswConfig(String url, String username, String password) {
+    public ProbeReport getPreferredCswConfig(String url, String username, String password) {
         ProbeReport requestReport = sendCswCapabilitiesRequest(url, username, password);
         if (requestReport.containsFailureMessages()) {
             return requestReport;
@@ -174,7 +185,7 @@ public class CswSourceUtils {
                 results.addMessage(createCommonSourceConfigMsg(DISCOVERED_SOURCE));
                 return results.probeResult(DISCOVERED_SOURCES,
                         preferred.outputSchema(GMD_OUTPUT_SCHEMA)
-                                .factoryPid(CSW_PROFILE_FACTORY_PID));
+                                .factoryPid(CSW_GMD_FACTORY_PID));
             }
         } catch (Exception e) {
         }

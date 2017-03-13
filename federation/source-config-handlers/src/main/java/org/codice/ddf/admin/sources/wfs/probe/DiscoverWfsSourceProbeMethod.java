@@ -28,8 +28,6 @@ import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.DISCOVER
 import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.DISCOVER_SOURCES_ID;
 import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.UNKNOWN_ENDPOINT;
 import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.getCommonSourceSubtypeDescriptions;
-import static org.codice.ddf.admin.sources.wfs.WfsSourceUtils.discoverWfsUrl;
-import static org.codice.ddf.admin.sources.wfs.WfsSourceUtils.getPreferredWfsConfig;
 
 import java.util.List;
 import java.util.Map;
@@ -38,6 +36,7 @@ import org.codice.ddf.admin.api.config.sources.WfsSourceConfiguration;
 import org.codice.ddf.admin.api.handler.ConfigurationMessage;
 import org.codice.ddf.admin.api.handler.method.ProbeMethod;
 import org.codice.ddf.admin.api.handler.report.ProbeReport;
+import org.codice.ddf.admin.sources.wfs.WfsSourceUtils;
 
 import com.google.common.collect.ImmutableList;
 
@@ -67,6 +66,8 @@ public class DiscoverWfsSourceProbeMethod extends ProbeMethod<WfsSourceConfigura
 
     public static final List<String> RETURN_TYPES = ImmutableList.of(DISCOVERED_SOURCES);
 
+    private final WfsSourceUtils wfsSourceUtils;
+
     public DiscoverWfsSourceProbeMethod() {
         super(WFS_DISCOVER_SOURCES_ID,
                 DESCRIPTION,
@@ -76,6 +77,7 @@ public class DiscoverWfsSourceProbeMethod extends ProbeMethod<WfsSourceConfigura
                 FAILURE_TYPES,
                 WARNING_TYPES,
                 RETURN_TYPES);
+        wfsSourceUtils = new WfsSourceUtils();
     }
 
     @Override
@@ -84,7 +86,7 @@ public class DiscoverWfsSourceProbeMethod extends ProbeMethod<WfsSourceConfigura
         String pw = configuration.sourceUserPassword();
         String testUrl = configuration.endpointUrl();
         if (testUrl == null) {
-            ProbeReport discoverEndpointReport = discoverWfsUrl(configuration.sourceHostName(),
+            ProbeReport discoverEndpointReport = wfsSourceUtils.discoverWfsUrl(configuration.sourceHostName(),
                     configuration.sourcePort(),
                     un,
                     pw);
@@ -93,7 +95,7 @@ public class DiscoverWfsSourceProbeMethod extends ProbeMethod<WfsSourceConfigura
             }
             testUrl = discoverEndpointReport.getProbeResult(DISCOVERED_URL);
         }
-        return getPreferredWfsConfig(testUrl, un, pw);
+        return wfsSourceUtils.getPreferredWfsConfig(testUrl, un, pw);
     }
 
     @Override

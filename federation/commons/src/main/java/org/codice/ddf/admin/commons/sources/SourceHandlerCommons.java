@@ -38,6 +38,8 @@ import com.google.common.collect.ImmutableMap;
 
 public class SourceHandlerCommons {
 
+    private static final RequestUtils REQUEST_UTILS = new RequestUtils();
+
     //Common probe keys
     public static final String DISCOVERED_SOURCES = "discoveredSources";
     public static final String DISCOVERED_URL = "discoveredUrl";
@@ -50,7 +52,7 @@ public class SourceHandlerCommons {
     //Common failure types
     public static final String UNKNOWN_ENDPOINT = "UNKNOWN_ENDPOINT";
     private static final Map<String, String> FAILURE_DESCRIPTIONS = ImmutableMap.<String, String>builder().putAll(
-            RequestUtils.getRequestSubtypeDescriptions(RequestUtils.CANNOT_CONNECT, RequestUtils.CERT_ERROR))
+            REQUEST_UTILS.getRequestSubtypeDescriptions(RequestUtils.CANNOT_CONNECT, RequestUtils.CERT_ERROR))
                     .put(UNKNOWN_ENDPOINT, "The endpoint does not appear to have the specified capabilities.")
                     .put(FAILED_CREATE, "Failed to create source configuration.")
                     .put(FAILED_DELETE, "Failed to delete source configuration.")
@@ -58,16 +60,19 @@ public class SourceHandlerCommons {
 
     //Common warning types
     private static final Map<String, String> WARNING_DESCRIPTIONS = ImmutableMap.copyOf(
-            RequestUtils.getRequestSubtypeDescriptions(RequestUtils.UNTRUSTED_CA));
+            REQUEST_UTILS.getRequestSubtypeDescriptions(RequestUtils.UNTRUSTED_CA));
 
     //Common success types
     public static final String DISCOVERED_SOURCE = "DISCOVERED_SOURCE";
 
     public static final String VERIFIED_CAPABILITIES = "VERIFIED_CAPABILITIES";
-    private static final Map<String, String> SUCCESS_DESCRIPTIONS = ImmutableMap.of(DISCOVERED_SOURCE, "Successfully discovered source from a url.",
-            VERIFIED_CAPABILITIES, "Verified endpoint has specified capabilities",
-            SUCCESSFUL_CREATE, "Successfully created a source configuration.",
-            SUCCESSFUL_DELETE, "Successfully deleted source configuration.");
+    private static final Map<String, String> SUCCESS_DESCRIPTIONS = ImmutableMap.<String, String>builder()
+            .putAll(REQUEST_UTILS.getRequestSubtypeDescriptions(RequestUtils.CONNECTED))
+            .put(DISCOVERED_SOURCE, "Successfully discovered source from a url.")
+            .put(VERIFIED_CAPABILITIES, "Verified endpoint has specified capabilities")
+            .put(SUCCESSFUL_CREATE, "Successfully created a source configuration.")
+            .put(SUCCESSFUL_DELETE, "Successfully deleted source configuration.")
+            .build();
 
     private static final MessageBuilder SOURCES_MESSAGE_BUILDER = new MessageBuilder(
             SUCCESS_DESCRIPTIONS,

@@ -55,6 +55,16 @@ public class OpenSearchSourceUtils {
 
     private static final String TOTAL_RESULTS_XPATH = "//os:totalResults|//opensearch:totalResults";
 
+    private final RequestUtils requestUtils;
+
+    public OpenSearchSourceUtils() {
+        this(new RequestUtils());
+    }
+
+    public OpenSearchSourceUtils(RequestUtils requestUtils) {
+        this.requestUtils = requestUtils;
+    }
+
     /**
      * Confirms whether or not an endpoint has OpenSearch capabilities.
      * SUCCESS TYPES - VERIFIED_CAPABILITIES,
@@ -67,7 +77,7 @@ public class OpenSearchSourceUtils {
      * @param password
      * @return report
      */
-    public static ProbeReport getOpenSearchConfig(String url, String username, String password) {
+    public ProbeReport getOpenSearchConfig(String url, String username, String password) {
         ProbeReport results = verifyOpenSearchCapabilities(url, username, password);
         if (results.containsFailureMessages()) {
             return results;
@@ -84,9 +94,9 @@ public class OpenSearchSourceUtils {
         return results;
     }
 
-    public static ProbeReport verifyOpenSearchCapabilities(String url, String username,
+    protected ProbeReport verifyOpenSearchCapabilities(String url, String username,
             String password) {
-        ProbeReport requestResults = RequestUtils.sendGetRequest(url + SIMPLE_QUERY_PARAMS,
+        ProbeReport requestResults = requestUtils.sendGetRequest(url + SIMPLE_QUERY_PARAMS,
                 username,
                 password);
         if (requestResults.containsFailureMessages()) {
@@ -136,7 +146,7 @@ public class OpenSearchSourceUtils {
      * @param password
      * @return report
      */
-    public static ProbeReport discoverOpenSearchUrl(String hostname, int port, String username,
+    public ProbeReport discoverOpenSearchUrl(String hostname, int port, String username,
             String password) {
         return URL_FORMATS.stream()
                 .map(formatUrl -> String.format(formatUrl, hostname, port))

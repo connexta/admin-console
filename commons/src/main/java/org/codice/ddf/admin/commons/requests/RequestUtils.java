@@ -93,9 +93,9 @@ public class RequestUtils {
      * @param password - user password to add to basic auth
      * @return report
      */
-    public static ProbeReport sendGetRequest(String url, String userName, String password) {
+    public ProbeReport sendGetRequest(String url, String userName, String password) {
         Report connectReport = endpointIsReachable(url);
-        if(connectReport.containsFailureMessages()) {
+        if (connectReport.containsFailureMessages()) {
             return new ProbeReport(connectReport.messages());
         }
         HttpGet request = new HttpGet(url);
@@ -116,7 +116,7 @@ public class RequestUtils {
      * @param content - body of the post request
      * @return report
      */
-    public static ProbeReport sendPostRequest(String url, String username, String password,
+    public ProbeReport sendPostRequest(String url, String username, String password,
             String contentType, String content) {
         Report connectReport = endpointIsReachable(url);
         if (connectReport.containsFailureMessages()) {
@@ -136,7 +136,7 @@ public class RequestUtils {
         return sendHttpRequest(post);
     }
 
-    private static ProbeReport sendHttpRequest(HttpRequestBase request) {
+    protected ProbeReport sendHttpRequest(HttpRequestBase request) {
         ProbeReport results = new ProbeReport();
         CloseableHttpClient client = null;
         CloseableHttpResponse response = null;
@@ -156,9 +156,13 @@ public class RequestUtils {
             try {
                 client = getHttpClient(true);
                 response = client.execute(request);
-                results.addMessage(createRequestConfigMsg(UNTRUSTED_CA));
-                results.addMessage(createRequestConfigMsg(EXECUTED_REQUEST));
-                return results.probeResults(responseToMap(response));
+                if (response.getStatusLine().getStatusCode() == HTTP_OK) {
+                    results.addMessage(createRequestConfigMsg(UNTRUSTED_CA));
+                    results.addMessage(createRequestConfigMsg(EXECUTED_REQUEST));
+                    return results.probeResults(responseToMap(response));
+                } else {
+                    return results.addMessage(createRequestConfigMsg(CANNOT_CONNECT));
+                }
             } catch (Exception e1) {
                 return results.addMessage(createRequestConfigMsg(CANNOT_CONNECT));
             }
@@ -174,7 +178,7 @@ public class RequestUtils {
      * @param url - url to connect to
      * @return report
      */
-    public static Report endpointIsReachable(String url) {
+    public Report endpointIsReachable(String url) {
         try {
             URLConnection urlConnection = (new URL(url).openConnection());
             urlConnection.setConnectTimeout(PING_TIMEOUT);
@@ -193,7 +197,7 @@ public class RequestUtils {
      * @param port
      * @return report
      */
-    public static Report endpointIsReachable(String hostname, int port) {
+    public Report endpointIsReachable(String hostname, int port) {
         try (Socket connection = new Socket()) {
             connection.connect(new InetSocketAddress(hostname, port), PING_TIMEOUT);
             connection.close();
@@ -203,7 +207,7 @@ public class RequestUtils {
         }
     }
 
-    private static CloseableHttpClient getHttpClient(boolean trustAnyCA) {
+    protected CloseableHttpClient getHttpClient(boolean trustAnyCA) {
         HttpClientBuilder builder = HttpClientBuilder.create()
                 .disableAutomaticRetries()
                 .setDefaultRequestConfig(RequestConfig.custom()
@@ -222,7 +226,7 @@ public class RequestUtils {
         return builder.build();
     }
 
-    private static Map<String, Object> responseToMap(CloseableHttpResponse response)
+    protected Map<String, Object> responseToMap(CloseableHttpResponse response)
             throws IOException {
         Map<String, Object> requestResults = new HashMap<>();
         requestResults.put(STATUS_CODE, response.getStatusLine().getStatusCode());
@@ -234,7 +238,7 @@ public class RequestUtils {
         return requestResults;
     }
 
-    private static void closeClientAndResponse(CloseableHttpClient client, CloseableHttpResponse response) {
+    private void closeClientAndResponse(CloseableHttpClient client, CloseableHttpResponse response) {
         try {
             if (client != null) {
                 client.close();
@@ -246,11 +250,11 @@ public class RequestUtils {
         }
     }
 
-    public static Map<String, String> getRequestSubtypeDescriptions(String... subtypeKeys) {
+    public Map<String, String> getRequestSubtypeDescriptions(String... subtypeKeys) {
         return REQUEST_MESSAGE_BUILDER.getDescriptions(subtypeKeys);
     }
 
-    public static ConfigurationMessage createRequestConfigMsg(String result){
+    public ConfigurationMessage createRequestConfigMsg(String result) {
         return REQUEST_MESSAGE_BUILDER.buildMessage(result);
     }
 }

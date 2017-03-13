@@ -28,8 +28,6 @@ import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.DISCOVER
 import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.DISCOVER_SOURCES_ID;
 import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.UNKNOWN_ENDPOINT;
 import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.getCommonSourceSubtypeDescriptions;
-import static org.codice.ddf.admin.sources.opensearch.OpenSearchSourceUtils.discoverOpenSearchUrl;
-import static org.codice.ddf.admin.sources.opensearch.OpenSearchSourceUtils.getOpenSearchConfig;
 
 import java.util.List;
 import java.util.Map;
@@ -38,6 +36,7 @@ import org.codice.ddf.admin.api.config.sources.OpenSearchSourceConfiguration;
 import org.codice.ddf.admin.api.handler.ConfigurationMessage;
 import org.codice.ddf.admin.api.handler.method.ProbeMethod;
 import org.codice.ddf.admin.api.handler.report.ProbeReport;
+import org.codice.ddf.admin.sources.opensearch.OpenSearchSourceUtils;
 
 import com.google.common.collect.ImmutableList;
 
@@ -68,6 +67,8 @@ public class DiscoverOpenSearchSourceProbeMethod
 
     public static final List<String> RETURN_TYPES = ImmutableList.of(DISCOVERED_SOURCES);
 
+    private final OpenSearchSourceUtils openSearchSourceUtils;
+
     public DiscoverOpenSearchSourceProbeMethod() {
         super(OPENSEARCH_DISCOVER_SOURCES_ID,
                 DESCRIPTION,
@@ -77,6 +78,7 @@ public class DiscoverOpenSearchSourceProbeMethod
                 FAILURE_TYPES,
                 WARNING_TYPES,
                 RETURN_TYPES);
+        openSearchSourceUtils = new OpenSearchSourceUtils();
     }
 
     @Override
@@ -85,7 +87,7 @@ public class DiscoverOpenSearchSourceProbeMethod
         String un = configuration.sourceUserName();
         String pw = configuration.sourceUserPassword();
         if (testUrl == null) {
-            ProbeReport discoveryReport = discoverOpenSearchUrl(configuration.sourceHostName(),
+            ProbeReport discoveryReport = openSearchSourceUtils.discoverOpenSearchUrl(configuration.sourceHostName(),
                     configuration.sourcePort(),
                     un,
                     pw);
@@ -94,7 +96,7 @@ public class DiscoverOpenSearchSourceProbeMethod
             }
             testUrl = discoveryReport.getProbeResult(DISCOVERED_URL);
         }
-        return getOpenSearchConfig(testUrl, un, pw);
+        return openSearchSourceUtils.getOpenSearchConfig(testUrl, un, pw);
     }
 
     @Override

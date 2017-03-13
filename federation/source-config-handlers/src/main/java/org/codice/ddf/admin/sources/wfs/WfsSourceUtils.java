@@ -17,6 +17,7 @@ import static java.net.HttpURLConnection.HTTP_OK;
 import static org.codice.ddf.admin.api.handler.ConfigurationMessage.createInternalErrorMsg;
 import static org.codice.ddf.admin.api.services.WfsServiceProperties.WFS1_FACTORY_PID;
 import static org.codice.ddf.admin.api.services.WfsServiceProperties.WFS2_FACTORY_PID;
+import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.DISCOVERED_SOURCE;
 import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.DISCOVERED_SOURCES;
 import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.DISCOVERED_URL;
 import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.SOURCES_NAMESPACE_CONTEXT;
@@ -57,6 +58,16 @@ public class WfsSourceUtils {
 
     private static final String WFS_VERSION_EXP = "/wfs:WFS_Capabilities/attribute::version";
 
+    private final RequestUtils requestUtils;
+
+    public WfsSourceUtils() {
+        this(new RequestUtils());
+    }
+
+    public WfsSourceUtils(RequestUtils requestUtils) {
+        this.requestUtils = requestUtils;
+    }
+
     /**
      * Attempts to verify the given URL as a functional WFS endpoint
      * SUCCESS TYPES - VERIFIED_CAPABILITIES,
@@ -69,9 +80,10 @@ public class WfsSourceUtils {
      * @param password
      * @return report
      */
-    public static ProbeReport sendWfsCapabilitiesRequest(String url, String username,
+    public ProbeReport sendWfsCapabilitiesRequest(String url, String username,
             String password) {
-        ProbeReport requestResults = RequestUtils.sendGetRequest(url, username, password);
+        String reqUrl = url + GET_CAPABILITIES_PARAMS + ACCEPT_VERSION_PARAMS;
+        ProbeReport requestResults = requestUtils.sendGetRequest(reqUrl, username, password);
         if (requestResults.containsFailureMessages()) {
             return requestResults;
         }
@@ -98,11 +110,12 @@ public class WfsSourceUtils {
      * @param password
      * @return
      */
-    public static ProbeReport discoverWfsUrl(String hostname, int port, String username,
+    public ProbeReport discoverWfsUrl(String hostname, int port, String username,
             String password) {
         return URL_FORMATS.stream()
                 .map(formatUrl -> String.format(formatUrl, hostname, port))
-                .map(url -> sendWfsCapabilitiesRequest(url + GET_CAPABILITIES_PARAMS,
+                .map(url -> sendWfsCapabilitiesRequest(
+                        url,
                         username,
                         password))
                 .filter(report -> !report.containsFailureMessages())
@@ -122,9 +135,9 @@ public class WfsSourceUtils {
      * @param password
      * @return report
      */
-    public static ProbeReport getPreferredWfsConfig(String url, String username, String password) {
+    public ProbeReport getPreferredWfsConfig(String url, String username, String password) {
         ProbeReport requestReport = sendWfsCapabilitiesRequest(
-                url + GET_CAPABILITIES_PARAMS + ACCEPT_VERSION_PARAMS, username, password);
+                url, username, password);
 
         if (requestReport.containsFailureMessages()) {
             return requestReport;
@@ -158,9 +171,10 @@ public class WfsSourceUtils {
         }
         switch (wfsVersion) {
         case "2.0.0":
-            return results.probeResult(DISCOVERED_SOURCES,
-                    preferredConfig.factoryPid(WFS2_FACTORY_PID));
+            results.addMessage(createCommonSourceConfigMsg(DISCOVERED_SOURCE));
+            return results.probeResult(DISCOVERED_SOURCES, preferredConfig.factoryPid(WFS2_FACTORY_PID));
         case "1.0.0":
+            results.addMessage(createCommonSourceConfigMsg(DISCOVERED_SOURCE));
             return results.probeResult(DISCOVERED_SOURCES,
                     preferredConfig.factoryPid(WFS1_FACTORY_PID));
         default:

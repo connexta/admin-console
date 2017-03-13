@@ -25,21 +25,21 @@ import static org.codice.ddf.admin.sources.impl.test.SourceNameExistsTestMethod.
 import java.util.List;
 
 import org.codice.ddf.admin.api.config.sources.SourceConfiguration;
-import org.codice.ddf.admin.api.configurator.Configurator;
 import org.codice.ddf.admin.api.handler.ConfigurationMessage;
 import org.codice.ddf.admin.api.handler.method.TestMethod;
 import org.codice.ddf.admin.api.handler.report.Report;
 import org.codice.ddf.admin.api.validation.SourceValidationUtils;
+import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 
 public class SourceNameExistsWfsTestMethod extends TestMethod<SourceConfiguration> {
 
     public static final String WFS_SOURCE_EXISTS_ID = SOURCE_NAME_EXISTS_TEST_ID;
 
-    private final Configurator configurator;
+    private final ConfiguratorFactory configuratorFactory;
 
     private final SourceValidationUtils sourceValidationUtils;
 
-    public SourceNameExistsWfsTestMethod(Configurator configurator) {
+    public SourceNameExistsWfsTestMethod(ConfiguratorFactory configuratorFactory) {
         super(WFS_SOURCE_EXISTS_ID,
                 DESCRIPTION,
                 REQUIRED_FIELDS,
@@ -50,11 +50,7 @@ public class SourceNameExistsWfsTestMethod extends TestMethod<SourceConfiguratio
 
         this.sourceValidationUtils = new SourceValidationUtils();
 
-        if (configurator == null) {
-            this.configurator = new Configurator();
-        } else {
-            this.configurator = configurator;
-        }
+        this.configuratorFactory = configuratorFactory;
     }
 
     @Override
@@ -62,7 +58,7 @@ public class SourceNameExistsWfsTestMethod extends TestMethod<SourceConfiguratio
         List<ConfigurationMessage> results =
                 sourceValidationUtils.validateSourceName(configuration.sourceName(),
                         WFS_FACTORY_PIDS,
-                        configurator);
+                        configuratorFactory.getConfigurator());
 
         if (results.isEmpty()) {
             return new Report(buildMessage(SUCCESS_TYPES, FAILURE_TYPES, null, SUCCESSFUL_TEST));

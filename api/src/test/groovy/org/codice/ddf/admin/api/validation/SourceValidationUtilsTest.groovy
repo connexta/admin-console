@@ -1,8 +1,8 @@
 package org.codice.ddf.admin.api.validation
 
 import org.codice.ddf.admin.api.config.sources.SourceConfiguration
-import org.codice.ddf.admin.api.configurator.Configurator
 import org.codice.ddf.admin.api.handler.ConfigurationMessage
+import org.codice.ddf.admin.configurator.Configurator
 import spock.lang.Specification
 
 class SourceValidationUtilsTest extends Specification {

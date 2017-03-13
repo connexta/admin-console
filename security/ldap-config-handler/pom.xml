@@ -44,6 +44,14 @@
         Remove when project is merged to DDF and re-parented
         -->
 
+        <!--TODO: switch this to DDF-provided version of service when available-->
+        <dependency>
+            <groupId>org.codice.ddf.admin.beta</groupId>
+            <artifactId>configurator-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+
         <!--ldap connection dependencies-->
         <dependency>
             <groupId>org.codice.org.forgerock.opendj</groupId>

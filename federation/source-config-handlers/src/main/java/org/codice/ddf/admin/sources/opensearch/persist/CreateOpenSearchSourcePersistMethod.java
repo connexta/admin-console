@@ -30,12 +30,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.codice.ddf.admin.api.config.sources.OpenSearchSourceConfiguration;
-import org.codice.ddf.admin.api.configurator.Configurator;
-import org.codice.ddf.admin.api.configurator.OperationReport;
 import org.codice.ddf.admin.api.handler.ConfigurationHandler;
 import org.codice.ddf.admin.api.handler.ConfigurationMessage;
 import org.codice.ddf.admin.api.handler.method.PersistMethod;
 import org.codice.ddf.admin.api.handler.report.Report;
+import org.codice.ddf.admin.configurator.Configurator;
+import org.codice.ddf.admin.configurator.ConfiguratorFactory;
+import org.codice.ddf.admin.configurator.OperationReport;
 
 import com.google.common.collect.ImmutableList;
 
@@ -51,12 +52,18 @@ public class CreateOpenSearchSourcePersistMethod
     private static final List<String> OPTIONAL_FIELDS = ImmutableList.of(SOURCE_USERNAME,
             SOURCE_USER_PASSWORD);
 
-    private static final Map<String, String> SUCCESS_TYPES = getCommonSourceSubtypeDescriptions(SUCCESSFUL_CREATE);
-    private static final Map<String, String> FAILURE_TYPES = getCommonSourceSubtypeDescriptions(FAILED_CREATE);
+    private static final Map<String, String> SUCCESS_TYPES = getCommonSourceSubtypeDescriptions(
+            SUCCESSFUL_CREATE);
+
+    private static final Map<String, String> FAILURE_TYPES = getCommonSourceSubtypeDescriptions(
+            FAILED_CREATE);
 
     private final ConfigurationHandler handler;
 
-    public CreateOpenSearchSourcePersistMethod(ConfigurationHandler handler) {
+    private final ConfiguratorFactory configuratorFactory;
+
+    public CreateOpenSearchSourcePersistMethod(ConfigurationHandler handler,
+            ConfiguratorFactory configuratorFactory) {
         super(CREATE_OPENSEARCH_SOURCE_ID,
                 DESCRIPTION,
                 REQUIRED_FIELDS,
@@ -64,13 +71,14 @@ public class CreateOpenSearchSourcePersistMethod
                 SUCCESS_TYPES,
                 FAILURE_TYPES,
                 null);
+        this.configuratorFactory = configuratorFactory;
 
         this.handler = handler;
     }
 
     @Override
     public Report persist(OpenSearchSourceConfiguration configuration) {
-        Configurator configurator = new Configurator();
+        Configurator configurator = configuratorFactory.getConfigurator();
         configurator.createManagedService(configuration.factoryPid(),
                 openSearchConfigToServiceProps(configuration));
         OperationReport report = configurator.commit("OpenSearch source saved with details: {}",
@@ -78,9 +86,7 @@ public class CreateOpenSearchSourcePersistMethod
         return createReport(SUCCESS_TYPES,
                 FAILURE_TYPES,
                 null,
-                report.containsFailedResults() ?
-                        FAILED_CREATE :
-                        SUCCESSFUL_CREATE);
+                report.containsFailedResults() ? FAILED_CREATE : SUCCESSFUL_CREATE);
     }
 
     @Override

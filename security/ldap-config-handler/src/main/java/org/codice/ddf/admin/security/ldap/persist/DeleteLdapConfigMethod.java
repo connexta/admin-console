@@ -24,10 +24,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.codice.ddf.admin.api.config.ldap.LdapConfiguration;
-import org.codice.ddf.admin.api.configurator.Configurator;
-import org.codice.ddf.admin.api.configurator.OperationReport;
 import org.codice.ddf.admin.api.handler.method.PersistMethod;
 import org.codice.ddf.admin.api.handler.report.Report;
+import org.codice.ddf.admin.configurator.Configurator;
+import org.codice.ddf.admin.configurator.ConfiguratorFactory;
+import org.codice.ddf.admin.configurator.OperationReport;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -46,7 +47,9 @@ public class DeleteLdapConfigMethod extends PersistMethod<LdapConfiguration> {
     public static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(FAILED_PERSIST,
             "Unable to delete configuration.");
 
-    public DeleteLdapConfigMethod() {
+    private final ConfiguratorFactory configuratorFactory;
+
+    public DeleteLdapConfigMethod(ConfiguratorFactory configuratorFactory) {
         super(DELETE_CONFIG_ID,
                 DESCRIPTION,
                 REQUIRED_FIELDS,
@@ -54,11 +57,12 @@ public class DeleteLdapConfigMethod extends PersistMethod<LdapConfiguration> {
                 SUCCESS_TYPES,
                 FAILURE_TYPES,
                 null);
+        this.configuratorFactory = configuratorFactory;
     }
 
     @Override
     public Report persist(LdapConfiguration config) {
-        Configurator configurator = new Configurator();
+        Configurator configurator = configuratorFactory.getConfigurator();
         configurator.deleteManagedService(config.servicePid());
 
         OperationReport report =

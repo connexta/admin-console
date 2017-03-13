@@ -44,11 +44,28 @@ import com.google.common.collect.ImmutableList;
 public class DiscoverCswSourceProbeMethod extends ProbeMethod<CswSourceConfiguration> {
 
     public static final String CSW_DISCOVER_SOURCES_ID = DISCOVER_SOURCES_ID;
-    public static final String DESCRIPTION = "Attempts to discover a CSW endpoint based on a hostname and port using optional authentication information. If the \"endpointUrl\" is specified it will use this to create a configuration instead of discovering the url.";
-    public static final List<String> OPTIONAL_FIELDS = ImmutableList.of(SOURCE_HOSTNAME, PORT, ENDPOINT_URL, SOURCE_USERNAME, SOURCE_USER_PASSWORD, ENDPOINT_URL);
-    public static final Map<String, String> SUCCESS_TYPES = getCommonSourceSubtypeDescriptions(DISCOVERED_SOURCE);
-    public static final Map<String, String> FAILURE_TYPES = getCommonSourceSubtypeDescriptions(CERT_ERROR, UNKNOWN_ENDPOINT, CANNOT_CONNECT);
-    public static final Map<String, String> WARNING_TYPES = getCommonSourceSubtypeDescriptions(UNTRUSTED_CA);
+
+    public static final String DESCRIPTION =
+            "Attempts to discover a CSW endpoint based on a hostname and port using optional authentication information. If the \"endpointUrl\" is specified it will use this to create a configuration instead of discovering the url.";
+
+    public static final List<String> OPTIONAL_FIELDS = ImmutableList.of(SOURCE_HOSTNAME,
+            PORT,
+            ENDPOINT_URL,
+            SOURCE_USERNAME,
+            SOURCE_USER_PASSWORD,
+            ENDPOINT_URL);
+
+    public static final Map<String, String> SUCCESS_TYPES = getCommonSourceSubtypeDescriptions(
+            DISCOVERED_SOURCE);
+
+    public static final Map<String, String> FAILURE_TYPES = getCommonSourceSubtypeDescriptions(
+            CERT_ERROR,
+            UNKNOWN_ENDPOINT,
+            CANNOT_CONNECT);
+
+    public static final Map<String, String> WARNING_TYPES = getCommonSourceSubtypeDescriptions(
+            UNTRUSTED_CA);
+
     public static final List<String> RETURN_TYPES = ImmutableList.of(DISCOVERED_SOURCES);
 
     public DiscoverCswSourceProbeMethod() {
@@ -68,7 +85,10 @@ public class DiscoverCswSourceProbeMethod extends ProbeMethod<CswSourceConfigura
         String pw = configuration.sourceUserPassword();
         String testUrl = configuration.endpointUrl();
         if (testUrl == null) {
-            ProbeReport discoverEndpointReport = discoverCswUrl(configuration.sourceHostName(), configuration.sourcePort(), un, pw);
+            ProbeReport discoverEndpointReport = discoverCswUrl(configuration.sourceHostName(),
+                    configuration.sourcePort(),
+                    un,
+                    pw);
             if (discoverEndpointReport.containsFailureMessages()) {
                 return discoverEndpointReport;
             }

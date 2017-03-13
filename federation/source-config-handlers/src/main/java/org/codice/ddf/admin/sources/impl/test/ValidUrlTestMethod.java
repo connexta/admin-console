@@ -33,11 +33,16 @@ import com.google.common.collect.ImmutableList;
 public class ValidUrlTestMethod extends TestMethod<SourceConfiguration> {
 
     private static final String DESCRIPTION = "Attempts to connect to a given hostname and port";
+
     public static final String VALID_URL_TEST_ID = "valid-url";
 
     private static final List<String> REQUIRED_FIELDS = ImmutableList.of(SOURCE_HOSTNAME, PORT);
-    private static final Map<String, String> SUCCESS_TYPES = getRequestSubtypeDescriptions(CONNECTED);
-    private static final Map<String, String> FAILURE_TYPES = getRequestSubtypeDescriptions(CANNOT_CONNECT);
+
+    private static final Map<String, String> SUCCESS_TYPES =
+            getRequestSubtypeDescriptions(CONNECTED);
+
+    private static final Map<String, String> FAILURE_TYPES = getRequestSubtypeDescriptions(
+            CANNOT_CONNECT);
 
     public ValidUrlTestMethod() {
         super(VALID_URL_TEST_ID,

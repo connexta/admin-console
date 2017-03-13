@@ -30,10 +30,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.codice.ddf.admin.api.config.ldap.EmbeddedLdapConfiguration;
-import org.codice.ddf.admin.api.configurator.Configurator;
-import org.codice.ddf.admin.api.configurator.OperationReport;
 import org.codice.ddf.admin.api.handler.method.PersistMethod;
 import org.codice.ddf.admin.api.handler.report.Report;
+import org.codice.ddf.admin.configurator.Configurator;
+import org.codice.ddf.admin.configurator.ConfiguratorFactory;
+import org.codice.ddf.admin.configurator.OperationReport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,9 +59,9 @@ public class DefaultEmbeddedLdapPersistMethod extends PersistMethod<EmbeddedLdap
     public static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(FAILED_PERSIST,
             "Failed to start Embedded LDAP or install a default configuration file.");
 
-    private Configurator configurator;
+    private final Configurator configurator;
 
-    public DefaultEmbeddedLdapPersistMethod() {
+    public DefaultEmbeddedLdapPersistMethod(ConfiguratorFactory configuratorFactory) {
         super(DEFAULT_CONFIGURATIONS_ID,
                 DESCRIPTION,
                 REQUIRED_FIELDS,
@@ -69,7 +70,7 @@ public class DefaultEmbeddedLdapPersistMethod extends PersistMethod<EmbeddedLdap
                 FAILURE_TYPES,
                 null);
 
-        configurator = new Configurator();
+        this.configurator = configuratorFactory.getConfigurator();
     }
 
     @Override
@@ -103,12 +104,5 @@ public class DefaultEmbeddedLdapPersistMethod extends PersistMethod<EmbeddedLdap
                 FAILURE_TYPES,
                 null,
                 report.containsFailedResults() ? FAILED_PERSIST : SUCCESSFUL_PERSIST);
-    }
-
-    /*
-      For testing purposes only
-     */
-    protected void setConfigurator(Configurator configurator) {
-        this.configurator = configurator;
     }
 }

@@ -23,11 +23,11 @@ import java.util.Map;
 
 import org.codice.ddf.admin.api.config.ConfigurationType;
 import org.codice.ddf.admin.api.config.ldap.EmbeddedLdapConfiguration;
-import org.codice.ddf.admin.api.configurator.Configurator;
 import org.codice.ddf.admin.api.handler.DefaultConfigurationHandler;
 import org.codice.ddf.admin.api.handler.method.PersistMethod;
 import org.codice.ddf.admin.api.handler.method.ProbeMethod;
 import org.codice.ddf.admin.api.handler.method.TestMethod;
+import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.security.ldap.embedded.persist.DefaultEmbeddedLdapPersistMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +42,11 @@ public class EmbeddedLdapConfigurationHandler
     private static final String EMBEDDED_LDAP_CONFIGURATION_HANDLER_ID =
             EmbeddedLdapConfiguration.CONFIGURATION_TYPE;
 
-    private Configurator configurator = new Configurator();
+    private final ConfiguratorFactory configuratorFactory;
+
+    public EmbeddedLdapConfigurationHandler(ConfiguratorFactory configuratorFactory) {
+        this.configuratorFactory = configuratorFactory;
+    }
 
     @Override
     public List<ProbeMethod> getProbeMethods() {
@@ -55,13 +59,13 @@ public class EmbeddedLdapConfigurationHandler
     }
 
     public List<PersistMethod> getPersistMethods() {
-        return ImmutableList.of(new DefaultEmbeddedLdapPersistMethod());
+        return ImmutableList.of(new DefaultEmbeddedLdapPersistMethod(configuratorFactory));
     }
 
     @Override
     public List<EmbeddedLdapConfiguration> getConfigurations() {
-        Map<String, Object> serviceProps =
-                configurator.getConfig(EMBEDDED_LDAP_MANAGER_SERVICE_PID);
+        Map<String, Object> serviceProps = configuratorFactory.getConfigurator()
+                .getConfig(EMBEDDED_LDAP_MANAGER_SERVICE_PID);
         if (serviceProps == null) {
             LOGGER.debug(
                     "No service properties available for Embedded LDAP configuration. Returning empty list.");
@@ -78,12 +82,5 @@ public class EmbeddedLdapConfigurationHandler
     @Override
     public String getConfigurationHandlerId() {
         return EMBEDDED_LDAP_CONFIGURATION_HANDLER_ID;
-    }
-
-    /*
-      For testing purposes only.
-     */
-    protected void setConfigurator(Configurator configurator) {
-        this.configurator = configurator;
     }
 }

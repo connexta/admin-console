@@ -27,7 +27,7 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.codice.ddf.admin.api.config.ldap.LdapConfiguration;
-import org.codice.ddf.admin.api.configurator.Configurator;
+import org.codice.ddf.admin.configurator.Configurator;
 
 public class LdapClaimsHandlerServiceProperties {
 
@@ -62,8 +62,8 @@ public class LdapClaimsHandlerServiceProperties {
     public static final String PROPERTY_FILE_LOCATION = "propertyFileLocation";
     // ---
 
-    public static LdapConfiguration ldapClaimsHandlerServiceToLdapConfig(
-            Map<String, Object> props) {
+    public static LdapConfiguration ldapClaimsHandlerServiceToLdapConfig(Map<String, Object> props,
+            Configurator configurator) {
         LdapConfiguration config = new LdapConfiguration();
         config.servicePid(
                 props.get(SERVICE_PID_KEY) == null ? null : (String) props.get(SERVICE_PID_KEY));
@@ -92,7 +92,7 @@ public class LdapClaimsHandlerServiceProperties {
         config.attributeMappingsPath(attributeMappingsPath);
 
         if (StringUtils.isNotEmpty(attributeMappingsPath)) {
-            Map<String, String> attributeMappings = new HashMap<>(new Configurator().getProperties(
+            Map<String, String> attributeMappings = new HashMap<>(configurator.getProperties(
                     Paths.get(attributeMappingsPath)));
             config.attributeMappings(attributeMappings);
         }

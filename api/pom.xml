@@ -39,7 +39,13 @@
             <version>${ddf.version}</version>
             <scope>provided</scope>
         </dependency>
-        
+
+        <!--TODO: switch this to DDF-provided version of service when available-->
+        <dependency>
+            <groupId>org.codice.ddf.admin.beta</groupId>
+            <artifactId>configurator-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <!--todo these ldap dependencies to be removed when ldap is yanked out of this module-->
         <dependency>
@@ -150,12 +156,12 @@
                                         <limit>
                                             <counter>BRANCH</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.44</minimum>
+                                            <minimum>0.45</minimum>
                                         </limit>
                                         <limit>
                                             <counter>COMPLEXITY</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.42</minimum>
+                                            <minimum>0.38</minimum>
                                         </limit>
                                     </limits>
                                 </rule>

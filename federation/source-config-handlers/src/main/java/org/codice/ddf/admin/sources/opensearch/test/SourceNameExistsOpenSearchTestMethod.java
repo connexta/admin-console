@@ -26,21 +26,21 @@ import java.util.Collections;
 import java.util.List;
 
 import org.codice.ddf.admin.api.config.sources.SourceConfiguration;
-import org.codice.ddf.admin.api.configurator.Configurator;
 import org.codice.ddf.admin.api.handler.ConfigurationMessage;
 import org.codice.ddf.admin.api.handler.method.TestMethod;
 import org.codice.ddf.admin.api.handler.report.Report;
 import org.codice.ddf.admin.api.validation.SourceValidationUtils;
+import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 
 public class SourceNameExistsOpenSearchTestMethod extends TestMethod<SourceConfiguration> {
 
     public static final String OPENSEARCH_SOURCE_EXISTS_ID = SOURCE_NAME_EXISTS_TEST_ID;
 
-    private final Configurator configurator;
+    private final ConfiguratorFactory configuratorFactory;
 
     private final SourceValidationUtils sourceValidationUtils;
 
-    public SourceNameExistsOpenSearchTestMethod(Configurator configurator) {
+    public SourceNameExistsOpenSearchTestMethod(ConfiguratorFactory configuratorFactory) {
         super(OPENSEARCH_SOURCE_EXISTS_ID,
                 DESCRIPTION,
                 REQUIRED_FIELDS,
@@ -51,11 +51,7 @@ public class SourceNameExistsOpenSearchTestMethod extends TestMethod<SourceConfi
 
         sourceValidationUtils = new SourceValidationUtils();
 
-        if (configurator == null) {
-            this.configurator = new Configurator();
-        } else {
-            this.configurator = configurator;
-        }
+        this.configuratorFactory = configuratorFactory;
     }
 
     @Override
@@ -63,7 +59,7 @@ public class SourceNameExistsOpenSearchTestMethod extends TestMethod<SourceConfi
         List<ConfigurationMessage> results =
                 sourceValidationUtils.validateSourceName(configuration.sourceName(),
                         Collections.singletonList(OPENSEARCH_FACTORY_PID),
-                        configurator);
+                        configuratorFactory.getConfigurator());
 
         if (results.isEmpty()) {
             return new Report(buildMessage(SUCCESS_TYPES, FAILURE_TYPES, null, SUCCESSFUL_TEST));

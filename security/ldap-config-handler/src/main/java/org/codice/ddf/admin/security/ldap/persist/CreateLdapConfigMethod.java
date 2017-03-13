@@ -51,11 +51,12 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.codice.ddf.admin.api.config.ldap.LdapConfiguration;
-import org.codice.ddf.admin.api.configurator.Configurator;
-import org.codice.ddf.admin.api.configurator.OperationReport;
 import org.codice.ddf.admin.api.handler.ConfigurationMessage;
 import org.codice.ddf.admin.api.handler.method.PersistMethod;
 import org.codice.ddf.admin.api.handler.report.Report;
+import org.codice.ddf.admin.configurator.Configurator;
+import org.codice.ddf.admin.configurator.ConfiguratorFactory;
+import org.codice.ddf.admin.configurator.OperationReport;
 import org.codice.ddf.admin.security.ldap.test.LdapTestingCommons;
 
 import com.google.common.collect.ImmutableList;
@@ -91,7 +92,9 @@ public class CreateLdapConfigMethod extends PersistMethod<LdapConfiguration> {
     public static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(FAILED_PERSIST,
             "Unable to persist changes.");
 
-    public CreateLdapConfigMethod() {
+    private final ConfiguratorFactory configuratorFactory;
+
+    public CreateLdapConfigMethod(ConfiguratorFactory configuratorFactory) {
         super(LDAP_CREATE_ID,
                 DESCRIPTION,
                 LOGIN_REQUIRED_FIELDS,
@@ -99,19 +102,21 @@ public class CreateLdapConfigMethod extends PersistMethod<LdapConfiguration> {
                 SUCCESS_TYPES,
                 FAILURE_TYPES,
                 null);
+        this.configuratorFactory = configuratorFactory;
     }
 
     @Override
     public Report persist(LdapConfiguration config) {
         if (!config.ignoreWarnings()) {
-            List<ConfigurationMessage> warnings = LdapTestingCommons.ldapConnectionExists(config);
+            List<ConfigurationMessage> warnings = LdapTestingCommons.ldapConnectionExists(config,
+                    configuratorFactory);
             if (!warnings.isEmpty()) {
                 return new Report(warnings);
             }
         }
 
         OperationReport report;
-        Configurator configurator = new Configurator();
+        Configurator configurator = configuratorFactory.getConfigurator();
         if (config.ldapUseCase()
                 .equals(AUTHENTICATION) || config.ldapUseCase()
                 .equals(AUTHENTICATION_AND_ATTRIBUTE_STORE)) {

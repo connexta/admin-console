@@ -40,10 +40,11 @@ import java.util.Map;
 
 import org.codice.ddf.admin.api.config.context.ContextPolicyConfiguration;
 import org.codice.ddf.admin.api.config.ldap.LdapConfiguration;
-import org.codice.ddf.admin.api.configurator.Configurator;
 import org.codice.ddf.admin.api.handler.ConfigurationHandler;
 import org.codice.ddf.admin.api.handler.method.ProbeMethod;
 import org.codice.ddf.admin.api.handler.report.ProbeReport;
+import org.codice.ddf.admin.configurator.Configurator;
+import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,13 +75,15 @@ public class AvailableOptionsProbeMethod extends ProbeMethod<ContextPolicyConfig
             AUTH_TYPES_KEY,
             CLAIMS_KEY);
 
-    private Configurator configurator = new Configurator();
-
     private ConfigurationHandler ldapConfigHandler;
 
-    public AvailableOptionsProbeMethod(ConfigurationHandler ldapConfigHandler) {
+    private final Configurator configurator;
+
+    public AvailableOptionsProbeMethod(ConfigurationHandler ldapConfigHandler,
+            ConfiguratorFactory configuratorFactory) {
         super(ID, DESCRIPTION, null, null, SUCCESS_TYPES, FAILED_TYPES, null, RETURN_TYPES);
         this.ldapConfigHandler = ldapConfigHandler;
+        configurator = configuratorFactory.getConfigurator();
     }
 
     @Override
@@ -132,8 +135,7 @@ public class AvailableOptionsProbeMethod extends ProbeMethod<ContextPolicyConfig
     }
 
     public Object getClaims() {
-        Map<String, Object> stsConfig = new Configurator().getConfig(
-                STS_CLAIMS_CONFIGURATION_CONFIG_ID);
+        Map<String, Object> stsConfig = configurator.getConfig(STS_CLAIMS_CONFIGURATION_CONFIG_ID);
         return stsConfig == null ? null : stsConfig.get(STS_CLAIMS_PROPS_KEY_CLAIMS);
     }
 }

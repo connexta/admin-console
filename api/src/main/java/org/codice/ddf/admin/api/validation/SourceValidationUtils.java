@@ -34,13 +34,12 @@ import javax.annotation.Nonnull;
 
 import org.apache.commons.lang.StringUtils;
 import org.codice.ddf.admin.api.config.sources.SourceConfiguration;
-import org.codice.ddf.admin.api.configurator.Configurator;
 import org.codice.ddf.admin.api.handler.ConfigurationMessage;
+import org.codice.ddf.admin.configurator.Configurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SourceValidationUtils {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(SourceValidationUtils.class);
 
     public static List<ConfigurationMessage> validateSourceFactoryPid(String factoryPid,
@@ -81,10 +80,6 @@ public class SourceValidationUtils {
         List<ConfigurationMessage> errors = validateString(sourceName, SOURCE_NAME);
         if(!errors.isEmpty()) {
             return errors;
-        }
-
-        if (configurator == null) {
-            configurator = new Configurator();
         }
 
         List<Map<String, Map<String, Object>>> configurations = factoryPids.stream()

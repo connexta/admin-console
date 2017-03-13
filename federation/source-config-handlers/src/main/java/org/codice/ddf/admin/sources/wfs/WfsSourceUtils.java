@@ -46,8 +46,7 @@ public class WfsSourceUtils {
     private static final List<String> WFS_MIME_TYPES = ImmutableList.of("text/xml",
             "application/xml",
             "text/xml; charset=UTF-8",
-            "application/xml; charset=UTF-8"
-    );
+            "application/xml; charset=UTF-8");
 
     private static final String ACCEPT_VERSION_PARAMS = "&AcceptVersions=2.0.0,1.0.0";
 
@@ -64,12 +63,14 @@ public class WfsSourceUtils {
      * FAILURE TYPES - CANNOT_CONNECT, CERT_ERROR, UNKNOWN_ENDPOINT
      * WARNING TYPES - UNTRUSTED_CA
      * RETURN TYPES -  CONTENT_TYPE, CONTENT, STATUS_CODE
+     *
      * @param url
      * @param username
      * @param password
      * @return report
      */
-    public static ProbeReport sendWfsCapabilitiesRequest(String url, String username, String password) {
+    public static ProbeReport sendWfsCapabilitiesRequest(String url, String username,
+            String password) {
         ProbeReport requestResults = RequestUtils.sendGetRequest(url, username, password);
         if (requestResults.containsFailureMessages()) {
             return requestResults;
@@ -90,16 +91,20 @@ public class WfsSourceUtils {
      * FAILURE TYPES - UNKNOWN_ENDPOINT
      * WARNING TYPES - UNTRUSTED_CA
      * RETURN TYPES - DISCOVERED_URL
+     *
      * @param hostname
      * @param port
      * @param username
      * @param password
      * @return
      */
-    public static ProbeReport discoverWfsUrl(String hostname, int port, String username, String password) {
+    public static ProbeReport discoverWfsUrl(String hostname, int port, String username,
+            String password) {
         return URL_FORMATS.stream()
                 .map(formatUrl -> String.format(formatUrl, hostname, port))
-                .map(url -> sendWfsCapabilitiesRequest(url + GET_CAPABILITIES_PARAMS, username, password))
+                .map(url -> sendWfsCapabilitiesRequest(url + GET_CAPABILITIES_PARAMS,
+                        username,
+                        password))
                 .filter(report -> !report.containsFailureMessages())
                 .findFirst()
                 .orElse(new ProbeReport(createCommonSourceConfigMsg(UNKNOWN_ENDPOINT)));
@@ -131,26 +136,33 @@ public class WfsSourceUtils {
         try {
             capabilitiesXml = createDocument(requestBody);
         } catch (Exception e) {
-            return results.addMessage(createInternalErrorMsg("Unable to read response from endpoint."));
+            return results.addMessage(createInternalErrorMsg(
+                    "Unable to read response from endpoint."));
         }
 
         WfsSourceConfiguration preferredConfig = new WfsSourceConfiguration();
         preferredConfig.configurationHandlerId(WFS_SOURCE_CONFIGURATION_HANDLER_ID);
-        preferredConfig.endpointUrl(url).sourceUserName(username).sourceUserPassword(password);
+        preferredConfig.endpointUrl(url)
+                .sourceUserName(username)
+                .sourceUserPassword(password);
 
-        XPath xpath = XPathFactory.newInstance().newXPath();
+        XPath xpath = XPathFactory.newInstance()
+                .newXPath();
         xpath.setNamespaceContext(SOURCES_NAMESPACE_CONTEXT);
         String wfsVersion;
         try {
-            wfsVersion = xpath.compile(WFS_VERSION_EXP).evaluate(capabilitiesXml);
+            wfsVersion = xpath.compile(WFS_VERSION_EXP)
+                    .evaluate(capabilitiesXml);
         } catch (XPathExpressionException e) {
             return results.addMessage(createInternalErrorMsg("Unable to parse XML response."));
         }
         switch (wfsVersion) {
         case "2.0.0":
-            return results.probeResult(DISCOVERED_SOURCES, preferredConfig.factoryPid(WFS2_FACTORY_PID));
+            return results.probeResult(DISCOVERED_SOURCES,
+                    preferredConfig.factoryPid(WFS2_FACTORY_PID));
         case "1.0.0":
-            return results.probeResult(DISCOVERED_SOURCES, preferredConfig.factoryPid(WFS1_FACTORY_PID));
+            return results.probeResult(DISCOVERED_SOURCES,
+                    preferredConfig.factoryPid(WFS1_FACTORY_PID));
         default:
             return results.addMessage(createCommonSourceConfigMsg(UNKNOWN_ENDPOINT));
         }

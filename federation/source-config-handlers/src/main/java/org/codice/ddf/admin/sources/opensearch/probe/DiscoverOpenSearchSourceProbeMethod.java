@@ -41,14 +41,31 @@ import org.codice.ddf.admin.api.handler.report.ProbeReport;
 
 import com.google.common.collect.ImmutableList;
 
-public class DiscoverOpenSearchSourceProbeMethod extends ProbeMethod<OpenSearchSourceConfiguration> {
+public class DiscoverOpenSearchSourceProbeMethod
+        extends ProbeMethod<OpenSearchSourceConfiguration> {
 
     public static final String OPENSEARCH_DISCOVER_SOURCES_ID = DISCOVER_SOURCES_ID;
-    public static final String DESCRIPTION = "Attempts to discover an OpenSearch endpoint based on a hostname and port using optional authentication information. If the \"endpointUrl\" is specified it will use this to create a configuration instead of discovering the url.";
-    public static final List<String> OPTIONAL_FIELDS = ImmutableList.of(SOURCE_HOSTNAME, PORT, ENDPOINT_URL, SOURCE_USERNAME, SOURCE_USER_PASSWORD);
-    public static final Map<String, String> SUCCESS_TYPES = getCommonSourceSubtypeDescriptions(DISCOVERED_SOURCE);
-    public static final Map<String, String> FAILURE_TYPES = getCommonSourceSubtypeDescriptions(CERT_ERROR, UNKNOWN_ENDPOINT, CANNOT_CONNECT);
-    public static final Map<String, String> WARNING_TYPES = getCommonSourceSubtypeDescriptions(UNTRUSTED_CA);
+
+    public static final String DESCRIPTION =
+            "Attempts to discover an OpenSearch endpoint based on a hostname and port using optional authentication information. If the \"endpointUrl\" is specified it will use this to create a configuration instead of discovering the url.";
+
+    public static final List<String> OPTIONAL_FIELDS = ImmutableList.of(SOURCE_HOSTNAME,
+            PORT,
+            ENDPOINT_URL,
+            SOURCE_USERNAME,
+            SOURCE_USER_PASSWORD);
+
+    public static final Map<String, String> SUCCESS_TYPES = getCommonSourceSubtypeDescriptions(
+            DISCOVERED_SOURCE);
+
+    public static final Map<String, String> FAILURE_TYPES = getCommonSourceSubtypeDescriptions(
+            CERT_ERROR,
+            UNKNOWN_ENDPOINT,
+            CANNOT_CONNECT);
+
+    public static final Map<String, String> WARNING_TYPES = getCommonSourceSubtypeDescriptions(
+            UNTRUSTED_CA);
+
     public static final List<String> RETURN_TYPES = ImmutableList.of(DISCOVERED_SOURCES);
 
     public DiscoverOpenSearchSourceProbeMethod() {
@@ -81,7 +98,8 @@ public class DiscoverOpenSearchSourceProbeMethod extends ProbeMethod<OpenSearchS
     }
 
     @Override
-    public List<ConfigurationMessage> validateOptionalFields(OpenSearchSourceConfiguration configuration) {
+    public List<ConfigurationMessage> validateOptionalFields(
+            OpenSearchSourceConfiguration configuration) {
         return validateForSourceDiscovery(configuration);
     }
 }

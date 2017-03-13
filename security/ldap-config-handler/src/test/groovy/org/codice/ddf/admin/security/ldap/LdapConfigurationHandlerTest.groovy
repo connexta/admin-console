@@ -14,6 +14,7 @@
 package org.codice.ddf.admin.security.ldap
 
 import org.codice.ddf.admin.api.config.ldap.LdapConfiguration
+import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.security.ldap.persist.CreateLdapConfigMethod
 import org.codice.ddf.admin.security.ldap.persist.DeleteLdapConfigMethod
 import org.codice.ddf.admin.security.ldap.probe.DefaultDirectoryStructureProbe
@@ -27,9 +28,11 @@ import spock.lang.Specification
 
 class LdapConfigurationHandlerTest extends Specification {
     LdapConfigurationHandler handler
+    ConfiguratorFactory configuratorFactory
 
     def setup() {
-        handler = new LdapConfigurationHandler()
+        configuratorFactory = Mock(ConfiguratorFactory)
+        handler = new LdapConfigurationHandler(configuratorFactory)
     }
 
     def 'test config handler id'() {

@@ -44,11 +44,27 @@ import com.google.common.collect.ImmutableList;
 public class DiscoverWfsSourceProbeMethod extends ProbeMethod<WfsSourceConfiguration> {
 
     public static final String WFS_DISCOVER_SOURCES_ID = DISCOVER_SOURCES_ID;
-    public static final String DESCRIPTION = "Attempts to discover a WFS endpoint based on a hostname and port using optional authentication information. If the \"endpointUrl\" is specified it will use this to create a configuration instead of discovering the url.";
-    public static final List<String> OPTIONAL_FIELDS = ImmutableList.of(SOURCE_HOSTNAME, PORT, ENDPOINT_URL, SOURCE_USERNAME, SOURCE_USER_PASSWORD);
-    public static final Map<String, String> SUCCESS_TYPES = getCommonSourceSubtypeDescriptions(DISCOVERED_SOURCE);
-    public static final Map<String, String> FAILURE_TYPES = getCommonSourceSubtypeDescriptions(CANNOT_CONNECT, UNKNOWN_ENDPOINT, CERT_ERROR);
-    public static final Map<String, String> WARNING_TYPES = getCommonSourceSubtypeDescriptions(UNTRUSTED_CA);
+
+    public static final String DESCRIPTION =
+            "Attempts to discover a WFS endpoint based on a hostname and port using optional authentication information. If the \"endpointUrl\" is specified it will use this to create a configuration instead of discovering the url.";
+
+    public static final List<String> OPTIONAL_FIELDS = ImmutableList.of(SOURCE_HOSTNAME,
+            PORT,
+            ENDPOINT_URL,
+            SOURCE_USERNAME,
+            SOURCE_USER_PASSWORD);
+
+    public static final Map<String, String> SUCCESS_TYPES = getCommonSourceSubtypeDescriptions(
+            DISCOVERED_SOURCE);
+
+    public static final Map<String, String> FAILURE_TYPES = getCommonSourceSubtypeDescriptions(
+            CANNOT_CONNECT,
+            UNKNOWN_ENDPOINT,
+            CERT_ERROR);
+
+    public static final Map<String, String> WARNING_TYPES = getCommonSourceSubtypeDescriptions(
+            UNTRUSTED_CA);
+
     public static final List<String> RETURN_TYPES = ImmutableList.of(DISCOVERED_SOURCES);
 
     public DiscoverWfsSourceProbeMethod() {
@@ -68,8 +84,10 @@ public class DiscoverWfsSourceProbeMethod extends ProbeMethod<WfsSourceConfigura
         String pw = configuration.sourceUserPassword();
         String testUrl = configuration.endpointUrl();
         if (testUrl == null) {
-            ProbeReport discoverEndpointReport = discoverWfsUrl(
-                    configuration.sourceHostName(), configuration.sourcePort(), un, pw);
+            ProbeReport discoverEndpointReport = discoverWfsUrl(configuration.sourceHostName(),
+                    configuration.sourcePort(),
+                    un,
+                    pw);
             if (discoverEndpointReport.containsFailureMessages()) {
                 return discoverEndpointReport;
             }

@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 import org.codice.ddf.admin.api.config.ConfigurationType;
 import org.codice.ddf.admin.api.config.sources.OpenSearchSourceConfiguration;
 import org.codice.ddf.admin.api.config.sources.SourceConfiguration;
-import org.codice.ddf.admin.api.configurator.Configurator;
 import org.codice.ddf.admin.api.handler.ConfigurationHandler;
 import org.codice.ddf.admin.api.handler.DefaultConfigurationHandler;
 import org.codice.ddf.admin.api.handler.SourceConfigurationHandler;
@@ -34,6 +33,8 @@ import org.codice.ddf.admin.api.handler.method.TestMethod;
 import org.codice.ddf.admin.api.handler.report.ProbeReport;
 import org.codice.ddf.admin.api.handler.report.Report;
 import org.codice.ddf.admin.api.services.OpenSearchServiceProperties;
+import org.codice.ddf.admin.configurator.Configurator;
+import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.sources.opensearch.persist.CreateOpenSearchSourcePersistMethod;
 import org.codice.ddf.admin.sources.opensearch.persist.DeleteOpenSearchSourcePersistMethod;
 import org.codice.ddf.admin.sources.opensearch.probe.DiscoverOpenSearchSourceProbeMethod;
@@ -48,8 +49,12 @@ public class OpenSearchSourceConfigurationHandler
 
     private final ConfigurationHandler handler;
 
-    public OpenSearchSourceConfigurationHandler(ConfigurationHandler handler) {
+    private final ConfiguratorFactory configuratorFactory;
+
+    public OpenSearchSourceConfigurationHandler(ConfigurationHandler handler,
+            ConfiguratorFactory configuratorFactory) {
         this.handler = handler;
+        this.configuratorFactory = configuratorFactory;
     }
 
     @Override
@@ -59,13 +64,14 @@ public class OpenSearchSourceConfigurationHandler
 
     @Override
     public List<TestMethod> getTestMethods() {
-        return Collections.singletonList(new SourceNameExistsOpenSearchTestMethod(new Configurator()));
+        return Collections.singletonList(new SourceNameExistsOpenSearchTestMethod(
+                configuratorFactory));
     }
 
     @Override
     public List<PersistMethod> getPersistMethods() {
-        return Arrays.asList(new CreateOpenSearchSourcePersistMethod(handler),
-                new DeleteOpenSearchSourcePersistMethod());
+        return Arrays.asList(new CreateOpenSearchSourcePersistMethod(handler, configuratorFactory),
+                new DeleteOpenSearchSourcePersistMethod(configuratorFactory));
     }
 
     @Override
@@ -85,7 +91,7 @@ public class OpenSearchSourceConfigurationHandler
 
     @Override
     public List<SourceConfiguration> getConfigurations() {
-        Configurator configurator = new Configurator();
+        Configurator configurator = configuratorFactory.getConfigurator();
         return configurator.getManagedServiceConfigs(OPENSEARCH_FACTORY_PID)
                 .values()
                 .stream()

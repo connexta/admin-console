@@ -369,6 +369,8 @@
      Remove when project is merged to DDF and re-parented
      -->
     <modules>
+        <!-- TODO Remove when upgrading to DDF that provides configurator -->
+        <module>configurator</module>
         <module>api</module>
         <module>config-handler-router</module>
         <module>security</module>

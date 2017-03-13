@@ -27,6 +27,7 @@
     <bean id="cswConfigurationHandler"
           class="org.codice.ddf.admin.sources.csw.CswSourceConfigurationHandler">
         <argument ref="sourceConfigurationHandler"/>
+        <argument ref="configuratorFactory"/>
     </bean>
     <service ref="cswConfigurationHandler">
         <interfaces>
@@ -38,6 +39,7 @@
     <bean id="wfsConfigurationHandler"
           class="org.codice.ddf.admin.sources.wfs.WfsSourceConfigurationHandler">
         <argument ref="sourceConfigurationHandler"/>
+        <argument ref="configuratorFactory"/>
     </bean>
     <service ref="wfsConfigurationHandler">
         <interfaces>
@@ -49,6 +51,7 @@
     <bean id="openSearchConfigurationHandler"
           class="org.codice.ddf.admin.sources.opensearch.OpenSearchSourceConfigurationHandler">
         <argument ref="sourceConfigurationHandler"/>
+        <argument ref="configuratorFactory"/>
     </bean>
     <service ref="openSearchConfigurationHandler">
         <interfaces>
@@ -61,4 +64,7 @@
                     interface="org.codice.ddf.admin.api.handler.SourceConfigurationHandler"
                     availability="optional"/>
 
+    <reference id="configuratorFactory"
+               interface="org.codice.ddf.admin.configurator.ConfiguratorFactory"
+               availability="mandatory" filter="(type=txact)"/>
 </blueprint>

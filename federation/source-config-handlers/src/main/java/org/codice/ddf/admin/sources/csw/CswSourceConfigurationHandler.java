@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
 import org.codice.ddf.admin.api.config.ConfigurationType;
 import org.codice.ddf.admin.api.config.sources.CswSourceConfiguration;
 import org.codice.ddf.admin.api.config.sources.SourceConfiguration;
-import org.codice.ddf.admin.api.configurator.Configurator;
 import org.codice.ddf.admin.api.handler.ConfigurationHandler;
 import org.codice.ddf.admin.api.handler.DefaultConfigurationHandler;
 import org.codice.ddf.admin.api.handler.SourceConfigurationHandler;
@@ -33,6 +32,8 @@ import org.codice.ddf.admin.api.handler.method.TestMethod;
 import org.codice.ddf.admin.api.handler.report.ProbeReport;
 import org.codice.ddf.admin.api.handler.report.Report;
 import org.codice.ddf.admin.api.services.CswServiceProperties;
+import org.codice.ddf.admin.configurator.Configurator;
+import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.sources.csw.persist.CreateCswSourcePersistMethod;
 import org.codice.ddf.admin.sources.csw.persist.DeleteCswSourcePersistMethod;
 import org.codice.ddf.admin.sources.csw.probe.DiscoverCswSourceProbeMethod;
@@ -46,8 +47,12 @@ public class CswSourceConfigurationHandler extends DefaultConfigurationHandler<S
 
     private final ConfigurationHandler handler;
 
-    public CswSourceConfigurationHandler(ConfigurationHandler handler) {
+    private final ConfiguratorFactory configuratorFactory;
+
+    public CswSourceConfigurationHandler(ConfigurationHandler handler,
+            ConfiguratorFactory configuratorFactory) {
         this.handler = handler;
+        this.configuratorFactory = configuratorFactory;
     }
 
     @Override
@@ -57,13 +62,13 @@ public class CswSourceConfigurationHandler extends DefaultConfigurationHandler<S
 
     @Override
     public List<TestMethod> getTestMethods() {
-        return Collections.singletonList(new SourceNameExistsCswTestMethod(new Configurator()));
+        return Collections.singletonList(new SourceNameExistsCswTestMethod(configuratorFactory));
     }
 
     @Override
     public List<PersistMethod> getPersistMethods() {
-        return Arrays.asList(new CreateCswSourcePersistMethod(handler),
-                new DeleteCswSourcePersistMethod());
+        return Arrays.asList(new CreateCswSourcePersistMethod(handler, configuratorFactory),
+                new DeleteCswSourcePersistMethod(configuratorFactory));
     }
 
     @Override
@@ -83,7 +88,7 @@ public class CswSourceConfigurationHandler extends DefaultConfigurationHandler<S
 
     @Override
     public List<SourceConfiguration> getConfigurations() {
-        Configurator configurator = new Configurator();
+        Configurator configurator = configuratorFactory.getConfigurator();
         return CSW_FACTORY_PIDS.stream()
                 .flatMap(factoryPid -> configurator.getManagedServiceConfigs(factoryPid)
                         .values()

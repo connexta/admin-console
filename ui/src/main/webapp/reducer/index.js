@@ -40,5 +40,6 @@ export const getOptions = (state) => webContext.getOptions(state.get('wcpm'))
 export const getEditingBinNumber = (state) => webContext.getEditingBinNumber(state.get('wcpm'))
 export const getConfirmDelete = (state) => webContext.getConfirmDelete(state.get('wcpm'))
 export const getWcpmErrors = (state) => webContext.getWcpmErrors(state.get('wcpm'))
+export const hasPath = (state, path, binNumber) => webContext.hasPath(state.get('wcpm'), path, binNumber)
 
 export default combineReducers({ fetch, wizard, backendError, sourceWizard, home, wcpm, polling, systemUsage })

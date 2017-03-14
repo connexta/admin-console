@@ -1,4 +1,4 @@
-import { getBins } from '../../reducer'
+import {getBins, hasPath} from '../../reducer'
 import { get, post } from 'redux-fetch'
 
 // Bin level
@@ -94,6 +94,12 @@ export const updatePolicyBins = (url) => async (dispatch) => {
 const isBlank = (string) => { return !string || !string.trim() }
 const errorResult = (scope, message) => ({ scope, message })
 
+const checkForRootContextPath = (state) => {
+  return hasPath(state, '/')
+        ? []
+        : [errorResult('general', 'Cannot remove root context path.')]
+}
+
 const checkContextPathValidity = (bin) => {
   let errors = []
 
@@ -149,12 +155,17 @@ const checkRequiredAttributesValidity = (bin) => {
 export const persistChanges = (binNumber, url, isDeleting) => async (dispatch, getState) => {
   dispatch(clearAllErrors())
   // Check for non-empty edit fields
+  // Todo: fix so state internals are not exposed here
   const bin = getBins(getState())[getState().toJS().wcpm.editingBinNumber]
 
   // do not perform field validation checks if bin is being removed
   if (!isDeleting) {
     let hasErrors = false
 
+    checkForRootContextPath(getState()).forEach((error) => {
+      hasErrors = true
+      dispatch(setError(error))
+    })
     checkContextPathValidity(bin).forEach((error) => {
       hasErrors = true
       dispatch(setError(error))
@@ -224,7 +235,12 @@ export const fetchOptions = (url) => async (dispatch, getState) => {
   }
 }
 
-export const confirmRemoveBinAndPersist = (binNumber, url) => (dispatch) => {
+export const confirmRemoveBinAndPersist = (binNumber, url) => async(dispatch, getState) => {
+  if (hasPath(getState(), '/', binNumber)) {
+    dispatch(setError(errorResult('general', 'Cannot remove root context path.')))
+    return
+  }
+
   dispatch(confirmRemoveBin(binNumber))
   dispatch(persistChanges(binNumber, url, true))
 }

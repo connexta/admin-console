@@ -137,6 +137,15 @@ export const getBins = (state) => state.get('bins').toJS()
 export const getEditingBinNumber = (state) => state.get('editingBinNumber')
 export const getConfirmDelete = (state) => state.get('confirmDelete')
 export const getWcpmErrors = (state) => state.get('wcpmErrors').toJS()
+export const hasPath = (state, path, binNumber) => {
+  const allBins = state.get('bins')
+  const binCheck = (bin) => bin.get('contextPaths').some(path => path === '/')
+  if (binNumber) {
+    return binCheck(allBins.get(binNumber))
+  } else {
+    return allBins.some(bin => binCheck(bin))
+  }
+}
 
 export default combineReducers({ bins, options, editingBinNumber, confirmDelete, wcpmErrors })
 

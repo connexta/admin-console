@@ -19,23 +19,29 @@ import static org.codice.ddf.admin.api.config.context.ContextPolicyConfiguration
 import static org.codice.ddf.admin.api.handler.ConfigurationMessage.FAILED_PERSIST;
 import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.EDIT;
 import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.SUCCESSFUL_PERSIST;
+import static org.codice.ddf.admin.api.handler.report.Report.createReport;
 import static org.codice.ddf.admin.api.services.ContextPolicyServiceProperties.POLICY_MANAGER_PID;
 import static org.codice.ddf.admin.api.services.ContextPolicyServiceProperties.configToPolicyManagerProps;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.codice.ddf.admin.api.config.context.ContextPolicyBin;
 import org.codice.ddf.admin.api.config.context.ContextPolicyConfiguration;
 import org.codice.ddf.admin.api.handler.method.PersistMethod;
 import org.codice.ddf.admin.api.handler.report.Report;
 import org.codice.ddf.admin.configurator.Configurator;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.configurator.OperationReport;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 public class EditContextPolicyMethod extends PersistMethod<ContextPolicyConfiguration> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(EditContextPolicyMethod.class);
 
     public static final String PERSIST_CONTEXT_POLICY_ID = EDIT;
 
@@ -49,6 +55,8 @@ public class EditContextPolicyMethod extends PersistMethod<ContextPolicyConfigur
 
     public static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(FAILED_PERSIST,
             "Unable to persist changes");
+
+    private static final String ROOT_CONTEXT_PATH = "/";
 
     private final ConfiguratorFactory configuratorFactory;
 
@@ -65,6 +73,16 @@ public class EditContextPolicyMethod extends PersistMethod<ContextPolicyConfigur
 
     @Override
     public Report persist(ContextPolicyConfiguration config) {
+        if (config.contextPolicyBins()
+                .stream()
+                .map(ContextPolicyBin::contextPaths)
+                .flatMap(Set::stream)
+                .noneMatch(ROOT_CONTEXT_PATH::equals)) {
+            LOGGER.debug("Invalid attempt to delete configuration for root context path");
+            return createReport(SUCCESS_TYPES, FAILURE_TYPES, null, FAILED_PERSIST);
+        }
+
+
         Configurator configurator = configuratorFactory.getConfigurator();
         configurator.updateConfigFile(POLICY_MANAGER_PID,
                 configToPolicyManagerProps(config),
@@ -74,7 +92,7 @@ public class EditContextPolicyMethod extends PersistMethod<ContextPolicyConfigur
                 "Web Context Policy saved with details: {}",
                 config.toString());
 
-        return Report.createReport(SUCCESS_TYPES,
+        return createReport(SUCCESS_TYPES,
                 FAILURE_TYPES,
                 null,
                 configReport.containsFailedResults() ? FAILED_PERSIST : SUCCESSFUL_PERSIST);

@@ -42,11 +42,15 @@ import org.codice.ddf.admin.api.handler.ConfigurationMessage;
 import org.codice.ddf.admin.api.handler.MessageBuilder;
 import org.codice.ddf.admin.api.handler.report.ProbeReport;
 import org.codice.ddf.admin.api.handler.report.Report;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.net.HttpHeaders;
 
 public class RequestUtils {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(RequestUtils.class);
 
     //Probe return types
     public static final String CONTENT_TYPE = "contentType";
@@ -82,15 +86,15 @@ public class RequestUtils {
     public static final int PING_TIMEOUT = 500;
 
     /**
-     * Sends a get request to the specified url. It does NOT check the response status code or body.
+     * Sends a get request to the specified URL. It does NOT check the response status code or body.
      * SUCCESS TYPES - EXECUTED_REQUEST
      * WARNING TYPES - UNTRUSTED_CA
      * FAILURE TYPES - CANNOT_CONNECT, CERT_ERROR
      * RETURN TYPES -  CONTENT_TYPE, CONTENT, STATUS_CODE
      *
-     * @param url
-     * @param userName - username to add to basic auth
-     * @param password - user password to add to basic auth
+     * @param url URL to send Get request to
+     * @param userName - Optional username to add to Basic Auth header
+     * @param password - Optional password to add to Basic Auth header
      * @return report
      */
     public ProbeReport sendGetRequest(String url, String userName, String password) {
@@ -109,11 +113,11 @@ public class RequestUtils {
 
     /**
      * Sends a post request to the specified url. Does not check response code or body.
-     * @param url
-     * @param username - username to add to basic auth
-     * @param password - password to add to basic auth
+     * @param url URL to send Post request to
+     * @param username - Optional username to add to Basic Auth header
+     * @param password - Optional password to add to Basic Auth header
      * @param contentType - Mime type of the post body
-     * @param content - body of the post request
+     * @param content - Body of the post request
      * @return report
      */
     public ProbeReport sendPostRequest(String url, String username, String password,
@@ -175,7 +179,7 @@ public class RequestUtils {
      * Opens a connection with the specified url.
      * SUCCESS TYPES - REACHED_URL
      * FAILURE_TYPES - CANNOT_CONNECT
-     * @param url - url to connect to
+     * @param url - URL to connect to
      * @return report
      */
     public Report endpointIsReachable(String url) {
@@ -190,11 +194,11 @@ public class RequestUtils {
     }
 
     /**
-     * Opens a connection with the specified url.
+     * Opens a connection with the specified hostname and port.
      * SUCCESS TYPES - REACHED_URL
      * FAILURE_TYPES - CANNOT_CONNECT
-     * @param hostname
-     * @param port
+     * @param hostname Host to attempt to connect to
+     * @param port Port over which to connect
      * @return report
      */
     public Report endpointIsReachable(String hostname, int port) {
@@ -220,7 +224,7 @@ public class RequestUtils {
                         .loadTrustMaterial(null, (chain, authType) -> true)
                         .build()));
             } catch (Exception e) {
-                // TODO: tbatie - 2/8/17 - Not sure what we should do here
+                LOGGER.debug("Unable to load TrustMaterial.");
             }
         }
         return builder.build();
@@ -247,6 +251,7 @@ public class RequestUtils {
                 response.close();
             }
         } catch (Exception e) {
+            LOGGER.debug("Failed to close client or response.");
         }
     }
 

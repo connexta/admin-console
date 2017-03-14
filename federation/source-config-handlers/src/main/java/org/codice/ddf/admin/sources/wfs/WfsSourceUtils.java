@@ -36,11 +36,15 @@ import javax.xml.xpath.XPathFactory;
 import org.codice.ddf.admin.api.config.sources.WfsSourceConfiguration;
 import org.codice.ddf.admin.api.handler.report.ProbeReport;
 import org.codice.ddf.admin.commons.requests.RequestUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 import com.google.common.collect.ImmutableList;
 
 public class WfsSourceUtils {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(WfsSourceUtils.class);
 
     public static final String GET_CAPABILITIES_PARAMS = "?service=WFS&request=GetCapabilities";
 
@@ -73,11 +77,11 @@ public class WfsSourceUtils {
      * SUCCESS TYPES - VERIFIED_CAPABILITIES,
      * FAILURE TYPES - CANNOT_CONNECT, CERT_ERROR, UNKNOWN_ENDPOINT
      * WARNING TYPES - UNTRUSTED_CA
-     * RETURN TYPES -  CONTENT_TYPE, CONTENT, STATUS_CODE
+     * RETURN TYPES -  DISCOVERED_URL
      *
-     * @param url
-     * @param username
-     * @param password
+     * @param url URL to probe for WFS capabilities
+     * @param username Optional username to add to Basic Auth header
+     * @param password Optional password to add to Basic Auth header
      * @return report
      */
     public ProbeReport sendWfsCapabilitiesRequest(String url, String username,
@@ -104,11 +108,11 @@ public class WfsSourceUtils {
      * WARNING TYPES - UNTRUSTED_CA
      * RETURN TYPES - DISCOVERED_URL
      *
-     * @param hostname
-     * @param port
-     * @param username
-     * @param password
-     * @return
+     * @param hostname Hostname to probe for WFS capabilities
+     * @param port Port over which to connect to host
+     * @param username Optional username to add to Basic Auth header
+     * @param password Optional username to add to Basic Auth header
+     * @return report
      */
     public ProbeReport discoverWfsUrl(String hostname, int port, String username,
             String password) {
@@ -130,9 +134,9 @@ public class WfsSourceUtils {
      * WARNING TYPES - UNTRUSTED_CA
      * RETURN TYPES - DISCOVERED_SOURCES
      *
-     * @param url
-     * @param username
-     * @param password
+     * @param url WFS URL to probe for a configuration
+     * @param username Optional username to add to Basic Auth header
+     * @param password Optional password to add to Basic Auth header
      * @return report
      */
     public ProbeReport getPreferredWfsConfig(String url, String username, String password) {
@@ -149,6 +153,7 @@ public class WfsSourceUtils {
         try {
             capabilitiesXml = createDocument(requestBody);
         } catch (Exception e) {
+            LOGGER.debug("Failed to read response from WFS endpoint.");
             return results.addMessage(createInternalErrorMsg(
                     "Unable to read response from endpoint."));
         }
@@ -167,6 +172,7 @@ public class WfsSourceUtils {
             wfsVersion = xpath.compile(WFS_VERSION_EXP)
                     .evaluate(capabilitiesXml);
         } catch (XPathExpressionException e) {
+            LOGGER.debug("Failed to parse XML response.");
             return results.addMessage(createInternalErrorMsg("Unable to parse XML response."));
         }
         switch (wfsVersion) {
@@ -178,6 +184,7 @@ public class WfsSourceUtils {
             return results.probeResult(DISCOVERED_SOURCES,
                     preferredConfig.factoryPid(WFS1_FACTORY_PID));
         default:
+            LOGGER.debug("Unsupported WFS version discovered.");
             return results.addMessage(createCommonSourceConfigMsg(UNKNOWN_ENDPOINT));
         }
     }

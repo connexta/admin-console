@@ -28,7 +28,7 @@ import static org.codice.ddf.admin.api.handler.ConfigurationMessage.MessageType.
 
 class RequestUtilsTest extends Specification {
 
-    def utils
+    RequestUtils utils
     def client = Mock(CloseableHttpClient)
     def request = Mock(HttpGet)
     def response = Mock(CloseableHttpResponse)
@@ -38,6 +38,7 @@ class RequestUtilsTest extends Specification {
     def setup() {
         utils = Spy(RequestUtils)
     }
+
     def 'test sendHttpRequest good response'() {
         setup:
         def responseMap = [statusCode: 200,
@@ -57,6 +58,9 @@ class RequestUtilsTest extends Specification {
         report.probeResults() == responseMap
         !report.containsFailureMessages()
         report.messages().find {it.type() == SUCCESS && it.subtype() == RequestUtils.EXECUTED_REQUEST}
+        1 * utils.closeClientAndResponse(client, response)
+        1 * client.close()
+        1 * response.close()
     }
 
     def 'test sendHttpRequest bad response'() {
@@ -70,6 +74,9 @@ class RequestUtilsTest extends Specification {
         statusLine.getStatusCode() >> 400
 
         report.messages().find {it.type() == FAILURE && it.subtype() == RequestUtils.CANNOT_CONNECT}
+        1 * utils.closeClientAndResponse(client, response)
+        1 * client.close()
+        1 * response.close()
     }
 
     def 'test sendHttpRequest SSL cert error'() {
@@ -81,6 +88,9 @@ class RequestUtilsTest extends Specification {
         client.execute(request) >> {throw new SSLPeerUnverifiedException("Danger!")}
 
         report.messages().find {it.type() == FAILURE && it.subtype() == RequestUtils.CERT_ERROR}
+        1 * utils.closeClientAndResponse(client, _)
+        1 * client.close()
+        0 * response.close()
     }
 
     def 'test sendHttpRequest untrusted CA success case'() {
@@ -93,11 +103,8 @@ class RequestUtilsTest extends Specification {
         def report = utils.sendHttpRequest(request)
 
         then:
-        utils.getHttpClient(false) >> {throw new IOException()}
-
-        then:
-        utils.getHttpClient(true) >> client
-        client.execute(request) >> response
+        utils.getHttpClient(_) >> client
+        client.execute(request) >> {throw new IOException("oops")} >> response
         response.getStatusLine() >> statusLine
         statusLine.getStatusCode() >> 200
         utils.responseToMap(_) >> responseMap
@@ -106,6 +113,10 @@ class RequestUtilsTest extends Specification {
         !report.containsFailureMessages()
         report.messages().find {it.type() == WARNING && it.subtype() == RequestUtils.UNTRUSTED_CA}
         report.messages().find {it.type() == SUCCESS && it.subtype() == RequestUtils.EXECUTED_REQUEST}
+
+        2 * utils.closeClientAndResponse(_, _)
+        2 * client.close()
+        1 * response.close()
     }
 
     def 'test sendHttpRequest untrusted CA fail case'() {
@@ -113,14 +124,14 @@ class RequestUtilsTest extends Specification {
         def report = utils.sendHttpRequest(request)
 
         then:
-        utils.getHttpClient(false) >> {throw new IOException()}
-
-        then:
-        utils.getHttpClient(true) >> client
-        client.execute(request) >> response
+        utils.getHttpClient(_) >> client
+        client.execute(_) >> {throw new IOException()} >> response
         response.getStatusLine() >> statusLine
         statusLine.getStatusCode() >> 400
         report.messages().find {it.type() == FAILURE && it.subtype() == RequestUtils.CANNOT_CONNECT}
+        2 * utils.closeClientAndResponse(client, _)
+        2 * client.close()
+        1 * response.close()
     }
 
     def 'test sendHttpRequest client cannot connect'() {
@@ -128,10 +139,12 @@ class RequestUtilsTest extends Specification {
         def report = utils.sendHttpRequest(request)
 
         then:
-        utils.getHttpClient(true) >> {throw new IOException()}
-        then:
-        utils.getHttpClient(false) >> {throw new IOException()}
+        utils.getHttpClient(_) >> client
+        client.execute(_) >> {throw new IOException()}
         report.messages().find {it.type() == FAILURE && it.subtype() == RequestUtils.CANNOT_CONNECT}
+        2 * utils.closeClientAndResponse(_, _)
+        2 * client.close()
+        0 * response.close()
     }
 
     def 'test responseToMap'() {
@@ -199,5 +212,18 @@ class RequestUtilsTest extends Specification {
         then:
         utils.endpointIsReachable("testUrl") >> goodReport
         1 * utils.sendHttpRequest(_)
+    }
+
+    def 'test getCloseableHttpClient'() {
+        setup:
+        def otherClient = null
+        def otherResponse = null
+
+        when:
+        utils.closeClientAndResponse(otherClient, otherResponse)
+
+        then:
+        0 * otherClient.close()
+        0 * otherResponse.close()
     }
 }

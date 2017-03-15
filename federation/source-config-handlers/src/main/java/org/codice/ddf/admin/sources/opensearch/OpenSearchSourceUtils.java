@@ -35,11 +35,15 @@ import javax.xml.xpath.XPathFactory;
 import org.codice.ddf.admin.api.config.sources.OpenSearchSourceConfiguration;
 import org.codice.ddf.admin.api.handler.report.ProbeReport;
 import org.codice.ddf.admin.commons.requests.RequestUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 import com.google.common.collect.ImmutableList;
 
 public class OpenSearchSourceUtils {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(OpenSearchSourceUtils.class);
 
     private static final List<String> OPENSEARCH_MIME_TYPES = ImmutableList.of(
             "application/atom+xml",
@@ -72,9 +76,9 @@ public class OpenSearchSourceUtils {
      * WARNING TYPES - UNTRUSTED_CA
      * RETURN TYPES -  CONTENT_TYPE, CONTENT, STATUS_CODE
      *
-     * @param url
-     * @param username
-     * @param password
+     * @param url The URL to probe for OpenSearch capabilities
+     * @param username Optional username to send with Basic Auth header
+     * @param password Optional password to send with Basic Auth header
      * @return report
      */
     public ProbeReport getOpenSearchConfig(String url, String username, String password) {
@@ -114,12 +118,12 @@ public class OpenSearchSourceUtils {
         try {
             capabilitiesXml = createDocument(requestResults.getProbeResult(RequestUtils.CONTENT));
         } catch (Exception e) {
+            LOGGER.debug("Failed to read response from OpenSearch endpoint.");
             return requestResults.addMessage(createInternalErrorMsg(
-                    "Unable to read response from endpoint."));
+                    "Unable to read response from OpenSearch endpoint."));
         }
 
-        XPath xpath = XPathFactory.newInstance()
-                .newXPath();
+        XPath xpath = XPathFactory.newInstance().newXPath();
         xpath.setNamespaceContext(SOURCES_NAMESPACE_CONTEXT);
         try {
             if ((Boolean) xpath.compile(TOTAL_RESULTS_XPATH)
@@ -128,6 +132,7 @@ public class OpenSearchSourceUtils {
                         .probeResult(DISCOVERED_URL, url);
             }
         } catch (XPathExpressionException e) {
+            LOGGER.debug("Failed to compile OpenSearch totalResults XPath.");
             return requestResults.addMessage(createInternalErrorMsg("Failed to compile XPath."));
         }
         return requestResults.addMessage(createCommonSourceConfigMsg(UNKNOWN_ENDPOINT));
@@ -140,10 +145,10 @@ public class OpenSearchSourceUtils {
      * WARNING TYPES - UNTRUSTED_CA
      * RETURN TYPES - DISCOVERED_URL
      *
-     * @param hostname
-     * @param port
-     * @param username
-     * @param password
+     * @param hostname Hostname to probe for OpenSearch capabilities
+     * @param port Port over which to connect to host
+     * @param username Optional username to send with Basic Auth header
+     * @param password Optional password to send with Basic Auth header
      * @return report
      */
     public ProbeReport discoverOpenSearchUrl(String hostname, int port, String username,

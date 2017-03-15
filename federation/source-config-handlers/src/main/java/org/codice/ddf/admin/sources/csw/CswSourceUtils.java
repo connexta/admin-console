@@ -37,11 +37,15 @@ import javax.xml.xpath.XPathFactory;
 import org.codice.ddf.admin.api.config.sources.CswSourceConfiguration;
 import org.codice.ddf.admin.api.handler.report.ProbeReport;
 import org.codice.ddf.admin.commons.requests.RequestUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 import com.google.common.collect.ImmutableList;
 
 public class CswSourceUtils {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CswSourceUtils.class);
 
     public static final String GET_CAPABILITIES_PARAMS = "?service=CSW&request=GetCapabilities";
 
@@ -78,14 +82,14 @@ public class CswSourceUtils {
 
     /**
      * Confirms whether or not an endpoint has CSW capabilities.
-     * SUCCESS TYPES - VERIFIED_CAPABILITIES,
+     * SUCCESS TYPES - VERIFIED_CAPABILITIES
      * FAILURE TYPES - CANNOT_CONNECT, CERT_ERROR, UNKNOWN_ENDPOINT
      * WARNING TYPES - UNTRUSTED_CA
      * RETURN TYPES -  CONTENT_TYPE, CONTENT, STATUS_CODE
      *
-     * @param url
-     * @param username
-     * @param password
+     * @param url URL to probe for CSW capabilities
+     * @param username Optional username for Basic Auth header
+     * @param password Optional Password for Basic Auth header
      * @return report
      */
     public ProbeReport sendCswCapabilitiesRequest(String url, String username,
@@ -110,15 +114,15 @@ public class CswSourceUtils {
 
     /**
      * Attempts to discover the source from the given hostname and port
-     * SUCCESS TYPES - VERIFIED_CAPABILITIES,
+     * SUCCESS TYPES - VERIFIED_CAPABILITIES
      * FAILURE TYPES - UNKNOWN_ENDPOINT
      * WARNING TYPES - UNTRUSTED_CA
      * RETURN TYPES - DISCOVERED_URL
      *
-     * @param hostname
-     * @param port
-     * @param username
-     * @param password
+     * @param hostname Host to probe for CSW capabilities
+     * @param port Port used for communication with host
+     * @param username Optional username for Basic Auth header
+     * @param password Optional password for Basic Auth header
      * @return report
      */
     public ProbeReport discoverCswUrl(String hostname, int port, String username,
@@ -133,14 +137,14 @@ public class CswSourceUtils {
 
     /**
      * Attempts to create a CSW configuration from the given url.
-     * SUCCESS TYPES - CONFIG_CREATED
+     * SUCCESS TYPES - DISCOVERED_SOURCE
      * FAILURE TYPES - CERT_ERROR, UNKNOWN_ENDPOINT, CANNOT_CONNECT
      * WARNING TYPES - UNTRUSTED_CA
      * RETURN TYPES - DISCOVERED_SOURCES
      *
-     * @param url
-     * @param username
-     * @param password
+     * @param url A URL of an endpoint with CSW capabilities
+     * @param username Optional username to send with Basic Auth header
+     * @param password Optional password to send with Basic Auth header
      * @return report
      */
     public ProbeReport getPreferredCswConfig(String url, String username, String password) {
@@ -155,6 +159,7 @@ public class CswSourceUtils {
         try {
             capabilitiesXml = createDocument(requestBody);
         } catch (Exception e) {
+            LOGGER.debug("Failed to create XML document from response.");
             return results.addMessage(createInternalErrorMsg(
                     "Unable to read response from endpoint."));
         }
@@ -177,6 +182,7 @@ public class CswSourceUtils {
                         preferred.factoryPid(CSW_PROFILE_FACTORY_PID));
             }
         } catch (Exception e) {
+            LOGGER.debug("Failed to compile DDF Profile CSW discovery XPath expression.");
         }
 
         try {
@@ -188,6 +194,7 @@ public class CswSourceUtils {
                                 .factoryPid(CSW_GMD_FACTORY_PID));
             }
         } catch (Exception e) {
+            LOGGER.debug("Failed to compile GMD CSW discovery XPath expression.");
         }
 
         try {
@@ -198,8 +205,10 @@ public class CswSourceUtils {
                     preferred.outputSchema(outputSchema)
                             .factoryPid(CSW_SPEC_FACTORY_PID));
         } catch (Exception e) {
+            LOGGER.debug("Failed to compile generic CSW specification discovery XPath expression.");
         }
 
+        LOGGER.debug("URL [{}] responded to GetCapabilities request, but response was not readable", url);
         return results.addMessage(createInternalErrorMsg(
                 "Failed to create a CSW source configuration from the URL."));
     }

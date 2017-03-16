@@ -242,7 +242,7 @@ public class RequestUtils {
         return requestResults;
     }
 
-    private void closeClientAndResponse(CloseableHttpClient client, CloseableHttpResponse response) {
+    protected void closeClientAndResponse(CloseableHttpClient client, CloseableHttpResponse response) {
         try {
             if (client != null) {
                 client.close();

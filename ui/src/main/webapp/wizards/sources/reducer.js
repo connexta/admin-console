@@ -1,5 +1,6 @@
 import { combineReducers } from 'redux-immutable'
 import { fromJS, Map } from 'immutable'
+import sub from 'redux-submarine'
 
 const sourceStage = (state = 'welcomeStage', { type, stage }) => {
   switch (type) {
@@ -13,8 +14,6 @@ const sourceStage = (state = 'welcomeStage', { type, stage }) => {
       return state
   }
 }
-
-export const getSourceStage = (state) => state.getIn(['sourceWizard', 'sourceStage'])
 
 const sourceStagesClean = (state = false, { type }) => {
   switch (type) {
@@ -33,8 +32,6 @@ const sourceStagesClean = (state = false, { type }) => {
   }
 }
 
-export const getStageProgress = (state) => state.getIn(['sourceWizard', 'sourceStageProgress'])
-
 const sourceStageProgress = (state = 'welcomeStage', { type, stage }) => {
   switch (type) {
     case 'SET_CURRENT_PROGRESS':
@@ -47,10 +44,6 @@ const sourceStageProgress = (state = 'welcomeStage', { type, stage }) => {
       return state
   }
 }
-
-export const getStagesClean = (state) => state.getIn(['sourceWizard', 'sourceStagesClean'])
-
-export const getConfig = (state, id) => state.getIn(['wizard', 'config', id], Map()).toJS()
 
 const sourceSelections = (state = Map(), { type, sourceConfigs }) => {
   switch (type) {
@@ -94,9 +87,6 @@ const discoveryType = (state = 'hostnamePort', { type, value }) => {
   }
 }
 
-// TODO: replace these absolute paths with relative ones like the other wizards
-export const getConfigTypes = (state) => state.getIn(['sourceWizard', 'configTypes']).toJS()
-
 export const getConfigTypeById = (state, id) => {
   const found = getConfigTypes(state).filter((config) => config.id === id)
   if (found.length > 0) {
@@ -134,15 +124,18 @@ export const getDiscoveryConfigs = (state) => (type) => {
   }
 }
 
-export const getSourceSelections = (state) => state.getIn(['sourceWizard', 'sourceSelections'])
+export const submarine = sub()
+export const getSourceSelections = (state) => submarine(state).get('sourceSelections')
+export const getIsSubmitting = (state) => submarine(state).get('isSubmitting')
+export const getDiscoveryType = (state) => submarine(state).get('discoveryType')
+export const getSourceStage = (state) => submarine(state).get('sourceStage')
+export const getStageProgress = (state) => submarine(state).get('sourceStageProgress')
+export const getStagesClean = (state) => submarine(state).get('sourceStagesClean')
+export const getConfigTypes = (state) => submarine(state).get('configTypes').toJS()
 
+export const getConfig = (state, id) => state.getIn(['wizard', 'config', id], Map()).toJS()
 export const getConfigurationHandlerId = (state) => state.getIn(['wizard', 'config', 'configurationHandlerId'])
-
 export const getSourceName = (state) => state.getIn(['wizard', 'config', 'sourceName', 'value'])
-
-export const getIsSubmitting = (state) => state.getIn(['sourceWizard', 'isSubmitting'])
-
-export const getDiscoveryType = (state) => state.getIn(['sourceWizard', 'discoveryType'])
 
 export default combineReducers({ sourceStage, sourceStagesClean, sourceStageProgress, sourceSelections, isSubmitting, configTypes, discoveryType })
 

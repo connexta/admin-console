@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import { getSourceSelections, getConfigurationHandlerId, getDiscoveryType } from '../reducer'
-import { getMessages } from '../../../reducer'
+import { getMessages } from 'admin-wizard/reducer'
 import { changeStage, testSources } from '../actions'
 
 import Title from 'components/Title'

@@ -54,8 +54,14 @@ public class DiscoverSourcesProbeMethod extends ProbeMethod<SourceConfiguration>
             "Retrieves possible configurations for the specified url. The results will be in a list of maps with the keys "
                     + CONFIG + ", " + MESSAGES;
 
-    public static final List<String> OPTIONAL_FIELDS = ImmutableList.of(SOURCE_HOSTNAME, PORT, ENDPOINT_URL, SOURCE_USERNAME, SOURCE_USER_PASSWORD);
-    public static final Map<String, String> SUCCESS_TYPES =  getCommonSourceSubtypeDescriptions(DISCOVERED_SOURCE);
+    public static final List<String> OPTIONAL_FIELDS = ImmutableList.of(SOURCE_HOSTNAME,
+            PORT,
+            ENDPOINT_URL,
+            SOURCE_USERNAME,
+            SOURCE_USER_PASSWORD);
+
+    public static final Map<String, String> SUCCESS_TYPES = getCommonSourceSubtypeDescriptions(
+            DISCOVERED_SOURCE);
 
     public static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(
             FAILED_PROBE, "No sources were discovered from the specified host.",
@@ -94,7 +100,8 @@ public class DiscoverSourcesProbeMethod extends ProbeMethod<SourceConfiguration>
         List<Map<String, Object>> discoveredSources = sourceProbeReports.stream()
                 .filter(probeReport -> !probeReport.containsFailureMessages())
                 .map(probeReport -> ImmutableMap.of(CONFIG,
-                        probeReport.probeResults().get(DISCOVERED_SOURCES),
+                        probeReport.probeResults()
+                                .get(DISCOVERED_SOURCES),
                         MESSAGES,
                         probeReport.messages()))
                 .collect(Collectors.toList());

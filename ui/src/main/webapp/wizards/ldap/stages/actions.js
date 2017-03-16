@@ -1,6 +1,6 @@
 import { post } from 'redux-fetch'
 
-import { getAllConfig } from '../../../reducer'
+import { getAllConfig } from 'admin-wizard/reducer'
 import { setMessages, clearMessages } from 'admin-wizard/actions'
 
 export const setProbeValue = (value) => ({ type: 'SET_PROBE_VALUE', value })

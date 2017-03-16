@@ -2,14 +2,14 @@ import React from 'react'
 import Paper from 'material-ui/Paper'
 import {connect} from 'react-redux'
 import Mount from 'react-mount'
+import { isSubmitting } from 'redux-fetch'
 import {
   getBins,
   getOptions,
   getEditingBinNumber,
   getConfirmDelete,
-  getWcpmErrors,
-  isSubmitting
-} from '../../reducer'
+  getWcpmErrors
+} from './reducer'
 import {
   addAttribute,
   editAttribute,

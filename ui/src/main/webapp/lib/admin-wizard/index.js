@@ -2,8 +2,9 @@ import React from 'react'
 
 import { connect } from 'react-redux'
 import Mount from 'react-mount'
+import { isSubmitting } from 'redux-fetch'
 
-import { getDisplayedLdapStage, getAllConfig, isSubmitting, getMessages, getAllowSkip } from '../../reducer'
+import { getDisplayedLdapStage, getAllConfig, getMessages, getAllowSkip } from './reducer'
 
 import {
   // sync

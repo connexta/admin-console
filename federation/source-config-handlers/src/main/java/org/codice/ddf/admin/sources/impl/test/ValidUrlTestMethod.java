@@ -58,10 +58,12 @@ public class ValidUrlTestMethod extends TestMethod<SourceConfiguration> {
     public Report test(SourceConfiguration configuration) {
         return configuration.endpointUrl() != null ?
                 requestUtils.endpointIsReachable(configuration.endpointUrl()) :
-                requestUtils.endpointIsReachable(configuration.sourceHostName(), configuration.sourcePort());
+                requestUtils.endpointIsReachable(configuration.sourceHostName(),
+                        configuration.sourcePort());
     }
+
     @Override
-    public List<ConfigurationMessage> validateOptionalFields(SourceConfiguration configuration){
+    public List<ConfigurationMessage> validateOptionalFields(SourceConfiguration configuration) {
         return configuration.endpointUrl() == null ?
                 validateHostnameAndPort(configuration) :
                 validateEndpointUrl(configuration);

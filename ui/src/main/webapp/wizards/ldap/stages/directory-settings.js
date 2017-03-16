@@ -2,7 +2,7 @@ import React from 'react'
 
 import { connect } from 'react-redux'
 
-import { getProbeValue } from '../../../reducer'
+import { getProbeValue } from 'admin-wizard/reducer'
 
 import { List, ListItem } from 'material-ui/List'
 import { Card, CardActions, CardHeader } from 'material-ui/Card'

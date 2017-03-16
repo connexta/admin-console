@@ -1,5 +1,13 @@
 import { combineReducers } from 'redux-immutable'
 
+import home, { submarine as homeSubmarine } from '../home/reducer'
+import systemUsage, { submarine as systemUsageSubmarine } from 'system-usage/reducer'
+import polling, { submarine as pollingSubmarine } from 'redux-polling'
+import fetch, { submarine as fetchSubmarine } from 'redux-fetch'
+import wizard, { submarine as wizardSubmarine } from 'admin-wizard/reducer'
+import wcpm, { submarine as wcpmSubmarine } from '../adminTools/webContextPolicyManager/reducer'
+import sourceWizard, { submarine as sourceSubmarine } from '../wizards/sources/reducer'
+
 const backendError = (state = {}, { type, err } = {}) => {
   switch (type) {
     case 'BACKEND_ERRORS':
@@ -11,35 +19,16 @@ const backendError = (state = {}, { type, err } = {}) => {
 }
 
 export const getBackendErrors = (state) => state.get('backendError')
-
-import polling from 'redux-polling'
-import * as pollingSelectors from 'redux-polling/selectors'
-export const isPolling = (state, id) => pollingSelectors.isPolling(state.get('polling'), id)
-
-import wizard, * as ldap from 'admin-wizard/reducer'
-import sourceWizard from '../wizards/sources/reducer'
-import home from '../home/reducer'
-import wcpm, * as webContext from '../adminTools/webContextPolicyManager/reducer'
-import systemUsage from 'system-usage/reducer'
-
-import fetch, * as fetchSelectors from 'redux-fetch'
-
-export const getException = (state) => fetchSelectors.getException(state.get('fetch'))
-export const isSubmitting = (state, id) => fetchSelectors.isSubmitting(state.get('fetch'), id)
-
-export const getAllConfig = (state) => ldap.getAllConfig(state.get('wizard'))
-export const getConfig = (state, id) => ldap.getConfig(state.get('wizard'), id)
-export const getProbeValue = (state) => ldap.getProbeValue(state.get('wizard'))
-export const getStep = (state) => ldap.getStep(state.get('wizard'))
-export const getMessages = (state, id) => ldap.getMessages(state.get('wizard'), id)
-export const getDisplayedLdapStage = (state) => ldap.getDisplayedLdapStage(state.get('wizard'))
-export const getAllowSkip = (state, stageId) => ldap.getAllowSkip(state.get('wizard'), stageId)
-
-export const getBins = (state) => webContext.getBins(state.get('wcpm'))
-export const getOptions = (state) => webContext.getOptions(state.get('wcpm'))
-export const getEditingBinNumber = (state) => webContext.getEditingBinNumber(state.get('wcpm'))
-export const getConfirmDelete = (state) => webContext.getConfirmDelete(state.get('wcpm'))
-export const getWcpmErrors = (state) => webContext.getWcpmErrors(state.get('wcpm'))
-export const hasPath = (state, path, binNumber) => webContext.hasPath(state.get('wcpm'), path, binNumber)
-
 export default combineReducers({ fetch, wizard, backendError, sourceWizard, home, wcpm, polling, systemUsage })
+
+// Submarines patch redux selectors which causes issues running unit tests.
+// The following if protects against the side effect during tests. Do not remove.
+if (process.env.NODE_ENV !== 'ci') {
+  systemUsageSubmarine.init((state) => state.get('systemUsage'))
+  pollingSubmarine.init((state) => state.get('polling'))
+  homeSubmarine.init((state) => state.get('home'))
+  fetchSubmarine.init((state) => state.get('fetch'))
+  wizardSubmarine.init((state) => state.get('wizard'))
+  wcpmSubmarine.init((state) => state.get('wcpm'))
+  sourceSubmarine.init((state) => state.get('sourceWizard'))
+}

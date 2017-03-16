@@ -1,6 +1,6 @@
 import { post } from 'redux-fetch'
 
-import { getAllConfig } from '../../reducer'
+import { getAllConfig } from 'admin-wizard/reducer'
 import { getDiscoveryConfigs } from './reducer'
 import { clearWizard } from 'admin-wizard/actions'
 

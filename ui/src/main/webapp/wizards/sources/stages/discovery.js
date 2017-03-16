@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { getAllConfig, getMessages } from '../../../reducer'
+import { getAllConfig, getMessages } from 'admin-wizard/reducer'
 import { getDiscoveryType } from '../reducer'
 import { testSources, setDiscoveryType } from '../actions'
 
@@ -43,7 +43,7 @@ const discoveryStageDefaults = {
 
 const DiscoveryStageView = ({ messages, testSources, setDefaults, configs, discoveryType, setDiscoveryType }) => {
   const nextShouldBeDisabled = () => {
-    // check to see if username/password entry is mismatched
+    // checks that username & password are either both filled out or both empty (because it's optional)
     if (isBlank(configs.sourceUserName) !== isEmpty(configs.sourceUserPassword)) {
       return true
     }

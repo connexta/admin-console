@@ -1,6 +1,6 @@
 import * as api from 'admin-api'
 
-import { getAllConfig } from '../../reducer'
+import { getAllConfig } from './reducer'
 
 export const setMessages = (id, messages) => ({ type: 'SET_MESSAGES', id, messages })
 export const updateProgress = (id, value) => ({ type: 'UPDATE_PROGRESS', id, value })

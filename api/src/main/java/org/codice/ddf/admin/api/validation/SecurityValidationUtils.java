@@ -23,6 +23,7 @@ import static org.codice.ddf.admin.api.validation.ValidationUtils.validateString
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -39,14 +40,16 @@ public class SecurityValidationUtils {
 
     public static final String LDAP = "ldap";
 
-    public static final String IDP = "IdP";
+    public static final String IDP_REALM = "IdP";
 
-    public static final List<String> ALL_REALMS = ImmutableList.of(KARAF, LDAP, IDP);
+    public static final List<String> ALL_REALMS = ImmutableList.of(KARAF, LDAP, IDP_REALM);
 
     // TODO: tbatie - 1/20/17 - (Ticket) These auth types eventually need to be configurable
     public static final String SAML = "SAML";
 
     public static final String BASIC = "basic";
+
+    public static final String IDP_AUTH = "IDP";
 
     public static final String PKI = "PKI";
 
@@ -56,12 +59,21 @@ public class SecurityValidationUtils {
 
     public static final List<String> ALL_AUTH_TYPES = ImmutableList.of(SAML,
             BASIC,
+            IDP_AUTH,
             PKI,
             CAS,
             GUEST);
 
-    public static final List<ConfigurationMessage> validateContextPolicyBins(
-            List<ContextPolicyBin> bins, String configId) {
+    private static final String INV_REALM_MSG = String.format(
+            "Unknown realm [%%s]. Realm must be one of: %s",
+            String.join(",", ALL_REALMS));
+
+    private static final String INV_AUTH_MSG = String.format(
+            "Unknown authentication type [%%s]. Authentication type must be one of: %s",
+            String.join(",", ALL_AUTH_TYPES));
+
+    public static List<ConfigurationMessage> validateContextPolicyBins(List<ContextPolicyBin> bins,
+            String configId) {
         List<ConfigurationMessage> errors = new ArrayList<>();
         if (bins == null || bins.isEmpty()) {
             errors.add(createMissingRequiredFieldMsg(configId));
@@ -74,39 +86,58 @@ public class SecurityValidationUtils {
             errors.addAll(bins.stream()
                     .filter(cpb -> cpb.requiredAttributes() != null && !cpb.requiredAttributes()
                             .isEmpty())
-                    .map(cpb -> cpb.validate(Arrays.asList(REQ_ATTRIS)))
+                    .map(cpb -> cpb.validate(Collections.singletonList(REQ_ATTRIS)))
                     .flatMap(List::stream)
                     .collect(Collectors.toList()));
         }
         return errors;
     }
 
-    public static final List<ConfigurationMessage> validateRealm(String realm, String configId) {
+    public static List<ConfigurationMessage> validateRealm(String realm, String configId) {
         List<ConfigurationMessage> errors = validateString(realm, configId);
-        if (errors.isEmpty() && !ALL_REALMS.contains(realm)) {
-            errors.add(createInvalidFieldMsg(
-                    "Unknown realm \"" + realm + "\". Realm must be one of " + String.join(",",
-                            ALL_REALMS), configId));
+        if (errors.isEmpty()) {
+            // Check for match, regardless of case.
+            if (ALL_REALMS.stream()
+                    .noneMatch(realm::equalsIgnoreCase)) {
+                errors.add(createInvalidFieldMsg(String.format(INV_REALM_MSG, realm), configId));
+            }
         }
 
         return errors;
     }
 
-    public static final List<ConfigurationMessage> validateAuthTypes(Set<String> authTypes,
+    public static List<ConfigurationMessage> validateAuthTypes(Set<String> authTypes,
             String configId) {
         List<ConfigurationMessage> errors = new ArrayList<>();
         if (authTypes == null || authTypes.isEmpty()) {
             errors.add(createMissingRequiredFieldMsg(configId));
         } else {
             for (String authType : authTypes) {
-                if (!ALL_AUTH_TYPES.contains(authType)) {
-                    errors.add(createInvalidFieldMsg("Unknown authentication type \"" + authType
-                            + "\". Authentication type must be one of: " + String.join(",",
-                            ALL_AUTH_TYPES), configId));
+                // Check for match, regardless of case.
+                if (ALL_AUTH_TYPES.stream()
+                        .noneMatch(authType::equalsIgnoreCase)) {
+                    errors.add(createInvalidFieldMsg(String.format(INV_AUTH_MSG, authType),
+                            configId));
                 }
             }
         }
 
         return errors;
+    }
+
+    public static String normalizeAuthType(String input) throws IllegalArgumentException {
+        return normalize(input, ALL_AUTH_TYPES);
+    }
+
+    public static String normalizeRealm(String input) throws IllegalArgumentException {
+        return normalize(input, ALL_REALMS);
+    }
+
+    private static String normalize(String input, List<String> validVals)
+            throws IllegalArgumentException {
+        return validVals.stream()
+                .filter(input::equalsIgnoreCase)
+                .findFirst()
+                .orElseThrow(IllegalArgumentException::new);
     }
 }

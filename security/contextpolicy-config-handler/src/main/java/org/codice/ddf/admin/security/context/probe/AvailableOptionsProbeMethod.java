@@ -25,7 +25,8 @@ import static org.codice.ddf.admin.api.validation.LdapValidationUtils.AUTHENTICA
 import static org.codice.ddf.admin.api.validation.LdapValidationUtils.AUTHENTICATION_AND_ATTRIBUTE_STORE;
 import static org.codice.ddf.admin.api.validation.SecurityValidationUtils.BASIC;
 import static org.codice.ddf.admin.api.validation.SecurityValidationUtils.GUEST;
-import static org.codice.ddf.admin.api.validation.SecurityValidationUtils.IDP;
+import static org.codice.ddf.admin.api.validation.SecurityValidationUtils.IDP_AUTH;
+import static org.codice.ddf.admin.api.validation.SecurityValidationUtils.IDP_REALM;
 import static org.codice.ddf.admin.api.validation.SecurityValidationUtils.KARAF;
 import static org.codice.ddf.admin.api.validation.SecurityValidationUtils.LDAP;
 import static org.codice.ddf.admin.api.validation.SecurityValidationUtils.PKI;
@@ -110,7 +111,7 @@ public class AvailableOptionsProbeMethod extends ProbeMethod<ContextPolicyConfig
         List<String> authTypes = new ArrayList<>(Arrays.asList(BASIC, SAML, PKI, GUEST));
 
         if (configurator.isBundleStarted(IDP_CLIENT_BUNDLE_NAME)) {
-            authTypes.add(IDP);
+            authTypes.add(IDP_AUTH);
         }
 
         return authTypes;
@@ -120,7 +121,7 @@ public class AvailableOptionsProbeMethod extends ProbeMethod<ContextPolicyConfig
         List<String> realms = new ArrayList<>(Collections.singletonList(KARAF));
         // If an IdpConfigurationHandler exists replace this with a service reference
         if (configurator.isBundleStarted(IDP_SERVER_BUNDLE_NAME)) {
-            realms.add(IDP);
+            realms.add(IDP_REALM);
         }
 
         if (ldapConfigHandler == null

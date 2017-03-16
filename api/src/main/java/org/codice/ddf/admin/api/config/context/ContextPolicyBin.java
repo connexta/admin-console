@@ -29,6 +29,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.api.handler.ConfigurationMessage;
+import org.codice.ddf.admin.api.validation.SecurityValidationUtils;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableMap;
@@ -101,12 +102,16 @@ public class ContextPolicyBin {
 
     //Setters
     public ContextPolicyBin realm(String realm) {
-        this.realm = realm;
+        // Ensure that the realm has been converted to a correct, expected case
+        this.realm = SecurityValidationUtils.normalizeRealm(realm);
         return this;
     }
 
     public ContextPolicyBin authenticationTypes(Set<String> authenticationTypes) {
-        this.authenticationTypes = authenticationTypes;
+        // Ensure that the authentication type names have been converted to correct, expected case
+        this.authenticationTypes = authenticationTypes.stream()
+                .map(SecurityValidationUtils::normalizeAuthType)
+                .collect(Collectors.toSet());
         return this;
     }
 

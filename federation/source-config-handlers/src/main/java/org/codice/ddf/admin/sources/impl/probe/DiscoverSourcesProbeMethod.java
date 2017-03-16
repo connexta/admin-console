@@ -17,13 +17,17 @@ import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.PORT;
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_HOSTNAME;
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_USERNAME;
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_USER_PASSWORD;
+import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.FAILED_PROBE;
 import static org.codice.ddf.admin.api.handler.report.ProbeReport.createProbeReport;
 import static org.codice.ddf.admin.api.validation.SourceValidationUtils.validateOptionalUsernameAndPassword;
+import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.BAD_IP;
 import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.DISCOVERED_SOURCE;
 import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.DISCOVERED_SOURCES;
 import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.DISCOVER_SOURCES_ID;
 import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.getCommonSourceSubtypeDescriptions;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -36,6 +40,7 @@ import org.codice.ddf.admin.api.handler.report.ProbeReport;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.net.InetAddresses;
 
 public class DiscoverSourcesProbeMethod extends ProbeMethod<SourceConfiguration> {
 
@@ -56,7 +61,10 @@ public class DiscoverSourcesProbeMethod extends ProbeMethod<SourceConfiguration>
     public static final Map<String, String> SUCCESS_TYPES = getCommonSourceSubtypeDescriptions(
             DISCOVERED_SOURCE);
 
-    //    public static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(FAILED_PROBE, "No sources were discovered from the specified host.");
+    public static final Map<String, String> FAILURE_TYPES = ImmutableMap.of(
+            FAILED_PROBE, "No sources were discovered from the specified host.",
+            BAD_IP, "Could not resolve host from IP address.");
+
     public static final List<String> RETURN_TYPES = ImmutableList.of(DISCOVERED_SOURCES);
 
     private List<SourceConfigurationHandler> handlers;
@@ -77,6 +85,13 @@ public class DiscoverSourcesProbeMethod extends ProbeMethod<SourceConfiguration>
 
     @Override
     public ProbeReport probe(SourceConfiguration config) {
+        if (InetAddresses.isInetAddress(config.sourceHostName())) {
+            try {
+                config.sourceHostName(InetAddress.getByName(config.sourceHostName()).getHostName());
+            } catch (UnknownHostException e) {
+                return createProbeReport(SUCCESS_TYPES, FAILURE_TYPES, null, BAD_IP);
+            }
+        }
         List<ProbeReport> sourceProbeReports = handlers.stream()
                 .map(handler -> handler.probe(DISCOVER_SOURCES_ID, config))
                 .collect(Collectors.toList());

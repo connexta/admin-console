@@ -51,11 +51,12 @@ public class SourceHandlerCommons {
 
     //Common failure types
     public static final String UNKNOWN_ENDPOINT = "UNKNOWN_ENDPOINT";
-    private static final Map<String, String> FAILURE_DESCRIPTIONS = ImmutableMap.<String, String>builder().putAll(
-            REQUEST_UTILS.getRequestSubtypeDescriptions(RequestUtils.CANNOT_CONNECT, RequestUtils.CERT_ERROR))
-                    .put(UNKNOWN_ENDPOINT, "The endpoint does not appear to have the specified capabilities.")
-                    .put(FAILED_CREATE, "Failed to create source configuration.")
-                    .put(FAILED_DELETE, "Failed to delete source configuration.")
+    public static final String BAD_IP = "BAD_IP";
+    private static final Map<String, String> FAILURE_DESCRIPTIONS = ImmutableMap.<String, String>builder()
+            .putAll(REQUEST_UTILS.getRequestSubtypeDescriptions(RequestUtils.CANNOT_CONNECT, RequestUtils.CERT_ERROR))
+            .put(UNKNOWN_ENDPOINT, "The endpoint does not appear to have the specified capabilities.")
+            .put(FAILED_CREATE, "Failed to create source configuration.")
+            .put(FAILED_DELETE, "Failed to delete source configuration.")
             .build();
 
     //Common warning types

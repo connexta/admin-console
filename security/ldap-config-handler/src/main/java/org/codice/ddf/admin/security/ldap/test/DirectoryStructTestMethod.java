@@ -173,7 +173,7 @@ public class DirectoryStructTestMethod extends TestMethod<LdapConfiguration> {
                 configuration.baseUserDn(),
                 Filter.present(configuration.userNameAttribute())
                         .toString(),
-                SearchScope.SUBORDINATES,
+                SearchScope.WHOLE_SUBTREE,
                 1);
         if (baseUsersResults.isEmpty()) {
             resultsWithConfigIds.put(NO_USERS_IN_BASE_USER_DN.name(), BASE_USER_DN);
@@ -198,7 +198,7 @@ public class DirectoryStructTestMethod extends TestMethod<LdapConfiguration> {
                 configuration.baseGroupDn(),
                 Filter.equality("objectClass", configuration.groupObjectClass())
                         .toString(),
-                SearchScope.SUBORDINATES,
+                SearchScope.WHOLE_SUBTREE,
                 1);
         if (baseGroupResults.isEmpty()) {
             resultsWithConfigIds.put(NO_GROUPS_IN_BASE_GROUP_DN.name(), BASE_GROUP_DN);
@@ -213,7 +213,7 @@ public class DirectoryStructTestMethod extends TestMethod<LdapConfiguration> {
                 Filter.and(Filter.equality("objectClass", configuration.groupObjectClass()),
                         Filter.present(configuration.groupAttributeHoldingMember()))
                         .toString(),
-                SearchScope.SUBORDINATES,
+                SearchScope.WHOLE_SUBTREE,
                 1);
         if (groups.isEmpty()) {
             resultsWithConfigIds.put(NO_GROUPS_WITH_MEMBERS.name(), GROUP_ATTRIBUTE_HOLDING_MEMBER);
@@ -246,7 +246,7 @@ public class DirectoryStructTestMethod extends TestMethod<LdapConfiguration> {
         List<SearchResultEntry> foundMember = ldapTestingCommons.getLdapQueryResults(ldapConnection,
                 configuration.baseUserDn(),
                 userFilter,
-                SearchScope.SUBORDINATES,
+                SearchScope.WHOLE_SUBTREE,
                 1);
         if (foundMember.isEmpty()) {
             resultsWithConfigIds.put(NO_REFERENCED_MEMBER.name(),

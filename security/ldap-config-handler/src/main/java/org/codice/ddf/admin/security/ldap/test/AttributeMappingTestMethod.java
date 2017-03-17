@@ -141,7 +141,7 @@ public class AttributeMappingTestMethod extends TestMethod<LdapConfiguration> {
                 configuration.baseUserDn(),
                 Filter.and(Filter.present(configuration.userNameAttribute()), Filter.present(attr))
                         .toString(),
-                SearchScope.SUBORDINATES,
+                SearchScope.WHOLE_SUBTREE,
                 1);
         return !userWithAttrResults.isEmpty();
     }

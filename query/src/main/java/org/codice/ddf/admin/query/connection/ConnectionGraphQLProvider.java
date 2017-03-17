@@ -1,5 +1,7 @@
 package org.codice.ddf.admin.query.connection;
 
+import static org.codice.ddf.admin.query.graphql.GraphQLCommons.actionCreatorToGraphQLObjectType;
+import static org.codice.ddf.admin.query.graphql.GraphQLCommons.actionsToGraphQLFieldDef;
 import static org.codice.ddf.admin.query.graphql.GraphQLCommons.fieldToGraphQLObjectType;
 import static org.codice.ddf.admin.query.graphql.GraphQLCommons.fieldsToGraphQLFieldDefinition;
 
@@ -13,19 +15,20 @@ import graphql.servlet.GraphQLQueryProvider;
 
 public class ConnectionGraphQLProvider implements GraphQLQueryProvider, GraphQLMutationProvider {
 
+    public static final ConnectionActionCreator CONNECTION_ACTION_CREATOR = new ConnectionActionCreator();
     @Override
     public Collection<GraphQLFieldDefinition> getMutations() {
-        return fieldsToGraphQLFieldDefinition(new ConnectionActionHandler().getPersistActions());
+        return actionsToGraphQLFieldDef(CONNECTION_ACTION_CREATOR, CONNECTION_ACTION_CREATOR.getPersistActions());
     }
 
     @Override
     public GraphQLObjectType getQuery() {
-        return fieldToGraphQLObjectType(new ConnectionActionHandler());
+        return actionCreatorToGraphQLObjectType(CONNECTION_ACTION_CREATOR, CONNECTION_ACTION_CREATOR.getDiscoveryActions());
     }
 
     @Override
     public String getName() {
-        return new ConnectionActionHandler().fieldName();
+        return CONNECTION_ACTION_CREATOR.name();
     }
 
     @Override

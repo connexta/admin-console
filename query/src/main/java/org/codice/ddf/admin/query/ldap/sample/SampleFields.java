@@ -4,8 +4,14 @@ import org.codice.ddf.admin.query.ldap.fields.LdapConfigurationField;
 import org.codice.ddf.admin.query.ldap.fields.LdapConnectionField;
 import org.codice.ddf.admin.query.ldap.fields.LdapCredentialsField;
 import org.codice.ddf.admin.query.ldap.fields.LdapSettingsField;
+import org.codice.ddf.admin.query.ldap.fields.query.LdapAttributeField;
 
 public class SampleFields {
+
+    public static final LdapAttributeField SAMPLE_LDAP_ATTRIBUTE = new LdapAttributeField();
+    static {
+        SAMPLE_LDAP_ATTRIBUTE.setValue("exampleAttri");
+    }
 
     public static final LdapConnectionField SAMPLE_LDAP_CONNECTION = new LdapConnectionField()
             .hostname("sampleHostName")

@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
 import org.codice.ddf.admin.query.api.fields.Field;
 import org.codice.ddf.admin.query.api.fields.ListField;
 import org.codice.ddf.admin.query.commons.fields.base.BaseEnumField;
-import org.codice.ddf.admin.query.commons.fields.base.BaseListField;
 import org.codice.ddf.admin.query.commons.fields.base.BaseObjectField;
 
 import graphql.schema.GraphQLInputObjectField;
@@ -76,6 +75,6 @@ public class GraphQLInput {
     }
 
     public static GraphQLInputType listFieldToGraphQLInputType(ListField listField) {
-        return new GraphQLList(fieldTypeToGraphQLInputType(listField.getListValueField()));
+        return new GraphQLList(fieldTypeToGraphQLInputType(listField.getListFieldType()));
     }
 }

@@ -2,23 +2,18 @@ package org.codice.ddf.admin.query.commons.fields.common.message;
 
 import java.util.List;
 
-import org.codice.ddf.admin.query.api.fields.Field;
-import org.codice.ddf.admin.query.api.fields.MessageField;
+import org.codice.ddf.admin.query.api.action.Message;
 import org.codice.ddf.admin.query.commons.fields.base.BaseListField;
 
 public class MessageListField extends BaseListField<MessageField> {
 
     public static final String DESCRIPTION = "A list containing messages.";
     public MessageListField(String fieldName) {
-        super(fieldName, DESCRIPTION);
-    }
-
-    public List<MessageField> getMessages() {
-        return fields;
+        super(fieldName, DESCRIPTION, new MessageField(null, null, null));
     }
 
     @Override
-    public Field getListValueField() {
-        return new BaseMessageField(null, null, null);
+    public List<Message> validate() {
+        throw new UnsupportedOperationException();
     }
 }

@@ -1,31 +1,26 @@
 package org.codice.ddf.admin.query.wcpm.fields;
 
-import java.util.List;
-
+import org.codice.ddf.admin.query.api.fields.Field;
 import org.codice.ddf.admin.query.commons.fields.base.BaseEnumField;
 import org.codice.ddf.admin.query.commons.fields.base.scalar.StringField;
 
 import com.google.common.collect.ImmutableList;
 
-public class Realm extends BaseEnumField<StringField> {
+public class Realm extends BaseEnumField<String> {
 
     public static final String DEFAULT_FIELD_NAME = "realm";
     public static final String FIELD_TYPE_NAME = "Realm";
     public static final String DESCRIPTION = "Authenticating Realms are used to authenticate an incoming authentication token and create a Subject on successful authentication.";
 
-    public static final StringField LDAP_REALM = new LdapRealm();
-    public static final StringField KARAF_REALM = new KarafRealm();
-
-    private static final List<StringField> REALMS = ImmutableList.of(LDAP_REALM,
-            KARAF_REALM);
+    public static final Realm LDAP_REALM = new Realm(new LdapRealm());
+    public static final Realm KARAF_REALM = new Realm(new KarafRealm());
 
     public Realm() {
-        super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
+        this(null);
     }
 
-    @Override
-    public List<StringField> getEnumValues() {
-        return REALMS;
+    protected Realm(Field<String> realm) {
+        super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION, ImmutableList.of(new LdapRealm(), new KarafRealm()), realm);
     }
 
     protected static final class LdapRealm extends StringField {

@@ -1,5 +1,9 @@
 package org.codice.ddf.admin.query.commons.fields.common;
 
+
+import org.codice.ddf.admin.query.commons.fields.common.message.MessageField;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -7,32 +11,26 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.codice.ddf.admin.query.api.fields.Field;
-import org.codice.ddf.admin.query.api.fields.MessageField;
-import org.codice.ddf.admin.query.api.fields.ReportField;
 import org.codice.ddf.admin.query.commons.fields.base.BaseObjectField;
-import org.codice.ddf.admin.query.commons.fields.common.message.BaseMessageField;
 import org.codice.ddf.admin.query.commons.fields.common.message.MessageListField;
 
 import com.google.common.collect.ImmutableList;
 
-public class BaseReportField extends BaseObjectField implements ReportField {
+public class ReportField extends BaseObjectField {
 
     public static final String FIELD_NAME = "report";
     public static final String FIELD_TYPE_NAME = "Report";
     public static final String DESCRIPTION = "A report containing the results of the task requested.";
 
-    String SUCCESSES = "successes";
-    String FAILURES  = "failures";
-    String WARNINGS = "warnings";
     private MessageListField successes;
     private MessageListField warnings;
     private MessageListField failures;
 
-    public BaseReportField() {
+    public ReportField() {
         super(FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
-        this.successes = new MessageListField(SUCCESSES);
-        this.warnings = new MessageListField(WARNINGS);
-        this.failures = new MessageListField(FAILURES);
+        this.successes = new MessageListField("successes");
+        this.warnings = new MessageListField("warnings");
+        this.failures = new MessageListField( "failures");
     }
 
     @Override
@@ -40,48 +38,44 @@ public class BaseReportField extends BaseObjectField implements ReportField {
         return ImmutableList.of(successes, warnings, failures);
     }
 
-    @Override
-    public List<MessageField> getSuccesses() {
-        return successes.getMessages();
+    public List<MessageField> successes() {
+        return new ArrayList<>(successes.getList());
     }
 
-    @Override
-    public  List<MessageField> getWarnings() {
-        return warnings.getMessages();
+    public  List<MessageField> warnings() {
+        return new ArrayList<>(warnings.getList());
     }
 
-    @Override
-    public  List<MessageField> getFailures() {
-        return failures.getMessages();
+    public  List<MessageField> failures() {
+        return new ArrayList<>(failures.getList());
     }
 
-    @Override
-    public  List<MessageField> getMessages() {
-        return Stream.of(successes.getMessages(), failures.getMessages(), warnings.getMessages())
+    public  List<MessageField> messages() {
+        return Stream.of(successes.getList(), failures.getList(), warnings.getList())
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList());
     }
 
-    public BaseReportField messages(List<BaseMessageField> messages) {
+    public ReportField messages(List<MessageField> messages) {
         messages.stream().forEach(this::message);
         return this;
     }
 
-    public BaseReportField messages(BaseMessageField... messages) {
+    public ReportField messages(MessageField... messages) {
         Arrays.asList(messages).stream().forEach(this::message);
         return this;
     }
 
-    public BaseReportField message(BaseMessageField message) {
-        switch (message.getMessageType()) {
+    public ReportField message(MessageField message) {
+        switch (message.messageType()) {
         case SUCCESS:
-            successes.addField(message);
+            successes.add(message);
             break;
         case FAILURE:
-            failures.addField(message);
+            failures.add(message);
             break;
         case WARNING:
-            warnings.addField(message);
+            warnings.add(message);
             break;
         }
         return this;

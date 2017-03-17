@@ -1,10 +1,9 @@
 package org.codice.ddf.admin.query.ldap.actions.discover;
 
 import java.util.List;
-import java.util.Map;
 
 import org.codice.ddf.admin.query.api.fields.Field;
-import org.codice.ddf.admin.query.commons.actions.BaseActionField;
+import org.codice.ddf.admin.query.commons.actions.BaseAction;
 import org.codice.ddf.admin.query.ldap.fields.LdapDistinguishedName;
 import org.codice.ddf.admin.query.ldap.fields.query.LdapAttributeField;
 import org.codice.ddf.admin.query.ldap.fields.query.LdapEntriesListField;
@@ -13,9 +12,9 @@ import org.codice.ddf.admin.query.ldap.fields.query.LdapQueryField;
 
 import com.google.common.collect.ImmutableList;
 
-public class LdapQuery extends BaseActionField<LdapEntriesListField> {
+public class LdapQuery extends BaseAction<LdapEntriesListField> {
 
-    public static final String FIELD_NAME = "query";
+    public static final String NAME = "query";
     public static final String DESCRIPTION = "Executes a query against LDAP.";
 
     private LdapDistinguishedName dn =  new LdapDistinguishedName();
@@ -23,16 +22,17 @@ public class LdapQuery extends BaseActionField<LdapEntriesListField> {
     private List<Field> arguments = ImmutableList.of(dn, query);
 
     public LdapQuery() {
-        super(FIELD_NAME, DESCRIPTION, new LdapEntriesListField());
+        super(NAME, DESCRIPTION, new LdapEntriesListField());
     }
 
     @Override
-    public LdapEntriesListField process(Map args) {
-        LdapAttributeField attri = new LdapAttributeField().setValue("exampleAttri");
+    public LdapEntriesListField process() {
+        LdapAttributeField attri = new LdapAttributeField();
+        attri.setValue("exampleAttri");
         LdapEntryField entry = new LdapEntryField().addAttribute(attri);
         LdapEntryField outterEntry = new LdapEntryField().addAttribute(attri)
                 .addEntry(entry);
-        return new LdapEntriesListField().addField(outterEntry);
+        return new LdapEntriesListField().add(outterEntry);
     }
 
     @Override

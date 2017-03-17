@@ -8,17 +8,12 @@ public class LdapAttributeListField extends BaseListField<LdapAttributeField> {
     public static final String DESCRIPTION = "A list of attributes an LDAP entry contains.";
 
     public LdapAttributeListField() {
-        super(DEFAULT_FIELD_NAME, DESCRIPTION);
+        super(DEFAULT_FIELD_NAME, DESCRIPTION, new LdapAttributeField());
     }
 
     @Override
-    public LdapAttributeField getListValueField() {
-        return new LdapAttributeField();
-    }
-
-    @Override
-    public LdapAttributeListField addField(LdapAttributeField value) {
-        super.addField(value);
+    public LdapAttributeListField add(LdapAttributeField value) {
+        super.add(value);
         return this;
     }
 }

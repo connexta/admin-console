@@ -1,14 +1,20 @@
 package org.codice.ddf.admin.query.api.fields;
 
-public interface Field {
+import java.util.List;
 
+import org.codice.ddf.admin.query.api.action.Message;
+
+public interface Field<T> {
     String fieldName();
     String fieldTypeName();
     FieldBaseType fieldBaseType();
     String description();
-    Object getValue();
+    T getValue();
+    void setValue(T value);
+    List<Message> validate();
 
+    // TODO: tbatie - 3/16/17 - Should we make this strings for expandability
     enum FieldBaseType {
-        STRING, INTEGER, FLOAT, BOOLEAN, LIST, OBJECT, ENUM, INTERFACE, UNION, ACTION, ACTION_HANDLER
+        STRING, INTEGER, FLOAT, BOOLEAN, LIST, OBJECT, ENUM, UNION
     }
 }

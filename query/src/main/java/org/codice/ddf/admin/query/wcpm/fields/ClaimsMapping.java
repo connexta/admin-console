@@ -1,6 +1,5 @@
 package org.codice.ddf.admin.query.wcpm.fields;
 
-import org.codice.ddf.admin.query.api.fields.Field;
 import org.codice.ddf.admin.query.commons.fields.base.BaseListField;
 
 public class ClaimsMapping extends BaseListField<ClaimsMapEntry> {
@@ -10,11 +9,13 @@ public class ClaimsMapping extends BaseListField<ClaimsMapEntry> {
 
 
     public ClaimsMapping() {
-        super(DEFAULT_FIELD_NAME, DESCRIPTION);
+        super(DEFAULT_FIELD_NAME, DESCRIPTION, new ClaimsMapEntry());
     }
 
     @Override
-    public Field getListValueField() {
-        return new ClaimsMapEntry();
+    public ClaimsMapping add(ClaimsMapEntry value) {
+        super.add(value);
+        return this;
     }
+
 }

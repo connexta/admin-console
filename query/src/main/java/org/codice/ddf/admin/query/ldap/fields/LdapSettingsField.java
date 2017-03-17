@@ -64,7 +64,7 @@ public class LdapSettingsField extends BaseObjectField {
     }
 
     public List<LdapAttributeEntryField> mapping() {
-        return mapping.getFields();
+        return mapping.getList();
     }
 
     public LdapSettingsField userBaseDn(String userBaseDn) {
@@ -93,7 +93,7 @@ public class LdapSettingsField extends BaseObjectField {
     }
 
     public LdapSettingsField mappingEntry(String claim, String attribute) {
-        mapping.addField(claim, attribute);
+        mapping.add(claim, attribute);
         return this;
 
     }

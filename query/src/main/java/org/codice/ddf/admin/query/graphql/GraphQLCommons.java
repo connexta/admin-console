@@ -9,16 +9,17 @@ import static graphql.schema.GraphQLObjectType.newObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
-import org.codice.ddf.admin.query.api.fields.ActionField;
-import org.codice.ddf.admin.query.api.fields.ActionHandlerField;
+import org.codice.ddf.admin.query.api.action.Action;
+import org.codice.ddf.admin.query.api.action.ActionCreator;
+import org.codice.ddf.admin.query.api.action.Message;
 import org.codice.ddf.admin.query.api.fields.Field;
 import org.codice.ddf.admin.query.api.fields.ListField;
 import org.codice.ddf.admin.query.api.fields.ObjectField;
 import org.codice.ddf.admin.query.commons.fields.base.BaseEnumField;
-import org.codice.ddf.admin.query.commons.fields.base.BaseListField;
 
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLArgument;
@@ -28,6 +29,34 @@ import graphql.schema.GraphQLObjectType;
 
 public class GraphQLCommons {
 
+    public static GraphQLObjectType actionCreatorToGraphQLObjectType(ActionCreator creator, List<Action> actions) {
+        return newObject().name(creator.typeName())
+                .description(creator.description())
+                .fields(actionsToGraphQLFieldDef(creator, actions))
+                .build();
+    }
+
+    public static List<GraphQLFieldDefinition> actionsToGraphQLFieldDef(ActionCreator creator, List<Action> actions) {
+        List<GraphQLFieldDefinition> fields = new ArrayList<>();
+
+        for(Action actionField : actions) {
+            List<GraphQLArgument> graphQLArgs = new ArrayList<>();
+
+            if (actionField.getArguments() != null) {
+                actionField.getArguments().forEach(f -> graphQLArgs.add(fieldToGraphQLArgument((Field)f)));
+            }
+
+            fields.add(newFieldDefinition().name(actionField.name())
+                    .type(fieldToGraphQLOutputType(actionField.returnType()))
+                    .description(actionField.description())
+                    .argument(graphQLArgs)
+                    .dataFetcher(env -> actionFieldDataFetch(env, actionField.name(), creator))
+                    .build());
+        }
+
+        return fields;
+    }
+
     public static GraphQLObjectType fieldToGraphQLObjectType(Field field) {
         switch (field.fieldBaseType()) {
         case OBJECT:
@@ -35,13 +64,6 @@ public class GraphQLCommons {
             return newObject().name(capitalize(field.fieldTypeName()) + "Payload")
                     .description(field.description())
                     .fields(fieldsToGraphQLFieldDefinition(((ObjectField)field).getFields()))
-                    .build();
-
-        case ACTION_HANDLER:
-            //Because this only be transformed into a top level sub query, there is no need to add Payload
-            return newObject().name(field.fieldTypeName())
-                    .description(field.description())
-                    .fields(fieldsToGraphQLFieldDefinition(((ActionHandlerField)field).getDiscoveryActions()))
                     .build();
         default:
             throw new RuntimeException("Unknown ObjectType: " + field.fieldBaseType());
@@ -59,21 +81,6 @@ public class GraphQLCommons {
 
     public static GraphQLFieldDefinition fieldToGraphQLFieldDefinition(Field field) {
         switch (field.fieldBaseType()) {
-        case ACTION:
-            ActionField actionField = (ActionField) field;
-            List<GraphQLArgument> graphQLArgs = new ArrayList<>();
-
-            if (actionField.getArguments() != null) {
-                actionField.getArguments().forEach(f -> graphQLArgs.add(fieldToGraphQLArgument((Field)f)));
-            }
-
-            return newFieldDefinition().name(actionField.fieldName())
-                    .type(fieldToGraphQLOutputType(actionField.getReturnField()))
-                    .description(actionField.description())
-                    .argument(graphQLArgs)
-                    .dataFetcher(env -> actionFieldDataFetch(env, actionField))
-                    .build();
-
         case UNION:
             return newFieldDefinition().name(field.fieldName())
                     .description(field.description())
@@ -107,27 +114,14 @@ public class GraphQLCommons {
         return builder.build();
     }
 
-    public static Object actionFieldDataFetch(DataFetchingEnvironment env, ActionField action) {
-        return action.process(env.getArguments()).getValue();
-    }
-
-    public static Object transformFieldToValue(Field field){
-        switch(field.fieldBaseType()) {
-        case ENUM:
-        case STRING:
-        case INTEGER:
-        case FLOAT:
-            return field.getValue();
-        case LIST:
-            return ((ListField) field).getFields()
-                    .stream()
-                    .map(f -> transformFieldToValue((Field) f))
-                    .collect(Collectors.toList());
-        case OBJECT:
-
-        default:
-            throw new RuntimeException("Unhandled base transform type [" + field.fieldBaseType() + "] with field name of [" + field.fieldName() + "] ");
-        }
+    public static Object actionFieldDataFetch(DataFetchingEnvironment env, String actionId, ActionCreator actionCreator) {
+//        if(true) {
+//            throw new RuntimeException("This is a test. Gimmie da money");
+//        }
+        Action action = actionCreator.createAction(actionId);
+        action.setArguments(env.getArguments());
+        List<Message> validationMessage = action.validate();
+        return action.process().getValue();
     }
 
     public static String capitalize(String str){

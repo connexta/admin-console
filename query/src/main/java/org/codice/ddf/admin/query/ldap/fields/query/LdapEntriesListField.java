@@ -1,6 +1,5 @@
 package org.codice.ddf.admin.query.ldap.fields.query;
 
-import org.codice.ddf.admin.query.api.fields.Field;
 import org.codice.ddf.admin.query.commons.fields.base.BaseListField;
 
 public class LdapEntriesListField extends BaseListField<LdapEntryField> {
@@ -9,17 +8,12 @@ public class LdapEntriesListField extends BaseListField<LdapEntryField> {
     public static final String DESCRIPTION = "A list of LDAP entries.";
 
     public LdapEntriesListField() {
-        super(DEFAULT_FIELD_NAME, DESCRIPTION);
+        super(DEFAULT_FIELD_NAME, DESCRIPTION, new LdapEntryField());
     }
 
     @Override
-    public Field getListValueField() {
-        return new LdapEntryField();
-    }
-
-    @Override
-    public LdapEntriesListField addField(LdapEntryField field) {
-        super.addField(field);
+    public LdapEntriesListField add(LdapEntryField field) {
+        super.add(field);
         return this;
     }
 }

@@ -13,8 +13,7 @@ public class ContextPath extends StringField {
     }
 
     @Override
-    public ContextPath setValue(String value) {
+    public void setValue(String value) {
         super.setValue(value);
-        return this;
     }
 }

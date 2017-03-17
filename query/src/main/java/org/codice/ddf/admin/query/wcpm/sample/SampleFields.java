@@ -13,27 +13,28 @@ import org.codice.ddf.admin.query.wcpm.fields.RealmList;
 public class SampleFields {
 
     public static final AuthTypeList SAMPLE_AUTH_TYPES_LIST = new AuthTypeList()
-            .addField(AuthType.BASIC_AUTH)
-            .addField(AuthType.IDP_AUTH)
-            .addField(AuthType.PKI_AUTH)
-            .addField(AuthType.SAML_AUTH)
-            .addField(AuthType.GUEST_AUTH);
+            .add(AuthType.BASIC_AUTH)
+            .add(AuthType.IDP_AUTH)
+            .add(AuthType.PKI_AUTH)
+            .add(AuthType.SAML_AUTH)
+            .add(AuthType.GUEST_AUTH);
 
     public static final RealmList SAMPLE_REALM_LIST = new RealmList()
-            .addField(Realm.KARAF_REALM)
-            .addField(Realm.LDAP_REALM);
+            .add(Realm.KARAF_REALM)
+            .add(Realm.LDAP_REALM);
 
-    public static final ContextPath SAMPLE_CONTEXT_PATH = new ContextPath().setValue("/example/path");
+    public static final ContextPath SAMPLE_CONTEXT_PATH = new ContextPath();
+    static {
+        SAMPLE_CONTEXT_PATH.setValue("/example/path");
+    }
 
     public static final ContextPaths SAMPLE_CONTEXT_PATHS = new ContextPaths()
-            .addField(SAMPLE_CONTEXT_PATH)
-            .addField(SAMPLE_CONTEXT_PATH)
-            .addField(SAMPLE_CONTEXT_PATH)
-            .addField(SAMPLE_CONTEXT_PATH);
+            .add(SAMPLE_CONTEXT_PATH)
+            .add(SAMPLE_CONTEXT_PATH)
+            .add(SAMPLE_CONTEXT_PATH);
 
-    public static final ClaimsMapEntry SAMPLE_CLAIMS_MAP_ENTRY = new ClaimsMapEntry().claim(
-            "sampleClaim")
-            .claimValue("sampleClaimValue");
+    public static final ClaimsMapEntry SAMPLE_CLAIMS_MAP_ENTRY = new ClaimsMapEntry()
+            .claim("sampleClaim").claimValue("sampleClaimValue");
 
     public static final ContextPolicyBin SAMPLE_CONTEXT_POLICY_BIN = new ContextPolicyBin()
             .realm(Realm.KARAF_REALM)
@@ -45,8 +46,8 @@ public class SampleFields {
             .addClaimsMapping(SAMPLE_CLAIMS_MAP_ENTRY)
             .addClaimsMapping(SAMPLE_CLAIMS_MAP_ENTRY);
 
-    public static final ContextPolicies SAMPLE_CONTEXT_POLICES = new ContextPolicies().addField(
+    public static final ContextPolicies SAMPLE_CONTEXT_POLICES = new ContextPolicies().add(
             SAMPLE_CONTEXT_POLICY_BIN)
-            .addField(SAMPLE_CONTEXT_POLICY_BIN);
+            .add(SAMPLE_CONTEXT_POLICY_BIN);
 
 }

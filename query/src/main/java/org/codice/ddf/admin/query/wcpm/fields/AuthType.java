@@ -1,43 +1,39 @@
 package org.codice.ddf.admin.query.wcpm.fields;
 
-import java.util.List;
-
+import org.codice.ddf.admin.query.api.fields.Field;
 import org.codice.ddf.admin.query.commons.fields.base.BaseEnumField;
 import org.codice.ddf.admin.query.commons.fields.base.scalar.StringField;
 
 import com.google.common.collect.ImmutableList;
 
-public class AuthType extends BaseEnumField<StringField> {
+public class AuthType extends BaseEnumField<String> {
 
     public static final String DEFAULT_FIELD_NAME = "authType";
     public static final String FIELD_TYPE_NAME = "AuthenticationType";
     public static final String DESCRIPTION = "Defines a specific type of authentication that should be performed.";
 
-    public static final StringField BASIC_AUTH = new BasicAuth();
-    public static final StringField SAML_AUTH = new SamlAuth();
-    public static final StringField PKI_AUTH = new PkiAuth();
-    public static final StringField IDP_AUTH = new IdpAuth();
-    public static final StringField GUEST_AUTH = new GuestAuth();
-
-    private static final List<StringField> AUTHENTICATION_TYPES = ImmutableList.of(BASIC_AUTH, SAML_AUTH, PKI_AUTH, IDP_AUTH, GUEST_AUTH);
+    public static final AuthType BASIC_AUTH = new AuthType(new BasicAuth());
+    public static final AuthType SAML_AUTH = new AuthType(new SamlAuth());
+    public static final AuthType PKI_AUTH = new AuthType(new PkiAuth());
+    public static final AuthType IDP_AUTH = new AuthType(new IdpAuth());
+    public static final AuthType GUEST_AUTH = new AuthType(new GuestAuth());
 
     public AuthType() {
-        super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
+        this(null);
     }
 
-    @Override
-    public List<StringField> getEnumValues() {
-        return AUTHENTICATION_TYPES;
+    protected AuthType(Field<String> authType) {
+        super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION, ImmutableList.of(new BasicAuth(), new SamlAuth(), new PkiAuth(), new IdpAuth(), new GuestAuth()), authType);
     }
 
     protected static final class BasicAuth extends StringField {
         public static final String BASIC = "basic";
         public static final String FIELD_NAME = BASIC;
-        public static final String FIELD_TYPE_ = BASIC;
-        public static final String DESCRIPTION = "Baasic access authentication is a method for a HTTP user agent to provide a user name and password when making a request.";
+        public static final String FIELD_TYPE = BASIC;
+        public static final String DESCRIPTION = "Basic access authentication is a method for a HTTP user agent to provide a user name and password when making a request.";
 
         public BasicAuth() {
-            super(FIELD_NAME, FIELD_TYPE_, DESCRIPTION);
+            super(FIELD_NAME, FIELD_TYPE, DESCRIPTION);
         }
 
         @Override
@@ -49,11 +45,11 @@ public class AuthType extends BaseEnumField<StringField> {
     protected static final class SamlAuth extends StringField {
         public static final String SAML = "SAML";
         public static final String FIELD_NAME = SAML;
-        public static final String FIELD_TYPE_ = SAML;
+        public static final String FIELD_TYPE = SAML;
         public static final String DESCRIPTION = "Security Assertion Markup Language is an XML-based, open-standard data format for exchanging authentication and authorization data between parties, in particular, between an identity provider and a service provider.";
 
         public SamlAuth() {
-            super(FIELD_NAME, FIELD_TYPE_, DESCRIPTION);
+            super(FIELD_NAME, FIELD_TYPE, DESCRIPTION);
         }
 
         @Override

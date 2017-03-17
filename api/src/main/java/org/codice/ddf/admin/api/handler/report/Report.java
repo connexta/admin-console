@@ -18,8 +18,10 @@ import static org.codice.ddf.admin.api.handler.ConfigurationMessage.buildMessage
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.api.handler.ConfigurationMessage;
@@ -52,21 +54,18 @@ public class Report {
 
     public boolean containsUnsuccessfulMessages() {
         return messages.stream()
-                .filter(msg -> msg.type() != ConfigurationMessage.MessageType.SUCCESS)
-                .findFirst()
-                .isPresent();
+                .anyMatch(msg -> msg.type() != ConfigurationMessage.MessageType.SUCCESS);
     }
 
     public boolean containsFailureMessages() {
         return messages.stream()
-                .filter(msg -> msg.type() == ConfigurationMessage.MessageType.FAILURE)
-                .findFirst()
-                .isPresent();
+                .anyMatch(msg -> msg.type() == ConfigurationMessage.MessageType.FAILURE);
     }
 
     public static Report createReport(Map<String, String> successTypes,
             Map<String, String> failureTypes, Map<String, String> warningTypes, String result) {
-        return createReport(successTypes, failureTypes, warningTypes, Arrays.asList(result));
+        return createReport(successTypes, failureTypes, warningTypes,
+                Collections.singletonList(result));
     }
 
     public static Report createReport(Map<String, String> successTypes,
@@ -106,7 +105,7 @@ public class Report {
     public Report addMessages(List<ConfigurationMessage> messages) {
         if (messages != null && !messages.isEmpty()) {
             messages.stream()
-                    .filter(msg -> msg != null)
+                    .filter(Objects::nonNull)
                     .forEach(msg -> this.messages.add(msg));
         }
         return this;

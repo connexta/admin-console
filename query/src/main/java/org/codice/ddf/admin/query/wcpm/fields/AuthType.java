@@ -1,3 +1,16 @@
+/**
+ * Copyright (c) Codice Foundation
+ * <p>
+ * This is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser
+ * General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or any later version.
+ * <p>
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details. A copy of the GNU Lesser General Public License
+ * is distributed along with this program and can be found at
+ * <http://www.gnu.org/licenses/lgpl.html>.
+ **/
 package org.codice.ddf.admin.query.wcpm.fields;
 
 import org.codice.ddf.admin.query.api.fields.Field;
@@ -61,11 +74,11 @@ public class AuthType extends BaseEnumField<String> {
     protected static final class PkiAuth extends StringField {
         public static final String PKI = "PKI";
         public static final String FIELD_NAME = PKI;
-        public static final String FIELD_TYPE_ = PKI;
+        public static final String FIELD_TYPE = PKI;
         public static final String DESCRIPTION = "A public key infrastructure (PKI) is a set of roles, policies, and procedures needed to create, manage, distribute, use, store, and revoke digital certificates and manage public-key encryption.";
 
         public PkiAuth() {
-            super(FIELD_NAME, FIELD_TYPE_, DESCRIPTION);
+            super(FIELD_NAME, FIELD_TYPE, DESCRIPTION);
         }
 
         @Override
@@ -77,11 +90,11 @@ public class AuthType extends BaseEnumField<String> {
     protected static final class IdpAuth extends StringField {
         public static final String IDP = "IdP";
         public static final String FIELD_NAME = IDP;
-        public static final String FIELD_TYPE_ = IDP;
+        public static final String FIELD_TYPE = IDP;
         public static final String DESCRIPTION = "Identity provider (IdP), also known as Identity Assertion Provider. Activates SAML Web SSO authentication support.";
 
         public IdpAuth() {
-            super(FIELD_NAME, FIELD_TYPE_, DESCRIPTION);
+            super(FIELD_NAME, FIELD_TYPE, DESCRIPTION);
         }
 
         @Override
@@ -93,11 +106,11 @@ public class AuthType extends BaseEnumField<String> {
     protected static final class GuestAuth extends StringField {
         public static final String GUEST = "guest";
         public static final String FIELD_NAME = GUEST;
-        public static final String FIELD_TYPE_ = GUEST;
+        public static final String FIELD_TYPE = GUEST;
         public static final String DESCRIPTION = "Provides guest access.";
 
         public GuestAuth() {
-            super(FIELD_NAME, FIELD_TYPE_, DESCRIPTION);
+            super(FIELD_NAME, FIELD_TYPE, DESCRIPTION);
         }
 
         @Override

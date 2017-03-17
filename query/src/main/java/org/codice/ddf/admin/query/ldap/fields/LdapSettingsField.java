@@ -1,3 +1,16 @@
+/**
+ * Copyright (c) Codice Foundation
+ * <p>
+ * This is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser
+ * General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or any later version.
+ * <p>
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details. A copy of the GNU Lesser General Public License
+ * is distributed along with this program and can be found at
+ * <http://www.gnu.org/licenses/lgpl.html>.
+ **/
 package org.codice.ddf.admin.query.ldap.fields;
 
 import java.util.List;
@@ -15,11 +28,11 @@ public class LdapSettingsField extends BaseObjectField {
     public static final String DESCRIPTION = "Contains information about the LDAP structure and various attributes required to setup.";
 
     // TODO: tbatie - 2/16/17 - Need to assess these fields again, FIELD class contains a T value that should be used instead
-    private String USER_NAME_ATTRIBUTE = "userNameAttribute";
-    private String USER_BASE_DN = "userBaseDn";
-    private String GROUP_BASE_DN = "groupBaseDn";
-    private String GROUP_OBJECT_CLASS = "groupObjectClass";
-    private String GROUP_MEMBERSHIP_ATTRIBUTE = "groupMembershipAttribute";
+    private static final String USER_NAME_ATTRIBUTE = "userNameAttribute";
+    private static final String USER_BASE_DN = "userBaseDn";
+    private static final String GROUP_BASE_DN = "groupBaseDn";
+    private static final String GROUP_OBJECT_CLASS = "groupObjectClass";
+    private static final String GROUP_MEMBERSHIP_ATTRIBUTE = "groupMembershipAttribute";
 
     private StringField usernameAttribute;
     private LdapDistinguishedName userBaseDn;

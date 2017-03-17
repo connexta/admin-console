@@ -42,12 +42,12 @@ const DiscoveryStageView = ({ messages, testSources, setDefaults, configs }) => 
         Discover Available Sources
       </Title>
       <Description>
-        Enter connection information to scan for available sources on a host.
+        Enter connection information to scan for available sources.
       </Description>
       <div style={{ width: 400, position: 'relative', margin: '0px auto', padding: 0 }}>
         <Hostname
           id='sourceHostName'
-          label='Hostname'
+          label='Host'
           autoFocus />
         <Port
           id='sourcePort'

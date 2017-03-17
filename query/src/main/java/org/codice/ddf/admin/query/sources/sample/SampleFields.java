@@ -44,7 +44,7 @@ public class SampleFields {
             .isAvaliable(true)
             .configuration(SAMPLE_OPENSEARCH_CONFIG);
 
-    public static final SourceInfoListField SAMPLE_SOURCES_INFO_LIST = new SourceInfoListField().addField(SAMPLE_CSW_SOURCE_INFO)
-            .addField(SAMPLE_WFS_SOURCE_INFO)
-            .addField(SAMPLE_OPENSEARCH_SOURCE_INFO);
+    public static final SourceInfoListField SAMPLE_SOURCES_INFO_LIST = new SourceInfoListField().add(SAMPLE_CSW_SOURCE_INFO)
+            .add(SAMPLE_WFS_SOURCE_INFO)
+            .add(SAMPLE_OPENSEARCH_SOURCE_INFO);
 }

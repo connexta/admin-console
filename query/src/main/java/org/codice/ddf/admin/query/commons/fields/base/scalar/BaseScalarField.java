@@ -1,9 +1,12 @@
 package org.codice.ddf.admin.query.commons.fields.base.scalar;
 
-import org.codice.ddf.admin.query.api.fields.ScalarField;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.codice.ddf.admin.query.api.action.Message;
 import org.codice.ddf.admin.query.commons.fields.base.BaseField;
 
-public abstract class BaseScalarField<T> extends BaseField implements ScalarField<T> {
+public abstract class BaseScalarField<T> extends BaseField<T> {
 
     private T value;
 
@@ -13,8 +16,14 @@ public abstract class BaseScalarField<T> extends BaseField implements ScalarFiel
 
     public T getValue() {return value; }
 
-    public BaseScalarField setValue(T value) {
+    @Override
+    public void setValue(T value) {
         this.value = value;
-        return this;
+    }
+
+    @Override
+    public List<Message> validate() {
+        // TODO: tbatie - 3/16/17 - Validate scalar fields
+        return new ArrayList<>();
     }
 }

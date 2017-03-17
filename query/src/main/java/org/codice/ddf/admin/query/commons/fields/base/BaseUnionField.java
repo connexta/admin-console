@@ -12,6 +12,7 @@ public abstract class BaseUnionField extends BaseObjectField implements UnionFie
     public static final String FIELD_TYPE_NAME_KEY = "fieldTypeName";
     private List<ObjectField> unionTypes;
 
+    // TODO: tbatie - 3/16/17 - We could do something similar to what we do for enum types, have an internal union value field instead
     public BaseUnionField(String fieldName, String fieldTypeName, String description, List<ObjectField> unionTypes, boolean isUnionValue) {
         super(fieldName, fieldTypeName, description, isUnionValue ? FieldBaseType.OBJECT : FieldBaseType.UNION);
         this.unionTypes = unionTypes;

@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.codice.ddf.admin.query.api.fields.Field;
 import org.codice.ddf.admin.query.commons.fields.base.BaseObjectField;
-import org.codice.ddf.admin.query.commons.fields.base.scalar.StringField;
 import org.codice.ddf.admin.query.commons.fields.common.ContextPath;
 import org.codice.ddf.admin.query.commons.fields.common.ContextPaths;
 
@@ -29,23 +28,23 @@ public class ContextPolicyBin extends BaseObjectField {
         claimsMapping = new ClaimsMapping();
     }
 
-    public ContextPolicyBin realm(StringField realm) {
-        this.realm.setValue(realm);
+    public ContextPolicyBin realm(Realm realm) {
+        this.realm = realm;
         return this;
     }
 
     public ContextPolicyBin addContextPath(ContextPath contextPath) {
-        contexts.addField(contextPath);
+        contexts.add(contextPath);
         return this;
     }
 
     public ContextPolicyBin addClaimsMapping(ClaimsMapEntry entry) {
-        claimsMapping.addField(entry);
+        claimsMapping.add(entry);
         return this;
     }
 
-    public ContextPolicyBin addAuthType(StringField authType) {
-        authTypes.addField(authType);
+    public ContextPolicyBin addAuthType(AuthType authType) {
+        authTypes.add(authType);
         return this;
     }
 

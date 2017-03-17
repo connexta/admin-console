@@ -10,4 +10,5 @@ public class BooleanField extends BaseScalarField<Boolean> {
     protected BooleanField(String fieldName, String fieldTypeName, String description) {
         super(fieldName, fieldTypeName, description, BOOLEAN);
     }
+
 }

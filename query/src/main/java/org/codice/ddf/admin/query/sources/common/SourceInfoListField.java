@@ -8,17 +8,12 @@ public class SourceInfoListField extends BaseListField<SourceInfoField> {
     public static final String DESCRIPTION = "A list of source configurations";
 
     public SourceInfoListField() {
-        super(DEFAULT_FIELD_NAME, DESCRIPTION);
+        super(DEFAULT_FIELD_NAME, DESCRIPTION, new SourceInfoField());
     }
 
     @Override
-    public SourceInfoListField addField(SourceInfoField value) {
-        super.addField(value);
+    public SourceInfoListField add(SourceInfoField value) {
+        super.add(value);
         return this;
-    }
-
-    @Override
-    public SourceInfoField getListValueField() {
-        return new SourceInfoField();
     }
 }

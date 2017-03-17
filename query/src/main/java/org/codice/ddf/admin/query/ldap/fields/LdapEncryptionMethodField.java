@@ -1,39 +1,27 @@
 package org.codice.ddf.admin.query.ldap.fields;
 
-import java.util.List;
-
+import org.codice.ddf.admin.query.api.fields.Field;
 import org.codice.ddf.admin.query.commons.fields.base.BaseEnumField;
 import org.codice.ddf.admin.query.commons.fields.base.scalar.StringField;
 
 import com.google.common.collect.ImmutableList;
 
-public class LdapEncryptionMethodField extends BaseEnumField<StringField> {
+public class LdapEncryptionMethodField extends BaseEnumField<String> {
 
     public static final String FIELD_NAME = "encryption";
-
     public static final String FIELD_TYPE_NAME = "EncryptionMethod";
+    public static final String DESCRIPTION = "All possible encryption methods supported to establish an LDAP connection.";
 
-    public static final String DESCRIPTION =
-            "All possible encryption methods supported to establish an LDAP connection.";
-
-    public static final StringField NO_ENCRYPTION = new NoEncryption();
-
-    public static final StringField LDAPS_ENCRYPTION = new LdapsEncryption();
-
-    public static final StringField START_TLS = new StartTlsEncryption();
+    public static final LdapEncryptionMethodField NO_ENCRYPTION = new LdapEncryptionMethodField(new NoEncryption());
+    public static final LdapEncryptionMethodField LDAPS_ENCRYPTION = new LdapEncryptionMethodField(new LdapsEncryption());
+    public static final LdapEncryptionMethodField START_TLS = new LdapEncryptionMethodField(new StartTlsEncryption());
 
     public LdapEncryptionMethodField() {
-        super(FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
+        this(null);
     }
 
-    @Override
-    public String getValue() {
-        return (String) super.getValue();
-    }
-
-    @Override
-    public List<StringField> getEnumValues() {
-        return ImmutableList.of(NO_ENCRYPTION, LDAPS_ENCRYPTION, START_TLS);
+    protected LdapEncryptionMethodField(Field<String> encryptionMethod) {
+        super(FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION, ImmutableList.of(new NoEncryption(), new LdapsEncryption(), new StartTlsEncryption()), encryptionMethod);
     }
 
     protected static final class NoEncryption extends StringField {

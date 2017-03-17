@@ -1,8 +1,8 @@
 package org.codice.ddf.admin.query.api.fields;
 
 import java.util.List;
+import java.util.Map;
 
-public interface UnionField extends Field {
-
+public interface UnionField extends ObjectField {
     List<ObjectField> getUnionTypes();
 }

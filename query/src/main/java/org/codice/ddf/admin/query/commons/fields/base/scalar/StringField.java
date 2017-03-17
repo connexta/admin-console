@@ -12,15 +12,4 @@ public class StringField extends BaseScalarField<String> {
     protected StringField(String fieldName, String fieldTypeName, String description) {
         super(fieldName, fieldTypeName, description, STRING);
     }
-
-    @Override
-    public StringField setValue(String value) {
-        super.setValue(value);
-        return this;
-    }
-
-    @Override
-    public String getValue() {
-        return super.getValue();
-    }
 }

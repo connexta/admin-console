@@ -2,25 +2,23 @@ package org.codice.ddf.admin.query.commons.actions;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.codice.ddf.admin.query.api.fields.Field;
+import org.codice.ddf.admin.query.api.action.Message;
 
-public abstract class GetAction<T extends Field> extends BaseActionField<T> {
+public abstract class GetAction<T extends Field> extends BaseAction<T> {
 
     public GetAction(String fieldName, String description, T returnType) {
         super(fieldName, description, returnType);
     }
 
-    public abstract T process();
-
     @Override
-    public T process(Map<String, Object> args) {
-        return process();
+    public List<Field> getArguments() {
+        return new ArrayList<>();
     }
 
     @Override
-    public List<Field> getArguments() {
+    public List<Message> validate() {
         return new ArrayList<>();
     }
 }

@@ -3,11 +3,9 @@ package org.codice.ddf.admin.query.graphql;
 import static org.codice.ddf.admin.query.commons.fields.base.BaseUnionField.FIELD_TYPE_NAME_KEY;
 import static org.codice.ddf.admin.query.graphql.GraphQLCommons.enumFieldToGraphQLEnumType;
 import static org.codice.ddf.admin.query.graphql.GraphQLCommons.fieldToGraphQLObjectType;
-import static org.codice.ddf.admin.query.graphql.GraphQLCommons.fieldsToGraphQLFieldDefinition;
 import static graphql.Scalars.GraphQLBoolean;
 import static graphql.Scalars.GraphQLInt;
 import static graphql.Scalars.GraphQLString;
-import static graphql.schema.GraphQLInterfaceType.newInterface;
 import static graphql.schema.GraphQLUnionType.newUnionType;
 
 import java.util.Arrays;
@@ -16,11 +14,9 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.codice.ddf.admin.query.api.fields.Field;
-import org.codice.ddf.admin.query.api.fields.InterfaceField;
 import org.codice.ddf.admin.query.api.fields.ListField;
 import org.codice.ddf.admin.query.api.fields.UnionField;
 import org.codice.ddf.admin.query.commons.fields.base.BaseEnumField;
-import org.codice.ddf.admin.query.commons.fields.base.BaseListField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +37,7 @@ public class GraphQLOutput {
         case ENUM:
             return enumFieldToGraphQLEnumType((BaseEnumField) field);
         case LIST:
-            return new GraphQLList(fieldToGraphQLOutputType(((ListField)field).getListValueField()));
+            return new GraphQLList(fieldToGraphQLOutputType(((ListField)field).getListFieldType()));
         case INTEGER:
             if(field.fieldTypeName() == null) {
                 return GraphQLInt;
@@ -57,8 +53,6 @@ public class GraphQLOutput {
                 return GraphQLString;
             }
             return new GraphQLScalarType(field.fieldTypeName(), field.description(), GraphQLString.getCoercing());
-        case INTERFACE:
-            return interfaceToGraphQLOutputType((InterfaceField) field);
         case UNION:
             return unionToGraphQLOutputType((UnionField) field);
         }
@@ -66,13 +60,13 @@ public class GraphQLOutput {
         return GraphQLString;
     }
 
-    public static GraphQLOutputType interfaceToGraphQLOutputType(InterfaceField field) {
-        return newInterface().name(field.fieldTypeName())
-                .description(field.description())
-                .typeResolver(new UnionTypeResolver())
-                .fields(fieldsToGraphQLFieldDefinition(field.getFields()))
-                .build();
-    }
+//    public static GraphQLOutputType interfaceToGraphQLOutputType(InterfaceField field) {
+//        return newInterface().name(field.fieldTypeName())
+//                .description(field.description())
+//                .typeResolver(new UnionTypeResolver())
+//                .fields(fieldsToGraphQLFieldDefinition(field.getFields()))
+//                .build();
+//    }
 
     public static GraphQLOutputType unionToGraphQLOutputType(UnionField field) {
         GraphQLObjectType[] unionValues = field.getUnionTypes()

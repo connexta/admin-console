@@ -3,7 +3,6 @@ package org.codice.ddf.admin.query.wcpm.actions.discover;
 import static org.codice.ddf.admin.query.wcpm.sample.SampleFields.SAMPLE_AUTH_TYPES_LIST;
 
 import org.codice.ddf.admin.query.commons.actions.GetAction;
-import org.codice.ddf.admin.query.wcpm.fields.AuthType;
 import org.codice.ddf.admin.query.wcpm.fields.AuthTypeList;
 
 public class GetAuthTypes extends GetAction<AuthTypeList> {
@@ -19,4 +18,5 @@ public class GetAuthTypes extends GetAction<AuthTypeList> {
     public AuthTypeList process() {
         return SAMPLE_AUTH_TYPES_LIST;
     }
+
 }

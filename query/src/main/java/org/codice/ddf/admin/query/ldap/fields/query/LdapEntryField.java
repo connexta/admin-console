@@ -31,12 +31,12 @@ public class LdapEntryField extends BaseObjectField {
     }
 
     public LdapEntryField addEntry(LdapEntryField entry){
-//        entries.addField(entry);
+//        entries.add(entry);
         return this;
     }
 
     public LdapEntryField addAttribute(LdapAttributeField attribute) {
-        attributes.addField(attribute);
+        attributes.add(attribute);
         return this;
     }
 }

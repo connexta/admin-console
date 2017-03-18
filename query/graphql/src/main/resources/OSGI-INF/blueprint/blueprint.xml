@@ -52,4 +52,11 @@
         </interfaces>
     </service>
 
+    <bean id="relayProvder" class="org.codice.ddf.admin.graphql.relay.RelayGraphQLProvider" />
+    <service ref="relayProvder">
+        <interfaces>
+            <value>graphql.servlet.GraphQLQueryProvider</value>
+        </interfaces>
+    </service>
+
 </blueprint>

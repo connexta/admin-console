@@ -10,6 +10,7 @@ import Description from 'components/Description'
 import ActionGroup from 'components/ActionGroup'
 import Action from 'components/Action'
 import Message from 'components/Message'
+import FlatButton from 'material-ui/FlatButton'
 
 import {
   Input,
@@ -19,8 +20,7 @@ import {
 } from 'admin-wizard/inputs'
 
 import {
-  sideLines,
-  linkStyle
+  sideLines
 } from '../styles.less'
 
 import { NavPanes } from '../components'
@@ -94,11 +94,11 @@ const DiscoveryStageView = ({ messages, testSources, setDefaults, configs, disco
           {
             (discoveryType === 'hostnamePort') ? (
               <div style={{ textAlign: 'right' }}>
-                <span className={linkStyle} onClick={() => { setDiscoveryType('url') }}>Know the source url?</span>
+                <FlatButton primary labelStyle={{fontSize: '14px', textTransform: 'none'}} label='Know the source url?' onClick={() => { setDiscoveryType('url') }} />
               </div>
             ) : (
               <div style={{ textAlign: 'right' }}>
-                <span className={linkStyle} onClick={() => { setDiscoveryType('hostnamePort') }}>Don't know the source url?</span>
+                <FlatButton primary labelStyle={{fontSize: '14px', textTransform: 'none'}} label={'Don\'t know the source url'} onClick={() => { setDiscoveryType('hostnamePort') }} />
               </div>
             )
           }

@@ -16,7 +16,6 @@ import DiscoveryStage from './stages/discovery'
 import SourceSelectionStage from './stages/source-selection'
 import ConfirmationStage from './stages/confirmation'
 import CompletedStage from './stages/completed'
-import ManualEntryStage from './stages/manual-entry'
 
 const WizardView = ({ id, children, clearWizard }) => (
   <Mount key={id}>{children}</Mount>
@@ -24,23 +23,13 @@ const WizardView = ({ id, children, clearWizard }) => (
 
 const Wizard = connect(null, { clearWizard })(WizardView)
 
-/*
-  - welcomeStage
-  - discoveryStage
-  - sourceSelectionStage
-  - confirmationStage
-  - completedStage
-  - manualEntryStage
-*/
-
 let StageRouter = ({ stage, messages }) => {
   const stageMapping = {
     welcomeStage: <WelcomeStage />,
     discoveryStage: <DiscoveryStage />,
     sourceSelectionStage: <SourceSelectionStage />,
     confirmationStage: <ConfirmationStage />,
-    completedStage: <CompletedStage />,
-    manualEntryStage: <ManualEntryStage />
+    completedStage: <CompletedStage />
   }
   return (stageMapping[stage])
 }

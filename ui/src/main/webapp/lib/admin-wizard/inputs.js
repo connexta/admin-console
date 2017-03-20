@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { connect } from 'react-redux'
-import { getConfig } from '../../reducer'
+import { getConfig } from './reducer'
 import { editConfig } from './actions'
 
 import TextField from 'material-ui/TextField'

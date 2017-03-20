@@ -1,6 +1,9 @@
 import { Map } from 'immutable'
 
-import { isPolling } from '../../reducer'
+import sub from 'redux-submarine'
+
+export const submarine = sub()
+export const isPolling = (state, id) => submarine(state).has(id)
 
 // actions
 const startPolling = (id) => ({ type: 'redux-polling/START', id })
@@ -27,7 +30,7 @@ export const poll = (id, asyncAction, { interval = 5000 } = {}) => (...args) => 
   }
 }
 
-const reducer = (state = Map(), { type, id } = {}) => {
+export default (state = Map(), { type, id } = {}) => {
   switch (type) {
     case 'redux-polling/START':
       return state.set(id, true)
@@ -37,5 +40,3 @@ const reducer = (state = Map(), { type, id } = {}) => {
       return state
   }
 }
-
-export default reducer

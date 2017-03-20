@@ -1,5 +1,6 @@
 import { combineReducers } from 'redux-immutable'
 import { fromJS, Map } from 'immutable'
+import sub from 'redux-submarine'
 
 const sourceStage = (state = 'welcomeStage', { type, stage }) => {
   switch (type) {
@@ -13,8 +14,6 @@ const sourceStage = (state = 'welcomeStage', { type, stage }) => {
       return state
   }
 }
-
-export const getSourceStage = (state) => state.getIn(['sourceWizard', 'sourceStage'])
 
 const sourceStagesClean = (state = false, { type }) => {
   switch (type) {
@@ -33,8 +32,6 @@ const sourceStagesClean = (state = false, { type }) => {
   }
 }
 
-export const getStageProgress = (state) => state.getIn(['sourceWizard', 'sourceStageProgress'])
-
 const sourceStageProgress = (state = 'welcomeStage', { type, stage }) => {
   switch (type) {
     case 'SET_CURRENT_PROGRESS':
@@ -47,14 +44,6 @@ const sourceStageProgress = (state = 'welcomeStage', { type, stage }) => {
       return state
   }
 }
-
-export const getStagesClean = (state) => state.getIn(['sourceWizard', 'sourceStagesClean'])
-
-export const getConfig = (state, id) => state.getIn(['wizard', 'config', id], Map()).toJS()
-
-export const getSelectedSourceDisplayName = (state, id) => state.getIn(['wizard', 'sourceWizard', ''])
-
-export const getProbeValue = (state) => state.getIn(['probeValue'])
 
 const sourceSelections = (state = Map(), { type, sourceConfigs }) => {
   switch (type) {
@@ -84,14 +73,19 @@ const configTypes = (state = fromJS([]), { type, types }) => {
   switch (type) {
     case 'SOURCES/SET_CONFIG_IDS':
       return fromJS(types)
-
     default:
       return state
   }
 }
 
-// TODO: replace these absolute paths with relative ones like the other wizards
-export const getConfigTypes = (state) => state.getIn(['sourceWizard', 'configTypes']).toJS()
+const discoveryType = (state = 'hostnamePort', { type, value }) => {
+  switch (type) {
+    case 'SOURCES/DISCOVERY_TYPE/SET':
+      return value
+    default:
+      return state
+  }
+}
 
 export const getConfigTypeById = (state, id) => {
   const found = getConfigTypes(state).filter((config) => config.id === id)
@@ -100,13 +94,48 @@ export const getConfigTypeById = (state, id) => {
   }
 }
 
-export const getSourceSelections = (state) => state.getIn(['sourceWizard', 'sourceSelections'])
+export const getDiscoveryConfigs = (state) => (type) => {
+  const sourceUserName = state.getIn(['wizard', 'config', 'sourceUserName', 'value'])
+  const sourceUserPassword = state.getIn(['wizard', 'config', 'sourceUserPassword', 'value'])
+  switch (type) {
+    case 'hostnamePort':
+      const sourceHostName = state.getIn(['wizard', 'config', 'sourceHostName', 'value'])
+      const sourcePort = state.getIn(['wizard', 'config', 'sourcePort', 'value'])
+      return {
+        sourceUserName,
+        sourceUserPassword,
+        sourceHostName,
+        sourcePort
+      }
 
+    case 'url':
+      const endpointUrl = state.getIn(['wizard', 'config', 'endpointUrl', 'value'])
+      return {
+        sourceUserName,
+        sourceUserPassword,
+        endpointUrl
+      }
+
+    default:
+      return {
+        sourceUserName,
+        sourceUserPassword
+      }
+  }
+}
+
+export const submarine = sub()
+export const getSourceSelections = (state) => submarine(state).get('sourceSelections')
+export const getIsSubmitting = (state) => submarine(state).get('isSubmitting')
+export const getDiscoveryType = (state) => submarine(state).get('discoveryType')
+export const getSourceStage = (state) => submarine(state).get('sourceStage')
+export const getStageProgress = (state) => submarine(state).get('sourceStageProgress')
+export const getStagesClean = (state) => submarine(state).get('sourceStagesClean')
+export const getConfigTypes = (state) => submarine(state).get('configTypes').toJS()
+
+export const getConfig = (state, id) => state.getIn(['wizard', 'config', id], Map()).toJS()
 export const getConfigurationHandlerId = (state) => state.getIn(['wizard', 'config', 'configurationHandlerId'])
-
 export const getSourceName = (state) => state.getIn(['wizard', 'config', 'sourceName', 'value'])
 
-export const getIsSubmitting = (state) => state.getIn(['sourceWizard', 'isSubmitting'])
-
-export default combineReducers({ sourceStage, sourceStagesClean, sourceStageProgress, sourceSelections, isSubmitting, configTypes })
+export default combineReducers({ sourceStage, sourceStagesClean, sourceStageProgress, sourceSelections, isSubmitting, configTypes, discoveryType })
 

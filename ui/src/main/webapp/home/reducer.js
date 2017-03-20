@@ -1,10 +1,12 @@
 import { combineReducers } from 'redux-immutable'
 import { Map } from 'immutable'
+import sub from 'redux-submarine'
 
-export const getSourceConfigs = (state) => state.getIn(['home', 'configs', 'sources'])
-export const getLdapConfigs = (state) => state.getIn(['home', 'configs', 'ldap'])
-export const getSubmittingPids = (state) => state.getIn(['home', 'submitting']).toJS()
-export const getConfigErrors = (state, servicePid) => state.getIn(['home', 'errors', servicePid], [])
+export const submarine = sub()
+export const getSourceConfigs = (state) => submarine(state).getIn(['configs', 'sources'])
+export const getLdapConfigs = (state) => submarine(state).getIn(['configs', 'ldap'])
+export const getSubmittingPids = (state) => submarine(state).getIn(['submitting']).toJS()
+export const getConfigErrors = (state, servicePid) => submarine(state).getIn(['errors', servicePid], [])
 
 const configs = (state = Map(), { type, id, value = [] }) => {
   switch (type) {

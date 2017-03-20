@@ -1,13 +1,11 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { getException } from '../reducer'
-
 import * as styles from './exceptions.less'
 
 import { Tabs, Tab } from 'material-ui/Tabs'
 
-import { clearException } from 'redux-fetch'
+import { clearException, getException } from 'redux-fetch'
 
 import Http from 'material-ui/svg-icons/action/http'
 import Code from 'material-ui/svg-icons/action/code'

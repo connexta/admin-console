@@ -44,14 +44,13 @@ const ConfigureEmbeddedLdap = (props) => {
         ldifPath='etc/org.codice.opendj/ldap' />
       <Title>Are You Sure You Want to Install Embedded LDAP?</Title>
       <Description>
-        <div> { /* todo - add a 'warning-style' box around this <p/> */ }
-          <p>
-            The embedded LDAP server is used for testing purposes only and
-            should not be used in a production environment.
-          </p>
-        </div>
+        { /* todo - add a 'warning-style' box around this <p/> */ }
         <p>
-        Installing Embedded LDAP will start up the internal LDAP and
+          The embedded LDAP server is used for testing purposes only and
+          should not be used in a production environment.
+        </p>
+        <p>
+          Installing Embedded LDAP will start up the internal LDAP and
           configure it as a {useCaseDescription(ldapUseCase)}.
         </p>
       </Description>

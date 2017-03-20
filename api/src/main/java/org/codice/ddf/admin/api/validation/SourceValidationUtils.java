@@ -125,7 +125,7 @@ public class SourceValidationUtils {
         return results;
     }
 
-    private static List<ConfigurationMessage> validateHostnameAndPort(SourceConfiguration configuration) {
+    public static List<ConfigurationMessage> validateHostnameAndPort(SourceConfiguration configuration) {
         List<ConfigurationMessage> validationResults = new ArrayList<>();
         if (configuration.sourceHostName() != null) {
             validationResults.addAll(configuration.validate(Arrays.asList(SOURCE_HOSTNAME, PORT)));
@@ -135,7 +135,7 @@ public class SourceValidationUtils {
         return validationResults;
     }
 
-    private static List<ConfigurationMessage> validateEndpointUrl(SourceConfiguration configuration) {
+    public static List<ConfigurationMessage> validateEndpointUrl(SourceConfiguration configuration) {
         List<ConfigurationMessage> validationResults = new ArrayList<>();
         if (configuration.endpointUrl() != null) {
             validationResults.addAll(configuration.validate(Collections.singletonList(ENDPOINT_URL)));

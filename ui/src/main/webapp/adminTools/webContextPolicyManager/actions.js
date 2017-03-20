@@ -1,4 +1,4 @@
-import {getBins, hasPath} from '../../reducer'
+import { getBins, hasPath } from './reducer'
 import { get, post } from 'redux-fetch'
 
 // Bin level

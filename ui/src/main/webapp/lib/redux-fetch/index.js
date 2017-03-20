@@ -3,10 +3,12 @@ import 'whatwg-fetch'
 import { Map } from 'immutable'
 import { combineReducers } from 'redux-immutable'
 
-// selectors
+import sub from 'redux-submarine'
 
-export const getException = (state) => state.get('exception')
-export const isSubmitting = (state, id) => state.get('submitting').has(id)
+// selectors
+export const submarine = sub()
+export const getException = (state) => submarine(state).get('exception')
+export const isSubmitting = (state, id) => submarine(state).get('submitting').has(id)
 
 // actions
 

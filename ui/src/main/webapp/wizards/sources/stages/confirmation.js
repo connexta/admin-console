@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import { getSourceName } from '../reducer'
-import { getAllConfig, getConfig, getMessages } from '../../../reducer'
+import { getAllConfig, getConfig, getMessages } from 'admin-wizard/reducer'
 import { persistConfig } from '../actions'
 import { NavPanes } from '../components.js'
 

@@ -1,6 +1,7 @@
 import { post } from 'redux-fetch'
 
-import { getAllConfig } from '../../reducer'
+import { getAllConfig } from 'admin-wizard/reducer'
+import { getDiscoveryConfigs } from './reducer'
 import { clearWizard } from 'admin-wizard/actions'
 
 export const changeStage = (stageId) => ({ type: 'SOURCE_CHANGE_STAGE', stage: stageId })
@@ -18,6 +19,7 @@ export const startSubmitting = () => ({ type: 'START_SUBMITTING' })
 export const endSubmitting = () => ({ type: 'END_SUBMITTING' })
 export const setConfigSource = (source) => ({ type: 'SET_CONFIG_SOURCE', value: source })
 export const setConfigTypes = (types) => ({ type: 'SOURCES/SET_CONFIG_IDS', types })
+export const setDiscoveryType = (value) => ({ type: 'SOURCES/DISCOVERY_TYPE/SET', value })
 
 export const resetSourceWizardState = () => (dispatch) => {
   dispatch(clearWizard())
@@ -32,11 +34,11 @@ const filterErrors = (messages) => {
   return messages.filter((message) => (message.type === 'FAILURE'))
 }
 
-export const testSources = (configType, nextStageId, id = 'general') => async (dispatch, getState) => {
+export const testSources = (configType, nextStageId, id = 'general', discoveryType = 'hostnamePort') => async (dispatch, getState) => {
   dispatch(stagesClean())
   dispatch(startSubmitting())
   try {
-    const configuration = { configurationType: configType, ...getAllConfig(getState()) }
+    const configuration = { configurationType: configType, ...getDiscoveryConfigs(getState())(discoveryType) }
     for (let key in configuration) {
       if (!configuration[key]) {
         delete configuration[key]
@@ -139,39 +141,6 @@ export const fetchConfigTypes = (nextStageId, id = 'general') => async (dispatch
       dispatch(clearMessages(id))
       dispatch(changeStage(nextStageId))
     }
-  } finally {
-    dispatch(endSubmitting())
-  }
-}
-
-export const testManualUrl = (endpointUrl, configType, nextStageId, id = 'general') => async (dispatch, getState) => {
-  dispatch(stagesClean())
-  dispatch(startSubmitting())
-  try {
-    const configuration = {
-      ...getAllConfig(getState()),
-      configurationType: configType,
-      endpointUrl: endpointUrl.trim()
-    }
-    for (let key in configuration) {
-      if (!configuration[key]) {
-        delete configuration[key]
-      }
-    }
-    const body = JSON.stringify(configuration)
-
-    const url = '/admin/beta/config/probe/' + configType + '/discover-sources'
-    const res = await dispatch(post(url, { body }))
-    const json = await res.json()
-
-    if (containsErrors(json)) {
-      dispatch(clearMessages(id))
-      dispatch(setMessages(id, filterErrors(json.messages)))
-      return
-    }
-
-    dispatch(setConfigSource(json.probeResults.discoveredSources))
-    dispatch(changeStage(nextStageId))
   } finally {
     dispatch(endSubmitting())
   }

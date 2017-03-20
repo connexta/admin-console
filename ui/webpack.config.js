@@ -115,7 +115,12 @@ if (process.env.NODE_ENV === 'production') {
     entry: glob.sync('./src/main/webapp/**/*spec.js')
       .concat('./src/main/webapp/app.js')
       .map(function (spec) { return path.resolve(spec) }),
-    plugins: [new HtmlWebpackPlugin()],
+    plugins: [
+      new webpack.DefinePlugin({
+        'process.env.NODE_ENV': '"ci"'
+      }),
+      new HtmlWebpackPlugin()
+    ],
     module: {
       rules: [
         {

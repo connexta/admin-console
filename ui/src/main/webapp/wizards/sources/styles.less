@@ -65,3 +65,37 @@
   max-width: 800px;
   position: relative;
 }
+
+.sideLines {
+  text-align: center;
+  position: relative;
+  top: 2px;
+  padding-top: 1px;
+  margin: 60px 0px 0px;
+  line-height: 0;
+}
+
+.sideLines:after {
+  content: "";
+  width: 100%;
+  background-color: transparent;
+  display: block;
+  height: 1px;
+  border-top: 1px solid #e7e7e7;
+  position: absolute;
+  top: 50%;
+  margin-top: -1px;
+  z-index: 1;
+}
+
+.sideLines span {
+  line-height: 1;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.541176);
+  z-index: 2;
+  position: relative;
+  display: inline-block;
+  background-color: #fff;
+  padding: 0 7px 0 7px;
+}
+

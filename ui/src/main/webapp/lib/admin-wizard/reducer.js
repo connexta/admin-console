@@ -1,12 +1,15 @@
 import { combineReducers } from 'redux-immutable'
 import { fromJS, List, Map } from 'immutable'
 
-export const getConfig = (state, id) => state.getIn(['config'].concat(id), Map()).toJS()
-export const getAllConfig = (state) => state.get('config').map((config) => config.get('value')).toJS()
-export const getMessages = (state, id) => state.getIn(['messages', id], List()).toJS()
-export const getProbeValue = (state) => state.getIn(['probeValue'])
-export const getDisplayedLdapStage = (state) => state.getIn(['ldapDisplayedStages']).last()
-export const getAllowSkip = (state, stageId) => state.getIn(['allowSkip', stageId])
+import sub from 'redux-submarine'
+
+export const submarine = sub()
+export const getConfig = (state, id) => submarine(state).getIn(['config'].concat(id), Map()).toJS()
+export const getAllConfig = (state) => submarine(state).get('config').map((config) => config.get('value')).toJS()
+export const getMessages = (state, id) => submarine(state).getIn(['messages', id], List()).toJS()
+export const getProbeValue = (state) => submarine(state).getIn(['probeValue'])
+export const getDisplayedLdapStage = (state) => submarine(state).getIn(['ldapDisplayedStages']).last()
+export const getAllowSkip = (state, stageId) => submarine(state).getIn(['allowSkip', stageId])
 
 // TODO: add reducer checks for the wizardClear action to reset the state to defaults
 const config = (state = Map(), { type, id, value, values, messages, options }) => {

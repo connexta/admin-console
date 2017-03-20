@@ -13,13 +13,14 @@
  */
 package org.codice.ddf.admin.sources.impl.probe;
 
+import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.ENDPOINT_URL;
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.PORT;
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_HOSTNAME;
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_USERNAME;
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_USER_PASSWORD;
 import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.FAILED_PROBE;
 import static org.codice.ddf.admin.api.handler.report.ProbeReport.createProbeReport;
-import static org.codice.ddf.admin.api.validation.SourceValidationUtils.validateOptionalUsernameAndPassword;
+import static org.codice.ddf.admin.api.validation.SourceValidationUtils.validateForSourceDiscovery;
 import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.BAD_IP;
 import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.DISCOVERED_SOURCE;
 import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.DISCOVERED_SOURCES;
@@ -53,9 +54,10 @@ public class DiscoverSourcesProbeMethod extends ProbeMethod<SourceConfiguration>
             "Retrieves possible configurations for the specified url. The results will be in a list of maps with the keys "
                     + CONFIG + ", " + MESSAGES;
 
-    public static final List<String> REQUIRED_FIELDS = ImmutableList.of(SOURCE_HOSTNAME, PORT);
-
-    public static final List<String> OPTIONAL_FIELDS = ImmutableList.of(SOURCE_USERNAME,
+    public static final List<String> OPTIONAL_FIELDS = ImmutableList.of(SOURCE_HOSTNAME,
+            PORT,
+            ENDPOINT_URL,
+            SOURCE_USERNAME,
             SOURCE_USER_PASSWORD);
 
     public static final Map<String, String> SUCCESS_TYPES = getCommonSourceSubtypeDescriptions(
@@ -66,14 +68,13 @@ public class DiscoverSourcesProbeMethod extends ProbeMethod<SourceConfiguration>
             BAD_IP, "Could not resolve host from IP address.");
 
     public static final List<String> RETURN_TYPES = ImmutableList.of(DISCOVERED_SOURCES);
-
     private List<SourceConfigurationHandler> handlers;
 
     // TODO: tbatie - 2/1/17 - (Ticket) We can't return a failure type here because the frontend can't handle the error properly
     public DiscoverSourcesProbeMethod(List<SourceConfigurationHandler> handlers) {
         super(DISCOVER_SOURCES_ID,
                 DESCRIPTION,
-                REQUIRED_FIELDS,
+                null,
                 OPTIONAL_FIELDS,
                 SUCCESS_TYPES,
                 null,
@@ -112,6 +113,6 @@ public class DiscoverSourcesProbeMethod extends ProbeMethod<SourceConfiguration>
 
     @Override
     public List<ConfigurationMessage> validateOptionalFields(SourceConfiguration configuration) {
-        return validateOptionalUsernameAndPassword(configuration);
+        return validateForSourceDiscovery(configuration);
     }
 }

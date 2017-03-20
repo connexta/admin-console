@@ -1,6 +1,8 @@
 import { combineReducers } from 'redux-immutable'
 import { fromJS, List } from 'immutable'
 
+import sub from 'redux-submarine'
+
 const emptyBin = {
   name: 'NewBin',
   realm: '',
@@ -132,13 +134,14 @@ const wcpmErrors = (state = fromJS({ general: [] }), { type, scope, message }) =
   }
 }
 
-export const getOptions = (state) => state.get('options').toJS()
-export const getBins = (state) => state.get('bins').toJS()
-export const getEditingBinNumber = (state) => state.get('editingBinNumber')
-export const getConfirmDelete = (state) => state.get('confirmDelete')
-export const getWcpmErrors = (state) => state.get('wcpmErrors').toJS()
+export const submarine = sub()
+export const getOptions = (state) => submarine(state).get('options').toJS()
+export const getBins = (state) => submarine(state).get('bins').toJS()
+export const getEditingBinNumber = (state) => submarine(state).get('editingBinNumber')
+export const getConfirmDelete = (state) => submarine(state).get('confirmDelete')
+export const getWcpmErrors = (state) => submarine(state).get('wcpmErrors').toJS()
 export const hasPath = (state, path, binNumber) => {
-  const allBins = state.get('bins')
+  const allBins = submarine(state).get('bins')
   const binCheck = (bin) => bin.get('contextPaths').some(path => path === '/')
   if (binNumber) {
     return binCheck(allBins.get(binNumber))

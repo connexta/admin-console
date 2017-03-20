@@ -1,5 +1,6 @@
 import { combineReducers } from 'redux-immutable'
 import { fromJS, Map } from 'immutable'
+import sub from 'redux-submarine'
 
 const systemUsageProperties = (state = Map(), { type, properties }) => {
   switch (type) {
@@ -19,18 +20,9 @@ const systemUsageAccepted = (state = false, { type }) => {
   }
 }
 
-// TODO: replace these absolute paths with relative ones like the other wizards
-export const getConfigTypes = (state) => state.getIn(['sourceWizard', 'configTypes']).toJS()
-
-export const getConfigTypeById = (state, id) => {
-  const found = getConfigTypes(state).filter((config) => config.id === id)
-  if (found.length > 0) {
-    return found[0].name
-  }
-}
-
-export const getSystemUsageProperties = (state) => state.getIn(['systemUsage', 'systemUsageProperties']).toJS()
-export const getSystemUsageAccepted = (state) => state.getIn(['systemUsage', 'systemUsageAccepted'])
+export const submarine = sub()
+export const getSystemUsageProperties = (state) => submarine(state).get('systemUsageProperties').toJS()
+export const getSystemUsageAccepted = (state) => submarine(state).get('systemUsageAccepted')
 
 export default combineReducers({ systemUsageProperties, systemUsageAccepted })
 

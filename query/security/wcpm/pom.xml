@@ -22,7 +22,7 @@
         <version>0.1.3-SNAPSHOT</version>
     </parent>
     <artifactId>admin-query-wcpm</artifactId>
-    <name>DDF :: Admin (Beta) :: Security :: WCPM</name>
+    <name>DDF :: Admin (Beta) :: Security :: Web Context Policy Manager</name>
     <packaging>bundle</packaging>
 
     <dependencies>
@@ -45,10 +45,10 @@
                 <configuration>
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}-beta</Bundle-SymbolicName>
-                        <Embed-dependency>
+                        <Embed-Dependency>
                             admin-query-common,
                             admin-query-security-common
-                        </Embed-dependency>
+                        </Embed-Dependency>
                     </instructions>
                 </configuration>
             </plugin>

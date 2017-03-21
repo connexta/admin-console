@@ -22,8 +22,9 @@
         <version>0.1.3-SNAPSHOT</version>
     </parent>
     <artifactId>admin-query-security</artifactId>
-    <name>DDF Admin (Beta) Security</name>
+    <name>DDF Admin (Beta) :: Security</name>
     <packaging>pom</packaging>
+
     <modules>
         <module>ldap</module>
         <module>wcpm</module>

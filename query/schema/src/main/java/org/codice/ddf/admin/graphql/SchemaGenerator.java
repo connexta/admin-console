@@ -28,20 +28,20 @@ import org.codice.ddf.admin.utils.conn.ConnectionActionCreator;
 import com.google.common.collect.ImmutableList;
 
 import graphql.introspection.IntrospectionQuery;
-import graphql.servlet.GraphQLServlet;
+import graphql.servlet.OsgiGraphQLServlet;
 
 public class SchemaGenerator {
 
-    private static final List<GraphQLProviderImpl> GRAPHQL_PROVIDERS =
-            ImmutableList.of(
-                    new GraphQLProviderImpl(new StsActionCreator()),
-                    new GraphQLProviderImpl(new ConnectionActionCreator()),
-                    new GraphQLProviderImpl(new LdapActionCreator()),
-                    new GraphQLProviderImpl(new SourceActionCreator()),
-                    new GraphQLProviderImpl(new WcpmActionCreator()));
-
     public static void main(String[] args) throws IOException, URISyntaxException {
-        GraphQLServlet servlet = new GraphQLServlet();
+        OsgiGraphQLServlet servlet = new OsgiGraphQLServlet();
+        final List<GraphQLProviderImpl> GRAPHQL_PROVIDERS =
+                ImmutableList.of(
+                        new GraphQLProviderImpl(new StsActionCreator()),
+                        new GraphQLProviderImpl(new ConnectionActionCreator()),
+                        new GraphQLProviderImpl(new LdapActionCreator()),
+                        new GraphQLProviderImpl(new SourceActionCreator()),
+                        new GraphQLProviderImpl(new WcpmActionCreator()));
+
         GRAPHQL_PROVIDERS.stream()
                 .forEach(query -> servlet.bindQueryProvider(query));
         GRAPHQL_PROVIDERS.stream()

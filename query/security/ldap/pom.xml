@@ -51,10 +51,10 @@
                 <configuration>
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}-beta</Bundle-SymbolicName>
-                        <Embed-dependency>
+                        <Embed-Dependency>
                             admin-query-common,
                             admin-query-security-common
-                        </Embed-dependency>
+                        </Embed-Dependency>
                     </instructions>
                 </configuration>
             </plugin>

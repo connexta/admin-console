@@ -23,7 +23,7 @@
     </parent>
 
     <artifactId>admin-query-sts</artifactId>
-    <name>DDF :: Admin (Beta) :: Security :: STS</name>
+    <name>DDF :: Admin (Beta) :: Security :: Security Token Service</name>
     <packaging>bundle</packaging>
 
     <dependencies>
@@ -46,10 +46,10 @@
                 <configuration>
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}-beta</Bundle-SymbolicName>
-                        <Embed-dependency>
+                        <Embed-Dependency>
                             admin-query-common,
                             admin-query-security-common
-                        </Embed-dependency>
+                        </Embed-Dependency>
                     </instructions>
                 </configuration>
             </plugin>

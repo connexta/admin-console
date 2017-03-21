@@ -32,6 +32,8 @@
         <module>sources</module>
         <module>security</module>
         <module>utils</module>
+        <module>app</module>
+        <module>schema</module>
     </modules>
 
     <dependencies>

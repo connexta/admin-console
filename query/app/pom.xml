@@ -12,25 +12,51 @@
  *
  **/
 -->
-
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>admin</artifactId>
+        <artifactId>admin-query</artifactId>
         <groupId>org.codice.ddf.admin.beta</groupId>
         <version>0.1.3-SNAPSHOT</version>
     </parent>
-    <artifactId>admin-beta-app</artifactId>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>admin-query-app</artifactId>
     <name>DDF :: Admin (Beta) :: App</name>
     <packaging>pom</packaging>
 
-    <properties>
-        <httpcore.version>4.4.6</httpcore.version>
-        <httpclient.version>4.5.3</httpclient.version>
-    </properties>
-
     <dependencies>
-        <!--TODO: switch this to DDF-provided version of service when available-->
+        <dependency>
+            <groupId>org.codice.ddf.admin.beta</groupId>
+            <artifactId>admin-query-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codice.ddf.admin.beta</groupId>
+            <artifactId>admin-query-sts</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codice.ddf.admin.beta</groupId>
+            <artifactId>admin-query-ldap</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codice.ddf.admin.beta</groupId>
+            <artifactId>admin-query-wcpm</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codice.ddf.admin.beta</groupId>
+            <artifactId>admin-query-utils</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codice.ddf.admin.beta</groupId>
+            <artifactId>admin-query-sources-impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.codice.ddf.admin.beta</groupId>
             <artifactId>configurator-api</artifactId>
@@ -41,60 +67,7 @@
             <artifactId>configurator-impl</artifactId>
             <version>${project.version}</version>
         </dependency>
-
-        <dependency>
-            <groupId>org.codice.ddf.admin.beta</groupId>
-            <artifactId>admin-query-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.codice.ddf.admin.beta</groupId>
-            <artifactId>admin-query-ldap</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.codice.ddf.admin.beta</groupId>
-            <artifactId>admin-query-sts</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.codice.ddf.admin.beta</groupId>
-            <artifactId>admin-query-wcpm</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.codice.ddf.admin.beta</groupId>
-            <artifactId>admin-query-sources-impl</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.codice.ddf.admin.beta</groupId>
-            <artifactId>ldap-config-handler</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.codice.ddf.admin.beta</groupId>
-            <artifactId>embedded-ldap-config-handler</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.codice.ddf.admin.beta</groupId>
-            <artifactId>admin-query</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.codice.ddf.admin.beta</groupId>
-            <artifactId>admin-module</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>${gson.version}</version>
-        </dependency>
     </dependencies>
-
     <build>
         <plugins>
             <plugin>

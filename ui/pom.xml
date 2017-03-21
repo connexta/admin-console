@@ -40,6 +40,16 @@
             <artifactId>maven-dependency-plugin</artifactId>
             <version>3.0.0</version>
         </dependency>
+        <dependency>
+            <groupId>org.codice.ddf.admin.beta</groupId>
+            <artifactId>admin-query-schema</artifactId>
+            <version>${project.version}</version>
+            <classifier>schema</classifier>
+            <type>json</type>
+        </dependency>
+        <!--
+        Remove when possible
+        -->
     </dependencies>
     <build>
         <plugins>

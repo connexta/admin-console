@@ -34,13 +34,8 @@
         </dependency>
         <dependency>
             <groupId>org.codice.ddf.admin.beta</groupId>
-            <artifactId>admin-query-security-common</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.codice.ddf.admin.beta</groupId>
             <artifactId>admin-query-sources-common</artifactId>
-            <version>0.1.3-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
     <build>
@@ -51,10 +46,10 @@
                 <configuration>
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}-beta</Bundle-SymbolicName>
-                        <Embed-dependency>
+                        <Embed-Dependency>
                             admin-query-common,
-                            admin-query-security-common
-                        </Embed-dependency>
+                            admin-query-sources-common
+                        </Embed-Dependency>
                     </instructions>
                 </configuration>
             </plugin>

@@ -24,7 +24,13 @@
 
     <artifactId>admin-query-sources-common</artifactId>
     <name>DDF :: Admin (Beta) :: Sources :: Common</name>
-
+    <dependencies>
+        <dependency>
+            <groupId>org.codice.ddf.admin.beta</groupId>
+            <artifactId>admin-query-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
     <build>
         <plugins>
             <plugin>

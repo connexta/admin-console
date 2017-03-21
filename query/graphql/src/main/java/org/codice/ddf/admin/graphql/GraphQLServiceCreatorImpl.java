@@ -33,6 +33,7 @@ public class GraphQLServiceCreatorImpl implements GraphQLServiceCreator {
             ServiceRegistration registration = executeAsSystem(() -> getBundleContext().registerService(GRAPHQL_INTERFACES, new GraphQLProviderImpl(creator), null));
             createdServices.put(creator.name(), registration);
         } catch (Exception e) {
+            e.printStackTrace();
             System.out.println(e.getMessage());
         }
     }

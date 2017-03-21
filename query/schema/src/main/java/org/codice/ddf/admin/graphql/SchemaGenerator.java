@@ -28,12 +28,12 @@ import org.codice.ddf.admin.utils.conn.ConnectionActionCreator;
 import com.google.common.collect.ImmutableList;
 
 import graphql.introspection.IntrospectionQuery;
-import graphql.servlet.OsgiGraphQLServlet;
+import graphql.servlet.GraphQLServlet;
 
 public class SchemaGenerator {
 
     public static void main(String[] args) throws IOException, URISyntaxException {
-        OsgiGraphQLServlet servlet = new OsgiGraphQLServlet();
+        GraphQLServlet servlet = new GraphQLServlet();
         final List<GraphQLProviderImpl> GRAPHQL_PROVIDERS =
                 ImmutableList.of(
                         new GraphQLProviderImpl(new StsActionCreator()),

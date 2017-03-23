@@ -33,7 +33,7 @@
         <dependency>
             <groupId>com.graphql-java</groupId>
             <artifactId>graphql-java-servlet</artifactId>
-            <version>0.7.0</version>
+            <version>1.0.1</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -44,6 +44,11 @@
             <groupId>com.graphql-java</groupId>
             <artifactId>graphql-java-annotations</artifactId>
             <version>0.13.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codice.ddf.admin.beta</groupId>
+            <artifactId>admin-graphql</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>

@@ -11,10 +11,10 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.graphql;
+package org.codice.ddf.admin.graphql.service;
 
-import static org.codice.ddf.admin.graphql.GraphQLCommons.actionCreatorToGraphQLObjectType;
-import static org.codice.ddf.admin.graphql.GraphQLCommons.actionsToGraphQLFieldDef;
+import static org.codice.ddf.admin.graphql.common.GraphQLCommons.actionCreatorToGraphQLObjectType;
+import static org.codice.ddf.admin.graphql.common.GraphQLCommons.actionsToGraphQLFieldDef;
 
 import java.util.Collection;
 import java.util.HashMap;

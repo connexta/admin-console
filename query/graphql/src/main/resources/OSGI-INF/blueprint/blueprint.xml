@@ -34,9 +34,9 @@
                interface="org.codice.ddf.admin.configurator.ConfiguratorFactory"
                availability="mandatory" filter="(type=txact)"/>
 
-    <bean id="graphQLServiceCreator" class="org.codice.ddf.admin.graphql.GraphQLServiceCreatorImpl" >
+    <bean id="graphQLServiceCreator" class="org.codice.ddf.admin.graphql.service.GraphQLServiceCreatorImpl" >
         <property name="graphqlProviders" ref="graphqlProviders" />
     </bean>
-    <service ref="graphQLServiceCreator" interface="org.codice.ddf.admin.graphql.GraphQLServiceCreator" />
+    <service ref="graphQLServiceCreator" interface="org.codice.ddf.admin.graphql.service.GraphQLServiceCreator" />
 
 </blueprint>

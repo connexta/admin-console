@@ -2,8 +2,7 @@ import React from 'react'
 
 import CheckIcon from 'material-ui/svg-icons/action/check-circle'
 import CloseIcon from 'material-ui/svg-icons/navigation/cancel'
-
-import {green500, red500} from 'material-ui/styles/colors'
+import muiThemeable from 'material-ui/styles/muiThemeable'
 import { center } from './styles.less'
 
 const statusIndicator = ({
@@ -11,11 +10,13 @@ const statusIndicator = ({
   height: '300px'
 })
 
-export default ({success}) => (
+const LargeStatusIndicator = ({success, muiTheme}) => (
   <div className={center}>
     {(success)
-      ? <CheckIcon style={statusIndicator} color={green500} />
-      : <CloseIcon style={statusIndicator} color={red500} />
+      ? <CheckIcon style={statusIndicator} color={muiTheme.palette.successColor} />
+      : <CloseIcon style={statusIndicator} color={muiTheme.palette.errorColor} />
     }
   </div>
 )
+
+export default muiThemeable()(LargeStatusIndicator)

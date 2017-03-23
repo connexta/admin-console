@@ -1,8 +1,9 @@
 import React from 'react'
 import Paper from 'material-ui/Paper'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 import Mount from 'react-mount'
 import { isSubmitting } from 'redux-fetch'
+import muiThemeable from 'material-ui/styles/muiThemeable'
 import {
   getBins,
   getOptions,
@@ -43,7 +44,6 @@ import {
   TableRow,
   TableRowColumn
 } from 'material-ui/Table'
-import {cyanA700} from 'material-ui/styles/colors'
 import CancelIcon from 'material-ui/svg-icons/content/remove-circle-outline'
 import DeleteIcon from 'material-ui/svg-icons/action/delete'
 import AddIcon from 'material-ui/svg-icons/content/add-circle-outline'
@@ -90,12 +90,12 @@ let ContextPathItem = ({ contextPath, binNumber, pathNumber, removePath, editing
 )
 ContextPathItem = connect(null, (dispatch, { binNumber, pathNumber, attribute }) => ({ removePath: () => dispatch(removeAttribute(attribute)(binNumber, pathNumber)) }))(ContextPathItem)
 
-let NewContextPathItem = ({ binNumber, addPath, onEdit, newPath, attribute, addButtonVisible = true, error }) => (
+let NewContextPathItem = ({ binNumber, addPath, onEdit, newPath, attribute, addButtonVisible = true, error, muiTheme }) => (
   <div>
     <Divider />
     <Flexbox style={{ position: 'relative' }} flexDirection='row' justifyContent='space-between'>
       <TextField hintStyle={{ padding: '0px 10px' }} inputStyle={{ padding: '0px 10px' }} style={{ width: '100%' }} id='name' hintText='Add New Path' onChange={(event, value) => onEdit(value)} value={newPath || ''} errorText={error} />
-      {(addButtonVisible) ? (<IconButton style={{ position: 'absolute', right: '0px' }} tooltip={'Add'} tooltipPosition='top-center' onClick={addPath}><AddIcon color={cyanA700} /></IconButton>) : null }
+      {(addButtonVisible) ? (<IconButton style={{ position: 'absolute', right: '0px' }} tooltip={'Add'} tooltipPosition='top-center' onClick={addPath}><AddIcon color={muiTheme.palette.primary1Color} /></IconButton>) : null }
       {(newPath && newPath.trim() !== '')
         ? <IconButton style={{ position: 'absolute', left: '-10px', width: '10px', height: '10px' }} iconStyle={{ width: '10px', height: '10px' }} onClick={() => onEdit('')}><ClearIcon /></IconButton>
         : null
@@ -108,17 +108,18 @@ NewContextPathItem = connect((state) => ({
 }), (dispatch, { binNumber, attribute }) => ({
   addPath: () => dispatch(addContextPath(attribute, binNumber)),
   onEdit: (value) => dispatch(editAttribute(attribute)(binNumber, value))
-}))(NewContextPathItem)
+}))(muiThemeable()(NewContextPathItem))
 
-let ContextPathGroup = ({ bin, binNumber, editing }) => (
+let ContextPathGroup = ({ bin, binNumber, editing, muiTheme }) => (
   <div className={(bin.name === 'WHITELIST') ? whitelistContextPathGroupStyle : contextPathGroupStyle}>
-    <p className={infoSubtitleLeft}>Context Paths</p>
+    <p className={infoSubtitleLeft} style={{ color: muiTheme.palette.primary1Color }}>Context Paths</p>
     {bin.contextPaths.map((contextPath, pathNumber) => (<ContextPathItem attribute='contextPaths' contextPath={contextPath} key={pathNumber} binNumber={binNumber} pathNumber={pathNumber} editing={editing} />))}
     {editing ? <NewContextPathItem binNumber={binNumber} attribute='contextPaths' newPath={bin['newcontextPaths']} /> : null}
   </div>
 )
+ContextPathGroup = muiThemeable()(ContextPathGroup)
 
-let NewSelectItem = ({ binNumber, addPath, onEdit, newPath, attribute, options, addButtonVisible = true, error }) => (
+let NewSelectItem = ({ binNumber, addPath, onEdit, newPath, attribute, options, addButtonVisible = true, error, muiTheme }) => (
   <div>
     <Divider />
     <Flexbox style={{ position: 'relative' }} flexDirection='row' justifyContent='space-between'>
@@ -135,7 +136,7 @@ let NewSelectItem = ({ binNumber, addPath, onEdit, newPath, attribute, options, 
         <IconButton style={{ position: 'absolute', right: '0px' }}
           tooltip={'Add'} tooltipPosition='top-center'
           onClick={addPath}>
-          <AddIcon color={cyanA700} />
+          <AddIcon color={muiTheme.palette.primary1Color} />
         </IconButton>
       ) : null }
       {(newPath && newPath.trim() !== '') ? (
@@ -151,7 +152,7 @@ let NewSelectItem = ({ binNumber, addPath, onEdit, newPath, attribute, options, 
 NewSelectItem = connect(null, (dispatch, { binNumber, attribute }) => ({
   addPath: () => dispatch(addAttribute(attribute)(binNumber)),
   onEdit: (value) => dispatch(editAttribute(attribute)(binNumber, value))
-}))(NewSelectItem)
+}))(muiThemeable()(NewSelectItem))
 
 let Realm = ({ bin, binNumber, policyOptions, editRealm, editing }) => {
   return editing ? (
@@ -217,7 +218,7 @@ AuthTypesGroup = connect(
     policyOptions: getOptions(state)
   }))(AuthTypesGroup)
 
-let AttributeTableGroup = ({ bin, binNumber, policyOptions, editAttribute, removeAttributeMapping, addAttributeMapping, editing, claimError, attrError }) => (
+let AttributeTableGroup = ({ bin, binNumber, policyOptions, editAttribute, removeAttributeMapping, addAttributeMapping, editing, claimError, attrError, muiTheme }) => (
   <Table selectable={false}>
     <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
       <TableRow>
@@ -251,7 +252,7 @@ let AttributeTableGroup = ({ bin, binNumber, policyOptions, editAttribute, remov
           </TableRowColumn>
           <TableRowColumn style={{ width: 120, position: 'relative' }}>
             <TextField fullWidth style={{ margin: '0px', fontSize: '14px' }} id='attributes' value={bin.newrequiredAttribute || ''} onChange={(event, value) => editAttribute('requiredAttribute', value)} hintText='Claim Value' errorText={attrError} />
-            <IconButton style={{ position: 'absolute', right: 0, top: 0 }} tooltip={'Add'} tooltipPosition='top-center' onClick={addAttributeMapping}><AddIcon color={cyanA700} /></IconButton>
+            <IconButton style={{ position: 'absolute', right: 0, top: 0 }} tooltip={'Add'} tooltipPosition='top-center' onClick={addAttributeMapping}><AddIcon color={muiTheme.palette.primary1Color} /></IconButton>
             {(bin.newrequiredAttribute && bin.newrequiredAttribute.trim() !== '')
               ? <IconButton style={{ position: 'absolute', left: '-5px', width: '10px', height: '10px' }} iconStyle={{ width: '10px', height: '10px' }} onClick={() => editAttribute('requiredAttribute', '')}><ClearIcon /></IconButton>
               : null
@@ -272,7 +273,7 @@ AttributeTableGroup = connect(
     addAttributeMapping: () => dispatch(addAttributeMapping(binNumber)),
     removeAttributeMapping: (claim) => dispatch(removeAttributeMapping(binNumber, claim)),
     editAttribute: (attribute, value) => dispatch(editAttribute(attribute)(binNumber, value))
-  }))(AttributeTableGroup)
+  }))(muiThemeable()(AttributeTableGroup))
 
 const DisabledPanel = () => (
   <div className={disabledPanelStyle} />
@@ -312,19 +313,19 @@ ErrorBanner = connect(
     messages: getWcpmErrors(state).general
   }))(ErrorBanner)
 
-const PolicyBin = ({ policyBin, binNumber, editing, editingBinNumber }) => (
+let PolicyBin = ({ policyBin, binNumber, editing, editingBinNumber, muiTheme }) => (
   <Paper className={policyBinOuterStyle} >
     <Flexbox flexDirection='row'>
       <ContextPathGroup binNumber={binNumber} bin={policyBin} editing={editing} />
       <div style={{ width: '20%', padding: '5px', boxSizing: 'border-box' }}>
-        <p className={infoSubtitleLeft}>Realm</p>
+        <p className={infoSubtitleLeft} style={{ color: muiTheme.palette.primary1Color }}>Realm</p>
         <Divider />
         <Realm bin={policyBin} binNumber={binNumber} editing={editing} />
-        <p className={infoSubtitleLeft}>Authentication Types</p>
+        <p className={infoSubtitleLeft} style={{ color: muiTheme.palette.primary1Color }}>Authentication Types</p>
         <AuthTypesGroup bin={policyBin} binNumber={binNumber} editing={editing} />
       </div>
       <div style={{ width: '60%', padding: '5px', boxSizing: 'border-box' }}>
-        <p className={infoSubtitleLeft}>{(editing) ? 'Required Subject Claims (Optional)' : 'Required Subject Claims'}</p>
+        <p className={infoSubtitleLeft} style={{ color: muiTheme.palette.primary1Color }}>{(editing) ? 'Required Subject Claims (Optional)' : 'Required Subject Claims'}</p>
         <Divider />
         <div>
           <AttributeTableGroup bin={policyBin} binNumber={binNumber} editing={editing} />
@@ -337,6 +338,7 @@ const PolicyBin = ({ policyBin, binNumber, editing, editingBinNumber }) => (
     { (!editing && editingBinNumber !== null) ? <DisabledPanel /> : null }
   </Paper>
 )
+PolicyBin = muiThemeable()(PolicyBin)
 
 let PolicyBins = ({ policies, editingBinNumber }) => (
   <div>
@@ -353,20 +355,21 @@ PolicyBins = connect((state) => ({
   editingBinNumber: getEditingBinNumber(state)
 }))(PolicyBins)
 
-let NewBin = ({ policies, addNewBin, nextBinNumber, editing }) => {
+let NewBin = ({ policies, addNewBin, nextBinNumber, editing, muiTheme }) => {
   if (editing) {
     return (
-      <Paper style={{ position: 'relative', width: '100%', height: '100px', margin: '5px 0px', textAlign: 'center', backgroundColor: '#EEE' }} >
+      <Paper style={{ position: 'relative', width: '100%', height: '100px', margin: '5px 0px', textAlign: 'center', backgroundColor: muiTheme.palette.canvasColor }} >
         <Flexbox className={newBinDisabledStyle} flexDirection='column' justifyContent='center' alignItems='center'>
           <FloatingActionButton disabled>
             <ContentAdd />
           </FloatingActionButton>
         </Flexbox>
+        <DisabledPanel />
       </Paper>
     )
   } else {
     return (
-      <Paper style={{ position: 'relative', width: '100%', height: '100px', margin: '5px 0px', textAlign: 'center', backgroundColor: '#EEE' }} onClick={() => addNewBin(nextBinNumber)}>
+      <Paper style={{ position: 'relative', width: '100%', height: '100px', margin: '5px 0px', textAlign: 'center', backgroundColor: muiTheme.palette.canvasColor }} onClick={() => addNewBin(nextBinNumber)}>
         <Flexbox className={newBinStyle} flexDirection='column' justifyContent='center' alignItems='center'>
           <FloatingActionButton>
             <ContentAdd />
@@ -376,20 +379,20 @@ let NewBin = ({ policies, addNewBin, nextBinNumber, editing }) => {
     )
   }
 }
-NewBin = connect((state) => ({ nextBinNumber: getBins(state).length }), { addNewBin })(NewBin)
+NewBin = connect((state) => ({ nextBinNumber: getBins(state).length }), { addNewBin })(muiThemeable()(NewBin))
 
-let wcpm = ({ updatePolicyBins, isSubmitting }) => (
+let wcpm = ({ updatePolicyBins, isSubmitting, muiTheme }) => (
   <Mount on={() => updatePolicyBins('/admin/beta/config/configurations/context-policy-manager')}>
     <div>
       <div style={{ padding: 20 }}>
-        <p className={infoTitle}>Web Context Policy Manager</p>
-        <p className={infoSubtitle}>
+        <p className={infoTitle} style={{ color: muiTheme.palette.textColor }}>Web Context Policy Manager</p>
+        <p className={infoSubtitle} style={{ color: muiTheme.palette.textColor }}>
           The Web Context Policy Manager defines security policies for all subpaths of this web server.
           It defines the realms a path should be authenticated against, the type of authentication that
           a path requires, and any user attributes that are required for authorization.
         </p>
 
-        <p className={infoSubtitle}>
+        <p className={infoSubtitle} style={{ color: muiTheme.palette.textColor }}>
           Any subpaths of a configured path will inherit its parent's policy. For example, in a system
           where a policy is configured for '/a', its policy applies to '/a/b' and '/a/b/c' unless otherwise
           specified.
@@ -412,4 +415,4 @@ export default connect(
     isSubmitting: isSubmitting(state, 'wcpm')
   }), {
     updatePolicyBins
-  })(wcpm)
+  })(muiThemeable()(wcpm))

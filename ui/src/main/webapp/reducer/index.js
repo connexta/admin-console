@@ -1,4 +1,19 @@
 import { combineReducers } from 'redux-immutable'
+import { fromJS } from 'immutable'
+
+import defaultTheme from 'themes/defaultTheme'
+import darkTheme from 'themes/darkTheme'
+import adminTheme from 'themes/adminTheme'
+import parrettTheme from 'themes/parrettTheme'
+import solarizedDarkTheme from 'themes/solarizedDarkTheme'
+
+const presetThemes = ({
+  'Admin': adminTheme,
+  'Material': defaultTheme,
+  'Dark': darkTheme,
+  'Parrett': parrettTheme,
+  'Solarized Dark': solarizedDarkTheme
+})
 
 import home, { submarine as homeSubmarine } from '../home/reducer'
 import systemUsage, { submarine as systemUsageSubmarine } from 'system-usage/reducer'
@@ -17,9 +32,23 @@ const backendError = (state = {}, { type, err } = {}) => {
     default: return state
   }
 }
-
 export const getBackendErrors = (state) => state.get('backendError')
-export default combineReducers({ fetch, wizard, backendError, sourceWizard, home, wcpm, polling, systemUsage })
+
+const theme = (state = fromJS(adminTheme), { type, path, value, themeName }) => {
+  switch (type) {
+    case 'THEME/SET_COLOR':
+      const temp = state.setIn(path, value)
+      return temp.setIn(['textField', 'errorColor'], temp.getIn(['palette', 'errorColor']))
+        .setIn(['raisedButton', 'disabledColor'], temp.getIn(['palette', 'disabledColor']))
+    case 'THEME/SET_PRESET':
+      return fromJS(presetThemes[themeName])
+    default:
+      return state
+  }
+}
+export const getTheme = (state) => state.get('theme').toJS()
+
+export default combineReducers({ fetch, wizard, backendError, sourceWizard, home, wcpm, polling, systemUsage, theme })
 
 // Submarines patch redux selectors which causes issues running unit tests.
 // The following if protects against the side effect during tests. Do not remove.

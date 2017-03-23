@@ -12,8 +12,9 @@ import AccountIcon from 'material-ui/svg-icons/action/account-circle'
 import LanguageIcon from 'material-ui/svg-icons/action/language'
 import VpnLockIcon from 'material-ui/svg-icons/notification/vpn-lock'
 import Divider from 'material-ui/Divider'
-import { cyan500 } from 'material-ui/styles/colors'
 import RaisedButton from 'material-ui/RaisedButton'
+import muiThemeable from 'material-ui/styles/muiThemeable'
+
 import MapDisplay from 'components/MapDisplay'
 import Spinner from 'components/Spinner'
 import confirmable from 'react-confirmable'
@@ -117,7 +118,7 @@ export const LdapTile = connect((state, { servicePid }) => ({
   onDeleteConfig: () => dispatch(actions.deleteConfig({configurationHandlerId: props.configurationType, ...props, id: 'sources'}))
 }))(LdapTileView)
 
-const TileLink = ({ to, title, subtitle, children }) => (
+let TileLink = ({ to, title, subtitle, Icon, muiTheme }) => (
   <div>
     <Link to={to}>
       <Paper className={styles.main}>
@@ -129,7 +130,7 @@ const TileLink = ({ to, title, subtitle, children }) => (
             style={{width: '100%', height: '100%'}}>
 
             <p className={styles.titleTitle}>{title}</p>
-            {children}
+            {React.createElement(Icon, { style: { color: muiTheme.palette.primary1Color, width: '50%', height: '50%' } })}
             <p className={styles.tileSubtitle}>{subtitle}</p>
 
           </Flexbox>
@@ -138,14 +139,15 @@ const TileLink = ({ to, title, subtitle, children }) => (
     </Link>
   </div>
 )
+TileLink = muiThemeable()(TileLink)
 
 const ConfigField = ({fieldName, value}) => (
   <div className={styles.configField}>{fieldName}: {value}</div>
 )
 
-const SourceConfigTiles = ({ sourceConfigs, submittingPids }) => {
+let SourceConfigTiles = ({ sourceConfigs, submittingPids, muiTheme }) => {
   if (sourceConfigs.length === 0) {
-    return <div style={{margin: '20px'}}>No Sources Configured </div>
+    return <div style={{ margin: '20px', color: muiTheme.palette.textColor }}>No Sources Configured</div>
   }
 
   return (
@@ -154,10 +156,11 @@ const SourceConfigTiles = ({ sourceConfigs, submittingPids }) => {
     </Flexbox>
   )
 }
+SourceConfigTiles = muiThemeable()(SourceConfigTiles)
 
-const LdapConfigTiles = ({ ldapConfigs, submittingPids }) => {
+let LdapConfigTiles = ({ ldapConfigs, submittingPids, muiTheme }) => {
   if (ldapConfigs.length === 0) {
-    return <div style={{margin: '20px'}}>No LDAP Servers Configured</div>
+    return <div style={{ margin: '20px', color: muiTheme.palette.textColor }}>No LDAP Servers Configured</div>
   }
 
   return (
@@ -166,10 +169,12 @@ const LdapConfigTiles = ({ ldapConfigs, submittingPids }) => {
     </Flexbox>
   )
 }
+LdapConfigTiles = muiThemeable()(LdapConfigTiles)
 
-const Title = ({ children }) => (
-  <h1 className={styles.title}>{children}</h1>
+let Title = ({ children, muiTheme }) => (
+  <h1 style={{ color: muiTheme.palette.textColor }}>{children}</h1>
 )
+Title = muiThemeable()(Title)
 
 const SourcesHomeView = ({ sourceConfigs = [], ldapConfigs = [], submittingPids = {}, onRefresh, offRefresh }) => (
   <div style={{width: '100%'}}>
@@ -183,23 +188,20 @@ const SourcesHomeView = ({ sourceConfigs = [], ldapConfigs = [], submittingPids 
       <TileLink
         to='/sources'
         title='Source Setup Wizard'
-        subtitle='Setup a new source for federating'>
-        <LanguageIcon style={{color: cyan500, width: '50%', height: '50%'}} />
-      </TileLink>
+        subtitle='Setup a new source for federating'
+        Icon={LanguageIcon} />
 
       <TileLink
         to='/web-context-policy-manager'
         title='Endpoint Security'
-        subtitle='Web context policy management'>
-        <VpnLockIcon style={{color: cyan500, width: '50%', height: '50%'}} />
-      </TileLink>
+        subtitle='Web context policy management'
+        Icon={VpnLockIcon} />
 
       <TileLink
         to='/ldap'
         title='LDAP Setup Wizard'
-        subtitle='Configure LDAP as a login'>
-        <AccountIcon style={{color: cyan500, width: '50%', height: '50%'}} />
-      </TileLink>
+        subtitle='Configure LDAP as a login'
+        Icon={AccountIcon} />
     </Flexbox>
 
     <Divider />

@@ -23,15 +23,16 @@ const WizardView = ({ id, children, clearWizard }) => (
 
 const Wizard = connect(null, { clearWizard })(WizardView)
 
+const stageMapping = {
+  welcomeStage: WelcomeStage,
+  discoveryStage: DiscoveryStage,
+  sourceSelectionStage: SourceSelectionStage,
+  confirmationStage: ConfirmationStage,
+  completedStage: CompletedStage
+}
+
 let StageRouter = ({ stage, messages }) => {
-  const stageMapping = {
-    welcomeStage: <WelcomeStage />,
-    discoveryStage: <DiscoveryStage />,
-    sourceSelectionStage: <SourceSelectionStage />,
-    confirmationStage: <ConfirmationStage />,
-    completedStage: <CompletedStage />
-  }
-  return (stageMapping[stage])
+  return React.createElement(stageMapping[stage])
 }
 StageRouter = connect((state) => ({
   stage: getSourceStage(state)

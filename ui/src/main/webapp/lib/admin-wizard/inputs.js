@@ -11,12 +11,11 @@ import SelectField from 'material-ui/SelectField'
 import AutoComplete from 'material-ui/AutoComplete'
 import IconButton from 'material-ui/IconButton'
 import InfoIcon from 'material-ui/svg-icons/action/info'
+import muiThemeable from 'material-ui/styles/muiThemeable'
 
 import visible from 'react-visible'
 
 import Flexbox from 'flexbox-react'
-
-import { green400, orange500 } from 'material-ui/styles/colors'
 
 const mapStateToProps = (state, { id }) => getConfig(state, id)
 
@@ -24,18 +23,18 @@ const mapDispatchToProps = (dispatch, { id }) => ({
   onEdit: (value) => dispatch(editConfig(id, value))
 })
 
-const messageStyles = {
-  SUCCESS: { color: green400 },
-  WARNING: { color: orange500 }
-}
-
-const InputView = ({ value = '', label, onEdit, message = {}, tooltip, ...rest }) => {
+const InputView = ({ value = '', label, onEdit, message = {}, tooltip, muiTheme, ...rest }) => {
   for (let key in rest) {
     if (rest[key] === undefined) {
       delete rest[key]
     }
   }
   const { type, message: text } = message
+
+  const messageStyles = {
+    SUCCESS: { color: muiTheme.palette.successColor },
+    WARNING: { color: muiTheme.palette.warningColor }
+  }
 
   return (
     <Flexbox flexDirection='row' style={{position: 'relative'}}>
@@ -61,7 +60,7 @@ const InputView = ({ value = '', label, onEdit, message = {}, tooltip, ...rest }
   )
 }
 
-const Input = visible(connect(mapStateToProps, mapDispatchToProps)(InputView))
+const Input = visible(connect(mapStateToProps, mapDispatchToProps)(muiThemeable()(InputView)))
 
 const Password = ({ label = 'Password', ...rest }) => (
   <Input type='password' label={label} {...rest} />
@@ -71,12 +70,17 @@ const Hostname = ({ label = 'Hostname', ...rest }) => (
   <Input label={label} {...rest} />
 )
 
-const InputAutoView = ({ value = '', options = [], type = 'text', message = {}, onEdit, label, tooltip, ...rest }) => {
+const InputAutoView = ({ value = '', options = [], type = 'text', message = {}, onEdit, label, tooltip, muiTheme, ...rest }) => {
   const { type: messageType, message: text } = message
   for (let key in rest) {
     if (rest[key] === undefined) {
       delete rest[key]
     }
+  }
+
+  const messageStyles = {
+    SUCCESS: { color: muiTheme.palette.successColor },
+    WARNING: { color: muiTheme.palette.warningColor }
   }
 
   return (
@@ -113,7 +117,7 @@ const InputAutoView = ({ value = '', options = [], type = 'text', message = {}, 
   )
 }
 
-const InputAuto = visible(connect(mapStateToProps, mapDispatchToProps)(InputAutoView))
+const InputAuto = visible(connect(mapStateToProps, mapDispatchToProps)(muiThemeable()(InputAutoView)))
 
 const Port = ({ value = 0, label = 'Port', ...rest }) => (
   <InputAuto type='number' value={value} label={label} {...rest} />

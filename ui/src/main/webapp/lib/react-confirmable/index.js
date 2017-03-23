@@ -2,6 +2,12 @@ import React, { Component } from 'react'
 import Flexbox from 'flexbox-react'
 import RaisedButton from 'material-ui/RaisedButton'
 import { infoSubtitleLeft } from './styles.less'
+import muiThemeable from 'material-ui/styles/muiThemeable'
+
+const ThemedFont = muiThemeable()(({ muiTheme, children, ...rest }) => (
+  <p style={{ color: muiTheme.palette.primary1Color }} {...rest}>
+    {children}</p>
+))
 
 export default (InnerComponent) => class extends Component {
   constructor (props) {
@@ -32,7 +38,7 @@ export default (InnerComponent) => class extends Component {
       return (
         <Flexbox style={confirmableStyle}
           flexDirection='column' alignItems='center'>
-          <p className={infoSubtitleLeft}>{confirmableMessage}</p>
+          <ThemedFont className={infoSubtitleLeft}>{confirmableMessage}</ThemedFont>
           <Flexbox flexDirection='row'>
             <RaisedButton label='Yes' className='yes' primary onClick={() => this.confirm(onClick)} />
             <RaisedButton label='No' className='no' secondary onClick={() => this.deny()} />

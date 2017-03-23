@@ -13,6 +13,10 @@
  **/
 package org.codice.ddf.admin.configurator.impl;
 
+import static org.codice.ddf.admin.configurator.impl.ConfigValidator.validateMap;
+import static org.codice.ddf.admin.configurator.impl.ConfigValidator.validatePropertiesPath;
+import static org.codice.ddf.admin.configurator.impl.ConfigValidator.validateString;
+
 import java.lang.management.ManagementFactory;
 import java.nio.file.Path;
 import java.util.ArrayDeque;
@@ -28,7 +32,6 @@ import javax.management.ObjectName;
 
 import org.codice.ddf.admin.configurator.Configurator;
 import org.codice.ddf.admin.configurator.ConfiguratorException;
-import org.codice.ddf.admin.configurator.Operation;
 import org.codice.ddf.admin.configurator.OperationReport;
 import org.codice.ddf.ui.admin.api.ConfigurationAdmin;
 import org.codice.ddf.ui.admin.api.ConfigurationAdminMBean;
@@ -80,7 +83,7 @@ public class ConfiguratorImpl implements Configurator {
      */
     public OperationReport commit(String auditMessage, String... auditParams) {
         OperationReport report = commit();
-        if (report.txactSucceeded()) {
+        if (report.isTransactionSucceeded()) {
             SecurityLogger.audit(auditMessage, (Object[]) auditParams);
         }
 
@@ -128,6 +131,7 @@ public class ConfiguratorImpl implements Configurator {
      * final {@link OperationReport}
      */
     public String startBundle(String bundleSymName) {
+        validateString(bundleSymName, "Missing bundle name");
         return registerHandler(BundleOperation.forStart(bundleSymName, getBundleContext()));
     }
 
@@ -139,6 +143,7 @@ public class ConfiguratorImpl implements Configurator {
      * final {@link OperationReport}
      */
     public String stopBundle(String bundleSymName) {
+        validateString(bundleSymName, "Missing bundle name");
         return registerHandler(BundleOperation.forStop(bundleSymName, getBundleContext()));
     }
 
@@ -149,6 +154,7 @@ public class ConfiguratorImpl implements Configurator {
      * @return true if started; else, false
      */
     public boolean isBundleStarted(String bundleSymName) {
+        validateString(bundleSymName, "Missing bundle name");
         try {
             return BundleOperation.forStart(bundleSymName, getBundleContext())
                     .readState();
@@ -165,6 +171,7 @@ public class ConfiguratorImpl implements Configurator {
      * final {@link OperationReport}
      */
     public String startFeature(String featureName) {
+        validateString(featureName, "Missing feature name");
         return registerHandler(FeatureOperation.forStart(featureName, getBundleContext()));
     }
 
@@ -176,6 +183,7 @@ public class ConfiguratorImpl implements Configurator {
      * final {@link OperationReport}
      */
     public String stopFeature(String featureName) {
+        validateString(featureName, "Missing feature name");
         return registerHandler(FeatureOperation.forStop(featureName, getBundleContext()));
     }
 
@@ -186,6 +194,7 @@ public class ConfiguratorImpl implements Configurator {
      * @return true if started; else, false
      */
     public boolean isFeatureStarted(String featureName) {
+        validateString(featureName, "Missing feature name");
         return FeatureOperation.forStart(featureName, getBundleContext())
                 .readState();
     }
@@ -199,6 +208,8 @@ public class ConfiguratorImpl implements Configurator {
      * final {@link OperationReport}
      */
     public String createPropertyFile(Path propFile, Map<String, String> properties) {
+        validatePropertiesPath(propFile);
+        validateMap(properties, "Missing properties");
         return registerHandler(PropertyOperation.forCreate(propFile, properties));
     }
 
@@ -210,6 +221,7 @@ public class ConfiguratorImpl implements Configurator {
      * final {@link OperationReport}
      */
     public String deletePropertyFile(Path propFile) {
+        validatePropertiesPath(propFile);
         return registerHandler(PropertyOperation.forDelete(propFile));
     }
 
@@ -227,6 +239,8 @@ public class ConfiguratorImpl implements Configurator {
      */
     public String updatePropertyFile(Path propFile, Map<String, String> properties,
             boolean keepIgnored) {
+        validatePropertiesPath(propFile);
+        validateMap(properties, "Missing properties");
         return registerHandler(PropertyOperation.forUpdate(propFile, properties, keepIgnored));
     }
 
@@ -237,6 +251,7 @@ public class ConfiguratorImpl implements Configurator {
      * @return the current set of key:value pairs
      */
     public Map<String, String> getProperties(Path propFile) {
+        validatePropertiesPath(propFile);
         return PropertyOperation.forUpdate(propFile, Collections.emptyMap(), true)
                 .readState();
     }
@@ -255,6 +270,8 @@ public class ConfiguratorImpl implements Configurator {
      */
     public String updateConfigFile(String configPid, Map<String, Object> configs,
             boolean keepIgnored) {
+        validateString(configPid, "Missing config id");
+        validateMap(configs, "Missing configuration properties");
         return registerHandler(AdminOperation.instance(configPid,
                 configs,
                 keepIgnored,
@@ -268,6 +285,7 @@ public class ConfiguratorImpl implements Configurator {
      * @return the current set of key:value pairs
      */
     public Map<String, Object> getConfig(String configPid) {
+        validateString(configPid, "Missing config id");
         return AdminOperation.instance(configPid,
                 Collections.emptyMap(),
                 true,
@@ -284,6 +302,8 @@ public class ConfiguratorImpl implements Configurator {
      * final {@link OperationReport}
      */
     public String createManagedService(String factoryPid, Map<String, Object> configs) {
+        validateString(factoryPid, "Missing factory id");
+        validateMap(configs, "Missing configuration properties");
         return registerHandler(ManagedServiceOperation.forCreate(factoryPid,
                 configs,
                 getConfigAdmin(),
@@ -298,12 +318,14 @@ public class ConfiguratorImpl implements Configurator {
      * final {@link OperationReport}
      */
     public String deleteManagedService(String configPid) {
+        validateString(configPid, "Missing config id");
         return registerHandler(ManagedServiceOperation.forDelete(configPid,
                 getConfigAdmin(),
                 getConfigAdminMBean()));
     }
 
     public Map<String, Map<String, Object>> getManagedServiceConfigs(String factoryPid) {
+        validateString(factoryPid, "Missing factory id");
         return ManagedServiceOperation.forCreate(factoryPid,
                 Collections.emptyMap(),
                 getConfigAdmin(),
@@ -316,7 +338,7 @@ public class ConfiguratorImpl implements Configurator {
      * any changes should be done through a commit
      *
      * @param serviceClass - Class of service to retrieve
-     * @param <S> type to be returned
+     * @param <S>          type to be returned
      * @return first found service reference of serviceClass
      * @throws ConfiguratorException if any errors occur
      */

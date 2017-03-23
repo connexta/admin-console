@@ -18,7 +18,6 @@ import java.util.Arrays;
 import org.apache.karaf.bundle.core.BundleState;
 import org.apache.karaf.bundle.core.BundleStateService;
 import org.codice.ddf.admin.configurator.ConfiguratorException;
-import org.codice.ddf.admin.configurator.Operation;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;

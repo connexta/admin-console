@@ -22,7 +22,7 @@ import java.util.Map;
  */
 public interface Configurator {
     /**
-     * Sequentially invokes all the {@link Operation}s, committing their changes. If a failure
+     * Sequentially invokes all the transaction's operations, committing their changes. If a failure
      * occurs during the processing, a rollback is attempted of those handlers that had already been
      * committed.
      * <p>
@@ -38,7 +38,7 @@ public interface Configurator {
     OperationReport commit(String auditMessage, String... auditParams);
 
     /**
-     * Sequentially invokes all the {@link Operation}s, committing their changes. If a failure
+     * Sequentially invokes all the transaction's operations, committing their changes. If a failure
      * occurs during the processing, a rollback is attempted of those handlers that had already been
      * committed.
      *
@@ -181,12 +181,21 @@ public interface Configurator {
      */
     String deleteManagedService(String configPid);
 
+    /**
+     * For the given managed service factory, retrieves the full complement of configuration properties.
+     *
+     * This will get all the key:value pairs for each available configuration.
+     *
+     * @param factoryPid the factoryPid of the service to query
+     * @return the the current sets of key:value pairs, in a map keyed on {@code configId}
+     */
     Map<String, Map<String, Object>> getManagedServiceConfigs(String factoryPid);
 
     /**
      * Retrieves the service reference. The reference should only be used for reading purposes,
      * any changes should be done through a commit
      *
+     * @param <S> Service interface
      * @param serviceClass - Class of service to retrieve
      * @return first found service reference of serviceClass
      * @throws ConfiguratorException if any errors occur

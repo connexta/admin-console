@@ -20,10 +20,16 @@ import java.util.List;
  * removed in a future version of the library. </b>
  */
 public interface OperationReport {
-    boolean txactSucceeded();
+    boolean isTransactionSucceeded();
 
     Result getResult(String key);
 
+    /**
+     * An immutable list of Results that failed.
+     *
+     * @return an immutable list of failed results.
+     * It is an implementor's responsibility to ensure that the collection is unmodifiable.
+     */
     List<Result> getFailedResults();
 
     boolean containsFailedResults();

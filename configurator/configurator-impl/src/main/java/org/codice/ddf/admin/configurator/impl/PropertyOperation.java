@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.codice.ddf.admin.configurator.ConfiguratorException;
-import org.codice.ddf.admin.configurator.Operation;
 
 /**
  * Transactional handler for persisting property file changes.
@@ -187,7 +186,7 @@ public abstract class PropertyOperation
 
     @Override
     public Map<String, String> readState() throws ConfiguratorException {
-        return currentProperties;
+        return Collections.unmodifiableMap(currentProperties);
     }
 
     void saveProperties(Map<String, String> propertyMap) throws ConfiguratorException {

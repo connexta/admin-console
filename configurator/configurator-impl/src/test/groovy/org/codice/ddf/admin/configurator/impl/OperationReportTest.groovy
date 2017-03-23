@@ -33,7 +33,7 @@ class OperationReportTest extends Specification {
         report.putResult('b2', pass2)
 
         then:
-        report.txactSucceeded()
+        report.isTransactionSucceeded()
         !report.containsFailedResults()
         report.getFailedResults() == []
         report.getResult('a1') == pass1
@@ -51,7 +51,7 @@ class OperationReportTest extends Specification {
         report.putResult('b2', fail1)
 
         then:
-        !report.txactSucceeded()
+        !report.isTransactionSucceeded()
         report.containsFailedResults()
         report.getFailedResults() == [fail1]
         report.getResult('a1') == pass1
@@ -69,7 +69,7 @@ class OperationReportTest extends Specification {
         report.putResult('b2', pass2)
 
         then:
-        report.txactSucceeded()
+        report.isTransactionSucceeded()
         !report.containsFailedResults()
         report.getFailedResults() == []
         report.getResult('a1') == pass1
@@ -87,7 +87,7 @@ class OperationReportTest extends Specification {
         report.putResult('b2', roll1)
 
         then:
-        !report.txactSucceeded()
+        !report.isTransactionSucceeded()
         report.containsFailedResults()
         report.getFailedResults() == [roll1]
         report.getResult('a1') == pass1
@@ -105,7 +105,7 @@ class OperationReportTest extends Specification {
         report.putResult('b2', roll1)
 
         then:
-        !report.txactSucceeded()
+        !report.isTransactionSucceeded()
         report.containsFailedResults()
         report.getFailedResults() == [roll1]
         report.getResult('a1') == pass1
@@ -124,7 +124,7 @@ class OperationReportTest extends Specification {
         report.putResult('b2', roll1)
 
         then:
-        !report.txactSucceeded()
+        !report.isTransactionSucceeded()
         report.containsFailedResults()
         report.getFailedResults() == [roll1]
         report.getResult('a1') == pass1
@@ -143,7 +143,7 @@ class OperationReportTest extends Specification {
         report.putResult('c3', skip1)
 
         then:
-        !report.txactSucceeded()
+        !report.isTransactionSucceeded()
         report.containsFailedResults()
         report.getFailedResults() == [roll1, skip1]
         report.getResult('b2') == roll1

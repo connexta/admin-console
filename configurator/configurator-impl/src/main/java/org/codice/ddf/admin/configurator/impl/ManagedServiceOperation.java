@@ -23,7 +23,6 @@ import javax.management.MalformedObjectNameException;
 import javax.validation.constraints.NotNull;
 
 import org.codice.ddf.admin.configurator.ConfiguratorException;
-import org.codice.ddf.admin.configurator.Operation;
 import org.codice.ddf.ui.admin.api.ConfigurationAdmin;
 import org.codice.ddf.ui.admin.api.ConfigurationAdminMBean;
 import org.slf4j.Logger;
@@ -43,16 +42,26 @@ public abstract class ManagedServiceOperation
     private static class DeleteHandler extends ManagedServiceOperation {
         private final String configPid;
 
-        private Map<String, Object> currentProperties;
+        private final Map<String, Object> currentProperties;
 
+        private static String getFactoryPid(String configPid, ConfigurationAdminMBean cfgAdmMbean) {
+            try {
+                return cfgAdmMbean.getFactoryPid(configPid);
+            } catch (IOException e) {
+                ManagedServiceOperation.LOGGER.debug(
+                        "Error getting current configuration for pid {}",
+                        configPid,
+                        e);
+                throw new ConfiguratorException("Internal error");
+            }
+        }
         private DeleteHandler(String configPid, ConfigurationAdmin configAdmin,
                 ConfigurationAdminMBean cfgAdmMbean) {
-            super(configAdmin, cfgAdmMbean);
+            super(getFactoryPid(configPid, cfgAdmMbean), configAdmin, cfgAdmMbean);
 
             this.configPid = configPid;
 
             try {
-                factoryPid = cfgAdmMbean.getFactoryPid(configPid);
                 currentProperties = cfgAdmMbean.getProperties(configPid);
             } catch (IOException e) {
                 ManagedServiceOperation.LOGGER.debug(
@@ -85,9 +94,8 @@ public abstract class ManagedServiceOperation
 
         private CreateHandler(String factoryPid, Map<String, Object> configs,
                 ConfigurationAdmin configAdmin, ConfigurationAdminMBean cfgAdmMbean) {
-            super(configAdmin, cfgAdmMbean);
+            super(factoryPid, configAdmin, cfgAdmMbean);
 
-            this.factoryPid = factoryPid;
             this.configs = new HashMap<>(configs);
         }
 
@@ -106,16 +114,17 @@ public abstract class ManagedServiceOperation
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ManagedServiceOperation.class);
 
-    protected String factoryPid;
+    private final String factoryPid;
 
-    protected final ConfigurationAdmin configAdmin;
+    private final ConfigurationAdmin configAdmin;
 
-    protected final ConfigurationAdminMBean cfgAdmMbean;
+    private final ConfigurationAdminMBean cfgAdmMbean;
 
-    private ManagedServiceOperation(ConfigurationAdmin configAdmin,
+    private ManagedServiceOperation(String factoryPid, ConfigurationAdmin configAdmin,
             ConfigurationAdminMBean cfgAdmMbean) {
         this.configAdmin = configAdmin;
         this.cfgAdmMbean = cfgAdmMbean;
+        this.factoryPid = factoryPid;
     }
 
     /**
@@ -171,7 +180,7 @@ public abstract class ManagedServiceOperation
         }
     }
 
-    protected void deleteByPid(String configPid) {
+    void deleteByPid(String configPid) {
         try {
             if (factoryPid == null) {
                 ManagedServiceOperation.LOGGER.debug("Error getting factory for pid {}", configPid);
@@ -184,7 +193,7 @@ public abstract class ManagedServiceOperation
         }
     }
 
-    protected String createManagedService(Map<String, Object> properties) {
+    String createManagedService(Map<String, Object> properties) {
         try {
             String configPid = configAdmin.createFactoryConfiguration(factoryPid);
             cfgAdmMbean.update(configPid, properties);

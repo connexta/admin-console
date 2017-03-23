@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 import javax.management.MalformedObjectNameException;
 
 import org.codice.ddf.admin.configurator.ConfiguratorException;
-import org.codice.ddf.admin.configurator.Operation;
 import org.codice.ddf.ui.admin.api.ConfigurationAdminMBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +42,7 @@ public class AdminOperation implements OperationBase, Operation<Void, Map<String
 
     private final ConfigurationAdminMBean cfgAdmMbean;
 
-    private Map<String, Object> currentProperties;
+    private final Map<String, Object> currentProperties;
 
     private AdminOperation(String pid, Map<String, Object> configs, boolean keepIgnored,
             ConfigurationAdminMBean cfgAdmMbean) {
@@ -124,10 +123,6 @@ public class AdminOperation implements OperationBase, Operation<Void, Map<String
                 if (defaultMetatypeValues.isPresent()) {
                     metatypes = (List) defaultMetatypeValues.get()
                             .get("metatype");
-                }
-
-                if (metatypes.isEmpty()) {
-                    return new HashMap<>();
                 }
 
                 return metatypes.stream()

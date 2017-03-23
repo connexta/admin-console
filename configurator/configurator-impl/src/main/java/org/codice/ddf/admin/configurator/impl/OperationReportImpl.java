@@ -13,6 +13,7 @@
  **/
 package org.codice.ddf.admin.configurator.impl;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +26,7 @@ import org.codice.ddf.admin.configurator.Result;
 public class OperationReportImpl implements OperationReport {
     private final Map<String, Result> results = new LinkedHashMap<>();
 
-    public boolean txactSucceeded() {
+    public boolean isTransactionSucceeded() {
         return results.values()
                 .stream()
                 .allMatch(Result::isTxactSucceeded);
@@ -36,10 +37,10 @@ public class OperationReportImpl implements OperationReport {
     }
 
     public List<Result> getFailedResults() {
-        return results.values()
+        return Collections.unmodifiableList(results.values()
                 .stream()
                 .filter(((Predicate<Result>) Result::isTxactSucceeded).negate())
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()));
     }
 
     public boolean containsFailedResults() {

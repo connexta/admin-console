@@ -32,14 +32,32 @@
             <artifactId>admin-query-api</artifactId>
             <version>${project.version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.codice.ddf.admin.beta</groupId>
-            <artifactId>admin-query-sts</artifactId>
+            <artifactId>configurator-api</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.codice.ddf.admin.beta</groupId>
+            <artifactId>configurator-impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.codice.ddf.admin.beta</groupId>
+            <artifactId>admin-graphql</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.codice.ddf.admin.beta</groupId>
             <artifactId>admin-query-ldap</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codice.ddf.admin.beta</groupId>
+            <artifactId>admin-query-sts</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -49,22 +67,12 @@
         </dependency>
         <dependency>
             <groupId>org.codice.ddf.admin.beta</groupId>
-            <artifactId>admin-query-utils</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.codice.ddf.admin.beta</groupId>
             <artifactId>admin-query-sources-impl</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.codice.ddf.admin.beta</groupId>
-            <artifactId>configurator-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.codice.ddf.admin.beta</groupId>
-            <artifactId>configurator-impl</artifactId>
+            <artifactId>admin-query-utils</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

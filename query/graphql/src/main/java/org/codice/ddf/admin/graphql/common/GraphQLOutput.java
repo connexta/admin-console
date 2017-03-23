@@ -11,7 +11,7 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.graphql;
+package org.codice.ddf.admin.graphql.common;
 
 import static org.codice.ddf.admin.api.fields.UnionField.FIELD_TYPE_NAME_KEY;
 

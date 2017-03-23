@@ -19,6 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
+import org.codice.ddf.admin.graphql.service.GraphQLProviderImpl;
 import org.codice.ddf.admin.ldap.actions.LdapActionCreator;
 import org.codice.ddf.admin.security.sts.StsActionCreator;
 import org.codice.ddf.admin.security.wcpm.actions.WcpmActionCreator;
@@ -28,12 +29,12 @@ import org.codice.ddf.admin.utils.conn.ConnectionActionCreator;
 import com.google.common.collect.ImmutableList;
 
 import graphql.introspection.IntrospectionQuery;
-import graphql.servlet.GraphQLServlet;
+import graphql.servlet.OsgiGraphQLServlet;
 
 public class SchemaGenerator {
 
     public static void main(String[] args) throws IOException, URISyntaxException {
-        GraphQLServlet servlet = new GraphQLServlet();
+        OsgiGraphQLServlet servlet = new GraphQLServletImpl();
         final List<GraphQLProviderImpl> GRAPHQL_PROVIDERS =
                 ImmutableList.of(
                         new GraphQLProviderImpl(new StsActionCreator()),

@@ -13,8 +13,8 @@
  */
 package org.codice.ddf.admin.sources.wfs.persist;
 
+import static org.codice.ddf.admin.api.config.Configuration.FACTORY_PID;
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.ENDPOINT_URL;
-import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.FACTORY_PID;
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_NAME;
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_USERNAME;
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_USER_PASSWORD;
@@ -22,6 +22,9 @@ import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.CREATE;
 import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.FAILED_CREATE;
 import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.SUCCESSFUL_CREATE;
 import static org.codice.ddf.admin.api.handler.report.Report.createReport;
+import static org.codice.ddf.admin.api.services.WfsServiceProperties.WFS1_FEATURE;
+import static org.codice.ddf.admin.api.services.WfsServiceProperties.WFS2_FACTORY_PID;
+import static org.codice.ddf.admin.api.services.WfsServiceProperties.WFS2_FEATURE;
 import static org.codice.ddf.admin.api.services.WfsServiceProperties.wfsConfigToServiceProps;
 import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.SOURCE_NAME_EXISTS_TEST_ID;
 import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.getCommonSourceSubtypeDescriptions;
@@ -85,8 +88,8 @@ public class CreateWfsSourcePersistMethod extends PersistMethod<WfsSourceConfigu
     @Override
     public Report persist(WfsSourceConfiguration configuration) {
         Configurator configurator = configuratorFactory.getConfigurator();
-        configurator.createManagedService(configuration.factoryPid(),
-                wfsConfigToServiceProps(configuration));
+        configurator.startFeature(configuration.factoryPid().equals(WFS2_FACTORY_PID) ? WFS2_FEATURE : WFS1_FEATURE);
+        configurator.createManagedService(configuration.factoryPid(), wfsConfigToServiceProps(configuration));
         OperationReport report = configurator.commit("WFS source saved with details: {}",
                 configuration.toString());
         return createReport(SUCCESS_TYPES,

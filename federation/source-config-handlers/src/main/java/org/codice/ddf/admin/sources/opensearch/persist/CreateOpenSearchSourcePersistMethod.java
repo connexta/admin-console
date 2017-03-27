@@ -21,6 +21,7 @@ import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.CREATE;
 import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.FAILED_CREATE;
 import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.SUCCESSFUL_CREATE;
 import static org.codice.ddf.admin.api.handler.report.Report.createReport;
+import static org.codice.ddf.admin.api.services.OpenSearchServiceProperties.OPENSEARCH_FEATURE;
 import static org.codice.ddf.admin.api.services.OpenSearchServiceProperties.openSearchConfigToServiceProps;
 import static org.codice.ddf.admin.api.validation.SourceValidationUtils.validateOptionalUsernameAndPassword;
 import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.SOURCE_NAME_EXISTS_TEST_ID;
@@ -79,6 +80,7 @@ public class CreateOpenSearchSourcePersistMethod
     @Override
     public Report persist(OpenSearchSourceConfiguration configuration) {
         Configurator configurator = configuratorFactory.getConfigurator();
+        configurator.startFeature(OPENSEARCH_FEATURE);
         configurator.createManagedService(configuration.factoryPid(),
                 openSearchConfigToServiceProps(configuration));
         OperationReport report = configurator.commit("OpenSearch source saved with details: {}",

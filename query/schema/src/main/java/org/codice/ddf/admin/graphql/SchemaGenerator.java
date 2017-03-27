@@ -19,7 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
-import org.codice.ddf.admin.graphql.service.GraphQLProviderImpl;
+import org.codice.ddf.admin.api.action.ActionCreator;
 import org.codice.ddf.admin.ldap.actions.LdapActionCreator;
 import org.codice.ddf.admin.security.sts.StsActionCreator;
 import org.codice.ddf.admin.security.wcpm.actions.WcpmActionCreator;
@@ -29,27 +29,22 @@ import org.codice.ddf.admin.utils.conn.ConnectionActionCreator;
 import com.google.common.collect.ImmutableList;
 
 import graphql.introspection.IntrospectionQuery;
-import graphql.servlet.OsgiGraphQLServlet;
 
 public class SchemaGenerator {
 
     public static void main(String[] args) throws IOException, URISyntaxException {
-        OsgiGraphQLServlet servlet = new GraphQLServletImpl();
-        final List<GraphQLProviderImpl> GRAPHQL_PROVIDERS =
+        GraphQLServletImpl servlet = new GraphQLServletImpl();
+        final List<ActionCreator> GRAPHQL_PROVIDERS =
                 ImmutableList.of(
-                        new GraphQLProviderImpl(new StsActionCreator()),
-                        new GraphQLProviderImpl(new ConnectionActionCreator()),
-                        new GraphQLProviderImpl(new LdapActionCreator()),
-                        new GraphQLProviderImpl(new SourceActionCreator()),
-                        new GraphQLProviderImpl(new WcpmActionCreator()));
+                        new StsActionCreator(),
+                        new ConnectionActionCreator(),
+                        new LdapActionCreator(),
+                        new SourceActionCreator(),
+                        new WcpmActionCreator());
 
-        GRAPHQL_PROVIDERS.stream()
-                .forEach(query -> servlet.bindQueryProvider(query));
-        GRAPHQL_PROVIDERS.stream()
-                .forEach(mute -> servlet.bindMutationProvider(mute));
-        servlet.bindQueryProvider(new RelayGraphQLProvider());
+        servlet.setActionCreators(GRAPHQL_PROVIDERS);
         String schemaResult = servlet.executeQuery(IntrospectionQuery.INTROSPECTION_QUERY);
         Files.write(Paths.get(System.getProperty("target.path"), "schema.json"),
-                schemaResult.getBytes());
+                schemaResult == null? "".getBytes() : schemaResult.getBytes());
     }
 }

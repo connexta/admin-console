@@ -20,7 +20,7 @@ import { getTheme } from 'admin-app-bar/reducer'
 import getMuiTheme from 'material-ui/styles/getMuiTheme'
 
 function graphQLFetcher (graphQLParams) {
-  return window.fetch(window.location.origin + '/graphql', {
+  return window.fetch(window.location.origin + '/admin/beta/graphql', {
     method: 'post',
     credentials: 'same-origin',
     headers: { 'Content-Type': 'application/json' },

@@ -22,8 +22,10 @@ public interface Action<T extends Field> {
     String name();
     String description();
     T returnType();
-    T process();
     List<Field> getArguments();
+
+    // TODO: tbatie - 3/27/17 - Break the above methods into a common interface for all these apis
+    T process();
     List<Message> validate();
     void setArguments(Map<String, Object> args);
 }

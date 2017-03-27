@@ -32,8 +32,6 @@ public class GraphQLServiceCreatorImpl implements GraphQLServiceCreator {
 
     private String[] GRAPHQL_INTERFACES = new String[] {GraphQLQueryProvider.class.getName(),
             GraphQLMutationProvider.class.getName()};
-    private List<GraphQLQueryProvider> graphqlProviders;
-
     private Map<String, ServiceRegistration> createdServices;
 
     public GraphQLServiceCreatorImpl() {
@@ -76,9 +74,5 @@ public class GraphQLServiceCreatorImpl implements GraphQLServiceCreator {
     public BundleContext getBundleContext(){
         return FrameworkUtil.getBundle(this.getClass())
                 .getBundleContext();
-    }
-
-    public void setGraphqlProviders(List<GraphQLQueryProvider> graphqlProviders) {
-        this.graphqlProviders = graphqlProviders;
     }
 }

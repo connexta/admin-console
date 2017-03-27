@@ -23,20 +23,27 @@
     <reference-list id="actionCreators"
                     interface="org.codice.ddf.admin.api.action.ActionCreator"
                     availability="optional">
-        <reference-listener bind-method="bindCreator" unbind-method="unbindCreator" ref="graphQLServiceCreator"/>
+        <reference-listener bind-method="bindCreator" unbind-method="unbindCreator" ref="graphQLServlet"/>
     </reference-list>
-
-    <reference-list id="graphqlProviders"
-                    interface="graphql.servlet.GraphQLQueryProvider"
-                    availability="optional" />
 
     <reference id="configuratorFactory"
                interface="org.codice.ddf.admin.configurator.ConfiguratorFactory"
                availability="mandatory" filter="(type=txact)"/>
 
-    <bean id="graphQLServiceCreator" class="org.codice.ddf.admin.graphql.service.GraphQLServiceCreatorImpl" >
-        <property name="graphqlProviders" ref="graphqlProviders" />
-    </bean>
-    <service ref="graphQLServiceCreator" interface="org.codice.ddf.admin.graphql.service.GraphQLServiceCreator" />
+    <!--<bean id="graphQLServiceCreator" class="org.codice.ddf.admin.graphql.service.GraphQLServiceCreatorImpl" />-->
+    <!--<service ref="graphQLServiceCreator" interface="org.codice.ddf.admin.graphql.service.GraphQLServiceCreator" />-->
 
+    <!--<reference-list id="graphqlProviders"-->
+                    <!--interface="graphql.servlet.GraphQLQueryProvider"-->
+                    <!--availability="optional" />-->
+
+    <bean id="graphQLServlet" class="org.codice.ddf.admin.graphql.GraphQLServletImpl" >
+        <property name="actionCreators" ref="actionCreators" />
+    </bean>
+
+    <service ref="graphQLServlet" interface="javax.servlet.Servlet" >
+        <service-properties>
+            <entry key="urlPatterns" value="/admin/beta/graphql/*" />
+        </service-properties>
+    </service>
 </blueprint>

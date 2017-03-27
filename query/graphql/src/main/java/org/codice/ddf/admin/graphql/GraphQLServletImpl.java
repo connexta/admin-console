@@ -62,8 +62,6 @@ public class GraphQLServletImpl extends GraphQLServlet {
                     build());
         }
         // TODO: tbatie - 3/23/17 - Investigate type providers
-
-
 //        Set<GraphQLType> types = new HashSet<>();
 //        for (GraphQLTypesProvider typesProvider : typesProviders) {
 //            types.addAll(typesProvider.getTypes());

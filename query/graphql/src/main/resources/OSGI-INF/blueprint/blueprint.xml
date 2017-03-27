@@ -30,13 +30,6 @@
                interface="org.codice.ddf.admin.configurator.ConfiguratorFactory"
                availability="mandatory" filter="(type=txact)"/>
 
-    <!--<bean id="graphQLServiceCreator" class="org.codice.ddf.admin.graphql.service.GraphQLServiceCreatorImpl" />-->
-    <!--<service ref="graphQLServiceCreator" interface="org.codice.ddf.admin.graphql.service.GraphQLServiceCreator" />-->
-
-    <!--<reference-list id="graphqlProviders"-->
-                    <!--interface="graphql.servlet.GraphQLQueryProvider"-->
-                    <!--availability="optional" />-->
-
     <bean id="graphQLServlet" class="org.codice.ddf.admin.graphql.GraphQLServletImpl" >
         <property name="actionCreators" ref="actionCreators" />
     </bean>

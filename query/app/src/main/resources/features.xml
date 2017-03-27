@@ -85,7 +85,6 @@
     </feature>
 
     <feature name="graphql-dependencies" install="manual" version="${project.version}" description="Required dependencies for admin-beta-graphql">
-        <feature>scr</feature>
         <bundle>mvn:com.fasterxml.jackson.core/jackson-core/2.8.4</bundle>
         <bundle>mvn:com.fasterxml.jackson.core/jackson-annotations/2.8.4</bundle>
         <bundle>mvn:com.fasterxml.jackson.core/jackson-databind/2.8.4</bundle>

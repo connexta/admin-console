@@ -35,6 +35,7 @@ public class AuthType extends BaseEnumField<String> {
         this(null);
     }
 
+    // TODO: tbatie - 3/27/17 - Add constructor for supporting additional authtypes. Do this for all enum fields
     protected AuthType(Field<String> authType) {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION, ImmutableList.of(new BasicAuth(), new SamlAuth(), new PkiAuth(), new IdpAuth(), new GuestAuth()), authType);
     }

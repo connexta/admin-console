@@ -22,6 +22,7 @@ public interface Field<T> {
     String fieldTypeName();
     FieldBaseType fieldBaseType();
     String description();
+
     T getValue();
     void setValue(T value);
     List<Message> validate();

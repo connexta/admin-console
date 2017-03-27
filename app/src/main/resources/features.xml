@@ -73,5 +73,6 @@
              description="DDF Admin UI (Beta)">
         <feature prerequisite="true">admin-beta-core</feature>
         <bundle>mvn:org.codice.ddf.admin.beta/admin-ui/${project.version}</bundle>
+        <bundle>mvn:org.codice.ddf.admin.beta/admin-module/${project.version}</bundle>
     </feature>
 </features>

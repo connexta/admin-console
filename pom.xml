@@ -44,6 +44,7 @@
         <node.version>v7.1.0</node.version>
         <yarn.version>v0.21.2</yarn.version>
         <junit.version>4.12</junit.version>
+        <spark.version>2.5.5</spark.version>
 
         <ddf.scm.connection.url />
         <snapshots.repository.url />
@@ -382,5 +383,6 @@
         <module>ui</module>
         <module>app</module>
         <module>commons</module>
+        <module>admin-module</module>
     </modules>
 </project>

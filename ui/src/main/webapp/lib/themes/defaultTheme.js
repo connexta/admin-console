@@ -8,6 +8,9 @@ export default fromJS(lightBaseTheme).mergeDeep({
   raisedButton: {
     disabledColor: '#DDDDDD'
   },
+  tableRow: {
+    selectedColor: '#DDDDDD'
+  },
   palette: {
     errorColor: '#F44336',
     warningColor: '#FF9800',

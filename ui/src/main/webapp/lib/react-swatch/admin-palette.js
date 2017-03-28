@@ -62,9 +62,10 @@ export default class extends Component {
           <Swatch label='Success' background={theme.palette.successColor} onChange={updateColor(['palette', 'successColor'])} />
         </Card>
         <Card style={cardStyle}>
-          <CardHeader title={<p style={cardHeaderStyle}>Misc</p>} />
+          <CardHeader title={<p style={cardHeaderStyle}>Tables</p>} />
           <Swatch label='Table Highlight' background={theme.palette.accent2Color} onChange={updateColor(['palette', 'accent2Color'])} />
           <Swatch label='Table Header' background={theme.palette.accent3Color} onChange={updateColor(['palette', 'accent3Color'])} />
+          <Swatch label='Table Selected' background={theme.tableRow.selectedColor} onChange={updateColor(['tableRow', 'selectedColor'])} />
         </Card>
         <SelectField
           floatingLabelText='Presets'

@@ -8,6 +8,9 @@ export default fromJS(darkBaseTheme).mergeDeep({
   raisedButton: {
     disabledColor: '#444444'
   },
+  tableRow: {
+    selectedColor: '#2f2f2f'
+  },
   palette: {
     accent1Color: '#753229',
     accent2Color: '#55351d',

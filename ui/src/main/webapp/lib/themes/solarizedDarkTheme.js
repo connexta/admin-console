@@ -2,6 +2,15 @@ import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme'
 import { fromJS } from 'immutable'
 
 export default fromJS(darkBaseTheme).mergeDeep({
+  textField: {
+    errorColor: '#6b2b3d'
+  },
+  raisedButton: {
+    disabledColor: '#586e75'
+  },
+  tableRow: {
+    selectedColor: '#073642'
+  },
   palette: {
     accent1Color: '#D33682',
     accent2Color: '#073642',
@@ -14,13 +23,6 @@ export default fromJS(darkBaseTheme).mergeDeep({
     successColor: '#859900',
     textColor: '#93A1A1',
     warningColor: '#B58900',
-    disabledColor: '#586e75',
-    borderColor: '#073642'
-  },
-  textField: {
-    errorColor: '#6b2b3d'
-  },
-  raisedButton: {
     disabledColor: '#586e75'
   }
 }).toJS()

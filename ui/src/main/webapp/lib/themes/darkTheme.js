@@ -8,6 +8,9 @@ export default fromJS(darkBaseTheme).mergeDeep({
   raisedButton: {
     disabledColor: '#444444'
   },
+  tableRow: {
+    selectedColor: '#3A3B3E'
+  },
   palette: {
     textColor: '#EEEEEE',
     alternateTextColor: '#000000',
@@ -19,6 +22,7 @@ export default fromJS(darkBaseTheme).mergeDeep({
     warningColor: '#DC8201',
     successColor: '#58955D',
     canvasColor: '#2A2B2E',
-    disabledColor: '#444444'
+    disabledColor: '#444444',
+    borderColor: '#3A3B3E'
   }
 }).toJS()

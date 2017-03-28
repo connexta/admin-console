@@ -40,6 +40,10 @@ public class WfsServiceProperties {
 
     public static final String WFS2_FACTORY_PID = "Wfs_v2_0_0_Federated_Source";
 
+    public static final String WFS1_FEATURE = "spatial-wfs-v1_0_0";
+
+    public static final String WFS2_FEATURE = "spatial-wfs-v2_0_0";
+
     public static final List<String> WFS_FACTORY_PIDS = ImmutableList.of(WFS1_FACTORY_PID,
             WFS2_FACTORY_PID);
     // ----

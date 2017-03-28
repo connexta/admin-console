@@ -25,6 +25,8 @@ import java.util.Map;
 
 import org.codice.ddf.admin.api.config.sources.OpenSearchSourceConfiguration;
 
+
+
 public class OpenSearchServiceProperties {
 
     // --- OpenSearch service properties
@@ -39,6 +41,8 @@ public class OpenSearchServiceProperties {
     public static final String USERNAME = "username";
 
     public static final String PASSWORD = "password";
+
+    public static final String OPENSEARCH_FEATURE = "catalog-opensearch-source";
     // ---
 
     public static final OpenSearchSourceConfiguration servicePropsToOpenSearchConfig(

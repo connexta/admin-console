@@ -13,16 +13,17 @@
  */
 package org.codice.ddf.admin.sources.csw.persist;
 
+import static org.codice.ddf.admin.api.config.Configuration.FACTORY_PID;
 import static org.codice.ddf.admin.api.config.sources.CswSourceConfiguration.FORCE_SPATIAL_FILTER;
 import static org.codice.ddf.admin.api.config.sources.CswSourceConfiguration.OUTPUT_SCHEMA;
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.ENDPOINT_URL;
-import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.FACTORY_PID;
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_NAME;
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_USERNAME;
 import static org.codice.ddf.admin.api.config.sources.SourceConfiguration.SOURCE_USER_PASSWORD;
 import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.CREATE;
 import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.FAILED_CREATE;
 import static org.codice.ddf.admin.api.handler.commons.HandlerCommons.SUCCESSFUL_CREATE;
+import static org.codice.ddf.admin.api.services.CswServiceProperties.CSW_FEATURE;
 import static org.codice.ddf.admin.api.services.CswServiceProperties.cswConfigToServiceProps;
 import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.SOURCE_NAME_EXISTS_TEST_ID;
 import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.getCommonSourceSubtypeDescriptions;
@@ -89,6 +90,7 @@ public class CreateCswSourcePersistMethod extends PersistMethod<CswSourceConfigu
     @Override
     public Report persist(CswSourceConfiguration configuration) {
         Configurator configurator = configuratorFactory.getConfigurator();
+        configurator.startFeature(CSW_FEATURE);
         configurator.createManagedService(configuration.factoryPid(),
                 cswConfigToServiceProps(configuration));
         OperationReport report = configurator.commit("CSW source saved with details: {}",

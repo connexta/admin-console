@@ -44,31 +44,6 @@
 
         <dependency>
             <groupId>org.codice.ddf.admin.beta</groupId>
-            <artifactId>admin-query-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.codice.ddf.admin.beta</groupId>
-            <artifactId>admin-query-ldap</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.codice.ddf.admin.beta</groupId>
-            <artifactId>admin-query-sts</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.codice.ddf.admin.beta</groupId>
-            <artifactId>admin-query-wcpm</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.codice.ddf.admin.beta</groupId>
-            <artifactId>admin-query-sources-impl</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.codice.ddf.admin.beta</groupId>
             <artifactId>ldap-config-handler</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -79,12 +54,32 @@
         </dependency>
         <dependency>
             <groupId>org.codice.ddf.admin.beta</groupId>
-            <artifactId>admin-query</artifactId>
+            <artifactId>admin-module</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.codice.ddf.admin.beta</groupId>
-            <artifactId>admin-module</artifactId>
+            <artifactId>admin-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codice.ddf.admin.beta</groupId>
+            <artifactId>config-handler-router</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codice.ddf.admin.beta</groupId>
+            <artifactId>sources-config-handler</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codice.ddf.admin.beta</groupId>
+            <artifactId>contextpolicy-config-handler</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codice.ddf.admin.beta</groupId>
+            <artifactId>admin-ui</artifactId>
             <version>${project.version}</version>
         </dependency>
 

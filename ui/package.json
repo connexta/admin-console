@@ -39,6 +39,7 @@
     "immutable": "^3.8.1",
     "material-ui": "^0.16.7",
     "react": "^15.1.0",
+    "react-apollo": "^1.0.1",
     "react-color": "^2.11.4",
     "react-deep-force-update": "^2.0.1",
     "react-dom": "^15.1.0",

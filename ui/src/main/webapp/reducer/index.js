@@ -1,5 +1,7 @@
 import { combineReducers } from 'redux-immutable'
 
+import client from '../client'
+
 import home, { submarine as homeSubmarine } from '../home/reducer'
 import systemUsage, { submarine as systemUsageSubmarine } from 'system-usage/reducer'
 import polling, { submarine as pollingSubmarine } from 'redux-polling'
@@ -20,7 +22,18 @@ const backendError = (state = {}, { type, err } = {}) => {
 }
 export const getBackendErrors = (state) => state.get('backendError')
 
-export default combineReducers({ fetch, wizard, backendError, sourceWizard, home, wcpm, polling, systemUsage, theme })
+export default combineReducers({
+  apollo: client.reducer(),
+  fetch,
+  wizard,
+  backendError,
+  sourceWizard,
+  home,
+  wcpm,
+  polling,
+  systemUsage,
+  theme
+})
 
 // Submarines patch redux selectors which causes issues running unit tests.
 // The following if protects against the side effect during tests. Do not remove.

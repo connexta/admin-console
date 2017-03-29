@@ -1,8 +1,10 @@
 import React from 'react'
 import { Provider, connect } from 'react-redux'
+import { ApolloProvider } from 'react-apollo'
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 
 import store from './store'
+import client from './client'
 
 import Exception from './containers/exceptions'
 import Ldap from './wizards/ldap'
@@ -57,17 +59,19 @@ const ConnectedMuiThemeProvider = connect((state) => ({
 
 const App = ({ children }) => (
   <Provider store={store}>
-    <ConnectedMuiThemeProvider>
-      <Banners>
-        <Modal />
-        <Backdrop>
-          <AdminAppBar />
-          <div style={{maxWidth: 960, margin: '0 auto'}}>{children}</div>
-          <Exception />
-        </Backdrop>
-        <DevTools />
-      </Banners>
-    </ConnectedMuiThemeProvider>
+    <ApolloProvider client={client}>
+      <ConnectedMuiThemeProvider>
+        <Banners>
+          <Modal />
+          <Backdrop>
+            <AdminAppBar />
+            <div style={{maxWidth: 960, margin: '0 auto'}}>{children}</div>
+            <Exception />
+          </Backdrop>
+          <DevTools />
+        </Banners>
+      </ConnectedMuiThemeProvider>
+    </ApolloProvider>
   </Provider>
 )
 

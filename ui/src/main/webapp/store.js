@@ -1,5 +1,6 @@
 import { createStore, compose, applyMiddleware } from 'redux'
 import thunk from 'redux-thunk'
+import client from './client'
 
 import { Map, fromJS } from 'immutable'
 
@@ -8,7 +9,7 @@ import reducer from './reducer'
 var enhancer
 
 if (process.env.NODE_ENV === 'production') {
-  enhancer = applyMiddleware(thunk)
+  enhancer = applyMiddleware(client.middleware(), thunk)
 }
 
 const asyncExceptionLoggger = (store) => (next) => async (action) => {
@@ -26,7 +27,7 @@ if (process.env.NODE_ENV !== 'production') {
   const debugSession =
     (window.location.href.match(/[?&]debug_session=([^&#]+)\b/) || [])[1]
   enhancer = compose(
-    applyMiddleware(asyncExceptionLoggger, thunk),
+    applyMiddleware(asyncExceptionLoggger, client.middleware(), thunk),
     DevTools.instrument(),
     persistState(debugSession, fromJS)
   )

@@ -19,11 +19,7 @@ import {
   Port
 } from 'admin-wizard/inputs'
 
-import {
-  sideLines
-} from '../styles.less'
-
-import { NavPanes } from '../components'
+import { NavPanes, SideLines } from '../components'
 
 import { setDefaults } from '../../../actions'
 import Mount from 'react-mount'
@@ -102,11 +98,7 @@ const DiscoveryStageView = ({ messages, testSources, setDefaults, configs, disco
               </div>
             )
           }
-          <div className={sideLines}>
-            <span>
-                Authentication (Optional)
-              </span>
-          </div>
+          <SideLines label='Authentication (Optional)' />
           <Input
             id='sourceUserName'
             label='Username'
@@ -121,7 +113,7 @@ const DiscoveryStageView = ({ messages, testSources, setDefaults, configs, disco
               primary
               label='Check'
               disabled={nextShouldBeDisabled()}
-              onClick={() => testSources('sources', 'sourceSelectionStage', 'sourceSelectionStage', discoveryType)} />
+              onClick={() => testSources('sources', 'sourceSelectionStage', 'discoveryStage', discoveryType)} />
           </ActionGroup>
         </div>
       </NavPanes>

@@ -7,6 +7,7 @@ import fetch, { submarine as fetchSubmarine } from 'redux-fetch'
 import wizard, { submarine as wizardSubmarine } from 'admin-wizard/reducer'
 import wcpm, { submarine as wcpmSubmarine } from '../adminTools/webContextPolicyManager/reducer'
 import sourceWizard, { submarine as sourceSubmarine } from '../wizards/sources/reducer'
+import theme, { submarine as themeSubmarine } from 'admin-app-bar/reducer'
 
 const backendError = (state = {}, { type, err } = {}) => {
   switch (type) {
@@ -17,9 +18,9 @@ const backendError = (state = {}, { type, err } = {}) => {
     default: return state
   }
 }
-
 export const getBackendErrors = (state) => state.get('backendError')
-export default combineReducers({ fetch, wizard, backendError, sourceWizard, home, wcpm, polling, systemUsage })
+
+export default combineReducers({ fetch, wizard, backendError, sourceWizard, home, wcpm, polling, systemUsage, theme })
 
 // Submarines patch redux selectors which causes issues running unit tests.
 // The following if protects against the side effect during tests. Do not remove.
@@ -31,4 +32,5 @@ if (process.env.NODE_ENV !== 'ci') {
   wizardSubmarine.init((state) => state.get('wizard'))
   wcpmSubmarine.init((state) => state.get('wcpm'))
   sourceSubmarine.init((state) => state.get('sourceWizard'))
+  themeSubmarine.init((state) => state.get('theme'))
 }

@@ -1,5 +1,7 @@
 import React from 'react'
-import { Provider } from 'react-redux'
+import { Provider, connect } from 'react-redux'
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
+
 import store from './store'
 
 import Exception from './containers/exceptions'
@@ -8,14 +10,14 @@ import Sources from './wizards/sources'
 import { Home } from './home'
 import Wcpm from './adminTools/webContextPolicyManager'
 
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
-import HomeIcon from 'material-ui/svg-icons/action/home'
-import IconButton from 'material-ui/IconButton'
-import { Link } from 'react-router'
-import AppBar from 'material-ui/AppBar'
-
 import Banners from 'system-usage/Banners'
 import Modal from 'system-usage/Modal'
+import Backdrop from 'components/Backdrop'
+import AdminAppBar from 'admin-app-bar'
+
+import { getTheme } from 'admin-app-bar/reducer'
+
+import getMuiTheme from 'material-ui/styles/getMuiTheme'
 
 var DevTools
 
@@ -27,29 +29,24 @@ if (process.env.NODE_ENV !== 'production') {
   DevTools = require('./containers/dev-tools').default
 }
 
-const LinkHomeIcon = (props) => (
-  <Link to='/'>
-    <HomeIcon {...props} />
-  </Link>
-)
+const ConnectedMuiThemeProvider = connect((state) => ({
+  muiTheme: getMuiTheme(getTheme(state))
+}))(MuiThemeProvider)
 
 const App = ({ children }) => (
-  <MuiThemeProvider>
-    <Provider store={store}>
+  <Provider store={store}>
+    <ConnectedMuiThemeProvider>
       <Banners>
         <Modal />
-        <AppBar
-          iconElementLeft={
-            <IconButton>
-              <LinkHomeIcon />
-            </IconButton>
-          } />
-        <div style={{ maxWidth: 960, padding: 20, margin: '0 auto' }}>{children}</div>
-        <Exception />
+        <Backdrop>
+          <AdminAppBar />
+          <div style={{maxWidth: 960, margin: '0 auto'}}>{children}</div>
+          <Exception />
+        </Backdrop>
         <DevTools />
       </Banners>
-    </Provider>
-  </MuiThemeProvider>
+    </ConnectedMuiThemeProvider>
+  </Provider>
 )
 
 export const routes = {

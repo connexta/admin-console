@@ -2,6 +2,7 @@ import inject from 'react-tap-event-plugin'
 import React from 'react'
 import { render } from 'react-dom'
 import { Router, createMemoryHistory, hashHistory, RouterContext, match } from 'react-router'
+import deepForceUpdate from 'react-deep-force-update'
 
 import { routes } from './app'
 
@@ -16,9 +17,10 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 if (process.env.NODE_ENV !== 'production') {
+  let instance
   const AppContainer = require('react-hot-loader').AppContainer
 
-  render(
+  instance = render(
     <AppContainer errorReporter={({ error }) => { throw error }}>
       <Router history={hashHistory} routes={routes} />
     </AppContainer>,
@@ -29,13 +31,15 @@ if (process.env.NODE_ENV !== 'production') {
     // use <App /> here rather than require() a <NextApp />.
     try {
       const routes = require('./app').routes
-      render(
+      instance = render(
         <AppContainer errorReporter={({ error }) => { throw error }}>
           <Router history={hashHistory} routes={routes} />
         </AppContainer>,
         document.getElementById('root'))
     } catch (e) {}
   })
+
+  window.forceUpdateThemeing = () => setTimeout(() => deepForceUpdate(instance), 0)
 }
 
 export default ({ html, path }, done) => {

@@ -16,21 +16,20 @@
 
 .navButtonStyles {
   opacity: 0.5;
-  background: #fff;
+  filter: invert(0%);
   width: 10%;
   transition: background-color 0.2s ease;
 }
 
 .navButtonStylesDisabled {
-  opacity: 0.2;
-  background: #fff;
+  opacity: 0.1;
   width: 10%;
 }
 
 
 .navButtonStyles:hover {
   opacity: 1.0;
-  background: #eee;
+  filter: invert(10%);
   transition: all 0.2s ease;
   cursor: pointer;
 }
@@ -74,16 +73,12 @@
   line-height: 0;
 }
 
-.sideLines:after {
-  content: "";
+.horizontalSideLines {
   width: 100%;
-  background-color: transparent;
   display: block;
   height: 1px;
-  border-top: 1px solid #e7e7e7;
   position: absolute;
   top: 50%;
-  margin-top: -1px;
   z-index: 1;
 }
 

@@ -1,5 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import muiThemeable from 'material-ui/styles/muiThemeable'
 
 import { getSourceStage, getStagesClean, getConfig, getStageProgress, getConfigTypeById } from './reducer'
 import { setNavStage, setConfigSource } from './actions'
@@ -17,7 +18,9 @@ import {
   animated,
   fadeIn,
   navButtonStyles,
-  navButtonStylesDisabled
+  navButtonStylesDisabled,
+  sideLines,
+  horizontalSideLines
 } from './styles.less'
 
 export const CenteredElements = ({ children, stageIndex, style }) => (
@@ -104,33 +107,33 @@ const SourceRadioButton = ({ disabled, value, label, valueSelected = 'undefined'
   }
 }
 
-export const BackNav = ({onClick, disabled}) => {
+export const BackNav = ({onClick, disabled, muiTheme}) => {
   if (!disabled) {
     return (
-      <div className={navButtonStyles} onClick={onClick}>
-        <LeftIcon style={{height: '100%', width: '100%'}} />
+      <div className={navButtonStyles} style={{ backgroundColor: muiTheme.palette.canvasColor }} onClick={onClick}>
+        <LeftIcon style={{ color: muiTheme.palette.textColor, height: '100%', width: '100%' }} />
       </div>
     )
   } else {
     return (
-      <div className={navButtonStylesDisabled}>
-        <LeftIcon style={{color: 'lightgrey', height: '100%', width: '100%'}} />
+      <div className={navButtonStylesDisabled} style={{ backgroundColor: muiTheme.palette.canvasColor }}>
+        <LeftIcon style={{ color: muiTheme.palette.textColor, height: '100%', width: '100%' }} />
       </div>
     )
   }
 }
 
-const ForwardNavView = ({onClick, clean, currentStage, maxStage, disabled}) => {
+const ForwardNavView = ({onClick, clean, currentStage, maxStage, disabled, muiTheme}) => {
   if (clean && (currentStage !== maxStage) && !disabled) {
     return (
-      <div className={navButtonStyles} onClick={onClick}>
-        <RightIcon style={{height: '100%', width: '100%'}} />
+      <div className={navButtonStyles} style={{ backgroundColor: muiTheme.palette.canvasColor }} onClick={onClick}>
+        <RightIcon style={{ color: muiTheme.palette.textColor, height: '100%', width: '100%' }} />
       </div>
     )
   } else {
     return (
-      <div className={navButtonStylesDisabled}>
-        <RightIcon style={{color: 'lightgrey', height: '100%', width: '100%'}} />
+      <div className={navButtonStylesDisabled} style={{ backgroundColor: muiTheme.palette.canvasColor }}>
+        <RightIcon style={{ color: muiTheme.palette.textColor, height: '100%', width: '100%' }} />
       </div>
     )
   }
@@ -140,14 +143,25 @@ export const ForwardNav = connect((state) => ({
   maxStage: getStageProgress(state),
   currentStage: getSourceStage(state)}))(ForwardNavView)
 
-const NavPanesView = ({ children, backClickTarget, forwardClickTarget, setNavStage, backDisabled = false, forwardDisabled = false }) => (
+const NavPanesView = ({ children, backClickTarget, forwardClickTarget, setNavStage, backDisabled = false, forwardDisabled = false, muiTheme }) => (
   <Flexbox justifyContent='center' flexDirection='row'>
-    <BackNav disabled={backDisabled} onClick={() => setNavStage(backClickTarget)} />
+    <BackNav disabled={backDisabled} onClick={() => setNavStage(backClickTarget)} muiTheme={muiTheme} />
     <CenteredElements style={{ width: '80%' }}>
       {children}
     </CenteredElements>
-    <ForwardNav disabled={forwardDisabled} onClick={() => setNavStage(forwardClickTarget)} />
+    <ForwardNav disabled={forwardDisabled} onClick={() => setNavStage(forwardClickTarget)} muiTheme={muiTheme} />
   </Flexbox>
 )
-export const NavPanes = connect(null, { setNavStage: setNavStage })(NavPanesView)
+export const NavPanes = connect(null, { setNavStage: setNavStage })(muiThemeable()(NavPanesView))
+
+const SideLinesView = ({ muiTheme, label }) => (
+  <div className={sideLines}>
+    <span style={{ color: muiTheme.palette.textColor, backgroundColor: muiTheme.palette.canvasColor }}>
+      {label}
+    </span>
+    <div className={horizontalSideLines} style={{ backgroundColor: muiTheme.palette.textColor }} />
+  </div>
+)
+
+export const SideLines = muiThemeable()(SideLinesView)
 

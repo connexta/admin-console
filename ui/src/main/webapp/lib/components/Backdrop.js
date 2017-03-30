@@ -8,13 +8,14 @@ const isInIframe = () => {
 
 let BackdropView = ({ muiTheme, children, ...rest }) => {
   let fixed = {
-    backgroundColor: muiTheme.palette.backdropColor,
-    height: '100vh'
+    backgroundColor: muiTheme.palette.backdropColor
   }
 
   if (isInIframe()) {
     fixed.borderRadius = '4px'
     fixed.height = '100%'
+  } else {
+    fixed.minHeight = '100vh'
   }
 
   return (

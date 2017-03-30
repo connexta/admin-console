@@ -7,8 +7,12 @@ import { getSystemUsageProperties, getSystemUsageAccepted } from './reducer'
 import Dialog from 'material-ui/Dialog'
 import FlatButton from 'material-ui/FlatButton'
 
+const isInIframe = () => {
+  return window !== window.top
+}
+
 let Modal = ({ settings, fetchSystemUsageProperties, getSystemUsageAccepted, acceptSystemUsage }) => {
-  if (settings && settings.systemUsageEnabled) {
+  if (settings && settings.systemUsageEnabled && !isInIframe()) {
     const acceptButton = (
       <FlatButton
         label='OK'

@@ -23,7 +23,7 @@
         <version>0.1.2-SNAPSHOT</version>
     </parent>
 
-    <name>DDF :: Configurator :: Transactional Implementation</name>
+    <name>DDF :: Configurator</name>
     <artifactId>configurator</artifactId>
     <packaging>pom</packaging>
 

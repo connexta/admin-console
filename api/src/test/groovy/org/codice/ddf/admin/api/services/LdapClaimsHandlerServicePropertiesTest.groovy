@@ -17,11 +17,15 @@ import org.codice.ddf.admin.api.config.ldap.LdapConfiguration
 import org.codice.ddf.admin.api.validation.LdapValidationUtils
 import org.codice.ddf.admin.api.validation.ValidationUtils
 import org.codice.ddf.admin.configurator.Configurator
+import spock.lang.Shared
 import spock.lang.Specification
 
+import java.nio.file.Files
 import java.nio.file.Paths
 
 class LdapClaimsHandlerServicePropertiesTest extends Specification {
+    @Shared
+    String originalDdfHome
 
     LdapClaimsHandlerServiceProperties ldapClaimsHandlerServiceProperties
 
@@ -58,11 +62,26 @@ class LdapClaimsHandlerServicePropertiesTest extends Specification {
     static final TEST_PROPERTY_FILE_LOCATION = "src/test/resources/testLdap.properties"
 
     def setup() {
+        originalDdfHome = System.getProperty('ddf.home')
+        def tempDir = Files.createTempDirectory("testroot")
+
+        def tempPath = tempDir.toString()
+        System.setProperty('ddf.home', tempPath)
+
         ldapClaimsHandlerServiceProperties = new LdapClaimsHandlerServiceProperties()
         configurator = Mock(Configurator)
         def props = new Properties()
         props.load(new FileReader(Paths.get(TEST_PROPERTY_FILE_LOCATION).toFile()))
-        configurator.getProperties(Paths.get(TEST_PROPERTY_FILE_LOCATION)) >> props
+
+        configurator.getProperties(Paths.get(tempPath, TEST_PROPERTY_FILE_LOCATION)) >> props
+    }
+
+    void cleanup() {
+        if (originalDdfHome != null) {
+            System.setProperty('ddf.home', originalDdfHome)
+        } else {
+            System.clearProperty('ddf.home')
+        }
     }
 
     def 'test ldapClaimsHandlerServiceToLdapConfig(Map<String, Object>) all present values success'() {

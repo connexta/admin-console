@@ -11,12 +11,18 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.common.fields.common.message;
+package org.codice.ddf.admin.common.message;
 
-public class WarningMessageField extends MessageField {
+import org.codice.ddf.admin.common.fields.base.BaseListField;
 
-    public WarningMessageField(String code, String content) {
-        super(code, content, MessageType.WARNING);
+public class SkipWarningsList extends BaseListField<MessageCodeField> {
+
+    public static final String FIELD_NAME = "skipWarnings";
+
+    public static final String DESCRIPTION =
+            "A list containing warning codes that should be ignored.";
+
+    public SkipWarningsList() {
+        super(FIELD_NAME, DESCRIPTION, new MessageCodeField());
     }
-
 }

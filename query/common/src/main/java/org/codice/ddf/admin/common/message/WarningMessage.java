@@ -11,13 +11,26 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.common.fields.common.message;
+package org.codice.ddf.admin.common.message;
 
-import org.codice.ddf.admin.api.action.Message;
+import java.util.List;
 
-public class FailureMessageField extends MessageField {
+public class WarningMessage extends BaseMessage {
 
-    public FailureMessageField(String code, String content) {
-        super(code, content, Message.MessageType.FAILURE);
+    public WarningMessage(String code) {
+        super(MessageType.WARNING, code);
+    }
+
+    public WarningMessage(String code, String pathOrigin) {
+        super(MessageType.WARNING, code, pathOrigin);
+    }
+
+    public WarningMessage(String code, List<String> path) {
+        super(MessageType.ERROR, code, path);
+    }
+
+    @Override
+    public WarningMessage copy() {
+        return new WarningMessage(getCode(), getPath());
     }
 }

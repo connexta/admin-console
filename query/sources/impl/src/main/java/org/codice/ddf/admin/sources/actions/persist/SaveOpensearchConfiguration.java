@@ -27,7 +27,10 @@ import com.google.common.collect.ImmutableList;
 public class SaveOpensearchConfiguration extends BaseAction<SourceInfoField> {
 
     public static final String NAME = "saveOpeansearchSource";
-    public static final String DESCRIPTION = "Saves a wfs source configuration. If a pid is specified, that source configuration will be updated.";
+
+    public static final String DESCRIPTION =
+            "Saves a wfs source configuration. If a pid is specified, that source configuration will be updated.";
+
     private OpensearchSourceConfigurationField config;
 
     public SaveOpensearchConfiguration() {
@@ -36,12 +39,12 @@ public class SaveOpensearchConfiguration extends BaseAction<SourceInfoField> {
     }
 
     @Override
-    public SourceInfoField process() {
-        return SAMPLE_OPENSEARCH_SOURCE_INFO;
+    public List<Field> getArguments() {
+        return ImmutableList.of(config);
     }
 
     @Override
-    public List<Field> getArguments() {
-        return ImmutableList.of(config);
+    public SourceInfoField performAction() {
+        return SAMPLE_OPENSEARCH_SOURCE_INFO;
     }
 }

@@ -27,7 +27,10 @@ import com.google.common.collect.ImmutableList;
 public class GetSourceConfigsAction extends BaseAction<SourceInfoListField> {
 
     public static final String NAME = "configs";
-    public static final String DESCRIPTION = "Retrieves all currently configured sources. If a source pid is specified, only that source configuration will be returned.";
+
+    public static final String DESCRIPTION =
+            "Retrieves all currently configured sources. If a source pid is specified, only that source configuration will be returned.";
+
     public PidField pid;
 
     public GetSourceConfigsAction() {
@@ -36,12 +39,12 @@ public class GetSourceConfigsAction extends BaseAction<SourceInfoListField> {
     }
 
     @Override
-    public SourceInfoListField process() {
-        return SAMPLE_SOURCES_INFO_LIST;
+    public List<Field> getArguments() {
+        return ImmutableList.of(pid);
     }
 
     @Override
-    public List<Field> getArguments() {
-        return ImmutableList.of(pid);
+    public SourceInfoListField performAction() {
+        return SAMPLE_SOURCES_INFO_LIST;
     }
 }

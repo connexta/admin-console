@@ -23,7 +23,8 @@ public abstract class BaseScalarField<T> extends BaseField<T> {
 
     private T value;
 
-    public BaseScalarField(String fieldName, String fieldTypeName, String description, FieldBaseType fieldBaseType) {
+    public BaseScalarField(String fieldName, String fieldTypeName, String description,
+            FieldBaseType fieldBaseType) {
         super(fieldName, fieldTypeName, description, fieldBaseType);
     }
 

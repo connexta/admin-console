@@ -27,7 +27,9 @@ import com.google.common.collect.ImmutableList;
 public class LdapUserAttributes extends BaseAction<LdapAttributeListField> {
 
     public static final String NAME = "userAttributes";
-    public static final String DESCRIPTION = "Retrieves a subset of available user attributes based on the LDAP settings provided.";
+
+    public static final String DESCRIPTION =
+            "Retrieves a subset of available user attributes based on the LDAP settings provided.";
 
     private LdapConfigurationField config = new LdapConfigurationField();
 
@@ -36,14 +38,13 @@ public class LdapUserAttributes extends BaseAction<LdapAttributeListField> {
     }
 
     @Override
-    public LdapAttributeListField process() {
-        return new LdapAttributeListField()
-                .add(SAMPLE_LDAP_ATTRIBUTE)
-                .add(SAMPLE_LDAP_ATTRIBUTE);
+    public List<Field> getArguments() {
+        return ImmutableList.of(config);
     }
 
     @Override
-    public List<Field> getArguments() {
-        return ImmutableList.of(config);
+    public LdapAttributeListField performAction() {
+        return new LdapAttributeListField().add(SAMPLE_LDAP_ATTRIBUTE)
+                .add(SAMPLE_LDAP_ATTRIBUTE);
     }
 }

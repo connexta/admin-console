@@ -18,15 +18,22 @@ import org.codice.ddf.admin.api.fields.Field;
 public abstract class BaseField<T> implements Field<T> {
 
     private String fieldName;
+
     private String fieldTypeName;
+
     private String description;
+
     private FieldBaseType fieldBaseType;
 
-    public BaseField(String fieldName, String fieldTypeName, String description, FieldBaseType fieldBaseType) {
+    private boolean isRequired;
+
+    public BaseField(String fieldName, String fieldTypeName, String description,
+            FieldBaseType fieldBaseType) {
         this.fieldName = fieldName;
         this.fieldTypeName = fieldTypeName;
         this.fieldBaseType = fieldBaseType;
         this.description = description;
+        isRequired = false;
     }
 
     @Override
@@ -49,4 +56,14 @@ public abstract class BaseField<T> implements Field<T> {
         return description;
     }
 
+    @Override
+    public boolean isRequired() {
+        return isRequired;
+    }
+
+    @Override
+    public BaseField<T> isRequired(boolean required) {
+        isRequired = required;
+        return this;
+    }
 }

@@ -18,7 +18,9 @@ import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 public class LdapAttributeField extends StringField {
 
     public static final String DEFAULT_FIELD_NAME = "setEnumValue";
+
     public static final String FIELD_TYPE_NAME = "LdapEntryAttribute";
+
     public static final String DESCRIPTION = "A particular setEnumValue an LDAP entry contains.";
 
     public LdapAttributeField() {

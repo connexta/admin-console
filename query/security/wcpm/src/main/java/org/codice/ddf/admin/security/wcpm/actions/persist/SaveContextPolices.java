@@ -26,7 +26,10 @@ import com.google.common.collect.ImmutableList;
 public class SaveContextPolices extends BaseAction<ContextPolicies> {
 
     public static final String DEFAULT_FIELD_NAME = "saveContextPolicies";
-    public static final String DESCRIPTION = "Saves a list of policies to be applied to their corresponding context paths.";
+
+    public static final String DESCRIPTION =
+            "Saves a list of policies to be applied to their corresponding context paths.";
+
     private ContextPolicies contextPolicies;
 
     public SaveContextPolices() {
@@ -35,12 +38,12 @@ public class SaveContextPolices extends BaseAction<ContextPolicies> {
     }
 
     @Override
-    public ContextPolicies process() {
-        return SAMPLE_CONTEXT_POLICES;
+    public List<Field> getArguments() {
+        return ImmutableList.of(contextPolicies);
     }
 
     @Override
-    public List<Field> getArguments() {
-        return ImmutableList.of(contextPolicies);
+    public ContextPolicies performAction() {
+        return SAMPLE_CONTEXT_POLICES;
     }
 }

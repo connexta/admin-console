@@ -23,13 +23,15 @@ import java.util.Map;
 import org.codice.ddf.admin.api.action.Message;
 import org.codice.ddf.admin.api.fields.ObjectField;
 
-public abstract class BaseObjectField extends BaseField<Map<String, Object>> implements ObjectField {
+public abstract class BaseObjectField extends BaseField<Map<String, Object>>
+        implements ObjectField {
 
     public BaseObjectField(String fieldName, String fieldTypeName, String description) {
         super(fieldName, fieldTypeName, description, OBJECT);
     }
 
-    protected BaseObjectField(String fieldName, String fieldTypeName, String description, FieldBaseType baseType) {
+    protected BaseObjectField(String fieldName, String fieldTypeName, String description,
+            FieldBaseType baseType) {
         super(fieldName, fieldTypeName, description, baseType);
     }
 
@@ -51,5 +53,27 @@ public abstract class BaseObjectField extends BaseField<Map<String, Object>> imp
     public List<Message> validate() {
         // TODO: tbatie - 3/16/17 - Validate object fields
         return new ArrayList<>();
+    }
+
+    @Override
+    public BaseObjectField allFieldsRequired(boolean required) {
+        isRequired(required);
+
+        getFields().stream()
+                .map(field -> field.isRequired(required))
+                .filter(field -> field instanceof ObjectField)
+                .map(ObjectField.class::cast)
+                .forEach(objField -> objField.allFieldsRequired(required));
+        return this;
+    }
+
+    @Override
+    public BaseObjectField innerFieldRequired(boolean required, String fieldName) {
+        isRequired(required);
+        getFields().stream()
+                .filter(field -> field instanceof ObjectField)
+                .map(ObjectField.class::cast)
+                .forEach(objField -> objField.innerFieldRequired(required, fieldName));
+        return this;
     }
 }

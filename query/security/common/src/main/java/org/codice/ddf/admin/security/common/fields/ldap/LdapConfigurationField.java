@@ -24,11 +24,18 @@ import com.google.common.collect.ImmutableList;
 public class LdapConfigurationField extends BaseObjectField {
 
     public static final String FIELD_NAME = "config";
+
     public static final String FIELD_TYPE_NAME = "LdapConfiguration";
-    public static final String DESCRIPTION = "A configuration containing all the required fields for saving LDAP settings";
+
+    public static final String DESCRIPTION =
+            "A configuration containing all the required fields for saving LDAP settings";
+
     private PidField pid;
+
     private LdapConnectionField connection;
+
     private LdapCredentialsField credentials;
+
     private LdapSettingsField settings;
 
     public LdapConfigurationField() {
@@ -38,7 +45,6 @@ public class LdapConfigurationField extends BaseObjectField {
         this.credentials = new LdapCredentialsField();
         this.settings = new LdapSettingsField();
     }
-
 
     public LdapConfigurationField connection(LdapConnectionField connection) {
         this.connection = connection;

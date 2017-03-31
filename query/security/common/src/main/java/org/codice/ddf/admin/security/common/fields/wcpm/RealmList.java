@@ -18,6 +18,7 @@ import org.codice.ddf.admin.common.fields.base.BaseListField;
 public class RealmList extends BaseListField<Realm> {
 
     public static final String DEFAULT_FIELD_NAME = "realms";
+
     public static final String DESCRIPTION = "A list of Realms";
 
     public RealmList() {

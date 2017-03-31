@@ -16,7 +16,6 @@ package org.codice.ddf.admin.common.actions;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.codice.ddf.admin.api.action.Message;
 import org.codice.ddf.admin.api.fields.Field;
 
 public abstract class GetAction<T extends Field> extends BaseAction<T> {
@@ -27,11 +26,6 @@ public abstract class GetAction<T extends Field> extends BaseAction<T> {
 
     @Override
     public List<Field> getArguments() {
-        return new ArrayList<>();
-    }
-
-    @Override
-    public List<Message> validate() {
         return new ArrayList<>();
     }
 }

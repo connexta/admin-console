@@ -21,14 +21,16 @@ import org.codice.ddf.admin.security.common.fields.wcpm.ContextPolicies;
 public class GetContextPolicies extends GetAction<ContextPolicies> {
 
     public static final String DEFAULT_FIELD_NAME = "policies";
-    public static final String DESCRIPTION = "Returns all currently configured policies applied to context paths.";
+
+    public static final String DESCRIPTION =
+            "Returns all currently configured policies applied to context paths.";
 
     public GetContextPolicies() {
         super(DEFAULT_FIELD_NAME, DESCRIPTION, new ContextPolicies());
     }
 
     @Override
-    public ContextPolicies process() {
+    public ContextPolicies performAction() {
         return SAMPLE_CONTEXT_POLICES;
     }
 }

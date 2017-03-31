@@ -22,10 +22,14 @@ import com.google.common.collect.ImmutableList;
 public class Realm extends BaseEnumField<String> {
 
     public static final String DEFAULT_FIELD_NAME = "realm";
+
     public static final String FIELD_TYPE_NAME = "Realm";
-    public static final String DESCRIPTION = "Authenticating Realms are used to authenticate an incoming authentication token and create a Subject on successful authentication.";
+
+    public static final String DESCRIPTION =
+            "Authenticating Realms are used to authenticate an incoming authentication token and create a Subject on successful authentication.";
 
     public static final Realm LDAP_REALM = new Realm(new LdapRealm());
+
     public static final Realm KARAF_REALM = new Realm(new KarafRealm());
 
     public Realm() {
@@ -33,7 +37,11 @@ public class Realm extends BaseEnumField<String> {
     }
 
     protected Realm(Field<String> realm) {
-        super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION, ImmutableList.of(new LdapRealm(), new KarafRealm()), realm);
+        super(DEFAULT_FIELD_NAME,
+                FIELD_TYPE_NAME,
+                DESCRIPTION,
+                ImmutableList.of(new LdapRealm(), new KarafRealm()),
+                realm);
     }
 
     protected static final class LdapRealm extends StringField {
@@ -54,7 +62,9 @@ public class Realm extends BaseEnumField<String> {
 
     protected static final class KarafRealm extends StringField {
         public static final String KARAF = "karaf";
-        public static final String DESCRIPTION = "The default realm. The karaf realm authenticates against the users.properties file.";
+
+        public static final String DESCRIPTION =
+                "The default realm. The karaf realm authenticates against the users.properties file.";
 
         public KarafRealm() {
             super(KARAF, KARAF, DESCRIPTION);

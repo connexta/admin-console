@@ -25,12 +25,16 @@ import org.codice.ddf.admin.api.fields.ListField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class BaseListField<T extends Field> extends BaseField<List> implements ListField<T> {
+public abstract class BaseListField<T extends Field> extends BaseField<List>
+        implements ListField<T> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseListField.class);
 
     protected List<T> fields;
+
     protected T listFieldType;
+
+    private boolean isRequiredNonEmpty;
 
     public BaseListField(String fieldName, String description, T listFieldType) {
         super(fieldName, null, description, LIST);
@@ -48,7 +52,6 @@ public abstract class BaseListField<T extends Field> extends BaseField<List> imp
         return fields;
     }
 
-
     @Override
     public List getValue() {
         return fields.stream()
@@ -58,18 +61,20 @@ public abstract class BaseListField<T extends Field> extends BaseField<List> imp
 
     @Override
     public void setValue(List values) {
-        if(values == null) {
+        if (values == null) {
             return;
         }
 
         List<T> newFields = new ArrayList<T>();
-        for(Object val : values) {
+        for (Object val : values) {
             try {
-                T newField = (T) getListFieldType().getClass().newInstance();
+                T newField = (T) getListFieldType().getClass()
+                        .newInstance();
                 newField.setValue(val);
                 newFields.add(newField);
             } catch (IllegalAccessException | InstantiationException e) {
-                LOGGER.debug("Unable to create instance of fieldType {}", getListFieldType().fieldTypeName());
+                LOGGER.debug("Unable to create instance of fieldType {}",
+                        getListFieldType().fieldTypeName());
             }
         }
 
@@ -86,5 +91,16 @@ public abstract class BaseListField<T extends Field> extends BaseField<List> imp
     public List<Message> validate() {
         // TODO: tbatie - 3/16/17 - Validate list field
         return new ArrayList<>();
+    }
+
+    @Override
+    public boolean isRequiredNonEmpty() {
+        return isRequiredNonEmpty;
+    }
+
+    @Override
+    public ListField<T> isRequiredNonEmpty(boolean required) {
+        isRequiredNonEmpty = required;
+        return this;
     }
 }

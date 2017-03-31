@@ -18,6 +18,7 @@ import org.codice.ddf.admin.common.fields.base.BaseListField;
 public class LdapConfigurationsField extends BaseListField<LdapConfigurationField> {
 
     public static final String DEFAULT_FIELD_NAME = "configs";
+
     public static final String DESCRIPTION = "A list of LDAP configurations.";
 
     public LdapConfigurationsField() {

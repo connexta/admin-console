@@ -14,13 +14,15 @@
 package org.codice.ddf.admin.graphql.common;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.codice.ddf.admin.api.action.Action;
 import org.codice.ddf.admin.api.action.ActionCreator;
-import org.codice.ddf.admin.api.action.Message;
+import org.codice.ddf.admin.api.action.ActionReport;
 import org.codice.ddf.admin.api.fields.EnumField;
 import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.api.fields.ObjectField;
@@ -31,33 +33,37 @@ import graphql.schema.GraphQLEnumType;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLObjectType;
 
-public class GraphQLCommons {
+public class GraphQLTransformCommons {
 
-    public static GraphQLObjectType actionCreatorToGraphQLObjectType(ActionCreator creator, List<Action> actions) {
-        return GraphQLObjectType.newObject().name(creator.typeName())
+    public static GraphQLObjectType actionCreatorToGraphQLObjectType(ActionCreator creator,
+            List<Action> actions) {
+        return GraphQLObjectType.newObject()
+                .name(creator.typeName())
                 .description(creator.description())
                 .fields(actionsToGraphQLFieldDef(creator, actions))
                 .build();
     }
 
-    public static List<GraphQLFieldDefinition> actionsToGraphQLFieldDef(ActionCreator creator, List<Action> actions) {
+    public static List<GraphQLFieldDefinition> actionsToGraphQLFieldDef(ActionCreator creator,
+            List<Action> actions) {
         List<GraphQLFieldDefinition> fields = new ArrayList<>();
 
-        for(Action actionField : actions) {
+        for (Action action : actions) {
             List<GraphQLArgument> graphQLArgs = new ArrayList<>();
 
-            if (actionField.getArguments() != null) {
-                actionField.getArguments().forEach(f -> graphQLArgs.add(fieldToGraphQLArgument((Field)f)));
+            if (action.getArguments() != null) {
+                action.getArguments()
+                        .forEach(f -> graphQLArgs.add(fieldToGraphQLArgument((Field) f)));
             }
 
-            fields.add(GraphQLFieldDefinition.newFieldDefinition().name(actionField.name())
-                    .type(GraphQLOutput.fieldToGraphQLOutputType(actionField.returnType()))
-                    .description(actionField.description())
+            fields.add(GraphQLFieldDefinition.newFieldDefinition()
+                    .name(action.name())
+                    .type(GraphQLTransformOutput.fieldToGraphQLOutputType(action.returnType()))
+                    .description(action.description())
                     .argument(graphQLArgs)
-                    .dataFetcher(env -> actionFieldDataFetch(env, actionField.name(), creator))
+                    .dataFetcher(env -> actionFieldDataFetch(env, action.name(), creator))
                     .build());
         }
-
         return fields;
     }
 
@@ -65,17 +71,19 @@ public class GraphQLCommons {
         switch (field.fieldBaseType()) {
         case OBJECT:
             //Add on Payload to avoid collision between an input and output field type name;
-            return GraphQLObjectType.newObject().name(capitalize(field.fieldTypeName()) + "Payload")
+            return GraphQLObjectType.newObject()
+                    .name(capitalize(field.fieldTypeName()) + "Payload")
                     .description(field.description())
-                    .fields(fieldsToGraphQLFieldDefinition(((ObjectField)field).getFields()))
+                    .fields(fieldsToGraphQLFieldDefinition(((ObjectField) field).getFields()))
                     .build();
         default:
             throw new RuntimeException("Unknown ObjectType: " + field.fieldBaseType());
         }
     }
 
-    public static List<GraphQLFieldDefinition> fieldsToGraphQLFieldDefinition(List<? extends Field> fields) {
-        if(fields == null) {
+    public static List<GraphQLFieldDefinition> fieldsToGraphQLFieldDefinition(
+            List<? extends Field> fields) {
+        if (fields == null) {
             return new ArrayList<>();
         }
         return fields.stream()
@@ -86,29 +94,32 @@ public class GraphQLCommons {
     public static GraphQLFieldDefinition fieldToGraphQLFieldDefinition(Field field) {
         switch (field.fieldBaseType()) {
         case UNION:
-            return GraphQLFieldDefinition.newFieldDefinition().name(field.fieldName())
+            return GraphQLFieldDefinition.newFieldDefinition()
+                    .name(field.fieldName())
                     .description(field.description())
-                    .type(GraphQLOutput.fieldToGraphQLOutputType(field))
-//                    .dataFetcher(fetcher -> unionTypeDataFetch(field))
+                    .type(GraphQLTransformOutput.fieldToGraphQLOutputType(field))
+                    //                    .dataFetcher(fetcher -> unionTypeDataFetch(field))
                     .build();
         default:
-            return GraphQLFieldDefinition.newFieldDefinition().name(field.fieldName())
+            return GraphQLFieldDefinition.newFieldDefinition()
+                    .name(field.fieldName())
                     .description(field.description())
-                    .type(GraphQLOutput.fieldToGraphQLOutputType(field))
+                    .type(GraphQLTransformOutput.fieldToGraphQLOutputType(field))
                     .build();
         }
     }
 
     public static GraphQLArgument fieldToGraphQLArgument(Field field) {
-        return GraphQLArgument.newArgument().name(field.fieldName())
+        return GraphQLArgument.newArgument()
+                .name(field.fieldName())
                 .description(field.description())
-                .type(GraphQLInput.fieldTypeToGraphQLInputType(field))
+                .type(GraphQLTransformInput.fieldTypeToGraphQLInputType(field))
                 .build();
     }
 
     public static GraphQLEnumType enumFieldToGraphQLEnumType(EnumField field) {
         GraphQLEnumType.Builder builder = GraphQLEnumType.newEnum()
-                .name(capitalize(field.fieldName()))
+                .name(capitalize(field.fieldTypeName()))
                 .description(field.description());
 
         field.getEnumValues()
@@ -118,17 +129,20 @@ public class GraphQLCommons {
         return builder.build();
     }
 
-    public static Object actionFieldDataFetch(DataFetchingEnvironment env, String actionId, ActionCreator actionCreator) {
-//        if(true) {
-//            throw new RuntimeException("This is a test. Gimmie da money");
-//        }
+    public static Object actionFieldDataFetch(DataFetchingEnvironment env, String actionId,
+            ActionCreator actionCreator) {
+        Map<String, Object> args = new HashMap<>();
+        if (env.getArguments() != null) {
+            args.putAll(env.getArguments());
+        }
+
         Action action = actionCreator.createAction(actionId);
         action.setArguments(env.getArguments());
-        List<Message> validationMessage = action.validate();
-        return action.process().getValue();
+        ActionReport report = action.process();
+        return report;
     }
 
-    public static String capitalize(String str){
+    public static String capitalize(String str) {
         return StringUtils.capitalize(str);
     }
 }

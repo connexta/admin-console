@@ -13,11 +13,12 @@
  **/
 package org.codice.ddf.admin.common.actions;
 
-import org.codice.ddf.admin.common.fields.common.ReportField;
+import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 
-public abstract class TestAction extends BaseAction<ReportField> {
+public abstract class TestAction extends BaseAction<BooleanField> {
 
+    // TODO: tbatie - 3/29/17 - Consider changing return type to be PASSED, WARNING, ERRORS, ERRORS_AND_WARNINGS
     public TestAction(String fieldName, String description) {
-        super(fieldName, description, new ReportField());
+        super(fieldName, description, new BooleanField(null));
     }
 }

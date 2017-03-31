@@ -13,13 +13,6 @@
 -->
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" >
 
-    <bean id="relayProvder" class="org.codice.ddf.admin.graphql.RelayGraphQLProvider" />
-    <service ref="relayProvder">
-        <interfaces>
-            <value>graphql.servlet.GraphQLQueryProvider</value>
-        </interfaces>
-    </service>
-
     <reference-list id="actionCreators"
                     interface="org.codice.ddf.admin.api.action.ActionCreator"
                     availability="optional">

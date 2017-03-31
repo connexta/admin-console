@@ -19,17 +19,23 @@ import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 import org.codice.ddf.admin.security.common.fields.sts.StsClaimField;
+
 import com.google.common.collect.ImmutableList;
 
 public class LdapAttributeEntryField extends BaseObjectField {
 
     public static final String FIELD_NAME = "attributeMapping";
+
     public static final String FIELD_TYPE_NAME = "AttributeMapping";
+
     public static final String DESCRIPTION = "A mapping from an STS claim to a user attribute.";
 
     public static final String STS_CLAIM = "stsClaim";
+
     public static final String USER_ATTRIBUTE = "userAttribute";
+
     private StsClaimField stsClaim;
+
     private StringField userAttribute;
 
     public LdapAttributeEntryField() {

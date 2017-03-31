@@ -16,6 +16,11 @@ package org.codice.ddf.admin.common.fields.base.scalar;
 import static org.codice.ddf.admin.api.fields.Field.FieldBaseType.BOOLEAN;
 
 public class BooleanField extends BaseScalarField<Boolean> {
+
+    public BooleanField() {
+        super(null, null, null, BOOLEAN);
+    }
+
     public BooleanField(String fieldName) {
         super(fieldName, null, null, BOOLEAN);
     }
@@ -23,5 +28,4 @@ public class BooleanField extends BaseScalarField<Boolean> {
     protected BooleanField(String fieldName, String fieldTypeName, String description) {
         super(fieldName, fieldTypeName, description, BOOLEAN);
     }
-
 }

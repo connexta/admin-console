@@ -16,7 +16,7 @@ package org.codice.ddf.admin.api.fields;
 import java.util.List;
 
 public interface UnionField extends ObjectField {
-
     String FIELD_TYPE_NAME_KEY = "fieldTypeName";
+
     List<ObjectField> getUnionTypes();
 }

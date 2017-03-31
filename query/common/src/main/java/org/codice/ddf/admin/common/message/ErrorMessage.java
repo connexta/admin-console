@@ -11,22 +11,26 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.common.fields.common.message;
+package org.codice.ddf.admin.common.message;
 
 import java.util.List;
 
-import org.codice.ddf.admin.api.action.Message;
-import org.codice.ddf.admin.common.fields.base.BaseListField;
+public class ErrorMessage extends BaseMessage {
 
-public class MessageListField extends BaseListField<MessageField> {
+    public ErrorMessage(String code) {
+        super(MessageType.ERROR, code);
+    }
 
-    public static final String DESCRIPTION = "A list containing messages.";
-    public MessageListField(String fieldName) {
-        super(fieldName, DESCRIPTION, new MessageField(null, null, null));
+    public ErrorMessage(String code, String pathOrigin) {
+        super(MessageType.ERROR, code, pathOrigin);
+    }
+
+    public ErrorMessage(String code, List<String> path) {
+        super(MessageType.ERROR, code, path);
     }
 
     @Override
-    public List<Message> validate() {
-        throw new UnsupportedOperationException();
+    public ErrorMessage copy() {
+        return new ErrorMessage(getCode(), getPath());
     }
 }

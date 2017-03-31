@@ -24,10 +24,16 @@ import com.google.common.collect.ImmutableList;
 
 public class LdapConnectionField extends BaseObjectField {
     public static final String FIELD_NAME = "connection";
+
     public static final String FIELD_TYPE_NAME = "LdapConnection";
-    public static final String DESCRIPTION = "Contains the required information to establish an LDAP connection.";
+
+    public static final String DESCRIPTION =
+            "Contains the required information to establish an LDAP connection.";
+
     private HostnameField hostname;
+
     private PortField port;
+
     private LdapEncryptionMethodField encryptionMethod;
 
     public LdapConnectionField() {
@@ -42,7 +48,7 @@ public class LdapConnectionField extends BaseObjectField {
         return this;
     }
 
-    public LdapConnectionField port(int port){
+    public LdapConnectionField port(int port) {
         this.port.setValue(port);
         return this;
     }

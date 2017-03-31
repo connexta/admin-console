@@ -18,6 +18,7 @@ import org.codice.ddf.admin.common.fields.base.BaseListField;
 public class LdapEntriesListField extends BaseListField<LdapEntryField> {
 
     public static final String DEFAULT_FIELD_NAME = "entries";
+
     public static final String DESCRIPTION = "A list of LDAP entries.";
 
     public LdapEntriesListField() {

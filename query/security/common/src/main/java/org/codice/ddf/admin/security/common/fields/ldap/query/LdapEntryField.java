@@ -23,28 +23,30 @@ import com.google.common.collect.ImmutableList;
 public class LdapEntryField extends BaseObjectField {
 
     public static final String DEFAULT_FIELD_NAME = "entry";
+
     public static final String FIELD_TYPE_NAME = "LdapEntry";
+
     public static final String DESCRIPTION = "An entry within an LDAP server.";
 
     // TODO: tbatie - 2/22/17 - Can't handle recursion
-//    private LdapEntriesListField entries;
+    //    private LdapEntriesListField entries;
     private LdapAttributeListField attributes;
 
     public LdapEntryField() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
-//        entries = new LdapEntriesListField();
+        //        entries = new LdapEntriesListField();
         attributes = new LdapAttributeListField();
     }
 
     @Override
     public List<Field> getFields() {
         return ImmutableList.of(
-//                entries,
+                //                entries,
                 attributes);
     }
 
-    public LdapEntryField addEntry(LdapEntryField entry){
-//        entries.add(entry);
+    public LdapEntryField addEntry(LdapEntryField entry) {
+        //        entries.add(entry);
         return this;
     }
 

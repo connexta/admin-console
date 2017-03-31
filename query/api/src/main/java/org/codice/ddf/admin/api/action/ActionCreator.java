@@ -17,10 +17,15 @@ import java.util.List;
 
 public interface ActionCreator {
     String name();
+
     String typeName();
+
     String description();
+
     Action createAction(String actionId);
+
     // TODO: tbatie - 3/27/17 - Change to sets
     List<Action> getDiscoveryActions();
+
     List<Action> getPersistActions();
 }

@@ -13,15 +13,20 @@
  **/
 package org.codice.ddf.admin.api.action;
 
-public interface Message {
-    MessageType messageType();
-    String code();
-    String content();
-    String messagePath();
-    void addMessageSubPath(String subPath);
+import java.util.List;
 
-    String MESSAGE_PATH_DELIMETER = ":";
+public interface Message {
+    MessageType getType();
+
+    String getCode();
+
+    List<String> getPath();
+
+    void addSubpath(String subPath);
+
+    Message copy();
+
     enum MessageType {
-        SUCCESS, FAILURE, WARNING
+        WARNING, ERROR
     }
 }

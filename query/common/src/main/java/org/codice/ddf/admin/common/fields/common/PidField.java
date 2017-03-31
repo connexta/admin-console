@@ -17,7 +17,9 @@ import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 
 public class PidField extends StringField {
     public static final String DEFAULT_FIELD_NAME = "pid";
+
     public static final String FIELD_TYPE_NAME = "Pid";
+
     public static final String DESCRIPTION = "A unique id used for persisting.";
 
     public PidField() {

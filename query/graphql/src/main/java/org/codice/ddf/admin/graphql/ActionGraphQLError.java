@@ -11,17 +11,40 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.common.fields.common.message;
+package org.codice.ddf.admin.graphql;
 
-import org.codice.ddf.admin.common.fields.base.scalar.StringField;
+import java.util.List;
 
-public class MessageCodeField extends StringField {
+import org.codice.ddf.admin.api.action.Message;
 
-    public static final String DEFAULT_FIELD_NAME = "code";
-    public static final String FIELD_TYPE_NAME = "MessageCode";
-    public static final String DESCRIPTION = "An encapsulating description of what the message means.";
+import graphql.ErrorType;
+import graphql.GraphQLError;
+import graphql.language.SourceLocation;
 
-    public MessageCodeField() {
-        super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
+public class ActionGraphQLError implements GraphQLError {
+
+    private Message message;
+
+    public ActionGraphQLError(Message message) {
+        this.message = message;
+    }
+
+    public Message getActionMessage() {
+        return message;
+    }
+
+    @Override
+    public String getMessage() {
+        return null;
+    }
+
+    @Override
+    public List<SourceLocation> getLocations() {
+        return null;
+    }
+
+    @Override
+    public ErrorType getErrorType() {
+        return null;
     }
 }

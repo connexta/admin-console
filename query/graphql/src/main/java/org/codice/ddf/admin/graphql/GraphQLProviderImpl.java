@@ -13,31 +13,40 @@
  **/
 package org.codice.ddf.admin.graphql;
 
-import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
-import static graphql.schema.GraphQLObjectType.newObject;
+import static org.codice.ddf.admin.graphql.common.GraphQLTransformCommons.actionCreatorToGraphQLObjectType;
+import static org.codice.ddf.admin.graphql.common.GraphQLTransformCommons.actionsToGraphQLFieldDef;
 
+import java.util.Collection;
 import java.util.HashMap;
 
+import org.codice.ddf.admin.api.action.ActionCreator;
+
+import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLObjectType;
-import graphql.schema.GraphQLTypeReference;
+import graphql.servlet.GraphQLMutationProvider;
 import graphql.servlet.GraphQLQueryProvider;
 
-public class RelayGraphQLProvider implements GraphQLQueryProvider {
+public class GraphQLProviderImpl implements GraphQLMutationProvider, GraphQLQueryProvider {
+
+    private ActionCreator creator;
+
+    public GraphQLProviderImpl(ActionCreator creator) {
+        this.creator = creator;
+    }
+
+    @Override
+    public Collection<GraphQLFieldDefinition> getMutations() {
+        return actionsToGraphQLFieldDef(creator, creator.getPersistActions());
+    }
+
     @Override
     public GraphQLObjectType getQuery() {
-        return newObject().name("Relay")
-                .description(
-                        "Workaround for https://github.com/facebook/relay/issues/112 re-exposing the root query object")
-                .field(newFieldDefinition().name("query")
-                        .description("The query root of the GraphQL interface.")
-                        .type((new GraphQLTypeReference("query")))
-                        .staticValue(new HashMap<>()))
-                .build();
+        return actionCreatorToGraphQLObjectType(creator, creator.getDiscoveryActions());
     }
 
     @Override
     public String getName() {
-        return "relay";
+        return creator.name();
     }
 
     @Override
@@ -45,5 +54,3 @@ public class RelayGraphQLProvider implements GraphQLQueryProvider {
         return new HashMap<>();
     }
 }
-
-

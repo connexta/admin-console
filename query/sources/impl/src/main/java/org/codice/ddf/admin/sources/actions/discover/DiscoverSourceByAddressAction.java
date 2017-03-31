@@ -27,8 +27,9 @@ import com.google.common.collect.ImmutableList;
 public class DiscoverSourceByAddressAction extends BaseAction<SourceInfoListField> {
 
     public static final String NAME = "discoverByAddress";
-    public static final String DESCRIPTION = "Attempts to discover sources with the given hostname and port.";
 
+    public static final String DESCRIPTION =
+            "Attempts to discover sources with the given hostname and port.";
 
     private AddressField address = new AddressField();
 
@@ -37,12 +38,12 @@ public class DiscoverSourceByAddressAction extends BaseAction<SourceInfoListFiel
     }
 
     @Override
-    public SourceInfoListField process() {
-        return SAMPLE_SOURCES_INFO_LIST;
+    public List<Field> getArguments() {
+        return ImmutableList.of(address);
     }
 
     @Override
-    public List<Field> getArguments() {
-        return ImmutableList.of(address);
+    public SourceInfoListField performAction() {
+        return SAMPLE_SOURCES_INFO_LIST;
     }
 }

@@ -13,19 +13,25 @@
  **/
 package org.codice.ddf.admin.sources.fields.type;
 
+import java.util.Arrays;
 import java.util.List;
 
+import org.codice.ddf.admin.api.action.Message;
 import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
+import org.codice.ddf.admin.common.message.ErrorMessage;
 
 import com.google.common.collect.ImmutableList;
 
 public class CswSourceConfigurationField extends SourceConfigUnionField {
 
     public static final String FIELD_TYPE_NAME = "CswSourceConfiguration";
-    public static final String DESCRIPTION = "Represents a CSW configuration containing properties to be saved.";
+
+    public static final String DESCRIPTION =
+            "Represents a CSW configuration containing properties to be saved.";
 
     private StringField outputSchema = new StringField("outputSchema");
+
     private StringField forceSpatialFilter = new StringField("forceSpatialFilter");
 
     public CswSourceConfigurationField() {
@@ -50,5 +56,10 @@ public class CswSourceConfigurationField extends SourceConfigUnionField {
                 .add(outputSchema)
                 .add(forceSpatialFilter)
                 .build();
+    }
+
+    @Override
+    public List<Message> validate() {
+        return Arrays.asList(new ErrorMessage("CSW_SRC_CONFIG_FIELD_ERROR", fieldName()));
     }
 }

@@ -24,8 +24,11 @@ import org.codice.ddf.admin.security.sts.actions.GetStsClaimsAction;
 public class StsActionCreator extends BaseActionCreator {
 
     public static final String NAME = "sts";
+
     public static final String TYPE_NAME = "SecurityTokenService";
-    public static final String DESCRIPTION = "The STS (Security Token Service) is responsible for generating assertions that allow clients to be authenticated.";
+
+    public static final String DESCRIPTION =
+            "The STS (Security Token Service) is responsible for generating assertions that allow clients to be authenticated.";
 
     public StsActionCreator() {
         super(NAME, TYPE_NAME, DESCRIPTION);

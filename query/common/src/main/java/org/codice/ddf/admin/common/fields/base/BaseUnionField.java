@@ -13,10 +13,12 @@
  **/
 package org.codice.ddf.admin.common.fields.base;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.codice.ddf.admin.api.action.Message;
 import org.codice.ddf.admin.api.fields.ObjectField;
 import org.codice.ddf.admin.api.fields.UnionField;
 
@@ -25,8 +27,12 @@ public abstract class BaseUnionField extends BaseObjectField implements UnionFie
     private List<ObjectField> unionTypes;
 
     // TODO: tbatie - 3/16/17 - We could do something similar to what we do for enum types, have an internal union value field instead
-    public BaseUnionField(String fieldName, String fieldTypeName, String description, List<ObjectField> unionTypes, boolean isUnionValue) {
-        super(fieldName, fieldTypeName, description, isUnionValue ? FieldBaseType.OBJECT : FieldBaseType.UNION);
+    public BaseUnionField(String fieldName, String fieldTypeName, String description,
+            List<ObjectField> unionTypes, boolean isUnionValue) {
+        super(fieldName,
+                fieldTypeName,
+                description,
+                isUnionValue ? FieldBaseType.OBJECT : FieldBaseType.UNION);
         this.unionTypes = unionTypes;
     }
 
@@ -41,5 +47,11 @@ public abstract class BaseUnionField extends BaseObjectField implements UnionFie
     @Override
     public List<ObjectField> getUnionTypes() {
         return unionTypes;
+    }
+
+    @Override
+    public List<Message> validate() {
+        // TODO: tbatie - 3/16/17 - Validate union fields
+        return new ArrayList<>();
     }
 }

@@ -28,9 +28,12 @@ import com.google.common.collect.ImmutableList;
 public class LdapRecommendedSettings extends BaseAction<LdapSettingsField> {
 
     public static final String NAME = "recommendedSettings";
-    public static final String DESCRIPTION = "Attempts to retrieve recommended settings from the LDAP connection.";
+
+    public static final String DESCRIPTION =
+            "Attempts to retrieve recommended settings from the LDAP connection.";
 
     private LdapConnectionField connection = new LdapConnectionField();
+
     private LdapCredentialsField credentials = new LdapCredentialsField();
 
     public LdapRecommendedSettings() {
@@ -38,12 +41,12 @@ public class LdapRecommendedSettings extends BaseAction<LdapSettingsField> {
     }
 
     @Override
-    public LdapSettingsField process() {
-        return SAMPLE_LDAP_SETTINGS;
+    public List<Field> getArguments() {
+        return ImmutableList.of(connection, credentials);
     }
 
     @Override
-    public List<Field> getArguments() {
-        return ImmutableList.of(connection, credentials);
+    public LdapSettingsField performAction() {
+        return SAMPLE_LDAP_SETTINGS;
     }
 }

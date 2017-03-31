@@ -11,11 +11,20 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.common.fields.common.message;
+package org.codice.ddf.admin.common.message;
 
-public class SuccessMessageField extends MessageField {
+import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 
-    public SuccessMessageField(String code, String content) {
-        super(code, content, MessageType.SUCCESS);
+public class MessageCodeField extends StringField {
+
+    public static final String FIELD_NAME = "code";
+
+    public static final String FIELD_TYPE_NAME = "MessageCode";
+
+    public static final String DESCRIPTION =
+            "An encapsulating description of what the message means.";
+
+    public MessageCodeField() {
+        super(FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
     }
 }

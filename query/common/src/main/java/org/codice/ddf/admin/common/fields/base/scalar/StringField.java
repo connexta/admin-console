@@ -15,14 +15,24 @@ package org.codice.ddf.admin.common.fields.base.scalar;
 
 import static org.codice.ddf.admin.api.fields.Field.FieldBaseType.STRING;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.codice.ddf.admin.api.action.Message;
+
 public class StringField extends BaseScalarField<String> {
 
     public StringField(String fieldName) {
         super(fieldName, null, null, STRING);
     }
 
-
     protected StringField(String fieldName, String fieldTypeName, String description) {
         super(fieldName, fieldTypeName, description, STRING);
+    }
+
+    @Override
+    public List<Message> validate() {
+        // TODO: tbatie - 3/16/17 - Validate scalar fields
+        return new ArrayList<>();
     }
 }

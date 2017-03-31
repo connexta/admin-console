@@ -25,32 +25,33 @@ import org.codice.ddf.admin.security.common.fields.wcpm.RealmList;
 
 public class SampleFields {
 
-    public static final AuthTypeList SAMPLE_AUTH_TYPES_LIST = new AuthTypeList()
-            .add(AuthType.BASIC_AUTH)
-            .add(AuthType.IDP_AUTH)
-            .add(AuthType.PKI_AUTH)
-            .add(AuthType.SAML_AUTH)
-            .add(AuthType.GUEST_AUTH);
+    public static final AuthTypeList SAMPLE_AUTH_TYPES_LIST =
+            new AuthTypeList().add(AuthType.BASIC_AUTH)
+                    .add(AuthType.IDP_AUTH)
+                    .add(AuthType.PKI_AUTH)
+                    .add(AuthType.SAML_AUTH)
+                    .add(AuthType.GUEST_AUTH);
 
-    public static final RealmList SAMPLE_REALM_LIST = new RealmList()
-            .add(Realm.KARAF_REALM)
+    public static final RealmList SAMPLE_REALM_LIST = new RealmList().add(Realm.KARAF_REALM)
             .add(Realm.LDAP_REALM);
 
     public static final ContextPath SAMPLE_CONTEXT_PATH = new ContextPath();
+
     static {
         SAMPLE_CONTEXT_PATH.setValue("/example/path");
     }
 
-    public static final ContextPaths SAMPLE_CONTEXT_PATHS = new ContextPaths()
-            .add(SAMPLE_CONTEXT_PATH)
+    public static final ContextPaths SAMPLE_CONTEXT_PATHS = new ContextPaths().add(
+            SAMPLE_CONTEXT_PATH)
             .add(SAMPLE_CONTEXT_PATH)
             .add(SAMPLE_CONTEXT_PATH);
 
-    public static final ClaimsMapEntry SAMPLE_CLAIMS_MAP_ENTRY = new ClaimsMapEntry()
-            .claim("sampleClaim").claimValue("sampleClaimValue");
+    public static final ClaimsMapEntry SAMPLE_CLAIMS_MAP_ENTRY = new ClaimsMapEntry().claim(
+            "sampleClaim")
+            .claimValue("sampleClaimValue");
 
-    public static final ContextPolicyBin SAMPLE_CONTEXT_POLICY_BIN = new ContextPolicyBin()
-            .realm(Realm.KARAF_REALM)
+    public static final ContextPolicyBin SAMPLE_CONTEXT_POLICY_BIN = new ContextPolicyBin().realm(
+            Realm.KARAF_REALM)
             .addContextPath(SAMPLE_CONTEXT_PATH)
             .addContextPath(SAMPLE_CONTEXT_PATH)
             .addAuthType(AuthType.BASIC_AUTH)

@@ -21,6 +21,7 @@ import org.codice.ddf.admin.security.common.fields.wcpm.RealmList;
 public class GetRealms extends GetAction<RealmList> {
 
     public static final String FIELD_NAME = "realms";
+
     public static final String DESCRIPTION = "Retrieves all currently configured realms.";
 
     public GetRealms() {
@@ -28,7 +29,7 @@ public class GetRealms extends GetAction<RealmList> {
     }
 
     @Override
-    public RealmList process() {
+    public RealmList performAction() {
         return SAMPLE_REALM_LIST;
     }
 }

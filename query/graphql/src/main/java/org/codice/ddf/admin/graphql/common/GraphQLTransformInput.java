@@ -27,12 +27,14 @@ import graphql.schema.GraphQLInputObjectField;
 import graphql.schema.GraphQLInputObjectType;
 import graphql.schema.GraphQLInputType;
 import graphql.schema.GraphQLList;
+import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLScalarType;
 
-public class GraphQLInput {
+public class GraphQLTransformInput {
 
     public static GraphQLInputObjectField fieldToGraphQLInputFieldDefinition(Field field) {
-        return GraphQLInputObjectField.newInputObjectField().name(field.fieldName())
+        return GraphQLInputObjectField.newInputObjectField()
+                .name(field.fieldName())
                 .description(field.description())
                 .type(fieldTypeToGraphQLInputType(field))
                 .build();
@@ -43,39 +45,45 @@ public class GraphQLInput {
         case OBJECT:
             return objectFieldToGraphQLInputType((ObjectField) field);
         case ENUM:
-            return GraphQLCommons.enumFieldToGraphQLEnumType((EnumField) field);
+            return GraphQLTransformCommons.enumFieldToGraphQLEnumType((EnumField) field);
         case LIST:
-            return listFieldToGraphQLInputType((ListField)field);
+            return listFieldToGraphQLInputType((ListField) field);
         case INTEGER:
-            if(field.fieldTypeName() == null) {
+            if (field.fieldTypeName() == null) {
                 return Scalars.GraphQLInt;
             }
-            return new GraphQLScalarType(field.fieldTypeName(), field.description(), Scalars.GraphQLInt.getCoercing());
+            return new GraphQLScalarType(field.fieldTypeName(),
+                    field.description(),
+                    Scalars.GraphQLInt.getCoercing());
         case BOOLEAN:
-            if(field.fieldTypeName() == null) {
+            if (field.fieldTypeName() == null) {
                 return Scalars.GraphQLBoolean;
             }
-            return new GraphQLScalarType(field.fieldTypeName(), field.description(), Scalars.GraphQLBoolean.getCoercing());
+            return new GraphQLScalarType(field.fieldTypeName(),
+                    field.description(),
+                    Scalars.GraphQLBoolean.getCoercing());
         case STRING:
-            if(field.fieldTypeName() == null) {
+            if (field.fieldTypeName() == null) {
                 return Scalars.GraphQLString;
             }
-            return new GraphQLScalarType(field.fieldTypeName(), field.description(), Scalars.GraphQLString.getCoercing());
+            return new GraphQLScalarType(field.fieldTypeName(),
+                    field.description(),
+                    Scalars.GraphQLString.getCoercing());
         }
         return null;
     }
 
-    public static GraphQLInputType objectFieldToGraphQLInputType(
-            ObjectField field) {
+    public static GraphQLInputType objectFieldToGraphQLInputType(ObjectField field) {
         List<GraphQLInputObjectField> fieldDefinitions = new ArrayList<>();
-        if(field.getFields() != null) {
+        if (field.getFields() != null) {
             fieldDefinitions = field.getFields()
                     .stream()
-                    .map(GraphQLInput::fieldToGraphQLInputFieldDefinition)
+                    .map(GraphQLTransformInput::fieldToGraphQLInputFieldDefinition)
                     .collect(Collectors.toList());
         }
 
-        return GraphQLInputObjectType.newInputObject().name(GraphQLCommons.capitalize(field.fieldTypeName()))
+        return GraphQLInputObjectType.newInputObject()
+                .name(GraphQLTransformCommons.capitalize(field.fieldTypeName()))
                 .description(field.description())
                 .fields(fieldDefinitions)
                 .build();
@@ -83,5 +91,9 @@ public class GraphQLInput {
 
     public static GraphQLInputType listFieldToGraphQLInputType(ListField listField) {
         return new GraphQLList(fieldTypeToGraphQLInputType(listField.getListFieldType()));
+    }
+
+    public GraphQLInputType isRequired(boolean required, GraphQLInputType inputType) {
+        return required ? new GraphQLNonNull(inputType) : inputType;
     }
 }

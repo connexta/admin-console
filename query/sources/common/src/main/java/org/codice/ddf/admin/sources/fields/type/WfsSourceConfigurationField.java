@@ -20,7 +20,9 @@ import org.codice.ddf.admin.api.fields.Field;
 public class WfsSourceConfigurationField extends SourceConfigUnionField {
 
     public static final String FIELD_TYPE_NAME = "WfsSourceConfiguration";
-    public static final String DESCRIPTION = "Represents a WFS configuration containing properties to be saved.";
+
+    public static final String DESCRIPTION =
+            "Represents a WFS configuration containing properties to be saved.";
 
     public WfsSourceConfigurationField() {
         super(FIELD_TYPE_NAME, DESCRIPTION);

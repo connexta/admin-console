@@ -1,6 +1,6 @@
 import React from 'react'
 import { Card, CardHeader, CardText } from 'material-ui/Card'
-import { ChromePicker } from 'react-color'
+import ChromePicker from 'react-color/lib/components/chrome/Chrome'
 import { getReadableTextColor } from './color-utils'
 import Collapse from 'material-ui/svg-icons/navigation/expand-less'
 import Expand from 'material-ui/svg-icons/navigation/expand-more'

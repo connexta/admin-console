@@ -86,7 +86,8 @@ public class DiscoverSourcesProbeMethod extends ProbeMethod<SourceConfiguration>
 
     @Override
     public ProbeReport probe(SourceConfiguration config) {
-        if (InetAddresses.isInetAddress(config.sourceHostName())) {
+        if (config.sourceHostName() != null
+                && InetAddresses.isInetAddress(config.sourceHostName())) {
             try {
                 config.sourceHostName(InetAddress.getByName(config.sourceHostName()).getHostName());
             } catch (UnknownHostException e) {

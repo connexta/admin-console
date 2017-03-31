@@ -10,7 +10,15 @@ import AppBar from 'material-ui/AppBar'
 import IconButton from 'material-ui/IconButton'
 import Drawer from 'material-ui/Drawer'
 
-import AdminPalette from 'react-swatch/admin-palette'
+let AdminPalette
+
+if (process.env.NODE_ENV === 'production') {
+  AdminPalette = () => null
+}
+
+if (process.env.NODE_ENV !== 'production') {
+  AdminPalette = require('react-swatch/admin-palette').default
+}
 
 import { updateThemeColor, setThemePreset } from './actions'
 import { getTheme } from './reducer'

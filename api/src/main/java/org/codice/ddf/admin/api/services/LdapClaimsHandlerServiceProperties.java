@@ -21,6 +21,7 @@ import static org.codice.ddf.admin.api.validation.LdapValidationUtils.ATTRIBUTE_
 import static org.codice.ddf.admin.api.validation.ValidationUtils.SERVICE_PID_KEY;
 
 import java.net.URI;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
@@ -92,8 +93,13 @@ public class LdapClaimsHandlerServiceProperties {
         config.attributeMappingsPath(attributeMappingsPath);
 
         if (StringUtils.isNotEmpty(attributeMappingsPath)) {
+            Path ddfHome = Paths.get(System.getProperty("ddf.home"));
+            Path mappingPath = Paths.get(attributeMappingsPath);
+            if (!mappingPath.startsWith(ddfHome)) {
+                mappingPath = ddfHome.resolve(mappingPath);
+            }
             Map<String, String> attributeMappings = new HashMap<>(configurator.getProperties(
-                    Paths.get(attributeMappingsPath)));
+                    mappingPath));
             config.attributeMappings(attributeMappings);
         }
         config.ldapUseCase(ATTRIBUTE_STORE);

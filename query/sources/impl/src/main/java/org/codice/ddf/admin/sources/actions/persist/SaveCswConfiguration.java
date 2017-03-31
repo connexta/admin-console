@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.common.actions.BaseAction;
+import org.codice.ddf.admin.common.message.ErrorMessage;
 import org.codice.ddf.admin.sources.fields.SourceInfoField;
 import org.codice.ddf.admin.sources.fields.type.CswSourceConfigurationField;
 
@@ -27,7 +28,10 @@ import com.google.common.collect.ImmutableList;
 public class SaveCswConfiguration extends BaseAction<SourceInfoField> {
 
     public static final String NAME = "saveCswSource";
-    public static final String DESCRIPTION = "Saves a csw source configuration. If a pid is specified, that source configuration will be updated.";
+
+    public static final String DESCRIPTION =
+            "Saves a csw source configuration. If a pid is specified, that source configuration will be updated.";
+
     private CswSourceConfigurationField config;
 
     public SaveCswConfiguration() {
@@ -36,12 +40,13 @@ public class SaveCswConfiguration extends BaseAction<SourceInfoField> {
     }
 
     @Override
-    public SourceInfoField process() {
-        return SAMPLE_CSW_SOURCE_INFO;
+    public List<Field> getArguments() {
+        return ImmutableList.of(config);
     }
 
     @Override
-    public List<Field> getArguments() {
-        return ImmutableList.of(config);
+    public SourceInfoField performAction() {
+        addReturnValueMessage(new ErrorMessage("SAVE_CSW_CONFIG_ERROR"));
+        return SAMPLE_CSW_SOURCE_INFO;
     }
 }

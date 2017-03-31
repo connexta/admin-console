@@ -24,10 +24,13 @@ import com.google.common.collect.ImmutableList;
 public class CredentialsField extends BaseObjectField {
 
     public static final String DEFAULT_FIELD_NAME = "creds";
-    public static final String FIELD_TYPE_NAME  = "Credentials";
+
+    public static final String FIELD_TYPE_NAME = "Credentials";
+
     public static final String DESCRIPTION = "Credentials required for base64 authentication.";
 
     private StringField username;
+
     private StringField password;
 
     public CredentialsField() {

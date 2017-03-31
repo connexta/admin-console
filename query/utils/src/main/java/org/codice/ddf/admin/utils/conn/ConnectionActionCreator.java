@@ -25,7 +25,9 @@ import com.google.common.collect.ImmutableList;
 public class ConnectionActionCreator extends BaseActionCreator {
 
     public static final String NAME = "conn";
+
     public static final String TYPE_NAME = "Connection";
+
     public static final String DESCRIPTION = "Provides actions for connecting to urls.";
 
     public ConnectionActionCreator() {

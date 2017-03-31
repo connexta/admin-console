@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.common.actions.BaseAction;
+import org.codice.ddf.admin.common.message.SkipWarningsList;
 import org.codice.ddf.admin.sources.fields.SourceInfoField;
 import org.codice.ddf.admin.sources.fields.type.WfsSourceConfigurationField;
 
@@ -27,21 +28,27 @@ import com.google.common.collect.ImmutableList;
 public class SaveWfsConfiguration extends BaseAction<SourceInfoField> {
 
     public static final String NAME = "saveWfsSource";
-    public static final String DESCRIPTION = "Saves a wfs source configuration. If a pid is specified, that source configuration will be updated.";
+
+    public static final String DESCRIPTION =
+            "Saves a wfs source configuration. If a pid is specified, that source configuration will be updated.";
+
     private WfsSourceConfigurationField config;
+
+    private SkipWarningsList skipWarnings;
 
     public SaveWfsConfiguration() {
         super(NAME, DESCRIPTION, new SourceInfoField());
         config = new WfsSourceConfigurationField();
-    }
-
-    @Override
-    public SourceInfoField process() {
-        return SAMPLE_WFS_SOURCE_INFO;
+        skipWarnings = new SkipWarningsList();
     }
 
     @Override
     public List<Field> getArguments() {
-        return ImmutableList.of(config);
+        return ImmutableList.of(config, skipWarnings);
+    }
+
+    @Override
+    public SourceInfoField performAction() {
+        return SAMPLE_WFS_SOURCE_INFO;
     }
 }

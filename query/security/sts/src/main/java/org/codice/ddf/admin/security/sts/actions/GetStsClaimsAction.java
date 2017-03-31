@@ -20,6 +20,7 @@ import org.codice.ddf.admin.security.common.fields.sts.StsClaimsField;
 public class GetStsClaimsAction extends GetAction<StsClaimsField> {
 
     public static final String NAME = "claims";
+
     public static final String DESCRIPTION = "All currently configured claims the STS supports.";
 
     public GetStsClaimsAction() {
@@ -27,7 +28,7 @@ public class GetStsClaimsAction extends GetAction<StsClaimsField> {
     }
 
     @Override
-    public StsClaimsField process() {
+    public StsClaimsField performAction() {
         StsClaimField claim = new StsClaimField();
         claim.setValue("testClaim");
         return new StsClaimsField().add(claim);

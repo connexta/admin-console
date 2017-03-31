@@ -27,6 +27,7 @@ import com.google.common.collect.ImmutableList;
 public class DiscoverSourceByUrlAction extends BaseAction<SourceInfoListField> {
 
     public static final String NAME = "discoverByUrl";
+
     public static final String DESCRIPTION = "Attempts to discover source given a url.";
 
     private UrlField endpoint = new UrlField();
@@ -36,12 +37,12 @@ public class DiscoverSourceByUrlAction extends BaseAction<SourceInfoListField> {
     }
 
     @Override
-    public SourceInfoListField process() {
-        return SAMPLE_SOURCES_INFO_LIST;
+    public List<Field> getArguments() {
+        return ImmutableList.of(endpoint);
     }
 
     @Override
-    public List<Field> getArguments() {
-        return ImmutableList.of(endpoint);
+    public SourceInfoListField performAction() {
+        return SAMPLE_SOURCES_INFO_LIST;
     }
 }

@@ -18,14 +18,58 @@ import java.util.Map;
 
 import org.codice.ddf.admin.api.fields.Field;
 
+/**
+ * Intended to be called in the sequence of
+ * 1. setArguments
+ * 2. validate
+ * 3. process
+ *
+ * @param <T>
+ */
 public interface Action<T extends Field> {
+
+    String ARGUMENT = "__argument";
+
+    /**
+     * Returns the unique name of the Action
+     *
+     * @return name
+     */
     String name();
+
+    /**
+     * Returns a description of what the Action is designed to perform and any clarity about it's implementation.
+     *
+     * @return description
+     */
     String description();
+
+    /**
+     * Returns a sample field of the expected return type from the process method.
+     *
+     * @return returnType
+     */
     T returnType();
+
+    /**
+     * Returns any fields the Action will need for processing.
+     *
+     * @return args
+     */
     List<Field> getArguments();
 
-    // TODO: tbatie - 3/27/17 - Break the above methods into a common interface for all these apis
-    T process();
-    List<Message> validate();
+    /**
+     * Sets the arguments used by the Action for processing
+     *
+     * @param args
+     */
     void setArguments(Map<String, Object> args);
+
+    /**
+     * Performs an operation.
+     *
+     * @return
+     */
+    ActionReport<T> process();
+
 }

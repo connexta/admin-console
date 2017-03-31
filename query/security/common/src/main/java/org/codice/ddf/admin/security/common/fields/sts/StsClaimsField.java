@@ -18,6 +18,7 @@ import org.codice.ddf.admin.common.fields.base.BaseListField;
 public class StsClaimsField extends BaseListField<StsClaimField> {
 
     public static final String DEFAULT_FIELD_NAME = "claims";
+
     public static final String DESCRIPTION = "All currently configured claims supported by the STS";
 
     public StsClaimsField() {

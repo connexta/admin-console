@@ -27,7 +27,10 @@ import com.google.common.collect.ImmutableList;
 public class DeleteSource extends BaseAction<SourceInfoListField> {
 
     public static final String NAME = "deleteSource";
-    public static final String DESCRIPTION = "Delete's the given pid of a source. Returns back a list of all currently configured sources";
+
+    public static final String DESCRIPTION =
+            "Delete's the given pid of a source. Returns back a list of all currently configured sources";
+
     private PidField pid;
 
     public DeleteSource() {
@@ -36,12 +39,12 @@ public class DeleteSource extends BaseAction<SourceInfoListField> {
     }
 
     @Override
-    public SourceInfoListField process() {
-        return SAMPLE_SOURCES_INFO_LIST;
+    public List<Field> getArguments() {
+        return ImmutableList.of(pid);
     }
 
     @Override
-    public List<Field> getArguments() {
-        return ImmutableList.of(pid);
+    public SourceInfoListField performAction() {
+        return SAMPLE_SOURCES_INFO_LIST;
     }
 }

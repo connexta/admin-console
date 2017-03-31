@@ -13,19 +13,18 @@
  **/
 package org.codice.ddf.admin.utils.conn.actions;
 
-import static org.codice.ddf.admin.common.sample.SampleFields.SAMPLE_REPORT;
-
 import java.util.List;
 
 import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.common.actions.TestAction;
+import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.common.fields.common.AddressField;
-import org.codice.ddf.admin.common.fields.common.ReportField;
 
 import com.google.common.collect.ImmutableList;
 
 public class PingByAddress extends TestAction {
     public static final String NAME = "pingByAddress";
+
     public static final String DESCRIPTION = "Attempts to reach the given address";
 
     private AddressField address;
@@ -36,12 +35,14 @@ public class PingByAddress extends TestAction {
     }
 
     @Override
-    public ReportField process() {
-        return SAMPLE_REPORT;
+    public List<Field> getArguments() {
+        return ImmutableList.of(address);
     }
 
     @Override
-    public List<Field> getArguments() {
-        return ImmutableList.of(address);
+    public BooleanField performAction() {
+        BooleanField testPassed = new BooleanField();
+        testPassed.setValue(true);
+        return testPassed;
     }
 }

@@ -23,12 +23,18 @@ import com.google.common.collect.ImmutableList;
 
 public class LdapCredentialsField extends BaseObjectField {
     public static final String FIELD_NAME = "credentials";
+
     public static final String FIELD_TYPE_NAME = "LdapCredentials";
-    public static final String DESCRIPTION = "Contains the required credentials to bind a user to an LDAP connection.";
+
+    public static final String DESCRIPTION =
+            "Contains the required credentials to bind a user to an LDAP connection.";
 
     public static final String USERNAME = "username";
+
     public static final String PASSWORD = "password";
+
     private StringField username;
+
     private StringField password;
 
     public LdapCredentialsField() {

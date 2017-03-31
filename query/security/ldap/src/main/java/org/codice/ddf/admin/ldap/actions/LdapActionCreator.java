@@ -30,7 +30,9 @@ import org.codice.ddf.admin.ldap.actions.persist.SaveLdapConfiguration;
 public class LdapActionCreator extends BaseActionCreator {
 
     public static final String NAME = "ldap";
+
     public static final String TYPE_NAME = "Ldap";
+
     public static final String DESCRIPTION = "Facilities for interacting with LDAP servers.";
 
     public LdapActionCreator() {

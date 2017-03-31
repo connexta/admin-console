@@ -24,5 +24,4 @@ public class IntegerField extends BaseScalarField<Integer> {
     protected IntegerField(String fieldName, String fieldTypeName, String description) {
         super(fieldName, fieldTypeName, description, INTEGER);
     }
-
 }

@@ -23,10 +23,13 @@ import com.google.common.collect.ImmutableList;
 public class AddressField extends BaseObjectField {
 
     public static final String DEFAULT_FIELD_NAME = "address";
-    public static final String FIELD_TYPE_NAME  = "Address";
+
+    public static final String FIELD_TYPE_NAME = "Address";
+
     public static final String DESCRIPTION = "Represents a url base address.";
 
     private HostnameField hostname;
+
     private PortField port;
 
     public AddressField() {

@@ -27,9 +27,11 @@ import com.google.common.collect.ImmutableList;
 public class LdapConfigurations extends BaseAction<LdapConfigurationsField> {
 
     public static final String NAME = "configs";
+
     public static final String DESCRIPTION = "Retrieves all currently configured LDAP settings.";
 
     private PidField pid = new PidField();
+
     private List<Field> arguments = ImmutableList.of(pid);
 
     public LdapConfigurations() {
@@ -37,14 +39,13 @@ public class LdapConfigurations extends BaseAction<LdapConfigurationsField> {
     }
 
     @Override
-    public LdapConfigurationsField process() {
-        return new LdapConfigurationsField()
-                .add(SAMPLE_LDAP_CONFIGURATION)
-                .add(SAMPLE_LDAP_CONFIGURATION);
+    public List<Field> getArguments() {
+        return arguments;
     }
 
     @Override
-    public List<Field> getArguments() {
-        return arguments;
+    public LdapConfigurationsField performAction() {
+        return new LdapConfigurationsField().add(SAMPLE_LDAP_CONFIGURATION)
+                .add(SAMPLE_LDAP_CONFIGURATION);
     }
 }

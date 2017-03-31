@@ -28,10 +28,13 @@ import com.google.common.collect.ImmutableList;
 public class LdapQuery extends BaseAction<LdapEntriesListField> {
 
     public static final String NAME = "query";
+
     public static final String DESCRIPTION = "Executes a query against LDAP.";
 
-    private LdapDistinguishedName dn =  new LdapDistinguishedName();
+    private LdapDistinguishedName dn = new LdapDistinguishedName();
+
     private LdapQueryField query = new LdapQueryField();
+
     private List<Field> arguments = ImmutableList.of(dn, query);
 
     public LdapQuery() {
@@ -39,17 +42,17 @@ public class LdapQuery extends BaseAction<LdapEntriesListField> {
     }
 
     @Override
-    public LdapEntriesListField process() {
+    public List<Field> getArguments() {
+        return arguments;
+    }
+
+    @Override
+    public LdapEntriesListField performAction() {
         LdapAttributeField attri = new LdapAttributeField();
         attri.setValue("exampleAttri");
         LdapEntryField entry = new LdapEntryField().addAttribute(attri);
         LdapEntryField outterEntry = new LdapEntryField().addAttribute(attri)
                 .addEntry(entry);
         return new LdapEntriesListField().add(outterEntry);
-    }
-
-    @Override
-    public List<Field> getArguments() {
-        return arguments;
     }
 }

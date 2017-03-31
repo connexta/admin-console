@@ -18,6 +18,7 @@ import org.codice.ddf.admin.common.fields.base.BaseListField;
 public class AuthTypeList extends BaseListField<AuthType> {
 
     public static final String DEFAULT_FIELD_NAME = "authTypes";
+
     public static final String DESCRIPTION = "A list of authentication types";
 
     public AuthTypeList() {

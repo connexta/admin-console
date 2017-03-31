@@ -14,11 +14,10 @@
 package org.codice.ddf.admin.common.actions;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.api.action.Action;
+import org.codice.ddf.admin.api.action.ActionReport;
 import org.codice.ddf.admin.api.action.Message;
 import org.codice.ddf.admin.api.fields.Field;
 import org.slf4j.Logger;
@@ -27,14 +26,20 @@ import org.slf4j.LoggerFactory;
 public abstract class BaseAction<T extends Field> implements Action<T> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseAction.class);
+
     private String name;
+
     private String description;
+
     private T returnType;
+
+    private ActionReportImpl<T> report;
 
     public BaseAction(String name, String description, T returnType) {
         this.name = name;
         this.description = description;
         this.returnType = returnType;
+        report = new ActionReportImpl<T>();
     }
 
     @Override
@@ -54,8 +59,7 @@ public abstract class BaseAction<T extends Field> implements Action<T> {
 
     @Override
     public void setArguments(Map<String, Object> args) {
-
-        if(args == null || args.isEmpty()) {
+        if (args == null || args.isEmpty()) {
             return;
         }
 
@@ -64,28 +68,40 @@ public abstract class BaseAction<T extends Field> implements Action<T> {
                 .forEach(field -> field.setValue(args.get(field.fieldName())));
 
         // TODO: tbatie - 3/16/17 - Add logger if a fieldName is not found
-//        for(Field arg : args) {
-//            Optional<Field> matchedField = getArguments().stream()
-//                    .filter(field -> arg.fieldName() != null && field.fieldName().equals(arg.fieldName()))
-//                    .findFirst();
-//
-//            if(matchedField.isPresent()) {
-//                matchedField.get().setEnumValue(arg.getValue());
-//            } else {
-//                List<String> allFieldNames = getArguments().stream()
-//                        .map(field -> field.fieldName())
-//                        .collect(Collectors.toList());
-//
-//                LOGGER.debug("Unknown argument field name {} in action {}. Field names must be one of: [{}]", arg.fieldName(), name, String.join(",", allFieldNames));
-//            }
-//        }
     }
 
     @Override
-    public List<Message> validate() {
-        return getArguments().stream()
+    public ActionReport<T> process() {
+        validate();
+        if (!report.containsErrorMsgs()) {
+            report.result(performAction());
+        }
+
+        return report;
+    }
+
+    protected BaseAction addArgumentMessage(Message msg) {
+        Message copy = msg.copy();
+        copy.addSubpath(name);
+        copy.addSubpath(ARGUMENT);
+        report.addMessage(copy);
+        return this;
+    }
+
+    protected BaseAction addReturnValueMessage(Message msg) {
+        Message copy = msg.copy();
+        copy.addSubpath(name);
+        report.addMessage(copy);
+        return this;
+    }
+
+    public void validate() {
+        getArguments().stream()
                 .map(Field::validate)
                 .flatMap(Collection<Message>::stream)
-                .collect(Collectors.toList());
+                .forEach(msg -> addArgumentMessage(msg));
     }
+
+    public abstract T performAction();
+
 }

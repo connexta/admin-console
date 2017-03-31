@@ -26,7 +26,10 @@ import com.google.common.collect.ImmutableList;
 public class SaveWhitelistedContexts extends BaseAction<ContextPaths> {
 
     public static final String DEFAULT_FIELD_NAME = "saveWhitelistContexts";
-    public static final String DESCRIPTION = "Persists the given contexts paths as white listed contexts. White listing a context path will result in no security being applied to the given paths.";
+
+    public static final String DESCRIPTION =
+            "Persists the given contexts paths as white listed contexts. White listing a context path will result in no security being applied to the given paths.";
+
     private ContextPaths contexts;
 
     public SaveWhitelistedContexts() {
@@ -35,12 +38,12 @@ public class SaveWhitelistedContexts extends BaseAction<ContextPaths> {
     }
 
     @Override
-    public ContextPaths process() {
-        return SAMPLE_CONTEXT_PATHS;
+    public List<Field> getArguments() {
+        return ImmutableList.of(contexts);
     }
 
     @Override
-    public List<Field> getArguments() {
-        return ImmutableList.of(contexts);
+    public ContextPaths performAction() {
+        return SAMPLE_CONTEXT_PATHS;
     }
 }

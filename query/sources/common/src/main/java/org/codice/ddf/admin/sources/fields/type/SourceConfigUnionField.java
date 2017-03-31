@@ -28,13 +28,22 @@ import com.google.common.collect.ImmutableList;
 public class SourceConfigUnionField extends BaseUnionField {
 
     public static final String FIELD_NAME = "sourceConfig";
-    public static final String FIELD_TYPE_NAME = "SourceConfiguration";
-    public static final String DESCRIPTION = "All supported source configuration types";
-    private static final List<ObjectField> UNION_TYPES = ImmutableList.of(new CswSourceConfigurationField(), new WfsSourceConfigurationField(), new OpensearchSourceConfigurationField());
 
-    protected PidField id =  new PidField();
+    public static final String FIELD_TYPE_NAME = "SourceConfiguration";
+
+    public static final String DESCRIPTION = "All supported source configuration types";
+
+    private static final List<ObjectField> UNION_TYPES =
+            ImmutableList.of(new CswSourceConfigurationField(),
+                    new WfsSourceConfigurationField(),
+                    new OpensearchSourceConfigurationField());
+
+    protected PidField id = new PidField();
+
     protected StringField sourceName = new StringField("sourceName");
+
     protected UrlField endpointUrl = new UrlField("endpointUrl");
+
     protected CredentialsField creds = new CredentialsField();
 
     public SourceConfigUnionField() {
@@ -61,7 +70,8 @@ public class SourceConfigUnionField extends BaseUnionField {
     }
 
     public SourceConfigUnionField credentials(String username, String password) {
-        this.creds.username(username).password(password);
+        this.creds.username(username)
+                .password(password);
         return this;
     }
 

@@ -35,33 +35,39 @@ import graphql.schema.GraphQLScalarType;
 import graphql.schema.GraphQLUnionType;
 import graphql.schema.TypeResolver;
 
-public class GraphQLOutput {
+public class GraphQLTransformOutput {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(GraphQLOutput.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GraphQLTransformOutput.class);
 
     public static GraphQLOutputType fieldToGraphQLOutputType(Field field) {
         switch (field.fieldBaseType()) {
         case OBJECT:
-            return GraphQLCommons.fieldToGraphQLObjectType(field);
+            return GraphQLTransformCommons.fieldToGraphQLObjectType(field);
         case ENUM:
-            return GraphQLCommons.enumFieldToGraphQLEnumType((EnumField) field);
+            return GraphQLTransformCommons.enumFieldToGraphQLEnumType((EnumField) field);
         case LIST:
-            return new GraphQLList(fieldToGraphQLOutputType(((ListField)field).getListFieldType()));
+            return new GraphQLList(fieldToGraphQLOutputType(((ListField) field).getListFieldType()));
         case INTEGER:
-            if(field.fieldTypeName() == null) {
+            if (field.fieldTypeName() == null) {
                 return Scalars.GraphQLInt;
             }
-            return new GraphQLScalarType(field.fieldTypeName(), field.description(), Scalars.GraphQLInt.getCoercing());
+            return new GraphQLScalarType(field.fieldTypeName(),
+                    field.description(),
+                    Scalars.GraphQLInt.getCoercing());
         case BOOLEAN:
-            if(field.fieldTypeName() == null) {
+            if (field.fieldTypeName() == null) {
                 return Scalars.GraphQLBoolean;
             }
-            return new GraphQLScalarType(field.fieldTypeName(), field.description(), Scalars.GraphQLBoolean.getCoercing());
+            return new GraphQLScalarType(field.fieldTypeName(),
+                    field.description(),
+                    Scalars.GraphQLBoolean.getCoercing());
         case STRING:
-            if(field.fieldTypeName() == null) {
+            if (field.fieldTypeName() == null) {
                 return Scalars.GraphQLString;
             }
-            return new GraphQLScalarType(field.fieldTypeName(), field.description(), Scalars.GraphQLString.getCoercing());
+            return new GraphQLScalarType(field.fieldTypeName(),
+                    field.description(),
+                    Scalars.GraphQLString.getCoercing());
         case UNION:
             return unionToGraphQLOutputType((UnionField) field);
         }
@@ -69,21 +75,22 @@ public class GraphQLOutput {
         return Scalars.GraphQLString;
     }
 
-//    public static GraphQLOutputType interfaceToGraphQLOutputType(InterfaceField field) {
-//        return newInterface().name(field.fieldTypeName())
-//                .description(field.description())
-//                .typeResolver(new UnionTypeResolver())
-//                .fields(fieldsToGraphQLFieldDefinition(field.getFields()))
-//                .build();
-//    }
+    //    public static GraphQLOutputType interfaceToGraphQLOutputType(InterfaceField field) {
+    //        return newInterface().name(field.fieldTypeName())
+    //                .description(field.description())
+    //                .typeResolver(new UnionTypeResolver())
+    //                .fields(fieldsToGraphQLFieldDefinition(field.getFields()))
+    //                .build();
+    //    }
 
     public static GraphQLOutputType unionToGraphQLOutputType(UnionField field) {
         GraphQLObjectType[] unionValues = field.getUnionTypes()
                 .stream()
-                .map(GraphQLCommons::fieldToGraphQLObjectType)
+                .map(GraphQLTransformCommons::fieldToGraphQLObjectType)
                 .toArray(GraphQLObjectType[]::new);
 
-        return GraphQLUnionType.newUnionType().name(field.fieldTypeName())
+        return GraphQLUnionType.newUnionType()
+                .name(field.fieldTypeName())
                 .description(field.description())
                 .typeResolver(new UnionTypeResolver(unionValues))
                 .possibleTypes(unionValues)
@@ -102,9 +109,10 @@ public class GraphQLOutput {
 
         @Override
         public GraphQLObjectType getType(Object object) {
-            if(!(object instanceof Map) || ((Map)object).get(FIELD_TYPE_NAME_KEY) == null) {
+            if (!(object instanceof Map) || ((Map) object).get(FIELD_TYPE_NAME_KEY) == null) {
                 LOGGER.error("Cannot handle supposed union object: " + object.toString());
-                throw new RuntimeException("Cannot handle supposed union object: " + object.toString());
+                throw new RuntimeException(
+                        "Cannot handle supposed union object: " + object.toString());
             }
 
             String fieldTypeName = (String) ((Map<String, Object>) object).get(FIELD_TYPE_NAME_KEY);
@@ -114,7 +122,7 @@ public class GraphQLOutput {
                             .equals(payloadFieldTypeName))
                     .findFirst();
 
-            if(!foundUnionType.isPresent()) {
+            if (!foundUnionType.isPresent()) {
                 LOGGER.error("UNKNOWN UNION TYPE: " + fieldTypeName);
                 throw new RuntimeException("UNKNOWN UNION TYPE: " + payloadFieldTypeName);
             }

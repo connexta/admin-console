@@ -31,8 +31,11 @@ import com.google.common.collect.ImmutableList;
 public class SourceActionCreator extends BaseActionCreator {
 
     public static final String NAME = "sources";
+
     public static final String TYPE_NAME = "Sources";
-    public static final String DESCRIPTION = "Responsible for delegating tasks and information to all other source handlers.";
+
+    public static final String DESCRIPTION =
+            "Responsible for delegating tasks and information to all other source handlers.";
 
     public SourceActionCreator() {
         super(NAME, TYPE_NAME, DESCRIPTION);
@@ -47,6 +50,9 @@ public class SourceActionCreator extends BaseActionCreator {
 
     @Override
     public List<Action> getPersistActions() {
-        return ImmutableList.of(new SaveCswConfiguration(), new SaveWfsConfiguration(), new SaveOpensearchConfiguration(), new DeleteSource());
+        return ImmutableList.of(new SaveCswConfiguration(),
+                new SaveWfsConfiguration(),
+                new SaveOpensearchConfiguration(),
+                new DeleteSource());
     }
 }

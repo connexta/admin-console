@@ -18,6 +18,7 @@ import org.codice.ddf.admin.common.fields.base.BaseListField;
 public class SourceInfoListField extends BaseListField<SourceInfoField> {
 
     public static final String DEFAULT_FIELD_NAME = "sourceConfigs";
+
     public static final String DESCRIPTION = "A list of source configurations";
 
     public SourceInfoListField() {

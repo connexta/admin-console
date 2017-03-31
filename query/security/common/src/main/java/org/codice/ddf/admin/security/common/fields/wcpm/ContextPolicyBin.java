@@ -25,12 +25,18 @@ import com.google.common.collect.ImmutableList;
 public class ContextPolicyBin extends BaseObjectField {
 
     public static final String DEFAULT_FIELD_NAME = "bin";
-    public static final String FIELD_TYPE_NAME  ="ContextPolicyBin";
-    public static final String DESCRIPTION = "Represents a policy being applied to a set of context paths.";
+
+    public static final String FIELD_TYPE_NAME = "ContextPolicyBin";
+
+    public static final String DESCRIPTION =
+            "Represents a policy being applied to a set of context paths.";
 
     private ContextPaths contexts;
+
     private AuthTypeList authTypes;
+
     private Realm realm;
+
     private ClaimsMapping claimsMapping;
 
     public ContextPolicyBin() {

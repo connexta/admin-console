@@ -28,7 +28,9 @@ import com.google.common.collect.ImmutableList;
 
 public class WcpmActionCreator extends BaseActionCreator {
     public static final String NAME = "wcpm";
+
     public static final String TYPE_NAME = "WebContextPolicyManager";
+
     public static final String DESCRIPTION = "Manages policies for the system's endpoints";
 
     public WcpmActionCreator() {
@@ -37,7 +39,10 @@ public class WcpmActionCreator extends BaseActionCreator {
 
     @Override
     public List<Action> getDiscoveryActions() {
-        return ImmutableList.of(new GetAuthTypes(), new GetRealms(), new GetWhiteListContexts(), new GetContextPolicies());
+        return ImmutableList.of(new GetAuthTypes(),
+                new GetRealms(),
+                new GetWhiteListContexts(),
+                new GetContextPolicies());
     }
 
     @Override

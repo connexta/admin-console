@@ -28,7 +28,9 @@ public abstract class BaseActionCreator implements ActionCreator {
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseActionCreator.class);
 
     private String name;
+
     private String typeName;
+
     private String description;
 
     public BaseActionCreator(String name, String typeName, String description) {
@@ -56,7 +58,8 @@ public abstract class BaseActionCreator implements ActionCreator {
     public Action createAction(String actionId) {
         Optional<Action> foundAction = Stream.concat(getDiscoveryActions().stream(),
                 getPersistActions().stream())
-                .filter(action -> action.name().equals(actionId))
+                .filter(action -> action.name()
+                        .equals(actionId))
                 .findFirst();
 
         if (foundAction.isPresent()) {
@@ -68,7 +71,10 @@ public abstract class BaseActionCreator implements ActionCreator {
                 .map(Action::name)
                 .collect(Collectors.toList());
 
-        LOGGER.debug("Unknown actionId {} for handler {}. Known action id's are [{}]", actionId, name, String.join(",", allActionIds));
+        LOGGER.debug("Unknown actionId {} for handler {}. Known action id's are [{}]",
+                actionId,
+                name,
+                String.join(",", allActionIds));
         return null;
     }
 }

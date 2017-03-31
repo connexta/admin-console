@@ -81,6 +81,11 @@
             <artifactId>configurator-api</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.codice.ddf.admin.beta</groupId>
+            <artifactId>admin-query-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -98,7 +103,8 @@
                             graphql-java,
                             lombok,
                             antlr4-runtime,
-                            graphql-dependencies
+                            graphql-dependencies,
+                            admin-query-common
                         </Embed-Dependency>
                         <Import-Package>
                             !org.apache.tools.ant*,

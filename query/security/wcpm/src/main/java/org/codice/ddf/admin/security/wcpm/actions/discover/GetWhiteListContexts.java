@@ -21,15 +21,16 @@ import org.codice.ddf.admin.common.fields.common.ContextPaths;
 public class GetWhiteListContexts extends GetAction<ContextPaths> {
 
     public static final String DEFAULT_FIELD_NAME = "whitelisted";
-    public static final String DESCRIPTION = "Returns all white listed contexts. Any contexts that are white listed have no security policy applied to them.";
+
+    public static final String DESCRIPTION =
+            "Returns all white listed contexts. Any contexts that are white listed have no security policy applied to them.";
 
     public GetWhiteListContexts() {
         super(DEFAULT_FIELD_NAME, DESCRIPTION, new ContextPaths());
     }
 
     @Override
-    public ContextPaths process() {
+    public ContextPaths performAction() {
         return SAMPLE_CONTEXT_PATHS;
     }
-
 }

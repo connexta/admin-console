@@ -24,10 +24,14 @@ import com.google.common.collect.ImmutableList;
 public class ClaimsMapEntry extends BaseObjectField {
 
     public static final String DEFAULT_FIELD_NAME = "claimsMapping";
+
     public static final String FIELD_TYPE_NAME = "ClaimsMapEntry";
-    public static final String DESCRIPTION = "Represents a mapping of a claim subject to a specific claim value";
+
+    public static final String DESCRIPTION =
+            "Represents a mapping of a claim subject to a specific claim value";
 
     private StringField claim;
+
     private StringField claimValue;
 
     public ClaimsMapEntry() {
@@ -45,7 +49,6 @@ public class ClaimsMapEntry extends BaseObjectField {
         this.claimValue.setValue(claimValue);
         return this;
     }
-
 
     @Override
     public List<Field> getFields() {

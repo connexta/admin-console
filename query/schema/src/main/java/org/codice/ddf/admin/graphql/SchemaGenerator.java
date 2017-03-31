@@ -34,17 +34,15 @@ public class SchemaGenerator {
 
     public static void main(String[] args) throws IOException, URISyntaxException {
         GraphQLServletImpl servlet = new GraphQLServletImpl();
-        final List<ActionCreator> GRAPHQL_PROVIDERS =
-                ImmutableList.of(
-                        new StsActionCreator(),
-                        new ConnectionActionCreator(),
-                        new LdapActionCreator(),
-                        new SourceActionCreator(),
-                        new WcpmActionCreator());
+        final List<ActionCreator> GRAPHQL_PROVIDERS = ImmutableList.of(new StsActionCreator(),
+                new ConnectionActionCreator(),
+                new LdapActionCreator(),
+                new SourceActionCreator(),
+                new WcpmActionCreator());
 
         servlet.setActionCreators(GRAPHQL_PROVIDERS);
         String schemaResult = servlet.executeQuery(IntrospectionQuery.INTROSPECTION_QUERY);
         Files.write(Paths.get(System.getProperty("target.path"), "schema.json"),
-                schemaResult == null? "".getBytes() : schemaResult.getBytes());
+                schemaResult == null ? "".getBytes() : schemaResult.getBytes());
     }
 }

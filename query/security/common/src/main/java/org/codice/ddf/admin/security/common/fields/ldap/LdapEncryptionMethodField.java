@@ -22,19 +22,33 @@ import com.google.common.collect.ImmutableList;
 public class LdapEncryptionMethodField extends BaseEnumField<String> {
 
     public static final String FIELD_NAME = "encryption";
-    public static final String FIELD_TYPE_NAME = "EncryptionMethod";
-    public static final String DESCRIPTION = "All possible encryption methods supported to establish an LDAP connection.";
 
-    public static final LdapEncryptionMethodField NO_ENCRYPTION = new LdapEncryptionMethodField(new NoEncryption());
-    public static final LdapEncryptionMethodField LDAPS_ENCRYPTION = new LdapEncryptionMethodField(new LdapsEncryption());
-    public static final LdapEncryptionMethodField START_TLS = new LdapEncryptionMethodField(new StartTlsEncryption());
+    public static final String FIELD_TYPE_NAME = "EncryptionMethod";
+
+    public static final String DESCRIPTION =
+            "All possible encryption methods supported to establish an LDAP connection.";
+
+    public static final LdapEncryptionMethodField NO_ENCRYPTION =
+            new LdapEncryptionMethodField(new NoEncryption());
+
+    public static final LdapEncryptionMethodField LDAPS_ENCRYPTION = new LdapEncryptionMethodField(
+            new LdapsEncryption());
+
+    public static final LdapEncryptionMethodField START_TLS =
+            new LdapEncryptionMethodField(new StartTlsEncryption());
 
     public LdapEncryptionMethodField() {
         this(null);
     }
 
     protected LdapEncryptionMethodField(Field<String> encryptionMethod) {
-        super(FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION, ImmutableList.of(new NoEncryption(), new LdapsEncryption(), new StartTlsEncryption()), encryptionMethod);
+        super(FIELD_NAME,
+                FIELD_TYPE_NAME,
+                DESCRIPTION,
+                ImmutableList.of(new NoEncryption(),
+                        new LdapsEncryption(),
+                        new StartTlsEncryption()),
+                encryptionMethod);
     }
 
     protected static final class NoEncryption extends StringField {

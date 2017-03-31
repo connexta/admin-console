@@ -32,13 +32,13 @@ const GraphiQL = () => {
   require('graphiql/graphiql.css')
   const GraphiQL = require('graphiql')
   return <div style={{width: '100%',
-      height: '100%',
-      position: 'absolute',
-      top: '100px',
-      left: '0px',
-      bottom: '0px',
-      right: '0px'}}>
-    <GraphiQL fetcher={graphQLFetcher}  />
+    height: '100%',
+    position: 'absolute',
+    top: '100px',
+    left: '0px',
+    bottom: '0px',
+    right: '0px'}}>
+    <GraphiQL fetcher={graphQLFetcher} />
   </div>
 }
 var DevTools

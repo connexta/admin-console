@@ -18,7 +18,7 @@
     <parent>
         <groupId>org.codice.ddf.admin.beta</groupId>
         <artifactId>admin</artifactId>
-        <version>0.1.2-SNAPSHOT</version>
+        <version>0.1.2</version>
     </parent>
     <artifactId>admin-federation</artifactId>
     <name>DDF :: Admin (Beta) :: Federation</name>

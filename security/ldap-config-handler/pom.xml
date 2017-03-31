@@ -18,7 +18,7 @@
     <parent>
         <artifactId>admin-security</artifactId>
         <groupId>org.codice.ddf.admin.beta</groupId>
-        <version>0.1.2-SNAPSHOT</version>
+        <version>0.1.2</version>
     </parent>
     <name>DDF :: Admin (Beta) :: Security :: LDAP Handler</name>
     <artifactId>ldap-config-handler</artifactId>

@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  */
-package org.codice.ddf.admin.beta.graphql.servlet;
+package graphql.servlet;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -29,12 +29,6 @@ import graphql.InvalidSyntaxError;
 import graphql.execution.ExecutionStrategy;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLSchema;
-import graphql.servlet.GenericGraphQLError;
-import graphql.servlet.GraphQLContext;
-import graphql.servlet.GraphQLMBean;
-import graphql.servlet.GraphQLOperationListener;
-import graphql.servlet.GraphQLSchemaProvider;
-import graphql.servlet.GraphQLServletListener;
 import graphql.validation.ValidationError;
 import lombok.Getter;
 import lombok.Setter;

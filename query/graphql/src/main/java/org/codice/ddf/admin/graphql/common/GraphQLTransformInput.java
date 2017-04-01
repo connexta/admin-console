@@ -13,6 +13,8 @@
  **/
 package org.codice.ddf.admin.graphql.common;
 
+import static org.codice.ddf.admin.graphql.common.GraphQLTransformCommons.enumFieldToGraphQLEnumType;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,53 +34,67 @@ import graphql.schema.GraphQLScalarType;
 
 public class GraphQLTransformInput {
 
-    public static GraphQLInputObjectField fieldToGraphQLInputFieldDefinition(Field field) {
-        return GraphQLInputObjectField.newInputObjectField()
-                .name(field.fieldName())
-                .description(field.description())
-                .type(fieldTypeToGraphQLInputType(field))
-                .build();
-    }
-
     public static GraphQLInputType fieldTypeToGraphQLInputType(Field field) {
+        GraphQLInputType type = null;
         switch (field.fieldBaseType()) {
         case OBJECT:
-            return objectFieldToGraphQLInputType((ObjectField) field);
+            type = objectFieldToGraphQLInputType((ObjectField) field);
+            break;
         case ENUM:
-            return GraphQLTransformCommons.enumFieldToGraphQLEnumType((EnumField) field);
+            type = enumFieldToGraphQLEnumType((EnumField) field);
+            break;
         case LIST:
-            return listFieldToGraphQLInputType((ListField) field);
+            type = listFieldToGraphQLInputType((ListField) field);
+            break;
         case INTEGER:
             if (field.fieldTypeName() == null) {
-                return Scalars.GraphQLInt;
+                type = Scalars.GraphQLInt;
+            } else {
+                type = new GraphQLScalarType(field.fieldTypeName(),
+                        field.description(),
+                        Scalars.GraphQLInt.getCoercing());
             }
-            return new GraphQLScalarType(field.fieldTypeName(),
-                    field.description(),
-                    Scalars.GraphQLInt.getCoercing());
+            break;
         case BOOLEAN:
             if (field.fieldTypeName() == null) {
-                return Scalars.GraphQLBoolean;
+                type = Scalars.GraphQLBoolean;
+            } else {
+                type = new GraphQLScalarType(field.fieldTypeName(),
+                        field.description(),
+                        Scalars.GraphQLBoolean.getCoercing());
             }
-            return new GraphQLScalarType(field.fieldTypeName(),
-                    field.description(),
-                    Scalars.GraphQLBoolean.getCoercing());
+            break;
         case STRING:
             if (field.fieldTypeName() == null) {
-                return Scalars.GraphQLString;
+                type = Scalars.GraphQLString;
+            } else {
+                type = new GraphQLScalarType(field.fieldTypeName(),
+                        field.description(),
+                        Scalars.GraphQLString.getCoercing());
             }
-            return new GraphQLScalarType(field.fieldTypeName(),
-                    field.description(),
-                    Scalars.GraphQLString.getCoercing());
+            break;
         }
-        return null;
+
+        if (type == null) {
+            throw new RuntimeException(
+                    "Error transforming input field to GraphQLInputType. Unknown field type: "
+                            + field.fieldBaseType());
+        }
+
+        return field.isRequired() ? new GraphQLNonNull(type) : type;
+    }
+
+    public static GraphQLInputType listFieldToGraphQLInputType(ListField listField) {
+        return new GraphQLList(fieldTypeToGraphQLInputType(listField.getListFieldType()));
     }
 
     public static GraphQLInputType objectFieldToGraphQLInputType(ObjectField field) {
         List<GraphQLInputObjectField> fieldDefinitions = new ArrayList<>();
+
         if (field.getFields() != null) {
             fieldDefinitions = field.getFields()
                     .stream()
-                    .map(GraphQLTransformInput::fieldToGraphQLInputFieldDefinition)
+                    .map(input -> fieldToGraphQLInputObjectFieldDefinition(input))
                     .collect(Collectors.toList());
         }
 
@@ -89,11 +105,15 @@ public class GraphQLTransformInput {
                 .build();
     }
 
-    public static GraphQLInputType listFieldToGraphQLInputType(ListField listField) {
-        return new GraphQLList(fieldTypeToGraphQLInputType(listField.getListFieldType()));
+    public static GraphQLInputObjectField fieldToGraphQLInputObjectFieldDefinition(Field field) {
+        return GraphQLInputObjectField.newInputObjectField()
+                .name(field.fieldName())
+                .description(field.description())
+                .type(fieldTypeToGraphQLInputType(field))
+                .build();
     }
 
-    public GraphQLInputType isRequired(boolean required, GraphQLInputType inputType) {
+    public static GraphQLInputType isRequired(boolean required, GraphQLInputType inputType) {
         return required ? new GraphQLNonNull(inputType) : inputType;
     }
 }

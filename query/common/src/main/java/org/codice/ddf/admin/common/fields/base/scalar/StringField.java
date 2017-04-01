@@ -35,4 +35,10 @@ public class StringField extends BaseScalarField<String> {
         // TODO: tbatie - 3/16/17 - Validate scalar fields
         return new ArrayList<>();
     }
+
+    @Override
+    public StringField isRequired(boolean required) {
+        super.isRequired(required);
+        return this;
+    }
 }

@@ -30,7 +30,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.codice.ddf.admin.api.action.ActionCreator;
 import org.codice.ddf.admin.api.action.Message;
-import org.codice.ddf.admin.beta.graphql.servlet.GraphQLServlet;
 
 import graphql.GraphQLError;
 import graphql.execution.ExecutionStrategy;
@@ -42,6 +41,7 @@ import graphql.servlet.GraphQLContext;
 import graphql.servlet.GraphQLContextBuilder;
 import graphql.servlet.GraphQLMutationProvider;
 import graphql.servlet.GraphQLQueryProvider;
+import graphql.servlet.GraphQLServlet;
 import graphql.servlet.GraphQLVariables;
 
 public class GraphQLServletImpl extends GraphQLServlet {
@@ -79,7 +79,7 @@ public class GraphQLServletImpl extends GraphQLServlet {
                     .
                             build());
         }
-        // TODO: tbatie - 3/23/17 - Investigate type providers
+
         boolean noMutations = providers.stream()
                 .map(GraphQLProviderImpl::getMutations)
                 .flatMap(Collection::stream)

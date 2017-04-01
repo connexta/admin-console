@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.codice.ddf.admin.api.action.Action;
@@ -25,7 +24,6 @@ import org.codice.ddf.admin.api.action.ActionCreator;
 import org.codice.ddf.admin.api.action.ActionReport;
 import org.codice.ddf.admin.api.fields.EnumField;
 import org.codice.ddf.admin.api.fields.Field;
-import org.codice.ddf.admin.api.fields.ObjectField;
 
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLArgument;
@@ -67,46 +65,17 @@ public class GraphQLTransformCommons {
         return fields;
     }
 
-    public static GraphQLObjectType fieldToGraphQLObjectType(Field field) {
-        switch (field.fieldBaseType()) {
-        case OBJECT:
-            //Add on Payload to avoid collision between an input and output field type name;
-            return GraphQLObjectType.newObject()
-                    .name(capitalize(field.fieldTypeName()) + "Payload")
-                    .description(field.description())
-                    .fields(fieldsToGraphQLFieldDefinition(((ObjectField) field).getFields()))
-                    .build();
-        default:
-            throw new RuntimeException("Unknown ObjectType: " + field.fieldBaseType());
+    public static Object actionFieldDataFetch(DataFetchingEnvironment env, String actionId,
+            ActionCreator actionCreator) {
+        Map<String, Object> args = new HashMap<>();
+        if (env.getArguments() != null) {
+            args.putAll(env.getArguments());
         }
-    }
 
-    public static List<GraphQLFieldDefinition> fieldsToGraphQLFieldDefinition(
-            List<? extends Field> fields) {
-        if (fields == null) {
-            return new ArrayList<>();
-        }
-        return fields.stream()
-                .map(field -> fieldToGraphQLFieldDefinition(field))
-                .collect(Collectors.toList());
-    }
-
-    public static GraphQLFieldDefinition fieldToGraphQLFieldDefinition(Field field) {
-        switch (field.fieldBaseType()) {
-        case UNION:
-            return GraphQLFieldDefinition.newFieldDefinition()
-                    .name(field.fieldName())
-                    .description(field.description())
-                    .type(GraphQLTransformOutput.fieldToGraphQLOutputType(field))
-                    //                    .dataFetcher(fetcher -> unionTypeDataFetch(field))
-                    .build();
-        default:
-            return GraphQLFieldDefinition.newFieldDefinition()
-                    .name(field.fieldName())
-                    .description(field.description())
-                    .type(GraphQLTransformOutput.fieldToGraphQLOutputType(field))
-                    .build();
-        }
+        Action action = actionCreator.createAction(actionId);
+        action.setArguments(env.getArguments());
+        ActionReport report = action.process();
+        return report;
     }
 
     public static GraphQLArgument fieldToGraphQLArgument(Field field) {
@@ -129,18 +98,6 @@ public class GraphQLTransformCommons {
         return builder.build();
     }
 
-    public static Object actionFieldDataFetch(DataFetchingEnvironment env, String actionId,
-            ActionCreator actionCreator) {
-        Map<String, Object> args = new HashMap<>();
-        if (env.getArguments() != null) {
-            args.putAll(env.getArguments());
-        }
-
-        Action action = actionCreator.createAction(actionId);
-        action.setArguments(env.getArguments());
-        ActionReport report = action.process();
-        return report;
-    }
 
     public static String capitalize(String str) {
         return StringUtils.capitalize(str);

@@ -19,6 +19,8 @@ import java.util.List;
 
 import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.common.actions.BaseAction;
+import org.codice.ddf.admin.common.fields.common.CredentialsField;
+import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.common.message.ErrorMessage;
 import org.codice.ddf.admin.sources.fields.SourceInfoField;
 import org.codice.ddf.admin.sources.fields.type.CswSourceConfigurationField;
@@ -36,7 +38,10 @@ public class SaveCswConfiguration extends BaseAction<SourceInfoField> {
 
     public SaveCswConfiguration() {
         super(NAME, DESCRIPTION, new SourceInfoField());
-        config = new CswSourceConfigurationField();
+        config = new CswSourceConfigurationField()
+                .allFieldsRequired(true)
+                .innerFieldRequired(false, PidField.DEFAULT_FIELD_NAME)
+                .innerFieldRequired(false, CredentialsField.DEFAULT_FIELD_NAME);
     }
 
     @Override

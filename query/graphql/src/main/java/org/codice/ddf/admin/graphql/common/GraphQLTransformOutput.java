@@ -14,20 +14,25 @@
 package org.codice.ddf.admin.graphql.common;
 
 import static org.codice.ddf.admin.api.fields.UnionField.FIELD_TYPE_NAME_KEY;
+import static org.codice.ddf.admin.graphql.common.GraphQLTransformCommons.capitalize;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.api.fields.EnumField;
 import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.api.fields.ListField;
+import org.codice.ddf.admin.api.fields.ObjectField;
 import org.codice.ddf.admin.api.fields.UnionField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import graphql.Scalars;
+import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
@@ -42,7 +47,7 @@ public class GraphQLTransformOutput {
     public static GraphQLOutputType fieldToGraphQLOutputType(Field field) {
         switch (field.fieldBaseType()) {
         case OBJECT:
-            return GraphQLTransformCommons.fieldToGraphQLObjectType(field);
+            return fieldToGraphQLObjectType(field);
         case ENUM:
             return GraphQLTransformCommons.enumFieldToGraphQLEnumType((EnumField) field);
         case LIST:
@@ -75,18 +80,52 @@ public class GraphQLTransformOutput {
         return Scalars.GraphQLString;
     }
 
-    //    public static GraphQLOutputType interfaceToGraphQLOutputType(InterfaceField field) {
-    //        return newInterface().name(field.fieldTypeName())
-    //                .description(field.description())
-    //                .typeResolver(new UnionTypeResolver())
-    //                .fields(fieldsToGraphQLFieldDefinition(field.getFields()))
-    //                .build();
-    //    }
+    public static GraphQLFieldDefinition fieldToGraphQLFieldDefinition(Field field) {
+        switch (field.fieldBaseType()) {
+        case UNION:
+            return GraphQLFieldDefinition.newFieldDefinition()
+                    .name(field.fieldName())
+                    .description(field.description())
+                    .type(GraphQLTransformOutput.fieldToGraphQLOutputType(field))
+                    //                    .dataFetcher(fetcher -> unionTypeDataFetch(field))
+                    .build();
+        default:
+            return GraphQLFieldDefinition.newFieldDefinition()
+                    .name(field.fieldName())
+                    .description(field.description())
+                    .type(GraphQLTransformOutput.fieldToGraphQLOutputType(field))
+                    .build();
+        }
+    }
+
+    public static List<GraphQLFieldDefinition> fieldsToGraphQLFieldDefinition(
+            List<? extends Field> fields) {
+        if (fields == null) {
+            return new ArrayList<>();
+        }
+        return fields.stream()
+                .map(field -> fieldToGraphQLFieldDefinition(field))
+                .collect(Collectors.toList());
+    }
+
+    public static GraphQLObjectType fieldToGraphQLObjectType(Field field) {
+        switch (field.fieldBaseType()) {
+        case OBJECT:
+            //Add on Payload to avoid collision between an input and output field type name;
+            return GraphQLObjectType.newObject()
+                    .name(capitalize(field.fieldTypeName()) + "Payload")
+                    .description(field.description())
+                    .fields(fieldsToGraphQLFieldDefinition(((ObjectField) field).getFields()))
+                    .build();
+        default:
+            throw new RuntimeException("Unknown ObjectType: " + field.fieldBaseType());
+        }
+    }
 
     public static GraphQLOutputType unionToGraphQLOutputType(UnionField field) {
         GraphQLObjectType[] unionValues = field.getUnionTypes()
                 .stream()
-                .map(GraphQLTransformCommons::fieldToGraphQLObjectType)
+                .map(GraphQLTransformOutput::fieldToGraphQLObjectType)
                 .toArray(GraphQLObjectType[]::new);
 
         return GraphQLUnionType.newUnionType()

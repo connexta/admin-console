@@ -57,7 +57,9 @@ public abstract class BaseObjectField extends BaseField<Map<String, Object>>
 
     @Override
     public BaseObjectField allFieldsRequired(boolean required) {
-        isRequired(required);
+        if(required) {
+            isRequired(required);
+        }
 
         getFields().stream()
                 .map(field -> field.isRequired(required))
@@ -69,7 +71,14 @@ public abstract class BaseObjectField extends BaseField<Map<String, Object>>
 
     @Override
     public BaseObjectField innerFieldRequired(boolean required, String fieldName) {
-        isRequired(required);
+        if(required) {
+            isRequired(required);
+        }
+
+        getFields().stream()
+                .filter(field -> field.fieldName().equals(fieldName))
+                .forEach(field -> field.isRequired(required));
+
         getFields().stream()
                 .filter(field -> field instanceof ObjectField)
                 .map(ObjectField.class::cast)

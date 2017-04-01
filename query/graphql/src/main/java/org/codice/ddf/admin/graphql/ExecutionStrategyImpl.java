@@ -89,7 +89,7 @@ public class ExecutionStrategyImpl extends EnhancedExecutionStrategy {
                         .forEach(executionContext::addError);
             }
         } catch (Exception e) {
-            LOGGER.warn("Exception while fetching data", e);
+            LOGGER.info("Exception while fetching data", e);
             executionContext.addError(new ExceptionWhileDataFetching(e));
         }
 

@@ -50,8 +50,7 @@ public class WfsSourceConfigurationHandler extends DefaultConfigurationHandler<S
 
     private final ConfiguratorFactory configuratorFactory;
 
-    public WfsSourceConfigurationHandler(ConfigurationHandler handler,
-            ConfiguratorFactory configuratorFactory) {
+    public WfsSourceConfigurationHandler(ConfigurationHandler handler, ConfiguratorFactory configuratorFactory) {
         this.handler = handler;
         this.configuratorFactory = configuratorFactory;
     }

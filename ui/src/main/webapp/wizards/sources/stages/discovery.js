@@ -94,7 +94,7 @@ const DiscoveryStageView = ({ messages, testSources, setDefaults, configs, disco
               </div>
             ) : (
               <div style={{ textAlign: 'right' }}>
-                <FlatButton primary labelStyle={{fontSize: '14px', textTransform: 'none'}} label={'Don\'t know the source url'} onClick={() => { setDiscoveryType('hostnamePort') }} />
+                <FlatButton primary labelStyle={{fontSize: '14px', textTransform: 'none'}} label={'Don\'t know the source url?'} onClick={() => { setDiscoveryType('hostnamePort') }} />
               </div>
             )
           }

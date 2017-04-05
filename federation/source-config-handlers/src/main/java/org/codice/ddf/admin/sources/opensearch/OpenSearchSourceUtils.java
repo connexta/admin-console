@@ -13,7 +13,6 @@
  */
 package org.codice.ddf.admin.sources.opensearch;
 
-import static java.net.HttpURLConnection.HTTP_OK;
 import static org.codice.ddf.admin.api.handler.ConfigurationMessage.createInternalErrorMsg;
 import static org.codice.ddf.admin.api.services.OpenSearchServiceProperties.OPENSEARCH_FACTORY_PID;
 import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.DISCOVERED_SOURCES;
@@ -26,6 +25,7 @@ import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.createDo
 import static org.codice.ddf.admin.sources.opensearch.OpenSearchSourceConfigurationHandler.OPENSEARCH_SOURCE_CONFIGURATION_HANDLER_ID;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
@@ -40,22 +40,20 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 public class OpenSearchSourceUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenSearchSourceUtils.class);
 
-    private static final List<String> OPENSEARCH_MIME_TYPES = ImmutableList.of(
-            "application/atom+xml",
-            "application/atom+xml; charset=UTF-8");
-
     private static final List<String> URL_FORMATS = ImmutableList.of(
             "https://%s:%d/services/catalog/query",
-            "https://%s:%d/catalog/query",
-            "http://%s:%d/services/catalog/query",
-            "http://%s:%d/catalog/query");
+            "https://%s:%d/catalog/query");
 
-    private static final String SIMPLE_QUERY_PARAMS = "?q=test&mr=1&src=local";
+    private static final Map<String, String> SIMPLE_QUERY_PARAMS = ImmutableMap.of(
+            "q", "test",
+            "mr", "1",
+            "src", "local");
 
     private static final String TOTAL_RESULTS_XPATH = "//os:totalResults|//opensearch:totalResults";
 
@@ -100,18 +98,9 @@ public class OpenSearchSourceUtils {
 
     protected ProbeReport verifyOpenSearchCapabilities(String url, String username,
             String password) {
-        ProbeReport requestResults = requestUtils.sendGetRequest(url + SIMPLE_QUERY_PARAMS,
-                username,
-                password);
+        ProbeReport requestResults = requestUtils.sendGetRequest(url, username, password, SIMPLE_QUERY_PARAMS);
         if (requestResults.containsFailureMessages()) {
             return requestResults;
-        }
-
-        int statusCode = requestResults.getProbeResult(RequestUtils.STATUS_CODE);
-        String contentType = requestResults.getProbeResult(RequestUtils.CONTENT_TYPE);
-
-        if (!(statusCode == HTTP_OK && OPENSEARCH_MIME_TYPES.contains(contentType))) {
-            return requestResults.addMessage(createCommonSourceConfigMsg(UNKNOWN_ENDPOINT));
         }
 
         Document capabilitiesXml;
@@ -160,5 +149,4 @@ public class OpenSearchSourceUtils {
                 .findFirst()
                 .orElse(new ProbeReport(createCommonSourceConfigMsg(UNKNOWN_ENDPOINT)));
     }
-
 }

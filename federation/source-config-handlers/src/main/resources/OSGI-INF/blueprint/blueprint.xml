@@ -67,4 +67,5 @@
     <reference id="configuratorFactory"
                interface="org.codice.ddf.admin.configurator.ConfiguratorFactory"
                availability="mandatory" filter="(type=txact)"/>
+
 </blueprint>

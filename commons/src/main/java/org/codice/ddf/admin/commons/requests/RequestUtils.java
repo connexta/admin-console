@@ -16,44 +16,31 @@ package org.codice.ddf.admin.commons.requests;
 import static java.net.HttpURLConnection.HTTP_OK;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.net.ssl.SSLPeerUnverifiedException;
+import javax.ws.rs.core.Response;
 
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.ssl.SSLContexts;
-import org.apache.http.util.EntityUtils;
+import org.apache.cxf.jaxrs.client.WebClient;
 import org.codice.ddf.admin.api.handler.ConfigurationMessage;
 import org.codice.ddf.admin.api.handler.MessageBuilder;
 import org.codice.ddf.admin.api.handler.report.ProbeReport;
 import org.codice.ddf.admin.api.handler.report.Report;
+import org.codice.ddf.cxf.SecureCxfClientFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.net.HttpHeaders;
 
 public class RequestUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RequestUtils.class);
 
     //Probe return types
-    public static final String CONTENT_TYPE = "contentType";
     public static final String CONTENT = "content";
     public static final String STATUS_CODE = "statusCode";
 
@@ -81,8 +68,6 @@ public class RequestUtils {
             FAILURE_DESCRIPTIONS,
             WARNING_DESCRIPTIONS);
 
-    private static final String HTTPS = "https";
-    private static final String NONE = "NONE";
     public static final int PING_TIMEOUT = 500;
 
     /**
@@ -91,24 +76,26 @@ public class RequestUtils {
      * WARNING TYPES - UNTRUSTED_CA
      * FAILURE TYPES - CANNOT_CONNECT, CERT_ERROR
      * RETURN TYPES -  CONTENT_TYPE, CONTENT, STATUS_CODE
-     *
      * @param url URL to send Get request to
      * @param userName - Optional username to add to Basic Auth header
      * @param password - Optional password to add to Basic Auth header
      * @return report
      */
-    public ProbeReport sendGetRequest(String url, String userName, String password) {
-        Report connectReport = endpointIsReachable(url);
-        if (connectReport.containsFailureMessages()) {
-            return new ProbeReport(connectReport.messages());
-        }
-        HttpGet request = new HttpGet(url);
+    public ProbeReport sendGetRequest(String url, String userName, String password, Map<String, String> queryParams) {
 
-        if (url.startsWith(HTTPS) && userName != null && password != null) {
-            String auth = Base64.getEncoder().encodeToString((userName + ":" + password).getBytes());
-            request.setHeader(HttpHeaders.AUTHORIZATION, "Basic " + auth);
+        WebClient client = generateClient(url, userName, password);
+
+        for (Map.Entry<String, String> e : queryParams.entrySet()) {
+            client.query(e.getKey(), e.getValue());
         }
-        return sendHttpRequest(request);
+        Response r = client.get();
+
+        if (r.getStatus() != HTTP_OK || r.readEntity(String.class).equals("")) {
+            LOGGER.debug("Bad or empty response sending GET to {}.", url);
+            return new ProbeReport().addMessage(createRequestConfigMsg(CANNOT_CONNECT));
+        }
+        return new ProbeReport().addMessage(createRequestConfigMsg(EXECUTED_REQUEST))
+                .probeResults(responseToMap(r));
     }
 
     /**
@@ -120,59 +107,23 @@ public class RequestUtils {
      * @param content - Body of the post request
      * @return report
      */
-    public ProbeReport sendPostRequest(String url, String username, String password,
-            String contentType, String content) {
-        Report connectReport = endpointIsReachable(url);
-        if (connectReport.containsFailureMessages()) {
-            return new ProbeReport(connectReport.messages());
+    public ProbeReport sendPostRequest(String url, String username, String password, String contentType, String content) {
+        WebClient client = generateClient(url, username, password);
+
+        Response r = client.type(contentType).post(content);
+        if (r.getStatus() != HTTP_OK || r.readEntity(String.class).equals("")) {
+            LOGGER.debug("Bad or empty response POST to {}.", url);
+            return new ProbeReport().addMessage(createRequestConfigMsg(CANNOT_CONNECT));
         }
-        HttpPost post = new HttpPost(url);
-        post.setHeader("Content-Type", contentType);
-        if (url.startsWith("https") && username != null && password != null) {
-            String auth = Base64.getEncoder().encodeToString((username + ":" + password).getBytes());
-            post.setHeader(HttpHeaders.AUTHORIZATION, "Basic " + auth);
-        }
-        try {
-            post.setEntity(new StringEntity(content));
-        } catch (UnsupportedEncodingException e) {
-            return new ProbeReport(ConfigurationMessage.createInternalErrorMsg("Error encoding query."));
-        }
-        return sendHttpRequest(post);
+        return new ProbeReport().addMessage(createRequestConfigMsg(EXECUTED_REQUEST))
+                .probeResults(responseToMap(r));
     }
 
-    protected ProbeReport sendHttpRequest(HttpRequestBase request) {
-        ProbeReport results = new ProbeReport();
-        CloseableHttpClient client = null;
-        CloseableHttpResponse response = null;
-        try {
-            client = getHttpClient(false);
-            response = client.execute(request);
-            if (response.getStatusLine().getStatusCode() == HTTP_OK) {
-                return new ProbeReport().addMessage(createRequestConfigMsg(EXECUTED_REQUEST))
-                        .probeResults(responseToMap(response));
-            } else {
-                return new ProbeReport().addMessage(createRequestConfigMsg(CANNOT_CONNECT));
-            }
-        } catch (SSLPeerUnverifiedException e) {
-            return results.addMessage(createRequestConfigMsg(CERT_ERROR));
-        } catch (IOException e) {
-            closeClientAndResponse(client, response);
-            try {
-                client = getHttpClient(true);
-                response = client.execute(request);
-                if (response.getStatusLine().getStatusCode() == HTTP_OK) {
-                    results.addMessage(createRequestConfigMsg(UNTRUSTED_CA));
-                    results.addMessage(createRequestConfigMsg(EXECUTED_REQUEST));
-                    return results.probeResults(responseToMap(response));
-                } else {
-                    return results.addMessage(createRequestConfigMsg(CANNOT_CONNECT));
-                }
-            } catch (Exception e1) {
-                return results.addMessage(createRequestConfigMsg(CANNOT_CONNECT));
-            }
-        } finally {
-            closeClientAndResponse(client, response);
-        }
+    private WebClient generateClient(String url, String username, String password) {
+        SecureCxfClientFactory<WebClient> clientFactory =  username == null && password == null ?
+                new SecureCxfClientFactory<>(url, WebClient.class) :
+                new SecureCxfClientFactory<>(url, WebClient.class, username, password);
+        return clientFactory.getClient();
     }
 
     /**
@@ -211,48 +162,11 @@ public class RequestUtils {
         }
     }
 
-    protected CloseableHttpClient getHttpClient(boolean trustAnyCA) {
-        HttpClientBuilder builder = HttpClientBuilder.create()
-                .disableAutomaticRetries()
-                .setDefaultRequestConfig(RequestConfig.custom()
-                        .setConnectTimeout(PING_TIMEOUT)
-                        .setSocketTimeout(PING_TIMEOUT)
-                        .build());
-        if (trustAnyCA) {
-            try {
-                builder.setSSLSocketFactory(new SSLConnectionSocketFactory(SSLContexts.custom()
-                        .loadTrustMaterial(null, (chain, authType) -> true)
-                        .build()));
-            } catch (Exception e) {
-                LOGGER.debug("Unable to load TrustMaterial.");
-            }
-        }
-        return builder.build();
-    }
-
-    protected Map<String, Object> responseToMap(CloseableHttpResponse response)
-            throws IOException {
+    protected Map<String, Object> responseToMap(Response response) {
         Map<String, Object> requestResults = new HashMap<>();
-        requestResults.put(STATUS_CODE, response.getStatusLine().getStatusCode());
-
-        String contentType = response.getEntity().getContentType() == null ?
-                NONE : response.getEntity().getContentType().getValue();
-        requestResults.put(CONTENT_TYPE, contentType);
-        requestResults.put(CONTENT, EntityUtils.toString(response.getEntity()));
+        requestResults.put(STATUS_CODE, response.getStatus());
+        requestResults.put(CONTENT, response.readEntity(String.class));
         return requestResults;
-    }
-
-    protected void closeClientAndResponse(CloseableHttpClient client, CloseableHttpResponse response) {
-        try {
-            if (client != null) {
-                client.close();
-            }
-            if (response != null) {
-                response.close();
-            }
-        } catch (Exception e) {
-            LOGGER.debug("Failed to close client or response.");
-        }
     }
 
     public Map<String, String> getRequestSubtypeDescriptions(String... subtypeKeys) {

@@ -23,6 +23,6 @@ public class SkipWarningsList extends BaseListField<MessageCodeField> {
             "A list containing warning codes that should be ignored.";
 
     public SkipWarningsList() {
-        super(FIELD_NAME, DESCRIPTION, new MessageCodeField());
+        super(FIELD_NAME, DESCRIPTION, new MessageCodeField().isRequired(true));
     }
 }

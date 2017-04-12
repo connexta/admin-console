@@ -31,4 +31,10 @@ public class StsClaimField extends StringField {
     public StsClaimField() {
         super(DEFAULT_FIELD_NAME, FIELD_NAME_TYPE, DESCRIPTION);
     }
+
+    @Override
+    public StsClaimField isRequired(boolean required) {
+        super.isRequired(required);
+        return this;
+    }
 }

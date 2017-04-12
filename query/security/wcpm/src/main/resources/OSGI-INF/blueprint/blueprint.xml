@@ -13,6 +13,12 @@
 -->
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
     <service id="wcpmActionCreator" interface="org.codice.ddf.admin.api.action.ActionCreator">
-        <bean class="org.codice.ddf.admin.security.wcpm.actions.WcpmActionCreator" />
+        <bean class="org.codice.ddf.admin.security.wcpm.actions.WcpmActionCreator">
+            <argument ref="configuratorFactory" />
+        </bean>
     </service>
+
+    <reference id="configuratorFactory"
+               interface="org.codice.ddf.admin.configurator.ConfiguratorFactory"
+               availability="mandatory" filter="(type=txact)"/>
 </blueprint>

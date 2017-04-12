@@ -23,7 +23,7 @@ public class ContextPolicies extends BaseListField<ContextPolicyBin> {
             "A list of polices being applied to a collection of context paths";
 
     public ContextPolicies() {
-        super(DEFAULT_FIELD_NAME, DESCRIPTION, new ContextPolicyBin());
+        super(DEFAULT_FIELD_NAME, DESCRIPTION, new ContextPolicyBin().allFieldsRequired(true));
     }
 
     @Override

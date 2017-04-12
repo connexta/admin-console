@@ -13,12 +13,10 @@
  **/
 package org.codice.ddf.admin.common.fields.base;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.codice.ddf.admin.api.action.Message;
 import org.codice.ddf.admin.api.fields.ObjectField;
 import org.codice.ddf.admin.api.fields.UnionField;
 

@@ -13,9 +13,12 @@
  **/
 package org.codice.ddf.admin.security.wcpm.actions.discover;
 
+import java.util.Arrays;
+
 import org.codice.ddf.admin.common.actions.GetAction;
+import org.codice.ddf.admin.configurator.Configurator;
+import org.codice.ddf.admin.security.common.fields.wcpm.AuthType;
 import org.codice.ddf.admin.security.common.fields.wcpm.AuthTypeList;
-import org.codice.ddf.admin.security.wcpm.sample.SampleFields;
 
 public class GetAuthTypes extends GetAction<AuthTypeList> {
 
@@ -24,12 +27,20 @@ public class GetAuthTypes extends GetAction<AuthTypeList> {
     public static final String DESCRIPTION =
             "Retrieves all currently configured authentication types.";
 
-    public GetAuthTypes() {
+    private Configurator configurator;
+
+    public GetAuthTypes(Configurator configurator) {
         super(FIELD_NAME, DESCRIPTION, new AuthTypeList());
+        this.configurator = configurator;
     }
 
     @Override
     public AuthTypeList performAction() {
-        return SampleFields.SAMPLE_AUTH_TYPES_LIST;
+        // TODO: 4/3/17 Should implement the different auth type action creators once implemented
+        return new AuthTypeList(Arrays.asList(AuthType.BASIC_AUTH,
+                AuthType.SAML_AUTH,
+                AuthType.PKI_AUTH,
+                AuthType.GUEST_AUTH,
+                AuthType.IDP_AUTH));
     }
 }

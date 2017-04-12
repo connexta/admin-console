@@ -50,6 +50,20 @@ public class ClaimsMapEntry extends BaseObjectField {
         return this;
     }
 
+    public String claim() {
+        return claim.getValue();
+    }
+
+    public String claimValue() {
+        return claimValue.getValue();
+    }
+
+    @Override
+    public ClaimsMapEntry isRequired(boolean required) {
+        super.isRequired(required);
+        return this;
+    }
+
     @Override
     public List<Field> getFields() {
         return ImmutableList.of(claim, claimValue);

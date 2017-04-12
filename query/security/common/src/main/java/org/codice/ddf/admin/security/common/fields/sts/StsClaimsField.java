@@ -22,7 +22,7 @@ public class StsClaimsField extends BaseListField<StsClaimField> {
     public static final String DESCRIPTION = "All currently configured claims supported by the STS";
 
     public StsClaimsField() {
-        super(DEFAULT_FIELD_NAME, DESCRIPTION, new StsClaimField());
+        super(DEFAULT_FIELD_NAME, DESCRIPTION, new StsClaimField().isRequired(true));
     }
 
     @Override

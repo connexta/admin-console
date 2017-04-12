@@ -13,13 +13,10 @@
  **/
 package org.codice.ddf.admin.sources.fields.type;
 
-import java.util.Arrays;
 import java.util.List;
 
-import org.codice.ddf.admin.api.action.Message;
 import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
-import org.codice.ddf.admin.common.message.ErrorMessage;
 
 import com.google.common.collect.ImmutableList;
 

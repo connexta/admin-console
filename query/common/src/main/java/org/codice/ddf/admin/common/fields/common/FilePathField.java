@@ -30,4 +30,10 @@ public class FilePathField extends StringField {
     public FilePathField(String fieldName) {
         super(fieldName, FIELD_TYPE_NAME, DESCRIPTION);
     }
+
+    @Override
+    public FilePathField isRequired(boolean required) {
+        super.isRequired(required);
+        return this;
+    }
 }

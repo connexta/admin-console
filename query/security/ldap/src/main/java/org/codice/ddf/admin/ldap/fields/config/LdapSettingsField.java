@@ -19,7 +19,6 @@ import java.util.Map;
 import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
-import org.codice.ddf.admin.common.fields.common.FilePathField;
 import org.codice.ddf.admin.ldap.fields.LdapDistinguishedName;
 
 import com.google.common.collect.ImmutableList;

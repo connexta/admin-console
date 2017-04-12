@@ -44,6 +44,20 @@ public class Realm extends BaseEnumField<String> {
                 realm);
     }
 
+    public Realm getRealmFromValue(String value) {
+        return new Realm(getEnumValues().stream()
+                .filter(field -> field.getValue()
+                        .equals(value))
+                .findFirst()
+                .get());
+    }
+
+    @Override
+    public Realm isRequired(boolean required) {
+        super.isRequired(required);
+        return this;
+    }
+
     protected static final class LdapRealm extends StringField {
         public static final String LDAP = "ldap";
 

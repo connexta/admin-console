@@ -83,26 +83,34 @@ public abstract class BaseListField<T extends Field> extends BaseField<List>
 
     @Override
     public BaseListField add(T value) {
+        // TODO: 4/10/17 perform special validation for object fields
+        // TODO: 4/10/17 Copy the obj instead
+        value.isRequired(listFieldType.isRequired());
         fields.add(value);
         return this;
     }
 
     @Override
-    public List<Message> validate() {
-        List<Message> validationErrors = super.validate();
-        if(!validationErrors.isEmpty()) {
-            return validationErrors;
-        }
+    public BaseListField addAll(List<T> values) {
+        values.forEach(field -> add(field));
+        return this;
+    }
 
-        if(getList() != null && !getList().isEmpty()) {
-            validationErrors.addAll(getList().stream()
+    @Override
+    public List<Message> validate() {
+        List<Message> validationMsgs = super.validate();
+
+        if (validationMsgs.isEmpty()) {
+            List<Message> fieldValidationMsgs = getList().stream()
                     .map(field -> (List<Message>) field.validate())
                     .flatMap(Collection::stream)
-                    .collect(Collectors.toList()));
+                    .collect(Collectors.toList());
+
+            fieldValidationMsgs.forEach(msg -> msg.addSubpath(fieldName()));
+            validationMsgs.addAll(fieldValidationMsgs);
         }
 
-        validationErrors.forEach(msg -> msg.addSubpath(fieldName()));
-        return validationErrors;
+        return validationMsgs;
     }
 
     @Override

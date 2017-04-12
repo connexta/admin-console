@@ -13,10 +13,10 @@
  **/
 package org.codice.ddf.admin.security.wcpm.actions.discover;
 
-import static org.codice.ddf.admin.security.wcpm.sample.SampleFields.SAMPLE_CONTEXT_POLICES;
-
 import org.codice.ddf.admin.common.actions.GetAction;
+import org.codice.ddf.admin.configurator.Configurator;
 import org.codice.ddf.admin.security.common.fields.wcpm.ContextPolicies;
+import org.codice.ddf.admin.security.common.fields.wcpm.services.PolicyManagerServiceProperties;
 
 public class GetContextPolicies extends GetAction<ContextPolicies> {
 
@@ -25,12 +25,17 @@ public class GetContextPolicies extends GetAction<ContextPolicies> {
     public static final String DESCRIPTION =
             "Returns all currently configured policies applied to context paths.";
 
-    public GetContextPolicies() {
+    private Configurator configurator;
+
+    private PolicyManagerServiceProperties wcpmServiceProps = new PolicyManagerServiceProperties();
+
+    public GetContextPolicies(Configurator configurator) {
         super(DEFAULT_FIELD_NAME, DESCRIPTION, new ContextPolicies());
+        this.configurator = configurator;
     }
 
     @Override
     public ContextPolicies performAction() {
-        return SAMPLE_CONTEXT_POLICES;
+        return wcpmServiceProps.contextPolicyServiceToContextPolicyFields(configurator);
     }
 }

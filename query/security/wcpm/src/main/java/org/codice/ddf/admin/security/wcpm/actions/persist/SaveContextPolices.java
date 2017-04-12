@@ -13,13 +13,22 @@
  **/
 package org.codice.ddf.admin.security.wcpm.actions.persist;
 
-import static org.codice.ddf.admin.security.wcpm.sample.SampleFields.SAMPLE_CONTEXT_POLICES;
+import static org.codice.ddf.admin.common.message.DefaultMessages.failedPersistError;
+import static org.codice.ddf.admin.common.message.DefaultMessages.noRootContextError;
+import static org.codice.ddf.admin.security.wcpm.commons.ContextPolicyServiceProperties.POLICY_MANAGER_PID;
+import static org.codice.ddf.admin.security.wcpm.commons.ContextPolicyServiceProperties.ROOT_CONTEXT_PATH;
+import static org.codice.ddf.admin.security.wcpm.commons.ContextPolicyServiceProperties.contextPoliciesToPolicyManagerProps;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.common.actions.BaseAction;
+import org.codice.ddf.admin.configurator.Configurator;
+import org.codice.ddf.admin.configurator.OperationReport;
 import org.codice.ddf.admin.security.common.fields.wcpm.ContextPolicies;
+import org.codice.ddf.admin.security.common.fields.wcpm.ContextPolicyBin;
+import org.codice.ddf.admin.security.common.fields.wcpm.services.PolicyManagerServiceProperties;
 
 import com.google.common.collect.ImmutableList;
 
@@ -30,11 +39,16 @@ public class SaveContextPolices extends BaseAction<ContextPolicies> {
     public static final String DESCRIPTION =
             "Saves a list of policies to be applied to their corresponding context paths.";
 
+    private Configurator configurator;
+
     private ContextPolicies contextPolicies;
 
-    public SaveContextPolices() {
+    private PolicyManagerServiceProperties wcpmServiceProps = new PolicyManagerServiceProperties();
+
+    public SaveContextPolices(Configurator configurator) {
         super(DEFAULT_FIELD_NAME, DESCRIPTION, new ContextPolicies());
         contextPolicies = new ContextPolicies();
+        this.configurator = configurator;
     }
 
     @Override
@@ -44,6 +58,28 @@ public class SaveContextPolices extends BaseAction<ContextPolicies> {
 
     @Override
     public ContextPolicies performAction() {
-        return SAMPLE_CONTEXT_POLICES;
+
+        if (contextPolicies.getList()
+                .stream()
+                .map(ContextPolicyBin::contexts)
+                .flatMap(Collection::stream)
+                .noneMatch(ROOT_CONTEXT_PATH::equals)) {
+            // TODO return some kind of error message here indicating the error
+            addArgumentMessage(noRootContextError(name()));
+        } else {
+            configurator.updateConfigFile(POLICY_MANAGER_PID,
+                    contextPoliciesToPolicyManagerProps(contextPolicies),
+                    true);
+
+            OperationReport configReport = configurator.commit(
+                    "Web Context Policy saved with details: {}",
+                    contextPolicies.toString());
+
+            if (configReport.containsFailedResults()) {
+                addArgumentMessage(failedPersistError(name()));
+            }
+        }
+
+        return wcpmServiceProps.contextPolicyServiceToContextPolicyFields(configurator);
     }
 }

@@ -22,7 +22,7 @@ public class RealmList extends BaseListField<Realm> {
     public static final String DESCRIPTION = "A list of Realms";
 
     public RealmList() {
-        super(DEFAULT_FIELD_NAME, DESCRIPTION, new Realm());
+        super(DEFAULT_FIELD_NAME, DESCRIPTION, new Realm().isRequired(true));
     }
 
     @Override

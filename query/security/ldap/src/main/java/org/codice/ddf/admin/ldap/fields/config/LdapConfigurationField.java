@@ -92,4 +92,10 @@ public class LdapConfigurationField extends BaseObjectField {
     public List<Field> getFields() {
         return ImmutableList.of(pid, connection, bindUserInfo, settings);
     }
+
+    @Override
+    public LdapConfigurationField allFieldsRequired(boolean required) {
+        super.allFieldsRequired(required);
+        return this;
+    }
 }

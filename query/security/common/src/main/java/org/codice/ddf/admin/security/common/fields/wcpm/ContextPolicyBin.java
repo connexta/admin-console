@@ -13,7 +13,10 @@
  **/
 package org.codice.ddf.admin.security.common.fields.wcpm;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
@@ -47,6 +50,11 @@ public class ContextPolicyBin extends BaseObjectField {
         claimsMapping = new ClaimsMapping();
     }
 
+    public ContextPolicyBin realm(String realm) {
+        this.realm = new Realm().getRealmFromValue(realm);
+        return this;
+    }
+
     public ContextPolicyBin realm(Realm realm) {
         this.realm = realm;
         return this;
@@ -57,8 +65,34 @@ public class ContextPolicyBin extends BaseObjectField {
         return this;
     }
 
+    public ContextPolicyBin addContextPath(String contextPath) {
+        contexts.add(new ContextPath(contextPath));
+        return this;
+    }
+
+    public ContextPolicyBin addClaimsMapping(String claim, String claimValue) {
+        claimsMapping.add(new ClaimsMapEntry().claim(claim)
+                .claimValue(claimValue));
+        return this;
+    }
+
     public ContextPolicyBin addClaimsMapping(ClaimsMapEntry entry) {
         claimsMapping.add(entry);
+        return this;
+    }
+
+    public ContextPolicyBin addClaimsMap(Map<String, String> claimsMap) {
+        List<ClaimsMapEntry> claims = claimsMap.entrySet()
+                .stream()
+                .map(entry -> new ClaimsMapEntry().claim(entry.getKey())
+                        .claimValue(entry.getValue()))
+                .collect(Collectors.toList());
+        claimsMapping.addAll(claims);
+        return this;
+    }
+
+    public ContextPolicyBin addAuthType(String authType) {
+        authTypes.add(new AuthType().getAuthTypeFromValue(authType));
         return this;
     }
 
@@ -67,8 +101,42 @@ public class ContextPolicyBin extends BaseObjectField {
         return this;
     }
 
+    public ContextPolicyBin authTypes(Collection<String> authTypes) {
+        authTypes.stream()
+                .forEach(authType -> addAuthType(authType));
+        return this;
+    }
+
+    public ContextPolicyBin contexts(Collection<String> contexts) {
+        contexts.stream()
+                .forEach(context -> addContextPath(context));
+        return this;
+    }
+
+    public List<String> contexts() {
+        return contexts.getValue();
+    }
+
+    public List<String> authTypes() {
+        return authTypes.getValue();
+    }
+
+    public String realm() {
+        return realm.getValue();
+    }
+
+    public Map<String, String> claimsMapping() {
+        return claimsMapping.toMap();
+    }
+
     @Override
     public List<Field> getFields() {
         return ImmutableList.of(contexts, authTypes, realm, claimsMapping);
+    }
+
+    @Override
+    public ContextPolicyBin allFieldsRequired(boolean required) {
+        super.allFieldsRequired(required);
+        return this;
     }
 }

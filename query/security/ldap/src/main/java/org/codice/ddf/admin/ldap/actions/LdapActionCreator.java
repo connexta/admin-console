@@ -18,13 +18,16 @@ import java.util.List;
 
 import org.codice.ddf.admin.api.action.Action;
 import org.codice.ddf.admin.common.actions.BaseActionCreator;
+import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.ldap.actions.discover.LdapConfigurations;
 import org.codice.ddf.admin.ldap.actions.discover.LdapQuery;
 import org.codice.ddf.admin.ldap.actions.discover.LdapRecommendedSettings;
-import org.codice.ddf.admin.ldap.actions.discover.LdapTestBindField;
-import org.codice.ddf.admin.ldap.actions.discover.LdapTestConnectionField;
-import org.codice.ddf.admin.ldap.actions.discover.LdapTestSettingsField;
+import org.codice.ddf.admin.ldap.actions.discover.LdapTestBind;
+import org.codice.ddf.admin.ldap.actions.discover.LdapTestConnection;
+import org.codice.ddf.admin.ldap.actions.discover.LdapTestSettings;
 import org.codice.ddf.admin.ldap.actions.discover.LdapUserAttributes;
+import org.codice.ddf.admin.ldap.actions.embedded.InstallEmbeddedLdap;
+import org.codice.ddf.admin.ldap.actions.persist.DeleteLdapConfiguration;
 import org.codice.ddf.admin.ldap.actions.persist.SaveLdapConfiguration;
 
 public class LdapActionCreator extends BaseActionCreator {
@@ -35,23 +38,26 @@ public class LdapActionCreator extends BaseActionCreator {
 
     public static final String DESCRIPTION = "Facilities for interacting with LDAP servers.";
 
-    public LdapActionCreator() {
+    private ConfiguratorFactory configuratorFactory;
+
+    public LdapActionCreator(ConfiguratorFactory configuratorFactory) {
         super(NAME, TYPE_NAME, DESCRIPTION);
+        this.configuratorFactory = configuratorFactory;
     }
 
     @Override
     public List<Action> getDiscoveryActions() {
         return Arrays.asList(new LdapRecommendedSettings(),
-                new LdapTestConnectionField(),
-                new LdapTestBindField(),
-                new LdapTestSettingsField(),
+                new LdapTestConnection(),
+                new LdapTestBind(),
+                new LdapTestSettings(),
                 new LdapQuery(),
                 new LdapUserAttributes(),
-                new LdapConfigurations());
+                new LdapConfigurations(configuratorFactory));
     }
 
     @Override
     public List<Action> getPersistActions() {
-        return Arrays.asList(new SaveLdapConfiguration());
+        return Arrays.asList(new SaveLdapConfiguration(configuratorFactory), new DeleteLdapConfiguration(configuratorFactory), new InstallEmbeddedLdap(configuratorFactory.getConfigurator()));
     }
 }

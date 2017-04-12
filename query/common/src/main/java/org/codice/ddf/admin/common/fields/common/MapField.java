@@ -11,7 +11,7 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.security.common.fields.ldap.query;
+package org.codice.ddf.admin.common.fields.common;
 
 import java.util.List;
 
@@ -20,38 +20,29 @@ import org.codice.ddf.admin.common.fields.base.BaseObjectField;
 
 import com.google.common.collect.ImmutableList;
 
-public class LdapEntryField extends BaseObjectField {
+public class MapField extends BaseObjectField {
 
-    public static final String DEFAULT_FIELD_NAME = "entry";
+    public static final String DEFAULT_FIELD_NAME = "map";
 
-    public static final String FIELD_TYPE_NAME = "LdapEntry";
+    public static final String FIELD_TYPE_NAME = "Map";
 
-    public static final String DESCRIPTION = "An entry within an LDAP server.";
+    public static final String DESCRIPTION = "A map containing a list of key value pairs.";
 
-    // TODO: tbatie - 2/22/17 - Can't handle recursion
-    //    private LdapEntriesListField entries;
-    private LdapAttributeListField attributes;
+    private EntriesField entries;
 
-    public LdapEntryField() {
+    public MapField() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
-        //        entries = new LdapEntriesListField();
-        attributes = new LdapAttributeListField();
+        entries = new EntriesField();
     }
 
     @Override
     public List<Field> getFields() {
-        return ImmutableList.of(
-                //                entries,
-                attributes);
+        return ImmutableList.of(entries);
     }
 
-    public LdapEntryField addEntry(LdapEntryField entry) {
-        //        entries.add(entry);
+    public MapField put(String key, String value) {
+        entries.add(key, value);
         return this;
     }
 
-    public LdapEntryField addAttribute(LdapAttributeField attribute) {
-        attributes.add(attribute);
-        return this;
-    }
 }

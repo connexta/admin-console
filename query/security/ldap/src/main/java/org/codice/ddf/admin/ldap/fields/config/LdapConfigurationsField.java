@@ -11,23 +11,30 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.security.common.fields.ldap.query;
+package org.codice.ddf.admin.ldap.fields.config;
+
+import java.util.List;
 
 import org.codice.ddf.admin.common.fields.base.BaseListField;
 
-public class LdapAttributeListField extends BaseListField<LdapAttributeField> {
+public class LdapConfigurationsField extends BaseListField<LdapConfigurationField> {
 
-    public static final String DEFAULT_FIELD_NAME = "attributes";
+    public static final String DEFAULT_FIELD_NAME = "configs";
 
-    public static final String DESCRIPTION = "A list of attributes an LDAP entry contains.";
+    public static final String DESCRIPTION = "A list of LDAP configurations.";
 
-    public LdapAttributeListField() {
-        super(DEFAULT_FIELD_NAME, DESCRIPTION, new LdapAttributeField());
+    public LdapConfigurationsField() {
+        super(DEFAULT_FIELD_NAME, DESCRIPTION, new LdapConfigurationField());
     }
 
     @Override
-    public LdapAttributeListField add(LdapAttributeField value) {
+    public LdapConfigurationsField add(LdapConfigurationField value) {
         super.add(value);
+        return this;
+    }
+
+    public LdapConfigurationsField addAll(List<LdapConfigurationField> configs) {
+        configs.forEach(config -> add(config));
         return this;
     }
 }

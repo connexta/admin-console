@@ -11,23 +11,23 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.security.common.fields.ldap.query;
+package org.codice.ddf.admin.common.fields.common;
 
-import org.codice.ddf.admin.common.fields.base.BaseListField;
+import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 
-public class LdapEntriesListField extends BaseListField<LdapEntryField> {
+public class FilePathField extends StringField {
+    public static final String DEFAULT_FIELD_NAME = "filePath";
 
-    public static final String DEFAULT_FIELD_NAME = "entries";
+    public static final String FIELD_TYPE_NAME = "FilePath";
 
-    public static final String DESCRIPTION = "A list of LDAP entries.";
+    // TODO: tbatie - 4/3/17 - Enforce file path must be relative to ddf home?
+    public static final String DESCRIPTION = "Specifies a unique location in a file system.";
 
-    public LdapEntriesListField() {
-        super(DEFAULT_FIELD_NAME, DESCRIPTION, new LdapEntryField());
+    public FilePathField() {
+        this(DEFAULT_FIELD_NAME);
     }
 
-    @Override
-    public LdapEntriesListField add(LdapEntryField field) {
-        super.add(field);
-        return this;
+    public FilePathField(String fieldName) {
+        super(fieldName, FIELD_TYPE_NAME, DESCRIPTION);
     }
 }

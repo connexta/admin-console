@@ -16,6 +16,7 @@ package org.codice.ddf.admin.common.fields.base;
 import static org.codice.ddf.admin.api.fields.Field.FieldBaseType.LIST;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -61,7 +62,8 @@ public abstract class BaseListField<T extends Field> extends BaseField<List>
 
     @Override
     public void setValue(List values) {
-        if (values == null) {
+        if (values == null || values.isEmpty()) {
+            fields = null;
             return;
         }
 
@@ -71,14 +73,12 @@ public abstract class BaseListField<T extends Field> extends BaseField<List>
                 T newField = (T) getListFieldType().getClass()
                         .newInstance();
                 newField.setValue(val);
-                newFields.add(newField);
+                add(newField);
             } catch (IllegalAccessException | InstantiationException e) {
                 LOGGER.debug("Unable to create instance of fieldType {}",
                         getListFieldType().fieldTypeName());
             }
         }
-
-        fields = newFields;
     }
 
     @Override
@@ -89,8 +89,20 @@ public abstract class BaseListField<T extends Field> extends BaseField<List>
 
     @Override
     public List<Message> validate() {
-        // TODO: tbatie - 3/16/17 - Validate list field
-        return new ArrayList<>();
+        List<Message> validationErrors = super.validate();
+        if(!validationErrors.isEmpty()) {
+            return validationErrors;
+        }
+
+        if(getList() != null && !getList().isEmpty()) {
+            validationErrors.addAll(getList().stream()
+                    .map(field -> (List<Message>) field.validate())
+                    .flatMap(Collection::stream)
+                    .collect(Collectors.toList()));
+        }
+
+        validationErrors.forEach(msg -> msg.addSubpath(fieldName()));
+        return validationErrors;
     }
 
     @Override

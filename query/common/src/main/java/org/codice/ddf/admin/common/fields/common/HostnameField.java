@@ -13,6 +13,12 @@
  **/
 package org.codice.ddf.admin.common.fields.common;
 
+import static org.codice.ddf.admin.common.message.DefaultMessages.invalidHostnameError;
+
+import java.util.List;
+import java.util.regex.Pattern;
+
+import org.codice.ddf.admin.api.action.Message;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 
 public class HostnameField extends StringField {
@@ -25,11 +31,31 @@ public class HostnameField extends StringField {
             "Must be between 1 and 63 characters long, and the entire hostname (including the delimiting dots but not a trailing dot)"
                     + " has a maximum of 253 ASCII characters.";
 
+    private static final Pattern HOST_NAME_PATTERN = Pattern.compile("[0-9a-zA-Z.-]+");
+
     public HostnameField(String fieldName) {
         super(fieldName, FIELD_TYPE_NAME, DESCRIPTION);
     }
 
     public HostnameField() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
+    }
+
+    @Override
+    public List<Message> validate() {
+        List<Message> validationMsgs = super.validate();
+        if(!validationMsgs.isEmpty()) {
+            return validationMsgs;
+        }
+
+        if(getValue() != null && !validHostname(getValue())) {
+            validationMsgs.add(invalidHostnameError(fieldName()));
+        }
+
+        return validationMsgs;
+    }
+
+    public boolean validHostname(String hostname) {
+        return HOST_NAME_PATTERN.matcher(getValue()).matches();
     }
 }

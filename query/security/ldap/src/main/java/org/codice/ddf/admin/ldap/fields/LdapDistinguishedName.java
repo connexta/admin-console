@@ -11,9 +11,15 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.security.common.fields.ldap;
+package org.codice.ddf.admin.ldap.fields;
 
+import static org.codice.ddf.admin.ldap.actions.commons.LdapActionMessages.invalidDnFormatError;
+
+import java.util.List;
+
+import org.codice.ddf.admin.api.action.Message;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
+import org.forgerock.opendj.ldap.DN;
 
 public class LdapDistinguishedName extends StringField {
     public static final String DEFAULT_FIELD_NAME = "dn";
@@ -30,5 +36,28 @@ public class LdapDistinguishedName extends StringField {
 
     public LdapDistinguishedName(String fieldName) {
         super(fieldName, FIELD_TYPE_NAME, DESCRIPTION);
+    }
+
+    @Override
+    public List<Message> validate() {
+        List<Message> validationMsgs = super.validate();
+        if(!validationMsgs.isEmpty()) {
+            return validationMsgs;
+        }
+
+        if(getValue() != null && !isValidDN(getValue())) {
+            validationMsgs.add(invalidDnFormatError(fieldName()));
+        }
+
+        return validationMsgs;
+    }
+
+    public boolean isValidDN(String dn) {
+        try {
+            DN.valueOf(dn);
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
     }
 }

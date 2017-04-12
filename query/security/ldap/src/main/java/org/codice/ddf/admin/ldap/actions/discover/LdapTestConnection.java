@@ -18,32 +18,38 @@ import java.util.List;
 import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.common.actions.TestAction;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
-import org.codice.ddf.admin.security.common.fields.ldap.LdapSettingsField;
+import org.codice.ddf.admin.ldap.actions.commons.LdapConnectionAttempt;
+import org.codice.ddf.admin.ldap.actions.commons.LdapTestingUtils;
+import org.codice.ddf.admin.ldap.fields.connection.LdapConnectionField;
 
 import com.google.common.collect.ImmutableList;
 
-public class LdapTestSettingsField extends TestAction {
-    public static final String NAME = "testSettings";
+public class LdapTestConnection extends TestAction {
+
+    public static final String NAME = "testConnect";
 
     public static final String DESCRIPTION =
-            "Tests whether the given LDAP dn's and user attributes exist.";
+            "Attempts to established a connection with the given connection configuration";
 
-    private LdapSettingsField settings;
+    private LdapConnectionField connection;
+    private LdapTestingUtils utils;
 
-    public LdapTestSettingsField() {
+    public LdapTestConnection() {
         super(NAME, DESCRIPTION);
-        settings = new LdapSettingsField();
+        connection = new LdapConnectionField();
+        utils = new LdapTestingUtils();
     }
 
     @Override
     public List<Field> getArguments() {
-        return ImmutableList.of(settings);
+        return ImmutableList.of(connection);
     }
 
+    // Possible message types: CANNOT_CONFIGURE, CANNOT_CONNECT
     @Override
     public BooleanField performAction() {
-        BooleanField testPassed = new BooleanField();
-        testPassed.setValue(true);
-        return testPassed;
+        LdapConnectionAttempt connectionAttempt = utils.getLdapConnection(connection);
+        addReturnValueMessages(connectionAttempt.messages());
+        return new BooleanField(connectionAttempt.connection().isPresent());
     }
 }

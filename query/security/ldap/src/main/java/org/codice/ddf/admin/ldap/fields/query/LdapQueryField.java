@@ -11,44 +11,48 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.common.fields.common;
+package org.codice.ddf.admin.ldap.fields.query;
 
-import static org.codice.ddf.admin.common.message.DefaultMessages.invalidPortRangeError;
+import static org.codice.ddf.admin.ldap.actions.commons.LdapActionMessages.invalidQueryError;
 
 import java.util.List;
 
 import org.codice.ddf.admin.api.action.Message;
-import org.codice.ddf.admin.common.fields.base.scalar.IntegerField;
+import org.codice.ddf.admin.common.fields.base.scalar.StringField;
+import org.forgerock.opendj.ldap.Filter;
 
-public class PortField extends IntegerField {
+public class LdapQueryField extends StringField {
+    public static final String DEFAULT_FIELD_NAME = "query";
 
-    public static final String DEFAULT_FIELD_NAME = "port";
-    public static final String FIELD_TYPE_NAME  = "Port";
-    public static final String DESCRIPTION = "Port range within the bounds of 0 - 65535";
+    public static final String FIELD_TYPE_NAME = "LdapQuery";
 
-    public PortField(String fieldName) {
-        super(fieldName, FIELD_TYPE_NAME, DESCRIPTION);
-    }
+    public static final String DESCRIPTION =
+            "A Search filters that enables you to define search criteria. Ex: (objectClass=*). LDAP query syntax can be found at: https://msdn.microsoft.com/en-us/library/aa746475(v=vs.85).aspx";
 
-    public PortField() {
+    public LdapQueryField() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
     }
 
     @Override
     public List<Message> validate() {
         List<Message> validationMsgs = super.validate();
-        if(!validationMsgs.isEmpty()) {
+        if (!validationMsgs.isEmpty()) {
             return validationMsgs;
         }
 
-        if(getValue() != null && !validPortRange(getValue())) {
-            validationMsgs.add(invalidPortRangeError(fieldName()));
+        if(getValue() != null && !validQuery(getValue())) {
+            validationMsgs.add(invalidQueryError(fieldName()));
         }
 
         return validationMsgs;
     }
 
-    public boolean validPortRange(int port) {
-        return port > 0 && port < 65536;
+    public boolean validQuery(String query) {
+        try {
+            Filter.valueOf(query);
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
     }
 }

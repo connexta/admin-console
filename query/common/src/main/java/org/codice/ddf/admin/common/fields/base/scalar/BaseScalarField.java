@@ -36,10 +36,4 @@ public abstract class BaseScalarField<T> extends BaseField<T> {
     public void setValue(T value) {
         this.value = value;
     }
-
-    @Override
-    public List<Message> validate() {
-        // TODO: tbatie - 3/16/17 - Validate scalar fields
-        return new ArrayList<>();
-    }
 }

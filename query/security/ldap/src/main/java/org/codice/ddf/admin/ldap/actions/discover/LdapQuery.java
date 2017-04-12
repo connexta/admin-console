@@ -13,15 +13,25 @@
  **/
 package org.codice.ddf.admin.ldap.actions.discover;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.common.actions.BaseAction;
-import org.codice.ddf.admin.security.common.fields.ldap.LdapDistinguishedName;
-import org.codice.ddf.admin.security.common.fields.ldap.query.LdapAttributeField;
-import org.codice.ddf.admin.security.common.fields.ldap.query.LdapEntriesListField;
-import org.codice.ddf.admin.security.common.fields.ldap.query.LdapEntryField;
-import org.codice.ddf.admin.security.common.fields.ldap.query.LdapQueryField;
+import org.codice.ddf.admin.common.fields.base.scalar.IntegerField;
+import org.codice.ddf.admin.common.fields.common.MapField;
+import org.codice.ddf.admin.ldap.actions.commons.LdapConnectionAttempt;
+import org.codice.ddf.admin.ldap.actions.commons.LdapTestingUtils;
+import org.codice.ddf.admin.ldap.fields.LdapDistinguishedName;
+import org.codice.ddf.admin.ldap.fields.connection.LdapBindUserInfo;
+import org.codice.ddf.admin.ldap.fields.connection.LdapConnectionField;
+import org.codice.ddf.admin.ldap.fields.query.LdapEntriesListField;
+import org.codice.ddf.admin.ldap.fields.query.LdapQueryField;
+import org.forgerock.opendj.ldap.Attribute;
+import org.forgerock.opendj.ldap.ByteString;
+import org.forgerock.opendj.ldap.SearchScope;
+import org.forgerock.opendj.ldap.responses.SearchResultEntry;
 
 import com.google.common.collect.ImmutableList;
 
@@ -31,28 +41,73 @@ public class LdapQuery extends BaseAction<LdapEntriesListField> {
 
     public static final String DESCRIPTION = "Executes a query against LDAP.";
 
-    private LdapDistinguishedName dn = new LdapDistinguishedName();
+    private LdapConnectionField conn;
 
-    private LdapQueryField query = new LdapQueryField();
+    private LdapBindUserInfo creds;
 
-    private List<Field> arguments = ImmutableList.of(dn, query);
+    private IntegerField maxQueryResults;
+
+    private LdapDistinguishedName dn;
+
+    private LdapQueryField query;
+
+    private LdapTestingUtils utils;
 
     public LdapQuery() {
         super(NAME, DESCRIPTION, new LdapEntriesListField());
+        conn = new LdapConnectionField();
+        creds = new LdapBindUserInfo();
+        maxQueryResults = new IntegerField("maxQueryResults");
+        dn = new LdapDistinguishedName("queryBase");
+        query = new LdapQueryField();
+        utils = new LdapTestingUtils();
     }
 
     @Override
     public List<Field> getArguments() {
-        return arguments;
+        // TODO: tbatie - 4/3/17 - Add other args
+        return ImmutableList.of(conn, creds, dn, maxQueryResults, dn, query);
     }
 
     @Override
     public LdapEntriesListField performAction() {
-        LdapAttributeField attri = new LdapAttributeField();
-        attri.setValue("exampleAttri");
-        LdapEntryField entry = new LdapEntryField().addAttribute(attri);
-        LdapEntryField outterEntry = new LdapEntryField().addAttribute(attri)
-                .addEntry(entry);
-        return new LdapEntriesListField().add(outterEntry);
+
+        LdapConnectionAttempt connectionAttempt = utils.bindUserToLdapConnection(conn, creds);
+        addReturnValueMessages(connectionAttempt.messages());
+
+        if(!connectionAttempt.connection().isPresent()) {
+            return null;
+        }
+
+        List<SearchResultEntry> searchResults = utils.getLdapQueryResults(
+                connectionAttempt.connection().get(),
+                dn.getValue(),
+                query.getValue(),
+                SearchScope.WHOLE_SUBTREE,
+                maxQueryResults.getValue());
+
+        List<MapField> convertedSearchResults = new ArrayList<>();
+
+        for (SearchResultEntry entry : searchResults) {
+            MapField entryMap = new MapField();
+            for (Attribute attri : entry.getAllAttributes()) {
+                entryMap.put("name",
+                        entry.getName()
+                                .toString());
+                if (!attri.getAttributeDescriptionAsString()
+                        .toLowerCase()
+                        .contains("password")) {
+                    List<String> attributeValueList = attri.parallelStream()
+                            .map(ByteString::toString)
+                            .collect(Collectors.toList());
+                    String attributeValue = attributeValueList.size() == 1 ? attributeValueList.get(
+                            0) : attributeValueList.toString();
+                    entryMap.put(attri.getAttributeDescriptionAsString(), attributeValue);
+                }
+            }
+            convertedSearchResults.add(entryMap);
+        }
+
+        return new LdapEntriesListField().addAll(convertedSearchResults);
     }
 }

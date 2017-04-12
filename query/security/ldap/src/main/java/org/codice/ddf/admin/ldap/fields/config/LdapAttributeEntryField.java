@@ -11,10 +11,11 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.security.common.fields.ldap;
+package org.codice.ddf.admin.ldap.fields.config;
 
 import java.util.List;
 
+import org.codice.ddf.admin.api.action.Message;
 import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
@@ -52,6 +53,14 @@ public class LdapAttributeEntryField extends BaseObjectField {
     public LdapAttributeEntryField userAttribute(String userAttribute) {
         this.userAttribute.setValue(userAttribute);
         return this;
+    }
+
+    public String stsClaim(){
+        return stsClaim.getValue();
+    }
+
+    public String userAttribute() {
+        return userAttribute.getValue();
     }
 
     @Override

@@ -22,6 +22,7 @@ import org.apache.commons.lang.StringUtils;
 import org.codice.ddf.admin.api.action.Action;
 import org.codice.ddf.admin.api.action.ActionCreator;
 import org.codice.ddf.admin.api.action.ActionReport;
+import org.codice.ddf.admin.api.action.Message;
 import org.codice.ddf.admin.api.fields.EnumField;
 import org.codice.ddf.admin.api.fields.Field;
 
@@ -75,6 +76,7 @@ public class GraphQLTransformCommons {
         Action action = actionCreator.createAction(actionId);
         action.setArguments(env.getArguments());
         ActionReport report = action.process();
+        report.messages().forEach(msg -> ((Message)msg).addSubpath(actionCreator.name()));
         return report;
     }
 

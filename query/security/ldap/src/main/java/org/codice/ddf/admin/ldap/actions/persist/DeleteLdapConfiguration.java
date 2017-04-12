@@ -11,45 +11,51 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.ldap.actions.discover;
+package org.codice.ddf.admin.ldap.actions.persist;
 
 import java.util.List;
 
 import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.common.actions.BaseAction;
 import org.codice.ddf.admin.common.fields.common.PidField;
+import org.codice.ddf.admin.configurator.Configurator;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
+import org.codice.ddf.admin.configurator.OperationReport;
 import org.codice.ddf.admin.ldap.actions.commons.services.LdapServiceCommons;
 import org.codice.ddf.admin.ldap.fields.config.LdapConfigurationsField;
 
 import com.google.common.collect.ImmutableList;
 
-public class LdapConfigurations extends BaseAction<LdapConfigurationsField> {
+public class DeleteLdapConfiguration extends BaseAction<LdapConfigurationsField> {
 
-    public static final String NAME = "configs";
+    public static final String NAME = "deleteLdapConfig";
 
-    public static final String DESCRIPTION = "Retrieves all currently configured LDAP settings.";
+    public static final String DESCRIPTION = "Deletes the specified LDAP configuration.";
 
-    private PidField pid = new PidField();
-
+    private PidField pid;
     private ConfiguratorFactory configuratorFactory;
     private LdapServiceCommons serviceCommons;
 
-    private List<Field> arguments = ImmutableList.of(pid);
-
-    public LdapConfigurations(ConfiguratorFactory configuratorFactory) {
+    public DeleteLdapConfiguration(ConfiguratorFactory configuratorFactory) {
         super(NAME, DESCRIPTION, new LdapConfigurationsField());
+        pid = new PidField();
         this.configuratorFactory = configuratorFactory;
         serviceCommons = new LdapServiceCommons();
     }
 
     @Override
     public List<Field> getArguments() {
-        return arguments;
+        return ImmutableList.of(pid);
     }
 
     @Override
     public LdapConfigurationsField performAction() {
+        Configurator configurator = configuratorFactory.getConfigurator();
+        configurator.deleteManagedService(pid.getValue());
+        OperationReport report =
+                configurator.commit("LDAP Configuration deleted for servicePid: {}",
+                        pid.getValue());
+        // TODO: tbatie - 4/3/17 - Add error reporting here
         return serviceCommons.getLdapConfigurations(configuratorFactory);
     }
 }

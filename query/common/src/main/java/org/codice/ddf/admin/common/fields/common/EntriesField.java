@@ -11,19 +11,23 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.security.common.fields.ldap.query;
+package org.codice.ddf.admin.common.fields.common;
 
-import org.codice.ddf.admin.common.fields.base.scalar.StringField;
+import org.codice.ddf.admin.common.fields.base.BaseListField;
 
-public class LdapQueryField extends StringField {
-    public static final String DEFAULT_FIELD_NAME = "query";
+public class EntriesField extends BaseListField<PairField> {
 
-    public static final String FIELD_TYPE_NAME = "LdapQuery";
+    public static final String DEFAULT_FIELD_NAME = "entries";
 
-    public static final String DESCRIPTION =
-            "A Search filters that enables you to define search criteria. Ex: (objectClass=*). LDAP query syntax can be found at: https://msdn.microsoft.com/en-us/library/aa746475(v=vs.85).aspx";
+    public static final String DESCRIPTION = "A list of pairs.";
 
-    public LdapQueryField() {
-        super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
+    public EntriesField() {
+        super(DEFAULT_FIELD_NAME, DESCRIPTION, new PairField());
+    }
+
+    public EntriesField add(String key, String value) {
+        add(new PairField().key(key)
+                .value(value));
+        return this;
     }
 }

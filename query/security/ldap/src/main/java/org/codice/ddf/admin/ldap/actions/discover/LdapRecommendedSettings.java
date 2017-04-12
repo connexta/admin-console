@@ -13,40 +13,67 @@
  **/
 package org.codice.ddf.admin.ldap.actions.discover;
 
-import static org.codice.ddf.admin.ldap.sample.SampleFields.SAMPLE_LDAP_SETTINGS;
-
 import java.util.List;
 
 import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.common.actions.BaseAction;
-import org.codice.ddf.admin.security.common.fields.ldap.LdapConnectionField;
-import org.codice.ddf.admin.security.common.fields.ldap.LdapCredentialsField;
-import org.codice.ddf.admin.security.common.fields.ldap.LdapSettingsField;
+import org.codice.ddf.admin.ldap.actions.commons.LdapConnectionAttempt;
+import org.codice.ddf.admin.ldap.actions.commons.LdapTestingUtils;
+import org.codice.ddf.admin.ldap.actions.commons.ServerGuesser;
+import org.codice.ddf.admin.ldap.fields.connection.LdapBindUserInfo;
+import org.codice.ddf.admin.ldap.fields.connection.LdapConnectionField;
+import org.codice.ddf.admin.ldap.fields.query.LdapRecommendedSettingsField;
+import org.codice.ddf.admin.ldap.fields.query.LdapTypeField;
 
 import com.google.common.collect.ImmutableList;
 
-public class LdapRecommendedSettings extends BaseAction<LdapSettingsField> {
+public class LdapRecommendedSettings extends BaseAction<LdapRecommendedSettingsField> {
 
     public static final String NAME = "recommendedSettings";
 
     public static final String DESCRIPTION =
             "Attempts to retrieve recommended settings from the LDAP connection.";
 
-    private LdapConnectionField connection = new LdapConnectionField();
+    private LdapConnectionField conn;
 
-    private LdapCredentialsField credentials = new LdapCredentialsField();
+    private LdapBindUserInfo creds;
+
+    private LdapTypeField ldapType;
+
+    private LdapTestingUtils utils;
 
     public LdapRecommendedSettings() {
-        super(NAME, DESCRIPTION, new LdapSettingsField());
+        super(NAME, DESCRIPTION, new LdapRecommendedSettingsField());
+        conn = new LdapConnectionField();
+        creds = new LdapBindUserInfo();
+        ldapType = new LdapTypeField();
+        utils = new LdapTestingUtils();
     }
 
     @Override
     public List<Field> getArguments() {
-        return ImmutableList.of(connection, credentials);
+        return ImmutableList.of(conn, creds, ldapType);
     }
 
     @Override
-    public LdapSettingsField performAction() {
-        return SAMPLE_LDAP_SETTINGS;
+    public LdapRecommendedSettingsField performAction() {
+        LdapConnectionAttempt connectionAttempt = utils.bindUserToLdapConnection(conn, creds);
+        addReturnValueMessages(connectionAttempt.messages());
+        if(!connectionAttempt.connection().isPresent()) {
+            return null;
+        }
+
+        ServerGuesser guesser = ServerGuesser.buildGuesser(ldapType.getValue(),
+                connectionAttempt.connection()
+                        .get());
+
+        return new LdapRecommendedSettingsField()
+                .userDns(guesser.getUserBaseChoices())
+                .groupDns(guesser.getGroupBaseChoices())
+                .userNameAttributes(guesser.getUserNameAttribute())
+                .groupObjectClasses(guesser.getGroupObjectClass())
+                .groupAttributesHoldingMember(guesser.getGroupAttributeHoldingMember())
+                .memberAttributesReferencedInGroup(guesser.getMemberAttributeReferencedInGroup())
+                .queryBases(guesser.getBaseContexts());
     }
 }

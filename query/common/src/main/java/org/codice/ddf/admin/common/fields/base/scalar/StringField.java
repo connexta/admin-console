@@ -14,8 +14,8 @@
 package org.codice.ddf.admin.common.fields.base.scalar;
 
 import static org.codice.ddf.admin.api.fields.Field.FieldBaseType.STRING;
+import static org.codice.ddf.admin.common.message.DefaultMessages.emptyFieldError;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.codice.ddf.admin.api.action.Message;
@@ -32,8 +32,17 @@ public class StringField extends BaseScalarField<String> {
 
     @Override
     public List<Message> validate() {
-        // TODO: tbatie - 3/16/17 - Validate scalar fields
-        return new ArrayList<>();
+        List<Message> validationMsgs = super.validate();
+
+        if(!validationMsgs.isEmpty()) {
+            return validationMsgs;
+        }
+
+        if(getValue() != null && getValue().isEmpty()) {
+            validationMsgs.add(emptyFieldError(fieldName()));
+        }
+
+        return validationMsgs;
     }
 
     @Override

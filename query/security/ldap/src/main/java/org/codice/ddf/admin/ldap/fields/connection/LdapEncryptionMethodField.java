@@ -11,7 +11,7 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.security.common.fields.ldap;
+package org.codice.ddf.admin.ldap.fields.connection;
 
 import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.common.fields.base.BaseEnumField;
@@ -28,14 +28,20 @@ public class LdapEncryptionMethodField extends BaseEnumField<String> {
     public static final String DESCRIPTION =
             "All possible encryption methods supported to establish an LDAP connection.";
 
-    public static final LdapEncryptionMethodField NO_ENCRYPTION =
+    public static final String NONE = "none";
+
+    public static final String LDAPS = "ldaps";
+
+    public static final String START_TLS = "startTls";
+
+    public static final LdapEncryptionMethodField NO_ENCRYPTION_FIELD =
             new LdapEncryptionMethodField(new NoEncryption());
 
-    public static final LdapEncryptionMethodField LDAPS_ENCRYPTION = new LdapEncryptionMethodField(
-            new LdapsEncryption());
+    public static final LdapEncryptionMethodField LDAPS_ENCRYPTION_FIELD =
+            new LdapEncryptionMethodField(new LdapsEncryption());
 
-    public static final LdapEncryptionMethodField START_TLS =
-            new LdapEncryptionMethodField(new StartTlsEncryption());
+    public static final LdapEncryptionMethodField START_TLS_FIELD = new LdapEncryptionMethodField(
+            new StartTlsEncryption());
 
     public LdapEncryptionMethodField() {
         this(null);
@@ -52,8 +58,6 @@ public class LdapEncryptionMethodField extends BaseEnumField<String> {
     }
 
     protected static final class NoEncryption extends StringField {
-        public static final String NONE = "none";
-
         public static final String DESCRIPTION = "No encryption enabled for LDAP connection";
 
         public NoEncryption() {
@@ -67,7 +71,6 @@ public class LdapEncryptionMethodField extends BaseEnumField<String> {
     }
 
     protected static final class LdapsEncryption extends StringField {
-        public static final String LDAPS = "ldaps";
 
         public static final String DESCRIPTION = "Secure LDAPS encryption.";
 
@@ -82,8 +85,6 @@ public class LdapEncryptionMethodField extends BaseEnumField<String> {
     }
 
     protected static final class StartTlsEncryption extends StringField {
-        public static final String START_TLS = "startTls";
-
         public static final String DESCRIPTION =
                 "Attempts to upgrade a non encrypted connection to LDAPS.";
 

@@ -22,7 +22,7 @@ public interface Message {
 
     List<String> getPath();
 
-    void addSubpath(String subPath);
+    Message addSubpath(String subPath);
 
     Message copy();
 

@@ -11,7 +11,7 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.security.common.fields.ldap;
+package org.codice.ddf.admin.ldap.fields.connection;
 
 import java.util.List;
 
@@ -54,8 +54,21 @@ public class LdapConnectionField extends BaseObjectField {
     }
 
     public LdapConnectionField encryptionMethod(String encryptionMethod) {
+        // TODO: tbatie - 4/2/17 - Make a method for matching the enum value like in the auth types once that is pushed
         this.encryptionMethod.setValue(encryptionMethod);
         return this;
+    }
+
+    public String hostname() {
+        return hostname.getValue();
+    }
+
+    public int port() {
+        return port.getValue();
+    }
+
+    public String encryptionMethod(){
+        return encryptionMethod.getValue();
     }
 
     @Override

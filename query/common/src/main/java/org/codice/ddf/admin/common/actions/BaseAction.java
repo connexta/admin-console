@@ -14,6 +14,7 @@
 package org.codice.ddf.admin.common.actions;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import org.codice.ddf.admin.api.action.Action;
@@ -80,6 +81,10 @@ public abstract class BaseAction<T extends Field> implements Action<T> {
         return report;
     }
 
+    protected boolean containsErrorMsgs() {
+        return report.containsErrorMsgs();
+    }
+
     protected BaseAction addArgumentMessage(Message msg) {
         Message copy = msg.copy();
         copy.addSubpath(name);
@@ -92,6 +97,16 @@ public abstract class BaseAction<T extends Field> implements Action<T> {
         Message copy = msg.copy();
         copy.addSubpath(name);
         report.addMessage(copy);
+        return this;
+    }
+
+    protected BaseAction addArgumentMessages(List<Message> msgs) {
+        msgs.forEach(msg -> addArgumentMessage(msg));
+        return this;
+    }
+
+    protected BaseAction addReturnValueMessages(List<Message> msgs) {
+        msgs.forEach(msg -> addReturnValueMessage(msg));
         return this;
     }
 

@@ -18,6 +18,7 @@ import static org.codice.ddf.admin.api.fields.Field.FieldBaseType.ENUM;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.api.action.Message;
 import org.codice.ddf.admin.api.fields.EnumField;
@@ -54,6 +55,7 @@ public abstract class BaseEnumField<S> extends BaseField<S> implements EnumField
     @Override
     public void setValue(S value) {
         if (value == null) {
+            enumValue.setValue(null);
             return;
         }
 
@@ -65,13 +67,24 @@ public abstract class BaseEnumField<S> extends BaseField<S> implements EnumField
         if (matchedEnum.isPresent()) {
             enumValue = matchedEnum.get();
         } else {
-            // TODO: tbatie - 3/15/17 - Add logger and throw exception or something here
+            List<String> supportedValues = getEnumValues().stream()
+                    .map(supportedEnum -> supportedEnum.getValue().toString())
+                    .collect(Collectors.toList());
+            throw new RuntimeException(String.join("Unknown enum value [%s]. Supported enum values are: [%s]", value.toString(), String.join(",", supportedValues)));
         }
     }
 
     @Override
     public List<Message> validate() {
-        // TODO: tbatie - 3/30/17 - Validate BaseEnumField
-        return new ArrayList<>();
+        List<Message> validationMsgs = super.validate();
+        if(!validationMsgs.isEmpty()) {
+            return validationMsgs;
+        }
+
+        if(getValue() != null) {
+            validationMsgs.addAll(enumValue.validate());
+        }
+
+        return validationMsgs;
     }
 }

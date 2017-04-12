@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -110,22 +111,25 @@ public class GraphQLServletImpl extends GraphQLServlet {
         result.put("data", data);
 
         if (msgs != null && !msgs.isEmpty()) {
+            List<GraphQLError> graphQLJavaErrors = msgs.stream().filter(msg -> !ActionGraphQLError.class.isInstance(msg)).collect(
+                    Collectors.toList());
+
             List<Message> actionMsgs = msgs.stream()
                     .filter(ActionGraphQLError.class::isInstance)
                     .map(ActionGraphQLError.class::cast)
                     .map(ActionGraphQLError::getActionMessage)
                     .collect(Collectors.toList());
 
-            List<Message> warnings = actionMsgs.stream()
+            List<Message> actionWarnings = actionMsgs.stream()
                     .filter(error -> error.getType() == Message.MessageType.WARNING)
                     .collect(Collectors.toList());
 
-            List<Message> errors = actionMsgs.stream()
+            List<Message> actionErrors = actionMsgs.stream()
                     .filter(error -> error.getType() == Message.MessageType.ERROR)
                     .collect(Collectors.toList());
 
-            result.put("errors", errors);
-            result.put("warnings", warnings);
+            result.put("errors", Stream.concat(graphQLJavaErrors.stream(), actionErrors.stream()).collect(Collectors.toList()));
+            result.put("warnings", actionWarnings);
         }
 
         return result;

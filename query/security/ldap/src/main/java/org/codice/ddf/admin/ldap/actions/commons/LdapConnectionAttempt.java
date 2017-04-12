@@ -11,32 +11,40 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.api.fields;
+package org.codice.ddf.admin.ldap.actions.commons;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.codice.ddf.admin.api.action.Message;
+import org.forgerock.opendj.ldap.Connection;
 
-public interface Field<T> {
-    String fieldName();
+public class LdapConnectionAttempt {
 
-    String fieldTypeName();
+    private List<Message> msgs;
+    private Optional<Connection> connection;
 
-    FieldBaseType fieldBaseType();
+    public LdapConnectionAttempt() {
+        this.msgs = new ArrayList<>();
+        connection = Optional.empty();
+    }
 
-    String description();
+    public LdapConnectionAttempt(Message msg) {
+        this();
+        msgs.add(msg);
+    }
 
-    T getValue();
+    public LdapConnectionAttempt(Connection connection) {
+        this();
+        this.connection = Optional.of(connection);
+    }
 
-    void setValue(T value);
+    public List<Message> messages() {
+        return msgs;
+    }
 
-    List<Message> validate();
-
-    boolean isRequired();
-
-    Field<T> isRequired(boolean required);
-
-    enum FieldBaseType {
-        STRING, INTEGER, FLOAT, BOOLEAN, LIST, OBJECT, ENUM, UNION
+    public Optional<Connection> connection() {
+        return connection;
     }
 }

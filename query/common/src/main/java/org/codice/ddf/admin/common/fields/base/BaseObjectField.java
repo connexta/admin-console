@@ -16,9 +16,11 @@ package org.codice.ddf.admin.common.fields.base;
 import static org.codice.ddf.admin.api.fields.Field.FieldBaseType.OBJECT;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.api.action.Message;
 import org.codice.ddf.admin.api.fields.ObjectField;
@@ -51,8 +53,19 @@ public abstract class BaseObjectField extends BaseField<Map<String, Object>>
 
     @Override
     public List<Message> validate() {
-        // TODO: tbatie - 3/16/17 - Validate object fields
-        return new ArrayList<>();
+        List<Message> validationErrors = super.validate();
+
+        if(!validationErrors.isEmpty()) {
+            return validationErrors;
+        }
+
+
+        validationErrors.addAll(getFields().stream().map(field -> (List<Message>)field.validate())
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList()));
+
+        validationErrors.forEach(msg -> msg.addSubpath(fieldName()));
+        return validationErrors;
     }
 
     @Override

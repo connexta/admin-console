@@ -13,6 +13,12 @@
  **/
 package org.codice.ddf.admin.common.fields.base;
 
+import static org.codice.ddf.admin.common.message.DefaultMessages.missingRequiredFieldError;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.codice.ddf.admin.api.action.Message;
 import org.codice.ddf.admin.api.fields.Field;
 
 public abstract class BaseField<T> implements Field<T> {
@@ -65,5 +71,16 @@ public abstract class BaseField<T> implements Field<T> {
     public BaseField<T> isRequired(boolean required) {
         isRequired = required;
         return this;
+    }
+
+    @Override
+    public List<Message> validate() {
+        List<Message> errors = new ArrayList<>();
+
+        if(isRequired() && getValue() == null) {
+            errors.add(missingRequiredFieldError(fieldName()));
+        }
+
+        return errors;
     }
 }

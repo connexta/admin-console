@@ -59,11 +59,6 @@ public class CswSourceConfigurationField extends SourceConfigUnionField {
     }
 
     @Override
-    public List<Message> validate() {
-        return Arrays.asList(new ErrorMessage("CSW_SRC_CONFIG_FIELD_ERROR", fieldName()));
-    }
-
-    @Override
     public CswSourceConfigurationField allFieldsRequired(boolean required) {
         super.allFieldsRequired(required);
         return this;

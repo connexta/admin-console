@@ -11,7 +11,7 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.security.common.fields.ldap;
+package org.codice.ddf.admin.ldap.fields.connection;
 
 import java.util.List;
 
@@ -21,13 +21,13 @@ import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 
 import com.google.common.collect.ImmutableList;
 
-public class LdapCredentialsField extends BaseObjectField {
-    public static final String FIELD_NAME = "credentials";
+public class LdapBindUserInfo extends BaseObjectField {
+    public static final String FIELD_NAME = "bindInfo";
 
-    public static final String FIELD_TYPE_NAME = "LdapCredentials";
+    public static final String FIELD_TYPE_NAME = "BindUserInfo";
 
     public static final String DESCRIPTION =
-            "Contains the required credentials to bind a user to an LDAP connection.";
+            "Contains the required information to bind a user to an LDAP connection.";
 
     public static final String USERNAME = "username";
 
@@ -37,24 +37,59 @@ public class LdapCredentialsField extends BaseObjectField {
 
     private StringField password;
 
-    public LdapCredentialsField() {
+    private LdapBindMethod bindMethod;
+
+    private LdapRealm realm;
+
+    public LdapBindUserInfo() {
         super(FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
         this.username = new StringField(USERNAME);
         this.password = new StringField(PASSWORD);
+        this.bindMethod = new LdapBindMethod();
+        this.realm = new LdapRealm();
     }
 
-    public LdapCredentialsField username(String username) {
+    public LdapBindUserInfo username(String username) {
         this.username.setValue(username);
         return this;
     }
 
-    public LdapCredentialsField password(String password) {
+    public LdapBindUserInfo password(String password) {
         this.password.setValue(password);
         return this;
     }
 
+    public LdapBindUserInfo bindMethod(String bindMethod) {
+        // TODO: tbatie - 4/2/17 - Match the bind method to a specific type
+        this.bindMethod.setValue(bindMethod);
+        return this;
+    }
+
+    public LdapBindUserInfo realm(String realm) {
+        // TODO: tbatie - 4/2/17 - Match the bind method to a specific type
+        this.realm.setValue(realm);
+        return this;
+    }
+
+
+    public String username() {
+        return username.getValue();
+    }
+
+    public String password() {
+        return password.getValue();
+    }
+
+    public String bindMethod() {
+        return bindMethod.getValue();
+    }
+
+    public String realm() {
+        return realm.getValue();
+    }
+
     @Override
     public List<Field> getFields() {
-        return ImmutableList.of(username, password);
+        return ImmutableList.of(username, password, bindMethod, realm);
     }
 }

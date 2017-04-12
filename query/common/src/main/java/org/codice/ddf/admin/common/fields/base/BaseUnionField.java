@@ -48,10 +48,4 @@ public abstract class BaseUnionField extends BaseObjectField implements UnionFie
     public List<ObjectField> getUnionTypes() {
         return unionTypes;
     }
-
-    @Override
-    public List<Message> validate() {
-        // TODO: tbatie - 3/16/17 - Validate union fields
-        return new ArrayList<>();
-    }
 }

@@ -11,24 +11,23 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.security.common.fields.ldap.query;
+package org.codice.ddf.admin.common.message;
 
-import org.codice.ddf.admin.common.fields.base.scalar.StringField;
+public class DefaultMessages {
 
-public class LdapAttributeField extends StringField {
-
-    public static final String DEFAULT_FIELD_NAME = "setEnumValue";
-
-    public static final String FIELD_TYPE_NAME = "LdapEntryAttribute";
-
-    public static final String DESCRIPTION = "A particular setEnumValue an LDAP entry contains.";
-
-    public LdapAttributeField() {
-        super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
+    public static ErrorMessage invalidPortRangeError(String pathOrigin) {
+        return new ErrorMessage("INVALID_PORT_RANGE", pathOrigin);
     }
 
-    @Override
-    public void setValue(String attribute) {
-        super.setValue(attribute);
+    public static ErrorMessage missingRequiredFieldError(String pathOrigin) {
+        return new ErrorMessage("MISSING_REQUIRED_FIELD", pathOrigin);
+    }
+
+    public static ErrorMessage emptyFieldError(String pathOrigin) {
+        return new ErrorMessage("EMPTY_FIELD", pathOrigin);
+    }
+
+    public static ErrorMessage invalidHostnameError(String pathOrigin) {
+        return new ErrorMessage("INVALID_HOSTNAME", pathOrigin);
     }
 }

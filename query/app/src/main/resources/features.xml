@@ -55,6 +55,7 @@
     <feature name="admin-beta-ldap" install="manual" version="${project.version}"
              description="DDF Admin Security (Beta) :: LDAP Handler">
         <feature prerequisite="true">admin-beta-core</feature>
+        <feature prerequisite="true">admin-beta-temp-configurator</feature>
         <bundle>mvn:org.codice.ddf.admin.beta/admin-query-ldap/${project.version}</bundle>
     </feature>
 

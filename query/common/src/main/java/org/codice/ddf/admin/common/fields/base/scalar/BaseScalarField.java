@@ -13,10 +13,6 @@
  **/
 package org.codice.ddf.admin.common.fields.base.scalar;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.codice.ddf.admin.api.action.Message;
 import org.codice.ddf.admin.common.fields.base.BaseField;
 
 public abstract class BaseScalarField<T> extends BaseField<T> {

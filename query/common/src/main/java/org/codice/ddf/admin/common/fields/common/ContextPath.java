@@ -13,6 +13,12 @@
  **/
 package org.codice.ddf.admin.common.fields.common;
 
+import static org.codice.ddf.admin.common.message.DefaultMessages.invalidContextPathError;
+
+import java.util.List;
+
+import org.apache.commons.validator.UrlValidator;
+import org.codice.ddf.admin.api.action.Message;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 
 public class ContextPath extends StringField {
@@ -22,14 +28,47 @@ public class ContextPath extends StringField {
     public static final String FIELD_TYPE_NAME = "ContextPath";
 
     public static final String DESCRIPTION =
-            "The context path is the prefix of a URL path that is used to select the context(s) to which an incoming request is passed. For example, http://hostname.com/<contextPath>.";
+            "The context path is the suffix of a URL path that is used to select the context(s) to which an incoming request is passed. For example, http://hostname.com/<contextPath>.";
 
     public ContextPath() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
     }
 
+    public ContextPath(String path) {
+        this();
+        setValue(path);
+    }
+
     @Override
     public void setValue(String value) {
         super.setValue(value);
+    }
+
+    @Override
+    public List<Message> validate() {
+        List<Message> msgs = super.validate();
+        if (!msgs.isEmpty()) {
+            return msgs;
+        } else if (isRequired()) {
+            final UriPathValidator validator = new UriPathValidator();
+            if (!validator.isValidPath(getValue())) {
+                msgs.add(invalidContextPathError(fieldName()));
+            }
+        }
+
+        return msgs;
+    }
+
+    @Override
+    public ContextPath isRequired(boolean required) {
+        super.isRequired(required);
+        return this;
+    }
+
+    private static class UriPathValidator extends UrlValidator {
+        @Override
+        protected boolean isValidPath(String path) {
+            return super.isValidPath(path);
+        }
     }
 }

@@ -48,7 +48,13 @@
              description="DDF Admin Security (Beta)">
         <feature prerequisite="true">admin-beta-core</feature>
         <feature>admin-beta-ldap</feature>
+        <feature>admin-beta-wcpm</feature>
         <bundle>mvn:org.codice.ddf.admin.beta/admin-query-sts/${project.version}</bundle>
+    </feature>
+
+    <feature name="admin-beta-wcpm" install="manual" version="${project.version}"
+             description="DDF Admin Web Context Policy Manager (Beta)">
+        <feature prerequisite="true">admin-beta-core</feature>
         <bundle>mvn:org.codice.ddf.admin.beta/admin-query-wcpm/${project.version}</bundle>
     </feature>
 

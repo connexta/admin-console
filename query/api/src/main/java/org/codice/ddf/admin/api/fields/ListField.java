@@ -22,6 +22,8 @@ public interface ListField<T extends Field> extends Field<List> {
 
     ListField<T> add(T field);
 
+    ListField addAll(List<T> fields);
+
     ListField<T> isRequiredNonEmpty(boolean required);
 
     boolean isRequiredNonEmpty();

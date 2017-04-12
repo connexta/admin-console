@@ -13,10 +13,14 @@
  **/
 package org.codice.ddf.admin.security.wcpm.actions.discover;
 
-import static org.codice.ddf.admin.security.wcpm.sample.SampleFields.SAMPLE_CONTEXT_PATHS;
+import java.util.List;
 
 import org.codice.ddf.admin.common.actions.GetAction;
+import org.codice.ddf.admin.common.fields.common.ContextPath;
 import org.codice.ddf.admin.common.fields.common.ContextPaths;
+import org.codice.ddf.admin.configurator.Configurator;
+import org.codice.ddf.security.policy.context.ContextPolicyManager;
+import org.codice.ddf.security.policy.context.impl.PolicyManager;
 
 public class GetWhiteListContexts extends GetAction<ContextPaths> {
 
@@ -25,12 +29,26 @@ public class GetWhiteListContexts extends GetAction<ContextPaths> {
     public static final String DESCRIPTION =
             "Returns all white listed contexts. Any contexts that are white listed have no security policy applied to them.";
 
-    public GetWhiteListContexts() {
+    private Configurator configurator;
+
+    public GetWhiteListContexts(Configurator configurator) {
         super(DEFAULT_FIELD_NAME, DESCRIPTION, new ContextPaths());
+        this.configurator = configurator;
+
     }
 
     @Override
     public ContextPaths performAction() {
-        return SAMPLE_CONTEXT_PATHS;
+        ContextPolicyManager ref = configurator.getServiceReference(ContextPolicyManager.class);
+        PolicyManager policyManager = ((PolicyManager) ref);
+        List<String> whiteListStrs = policyManager.getWhiteListContexts();
+
+        ContextPaths whiteListedField = new ContextPaths();
+        for (String whiteListStr : whiteListStrs) {
+            ContextPath newContextPath = new ContextPath();
+            newContextPath.setValue(whiteListStr);
+            whiteListedField.add(newContextPath);
+        }
+        return whiteListedField;
     }
 }

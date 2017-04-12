@@ -17,12 +17,13 @@ import java.util.List;
 
 import org.codice.ddf.admin.api.action.Action;
 import org.codice.ddf.admin.common.actions.BaseActionCreator;
+import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.security.wcpm.actions.discover.GetAuthTypes;
 import org.codice.ddf.admin.security.wcpm.actions.discover.GetContextPolicies;
 import org.codice.ddf.admin.security.wcpm.actions.discover.GetRealms;
 import org.codice.ddf.admin.security.wcpm.actions.discover.GetWhiteListContexts;
 import org.codice.ddf.admin.security.wcpm.actions.persist.SaveContextPolices;
-import org.codice.ddf.admin.security.wcpm.actions.persist.SaveWhitelistedContexts;
+import org.codice.ddf.admin.security.wcpm.actions.persist.SaveWhitelistContexts;
 
 import com.google.common.collect.ImmutableList;
 
@@ -33,20 +34,24 @@ public class WcpmActionCreator extends BaseActionCreator {
 
     public static final String DESCRIPTION = "Manages policies for the system's endpoints";
 
-    public WcpmActionCreator() {
+    private ConfiguratorFactory configuratorFactory;
+
+    public WcpmActionCreator(ConfiguratorFactory configuratorFactory) {
         super(NAME, TYPE_NAME, DESCRIPTION);
+        this.configuratorFactory = configuratorFactory;
     }
 
     @Override
     public List<Action> getDiscoveryActions() {
-        return ImmutableList.of(new GetAuthTypes(),
+        return ImmutableList.of(new GetAuthTypes(configuratorFactory.getConfigurator()),
                 new GetRealms(),
-                new GetWhiteListContexts(),
-                new GetContextPolicies());
+                new GetWhiteListContexts(configuratorFactory.getConfigurator()),
+                new GetContextPolicies(configuratorFactory.getConfigurator()));
     }
 
     @Override
     public List<Action> getPersistActions() {
-        return ImmutableList.of(new SaveContextPolices(), new SaveWhitelistedContexts());
+        return ImmutableList.of(new SaveContextPolices(configuratorFactory.getConfigurator()),
+                new SaveWhitelistContexts(configuratorFactory.getConfigurator()));
     }
 }

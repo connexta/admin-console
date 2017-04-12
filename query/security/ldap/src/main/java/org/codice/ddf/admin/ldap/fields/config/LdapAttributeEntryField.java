@@ -15,7 +15,6 @@ package org.codice.ddf.admin.ldap.fields.config;
 
 import java.util.List;
 
-import org.codice.ddf.admin.api.action.Message;
 import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
@@ -66,5 +65,11 @@ public class LdapAttributeEntryField extends BaseObjectField {
     @Override
     public List<Field> getFields() {
         return ImmutableList.of(stsClaim, userAttribute);
+    }
+
+    @Override
+    public LdapAttributeEntryField allFieldsRequired(boolean required) {
+        super.allFieldsRequired(required);
+        return this;
     }
 }

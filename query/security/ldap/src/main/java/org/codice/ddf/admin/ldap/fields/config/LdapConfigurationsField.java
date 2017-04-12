@@ -24,7 +24,11 @@ public class LdapConfigurationsField extends BaseListField<LdapConfigurationFiel
     public static final String DESCRIPTION = "A list of LDAP configurations.";
 
     public LdapConfigurationsField() {
-        super(DEFAULT_FIELD_NAME, DESCRIPTION, new LdapConfigurationField());
+        super(DEFAULT_FIELD_NAME, DESCRIPTION, new LdapConfigurationField().allFieldsRequired(true));
+    }
+
+    public LdapConfigurationsField(LdapConfigurationField listFieldType) {
+        super(DEFAULT_FIELD_NAME, DESCRIPTION, listFieldType);
     }
 
     @Override

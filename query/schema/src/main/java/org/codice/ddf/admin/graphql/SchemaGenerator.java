@@ -39,7 +39,7 @@ public class SchemaGenerator {
                 new ConnectionActionCreator(),
                 new LdapActionCreator(new ConfiguratorFactoryImpl()),
                 new SourceActionCreator(),
-                new WcpmActionCreator());
+                new WcpmActionCreator(new ConfiguratorFactoryImpl()));
 
         servlet.setActionCreators(GRAPHQL_PROVIDERS);
         String schemaResult = servlet.executeQuery(IntrospectionQuery.INTROSPECTION_QUERY);

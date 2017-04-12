@@ -15,19 +15,51 @@ package org.codice.ddf.admin.common.message;
 
 public class DefaultMessages {
 
+    public static final String MISSING_REQUIRED_FIELD = "MISSING_REQUIRED_FIELD";
+
+    public static final String EMPTY_FIELD = "EMPTY_FIELD";
+
+    public static final String INVALID_FIELD = "INVALID_FIELD";
+
+    public static final String INVALID_PORT_RANGE = "INVALID_PORT_RANGE";
+
+    public static final String INVALID_HOSTNAME = "INVALID_HOSTNAME";
+
+    public static final String INVALID_CONTEXT_PATH = "INVALID_CONTEXT_PATH";
+
+    public static final String NO_ROOT_CONTEXT = "NO_ROOT_CONTEXT";
+
+    public static final String FAILED_PERSIST = "FAILED_PERSIST";
+
+    public static ErrorMessage noRootContextError(String pathOrigin) {
+        return new ErrorMessage(NO_ROOT_CONTEXT, pathOrigin);
+    }
+
+    public static ErrorMessage failedPersistError(String pathOrigin) {
+        return new ErrorMessage(FAILED_PERSIST, pathOrigin);
+    }
+
+    public static ErrorMessage invalidFieldError(String pathOrigin) {
+        return new ErrorMessage(INVALID_FIELD, pathOrigin);
+    }
+
+    public static ErrorMessage invalidContextPathError(String pathOrigin) {
+        return new ErrorMessage(INVALID_CONTEXT_PATH, pathOrigin);
+    }
+
     public static ErrorMessage invalidPortRangeError(String pathOrigin) {
-        return new ErrorMessage("INVALID_PORT_RANGE", pathOrigin);
+        return new ErrorMessage(INVALID_PORT_RANGE, pathOrigin);
     }
 
     public static ErrorMessage missingRequiredFieldError(String pathOrigin) {
-        return new ErrorMessage("MISSING_REQUIRED_FIELD", pathOrigin);
+        return new ErrorMessage(MISSING_REQUIRED_FIELD, pathOrigin);
     }
 
     public static ErrorMessage emptyFieldError(String pathOrigin) {
-        return new ErrorMessage("EMPTY_FIELD", pathOrigin);
+        return new ErrorMessage(EMPTY_FIELD, pathOrigin);
     }
 
     public static ErrorMessage invalidHostnameError(String pathOrigin) {
-        return new ErrorMessage("INVALID_HOSTNAME", pathOrigin);
+        return new ErrorMessage(INVALID_HOSTNAME, pathOrigin);
     }
 }

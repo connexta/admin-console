@@ -26,7 +26,7 @@ public class LdapAttributeMappingField extends BaseListField<LdapAttributeEntryF
             "A map containing STS claims to user attributes. Only 1 sts claim is allowed to be mapped to a single user setEnumValue.";
 
     public LdapAttributeMappingField() {
-        super(DEFAULT_FIELD_NAME, DESCRIPTION, new LdapAttributeEntryField());
+        super(DEFAULT_FIELD_NAME, DESCRIPTION, new LdapAttributeEntryField().allFieldsRequired(true));
     }
 
     public LdapAttributeMappingField add(String stsClaim, String userAttribute) {

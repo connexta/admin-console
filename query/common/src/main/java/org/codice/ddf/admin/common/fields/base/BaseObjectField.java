@@ -15,7 +15,6 @@ package org.codice.ddf.admin.common.fields.base;
 
 import static org.codice.ddf.admin.api.fields.Field.FieldBaseType.OBJECT;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -55,12 +54,12 @@ public abstract class BaseObjectField extends BaseField<Map<String, Object>>
     public List<Message> validate() {
         List<Message> validationErrors = super.validate();
 
-        if(!validationErrors.isEmpty()) {
+        if (!validationErrors.isEmpty()) {
             return validationErrors;
         }
 
-
-        validationErrors.addAll(getFields().stream().map(field -> (List<Message>)field.validate())
+        validationErrors.addAll(getFields().stream()
+                .map(field -> (List<Message>) field.validate())
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList()));
 
@@ -70,7 +69,7 @@ public abstract class BaseObjectField extends BaseField<Map<String, Object>>
 
     @Override
     public BaseObjectField allFieldsRequired(boolean required) {
-        if(required) {
+        if (required) {
             isRequired(required);
         }
 
@@ -84,12 +83,13 @@ public abstract class BaseObjectField extends BaseField<Map<String, Object>>
 
     @Override
     public BaseObjectField innerFieldRequired(boolean required, String fieldName) {
-        if(required) {
-            isRequired(required);
+        if (required) {
+            isRequired(true);
         }
 
         getFields().stream()
-                .filter(field -> field.fieldName().equals(fieldName))
+                .filter(field -> field.fieldName()
+                        .equals(fieldName))
                 .forEach(field -> field.isRequired(required));
 
         getFields().stream()

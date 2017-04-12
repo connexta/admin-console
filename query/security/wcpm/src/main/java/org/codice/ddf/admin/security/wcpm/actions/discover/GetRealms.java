@@ -13,9 +13,8 @@
  **/
 package org.codice.ddf.admin.security.wcpm.actions.discover;
 
-import static org.codice.ddf.admin.security.wcpm.sample.SampleFields.SAMPLE_REALM_LIST;
-
 import org.codice.ddf.admin.common.actions.GetAction;
+import org.codice.ddf.admin.security.common.fields.wcpm.Realm;
 import org.codice.ddf.admin.security.common.fields.wcpm.RealmList;
 
 public class GetRealms extends GetAction<RealmList> {
@@ -30,6 +29,22 @@ public class GetRealms extends GetAction<RealmList> {
 
     @Override
     public RealmList performAction() {
-        return SAMPLE_REALM_LIST;
+        // TODO: 3/31/17 Make reference to the ldap action creator once it is implemented clear.
+        // Implement idp
+        /**
+
+
+         if (ldapConfigHandler == null
+         || ((List<LdapConfiguration>) ldapConfigHandler.getConfigurations()).stream()
+         .anyMatch(config -> config.ldapUseCase()
+         .equals(AUTHENTICATION) || config.ldapUseCase()
+         .equals(AUTHENTICATION_AND_ATTRIBUTE_STORE))) {
+         realms.add(LDAP);
+         }
+
+         return realms;
+         */
+        return new RealmList().add(Realm.KARAF_REALM)
+                .add(Realm.LDAP_REALM);
     }
 }

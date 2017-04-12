@@ -27,4 +27,10 @@ public class MessageCodeField extends StringField {
     public MessageCodeField() {
         super(FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
     }
+
+    @Override
+    public MessageCodeField isRequired(boolean required) {
+        super.isRequired(required);
+        return this;
+    }
 }

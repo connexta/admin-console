@@ -22,7 +22,7 @@ public class ContextPaths extends BaseListField<ContextPath> {
     public static final String DESCRIPTION = "A list of context paths.";
 
     public ContextPaths() {
-        super(DEFAULT_FIELD_NAME, DESCRIPTION, new ContextPath());
+        super(DEFAULT_FIELD_NAME, DESCRIPTION, new ContextPath().isRequired(true));
     }
 
     @Override

@@ -28,6 +28,7 @@ import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.CANNOT_CON
 import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.SUCCESSFUL_BIND;
 import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.toDescriptionMap;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -42,11 +43,15 @@ import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.Filter;
 import org.forgerock.opendj.ldap.SearchScope;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 public class AttributeMappingTestMethod extends TestMethod<LdapConfiguration> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AttributeMappingTestMethod.class);
+
     public static final String DESCRIPTION =
             "Verifies that sts mapping values are valid and exist.";
 
@@ -106,18 +111,18 @@ public class AttributeMappingTestMethod extends TestMethod<LdapConfiguration> {
         // user entries that have each of the mapped attributes. If at least one is found for
         // each attribute, that is a success condition; else, it is a warning that should be
         // reported to the user.
-        LdapTestingCommons.LdapConnectionAttempt connectionAttempt =
-                ldapTestingCommons.bindUserToLdapConnection(configuration);
+        try (LdapTestingCommons.LdapConnectionAttempt connectionAttempt = ldapTestingCommons.bindUserToLdapConnection(
+                configuration)) {
 
-        if (connectionAttempt.result() != SUCCESSFUL_BIND) {
-            return createReport(SUCCESS_TYPES,
-                    FAILURE_TYPES,
-                    Collections.emptyMap(),
-                    Collections.singletonList(connectionAttempt.result()
-                            .name()));
-        }
+            if (connectionAttempt.result() != SUCCESSFUL_BIND) {
+                return createReport(SUCCESS_TYPES,
+                        FAILURE_TYPES,
+                        Collections.emptyMap(),
+                        Collections.singletonList(connectionAttempt.result()
+                                .name()));
+            }
 
-        try (Connection ldapConnection = connectionAttempt.connection()) {
+            Connection ldapConnection = connectionAttempt.connection();
             Optional<String> unknownAttribute = configuration.attributeMappings()
                     .values()
                     .stream()
@@ -129,6 +134,8 @@ public class AttributeMappingTestMethod extends TestMethod<LdapConfiguration> {
                         "No user found with attribute [%s].",
                         unknownAttribute.get()), ATTRIBUTE_MAPPINGS));
             }
+        } catch (IOException e) {
+            LOGGER.debug("Unexpected error closing connection", e);
         }
 
         return new Report(buildMessage(SUCCESS_TYPES, FAILURE_TYPES, null, SUCCESSFUL_TEST));

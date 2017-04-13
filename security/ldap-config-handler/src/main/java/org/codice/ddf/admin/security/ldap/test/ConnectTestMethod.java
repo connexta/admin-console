@@ -22,6 +22,7 @@ import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.CANNOT_CON
 import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.SUCCESSFUL_CONNECTION;
 import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.toDescriptionMap;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -63,18 +64,18 @@ public class ConnectTestMethod extends TestMethod<LdapConfiguration> {
 
     @Override
     public Report test(LdapConfiguration configuration) {
-        LdapTestingCommons.LdapConnectionAttempt connectionAttempt =
-                ldapTestingCommons.getLdapConnection(configuration);
-        if (connectionAttempt.connection() != null) {
-            connectionAttempt.connection()
-                    .close();
+        String result;
+        try (LdapTestingCommons.LdapConnectionAttempt connectionAttempt = ldapTestingCommons.getLdapConnection(
+                configuration)) {
+            result = connectionAttempt.result()
+                    .name();
+        } catch (IOException e) {
+            result = "Failure connecting";
         }
-
         return Report.createReport(SUCCESS_TYPES,
                 FAILURE_TYPES,
                 null,
-                Collections.singletonList(connectionAttempt.result()
-                        .name()));
+                Collections.singletonList(result));
     }
 
 }

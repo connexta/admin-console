@@ -32,6 +32,7 @@ import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.CANNOT_CON
 import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.SUCCESSFUL_BIND;
 import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.toDescriptionMap;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -49,11 +50,15 @@ import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.ByteString;
 import org.forgerock.opendj.ldap.SearchScope;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 public class LdapQueryProbe extends ProbeMethod<LdapConfiguration> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(LdapQueryProbe.class);
+
     private static final String LDAP_QUERY_ID = "query";
 
     private static final String DESCRIPTION =
@@ -102,44 +107,48 @@ public class LdapQueryProbe extends ProbeMethod<LdapConfiguration> {
     @Override
     public ProbeReport probe(LdapConfiguration configuration) {
         ProbeReport probeReport = new ProbeReport();
-        LdapTestingCommons.LdapConnectionAttempt connectionAttempt =
-                ldapTestingCommons.bindUserToLdapConnection(configuration);
-
-        if (connectionAttempt.result() != SUCCESSFUL_BIND) {
-            return createProbeReport(SUCCESS_TYPES,
-                    FAILURE_TYPES,
-                    null,
-                    Collections.singletonList(connectionAttempt.result()
-                            .name()));
-        }
-
-        List<SearchResultEntry> searchResults = ldapTestingCommons.getLdapQueryResults(
-                connectionAttempt.connection(),
-                configuration.queryBase(),
-                configuration.query(),
-                SearchScope.WHOLE_SUBTREE,
-                MAX_QUERY_RESULTS);
         List<Map<String, String>> convertedSearchResults = new ArrayList<>();
+        try (LdapTestingCommons.LdapConnectionAttempt connectionAttempt =
+                ldapTestingCommons.bindUserToLdapConnection(configuration)) {
 
-        for (SearchResultEntry entry : searchResults) {
-            Map<String, String> entryMap = new HashMap<>();
-            for (Attribute attri : entry.getAllAttributes()) {
-                entryMap.put("name",
-                        entry.getName()
-                                .toString());
-                if (!attri.getAttributeDescriptionAsString()
-                        .toLowerCase()
-                        .contains("password")) {
-                    List<String> attributeValueList = attri.parallelStream()
-                            .map(ByteString::toString)
-                            .collect(Collectors.toList());
-                    String attributeValue = attributeValueList.size() == 1 ? attributeValueList.get(
-                            0) : attributeValueList.toString();
-                    entryMap.put(attri.getAttributeDescriptionAsString(), attributeValue);
-                }
+            if (connectionAttempt.result() != SUCCESSFUL_BIND) {
+                return createProbeReport(SUCCESS_TYPES,
+                        FAILURE_TYPES,
+                        null,
+                        Collections.singletonList(connectionAttempt.result()
+                                .name()));
             }
-            convertedSearchResults.add(entryMap);
+
+            List<SearchResultEntry> searchResults = ldapTestingCommons.getLdapQueryResults(
+                    connectionAttempt.connection(),
+                    configuration.queryBase(),
+                    configuration.query(),
+                    SearchScope.WHOLE_SUBTREE,
+                    MAX_QUERY_RESULTS);
+
+            for (SearchResultEntry entry : searchResults) {
+                Map<String, String> entryMap = new HashMap<>();
+                for (Attribute attri : entry.getAllAttributes()) {
+                    entryMap.put("name",
+                            entry.getName()
+                                    .toString());
+                    if (!attri.getAttributeDescriptionAsString()
+                            .toLowerCase()
+                            .contains("password")) {
+                        List<String> attributeValueList = attri.parallelStream()
+                                .map(ByteString::toString)
+                                .collect(Collectors.toList());
+                        String attributeValue = attributeValueList.size() == 1 ? attributeValueList.get(
+                                0) : attributeValueList.toString();
+                        entryMap.put(attri.getAttributeDescriptionAsString(), attributeValue);
+                    }
+                }
+                convertedSearchResults.add(entryMap);
+            }
+        } catch (IOException e) {
+            LOGGER.debug("Unexpected error closing connection", e);
         }
+
 
         return probeReport.probeResult(LDAP_QUERY_RESULTS, convertedSearchResults);
     }

@@ -2,6 +2,7 @@ package org.codice.ddf.admin.api.validation
 
 import org.codice.ddf.admin.api.config.sources.SourceConfiguration
 import org.codice.ddf.admin.api.handler.ConfigurationMessage
+import org.codice.ddf.admin.configurator.ConfigReader
 import org.codice.ddf.admin.configurator.Configurator
 import spock.lang.Specification
 
@@ -20,7 +21,7 @@ class SourceValidationUtilsTest extends Specification {
     def sourceValidationUtils
 
     def setup() {
-        configurator = mockConfigurator(EXISTING_SOURCE_NAME)
+        configurator = mockConfigReader(EXISTING_SOURCE_NAME)
         sourceValidationUtils = new SourceValidationUtils()
     }
 
@@ -56,7 +57,7 @@ class SourceValidationUtilsTest extends Specification {
 
     def 'test validateSourceName(String, String, Configurator) with invalid existing config id property'() {
         when:
-        configurator = mockConfigurator(true)
+        configurator = mockConfigReader(true)
         sourceValidationUtils = new SourceValidationUtils()
         List<ConfigurationMessage> results = sourceValidationUtils.validateSourceName(NEW_SOURCE_NAME, FACTORY_IDS, configurator)
 
@@ -66,8 +67,8 @@ class SourceValidationUtilsTest extends Specification {
         results.get(0).subtype() == ConfigurationMessage.INTERNAL_ERROR
     }
 
-    def mockConfigurator(Object sourceName) {
-        return Mock(Configurator) {
+    def mockConfigReader(Object sourceName) {
+        return Mock(ConfigReader) {
             getManagedServiceConfigs(_ as String) >> ["fid": ["id": sourceName]] >> [:]
         }
     }

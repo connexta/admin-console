@@ -58,7 +58,7 @@ public class SourceNameExistsWfsTestMethod extends TestMethod<SourceConfiguratio
         List<ConfigurationMessage> results =
                 sourceValidationUtils.validateSourceName(configuration.sourceName(),
                         WFS_FACTORY_PIDS,
-                        configuratorFactory.getConfigurator());
+                        configuratorFactory.getConfigReader());
 
         if (results.isEmpty()) {
             return new Report(buildMessage(SUCCESS_TYPES, FAILURE_TYPES, null, SUCCESSFUL_TEST));

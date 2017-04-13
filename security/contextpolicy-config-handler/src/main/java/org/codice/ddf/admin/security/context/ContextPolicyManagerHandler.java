@@ -70,7 +70,7 @@ public class ContextPolicyManagerHandler
     @Override
     public List<ContextPolicyConfiguration> getConfigurations() {
         return Collections.singletonList(contextPolicyServiceToContextPolicyConfig(
-                configuratorFactory.getConfigurator()));
+                configuratorFactory.getConfigReader()));
     }
 
     @Override

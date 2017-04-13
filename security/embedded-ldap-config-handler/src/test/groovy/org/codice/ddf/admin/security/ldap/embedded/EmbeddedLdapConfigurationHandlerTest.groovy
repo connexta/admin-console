@@ -15,7 +15,7 @@ package org.codice.ddf.admin.security.ldap.embedded
 
 import org.codice.ddf.admin.api.config.ldap.EmbeddedLdapConfiguration
 import org.codice.ddf.admin.api.services.EmbeddedLdapServiceProperties
-import org.codice.ddf.admin.configurator.Configurator
+import org.codice.ddf.admin.configurator.ConfigReader
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.security.ldap.embedded.persist.DefaultEmbeddedLdapPersistMethod
 import spock.lang.Specification
@@ -23,12 +23,12 @@ import spock.lang.Specification
 class EmbeddedLdapConfigurationHandlerTest extends Specification {
 
     EmbeddedLdapConfigurationHandler embeddedLdapConfigurationHandler
-    ConfiguratorFactory configuratorFactory;
+    ConfiguratorFactory configuratorFactory
 
     def setup() {
         configuratorFactory = Mock(ConfiguratorFactory)
-        def configurator = Mock(Configurator)
-        configuratorFactory.getConfigurator() >> configurator
+        def configReader = Mock(ConfigReader)
+        configuratorFactory.getConfigReader() >> configReader
         embeddedLdapConfigurationHandler = new EmbeddedLdapConfigurationHandler(configuratorFactory)
     }
 
@@ -37,7 +37,7 @@ class EmbeddedLdapConfigurationHandlerTest extends Specification {
         def configurations = embeddedLdapConfigurationHandler.getConfigurations()
 
         then:
-        1 * configuratorFactory.getConfigurator()
+        1 * configuratorFactory.getConfigReader()
                 .getConfig(EmbeddedLdapServiceProperties.EMBEDDED_LDAP_MANAGER_SERVICE_PID) >> null
         configurations == Collections.emptyList()
     }
@@ -47,7 +47,7 @@ class EmbeddedLdapConfigurationHandlerTest extends Specification {
         def configurations = embeddedLdapConfigurationHandler.getConfigurations()
 
         then:
-        1 * configuratorFactory.getConfigurator()
+        1 * configuratorFactory.getConfigReader()
                 .getConfig(EmbeddedLdapServiceProperties.EMBEDDED_LDAP_MANAGER_SERVICE_PID) >> [(EmbeddedLdapConfiguration.EMBEDDED_LDAP_PORT): 123]
         configurations.size() == 1
         configurations.get(0).toString().contains("123")

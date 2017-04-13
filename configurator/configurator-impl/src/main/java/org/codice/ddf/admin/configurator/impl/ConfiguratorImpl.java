@@ -30,6 +30,7 @@ import javax.management.MBeanServerInvocationHandler;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
+import org.codice.ddf.admin.configurator.ConfigReader;
 import org.codice.ddf.admin.configurator.Configurator;
 import org.codice.ddf.admin.configurator.ConfiguratorException;
 import org.codice.ddf.admin.configurator.OperationReport;
@@ -62,7 +63,7 @@ import ddf.security.common.audit.SecurityLogger;
  * {@link #commit()} method to write the changes to the system. The resulting {@link OperationReport}
  * will have the outcome.
  */
-public class ConfiguratorImpl implements Configurator {
+public class ConfiguratorImpl implements Configurator, ConfigReader {
     private static final Logger LOGGER = LoggerFactory.getLogger(ConfiguratorImpl.class);
 
     private final Map<String, Operation> configHandlers = new LinkedHashMap<>();

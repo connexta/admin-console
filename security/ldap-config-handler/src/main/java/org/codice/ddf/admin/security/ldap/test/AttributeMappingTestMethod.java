@@ -37,7 +37,7 @@ import java.util.Optional;
 import org.codice.ddf.admin.api.config.ldap.LdapConfiguration;
 import org.codice.ddf.admin.api.handler.method.TestMethod;
 import org.codice.ddf.admin.api.handler.report.Report;
-import org.codice.ddf.admin.configurator.Configurator;
+import org.codice.ddf.admin.configurator.ConfigReader;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.Filter;
 import org.forgerock.opendj.ldap.SearchScope;
@@ -65,12 +65,12 @@ public class AttributeMappingTestMethod extends TestMethod<LdapConfiguration> {
                     .put(INVALID_FIELD, "The given attribute mapping is invalid.")
                     .build();
 
-    private final Configurator configurator;
+    private final ConfigReader configReader;
 
     private final LdapTestingCommons ldapTestingCommons;
 
     public AttributeMappingTestMethod(LdapTestingCommons ldapTestingCommons,
-            Configurator configurator) {
+            ConfigReader configReader) {
         super(LDAP_ATTRIBUTE_MAPPING_TEST_ID,
                 DESCRIPTION,
                 REQUIRED_FIELDS,
@@ -80,14 +80,14 @@ public class AttributeMappingTestMethod extends TestMethod<LdapConfiguration> {
                 null);
 
         this.ldapTestingCommons = ldapTestingCommons;
-        this.configurator = configurator;
+        this.configReader = configReader;
     }
 
     @Override
     public Report test(LdapConfiguration configuration) {
         // First check for any unknown claims. This should never happen in a correctly configured
         // system. Bail out on first unknown claim.
-        List stsClaims = Arrays.asList((String[]) configurator.getConfig(
+        List stsClaims = Arrays.asList((String[]) configReader.getConfig(
                 STS_CLAIMS_CONFIGURATION_CONFIG_ID)
                 .get(STS_CLAIMS_PROPS_KEY_CLAIMS));
         Optional<String> unknownStsClaim = configuration.attributeMappings()

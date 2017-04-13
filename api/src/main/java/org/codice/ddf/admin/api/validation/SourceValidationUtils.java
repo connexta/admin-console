@@ -35,7 +35,7 @@ import javax.annotation.Nonnull;
 import org.apache.commons.lang.StringUtils;
 import org.codice.ddf.admin.api.config.sources.SourceConfiguration;
 import org.codice.ddf.admin.api.handler.ConfigurationMessage;
-import org.codice.ddf.admin.configurator.Configurator;
+import org.codice.ddf.admin.configurator.ConfigReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,8 +46,9 @@ public class SourceValidationUtils {
             List<String> pidList, String configId) {
         List<ConfigurationMessage> errors = validateString(factoryPid, configId);
         if (errors.isEmpty() && !pidList.contains(factoryPid)) {
-            errors.add(createInvalidFieldMsg("Unknown factory PID type <" + factoryPid + ">."
-                    + "FactoryPid must be one of: " + String.join(",", pidList), configId));
+            errors.add(createInvalidFieldMsg(
+                    "Unknown factory PID type <" + factoryPid + ">." + "FactoryPid must be one of: "
+                            + String.join(",", pidList), configId));
         }
         return errors;
     }
@@ -71,19 +72,19 @@ public class SourceValidationUtils {
      *
      * @param sourceName   a non null name to validate
      * @param factoryPids  a list of non null factory pids of the configuration to validate names against
-     * @param configurator configurator to fetch configurations for the given {@code factoryPids}
+     * @param configReader configReader to fetch configurations for the given {@code factoryPids}
      * @return a {@link List} of {@link ConfigurationMessage}s containing failure messages, or empty {@link List}
      * if there are no duplicate source names found
      */
     public List<ConfigurationMessage> validateSourceName(@Nonnull String sourceName,
-            @Nonnull List<String> factoryPids, Configurator configurator) {
+            @Nonnull List<String> factoryPids, ConfigReader configReader) {
         List<ConfigurationMessage> errors = validateString(sourceName, SOURCE_NAME);
-        if(!errors.isEmpty()) {
+        if (!errors.isEmpty()) {
             return errors;
         }
 
         List<Map<String, Map<String, Object>>> configurations = factoryPids.stream()
-                .map(configurator::getManagedServiceConfigs)
+                .map(configReader::getManagedServiceConfigs)
                 .filter(config -> !config.isEmpty())
                 .collect(Collectors.toList());
 
@@ -125,7 +126,8 @@ public class SourceValidationUtils {
         return results;
     }
 
-    public static List<ConfigurationMessage> validateHostnameAndPort(SourceConfiguration configuration) {
+    public static List<ConfigurationMessage> validateHostnameAndPort(
+            SourceConfiguration configuration) {
         List<ConfigurationMessage> validationResults = new ArrayList<>();
         if (configuration.sourceHostName() != null) {
             validationResults.addAll(configuration.validate(Arrays.asList(SOURCE_HOSTNAME, PORT)));
@@ -135,7 +137,8 @@ public class SourceValidationUtils {
         return validationResults;
     }
 
-    public static List<ConfigurationMessage> validateEndpointUrl(SourceConfiguration configuration) {
+    public static List<ConfigurationMessage> validateEndpointUrl(
+            SourceConfiguration configuration) {
         List<ConfigurationMessage> validationResults = new ArrayList<>();
         if (configuration.endpointUrl() != null) {
             validationResults.addAll(configuration.validate(Collections.singletonList(ENDPOINT_URL)));

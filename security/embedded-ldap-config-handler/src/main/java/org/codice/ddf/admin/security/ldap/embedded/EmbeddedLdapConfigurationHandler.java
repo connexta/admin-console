@@ -64,7 +64,7 @@ public class EmbeddedLdapConfigurationHandler
 
     @Override
     public List<EmbeddedLdapConfiguration> getConfigurations() {
-        Map<String, Object> serviceProps = configuratorFactory.getConfigurator()
+        Map<String, Object> serviceProps = configuratorFactory.getConfigReader()
                 .getConfig(EMBEDDED_LDAP_MANAGER_SERVICE_PID);
         if (serviceProps == null) {
             LOGGER.debug(

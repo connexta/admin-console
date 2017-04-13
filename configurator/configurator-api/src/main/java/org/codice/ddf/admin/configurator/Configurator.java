@@ -17,6 +17,12 @@ import java.nio.file.Path;
 import java.util.Map;
 
 /**
+ * Provides pseudo-transactional semantics to system configuration tasks.
+ * <p>
+ * In order to use, invoke the various {@code start}, {@code stop}, {@code create}, {@code delete},
+ * {@code update}, methods in the intended order of operation, then invoke one of the {@code commit}
+ * methods to complete the transaction.
+ * <p>
  * <b> This code is experimental. While this class is functional and tested, it may change or be
  * removed in a future version of the library. </b>
  */
@@ -28,10 +34,9 @@ public interface Configurator {
      * <p>
      * In the case of a successful commit, changes should be logged.
      *
-     * @param auditMessage In the case of a successful commit, the message to pass to a
-     *                     {@code SecurityLogger}
-     * @param auditParams  In the case of a successful commit, the optional parameters to pass to a
-     *                     {@code SecurityLogger} to be interpolated into the message
+     * @param auditMessage In the case of a successful commit, the message to pass to be audited
+     * @param auditParams  In the case of a successful commit, optional parameters to pass to be
+     *                     interpolated into the message
      * @return report of the commit status, whether successful, successfully rolled back, or partially
      * rolled back with errors
      */
@@ -66,14 +71,6 @@ public interface Configurator {
     String stopBundle(String bundleSymName);
 
     /**
-     * Determines if the bundle with the given name is started.
-     *
-     * @param bundleSymName the symbolic name of the bundle
-     * @return true if started; else, false
-     */
-    boolean isBundleStarted(String bundleSymName);
-
-    /**
      * Installs and starts the feature with the given name.
      *
      * @param featureName the name of the feature
@@ -90,14 +87,6 @@ public interface Configurator {
      * final {@link OperationReport}
      */
     String stopFeature(String featureName);
-
-    /**
-     * Determines if the feature with the given name is started.
-     *
-     * @param featureName the name of the feature
-     * @return true if started; else, false
-     */
-    boolean isFeatureStarted(String featureName);
 
     /**
      * Creates a property file in the system with the given set of new key:value pairs.
@@ -133,14 +122,6 @@ public interface Configurator {
     String updatePropertyFile(Path propFile, Map<String, String> properties, boolean keepIgnored);
 
     /**
-     * Gets the current key:value pairs set in the given property file.
-     *
-     * @param propFile the property file to query
-     * @return the current set of key:value pairs
-     */
-    Map<String, String> getProperties(Path propFile);
-
-    /**
      * Updates a bundle configuration file in the system with the given set of new key:value pairs.
      *
      * @param configPid   the configId of the bundle configuration file to update
@@ -153,14 +134,6 @@ public interface Configurator {
      * final {@link OperationReport}
      */
     String updateConfigFile(String configPid, Map<String, Object> configs, boolean keepIgnored);
-
-    /**
-     * Gets the current key:value pairs set in the given configuration file.
-     *
-     * @param configPid the configId of the bundle configuration file to query
-     * @return the current set of key:value pairs
-     */
-    Map<String, Object> getConfig(String configPid);
 
     /**
      * Creates a new managed service for the given factory.
@@ -180,25 +153,4 @@ public interface Configurator {
      * final {@link OperationReport}
      */
     String deleteManagedService(String configPid);
-
-    /**
-     * For the given managed service factory, retrieves the full complement of configuration properties.
-     *
-     * This will get all the key:value pairs for each available configuration.
-     *
-     * @param factoryPid the factoryPid of the service to query
-     * @return the the current sets of key:value pairs, in a map keyed on {@code configId}
-     */
-    Map<String, Map<String, Object>> getManagedServiceConfigs(String factoryPid);
-
-    /**
-     * Retrieves the service reference. The reference should only be used for reading purposes,
-     * any changes should be done through a commit
-     *
-     * @param <S> Service interface
-     * @param serviceClass - Class of service to retrieve
-     * @return first found service reference of serviceClass
-     * @throws ConfiguratorException if any errors occur
-     */
-    <S> S getServiceReference(Class<S> serviceClass) throws ConfiguratorException;
 }

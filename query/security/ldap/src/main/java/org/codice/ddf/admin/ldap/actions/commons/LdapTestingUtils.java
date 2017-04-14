@@ -13,9 +13,9 @@
  **/
 package org.codice.ddf.admin.ldap.actions.commons;
 
-import static org.codice.ddf.admin.ldap.actions.commons.LdapActionMessages.CANNOT_BIND;
-import static org.codice.ddf.admin.ldap.actions.commons.LdapActionMessages.CANNOT_CONFIGURE;
-import static org.codice.ddf.admin.ldap.actions.commons.LdapActionMessages.CANNOT_CONNECT;
+import static org.codice.ddf.admin.ldap.actions.commons.LdapMessages.CANNOT_BIND;
+import static org.codice.ddf.admin.ldap.actions.commons.LdapMessages.CANNOT_CONFIGURE;
+import static org.codice.ddf.admin.ldap.actions.commons.LdapMessages.CANNOT_CONNECT;
 import static org.codice.ddf.admin.ldap.fields.connection.LdapBindMethod.DIGEST_MD5_SASL;
 import static org.codice.ddf.admin.ldap.fields.connection.LdapBindMethod.SIMPLE;
 import static org.codice.ddf.admin.ldap.fields.connection.LdapEncryptionMethodField.LDAPS;

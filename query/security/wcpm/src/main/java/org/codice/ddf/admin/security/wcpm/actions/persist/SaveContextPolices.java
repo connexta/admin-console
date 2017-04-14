@@ -23,16 +23,17 @@ import java.util.Collection;
 import java.util.List;
 
 import org.codice.ddf.admin.api.fields.Field;
+import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.actions.BaseAction;
+import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.configurator.Configurator;
 import org.codice.ddf.admin.configurator.OperationReport;
-import org.codice.ddf.admin.security.common.fields.wcpm.ContextPolicies;
 import org.codice.ddf.admin.security.common.fields.wcpm.ContextPolicyBin;
 import org.codice.ddf.admin.security.common.fields.wcpm.services.PolicyManagerServiceProperties;
 
 import com.google.common.collect.ImmutableList;
 
-public class SaveContextPolices extends BaseAction<ContextPolicies> {
+public class SaveContextPolices extends BaseAction<ListField<ContextPolicyBin>> {
 
     public static final String DEFAULT_FIELD_NAME = "saveContextPolicies";
 
@@ -41,13 +42,13 @@ public class SaveContextPolices extends BaseAction<ContextPolicies> {
 
     private Configurator configurator;
 
-    private ContextPolicies contextPolicies;
+    private ListField<ContextPolicyBin> contextPolicies;
 
     private PolicyManagerServiceProperties wcpmServiceProps = new PolicyManagerServiceProperties();
 
     public SaveContextPolices(Configurator configurator) {
-        super(DEFAULT_FIELD_NAME, DESCRIPTION, new ContextPolicies());
-        contextPolicies = new ContextPolicies();
+        super(DEFAULT_FIELD_NAME, DESCRIPTION, new ListFieldImpl<>(ContextPolicyBin.class));
+        contextPolicies = new ListFieldImpl<>("policies", ContextPolicyBin.class);
         this.configurator = configurator;
     }
 
@@ -57,7 +58,7 @@ public class SaveContextPolices extends BaseAction<ContextPolicies> {
     }
 
     @Override
-    public ContextPolicies performAction() {
+    public ListField<ContextPolicyBin> performAction() {
 
         if (contextPolicies.getList()
                 .stream()

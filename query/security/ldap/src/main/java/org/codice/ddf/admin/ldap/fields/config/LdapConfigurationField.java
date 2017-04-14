@@ -65,15 +65,15 @@ public class LdapConfigurationField extends BaseObjectField {
 
     //Field getters
     // TODO: tbatie - 4/11/17 - Rename these to -field
-    public LdapConnectionField connection() {
+    public LdapConnectionField connectionField() {
         return connection;
     }
 
-    public LdapBindUserInfo bindUserInfo() {
+    public LdapBindUserInfo bindUserInfoField() {
         return bindUserInfo;
     }
 
-    public LdapSettingsField settings() {
+    public LdapSettingsField settingsField() {
         return settings;
     }
 

@@ -13,12 +13,14 @@
  **/
 package org.codice.ddf.admin.security.wcpm.actions.discover;
 
+import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.actions.GetAction;
+import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.configurator.Configurator;
-import org.codice.ddf.admin.security.common.fields.wcpm.ContextPolicies;
+import org.codice.ddf.admin.security.common.fields.wcpm.ContextPolicyBin;
 import org.codice.ddf.admin.security.common.fields.wcpm.services.PolicyManagerServiceProperties;
 
-public class GetContextPolicies extends GetAction<ContextPolicies> {
+public class GetContextPolicies extends GetAction<ListField<ContextPolicyBin>> {
 
     public static final String DEFAULT_FIELD_NAME = "policies";
 
@@ -30,12 +32,12 @@ public class GetContextPolicies extends GetAction<ContextPolicies> {
     private PolicyManagerServiceProperties wcpmServiceProps = new PolicyManagerServiceProperties();
 
     public GetContextPolicies(Configurator configurator) {
-        super(DEFAULT_FIELD_NAME, DESCRIPTION, new ContextPolicies());
+        super(DEFAULT_FIELD_NAME, DESCRIPTION, new ListFieldImpl<>(ContextPolicyBin.class));
         this.configurator = configurator;
     }
 
     @Override
-    public ContextPolicies performAction() {
+    public ListField<ContextPolicyBin> performAction() {
         return wcpmServiceProps.contextPolicyServiceToContextPolicyFields(configurator);
     }
 }

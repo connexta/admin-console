@@ -13,11 +13,14 @@
  **/
 package org.codice.ddf.admin.ldap.fields.config;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.codice.ddf.admin.api.fields.Field;
+import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
+import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 import org.codice.ddf.admin.ldap.fields.LdapDistinguishedName;
 
@@ -46,7 +49,7 @@ public class LdapSettingsField extends BaseObjectField {
 
     private StringField memberAttributeReferencedInGroup;
 
-    private LdapAttributeMappingField attributeMap;
+    private ListField<LdapAttributeEntryField> attributeMap;
 
     private LdapUseCase useCase;
 
@@ -59,7 +62,7 @@ public class LdapSettingsField extends BaseObjectField {
         this.groupMembershipAttribute = new StringField("groupMembershipAttribute");
         this.groupAttributeHoldingMember = new StringField("groupAttributeHoldingMember");
         this.memberAttributeReferencedInGroup = new StringField("memberAttributeReferencedInGroup");
-        this.attributeMap = new LdapAttributeMappingField();
+        this.attributeMap = new ListFieldImpl<>("attributeMapping", LdapAttributeEntryField.class);
         this.useCase = new LdapUseCase();
     }
 
@@ -103,7 +106,11 @@ public class LdapSettingsField extends BaseObjectField {
     }
 
     public Map<String, String> attributeMap() {
-        return attributeMap.toMap();
+        Map<String, String> attributes = new HashMap<>();
+        attributeMap.getList()
+                .stream()
+                .forEach(entry -> attributes.put(entry.stsClaim(), entry.userAttribute()));
+        return attributes;
     }
 
     public String useCase() {
@@ -139,7 +146,7 @@ public class LdapSettingsField extends BaseObjectField {
         return memberAttributeReferencedInGroup;
     }
 
-    public LdapAttributeMappingField attributeMapField() {
+    public ListField<LdapAttributeEntryField> attributeMapField() {
         return attributeMap;
     }
 
@@ -170,7 +177,8 @@ public class LdapSettingsField extends BaseObjectField {
     }
 
     public LdapSettingsField mappingEntry(String claim, String attribute) {
-        attributeMap.add(claim, attribute);
+        attributeMap.add(new LdapAttributeEntryField().stsClaim(claim)
+                .userAttribute(attribute));
         return this;
     }
 

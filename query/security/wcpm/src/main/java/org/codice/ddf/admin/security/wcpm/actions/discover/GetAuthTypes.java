@@ -15,12 +15,13 @@ package org.codice.ddf.admin.security.wcpm.actions.discover;
 
 import java.util.Arrays;
 
+import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.actions.GetAction;
+import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.configurator.Configurator;
 import org.codice.ddf.admin.security.common.fields.wcpm.AuthType;
-import org.codice.ddf.admin.security.common.fields.wcpm.AuthTypeList;
 
-public class GetAuthTypes extends GetAction<AuthTypeList> {
+public class GetAuthTypes extends GetAction<ListField<AuthType>> {
 
     public static final String FIELD_NAME = "authTypes";
 
@@ -30,14 +31,14 @@ public class GetAuthTypes extends GetAction<AuthTypeList> {
     private Configurator configurator;
 
     public GetAuthTypes(Configurator configurator) {
-        super(FIELD_NAME, DESCRIPTION, new AuthTypeList());
+        super(FIELD_NAME, DESCRIPTION, new ListFieldImpl<>(AuthType.class));
         this.configurator = configurator;
     }
 
     @Override
-    public AuthTypeList performAction() {
+    public ListField<AuthType> performAction() {
         // TODO: 4/3/17 Should implement the different auth type action creators once implemented
-        return new AuthTypeList(Arrays.asList(AuthType.BASIC_AUTH,
+        return new ListFieldImpl<>(AuthType.class).addAll(Arrays.asList(AuthType.BASIC_AUTH,
                 AuthType.SAML_AUTH,
                 AuthType.PKI_AUTH,
                 AuthType.GUEST_AUTH,

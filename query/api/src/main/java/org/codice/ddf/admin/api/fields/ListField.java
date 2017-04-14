@@ -13,6 +13,7 @@
  **/
 package org.codice.ddf.admin.api.fields;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface ListField<T extends Field> extends Field<List> {
@@ -22,9 +23,5 @@ public interface ListField<T extends Field> extends Field<List> {
 
     ListField<T> add(T field);
 
-    ListField addAll(List<T> fields);
-
-    ListField<T> isRequiredNonEmpty(boolean required);
-
-    boolean isRequiredNonEmpty();
+    ListField addAll(Collection<T> fields);
 }

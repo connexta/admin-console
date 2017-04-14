@@ -14,14 +14,16 @@
 package org.codice.ddf.admin.security.common.fields.wcpm;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.api.fields.Field;
+import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
+import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.fields.common.ContextPath;
-import org.codice.ddf.admin.common.fields.common.ContextPaths;
 
 import com.google.common.collect.ImmutableList;
 
@@ -34,20 +36,20 @@ public class ContextPolicyBin extends BaseObjectField {
     public static final String DESCRIPTION =
             "Represents a policy being applied to a set of context paths.";
 
-    private ContextPaths contexts;
+    private ListField<ContextPath> contexts;
 
-    private AuthTypeList authTypes;
+    private ListField<AuthType> authTypes;
 
     private Realm realm;
 
-    private ClaimsMapping claimsMapping;
+    private ListField<ClaimsMapEntry> claimsMapping;
 
     public ContextPolicyBin() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
-        contexts = new ContextPaths();
-        authTypes = new AuthTypeList();
+        contexts = new ListFieldImpl<>("paths", ContextPath.class);
+        authTypes = new ListFieldImpl<>("authTypes", AuthType.class);
         realm = new Realm();
-        claimsMapping = new ClaimsMapping();
+        claimsMapping = new ListFieldImpl<>("claimsMapping", ClaimsMapEntry.class);
     }
 
     public ContextPolicyBin realm(String realm) {
@@ -126,7 +128,9 @@ public class ContextPolicyBin extends BaseObjectField {
     }
 
     public Map<String, String> claimsMapping() {
-        return claimsMapping.toMap();
+        Map<String, String> mapping = new HashMap<>();
+        claimsMapping.getList().forEach(entry -> mapping.put(entry.claim(), entry.claimValue()));
+        return mapping;
     }
 
     @Override

@@ -22,12 +22,16 @@ import org.codice.ddf.admin.api.action.Message;
 
 public class StringField extends BaseScalarField<String> {
 
-    public StringField(String fieldName) {
-        super(fieldName, null, null, STRING);
-    }
-
     protected StringField(String fieldName, String fieldTypeName, String description) {
         super(fieldName, fieldTypeName, description, STRING);
+    }
+
+    public StringField(String fieldName) {
+        this(fieldName, null, null);
+    }
+
+    public StringField() {
+        this(null);
     }
 
     @Override

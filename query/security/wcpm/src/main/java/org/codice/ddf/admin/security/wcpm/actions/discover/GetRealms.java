@@ -13,38 +13,25 @@
  **/
 package org.codice.ddf.admin.security.wcpm.actions.discover;
 
+import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.actions.GetAction;
+import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.security.common.fields.wcpm.Realm;
-import org.codice.ddf.admin.security.common.fields.wcpm.RealmList;
 
-public class GetRealms extends GetAction<RealmList> {
+public class GetRealms extends GetAction<ListField<Realm>> {
 
     public static final String FIELD_NAME = "realms";
 
     public static final String DESCRIPTION = "Retrieves all currently configured realms.";
 
     public GetRealms() {
-        super(FIELD_NAME, DESCRIPTION, new RealmList());
+        super(FIELD_NAME, DESCRIPTION, new ListFieldImpl<>(Realm.class));
     }
 
     @Override
-    public RealmList performAction() {
+    public ListField<Realm> performAction() {
         // TODO: 3/31/17 Make reference to the ldap action creator once it is implemented clear.
-        // Implement idp
-        /**
-
-
-         if (ldapConfigHandler == null
-         || ((List<LdapConfiguration>) ldapConfigHandler.getConfigurations()).stream()
-         .anyMatch(config -> config.ldapUseCase()
-         .equals(AUTHENTICATION) || config.ldapUseCase()
-         .equals(AUTHENTICATION_AND_ATTRIBUTE_STORE))) {
-         realms.add(LDAP);
-         }
-
-         return realms;
-         */
-        return new RealmList().add(Realm.KARAF_REALM)
+        return new ListFieldImpl<>(Realm.class).add(Realm.KARAF_REALM)
                 .add(Realm.LDAP_REALM);
     }
 }

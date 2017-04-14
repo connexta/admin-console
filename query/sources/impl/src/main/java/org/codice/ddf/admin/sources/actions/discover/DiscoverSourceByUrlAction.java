@@ -18,13 +18,15 @@ import static org.codice.ddf.admin.sources.sample.SampleFields.SAMPLE_SOURCES_IN
 import java.util.List;
 
 import org.codice.ddf.admin.api.fields.Field;
+import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.actions.BaseAction;
+import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.fields.common.UrlField;
-import org.codice.ddf.admin.sources.fields.SourceInfoListField;
+import org.codice.ddf.admin.sources.fields.SourceInfoField;
 
 import com.google.common.collect.ImmutableList;
 
-public class DiscoverSourceByUrlAction extends BaseAction<SourceInfoListField> {
+public class DiscoverSourceByUrlAction extends BaseAction<ListField<SourceInfoField>> {
 
     public static final String NAME = "discoverByUrl";
 
@@ -33,7 +35,7 @@ public class DiscoverSourceByUrlAction extends BaseAction<SourceInfoListField> {
     private UrlField endpoint = new UrlField();
 
     public DiscoverSourceByUrlAction() {
-        super(NAME, DESCRIPTION, new SourceInfoListField());
+        super(NAME, DESCRIPTION, new ListFieldImpl<>(SourceInfoField.class));
     }
 
     @Override
@@ -42,7 +44,7 @@ public class DiscoverSourceByUrlAction extends BaseAction<SourceInfoListField> {
     }
 
     @Override
-    public SourceInfoListField performAction() {
+    public ListField<SourceInfoField> performAction() {
         return SAMPLE_SOURCES_INFO_LIST;
     }
 }

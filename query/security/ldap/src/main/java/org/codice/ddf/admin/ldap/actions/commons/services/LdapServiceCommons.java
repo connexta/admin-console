@@ -20,13 +20,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.codice.ddf.admin.api.fields.ListField;
+import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.ldap.fields.config.LdapConfigurationField;
-import org.codice.ddf.admin.ldap.fields.config.LdapConfigurationsField;
 
 public class LdapServiceCommons {
 
-    public LdapConfigurationsField getLdapConfigurations(ConfiguratorFactory configuratorFactory) {
+    public ListField<LdapConfigurationField> getLdapConfigurations(ConfiguratorFactory configuratorFactory) {
         List<LdapConfigurationField> ldapLoginConfigs = configuratorFactory.getConfigurator()
                 .getManagedServiceConfigs(LDAP_LOGIN_MANAGED_SERVICE_FACTORY_PID)
                 .values()
@@ -47,9 +48,9 @@ public class LdapServiceCommons {
                 .collect(Collectors.toList());
 
         configs.stream()
-                .forEach(config -> config.bindUserInfo()
+                .forEach(config -> config.bindUserInfoField()
                         .password("*******"));
 
-        return new LdapConfigurationsField().addAll(configs);
+        return new ListFieldImpl<>(LdapConfigurationField.class).addAll(configs);
     }
 }

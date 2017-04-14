@@ -96,20 +96,20 @@ public class LdapLoginServiceProperties {
         Map<String, Object> ldapStsConfig = new HashMap<>();
 
         if (config != null) {
-            String ldapUrl = getLdapUrl(config.connection());
-            boolean startTls = isStartTls(config.connection());
+            String ldapUrl = getLdapUrl(config.connectionField());
+            boolean startTls = isStartTls(config.connectionField());
 
-            ldapStsConfig.put(LDAP_URL, ldapUrl + config.connection().hostname() + ":" + config.connection().port());
+            ldapStsConfig.put(LDAP_URL, ldapUrl + config.connectionField().hostname() + ":" + config.connectionField().port());
             ldapStsConfig.put(START_TLS, Boolean.toString(startTls));
-            ldapStsConfig.put(LDAP_BIND_USER_DN, config.bindUserInfo().username());
-            ldapStsConfig.put(LDAP_BIND_USER_PASS, config.bindUserInfo().password());
-            ldapStsConfig.put(BIND_METHOD, config.bindUserInfo().bindMethod());
+            ldapStsConfig.put(LDAP_BIND_USER_DN, config.bindUserInfoField().username());
+            ldapStsConfig.put(LDAP_BIND_USER_PASS, config.bindUserInfoField().password());
+            ldapStsConfig.put(BIND_METHOD, config.bindUserInfoField().bindMethod());
             //        ldapStsConfig.put(KDC_ADDRESS, config.bindKdcAddress());
-            ldapStsConfig.put(REALM, config.bindUserInfo().realm());
+            ldapStsConfig.put(REALM, config.bindUserInfoField().realm());
 
-            ldapStsConfig.put(USER_NAME_ATTRIBUTE, config.settings().usernameAttribute());
-            ldapStsConfig.put(USER_BASE_DN, config.settings().baseUserDn());
-            ldapStsConfig.put(GROUP_BASE_DN, config.settings().baseGroupDn());
+            ldapStsConfig.put(USER_NAME_ATTRIBUTE, config.settingsField().usernameAttribute());
+            ldapStsConfig.put(USER_BASE_DN, config.settingsField().baseUserDn());
+            ldapStsConfig.put(GROUP_BASE_DN, config.settingsField().baseGroupDn());
         }
         return ldapStsConfig;
     }

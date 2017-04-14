@@ -16,17 +16,21 @@ package org.codice.ddf.admin.ldap.actions.discover;
 import java.util.List;
 
 import org.codice.ddf.admin.api.fields.Field;
+import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.actions.BaseAction;
+import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.ldap.actions.commons.services.LdapServiceCommons;
-import org.codice.ddf.admin.ldap.fields.config.LdapConfigurationsField;
+import org.codice.ddf.admin.ldap.fields.config.LdapConfigurationField;
 
 import com.google.common.collect.ImmutableList;
 
-public class LdapConfigurations extends BaseAction<LdapConfigurationsField> {
+public class LdapConfigurations extends BaseAction<ListField<LdapConfigurationField>> {
 
     public static final String NAME = "configs";
+
+    public static final String CONFIGS_ARG_NAME = "configs";
 
     public static final String DESCRIPTION = "Retrieves all currently configured LDAP settings.";
 
@@ -38,7 +42,7 @@ public class LdapConfigurations extends BaseAction<LdapConfigurationsField> {
     private List<Field> arguments = ImmutableList.of(pid);
 
     public LdapConfigurations(ConfiguratorFactory configuratorFactory) {
-        super(NAME, DESCRIPTION, new LdapConfigurationsField());
+        super(NAME, DESCRIPTION, new ListFieldImpl<>(CONFIGS_ARG_NAME, LdapConfigurationField.class));
         this.configuratorFactory = configuratorFactory;
         serviceCommons = new LdapServiceCommons();
     }
@@ -49,7 +53,7 @@ public class LdapConfigurations extends BaseAction<LdapConfigurationsField> {
     }
 
     @Override
-    public LdapConfigurationsField performAction() {
+    public ListField<LdapConfigurationField> performAction() {
         return serviceCommons.getLdapConfigurations(configuratorFactory);
     }
 }

@@ -13,13 +13,15 @@
  **/
 package org.codice.ddf.admin.ldap.actions.discover;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
 import org.codice.ddf.admin.api.fields.Field;
+import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.actions.BaseAction;
-import org.codice.ddf.admin.common.fields.base.list.StringList;
+import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
+import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 import org.codice.ddf.admin.ldap.actions.commons.LdapConnectionAttempt;
 import org.codice.ddf.admin.ldap.actions.commons.LdapTestingUtils;
 import org.codice.ddf.admin.ldap.actions.commons.ServerGuesser;
@@ -32,7 +34,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableList;
 
-public class LdapUserAttributes extends BaseAction<StringList> {
+public class LdapUserAttributes extends BaseAction<ListField<StringField>> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LdapUserAttributes.class);
 
@@ -48,9 +50,7 @@ public class LdapUserAttributes extends BaseAction<StringList> {
     private LdapTestingUtils utils;
 
     public LdapUserAttributes() {
-        super(NAME,
-                DESCRIPTION,
-                new StringList("attributes", "A list of attributes found on LDAP entries."));
+        super(NAME, DESCRIPTION, new ListFieldImpl<>(StringField.class));
         config = new LdapConfigurationField();
         ldapType = new LdapTypeField();
         utils = new LdapTestingUtils();
@@ -62,10 +62,10 @@ public class LdapUserAttributes extends BaseAction<StringList> {
     }
 
     @Override
-    public StringList performAction() {
+    public ListField<StringField> performAction() {
 
         LdapConnectionAttempt ldapConnectionAttempt =
-                utils.bindUserToLdapConnection(config.connection(), config.bindUserInfo());
+                utils.bindUserToLdapConnection(config.connectionField(), config.bindUserInfoField());
         addArgumentMessages(ldapConnectionAttempt.messages());
 
         if (!ldapConnectionAttempt.connection()
@@ -80,7 +80,7 @@ public class LdapUserAttributes extends BaseAction<StringList> {
             ServerGuesser serverGuesser = ServerGuesser.buildGuesser(ldapType.getValue(),
                     ldapConnectionAttempt.connection()
                             .get());
-            ldapEntryAttributes = serverGuesser.getClaimAttributeOptions(config.settings()
+            ldapEntryAttributes = serverGuesser.getClaimAttributeOptions(config.settingsField()
                     .baseUserDn());
 
         } catch (SearchResultReferenceIOException | LdapException e) {
@@ -90,6 +90,8 @@ public class LdapUserAttributes extends BaseAction<StringList> {
         }
 
         // TODO: tbatie - 4/3/17 - Make a set field instead
-        return new StringList().setList(new ArrayList<>(ldapEntryAttributes));
+        ListFieldImpl entries = new ListFieldImpl<>(StringField.class);
+        entries.setValue(Arrays.asList(ldapEntryAttributes.toArray()));
+        return entries;
     }
 }

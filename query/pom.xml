@@ -54,4 +54,35 @@
             <version>2.6</version>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>1.4.1</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.codice.ddf.admin.beta</groupId>
+                        <artifactId>artifact-size-enforcer</artifactId>
+                        <version>${project.version}</version>
+                    </dependency>
+                </dependencies>
+                <executions>
+                    <execution>
+                        <id>check-artifact-size</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <ArtifactSizeEnforcerRule implementation="org.codice.ddf.admin.beta.enforcer.ArtifactSizeEnforcerRule" />
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

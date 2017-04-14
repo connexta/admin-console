@@ -385,5 +385,6 @@
         <module>app</module>
         <module>commons</module>
         <module>admin-module</module>
+        <module>artifact-size-enforcer</module>
     </modules>
 </project>

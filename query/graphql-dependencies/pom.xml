@@ -21,6 +21,7 @@
         <groupId>org.codice.ddf.admin.beta</groupId>
         <version>0.1.3-SNAPSHOT</version>
     </parent>
+    <name>DDF :: Admin (Beta) :: GraphQL Dependencies</name>
     <artifactId>graphql-dependencies</artifactId>
 
     <dependencies>
@@ -129,7 +130,9 @@
                             <filters>
                                 <filter>
                                     <artifact>com.graphql-java:graphql-java-servlet</artifact>
-                                    <includes>graphql/servlet/**</includes>
+                                    <includes>
+                                        <include>graphql/servlet/**</include>
+                                    </includes>
                                     <excludes>
                                         <exclude>graphql/servlet/GraphQLServlet.*</exclude>
                                         <exclude>graphql/servlet/OsgiGraphQLServlet.*</exclude>

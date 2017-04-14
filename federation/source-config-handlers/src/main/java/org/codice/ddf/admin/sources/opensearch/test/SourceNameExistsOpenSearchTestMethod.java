@@ -59,7 +59,7 @@ public class SourceNameExistsOpenSearchTestMethod extends TestMethod<SourceConfi
         List<ConfigurationMessage> results =
                 sourceValidationUtils.validateSourceName(configuration.sourceName(),
                         Collections.singletonList(OPENSEARCH_FACTORY_PID),
-                        configuratorFactory.getConfigurator());
+                        configuratorFactory.getConfigReader());
 
         if (results.isEmpty()) {
             return new Report(buildMessage(SUCCESS_TYPES, FAILURE_TYPES, null, SUCCESSFUL_TEST));

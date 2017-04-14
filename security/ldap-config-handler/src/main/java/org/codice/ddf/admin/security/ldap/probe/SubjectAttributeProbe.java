@@ -36,7 +36,7 @@ import org.codice.ddf.admin.api.config.ldap.LdapConfiguration;
 import org.codice.ddf.admin.api.handler.ConfigurationMessage;
 import org.codice.ddf.admin.api.handler.method.ProbeMethod;
 import org.codice.ddf.admin.api.handler.report.ProbeReport;
-import org.codice.ddf.admin.configurator.Configurator;
+import org.codice.ddf.admin.configurator.ConfigReader;
 import org.codice.ddf.admin.security.ldap.ServerGuesser;
 import org.codice.ddf.admin.security.ldap.test.LdapTestingCommons;
 import org.forgerock.opendj.ldap.LdapException;
@@ -76,9 +76,9 @@ public class SubjectAttributeProbe extends ProbeMethod<LdapConfiguration> {
 
     private final LdapTestingCommons ldapTestingCommons;
 
-    private final Configurator configurator;
+    private final ConfigReader configReader;
 
-    public SubjectAttributeProbe(LdapTestingCommons ldapTestingCommons, Configurator configurator) {
+    public SubjectAttributeProbe(LdapTestingCommons ldapTestingCommons, ConfigReader configReader) {
         super(SUBJECT_ATTRIBUTES_PROBE_ID,
                 DESCRIPTION,
                 REQUIRED_FIELDS,
@@ -89,13 +89,13 @@ public class SubjectAttributeProbe extends ProbeMethod<LdapConfiguration> {
                 RETURN_TYPES);
 
         this.ldapTestingCommons = ldapTestingCommons;
-        this.configurator = configurator;
+        this.configReader = configReader;
     }
 
     @Override
     public ProbeReport probe(LdapConfiguration configuration) {
         ProbeReport probeReport = new ProbeReport();
-        Object subjectClaims = configurator.getConfig(STS_CLAIMS_CONFIGURATION_CONFIG_ID)
+        Object subjectClaims = configReader.getConfig(STS_CLAIMS_CONFIGURATION_CONFIG_ID)
                 .get(STS_CLAIMS_PROPS_KEY_CLAIMS);
 
         LdapTestingCommons.LdapConnectionAttempt ldapConnectionAttempt =

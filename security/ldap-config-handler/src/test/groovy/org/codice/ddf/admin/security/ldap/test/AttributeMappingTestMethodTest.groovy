@@ -2,7 +2,7 @@ package org.codice.ddf.admin.security.ldap.test
 
 import org.codice.ddf.admin.api.config.ldap.LdapConfiguration
 import org.codice.ddf.admin.api.handler.report.Report
-import org.codice.ddf.admin.configurator.Configurator
+import org.codice.ddf.admin.configurator.ConfigReader
 import org.forgerock.opendj.ldap.Connection
 import spock.lang.Specification
 
@@ -14,7 +14,7 @@ class AttributeMappingTestMethodTest extends Specification {
     private ldapTestingCommons
     private connection
     private connectionAttempt
-    private configurator
+    private configReader
     private tester
 
     def setup() {
@@ -22,10 +22,10 @@ class AttributeMappingTestMethodTest extends Specification {
         connection = Mock(Connection)
         connectionAttempt = Mock(LdapTestingCommons.LdapConnectionAttempt)
 
-        configurator = Mock(Configurator)
-        configurator.getConfig(STS_CLAIMS_CONFIGURATION_CONFIG_ID) >>
+        configReader = Mock(ConfigReader)
+        configReader.getConfig(STS_CLAIMS_CONFIGURATION_CONFIG_ID) >>
                 [(STS_CLAIMS_PROPS_KEY_CLAIMS): ['a', 'b', 'c'] as String[]]
-        tester = new AttributeMappingTestMethod(ldapTestingCommons, configurator)
+        tester = new AttributeMappingTestMethod(ldapTestingCommons, configReader)
     }
 
     def 'fail due to failed connection'() {

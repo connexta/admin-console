@@ -44,7 +44,7 @@ import org.codice.ddf.admin.api.config.ldap.LdapConfiguration;
 import org.codice.ddf.admin.api.handler.ConfigurationHandler;
 import org.codice.ddf.admin.api.handler.method.ProbeMethod;
 import org.codice.ddf.admin.api.handler.report.ProbeReport;
-import org.codice.ddf.admin.configurator.Configurator;
+import org.codice.ddf.admin.configurator.ConfigReader;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,13 +78,13 @@ public class AvailableOptionsProbeMethod extends ProbeMethod<ContextPolicyConfig
 
     private ConfigurationHandler ldapConfigHandler;
 
-    private final Configurator configurator;
+    private final ConfigReader configReader;
 
     public AvailableOptionsProbeMethod(ConfigurationHandler ldapConfigHandler,
             ConfiguratorFactory configuratorFactory) {
         super(ID, DESCRIPTION, null, null, SUCCESS_TYPES, FAILED_TYPES, null, RETURN_TYPES);
         this.ldapConfigHandler = ldapConfigHandler;
-        configurator = configuratorFactory.getConfigurator();
+        configReader = configuratorFactory.getConfigReader();
     }
 
     @Override
@@ -110,7 +110,7 @@ public class AvailableOptionsProbeMethod extends ProbeMethod<ContextPolicyConfig
         // TODO: tbatie - 1/12/17 - (Ticket) need to eventually check if these handlers are running for these auth types instead of hardcoding
         List<String> authTypes = new ArrayList<>(Arrays.asList(BASIC, SAML, PKI, GUEST));
 
-        if (configurator.isBundleStarted(IDP_CLIENT_BUNDLE_NAME)) {
+        if (configReader.isBundleStarted(IDP_CLIENT_BUNDLE_NAME)) {
             authTypes.add(IDP_AUTH);
         }
 
@@ -120,7 +120,7 @@ public class AvailableOptionsProbeMethod extends ProbeMethod<ContextPolicyConfig
     public List<String> getRealms() {
         List<String> realms = new ArrayList<>(Collections.singletonList(KARAF));
         // If an IdpConfigurationHandler exists replace this with a service reference
-        if (configurator.isBundleStarted(IDP_SERVER_BUNDLE_NAME)) {
+        if (configReader.isBundleStarted(IDP_SERVER_BUNDLE_NAME)) {
             realms.add(IDP_REALM);
         }
 
@@ -136,7 +136,7 @@ public class AvailableOptionsProbeMethod extends ProbeMethod<ContextPolicyConfig
     }
 
     public Object getClaims() {
-        Map<String, Object> stsConfig = configurator.getConfig(STS_CLAIMS_CONFIGURATION_CONFIG_ID);
+        Map<String, Object> stsConfig = configReader.getConfig(STS_CLAIMS_CONFIGURATION_CONFIG_ID);
         return stsConfig == null ? null : stsConfig.get(STS_CLAIMS_PROPS_KEY_CLAIMS);
     }
 }

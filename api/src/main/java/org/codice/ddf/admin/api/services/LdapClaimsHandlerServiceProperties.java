@@ -28,7 +28,7 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.codice.ddf.admin.api.config.ldap.LdapConfiguration;
-import org.codice.ddf.admin.configurator.Configurator;
+import org.codice.ddf.admin.configurator.ConfigReader;
 
 public class LdapClaimsHandlerServiceProperties {
 
@@ -64,7 +64,7 @@ public class LdapClaimsHandlerServiceProperties {
     // ---
 
     public static LdapConfiguration ldapClaimsHandlerServiceToLdapConfig(Map<String, Object> props,
-            Configurator configurator) {
+            ConfigReader configReader) {
         LdapConfiguration config = new LdapConfiguration();
         config.servicePid(
                 props.get(SERVICE_PID_KEY) == null ? null : (String) props.get(SERVICE_PID_KEY));
@@ -98,7 +98,7 @@ public class LdapClaimsHandlerServiceProperties {
             if (!mappingPath.startsWith(ddfHome)) {
                 mappingPath = ddfHome.resolve(mappingPath);
             }
-            Map<String, String> attributeMappings = new HashMap<>(configurator.getProperties(
+            Map<String, String> attributeMappings = new HashMap<>(configReader.getProperties(
                     mappingPath));
             config.attributeMappings(attributeMappings);
         }

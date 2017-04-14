@@ -33,7 +33,7 @@ import org.codice.ddf.admin.api.handler.method.TestMethod;
 import org.codice.ddf.admin.api.handler.report.ProbeReport;
 import org.codice.ddf.admin.api.handler.report.Report;
 import org.codice.ddf.admin.api.services.WfsServiceProperties;
-import org.codice.ddf.admin.configurator.Configurator;
+import org.codice.ddf.admin.configurator.ConfigReader;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.sources.wfs.persist.CreateWfsSourcePersistMethod;
 import org.codice.ddf.admin.sources.wfs.persist.DeleteWfsSourcePersistMethod;
@@ -89,9 +89,9 @@ public class WfsSourceConfigurationHandler extends DefaultConfigurationHandler<S
 
     @Override
     public List<SourceConfiguration> getConfigurations() {
-        Configurator configurator = configuratorFactory.getConfigurator();
+        ConfigReader configReader = configuratorFactory.getConfigReader();
         return WFS_FACTORY_PIDS.stream()
-                .flatMap(factoryPid -> configurator.getManagedServiceConfigs(factoryPid)
+                .flatMap(factoryPid -> configReader.getManagedServiceConfigs(factoryPid)
                         .values()
                         .stream())
                 .map(WfsServiceProperties::servicePropsToWfsConfig)

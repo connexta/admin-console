@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.collections.ListUtils;
 import org.codice.ddf.admin.api.config.context.ContextPolicyBin;
 import org.codice.ddf.admin.api.config.context.ContextPolicyConfiguration;
-import org.codice.ddf.admin.configurator.Configurator;
+import org.codice.ddf.admin.configurator.ConfigReader;
 import org.codice.ddf.security.policy.context.ContextPolicy;
 import org.codice.ddf.security.policy.context.ContextPolicyManager;
 import org.codice.ddf.security.policy.context.impl.PolicyManager;
@@ -40,8 +40,8 @@ public class PolicyManagerServiceProperties {
     public static final String IDP_SERVER_BUNDLE_NAME = "security-idp-server";
 
     public static ContextPolicyConfiguration contextPolicyServiceToContextPolicyConfig(
-            Configurator configurator) {
-        ContextPolicyManager ref = configurator.getServiceReference(ContextPolicyManager.class);
+            ConfigReader configReader) {
+        ContextPolicyManager ref = configReader.getServiceReference(ContextPolicyManager.class);
         PolicyManager policyManager = ((PolicyManager) ref);
         return new ContextPolicyConfiguration().contextPolicyBins(policyManagerSettingsToBins(
                 policyManager))

@@ -33,7 +33,7 @@ import org.codice.ddf.admin.api.handler.method.TestMethod;
 import org.codice.ddf.admin.api.handler.report.ProbeReport;
 import org.codice.ddf.admin.api.handler.report.Report;
 import org.codice.ddf.admin.api.services.OpenSearchServiceProperties;
-import org.codice.ddf.admin.configurator.Configurator;
+import org.codice.ddf.admin.configurator.ConfigReader;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.sources.opensearch.persist.CreateOpenSearchSourcePersistMethod;
 import org.codice.ddf.admin.sources.opensearch.persist.DeleteOpenSearchSourcePersistMethod;
@@ -91,8 +91,8 @@ public class OpenSearchSourceConfigurationHandler
 
     @Override
     public List<SourceConfiguration> getConfigurations() {
-        Configurator configurator = configuratorFactory.getConfigurator();
-        return configurator.getManagedServiceConfigs(OPENSEARCH_FACTORY_PID)
+        ConfigReader configReader = configuratorFactory.getConfigReader();
+        return configReader.getManagedServiceConfigs(OPENSEARCH_FACTORY_PID)
                 .values()
                 .stream()
                 .map(OpenSearchServiceProperties::servicePropsToOpenSearchConfig)

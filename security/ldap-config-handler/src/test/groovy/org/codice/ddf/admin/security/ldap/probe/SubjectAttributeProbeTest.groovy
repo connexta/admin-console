@@ -2,7 +2,7 @@ package org.codice.ddf.admin.security.ldap.probe
 
 import org.codice.ddf.admin.api.config.ldap.LdapConfiguration
 import org.codice.ddf.admin.api.handler.report.ProbeReport
-import org.codice.ddf.admin.configurator.Configurator
+import org.codice.ddf.admin.configurator.ConfigReader
 import org.codice.ddf.admin.security.ldap.LdapConnectionResult
 import org.codice.ddf.admin.security.ldap.test.LdapTestingCommons
 import org.forgerock.opendj.ldap.SearchResultReferenceIOException
@@ -23,7 +23,7 @@ class SubjectAttributeProbeTest extends Specification {
         def ldapTestingCommons = Mock(LdapTestingCommons)
         def connectionAttempt = Mock(LdapTestingCommons.LdapConnectionAttempt)
         ldapTestingCommons.bindUserToLdapConnection(configuration) >> connectionAttempt
-        def configurator = Mock(Configurator)
+        def configurator = Mock(ConfigReader)
         def subjectClaims = ['one', 'two', 'three']
         configurator.getConfig(STS_CLAIMS_CONFIGURATION_CONFIG_ID) >>
                 [(STS_CLAIMS_PROPS_KEY_CLAIMS): subjectClaims]

@@ -29,7 +29,7 @@ import org.codice.ddf.admin.api.handler.method.ProbeMethod;
 import org.codice.ddf.admin.api.handler.method.TestMethod;
 import org.codice.ddf.admin.api.services.LdapClaimsHandlerServiceProperties;
 import org.codice.ddf.admin.api.services.LdapLoginServiceProperties;
-import org.codice.ddf.admin.configurator.Configurator;
+import org.codice.ddf.admin.configurator.ConfigReader;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.security.ldap.persist.CreateLdapConfigMethod;
 import org.codice.ddf.admin.security.ldap.persist.DeleteLdapConfigMethod;
@@ -67,10 +67,10 @@ public class LdapConfigurationHandler extends DefaultConfigurationHandler<LdapCo
     @Override
     public List<ProbeMethod> getProbeMethods() {
         LdapTestingCommons ldapTestingCommons = new LdapTestingCommons();
-        Configurator configurator = configuratorFactory.getConfigurator();
+        ConfigReader configReader = configuratorFactory.getConfigReader();
         return ImmutableList.of(new DefaultDirectoryStructureProbe(ldapTestingCommons),
                 new LdapQueryProbe(ldapTestingCommons),
-                new SubjectAttributeProbe(ldapTestingCommons, configurator));
+                new SubjectAttributeProbe(ldapTestingCommons, configReader));
     }
 
     @Override
@@ -80,7 +80,7 @@ public class LdapConfigurationHandler extends DefaultConfigurationHandler<LdapCo
                 new BindUserTestMethod(ldapTestingCommons),
                 new DirectoryStructTestMethod(ldapTestingCommons),
                 new AttributeMappingTestMethod(ldapTestingCommons,
-                        configuratorFactory.getConfigurator()));
+                        configuratorFactory.getConfigReader()));
     }
 
     @Override
@@ -91,20 +91,20 @@ public class LdapConfigurationHandler extends DefaultConfigurationHandler<LdapCo
 
     @Override
     public List<LdapConfiguration> getConfigurations() {
-        List<LdapConfiguration> ldapLoginConfigs = configuratorFactory.getConfigurator()
+        List<LdapConfiguration> ldapLoginConfigs = configuratorFactory.getConfigReader()
                 .getManagedServiceConfigs(LDAP_LOGIN_MANAGED_SERVICE_FACTORY_PID)
                 .values()
                 .stream()
                 .map(LdapLoginServiceProperties::ldapLoginServiceToLdapConfiguration)
                 .collect(Collectors.toList());
 
-        List<LdapConfiguration> ldapClaimsHandlerConfigs = configuratorFactory.getConfigurator()
+        List<LdapConfiguration> ldapClaimsHandlerConfigs = configuratorFactory.getConfigReader()
                 .getManagedServiceConfigs(LDAP_CLAIMS_HANDLER_MANAGED_SERVICE_FACTORY_PID)
                 .values()
                 .stream()
                 .map((props) -> LdapClaimsHandlerServiceProperties.ldapClaimsHandlerServiceToLdapConfig(
                         props,
-                        configuratorFactory.getConfigurator()))
+                        configuratorFactory.getConfigReader()))
                 .collect(Collectors.toList());
 
         return Stream.concat(ldapLoginConfigs.stream(), ldapClaimsHandlerConfigs.stream())

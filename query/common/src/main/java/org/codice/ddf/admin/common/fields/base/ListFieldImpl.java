@@ -26,21 +26,35 @@ import org.codice.ddf.admin.api.fields.ListField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class BaseListField<T extends Field> extends BaseField<List>
+public class ListFieldImpl<T extends Field> extends BaseField<List>
         implements ListField<T> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(BaseListField.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ListFieldImpl.class);
+
+    public static final String DEFAULT_FIELD_NAME  = "list";
 
     protected List<T> fields;
 
     protected T listFieldType;
 
-    private boolean isRequiredNonEmpty;
-
-    public BaseListField(String fieldName, String description, T listFieldType) {
-        super(fieldName, null, description, LIST);
+    public ListFieldImpl(String fieldName, Class<T> listFieldType) {
+        super(fieldName, null, null, LIST);
         this.fields = new ArrayList<>();
-        this.listFieldType = listFieldType;
+        try {
+            // TODO: tbatie - 4/13/17 - Review if this is the correct way to do all this
+            this.listFieldType = listFieldType.newInstance();
+        } catch (InstantiationException | IllegalAccessException e) {
+            throw new RuntimeException(String.format("Unable to create new instance of class [%s]. Ensure there is a default constructor for the ListFieldImpl to initialize.", listFieldType.getClass()));
+        }
+    }
+
+    public ListFieldImpl(Class<T> listFieldType, List<T> values) {
+        this(DEFAULT_FIELD_NAME, listFieldType);
+        addAll(values);
+    }
+
+    public ListFieldImpl(Class<T> listFieldType) {
+        this(DEFAULT_FIELD_NAME, listFieldType);
     }
 
     @Override
@@ -67,7 +81,6 @@ public abstract class BaseListField<T extends Field> extends BaseField<List>
             return;
         }
 
-        List<T> newFields = new ArrayList<T>();
         for (Object val : values) {
             try {
                 T newField = (T) getListFieldType().getClass()
@@ -82,7 +95,7 @@ public abstract class BaseListField<T extends Field> extends BaseField<List>
     }
 
     @Override
-    public BaseListField add(T value) {
+    public ListFieldImpl<T> add(T value) {
         // TODO: 4/10/17 perform special validation for object fields
         // TODO: 4/10/17 Copy the obj instead
         value.isRequired(listFieldType.isRequired());
@@ -91,7 +104,7 @@ public abstract class BaseListField<T extends Field> extends BaseField<List>
     }
 
     @Override
-    public BaseListField addAll(List<T> values) {
+    public ListFieldImpl<T> addAll(Collection<T> values) {
         values.forEach(field -> add(field));
         return this;
     }
@@ -111,16 +124,5 @@ public abstract class BaseListField<T extends Field> extends BaseField<List>
         }
 
         return validationMsgs;
-    }
-
-    @Override
-    public boolean isRequiredNonEmpty() {
-        return isRequiredNonEmpty;
-    }
-
-    @Override
-    public ListField<T> isRequiredNonEmpty(boolean required) {
-        isRequiredNonEmpty = required;
-        return this;
     }
 }

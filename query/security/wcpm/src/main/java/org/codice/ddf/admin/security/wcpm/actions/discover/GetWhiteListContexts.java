@@ -15,14 +15,15 @@ package org.codice.ddf.admin.security.wcpm.actions.discover;
 
 import java.util.List;
 
+import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.actions.GetAction;
+import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.fields.common.ContextPath;
-import org.codice.ddf.admin.common.fields.common.ContextPaths;
 import org.codice.ddf.admin.configurator.Configurator;
 import org.codice.ddf.security.policy.context.ContextPolicyManager;
 import org.codice.ddf.security.policy.context.impl.PolicyManager;
 
-public class GetWhiteListContexts extends GetAction<ContextPaths> {
+public class GetWhiteListContexts extends GetAction<ListField<ContextPath>> {
 
     public static final String DEFAULT_FIELD_NAME = "whitelisted";
 
@@ -32,18 +33,18 @@ public class GetWhiteListContexts extends GetAction<ContextPaths> {
     private Configurator configurator;
 
     public GetWhiteListContexts(Configurator configurator) {
-        super(DEFAULT_FIELD_NAME, DESCRIPTION, new ContextPaths());
+        super(DEFAULT_FIELD_NAME, DESCRIPTION, new ListFieldImpl<>(ContextPath.class));
         this.configurator = configurator;
 
     }
 
     @Override
-    public ContextPaths performAction() {
+    public ListField<ContextPath> performAction() {
         ContextPolicyManager ref = configurator.getServiceReference(ContextPolicyManager.class);
         PolicyManager policyManager = ((PolicyManager) ref);
         List<String> whiteListStrs = policyManager.getWhiteListContexts();
 
-        ContextPaths whiteListedField = new ContextPaths();
+        ListField<ContextPath> whiteListedField = new ListFieldImpl<>(ContextPath.class);
         for (String whiteListStr : whiteListStrs) {
             ContextPath newContextPath = new ContextPath();
             newContextPath.setValue(whiteListStr);

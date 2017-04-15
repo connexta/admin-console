@@ -20,9 +20,10 @@ import static org.codice.ddf.admin.security.wcpm.commons.ContextPolicyServicePro
 import java.util.List;
 
 import org.codice.ddf.admin.api.fields.Field;
+import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.actions.BaseAction;
+import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.fields.common.ContextPath;
-import org.codice.ddf.admin.common.fields.common.ContextPaths;
 import org.codice.ddf.admin.configurator.Configurator;
 import org.codice.ddf.admin.configurator.OperationReport;
 import org.codice.ddf.security.policy.context.ContextPolicyManager;
@@ -30,20 +31,20 @@ import org.codice.ddf.security.policy.context.impl.PolicyManager;
 
 import com.google.common.collect.ImmutableList;
 
-public class SaveWhitelistContexts extends BaseAction<ContextPaths> {
+public class SaveWhitelistContexts extends BaseAction<ListField<ContextPath>> {
 
     public static final String DEFAULT_FIELD_NAME = "saveWhitelistContexts";
 
     public static final String DESCRIPTION =
             "Persists the given contexts paths as white listed contexts. White listing a context path will result in no security being applied to the given paths.";
 
-    private ContextPaths contexts;
+    private ListField<ContextPath> contexts;
 
     private Configurator configurator;
 
     public SaveWhitelistContexts(Configurator configurator) {
-        super(DEFAULT_FIELD_NAME, DESCRIPTION, new ContextPaths());
-        contexts = new ContextPaths();
+        super(DEFAULT_FIELD_NAME, DESCRIPTION, new ListFieldImpl<>(ContextPath.class));
+        contexts = new ListFieldImpl<>("paths", ContextPath.class);
         contexts.isRequired(true);
         this.configurator = configurator;
     }
@@ -54,10 +55,10 @@ public class SaveWhitelistContexts extends BaseAction<ContextPaths> {
     }
 
     @Override
-    public ContextPaths performAction() {
+    public ListField<ContextPath> performAction() {
         ContextPolicyManager ref = configurator.getServiceReference(ContextPolicyManager.class);
         PolicyManager policyManager = ((PolicyManager) ref);
-        ContextPaths preUpdateWhitelistContexts = new ContextPaths();
+        ListField<ContextPath> preUpdateWhitelistContexts = new ListFieldImpl<>(ContextPath.class);
 
         for (String path : policyManager.getWhiteListContexts()) {
             preUpdateWhitelistContexts.add(new ContextPath(path));

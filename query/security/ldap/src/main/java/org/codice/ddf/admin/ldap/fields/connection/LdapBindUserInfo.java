@@ -13,8 +13,11 @@
  **/
 package org.codice.ddf.admin.ldap.fields.connection;
 
+import static org.codice.ddf.admin.ldap.fields.connection.LdapBindMethod.DIGEST_MD5_SASL;
+
 import java.util.List;
 
+import org.codice.ddf.admin.api.action.Message;
 import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
@@ -27,7 +30,7 @@ public class LdapBindUserInfo extends BaseObjectField {
     public static final String FIELD_TYPE_NAME = "BindUserInfo";
 
     public static final String DESCRIPTION =
-            "Contains the required information to bind a user to an LDAP connection.";
+            "Contains the required information to bind a user to an LDAP connection. When the bindMethod is set to DigestMD5SASL, a realm must be provided.";
 
     public static final String USERNAME = "username";
 
@@ -60,13 +63,11 @@ public class LdapBindUserInfo extends BaseObjectField {
     }
 
     public LdapBindUserInfo bindMethod(String bindMethod) {
-        // TODO: tbatie - 4/2/17 - Match the bind method to a specific type
         this.bindMethod.setValue(bindMethod);
         return this;
     }
 
     public LdapBindUserInfo realm(String realm) {
-        // TODO: tbatie - 4/2/17 - Match the bind method to a specific type
         this.realm.setValue(realm);
         return this;
     }
@@ -86,6 +87,14 @@ public class LdapBindUserInfo extends BaseObjectField {
 
     public String realm() {
         return realm.getValue();
+    }
+
+    @Override
+    public List<Message> validate() {
+        if(bindMethod().equals(DIGEST_MD5_SASL)) {
+            realm.isRequired(true);
+        }
+        return super.validate();
     }
 
     @Override

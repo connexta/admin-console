@@ -20,8 +20,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections.ListUtils;
+import org.codice.ddf.admin.api.fields.ListField;
+import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.configurator.Configurator;
-import org.codice.ddf.admin.security.common.fields.wcpm.ContextPolicies;
 import org.codice.ddf.admin.security.common.fields.wcpm.ContextPolicyBin;
 import org.codice.ddf.security.policy.context.ContextPolicy;
 import org.codice.ddf.security.policy.context.ContextPolicyManager;
@@ -38,15 +39,14 @@ public class PolicyManagerServiceProperties {
 
     public static final String IDP_SERVER_BUNDLE_NAME = "security-idp-server";
 
-    public ContextPolicies contextPolicyServiceToContextPolicyFields(Configurator configurator) {
+    public ListField<ContextPolicyBin> contextPolicyServiceToContextPolicyFields(Configurator configurator) {
         ContextPolicyManager ref = configurator.getServiceReference(ContextPolicyManager.class);
         return policyManagerSettingsToBins((PolicyManager) ref);
     }
 
     // TODO: tbatie - 1/17/17 - (Ticket) Get rid of this PolicyManager reference and break this dependency.
-    public ContextPolicies policyManagerSettingsToBins(PolicyManager policyManager) {
+    public ListField<ContextPolicyBin> policyManagerSettingsToBins(PolicyManager policyManager) {
         List<ContextPolicyBin> policies = new ArrayList<>();
-        ContextPolicyBin policyField = new ContextPolicyBin();
 
         Collection<ContextPolicy> allPolicies = policyManager.getAllContextPolicies();
         for (ContextPolicy policy : allPolicies) {
@@ -75,7 +75,7 @@ public class PolicyManagerServiceProperties {
             }
         }
 
-        ContextPolicies policiesField = new ContextPolicies();
+        ListField<ContextPolicyBin> policiesField = new ListFieldImpl<>(ContextPolicyBin.class);
         policiesField.addAll(policies);
         return policiesField;
     }

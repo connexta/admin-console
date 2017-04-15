@@ -16,7 +16,7 @@ package org.codice.ddf.admin.ldap.actions.commons;
 import org.codice.ddf.admin.common.message.ErrorMessage;
 import org.codice.ddf.admin.common.message.WarningMessage;
 
-public class LdapActionMessages {
+public class LdapMessages {
 
     public static final ErrorMessage CANNOT_CONFIGURE = new ErrorMessage("CANNOT_CONFIGURE");
     public static final ErrorMessage CANNOT_CONNECT = new ErrorMessage("CANNOT_CONNECT");

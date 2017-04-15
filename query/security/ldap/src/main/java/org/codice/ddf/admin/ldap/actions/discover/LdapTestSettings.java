@@ -13,13 +13,13 @@
  **/
 package org.codice.ddf.admin.ldap.actions.discover;
 
-import static org.codice.ddf.admin.ldap.actions.commons.LdapActionMessages.BASE_GROUP_DN_NOT_FOUND;
-import static org.codice.ddf.admin.ldap.actions.commons.LdapActionMessages.BASE_USER_DN_NOT_FOUND;
-import static org.codice.ddf.admin.ldap.actions.commons.LdapActionMessages.NO_GROUPS_IN_BASE_GROUP_DN;
-import static org.codice.ddf.admin.ldap.actions.commons.LdapActionMessages.NO_GROUPS_WITH_MEMBERS;
-import static org.codice.ddf.admin.ldap.actions.commons.LdapActionMessages.NO_REFERENCED_MEMBER;
-import static org.codice.ddf.admin.ldap.actions.commons.LdapActionMessages.NO_USERS_IN_BASE_USER_DN;
-import static org.codice.ddf.admin.ldap.actions.commons.LdapActionMessages.USER_NAME_ATTRIBUTE_NOT_FOUND;
+import static org.codice.ddf.admin.ldap.actions.commons.LdapMessages.BASE_GROUP_DN_NOT_FOUND;
+import static org.codice.ddf.admin.ldap.actions.commons.LdapMessages.BASE_USER_DN_NOT_FOUND;
+import static org.codice.ddf.admin.ldap.actions.commons.LdapMessages.NO_GROUPS_IN_BASE_GROUP_DN;
+import static org.codice.ddf.admin.ldap.actions.commons.LdapMessages.NO_GROUPS_WITH_MEMBERS;
+import static org.codice.ddf.admin.ldap.actions.commons.LdapMessages.NO_REFERENCED_MEMBER;
+import static org.codice.ddf.admin.ldap.actions.commons.LdapMessages.NO_USERS_IN_BASE_USER_DN;
+import static org.codice.ddf.admin.ldap.actions.commons.LdapMessages.USER_NAME_ATTRIBUTE_NOT_FOUND;
 
 import java.util.ArrayList;
 import java.util.Arrays;

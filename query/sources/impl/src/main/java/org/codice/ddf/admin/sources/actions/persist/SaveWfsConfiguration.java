@@ -18,8 +18,10 @@ import static org.codice.ddf.admin.sources.sample.SampleFields.SAMPLE_WFS_SOURCE
 import java.util.List;
 
 import org.codice.ddf.admin.api.fields.Field;
+import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.actions.BaseAction;
-import org.codice.ddf.admin.common.message.SkipWarningsList;
+import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
+import org.codice.ddf.admin.common.message.MessageCodeField;
 import org.codice.ddf.admin.sources.fields.SourceInfoField;
 import org.codice.ddf.admin.sources.fields.type.WfsSourceConfigurationField;
 
@@ -34,12 +36,12 @@ public class SaveWfsConfiguration extends BaseAction<SourceInfoField> {
 
     private WfsSourceConfigurationField config;
 
-    private SkipWarningsList skipWarnings;
+    private ListField<MessageCodeField> skipWarnings;
 
     public SaveWfsConfiguration() {
         super(NAME, DESCRIPTION, new SourceInfoField());
         config = new WfsSourceConfigurationField();
-        skipWarnings = new SkipWarningsList();
+        skipWarnings = new ListFieldImpl<>("skipWarnings", MessageCodeField.class);
     }
 
     @Override

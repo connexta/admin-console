@@ -18,13 +18,15 @@ import static org.codice.ddf.admin.sources.sample.SampleFields.SAMPLE_SOURCES_IN
 import java.util.List;
 
 import org.codice.ddf.admin.api.fields.Field;
+import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.actions.BaseAction;
+import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.fields.common.PidField;
-import org.codice.ddf.admin.sources.fields.SourceInfoListField;
+import org.codice.ddf.admin.sources.fields.SourceInfoField;
 
 import com.google.common.collect.ImmutableList;
 
-public class DeleteSource extends BaseAction<SourceInfoListField> {
+public class DeleteSource extends BaseAction<ListField<SourceInfoField>> {
 
     public static final String NAME = "deleteSource";
 
@@ -34,7 +36,7 @@ public class DeleteSource extends BaseAction<SourceInfoListField> {
     private PidField pid;
 
     public DeleteSource() {
-        super(NAME, DESCRIPTION, new SourceInfoListField());
+        super(NAME, DESCRIPTION, new ListFieldImpl<>(SourceInfoField.class));
         pid = new PidField();
     }
 
@@ -44,7 +46,7 @@ public class DeleteSource extends BaseAction<SourceInfoListField> {
     }
 
     @Override
-    public SourceInfoListField performAction() {
+    public ListField<SourceInfoField> performAction() {
         return SAMPLE_SOURCES_INFO_LIST;
     }
 }

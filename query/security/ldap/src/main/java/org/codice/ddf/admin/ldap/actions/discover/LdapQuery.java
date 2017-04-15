@@ -18,7 +18,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.api.fields.Field;
+import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.actions.BaseAction;
+import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.fields.base.scalar.IntegerField;
 import org.codice.ddf.admin.common.fields.common.MapField;
 import org.codice.ddf.admin.ldap.actions.commons.LdapConnectionAttempt;
@@ -26,7 +28,6 @@ import org.codice.ddf.admin.ldap.actions.commons.LdapTestingUtils;
 import org.codice.ddf.admin.ldap.fields.LdapDistinguishedName;
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindUserInfo;
 import org.codice.ddf.admin.ldap.fields.connection.LdapConnectionField;
-import org.codice.ddf.admin.ldap.fields.query.LdapEntriesListField;
 import org.codice.ddf.admin.ldap.fields.query.LdapQueryField;
 import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.ByteString;
@@ -35,7 +36,7 @@ import org.forgerock.opendj.ldap.responses.SearchResultEntry;
 
 import com.google.common.collect.ImmutableList;
 
-public class LdapQuery extends BaseAction<LdapEntriesListField> {
+public class LdapQuery extends BaseAction<ListField<MapField>> {
 
     public static final String NAME = "query";
 
@@ -54,7 +55,7 @@ public class LdapQuery extends BaseAction<LdapEntriesListField> {
     private LdapTestingUtils utils;
 
     public LdapQuery() {
-        super(NAME, DESCRIPTION, new LdapEntriesListField());
+        super(NAME, DESCRIPTION, new ListFieldImpl<>(MapField.class));
         conn = new LdapConnectionField();
         creds = new LdapBindUserInfo();
         maxQueryResults = new IntegerField("maxQueryResults");
@@ -66,11 +67,11 @@ public class LdapQuery extends BaseAction<LdapEntriesListField> {
     @Override
     public List<Field> getArguments() {
         // TODO: tbatie - 4/3/17 - Add other args
-        return ImmutableList.of(conn, creds, dn, maxQueryResults, dn, query);
+        return ImmutableList.of(conn, creds, dn, maxQueryResults, query);
     }
 
     @Override
-    public LdapEntriesListField performAction() {
+    public ListField<MapField> performAction() {
 
         LdapConnectionAttempt connectionAttempt = utils.bindUserToLdapConnection(conn, creds);
         addReturnValueMessages(connectionAttempt.messages());
@@ -108,6 +109,6 @@ public class LdapQuery extends BaseAction<LdapEntriesListField> {
             convertedSearchResults.add(entryMap);
         }
 
-        return new LdapEntriesListField().addAll(convertedSearchResults);
+        return new ListFieldImpl<>(MapField.class).addAll(convertedSearchResults);
     }
 }

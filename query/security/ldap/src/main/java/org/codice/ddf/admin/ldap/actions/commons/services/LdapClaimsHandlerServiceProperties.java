@@ -115,19 +115,19 @@ public class LdapClaimsHandlerServiceProperties {
 
 
         if (config != null) {
-            String ldapUrl = getLdapUrl(config.connection());
-            boolean startTls = isStartTls(config.connection());
-            props.put(URL, ldapUrl + config.connection().hostname() + ":" + config.connection().port());
+            String ldapUrl = getLdapUrl(config.connectionField());
+            boolean startTls = isStartTls(config.connectionField());
+            props.put(URL, ldapUrl + config.connectionField().hostname() + ":" + config.connectionField().port());
             props.put(START_TLS, startTls);
-            props.put(LDAP_BIND_USER_DN, config.bindUserInfo().username());
-            props.put(PASSWORD, config.bindUserInfo().password());
-            props.put(BIND_METHOD, config.bindUserInfo().bindMethod());
-            props.put(LOGIN_USER_ATTRIBUTE, config.settings().usernameAttribute());
-            props.put(USER_BASE_DN, config.settings().baseUserDn());
-            props.put(GROUP_BASE_DN, config.settings().baseGroupDn());
-            props.put(OBJECT_CLASS, config.settings().groupObjectClass());
-            props.put(MEMBERSHIP_USER_ATTRIBUTE, config.settings().memberAttributeReferencedInGroup());
-            props.put(MEMBER_NAME_ATTRIBUTE, config.settings().groupAttributeHoldingMember());
+            props.put(LDAP_BIND_USER_DN, config.bindUserInfoField().username());
+            props.put(PASSWORD, config.bindUserInfoField().password());
+            props.put(BIND_METHOD, config.bindUserInfoField().bindMethod());
+            props.put(LOGIN_USER_ATTRIBUTE, config.settingsField().usernameAttribute());
+            props.put(USER_BASE_DN, config.settingsField().baseUserDn());
+            props.put(GROUP_BASE_DN, config.settingsField().baseGroupDn());
+            props.put(OBJECT_CLASS, config.settingsField().groupObjectClass());
+            props.put(MEMBERSHIP_USER_ATTRIBUTE, config.settingsField().memberAttributeReferencedInGroup());
+            props.put(MEMBER_NAME_ATTRIBUTE, config.settingsField().groupAttributeHoldingMember());
             // TODO: tbatie - 4/11/17 - Look up the pid, if it doesn't exist then create a new attribute mapping, else use the existing one
 //            props.put(PROPERTY_FILE_LOCATION, config.settings().attributeMappingPath());
         }

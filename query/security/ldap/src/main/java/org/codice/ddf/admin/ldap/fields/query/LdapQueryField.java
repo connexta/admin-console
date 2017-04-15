@@ -13,7 +13,7 @@
  **/
 package org.codice.ddf.admin.ldap.fields.query;
 
-import static org.codice.ddf.admin.ldap.actions.commons.LdapActionMessages.invalidQueryError;
+import static org.codice.ddf.admin.ldap.actions.commons.LdapMessages.invalidQueryError;
 
 import java.util.List;
 

@@ -13,8 +13,9 @@
  **/
 package org.codice.ddf.admin.sources.sample;
 
+import org.codice.ddf.admin.api.fields.ListField;
+import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.sources.fields.SourceInfoField;
-import org.codice.ddf.admin.sources.fields.SourceInfoListField;
 import org.codice.ddf.admin.sources.fields.type.CswSourceConfigurationField;
 import org.codice.ddf.admin.sources.fields.type.OpensearchSourceConfigurationField;
 import org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField;
@@ -57,8 +58,9 @@ public class SampleFields {
                     .isAvaliable(true)
                     .configuration(SAMPLE_OPENSEARCH_CONFIG);
 
-    public static final SourceInfoListField SAMPLE_SOURCES_INFO_LIST =
-            new SourceInfoListField().add(SAMPLE_CSW_SOURCE_INFO)
+    public static final ListField<SourceInfoField> SAMPLE_SOURCES_INFO_LIST =
+            new ListFieldImpl<>(SourceInfoField.class)
+                    .add(SAMPLE_CSW_SOURCE_INFO)
                     .add(SAMPLE_WFS_SOURCE_INFO)
                     .add(SAMPLE_OPENSEARCH_SOURCE_INFO);
 }

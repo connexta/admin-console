@@ -13,7 +13,7 @@
  **/
 package org.codice.ddf.admin.ldap.fields;
 
-import static org.codice.ddf.admin.ldap.actions.commons.LdapActionMessages.invalidDnFormatError;
+import static org.codice.ddf.admin.ldap.actions.commons.LdapMessages.invalidDnFormatError;
 
 import java.util.List;
 

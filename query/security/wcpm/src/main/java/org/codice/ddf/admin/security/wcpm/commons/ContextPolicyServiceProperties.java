@@ -18,8 +18,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.codice.ddf.admin.common.fields.common.ContextPaths;
-import org.codice.ddf.admin.security.common.fields.wcpm.ContextPolicies;
+import org.codice.ddf.admin.api.fields.ListField;
+import org.codice.ddf.admin.common.fields.common.ContextPath;
 import org.codice.ddf.admin.security.common.fields.wcpm.ContextPolicyBin;
 
 import com.google.common.collect.ImmutableMap;
@@ -41,7 +41,7 @@ public class ContextPolicyServiceProperties {
     // ---
 
     public static Map<String, Object> contextPoliciesToPolicyManagerProps(
-            ContextPolicies contextPolicies) {
+            ListField<ContextPolicyBin> contextPolicies) {
         List<String> realmsProps = new ArrayList<>();
         List<String> authTypesProps = new ArrayList<>();
         List<String> reqAttrisProps = new ArrayList<>();
@@ -73,7 +73,7 @@ public class ContextPolicyServiceProperties {
                 reqAttrisProps);
     }
 
-    public static Map<String, Object> whiteListToPolicyManagerProps(ContextPaths contexts) {
+    public static Map<String, Object> whiteListToPolicyManagerProps(ListField<ContextPath> contexts) {
         return ImmutableMap.of(WHITE_LIST_CONTEXT, contexts.getValue());
     }
 }

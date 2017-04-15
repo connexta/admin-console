@@ -14,23 +14,23 @@
 package org.codice.ddf.admin.security.sts.actions;
 
 import org.codice.ddf.admin.common.actions.GetAction;
+import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.security.common.fields.sts.StsClaimField;
-import org.codice.ddf.admin.security.common.fields.sts.StsClaimsField;
 
-public class GetStsClaimsAction extends GetAction<StsClaimsField> {
+public class GetStsClaimsAction extends GetAction<ListFieldImpl<StsClaimField>> {
 
     public static final String NAME = "claims";
 
     public static final String DESCRIPTION = "All currently configured claims the STS supports.";
 
     public GetStsClaimsAction() {
-        super(NAME, DESCRIPTION, new StsClaimsField());
+        super(NAME, DESCRIPTION, new ListFieldImpl<>(StsClaimField.class));
     }
 
     @Override
-    public StsClaimsField performAction() {
+    public ListFieldImpl performAction() {
         StsClaimField claim = new StsClaimField();
         claim.setValue("testClaim");
-        return new StsClaimsField().add(claim);
+        return new ListFieldImpl<>(StsClaimField.class).add(claim);
     }
 }

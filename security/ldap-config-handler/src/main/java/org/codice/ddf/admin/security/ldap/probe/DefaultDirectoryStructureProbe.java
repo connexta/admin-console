@@ -38,6 +38,7 @@ import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.CANNOT_CON
 import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.SUCCESSFUL_BIND;
 import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.toDescriptionMap;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -50,11 +51,15 @@ import org.codice.ddf.admin.api.handler.method.ProbeMethod;
 import org.codice.ddf.admin.api.handler.report.ProbeReport;
 import org.codice.ddf.admin.security.ldap.ServerGuesser;
 import org.codice.ddf.admin.security.ldap.test.LdapTestingCommons;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 public class DefaultDirectoryStructureProbe extends ProbeMethod<LdapConfiguration> {
+    private static final Logger LOGGER =
+            LoggerFactory.getLogger(DefaultDirectoryStructureProbe.class);
 
     private static final String ID = "dir-struct";
 
@@ -106,33 +111,37 @@ public class DefaultDirectoryStructureProbe extends ProbeMethod<LdapConfiguratio
 
     @Override
     public ProbeReport probe(LdapConfiguration configuration) {
-        LdapTestingCommons.LdapConnectionAttempt connectionAttempt =
-                ldapTestingCommons.bindUserToLdapConnection(configuration);
-        if (connectionAttempt.result() != SUCCESSFUL_BIND) {
-            return createProbeReport(SUCCESS_TYPES,
-                    FAILURE_TYPES,
-                    null,
-                    connectionAttempt.result()
-                            .name());
-        }
-
         Map<String, Object> probeResult = new HashMap<>();
-        String ldapType = configuration.ldapType();
-        ServerGuesser guesser = ServerGuesser.buildGuesser(ldapType,
-                connectionAttempt.connection());
+        try (LdapTestingCommons.LdapConnectionAttempt connectionAttempt =
+                ldapTestingCommons.bindUserToLdapConnection(configuration)) {
 
-        if (guesser != null) {
-            probeResult.put(BASE_USER_DN, guesser.getUserBaseChoices());
-            probeResult.put(BASE_GROUP_DN, guesser.getGroupBaseChoices());
-            probeResult.put(USER_NAME_ATTRIBUTE, guesser.getUserNameAttribute());
-            probeResult.put(GROUP_OBJECT_CLASS, guesser.getGroupObjectClass());
-            probeResult.put(GROUP_ATTRIBUTE_HOLDING_MEMBER,
-                    guesser.getGroupAttributeHoldingMember());
-            probeResult.put(MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP,
-                    guesser.getMemberAttributeReferencedInGroup());
-            // TODO RAP 13 Dec 16: Better query, perhaps driven by guessers?
-            probeResult.put(QUERY, Collections.singletonList("objectClass=*"));
-            probeResult.put(QUERY_BASE, guesser.getBaseContexts());
+            if (connectionAttempt.result() != SUCCESSFUL_BIND) {
+                return createProbeReport(SUCCESS_TYPES,
+                        FAILURE_TYPES,
+                        null,
+                        connectionAttempt.result()
+                                .name());
+            }
+
+            String ldapType = configuration.ldapType();
+            ServerGuesser guesser = ServerGuesser.buildGuesser(ldapType,
+                    connectionAttempt.connection());
+
+            if (guesser != null) {
+                probeResult.put(BASE_USER_DN, guesser.getUserBaseChoices());
+                probeResult.put(BASE_GROUP_DN, guesser.getGroupBaseChoices());
+                probeResult.put(USER_NAME_ATTRIBUTE, guesser.getUserNameAttribute());
+                probeResult.put(GROUP_OBJECT_CLASS, guesser.getGroupObjectClass());
+                probeResult.put(GROUP_ATTRIBUTE_HOLDING_MEMBER,
+                        guesser.getGroupAttributeHoldingMember());
+                probeResult.put(MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP,
+                        guesser.getMemberAttributeReferencedInGroup());
+                // TODO RAP 13 Dec 16: Better query, perhaps driven by guessers?
+                probeResult.put(QUERY, Collections.singletonList("objectClass=*"));
+                probeResult.put(QUERY_BASE, guesser.getBaseContexts());
+            }
+        } catch (IOException e) {
+            LOGGER.debug("Unexpected error closing connection", e);
         }
 
         return createProbeReport(SUCCESS_TYPES, FAILURE_TYPES, null, SUCCESSFUL_PROBE).probeResults(

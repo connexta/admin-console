@@ -29,6 +29,7 @@ import static org.codice.ddf.admin.api.services.PolicyManagerServiceProperties.S
 import static org.codice.ddf.admin.api.validation.LdapValidationUtils.validateBindRealm;
 import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.SUCCESSFUL_BIND;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
@@ -98,29 +99,32 @@ public class SubjectAttributeProbe extends ProbeMethod<LdapConfiguration> {
         Object subjectClaims = configReader.getConfig(STS_CLAIMS_CONFIGURATION_CONFIG_ID)
                 .get(STS_CLAIMS_PROPS_KEY_CLAIMS);
 
-        LdapTestingCommons.LdapConnectionAttempt ldapConnectionAttempt =
-                ldapTestingCommons.bindUserToLdapConnection(configuration);
-
         Set<String> ldapEntryAttributes = null;
-        try {
-            if (ldapConnectionAttempt.result() == SUCCESSFUL_BIND) {
-                ServerGuesser serverGuesser = ServerGuesser.buildGuesser(configuration.ldapType(),
-                        ldapConnectionAttempt.connection());
-                ldapEntryAttributes =
-                        serverGuesser.getClaimAttributeOptions(configuration.baseUserDn());
-            } else {
-                LOGGER.warn("Error binding to LDAP server with config: {}",
-                        configuration.toString());
+        try (LdapTestingCommons.LdapConnectionAttempt ldapConnectionAttempt =
+                ldapTestingCommons.bindUserToLdapConnection(configuration)) {
+            try {
+                if (ldapConnectionAttempt.result() == SUCCESSFUL_BIND) {
+                    ServerGuesser serverGuesser = ServerGuesser.buildGuesser(configuration.ldapType(),
+                            ldapConnectionAttempt.connection());
+                    ldapEntryAttributes =
+                            serverGuesser.getClaimAttributeOptions(configuration.baseUserDn());
+                } else {
+                    LOGGER.warn("Error binding to LDAP server with config: {}",
+                            configuration.toString());
+                }
+            } catch (SearchResultReferenceIOException | LdapException e) {
+                LOGGER.warn("Error retrieving attributes from LDAP server; this may indicate a "
+                                + "configuration issue with {}: {}, {}: {}, or {}: {}",
+                        LdapConfiguration.BASE_GROUP_DN,
+                        configuration.baseGroupDn(),
+                        LdapConfiguration.GROUP_ATTRIBUTE_HOLDING_MEMBER,
+                        configuration.groupAttributeHoldingMember(),
+                        LdapConfiguration.MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP,
+                        configuration.memberAttributeReferencedInGroup());
             }
-        } catch (SearchResultReferenceIOException | LdapException e) {
-            LOGGER.warn("Error retrieving attributes from LDAP server; this may indicate a "
-                            + "configuration issue with {}: {}, {}: {}, or {}: {}",
-                    LdapConfiguration.BASE_GROUP_DN,
-                    configuration.baseGroupDn(),
-                    LdapConfiguration.GROUP_ATTRIBUTE_HOLDING_MEMBER,
-                    configuration.groupAttributeHoldingMember(),
-                    LdapConfiguration.MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP,
-                    configuration.memberAttributeReferencedInGroup());
+
+        } catch (IOException e) {
+            LOGGER.debug("Unexpected error closing connection", e);
         }
 
         return probeReport.probeResult(SUBJECT_CLAIMS, subjectClaims)

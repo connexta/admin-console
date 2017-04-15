@@ -13,26 +13,25 @@ class BindUserTestMethodTest extends Specification {
         def configuration = Mock(LdapConfiguration)
         configuration.bindUserMethod() >> "Simple"
         def ldapTestingCommons = Mock(LdapTestingCommons)
-
         def connectionAttempt = Mock(LdapTestingCommons.LdapConnectionAttempt)
+
+        connectionAttempt.connection() >> Mock(Connection)
+        ldapTestingCommons.bindUserToLdapConnection(configuration) >> connectionAttempt
+
         def tester = new BindUserTestMethod(ldapTestingCommons)
 
         when:
         Report report = tester.test(configuration)
 
         then:
-        1 * ldapTestingCommons.bindUserToLdapConnection(configuration) >> connectionAttempt
-        1 * connectionAttempt.result() >> LdapConnectionResult.SUCCESSFUL_BIND
-        1 * connectionAttempt.connection() >> Mock(Connection)
-        1 * connectionAttempt.result() >> LdapConnectionResult.SUCCESSFUL_BIND
+        _ * connectionAttempt.result() >> LdapConnectionResult.SUCCESSFUL_BIND
         !report.containsFailureMessages()
 
         when:
         report = tester.test(configuration)
 
         then:
-        1 * ldapTestingCommons.bindUserToLdapConnection(configuration) >> connectionAttempt
-        2 * connectionAttempt.result() >> LdapConnectionResult.CANNOT_BIND
+        _ * connectionAttempt.result() >> LdapConnectionResult.CANNOT_BIND
         report.containsFailureMessages()
     }
 
@@ -45,24 +44,24 @@ class BindUserTestMethodTest extends Specification {
         message.type() >> ConfigurationMessage.MessageType.FAILURE
 
         def connectionAttempt = Mock(LdapTestingCommons.LdapConnectionAttempt)
+
+        connectionAttempt.connection() >> Mock(Connection)
+        ldapTestingCommons.bindUserToLdapConnection(configuration) >> connectionAttempt
+
         def tester = new BindUserTestMethod(ldapTestingCommons)
 
         when:
         Report report = tester.test(configuration)
 
         then: 'pass'
-        1 * ldapTestingCommons.bindUserToLdapConnection(configuration) >> connectionAttempt
-        1 * connectionAttempt.result() >> LdapConnectionResult.SUCCESSFUL_BIND
-        1 * connectionAttempt.connection() >> Mock(Connection)
-        1 * connectionAttempt.result() >> LdapConnectionResult.SUCCESSFUL_BIND
+        _ * connectionAttempt.result() >> LdapConnectionResult.SUCCESSFUL_BIND
         !report.containsFailureMessages()
 
         when:
         report = tester.test(configuration)
 
         then: 'fail binding'
-        1 * ldapTestingCommons.bindUserToLdapConnection(configuration) >> connectionAttempt
-        2 * connectionAttempt.result() >> LdapConnectionResult.CANNOT_BIND
+        _ * connectionAttempt.result() >> LdapConnectionResult.CANNOT_BIND
         report.containsFailureMessages()
     }
 }

@@ -25,6 +25,7 @@ import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.CANNOT_CON
 import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.SUCCESSFUL_BIND;
 import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.SUCCESSFUL_CONNECTION;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -81,10 +82,10 @@ public class LdapTestingCommons {
 
         Connection ldapConnection;
 
-        try {
-            ldapConnection = new LDAPConnectionFactory(ldapConfiguration.hostName(),
-                    ldapConfiguration.port(),
-                    ldapOptions).getConnection();
+        try (LDAPConnectionFactory connectionFactory = new LDAPConnectionFactory(ldapConfiguration.hostName(),
+                ldapConfiguration.port(),
+                ldapOptions)) {
+            ldapConnection = connectionFactory.getConnection();
         } catch (Exception e) {
             LOGGER.debug("Error opening LDAP connection to [{}:{}]",
                     ldapConfiguration.hostName(),
@@ -96,6 +97,9 @@ public class LdapTestingCommons {
     }
 
     public LdapConnectionAttempt bindUserToLdapConnection(LdapConfiguration ldapConfiguration) {
+        // This ConnectionAttempt intentionally not closed as its internal connection is bound
+        // and rewrapped in a new ConnectionAttempt. It is only closed in the case of a bind
+        // failure.
         LdapConnectionAttempt ldapConnectionResult = getLdapConnection(ldapConfiguration);
         if (ldapConnectionResult.result() != SUCCESSFUL_CONNECTION) {
             return ldapConnectionResult;
@@ -112,6 +116,11 @@ public class LdapTestingCommons {
             connection.bind(bindRequest);
         } catch (Exception e) {
             LOGGER.debug("Error binding to LDAP", e);
+            try {
+                ldapConnectionResult.close();
+            } catch (IOException closeException) {
+                LOGGER.warn("Error closing LDAP connection", closeException);
+            }
             return new LdapConnectionAttempt(CANNOT_BIND);
         }
 
@@ -164,9 +173,6 @@ public class LdapTestingCommons {
 
         // TODO RAP 31 Jan 17: These case statements should operate in a case-insensitive manner
         switch (bindMethod) {
-        case SIMPLE:
-            request = Requests.newSimpleBindRequest(bindUser, bindUserCredentials.toCharArray());
-            break;
         //        case SASL:
         //            request = Requests.newPlainSASLBindRequest(bindUserDN,
         //                    bindUserCredentials.toCharArray());
@@ -193,6 +199,7 @@ public class LdapTestingCommons {
                 ((DigestMD5SASLBindRequest) request).setRealm(realm);
             }
             break;
+        case SIMPLE:
         default:
             request = Requests.newSimpleBindRequest(bindUser, bindUserCredentials.toCharArray());
             break;
@@ -254,8 +261,7 @@ public class LdapTestingCommons {
         return Collections.emptyList();
     }
 
-    public static class LdapConnectionAttempt {
-
+    public static class LdapConnectionAttempt implements Closeable {
         private LdapConnectionResult result;
 
         private Connection connection;
@@ -275,6 +281,13 @@ public class LdapTestingCommons {
 
         public LdapConnectionResult result() {
             return result;
+        }
+
+        @Override
+        public void close() throws IOException {
+            if (connection != null && !connection.isClosed()) {
+                connection.close();
+            }
         }
     }
 

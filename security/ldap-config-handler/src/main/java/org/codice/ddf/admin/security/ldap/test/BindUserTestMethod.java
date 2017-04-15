@@ -28,6 +28,7 @@ import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.CANNOT_CON
 import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.SUCCESSFUL_BIND;
 import static org.codice.ddf.admin.security.ldap.LdapConnectionResult.toDescriptionMap;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -79,19 +80,19 @@ public class BindUserTestMethod extends TestMethod<LdapConfiguration> {
 
     @Override
     public Report test(LdapConfiguration configuration) {
-        LdapTestingCommons.LdapConnectionAttempt bindConnectionAttempt =
-                ldapTestingCommons.bindUserToLdapConnection(configuration);
-
-        if (bindConnectionAttempt.result() == SUCCESSFUL_BIND) {
-            bindConnectionAttempt.connection()
-                    .close();
+        String result;
+        try (LdapTestingCommons.LdapConnectionAttempt bindConnectionAttempt = ldapTestingCommons.bindUserToLdapConnection(
+                configuration)) {
+            result = bindConnectionAttempt.result()
+                    .name();
+        } catch (IOException e) {
+            result = "Failure connecting";
         }
 
         return Report.createReport(SUCCESS_TYPES,
                 FAILURE_TYPES,
                 null,
-                Collections.singletonList(bindConnectionAttempt.result()
-                        .name()));
+                Collections.singletonList(result));
     }
 
     @Override

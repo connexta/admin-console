@@ -22,6 +22,8 @@ import org.codice.ddf.admin.api.action.Message;
 
 public class StringField extends BaseScalarField<String> {
 
+    public static final String DEFAULT_FIELD_NAME  = "string";
+
     protected StringField(String fieldName, String fieldTypeName, String description) {
         super(fieldName, fieldTypeName, description, STRING);
     }
@@ -31,7 +33,7 @@ public class StringField extends BaseScalarField<String> {
     }
 
     public StringField() {
-        this(null);
+        this(DEFAULT_FIELD_NAME);
     }
 
     @Override

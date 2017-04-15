@@ -31,11 +31,11 @@ public class ListFieldImpl<T extends Field> extends BaseField<List>
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ListFieldImpl.class);
 
+    public static final String DEFAULT_FIELD_NAME  = "list";
+
     protected List<T> fields;
 
     protected T listFieldType;
-
-    private boolean isRequiredNonEmpty;
 
     public ListFieldImpl(String fieldName, Class<T> listFieldType) {
         super(fieldName, null, null, LIST);
@@ -49,12 +49,12 @@ public class ListFieldImpl<T extends Field> extends BaseField<List>
     }
 
     public ListFieldImpl(Class<T> listFieldType, List<T> values) {
-        this(null, listFieldType);
+        this(DEFAULT_FIELD_NAME, listFieldType);
         addAll(values);
     }
 
     public ListFieldImpl(Class<T> listFieldType) {
-        this(null, listFieldType);
+        this(DEFAULT_FIELD_NAME, listFieldType);
     }
 
     @Override

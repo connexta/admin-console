@@ -48,7 +48,7 @@ const SourceTileView = (props) => {
           <ConfigField fieldName='Source Type' value={getSourceTypeFromFactoryPid(factoryPid)} />
           <ConfigField fieldName='Endpoint' value={endpointUrl} />
           <ConfigField fieldName='Username' value={sourceUserName || 'none'} />
-          <ConfigField fieldName='Password' value={sourceUserName || '******'} />
+          <ConfigField fieldName='Password' value={'******'} />
           <div style={{ textAlign: 'center' }}>
             <ConfirmableButton confirmableMessage='Confirm delete?' style={{ marginTop: 20 }}
               label='Delete' secondary onClick={onDeleteConfig} />

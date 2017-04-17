@@ -13,7 +13,6 @@
  */
 package org.codice.ddf.admin.sources.csw;
 
-import static java.net.HttpURLConnection.HTTP_OK;
 import static org.codice.ddf.admin.api.handler.ConfigurationMessage.createInternalErrorMsg;
 import static org.codice.ddf.admin.api.services.CswServiceProperties.CSW_GMD_FACTORY_PID;
 import static org.codice.ddf.admin.api.services.CswServiceProperties.CSW_PROFILE_FACTORY_PID;
@@ -29,6 +28,7 @@ import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.createDo
 import static org.codice.ddf.admin.sources.csw.CswSourceConfigurationHandler.CSW_SOURCE_CONFIGURATION_HANDLER_ID;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
@@ -42,22 +42,18 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 public class CswSourceUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CswSourceUtils.class);
 
-    public static final String GET_CAPABILITIES_PARAMS = "?service=CSW&request=GetCapabilities";
+    public static final Map<String, String> GET_CAPABILITIES_PARAMS = ImmutableMap.of(
+            "service", "CSW",
+            "request", "GetCapabilities");
 
     private static final List<String> URL_FORMATS = ImmutableList.of("https://%s:%d/services/csw",
-            "https://%s:%d/csw",
-            "http://%s:%d/services/csw",
-            "http://%s:%d/csw");
-
-    private static final List<String> CSW_MIME_TYPES = ImmutableList.of("text/xml",
-            "application/xml",
-            "application/xml; charset=UTF-8",
-            "text/xml; charset=UTF-8");
+            "https://%s:%d/csw");
 
     protected static final String GMD_OUTPUT_SCHEMA = "http://www.isotc211.org/2005/gmd";
 
@@ -92,24 +88,12 @@ public class CswSourceUtils {
      * @param password Optional Password for Basic Auth header
      * @return report
      */
-    public ProbeReport sendCswCapabilitiesRequest(String url, String username,
-            String password) {
-        ProbeReport requestResults = requestUtils.sendGetRequest(url + GET_CAPABILITIES_PARAMS,
-                username,
-                password);
-        if (requestResults.containsFailureMessages()) {
-            return requestResults;
-        }
-
-        int statusCode = requestResults.getProbeResult(RequestUtils.STATUS_CODE);
-        String contentType = requestResults.getProbeResult(RequestUtils.CONTENT_TYPE);
-
-        if (statusCode == HTTP_OK && CSW_MIME_TYPES.contains(contentType)) {
-            return requestResults.addMessage(createCommonSourceConfigMsg(VERIFIED_CAPABILITIES))
-                    .probeResult(DISCOVERED_URL, url);
-        }
-
-        return requestResults.addMessage(createCommonSourceConfigMsg(UNKNOWN_ENDPOINT));
+    public ProbeReport sendCswCapabilitiesRequest(String url, String username, String password) {
+        ProbeReport requestResults = requestUtils.sendGetRequest(url, username, password, GET_CAPABILITIES_PARAMS);
+        return requestResults.containsFailureMessages() ?
+                requestResults :
+                requestResults.addMessage(createCommonSourceConfigMsg(VERIFIED_CAPABILITIES))
+                .probeResult(DISCOVERED_URL, url);
     }
 
     /**
@@ -125,8 +109,7 @@ public class CswSourceUtils {
      * @param password Optional password for Basic Auth header
      * @return report
      */
-    public ProbeReport discoverCswUrl(String hostname, int port, String username,
-            String password) {
+    public ProbeReport discoverCswUrl(String hostname, int port, String username, String password) {
         return URL_FORMATS.stream()
                 .map(format -> String.format(format, hostname, port))
                 .map(url -> sendCswCapabilitiesRequest(url, username, password))
@@ -212,4 +195,5 @@ public class CswSourceUtils {
         return results.addMessage(createInternalErrorMsg(
                 "Failed to create a CSW source configuration from the URL."));
     }
+
 }

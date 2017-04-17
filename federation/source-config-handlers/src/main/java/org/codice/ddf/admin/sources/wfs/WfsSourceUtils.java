@@ -13,7 +13,6 @@
  */
 package org.codice.ddf.admin.sources.wfs;
 
-import static java.net.HttpURLConnection.HTTP_OK;
 import static org.codice.ddf.admin.api.handler.ConfigurationMessage.createInternalErrorMsg;
 import static org.codice.ddf.admin.api.services.WfsServiceProperties.WFS1_FACTORY_PID;
 import static org.codice.ddf.admin.api.services.WfsServiceProperties.WFS2_FACTORY_PID;
@@ -28,6 +27,7 @@ import static org.codice.ddf.admin.commons.sources.SourceHandlerCommons.createDo
 import static org.codice.ddf.admin.sources.wfs.WfsSourceConfigurationHandler.WFS_SOURCE_CONFIGURATION_HANDLER_ID;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
@@ -41,24 +41,24 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 public class WfsSourceUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WfsSourceUtils.class);
 
-    public static final String GET_CAPABILITIES_PARAMS = "?service=WFS&request=GetCapabilities";
-
     private static final List<String> WFS_MIME_TYPES = ImmutableList.of("text/xml",
             "application/xml",
-            "text/xml; charset=UTF-8",
-            "application/xml; charset=UTF-8");
+            "text/xml;charset=UTF-8",
+            "application/xml;charset=UTF-8");
 
-    private static final String ACCEPT_VERSION_PARAMS = "&AcceptVersions=2.0.0,1.0.0";
+    private static final Map<String, String> REQUEST_PARAMS = ImmutableMap.of(
+            "service", "WFS",
+            "request", "GetCapabilities",
+            "AcceptVersions", "2.0.0,1.0.0");
 
     private static final List<String> URL_FORMATS = ImmutableList.of("https://%s:%d/services/wfs",
-            "https://%s:%d/wfs",
-            "http://%s:%d/services/wfs",
-            "http://%s:%d/wfs");
+            "https://%s:%d/wfs");
 
     private static final String WFS_VERSION_EXP = "/wfs:WFS_Capabilities/attribute::version";
 
@@ -86,19 +86,10 @@ public class WfsSourceUtils {
      */
     public ProbeReport sendWfsCapabilitiesRequest(String url, String username,
             String password) {
-        String reqUrl = url + GET_CAPABILITIES_PARAMS + ACCEPT_VERSION_PARAMS;
-        ProbeReport requestResults = requestUtils.sendGetRequest(reqUrl, username, password);
-        if (requestResults.containsFailureMessages()) {
-            return requestResults;
-        }
-        int statusCode = requestResults.getProbeResult(RequestUtils.STATUS_CODE);
-        String contentType = requestResults.getProbeResult(RequestUtils.CONTENT_TYPE);
-
-        if (statusCode == HTTP_OK && WFS_MIME_TYPES.contains(contentType)) {
-            return requestResults.addMessage(createCommonSourceConfigMsg(VERIFIED_CAPABILITIES))
+        ProbeReport requestResults = requestUtils.sendGetRequest(url, username, password, REQUEST_PARAMS);
+        return requestResults.containsFailureMessages() ? requestResults :
+                requestResults.addMessage(createCommonSourceConfigMsg(VERIFIED_CAPABILITIES))
                     .probeResult(DISCOVERED_URL, url);
-        }
-        return requestResults.addMessage(createCommonSourceConfigMsg(UNKNOWN_ENDPOINT));
     }
 
     /**
@@ -188,4 +179,5 @@ public class WfsSourceUtils {
             return results.addMessage(createCommonSourceConfigMsg(UNKNOWN_ENDPOINT));
         }
     }
+
 }

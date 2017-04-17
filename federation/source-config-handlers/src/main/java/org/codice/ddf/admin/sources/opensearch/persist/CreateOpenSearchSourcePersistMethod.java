@@ -46,7 +46,7 @@ public class CreateOpenSearchSourcePersistMethod
     public static final String CREATE_OPENSEARCH_SOURCE_ID = CREATE;
 
     public static final String DESCRIPTION =
-            "Attempts to create and persist a OpenSearch source given a configuration.";
+            "Attempts to create and persist an OpenSearch source given a configuration.";
 
     public static final List<String> REQUIRED_FIELDS = ImmutableList.of(SOURCE_NAME, ENDPOINT_URL);
 

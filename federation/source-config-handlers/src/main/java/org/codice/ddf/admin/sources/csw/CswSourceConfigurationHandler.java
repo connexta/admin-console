@@ -49,8 +49,7 @@ public class CswSourceConfigurationHandler extends DefaultConfigurationHandler<S
 
     private final ConfiguratorFactory configuratorFactory;
 
-    public CswSourceConfigurationHandler(ConfigurationHandler handler,
-            ConfiguratorFactory configuratorFactory) {
+    public CswSourceConfigurationHandler(ConfigurationHandler handler, ConfiguratorFactory configuratorFactory) {
         this.handler = handler;
         this.configuratorFactory = configuratorFactory;
     }

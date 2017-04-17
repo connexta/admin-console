@@ -51,8 +51,7 @@ public class OpenSearchSourceConfigurationHandler
 
     private final ConfiguratorFactory configuratorFactory;
 
-    public OpenSearchSourceConfigurationHandler(ConfigurationHandler handler,
-            ConfiguratorFactory configuratorFactory) {
+    public OpenSearchSourceConfigurationHandler(ConfigurationHandler handler, ConfiguratorFactory configuratorFactory) {
         this.handler = handler;
         this.configuratorFactory = configuratorFactory;
     }

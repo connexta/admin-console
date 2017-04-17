@@ -27,6 +27,7 @@ import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.actions.BaseAction;
 import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.configurator.Configurator;
+import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.configurator.OperationReport;
 import org.codice.ddf.admin.security.common.fields.wcpm.ContextPolicyBin;
 import org.codice.ddf.admin.security.common.fields.wcpm.services.PolicyManagerServiceProperties;
@@ -40,16 +41,16 @@ public class SaveContextPolices extends BaseAction<ListField<ContextPolicyBin>> 
     public static final String DESCRIPTION =
             "Saves a list of policies to be applied to their corresponding context paths.";
 
-    private Configurator configurator;
+    private ConfiguratorFactory configuratorFactory;
 
     private ListField<ContextPolicyBin> contextPolicies;
 
     private PolicyManagerServiceProperties wcpmServiceProps = new PolicyManagerServiceProperties();
 
-    public SaveContextPolices(Configurator configurator) {
+    public SaveContextPolices(ConfiguratorFactory configuratorFactory) {
         super(DEFAULT_FIELD_NAME, DESCRIPTION, new ListFieldImpl<>(ContextPolicyBin.class));
         contextPolicies = new ListFieldImpl<>("policies", ContextPolicyBin.class);
-        this.configurator = configurator;
+        this.configuratorFactory = configuratorFactory;
     }
 
     @Override
@@ -68,6 +69,7 @@ public class SaveContextPolices extends BaseAction<ListField<ContextPolicyBin>> 
             // TODO return some kind of error message here indicating the error
             addArgumentMessage(noRootContextError(name()));
         } else {
+            Configurator configurator = configuratorFactory.getConfigurator();
             configurator.updateConfigFile(POLICY_MANAGER_PID,
                     contextPoliciesToPolicyManagerProps(contextPolicies),
                     true);
@@ -81,6 +83,6 @@ public class SaveContextPolices extends BaseAction<ListField<ContextPolicyBin>> 
             }
         }
 
-        return wcpmServiceProps.contextPolicyServiceToContextPolicyFields(configurator);
+        return wcpmServiceProps.contextPolicyServiceToContextPolicyFields(configuratorFactory);
     }
 }

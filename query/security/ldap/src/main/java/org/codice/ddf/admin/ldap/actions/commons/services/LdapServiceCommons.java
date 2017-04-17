@@ -28,20 +28,20 @@ import org.codice.ddf.admin.ldap.fields.config.LdapConfigurationField;
 public class LdapServiceCommons {
 
     public ListField<LdapConfigurationField> getLdapConfigurations(ConfiguratorFactory configuratorFactory) {
-        List<LdapConfigurationField> ldapLoginConfigs = configuratorFactory.getConfigurator()
+        List<LdapConfigurationField> ldapLoginConfigs = configuratorFactory.getConfigReader()
                 .getManagedServiceConfigs(LDAP_LOGIN_MANAGED_SERVICE_FACTORY_PID)
                 .values()
                 .stream()
                 .map(LdapLoginServiceProperties::ldapLoginServiceToLdapConfiguration)
                 .collect(Collectors.toList());
 
-        List<LdapConfigurationField> ldapClaimsHandlerConfigs = configuratorFactory.getConfigurator()
+        List<LdapConfigurationField> ldapClaimsHandlerConfigs = configuratorFactory.getConfigReader()
                 .getManagedServiceConfigs(LDAP_CLAIMS_HANDLER_MANAGED_SERVICE_FACTORY_PID)
                 .values()
                 .stream()
                 .map((props) -> LdapClaimsHandlerServiceProperties.ldapClaimsHandlerServiceToLdapConfig(
                         props,
-                        configuratorFactory.getConfigurator()))
+                        configuratorFactory))
                 .collect(Collectors.toList());
 
         List<LdapConfigurationField> configs = Stream.concat(ldapLoginConfigs.stream(), ldapClaimsHandlerConfigs.stream())

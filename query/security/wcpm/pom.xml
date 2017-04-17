@@ -49,7 +49,7 @@
         <dependency>
             <groupId>ddf.security.policy</groupId>
             <artifactId>security-policy-context</artifactId>
-            <version>2.11.0-SNAPSHOT</version>
+            <version>${ddf.version}</version>
         </dependency>
     </dependencies>
     <build>

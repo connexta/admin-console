@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
-import org.codice.ddf.admin.configurator.Configurator;
+import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.ldap.fields.config.LdapConfigurationField;
 import org.codice.ddf.admin.ldap.fields.config.LdapSettingsField;
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindUserInfo;
@@ -68,7 +68,7 @@ public class LdapClaimsHandlerServiceProperties {
     // ---
 
     public static LdapConfigurationField ldapClaimsHandlerServiceToLdapConfig(
-            Map<String, Object> props, Configurator configurator) {
+            Map<String, Object> props, ConfiguratorFactory configuratorFactory) {
 
         LdapConnectionField connection = new LdapConnectionField();
 
@@ -100,7 +100,7 @@ public class LdapClaimsHandlerServiceProperties {
         String attributeMappingsPath = LdapLoginServiceProperties.mapStringValue(PROPERTY_FILE_LOCATION, props);
         if (StringUtils.isNotEmpty(attributeMappingsPath)) {
             Map<String, String> attributeMappings =
-                    new HashMap<>(configurator.getProperties(Paths.get(attributeMappingsPath)));
+                    new HashMap<>(configuratorFactory.getConfigReader().getProperties(Paths.get(attributeMappingsPath)));
             settings.attributeMapField(attributeMappings);
         }
 

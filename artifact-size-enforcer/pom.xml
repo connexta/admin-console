@@ -25,6 +25,7 @@
     <name>DDF Admin (Beta) :: Artifact Size Enforcer</name>
     <packaging>jar</packaging>
 
+    <!--TODO: Move this plugin to ddf-support once it is stable-->
     <dependencies>
         <dependency>
             <groupId>org.apache.maven.enforcer</groupId>

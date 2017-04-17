@@ -25,6 +25,7 @@ import org.codice.ddf.admin.common.actions.BaseAction;
 import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.fields.common.ContextPath;
 import org.codice.ddf.admin.configurator.Configurator;
+import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.configurator.OperationReport;
 import org.codice.ddf.security.policy.context.ContextPolicyManager;
 import org.codice.ddf.security.policy.context.impl.PolicyManager;
@@ -40,13 +41,13 @@ public class SaveWhitelistContexts extends BaseAction<ListField<ContextPath>> {
 
     private ListField<ContextPath> contexts;
 
-    private Configurator configurator;
+    private ConfiguratorFactory configuratorFactory;
 
-    public SaveWhitelistContexts(Configurator configurator) {
+    public SaveWhitelistContexts(ConfiguratorFactory configuratorFactory) {
         super(DEFAULT_FIELD_NAME, DESCRIPTION, new ListFieldImpl<>(ContextPath.class));
         contexts = new ListFieldImpl<>("paths", ContextPath.class);
         contexts.isRequired(true);
-        this.configurator = configurator;
+        this.configuratorFactory = configuratorFactory;
     }
 
     @Override
@@ -56,7 +57,7 @@ public class SaveWhitelistContexts extends BaseAction<ListField<ContextPath>> {
 
     @Override
     public ListField<ContextPath> performAction() {
-        ContextPolicyManager ref = configurator.getServiceReference(ContextPolicyManager.class);
+        ContextPolicyManager ref = configuratorFactory.getConfigReader().getServiceReference(ContextPolicyManager.class);
         PolicyManager policyManager = ((PolicyManager) ref);
         ListField<ContextPath> preUpdateWhitelistContexts = new ListFieldImpl<>(ContextPath.class);
 
@@ -64,6 +65,7 @@ public class SaveWhitelistContexts extends BaseAction<ListField<ContextPath>> {
             preUpdateWhitelistContexts.add(new ContextPath(path));
         }
 
+        Configurator configurator = configuratorFactory.getConfigurator();
         configurator.updateConfigFile(POLICY_MANAGER_PID,
                 whiteListToPolicyManagerProps(contexts),
                 true);

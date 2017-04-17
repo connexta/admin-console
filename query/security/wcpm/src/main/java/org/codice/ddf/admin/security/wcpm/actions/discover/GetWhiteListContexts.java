@@ -19,7 +19,7 @@ import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.actions.GetAction;
 import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.fields.common.ContextPath;
-import org.codice.ddf.admin.configurator.Configurator;
+import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.security.policy.context.ContextPolicyManager;
 import org.codice.ddf.security.policy.context.impl.PolicyManager;
 
@@ -30,17 +30,17 @@ public class GetWhiteListContexts extends GetAction<ListField<ContextPath>> {
     public static final String DESCRIPTION =
             "Returns all white listed contexts. Any contexts that are white listed have no security policy applied to them.";
 
-    private Configurator configurator;
+    private ConfiguratorFactory configuratorFactory;
 
-    public GetWhiteListContexts(Configurator configurator) {
+    public GetWhiteListContexts(ConfiguratorFactory configuratorFactory) {
         super(DEFAULT_FIELD_NAME, DESCRIPTION, new ListFieldImpl<>(ContextPath.class));
-        this.configurator = configurator;
+        this.configuratorFactory = configuratorFactory;
 
     }
 
     @Override
     public ListField<ContextPath> performAction() {
-        ContextPolicyManager ref = configurator.getServiceReference(ContextPolicyManager.class);
+        ContextPolicyManager ref = configuratorFactory.getConfigReader().getServiceReference(ContextPolicyManager.class);
         PolicyManager policyManager = ((PolicyManager) ref);
         List<String> whiteListStrs = policyManager.getWhiteListContexts();
 

@@ -18,7 +18,7 @@ import java.util.Arrays;
 import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.actions.GetAction;
 import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
-import org.codice.ddf.admin.configurator.Configurator;
+import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.security.common.fields.wcpm.AuthType;
 
 public class GetAuthTypes extends GetAction<ListField<AuthType>> {
@@ -28,16 +28,16 @@ public class GetAuthTypes extends GetAction<ListField<AuthType>> {
     public static final String DESCRIPTION =
             "Retrieves all currently configured authentication types.";
 
-    private Configurator configurator;
+    private ConfiguratorFactory configuratorFactory;
 
-    public GetAuthTypes(Configurator configurator) {
+    public GetAuthTypes(ConfiguratorFactory configuratorFactory) {
         super(FIELD_NAME, DESCRIPTION, new ListFieldImpl<>(AuthType.class));
-        this.configurator = configurator;
+        this.configuratorFactory = configuratorFactory;
     }
 
     @Override
     public ListField<AuthType> performAction() {
-        // TODO: 4/3/17 Should implement the different auth type action creators once implemented
+        // TODO: tbatie - 4/14/17 - Check the backend to see if these services are running
         return new ListFieldImpl<>(AuthType.class).addAll(Arrays.asList(AuthType.BASIC_AUTH,
                 AuthType.SAML_AUTH,
                 AuthType.PKI_AUTH,

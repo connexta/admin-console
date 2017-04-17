@@ -47,9 +47,6 @@
             <classifier>schema</classifier>
             <type>json</type>
         </dependency>
-        <!--
-        Remove when possible
-        -->
     </dependencies>
     <build>
         <plugins>

@@ -156,7 +156,9 @@ if (process.env.NODE_ENV === 'production') {
     output: {
       publicPath: '',
       filename: 'bundle.js',
-      path: path.resolve(__dirname, 'target', 'ci')
+      path: path.resolve(__dirname, 'target', 'ci'),
+      devtoolModuleFilenameTemplate: '~[resource-path]?[loaders]',
+      devtoolFallbackModuleFilenameTemplate: '~[resource-path]?[loaders]'
     },
     entry: [
       'stack-source-map/register'

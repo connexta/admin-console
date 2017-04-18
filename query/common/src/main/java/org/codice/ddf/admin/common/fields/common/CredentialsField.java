@@ -35,8 +35,6 @@ public class CredentialsField extends BaseObjectField {
 
     public CredentialsField() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
-        this.username = new StringField("username");
-        this.password = new StringField("password");
     }
 
     public CredentialsField username(String username) {
@@ -49,8 +47,22 @@ public class CredentialsField extends BaseObjectField {
         return this;
     }
 
+    public StringField password() {
+        return password;
+    }
+
+    public StringField username() {
+        return username;
+    }
+
     @Override
     public List<Field> getFields() {
         return ImmutableList.of(username, password);
+    }
+
+    @Override
+    public void initializeFields() {
+        this.username = new StringField("username");
+        this.password = new StringField("password");
     }
 }

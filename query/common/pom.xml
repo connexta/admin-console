@@ -38,6 +38,14 @@
             <artifactId>admin-query-api</artifactId>
             <version>${project.version}</version>
         </dependency>
+
+        <!--Spock dependencies-->
+        <dependency>
+            <groupId>ddf.lib</groupId>
+            <artifactId>spock-shaded</artifactId>
+            <version>${ddf.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>

@@ -58,7 +58,7 @@ public class LdapRecommendedSettings extends BaseAction<LdapRecommendedSettingsF
     @Override
     public LdapRecommendedSettingsField performAction() {
         LdapConnectionAttempt connectionAttempt = utils.bindUserToLdapConnection(conn, creds);
-        addReturnValueMessages(connectionAttempt.messages());
+        addMessages(connectionAttempt.messages());
         if(!connectionAttempt.connection().isPresent()) {
             return null;
         }

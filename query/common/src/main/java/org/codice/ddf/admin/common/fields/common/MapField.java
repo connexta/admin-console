@@ -34,7 +34,6 @@ public class MapField extends BaseObjectField {
 
     public MapField() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
-        entries = new ListFieldImpl<>("entries", PairField.class);
     }
 
     @Override
@@ -47,4 +46,8 @@ public class MapField extends BaseObjectField {
         return this;
     }
 
+    @Override
+    public void initializeFields() {
+        entries = new ListFieldImpl<>("entries", PairField.class);
+    }
 }

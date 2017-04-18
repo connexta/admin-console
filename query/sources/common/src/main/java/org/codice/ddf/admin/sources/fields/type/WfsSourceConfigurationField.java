@@ -26,8 +26,6 @@ public class WfsSourceConfigurationField extends SourceConfigUnionField {
 
     public WfsSourceConfigurationField() {
         super(FIELD_TYPE_NAME, DESCRIPTION);
-        this.endpointUrl.setValue("SampleWfsUrl");
-        this.id.setValue("SampleWfsId");
     }
 
     @Override

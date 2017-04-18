@@ -27,13 +27,15 @@ import org.codice.ddf.admin.api.fields.ObjectField;
 public abstract class BaseObjectField extends BaseField<Map<String, Object>>
         implements ObjectField {
 
-    public BaseObjectField(String fieldName, String fieldTypeName, String description) {
-        super(fieldName, fieldTypeName, description, OBJECT);
-    }
-
     protected BaseObjectField(String fieldName, String fieldTypeName, String description,
             FieldBaseType baseType) {
         super(fieldName, fieldTypeName, description, baseType);
+        this.initializeFields();
+        getFields().forEach(field -> field.addToPath(this.fieldName()));
+    }
+
+    public BaseObjectField(String fieldName, String fieldTypeName, String description) {
+        this(fieldName, fieldTypeName, description, OBJECT);
     }
 
     @Override
@@ -97,5 +99,17 @@ public abstract class BaseObjectField extends BaseField<Map<String, Object>>
                 .map(ObjectField.class::cast)
                 .forEach(objField -> objField.innerFieldRequired(required, fieldName));
         return this;
+    }
+
+    /**
+     * Initializes all the {@link org.codice.ddf.admin.api.fields.Field} of an {@code ObjectField}. Any {@link org.codice.ddf.admin.api.fields.Field} that gets initialized
+     * in this method, and is also returned by the {@link ObjectField#getFields()}, will have the {@code ObjectField} added to its path.
+     */
+    public abstract void initializeFields();
+
+    @Override
+    public void addToPath(String fieldName) {
+        super.addToPath(fieldName);
+        getFields().forEach(child -> child.addToPath(fieldName));
     }
 }

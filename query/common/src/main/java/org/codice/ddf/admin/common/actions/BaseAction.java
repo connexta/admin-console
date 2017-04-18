@@ -93,7 +93,7 @@ public abstract class BaseAction<T extends Field> implements Action<T> {
         return this;
     }
 
-    protected BaseAction addReturnValueMessage(Message msg) {
+    protected BaseAction addMessage(Message msg) {
         Message copy = msg.copy();
         copy.addSubpath(name);
         report.addMessage(copy);
@@ -105,8 +105,8 @@ public abstract class BaseAction<T extends Field> implements Action<T> {
         return this;
     }
 
-    protected BaseAction addReturnValueMessages(List<Message> msgs) {
-        msgs.forEach(msg -> addReturnValueMessage(msg));
+    protected BaseAction addMessages(List<Message> msgs) {
+        msgs.forEach(msg -> addMessage(msg));
         return this;
     }
 

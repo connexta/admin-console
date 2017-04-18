@@ -86,6 +86,7 @@ public class ListFieldImpl<T extends Field> extends BaseField<List>
                 T newField = (T) getListFieldType().getClass()
                         .newInstance();
                 newField.setValue(val);
+                this.path().forEach(fieldName -> newField.addToPath(fieldName));
                 add(newField);
             } catch (IllegalAccessException | InstantiationException e) {
                 LOGGER.debug("Unable to create instance of fieldType {}",

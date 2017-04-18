@@ -42,10 +42,6 @@ public class LdapConfigurationField extends BaseObjectField {
 
     public LdapConfigurationField() {
         super(FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
-        this.pid = new PidField();
-        this.connection = new LdapConnectionField();
-        this.bindUserInfo = new LdapBindUserInfo();
-        this.settings = new LdapSettingsField();
     }
 
     public LdapConfigurationField connection(LdapConnectionField connection) {
@@ -97,5 +93,13 @@ public class LdapConfigurationField extends BaseObjectField {
     public LdapConfigurationField allFieldsRequired(boolean required) {
         super.allFieldsRequired(required);
         return this;
+    }
+
+    @Override
+    public void initializeFields() {
+        this.pid = new PidField();
+        this.connection = new LdapConnectionField();
+        this.bindUserInfo = new LdapBindUserInfo();
+        this.settings = new LdapSettingsField();
     }
 }

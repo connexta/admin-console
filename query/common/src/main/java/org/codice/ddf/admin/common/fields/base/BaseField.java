@@ -16,10 +16,14 @@ package org.codice.ddf.admin.common.fields.base;
 import static org.codice.ddf.admin.common.message.DefaultMessages.missingRequiredFieldError;
 
 import java.util.ArrayList;
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.codice.ddf.admin.api.action.Message;
 import org.codice.ddf.admin.api.fields.Field;
+
+import com.google.common.collect.ImmutableList;
 
 public abstract class BaseField<T> implements Field<T> {
 
@@ -33,6 +37,8 @@ public abstract class BaseField<T> implements Field<T> {
 
     private boolean isRequired;
 
+    private Deque<String> path;
+
     public BaseField(String fieldName, String fieldTypeName, String description,
             FieldBaseType fieldBaseType) {
         this.fieldName = fieldName;
@@ -40,6 +46,8 @@ public abstract class BaseField<T> implements Field<T> {
         this.fieldBaseType = fieldBaseType;
         this.description = description;
         isRequired = false;
+        path = new LinkedList<>();
+        path.push(this.fieldName);
     }
 
     @Override
@@ -74,10 +82,20 @@ public abstract class BaseField<T> implements Field<T> {
     }
 
     @Override
+    public List<String> path() {
+        return ImmutableList.copyOf(this.path);
+    }
+
+    @Override
+    public void addToPath(String fieldName) {
+        path.push(fieldName);
+    }
+
+    @Override
     public List<Message> validate() {
         List<Message> errors = new ArrayList<>();
 
-        if(isRequired() && getValue() == null) {
+        if (isRequired() && getValue() == null) {
             errors.add(missingRequiredFieldError(fieldName()));
         }
 

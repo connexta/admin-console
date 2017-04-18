@@ -27,6 +27,8 @@ public abstract class BaseMessage implements Message {
 
     private List<String> path;
 
+    private Field field;
+
     public BaseMessage(MessageType type, String code) {
         this.type = type;
         this.code = code;

@@ -51,7 +51,7 @@ public class SaveCswConfiguration extends BaseAction<SourceInfoField> {
 
     @Override
     public SourceInfoField performAction() {
-        addReturnValueMessage(new ErrorMessage("SAVE_CSW_CONFIG_ERROR"));
+        addMessage(new ErrorMessage("SAVE_CSW_CONFIG_ERROR"));
         return SAMPLE_CSW_SOURCE_INFO;
     }
 }

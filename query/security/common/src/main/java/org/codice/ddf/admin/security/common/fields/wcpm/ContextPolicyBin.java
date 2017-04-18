@@ -46,10 +46,6 @@ public class ContextPolicyBin extends BaseObjectField {
 
     public ContextPolicyBin() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
-        contexts = new ListFieldImpl<>("paths", ContextPath.class);
-        authTypes = new ListFieldImpl<>("authTypes", AuthType.class);
-        realm = new Realm();
-        claimsMapping = new ListFieldImpl<>("claimsMapping", ClaimsMapEntry.class);
     }
 
     public ContextPolicyBin realm(String realm) {
@@ -104,14 +100,12 @@ public class ContextPolicyBin extends BaseObjectField {
     }
 
     public ContextPolicyBin authTypes(Collection<String> authTypes) {
-        authTypes.stream()
-                .forEach(authType -> addAuthType(authType));
+        authTypes.forEach(authType -> addAuthType(authType));
         return this;
     }
 
     public ContextPolicyBin contexts(Collection<String> contexts) {
-        contexts.stream()
-                .forEach(context -> addContextPath(context));
+        contexts.forEach(context -> addContextPath(context));
         return this;
     }
 
@@ -142,5 +136,13 @@ public class ContextPolicyBin extends BaseObjectField {
     public ContextPolicyBin allFieldsRequired(boolean required) {
         super.allFieldsRequired(required);
         return this;
+    }
+
+    @Override
+    public void initializeFields() {
+        contexts = new ListFieldImpl<>("paths", ContextPath.class);
+        authTypes = new ListFieldImpl<>("authTypes", AuthType.class);
+        realm = new Realm();
+        claimsMapping = new ListFieldImpl<>("claimsMapping", ClaimsMapEntry.class);
     }
 }

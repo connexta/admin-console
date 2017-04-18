@@ -25,6 +25,7 @@ import org.codice.ddf.admin.api.fields.Field;
 
 public abstract class BaseEnumField<S> extends BaseField<S> implements EnumField<S, Field<S>> {
 
+    // TODO: 4/18/17 phuffer -  Replace this list with a single value. look at removing overriding getValue()
     private Field<S> enumValue;
 
     private List<Field<S>> enumValues;

@@ -49,7 +49,7 @@ public class LdapTestConnection extends TestAction {
     @Override
     public BooleanField performAction() {
         LdapConnectionAttempt connectionAttempt = utils.getLdapConnection(connection);
-        addReturnValueMessages(connectionAttempt.messages());
+        addMessages(connectionAttempt.messages());
         return new BooleanField(connectionAttempt.connection().isPresent());
     }
 }

@@ -83,14 +83,14 @@ public class InstallEmbeddedLdap extends BaseAction<BooleanField> {
             LOGGER.debug("Unrecognized LDAP use case \"{}\". No commits will be made. ",
                     useCase.getValue());
             // TODO: tbatie - 4/4/17 - change this to specify the arg that was unknown
-            addReturnValueMessage(new ErrorMessage("FAILED_PERSIST"));
+            addMessage(new ErrorMessage("FAILED_PERSIST"));
             return new BooleanField(false);
         }
 
         OperationReport report = configurator.commit();
 
         if(report.containsFailedResults()) {
-            addReturnValueMessage(new ErrorMessage("CANNOT_INSTALL"));
+            addMessage(new ErrorMessage("CANNOT_INSTALL"));
             return new BooleanField(false);
 
         }

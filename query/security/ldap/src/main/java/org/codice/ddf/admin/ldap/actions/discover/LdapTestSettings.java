@@ -71,7 +71,7 @@ public class LdapTestSettings extends TestAction {
     @Override
     public BooleanField performAction() {
         LdapConnectionAttempt connectionAttempt = utils.bindUserToLdapConnection(conn, bindInfo);
-        addReturnValueMessages(connectionAttempt.messages());
+        addMessages(connectionAttempt.messages());
 
         if (!connectionAttempt.connection()
                 .isPresent()) {

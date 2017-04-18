@@ -27,14 +27,12 @@ public class CswSourceConfigurationField extends SourceConfigUnionField {
     public static final String DESCRIPTION =
             "Represents a CSW configuration containing properties to be saved.";
 
-    private StringField outputSchema = new StringField("outputSchema");
+    private StringField outputSchema;
 
-    private StringField forceSpatialFilter = new StringField("forceSpatialFilter");
+    private StringField forceSpatialFilter;
 
     public CswSourceConfigurationField() {
         super(FIELD_TYPE_NAME, DESCRIPTION);
-        this.endpointUrl.setValue("SampleCswUrl");
-        this.id.setValue("SampleCswId");
     }
 
     public CswSourceConfigurationField outputSchema(String outputSchema) {
@@ -65,5 +63,12 @@ public class CswSourceConfigurationField extends SourceConfigUnionField {
     public CswSourceConfigurationField innerFieldRequired(boolean required, String fieldName) {
         super.innerFieldRequired(required, fieldName);
         return this;
+    }
+
+    @Override
+    public void initializeFields() {
+        super.initializeFields();
+        outputSchema = new StringField("outputSchema");
+        forceSpatialFilter = new StringField("forceSpatialFilter");
     }
 }

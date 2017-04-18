@@ -47,12 +47,12 @@ public class CredentialsField extends BaseObjectField {
         return this;
     }
 
-    public StringField password() {
-        return password;
+    public String password() {
+        return password.getValue();
     }
 
-    public StringField username() {
-        return username;
+    public String username() {
+        return username.getValue();
     }
 
     @Override

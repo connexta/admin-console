@@ -20,20 +20,24 @@ import spock.lang.Specification
 
 class BaseFieldTest extends Specification {
 
-    BaseObjectField field
+    BaseObjectField topLevelField
 
     def setup() {
-       field = new TestObjectField()
+        topLevelField = new TestObjectField()
     }
 
     def 'test field paths of nested ObjectFields is correct order'() {
         when:
-        def field1 = field.getFields().get(0)
-        def field2 = ((ObjectField) field1).getFields().get(0)
+        def innerField = topLevelField.getFields().get(0)
+        def subFieldOfInnerField = ((ObjectField) innerField).getFields().get(0)
+
+        List<String> topLevelFieldPath = topLevelField.path()
+        List<String> innerFieldPath = innerField.path()
+        List<String> subFieldOfInnerFieldPath = subFieldOfInnerField.path()
 
         then:
-        field.path() == [TestObjectField.DEFAULT_FIELD_NAME]
-        field1.path() == [TestObjectField.DEFAULT_FIELD_NAME, TestObjectField.InnerTestObjectField.DEFAULT_FIELD_NAME]
-        field2.path() == [TestObjectField.DEFAULT_FIELD_NAME, TestObjectField.InnerTestObjectField.DEFAULT_FIELD_NAME, StringField.DEFAULT_FIELD_NAME]
+        topLevelFieldPath == [TestObjectField.DEFAULT_FIELD_NAME]
+        innerFieldPath == [topLevelFieldPath, TestObjectField.InnerTestObjectField.DEFAULT_FIELD_NAME].flatten()
+        subFieldOfInnerFieldPath == [innerFieldPath, StringField.DEFAULT_FIELD_NAME].flatten()
     }
 }

@@ -32,7 +32,6 @@ public class SourceInfoField extends BaseObjectField {
     private static final String DESCRIPTION =
             "Contains various information such as if the source is reachable, and the source configuration";
 
-    // TODO: tbatie - 2/27/17 - Replace with a boolean scalar once implemented
     private BooleanField isAvailable;
 
     private StringField sourceHandlerName;

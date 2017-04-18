@@ -63,7 +63,7 @@ public class TestObjectField extends BaseObjectField {
 
         public static final String DESCRIPTION = "InnerTestObjectField Description";
 
-        StringField field;
+        StringField subFieldOfInnerField;
 
         InnerTestObjectField() {
             this(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
@@ -75,12 +75,12 @@ public class TestObjectField extends BaseObjectField {
 
         @Override
         public List<Field> getFields() {
-            return ImmutableList.of(field);
+            return ImmutableList.of(subFieldOfInnerField);
         }
 
         @Override
         public void initializeFields() {
-            field = new StringField();
+            subFieldOfInnerField = new StringField();
         }
     }
 }

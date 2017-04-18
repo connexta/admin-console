@@ -86,7 +86,6 @@ public class ListFieldImpl<T extends Field> extends BaseField<List>
                 T newField = (T) getListFieldType().getClass()
                         .newInstance();
                 newField.setValue(val);
-                path().forEach(fieldName -> newField.addToPath(fieldName));
                 add(newField);
             } catch (IllegalAccessException | InstantiationException e) {
                 LOGGER.debug("Unable to create instance of fieldType {}",
@@ -100,6 +99,7 @@ public class ListFieldImpl<T extends Field> extends BaseField<List>
         // TODO: 4/10/17 perform special validation for object fields
         // TODO: 4/10/17 Copy the obj instead
         value.isRequired(listFieldType.isRequired());
+        path().forEach(value::addToPath);
         fields.add(value);
         return this;
     }

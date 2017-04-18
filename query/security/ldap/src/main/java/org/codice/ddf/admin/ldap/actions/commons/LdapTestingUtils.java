@@ -108,8 +108,8 @@ public class LdapTestingUtils {
 
         try {
             BindRequest bindRequest = selectBindMethod(bindInfo.bindMethod(),
-                    bindInfo.credentials().username().getValue(),
-                    bindInfo.credentials().password().getValue(),
+                    bindInfo.credentials().username(),
+                    bindInfo.credentials().password(),
                     bindInfo.realm(),
                     null);
             connection.bind(bindRequest);

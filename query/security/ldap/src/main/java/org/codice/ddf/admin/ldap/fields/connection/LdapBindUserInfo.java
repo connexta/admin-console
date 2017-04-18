@@ -43,12 +43,12 @@ public class LdapBindUserInfo extends BaseObjectField {
     }
 
     public LdapBindUserInfo username(String username) {
-        this.creds.username().setValue(username);
+        this.creds.username(username);
         return this;
     }
 
     public LdapBindUserInfo password(String password) {
-        this.creds.password().setValue(password);
+        this.creds.password(password);
         return this;
     }
 

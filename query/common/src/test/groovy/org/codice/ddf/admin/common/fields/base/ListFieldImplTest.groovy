@@ -14,6 +14,8 @@
 package org.codice.ddf.admin.common.fields.base
 
 import org.codice.ddf.admin.api.fields.Field
+import org.codice.ddf.admin.api.fields.ObjectField
+import org.codice.ddf.admin.common.fields.TestObjectField
 import org.codice.ddf.admin.common.fields.base.scalar.StringField
 import spock.lang.Specification
 
@@ -38,5 +40,18 @@ class ListFieldImplTest extends Specification {
         then:
         listField.path() == [LIST_FIELD_NAME]
         ((Field) listField.getList().get(0)).path() == [LIST_FIELD_NAME, StringField.DEFAULT_FIELD_NAME]
+    }
+
+    def 'test the path of ObjectFields and their inner fields in listfields'() {
+        when:
+        listField = new ListFieldImpl<>(LIST_FIELD_NAME, TestObjectField.class)
+        def field = new TestObjectField()
+        listField.setValue(Collections.singletonList(field.getValue()))
+
+        then:
+        listField.path() == [LIST_FIELD_NAME]
+        ((Field) listField.getList().get(0)).path() == [LIST_FIELD_NAME, TestObjectField.DEFAULT_FIELD_NAME]
+        ((BaseObjectField) listField.getList().get(0)).getFields().get(0).path() == [LIST_FIELD_NAME, TestObjectField.DEFAULT_FIELD_NAME, TestObjectField.InnerTestObjectField.DEFAULT_FIELD_NAME]
+        ((BaseObjectField)((BaseObjectField) listField.getList().get(0)).getFields().get(0)).getFields().get(0).path() == [LIST_FIELD_NAME, TestObjectField.DEFAULT_FIELD_NAME, TestObjectField.InnerTestObjectField.DEFAULT_FIELD_NAME, StringField.DEFAULT_FIELD_NAME]
     }
 }

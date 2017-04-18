@@ -48,6 +48,7 @@ public class MapField extends BaseObjectField {
 
     @Override
     public void initializeFields() {
+        // TODO: 4/18/17 phuffer - replace with a MapField
         entries = new ListFieldImpl<>("entries", PairField.class);
     }
 }

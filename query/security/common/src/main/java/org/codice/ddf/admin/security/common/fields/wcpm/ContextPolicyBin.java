@@ -143,6 +143,7 @@ public class ContextPolicyBin extends BaseObjectField {
         contexts = new ListFieldImpl<>("paths", ContextPath.class);
         authTypes = new ListFieldImpl<>("authTypes", AuthType.class);
         realm = new Realm();
+        // TODO: 4/18/17 phuffer -  Replace with a MapField
         claimsMapping = new ListFieldImpl<>("claimsMapping", ClaimsMapEntry.class);
     }
 }

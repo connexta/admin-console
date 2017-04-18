@@ -27,7 +27,7 @@ public class CredentialsField extends BaseObjectField {
 
     public static final String FIELD_TYPE_NAME = "Credentials";
 
-    public static final String DESCRIPTION = "Credentials required for base64 authentication.";
+    public static final String DESCRIPTION = "Credentials required for authentication.";
 
     private StringField username;
 

@@ -30,8 +30,8 @@ public abstract class BaseObjectField extends BaseField<Map<String, Object>>
     protected BaseObjectField(String fieldName, String fieldTypeName, String description,
             FieldBaseType baseType) {
         super(fieldName, fieldTypeName, description, baseType);
-        this.initializeFields();
-        getFields().forEach(field -> field.addToPath(this.fieldName()));
+        initializeFields();
+        getFields().forEach(field -> field.addToPath(fieldName()));
     }
 
     public BaseObjectField(String fieldName, String fieldTypeName, String description) {

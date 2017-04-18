@@ -57,7 +57,7 @@ var config = {
   resolve: {
     modules: [
       path.resolve('./src/main/webapp/lib'),
-      path.resolve('./node_modules')
+      'node_modules'
     ]
   },
   plugins: [

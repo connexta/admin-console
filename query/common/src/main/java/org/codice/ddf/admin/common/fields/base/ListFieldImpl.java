@@ -77,7 +77,7 @@ public class ListFieldImpl<T extends Field> extends BaseField<List>
     @Override
     public void setValue(List values) {
         if (values == null || values.isEmpty()) {
-            fields = null;
+            fields.clear();
             return;
         }
 

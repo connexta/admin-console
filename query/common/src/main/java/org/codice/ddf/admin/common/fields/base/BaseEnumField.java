@@ -55,7 +55,7 @@ public abstract class BaseEnumField<S> extends BaseField<S> implements EnumField
     @Override
     public void setValue(S value) {
         if (value == null) {
-            enumValue.setValue(null);
+            enumValue = null;
             return;
         }
 

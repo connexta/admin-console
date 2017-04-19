@@ -32,12 +32,11 @@ public class SourceInfoField extends BaseObjectField {
     private static final String DESCRIPTION =
             "Contains various information such as if the source is reachable, and the source configuration";
 
-    // TODO: tbatie - 2/27/17 - Replace with a boolean scalar once implemented
-    private BooleanField isAvailable = new BooleanField("isAvailable");
+    private BooleanField isAvailable;
 
-    private StringField sourceHandlerName = new StringField("sourceHandlerName");
+    private StringField sourceHandlerName;
 
-    private SourceConfigUnionField config = new SourceConfigUnionField();
+    private SourceConfigUnionField config;
 
     public SourceInfoField() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
@@ -67,5 +66,12 @@ public class SourceInfoField extends BaseObjectField {
     public SourceInfoField allFieldsRequired(boolean required) {
         super.allFieldsRequired(required);
         return this;
+    }
+
+    @Override
+    public void initializeFields() {
+        isAvailable = new BooleanField("isAvailable");
+        sourceHandlerName = new StringField("sourceHandlerName");
+        config = new SourceConfigUnionField();
     }
 }

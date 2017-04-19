@@ -99,6 +99,7 @@ public class ListFieldImpl<T extends Field> extends BaseField<List>
         // TODO: 4/10/17 perform special validation for object fields
         // TODO: 4/10/17 Copy the obj instead
         value.isRequired(listFieldType.isRequired());
+        path().forEach(value::addToPath);
         fields.add(value);
         return this;
     }

@@ -40,8 +40,6 @@ public class LdapAttributeEntryField extends BaseObjectField {
 
     public LdapAttributeEntryField() {
         super(FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
-        stsClaim = new StsClaimField(STS_CLAIM);
-        userAttribute = new StringField(USER_ATTRIBUTE);
     }
 
     public LdapAttributeEntryField stsClaim(String claim) {
@@ -71,5 +69,11 @@ public class LdapAttributeEntryField extends BaseObjectField {
     public LdapAttributeEntryField allFieldsRequired(boolean required) {
         super.allFieldsRequired(required);
         return this;
+    }
+
+    @Override
+    public void initializeFields() {
+        stsClaim = new StsClaimField(STS_CLAIM);
+        userAttribute = new StringField(USER_ATTRIBUTE);
     }
 }

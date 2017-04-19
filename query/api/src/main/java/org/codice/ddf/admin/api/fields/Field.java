@@ -32,6 +32,20 @@ public interface Field<T> {
 
     List<Message> validate();
 
+    /**
+     * Returns a path that uniquely identifies this {@code Field}.
+     *
+     * @return a {@code List} of Strings identifying this {@code Field}
+     */
+    List<String> path();
+
+    /**
+     * Adds a sub-path to the list of Strings that describes this {@code Field}'s path.
+     *
+     * @param subPath unique identifier to add to the path
+     */
+    void addToPath(String subPath);
+
     boolean isRequired();
 
     Field<T> isRequired(boolean required);

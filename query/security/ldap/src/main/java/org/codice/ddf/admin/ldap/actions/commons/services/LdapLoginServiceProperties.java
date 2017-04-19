@@ -101,8 +101,8 @@ public class LdapLoginServiceProperties {
 
             ldapStsConfig.put(LDAP_URL, ldapUrl + config.connectionField().hostname() + ":" + config.connectionField().port());
             ldapStsConfig.put(START_TLS, Boolean.toString(startTls));
-            ldapStsConfig.put(LDAP_BIND_USER_DN, config.bindUserInfoField().username());
-            ldapStsConfig.put(LDAP_BIND_USER_PASS, config.bindUserInfoField().password());
+            ldapStsConfig.put(LDAP_BIND_USER_DN, config.bindUserInfoField().credentials().username());
+            ldapStsConfig.put(LDAP_BIND_USER_PASS, config.bindUserInfoField().credentials().password());
             ldapStsConfig.put(BIND_METHOD, config.bindUserInfoField().bindMethod());
             //        ldapStsConfig.put(KDC_ADDRESS, config.bindKdcAddress());
             ldapStsConfig.put(REALM, config.bindUserInfoField().realm());

@@ -74,7 +74,7 @@ public class LdapQuery extends BaseAction<ListField<MapField>> {
     public ListField<MapField> performAction() {
 
         LdapConnectionAttempt connectionAttempt = utils.bindUserToLdapConnection(conn, creds);
-        addReturnValueMessages(connectionAttempt.messages());
+        addMessages(connectionAttempt.messages());
 
         if(!connectionAttempt.connection().isPresent()) {
             return null;

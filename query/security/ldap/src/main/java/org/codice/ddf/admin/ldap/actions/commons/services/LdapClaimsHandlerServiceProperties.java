@@ -119,8 +119,8 @@ public class LdapClaimsHandlerServiceProperties {
             boolean startTls = isStartTls(config.connectionField());
             props.put(URL, ldapUrl + config.connectionField().hostname() + ":" + config.connectionField().port());
             props.put(START_TLS, startTls);
-            props.put(LDAP_BIND_USER_DN, config.bindUserInfoField().username());
-            props.put(PASSWORD, config.bindUserInfoField().password());
+            props.put(LDAP_BIND_USER_DN, config.bindUserInfoField().credentials().username());
+            props.put(PASSWORD, config.bindUserInfoField().credentials().password());
             props.put(BIND_METHOD, config.bindUserInfoField().bindMethod());
             props.put(LOGIN_USER_ATTRIBUTE, config.settingsField().usernameAttribute());
             props.put(USER_BASE_DN, config.settingsField().baseUserDn());

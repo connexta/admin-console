@@ -35,8 +35,6 @@ public class PairField extends BaseObjectField {
 
     public PairField() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
-        key = new StringField("key");
-        value = new StringField("value");
     }
 
     @Override
@@ -60,5 +58,11 @@ public class PairField extends BaseObjectField {
 
     public String value() {
         return value.getValue();
+    }
+
+    @Override
+    public void initializeFields() {
+        key = new StringField("key");
+        value = new StringField("value");
     }
 }

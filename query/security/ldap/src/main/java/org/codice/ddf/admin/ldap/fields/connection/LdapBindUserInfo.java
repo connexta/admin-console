@@ -20,7 +20,7 @@ import java.util.List;
 import org.codice.ddf.admin.api.action.Message;
 import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
-import org.codice.ddf.admin.common.fields.base.scalar.StringField;
+import org.codice.ddf.admin.common.fields.common.CredentialsField;
 
 import com.google.common.collect.ImmutableList;
 
@@ -32,13 +32,7 @@ public class LdapBindUserInfo extends BaseObjectField {
     public static final String DESCRIPTION =
             "Contains the required information to bind a user to an LDAP connection. When the bindMethod is set to DigestMD5SASL, a realm must be provided.";
 
-    public static final String USERNAME = "username";
-
-    public static final String PASSWORD = "password";
-
-    private StringField username;
-
-    private StringField password;
+    private CredentialsField creds;
 
     private LdapBindMethod bindMethod;
 
@@ -46,19 +40,15 @@ public class LdapBindUserInfo extends BaseObjectField {
 
     public LdapBindUserInfo() {
         super(FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
-        this.username = new StringField(USERNAME);
-        this.password = new StringField(PASSWORD);
-        this.bindMethod = new LdapBindMethod();
-        this.realm = new LdapRealm();
     }
 
     public LdapBindUserInfo username(String username) {
-        this.username.setValue(username);
+        this.creds.username(username);
         return this;
     }
 
     public LdapBindUserInfo password(String password) {
-        this.password.setValue(password);
+        this.creds.password(password);
         return this;
     }
 
@@ -72,13 +62,8 @@ public class LdapBindUserInfo extends BaseObjectField {
         return this;
     }
 
-
-    public String username() {
-        return username.getValue();
-    }
-
-    public String password() {
-        return password.getValue();
+    public CredentialsField credentials() {
+        return creds;
     }
 
     public String bindMethod() {
@@ -98,7 +83,14 @@ public class LdapBindUserInfo extends BaseObjectField {
     }
 
     @Override
+    public void initializeFields() {
+        this.creds = new CredentialsField();
+        this.bindMethod = new LdapBindMethod();
+        this.realm = new LdapRealm();
+    }
+
+    @Override
     public List<Field> getFields() {
-        return ImmutableList.of(username, password, bindMethod, realm);
+        return ImmutableList.of(creds, bindMethod, realm);
     }
 }

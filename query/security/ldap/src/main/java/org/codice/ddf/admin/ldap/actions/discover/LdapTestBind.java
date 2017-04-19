@@ -52,7 +52,7 @@ public class LdapTestBind extends TestAction {
     @Override
     public BooleanField performAction() {
         LdapConnectionAttempt connectionAttempt = utils.bindUserToLdapConnection(conn, creds);
-        addReturnValueMessages(connectionAttempt.messages());
+        addMessages(connectionAttempt.messages());
         return new BooleanField(connectionAttempt.connection().isPresent());
     }
 }

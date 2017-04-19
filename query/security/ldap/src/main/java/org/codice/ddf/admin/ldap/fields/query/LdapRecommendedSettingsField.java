@@ -42,13 +42,6 @@ public class LdapRecommendedSettingsField extends BaseObjectField {
 
     public LdapRecommendedSettingsField() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
-        userDns = new ListFieldImpl<>("userDns", LdapDistinguishedName.class);
-        groupDns = new ListFieldImpl<>("groupsDns", LdapDistinguishedName.class);
-        userNameAttributes = new ListFieldImpl<>("userNameAttributes", StringField.class);
-        groupObjectClasses = new ListFieldImpl<>("groupObjectClasses", StringField.class);
-        groupAttributesHoldingMember = new ListFieldImpl<>("groupAttributesHoldingMember", StringField.class);
-        memberAttributesReferencedInGroup =  new ListFieldImpl<>("memberAttributesReferencedInGroup", StringField.class);
-        queryBases = new ListFieldImpl<>("queryBases", LdapDistinguishedName.class);
     }
 
     public LdapRecommendedSettingsField userDns(List<String> baseDns) {
@@ -95,5 +88,16 @@ public class LdapRecommendedSettingsField extends BaseObjectField {
     public List<Field> getFields() {
         return ImmutableList.of(userDns, groupDns, userNameAttributes, groupObjectClasses, groupAttributesHoldingMember, memberAttributesReferencedInGroup,
                 queryBases);
+    }
+
+    @Override
+    public void initializeFields() {
+        userDns = new ListFieldImpl<>("userDns", LdapDistinguishedName.class);
+        groupDns = new ListFieldImpl<>("groupsDns", LdapDistinguishedName.class);
+        userNameAttributes = new ListFieldImpl<>("userNameAttributes", StringField.class);
+        groupObjectClasses = new ListFieldImpl<>("groupObjectClasses", StringField.class);
+        groupAttributesHoldingMember = new ListFieldImpl<>("groupAttributesHoldingMember", StringField.class);
+        memberAttributesReferencedInGroup =  new ListFieldImpl<>("memberAttributesReferencedInGroup", StringField.class);
+        queryBases = new ListFieldImpl<>("queryBases", LdapDistinguishedName.class);
     }
 }

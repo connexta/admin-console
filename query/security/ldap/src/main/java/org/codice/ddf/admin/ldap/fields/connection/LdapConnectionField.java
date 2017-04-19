@@ -38,9 +38,6 @@ public class LdapConnectionField extends BaseObjectField {
 
     public LdapConnectionField() {
         super(FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
-        hostname = new HostnameField();
-        port = new PortField();
-        encryptionMethod = new LdapEncryptionMethodField();
     }
 
     public LdapConnectionField hostname(String hostname) {
@@ -74,5 +71,12 @@ public class LdapConnectionField extends BaseObjectField {
     @Override
     public List<Field> getFields() {
         return ImmutableList.of(hostname, port, encryptionMethod);
+    }
+
+    @Override
+    public void initializeFields() {
+        hostname = new HostnameField();
+        port = new PortField();
+        encryptionMethod = new LdapEncryptionMethodField();
     }
 }

@@ -36,8 +36,6 @@ public class ClaimsMapEntry extends BaseObjectField {
 
     public ClaimsMapEntry() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
-        claim = new StringField("claim");
-        claimValue = new StringField("claimValue");
     }
 
     public ClaimsMapEntry claim(String claim) {
@@ -67,5 +65,11 @@ public class ClaimsMapEntry extends BaseObjectField {
     @Override
     public List<Field> getFields() {
         return ImmutableList.of(claim, claimValue);
+    }
+
+    @Override
+    public void initializeFields() {
+        claim = new StringField("claim");
+        claimValue = new StringField("claimValue");
     }
 }

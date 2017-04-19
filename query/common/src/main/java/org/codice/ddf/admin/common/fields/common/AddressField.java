@@ -34,12 +34,16 @@ public class AddressField extends BaseObjectField {
 
     public AddressField() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
-        this.hostname = new HostnameField();
-        this.port = new PortField();
     }
 
     @Override
     public List<Field> getFields() {
         return ImmutableList.of(hostname, port);
+    }
+
+    @Override
+    public void initializeFields() {
+        this.hostname = new HostnameField();
+        this.port = new PortField();
     }
 }

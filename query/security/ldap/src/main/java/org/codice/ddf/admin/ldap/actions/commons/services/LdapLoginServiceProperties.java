@@ -13,7 +13,6 @@
  */
 package org.codice.ddf.admin.ldap.actions.commons.services;
 
-import static org.codice.ddf.admin.ldap.actions.commons.services.LdapClaimsHandlerServiceProperties.SERVICE_PID_KEY;
 import static org.codice.ddf.admin.ldap.fields.config.LdapUseCase.LOGIN;
 import static org.codice.ddf.admin.ldap.fields.connection.LdapEncryptionMethodField.LDAPS;
 
@@ -89,7 +88,7 @@ public class LdapLoginServiceProperties {
                 .connection(connection)
                 .bindUserInfo(bindUserInfo)
                 .settings(settings)
-                .pid(mapStringValue(SERVICE_PID_KEY, props));
+                .pid(mapStringValue(LdapClaimsHandlerServiceProperties.SERVICE_PID_KEY, props));
     }
 
     public static Map<String, Object> ldapConfigurationToLdapLoginService(LdapConfigurationField config) {

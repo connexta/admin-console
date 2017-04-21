@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.api.action.Message;
+import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.api.fields.ObjectField;
 
 public abstract class BaseObjectField extends BaseField<Map<String, Object>>
@@ -61,6 +62,13 @@ public abstract class BaseObjectField extends BaseField<Map<String, Object>>
         }
 
         validationErrors.addAll(getFields().stream()
+                .filter(Field::isRequired)
+                .map(field -> (List<Message>) field.validate())
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList()));
+
+        validationErrors.addAll(getFields().stream()
+                .filter(field -> !field.isRequired() && field.getValue() != null)
                 .map(field -> (List<Message>) field.validate())
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList()));
@@ -105,7 +113,7 @@ public abstract class BaseObjectField extends BaseField<Map<String, Object>>
      * Initializes all the {@link org.codice.ddf.admin.api.fields.Field} of an {@code ObjectField}. Any {@link org.codice.ddf.admin.api.fields.Field} that gets initialized
      * in this method, and is also returned by the {@link ObjectField#getFields()}, will have the {@code ObjectField} added to its path.
      */
-    public abstract void initializeFields();
+    public abstract void initializeFields(boolean useDefaultRequiredFields);
 
     @Override
     public void addToPath(String fieldName) {

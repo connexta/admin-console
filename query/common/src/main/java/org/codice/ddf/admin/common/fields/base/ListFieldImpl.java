@@ -48,6 +48,12 @@ public class ListFieldImpl<T extends Field> extends BaseField<List>
         }
     }
 
+    public ListFieldImpl(String fieldName, T listFieldType) {
+        super(fieldName, null, null, LIST);
+        this.fields = new ArrayList<>();
+        this.listFieldType = listFieldType;
+    }
+
     public ListFieldImpl(Class<T> listFieldType, List<T> values) {
         this(DEFAULT_FIELD_NAME, listFieldType);
         addAll(values);
@@ -69,6 +75,9 @@ public class ListFieldImpl<T extends Field> extends BaseField<List>
 
     @Override
     public List getValue() {
+//        if (fields == null) {
+//            return null;
+//        }
         return fields.stream()
                 .map(field -> field.getValue())
                 .collect(Collectors.toList());
@@ -114,7 +123,7 @@ public class ListFieldImpl<T extends Field> extends BaseField<List>
     public List<Message> validate() {
         List<Message> validationMsgs = super.validate();
 
-        if (validationMsgs.isEmpty()) {
+        if (validationMsgs.isEmpty() && (getList() != null)) {
             List<Message> fieldValidationMsgs = getList().stream()
                     .map(field -> (List<Message>) field.validate())
                     .flatMap(Collection::stream)
@@ -127,3 +136,4 @@ public class ListFieldImpl<T extends Field> extends BaseField<List>
         return validationMsgs;
     }
 }
+

@@ -55,7 +55,7 @@ public class SaveLdapConfiguration extends BaseAction<ListField<LdapConfiguratio
         super(NAME, DESCRIPTION, new ListFieldImpl<>(LdapConfigurationField.class));
         config = new LdapConfigurationField();
         this.configuratorFactory = configuratorFactory;
-        this.serviceCommons = new LdapServiceCommons();
+        this.serviceCommons = new LdapServiceCommons(configuratorFactory);
     }
 
     @Override

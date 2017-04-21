@@ -48,6 +48,16 @@ public class ContextPolicyBin extends BaseObjectField {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
     }
 
+    public ContextPolicyBin(boolean usePreferredConfig) {
+        this();
+        if(usePreferredConfig) {
+            contexts.isRequired(true);
+            authTypes.isRequired(true);
+            realm.isRequired(true);
+            claimsMapping.isRequired(false);
+        }
+    }
+
     public ContextPolicyBin realm(String realm) {
         this.realm = new Realm().getRealmFromValue(realm);
         return this;
@@ -125,6 +135,10 @@ public class ContextPolicyBin extends BaseObjectField {
         Map<String, String> mapping = new HashMap<>();
         claimsMapping.getList().forEach(entry -> mapping.put(entry.claim(), entry.claimValue()));
         return mapping;
+    }
+
+    public ListField<ClaimsMapEntry> claimsMappingField() {
+        return claimsMapping;
     }
 
     @Override

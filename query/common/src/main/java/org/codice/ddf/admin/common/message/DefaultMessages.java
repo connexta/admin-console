@@ -31,6 +31,8 @@ public class DefaultMessages {
 
     public static final String FAILED_PERSIST = "FAILED_PERSIST";
 
+    public static final String INVALID_CLAIM_TYPE = "INVALID_CLAIM_TYPE";
+
     public static ErrorMessage noRootContextError(String pathOrigin) {
         return new ErrorMessage(NO_ROOT_CONTEXT, pathOrigin);
     }
@@ -62,4 +64,9 @@ public class DefaultMessages {
     public static ErrorMessage invalidHostnameError(String pathOrigin) {
         return new ErrorMessage(INVALID_HOSTNAME, pathOrigin);
     }
+
+    public static ErrorMessage invalidClaimType(String pathOrigin) {
+        return new ErrorMessage(INVALID_CLAIM_TYPE, pathOrigin);
+    }
+
 }

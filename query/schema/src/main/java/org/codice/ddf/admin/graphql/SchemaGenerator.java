@@ -35,7 +35,7 @@ public class SchemaGenerator {
 
     public static void main(String[] args) throws IOException, URISyntaxException {
         GraphQLServletImpl servlet = new GraphQLServletImpl();
-        final List<ActionCreator> GRAPHQL_PROVIDERS = ImmutableList.of(new StsActionCreator(),
+        final List<ActionCreator> GRAPHQL_PROVIDERS = ImmutableList.of(new StsActionCreator(new ConfiguratorFactoryImpl()),
                 new ConnectionActionCreator(),
                 new LdapActionCreator(new ConfiguratorFactoryImpl()),
                 new SourceActionCreator(),

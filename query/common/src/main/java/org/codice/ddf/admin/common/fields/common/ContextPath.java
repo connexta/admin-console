@@ -49,7 +49,7 @@ public class ContextPath extends StringField {
         List<Message> msgs = super.validate();
         if (!msgs.isEmpty()) {
             return msgs;
-        } else if (isRequired()) {
+        } else if (getValue() != null && !getValue().isEmpty()) {
             final UriPathValidator validator = new UriPathValidator();
             if (!validator.isValidPath(getValue())) {
                 msgs.add(invalidContextPathError(fieldName()));

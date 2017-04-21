@@ -91,7 +91,7 @@ public class AuthType extends BaseEnumField<String> {
             validationMessages.add(invalidFieldError(fieldName()));
         }
 
-        return new ArrayList<>();
+        return validationMessages;
     }
 
     protected static final class BasicAuth extends StringField {

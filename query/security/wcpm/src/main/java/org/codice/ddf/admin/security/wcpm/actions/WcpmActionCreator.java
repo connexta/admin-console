@@ -44,7 +44,7 @@ public class WcpmActionCreator extends BaseActionCreator {
     @Override
     public List<Action> getDiscoveryActions() {
         return ImmutableList.of(new GetAuthTypes(configuratorFactory),
-                new GetRealms(),
+                new GetRealms(configuratorFactory),
                 new GetWhiteListContexts(configuratorFactory),
                 new GetContextPolicies(configuratorFactory));
     }

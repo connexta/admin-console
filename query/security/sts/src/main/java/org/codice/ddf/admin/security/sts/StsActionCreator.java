@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.codice.ddf.admin.api.action.Action;
 import org.codice.ddf.admin.common.actions.BaseActionCreator;
+import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.security.sts.actions.GetStsClaimsAction;
 
 public class StsActionCreator extends BaseActionCreator {
@@ -30,13 +31,16 @@ public class StsActionCreator extends BaseActionCreator {
     public static final String DESCRIPTION =
             "The STS (Security Token Service) is responsible for generating assertions that allow clients to be authenticated.";
 
-    public StsActionCreator() {
+    private ConfiguratorFactory configuratorFactory;
+
+    public StsActionCreator(ConfiguratorFactory configuratorFactory) {
         super(NAME, TYPE_NAME, DESCRIPTION);
+        this.configuratorFactory = configuratorFactory;
     }
 
     @Override
     public List<Action> getDiscoveryActions() {
-        return Arrays.asList(new GetStsClaimsAction());
+        return Arrays.asList(new GetStsClaimsAction(configuratorFactory));
     }
 
     @Override

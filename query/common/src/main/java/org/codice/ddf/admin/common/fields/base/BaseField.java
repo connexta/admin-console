@@ -95,8 +95,14 @@ public abstract class BaseField<T> implements Field<T> {
     public List<Message> validate() {
         List<Message> errors = new ArrayList<>();
 
-        if (isRequired() && getValue() == null) {
-            errors.add(missingRequiredFieldError(fieldName()));
+        if(isRequired()) {
+            if (this instanceof ListFieldImpl && ((ListFieldImpl)this).getList().isEmpty()) {
+                errors.add(missingRequiredFieldError(fieldName()));
+            }
+
+            if (getValue() == null) {
+                errors.add(missingRequiredFieldError(fieldName()));
+            }
         }
 
         return errors;

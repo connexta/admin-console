@@ -13,8 +13,11 @@
  **/
 package org.codice.ddf.admin.security.common.fields.wcpm;
 
+import static org.codice.ddf.admin.common.message.DefaultMessages.invalidFieldError;
+
 import java.util.List;
 
+import org.codice.ddf.admin.api.action.Message;
 import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
@@ -60,6 +63,22 @@ public class ClaimsMapEntry extends BaseObjectField {
     public ClaimsMapEntry isRequired(boolean required) {
         super.isRequired(required);
         return this;
+    }
+
+    @Override
+    public List<Message> validate() {
+        List<Message> validationMsgs = super.validate();
+        if(!validationMsgs.isEmpty()) {
+            return validationMsgs;
+        }
+
+        if(claim.getValue() != null) {
+            if(claimValue.getValue() == null || claimValue.getValue().isEmpty()) {
+                validationMsgs.add(invalidFieldError(fieldName()));
+            }
+        }
+
+        return validationMsgs;
     }
 
     @Override

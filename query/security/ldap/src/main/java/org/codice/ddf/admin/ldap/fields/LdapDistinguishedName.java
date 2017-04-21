@@ -13,12 +13,11 @@
  **/
 package org.codice.ddf.admin.ldap.fields;
 
-import static org.codice.ddf.admin.ldap.actions.commons.LdapMessages.invalidDnFormatError;
-
 import java.util.List;
 
 import org.codice.ddf.admin.api.action.Message;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
+import org.codice.ddf.admin.ldap.actions.commons.LdapMessages;
 import org.forgerock.opendj.ldap.DN;
 
 public class LdapDistinguishedName extends StringField {
@@ -46,7 +45,7 @@ public class LdapDistinguishedName extends StringField {
         }
 
         if(getValue() != null && !isValidDN(getValue())) {
-            validationMsgs.add(invalidDnFormatError(fieldName()));
+            validationMsgs.add(LdapMessages.invalidDnFormatError(fieldName()));
         }
 
         return validationMsgs;

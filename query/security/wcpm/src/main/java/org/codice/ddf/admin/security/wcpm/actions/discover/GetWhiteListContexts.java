@@ -13,6 +13,8 @@
  **/
 package org.codice.ddf.admin.security.wcpm.actions.discover;
 
+import static org.codice.ddf.admin.security.wcpm.commons.ContextPolicyServiceProperties.getWhitelistContexts;
+
 import java.util.List;
 
 import org.codice.ddf.admin.api.fields.ListField;
@@ -20,8 +22,6 @@ import org.codice.ddf.admin.common.actions.GetAction;
 import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.fields.common.ContextPath;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
-import org.codice.ddf.security.policy.context.ContextPolicyManager;
-import org.codice.ddf.security.policy.context.impl.PolicyManager;
 
 public class GetWhiteListContexts extends GetAction<ListField<ContextPath>> {
 
@@ -40,10 +40,7 @@ public class GetWhiteListContexts extends GetAction<ListField<ContextPath>> {
 
     @Override
     public ListField<ContextPath> performAction() {
-        ContextPolicyManager ref = configuratorFactory.getConfigReader().getServiceReference(ContextPolicyManager.class);
-        PolicyManager policyManager = ((PolicyManager) ref);
-        List<String> whiteListStrs = policyManager.getWhiteListContexts();
-
+        List<String> whiteListStrs = getWhitelistContexts(configuratorFactory.getConfigReader());
         ListField<ContextPath> whiteListedField = new ListFieldImpl<>(ContextPath.class);
         for (String whiteListStr : whiteListStrs) {
             ContextPath newContextPath = new ContextPath();

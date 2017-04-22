@@ -34,6 +34,8 @@
     <feature name="admin-beta-temp-configurator" install="manual" version="${project.version}"
              description="Temporary version of the Configurator (Beta)">
         <!-- TODO switch to DDF dependencies after available in a release -->
+        <bundle>mvn:com.google.guava/guava/${guava.version}</bundle>
+        <feature>security-core-api</feature>
         <bundle>mvn:org.codice.ddf.admin.beta/configurator-api/${project.version}</bundle>
         <bundle>mvn:org.codice.ddf.admin.beta/configurator-impl/${project.version}</bundle>
     </feature>
@@ -92,6 +94,8 @@
     </feature>
 
     <feature name="graphql-dependencies" install="manual" version="${project.version}" description="Required dependencies for admin-beta-graphql">
+        <bundle>mvn:commons-io/commons-io/2.5</bundle>
+        <bundle>mvn:javax.servlet/javax.servlet-api/3.1.0</bundle>
         <bundle>mvn:com.fasterxml.jackson.core/jackson-core/2.8.4</bundle>
         <bundle>mvn:com.fasterxml.jackson.core/jackson-annotations/2.8.4</bundle>
         <bundle>mvn:com.fasterxml.jackson.core/jackson-databind/2.8.4</bundle>

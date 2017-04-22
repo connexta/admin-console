@@ -23,11 +23,11 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
+import org.codice.ddf.admin.common.services.ServicesCommons;
 import org.codice.ddf.admin.ldap.fields.config.LdapConfigurationField;
 import org.codice.ddf.admin.ldap.fields.config.LdapSettingsField;
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindUserInfo;
 import org.codice.ddf.admin.ldap.fields.connection.LdapConnectionField;
-import org.codice.ddf.configuration.PropertyResolver;
 
 public class LdapLoginServiceProperties {
     public static final Pattern URI_MATCHER = Pattern.compile("\\w*://.*");
@@ -126,7 +126,7 @@ public class LdapLoginServiceProperties {
 
     public static URI getUriFromProperty(String ldapUrl) {
         if (StringUtils.isNotEmpty(ldapUrl)) {
-            ldapUrl = PropertyResolver.resolveProperties(ldapUrl);
+            ldapUrl = new ServicesCommons().resolveProperty(ldapUrl);
             if (!URI_MATCHER.matcher(ldapUrl)
                     .matches()) {
                 ldapUrl = "ldap://" + ldapUrl;

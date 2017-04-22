@@ -20,6 +20,8 @@ import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.fields.common.ContextPath;
+import org.codice.ddf.admin.common.services.ServicesCommons;
+import org.codice.ddf.admin.configurator.ConfigReader;
 import org.codice.ddf.admin.security.common.fields.wcpm.ContextPolicyBin;
 
 import com.google.common.collect.ImmutableMap;
@@ -75,5 +77,15 @@ public class ContextPolicyServiceProperties {
 
     public static Map<String, Object> whiteListToPolicyManagerProps(ListField<ContextPath> contexts) {
         return ImmutableMap.of(WHITE_LIST_CONTEXT, contexts.getValue());
+    }
+
+    public static List<String> getWhitelistContexts(ConfigReader reader) {
+        Object whitelistProp = reader.getConfig(POLICY_MANAGER_PID).get(WHITE_LIST_CONTEXT);
+
+        if(whitelistProp != null && whitelistProp instanceof String[]) {
+            return new ServicesCommons().resolveProperties((String[])whitelistProp);
+        }
+
+        return new ArrayList<>();
     }
 }

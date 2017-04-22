@@ -15,6 +15,7 @@ package org.codice.ddf.admin.security.wcpm.actions.persist;
 
 import static org.codice.ddf.admin.common.message.DefaultMessages.failedPersistError;
 import static org.codice.ddf.admin.security.wcpm.commons.ContextPolicyServiceProperties.POLICY_MANAGER_PID;
+import static org.codice.ddf.admin.security.wcpm.commons.ContextPolicyServiceProperties.getWhitelistContexts;
 import static org.codice.ddf.admin.security.wcpm.commons.ContextPolicyServiceProperties.whiteListToPolicyManagerProps;
 
 import java.util.List;
@@ -27,8 +28,6 @@ import org.codice.ddf.admin.common.fields.common.ContextPath;
 import org.codice.ddf.admin.configurator.Configurator;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.configurator.OperationReport;
-import org.codice.ddf.security.policy.context.ContextPolicyManager;
-import org.codice.ddf.security.policy.context.impl.PolicyManager;
 
 import com.google.common.collect.ImmutableList;
 
@@ -57,11 +56,8 @@ public class SaveWhitelistContexts extends BaseAction<ListField<ContextPath>> {
 
     @Override
     public ListField<ContextPath> performAction() {
-        ContextPolicyManager ref = configuratorFactory.getConfigReader().getServiceReference(ContextPolicyManager.class);
-        PolicyManager policyManager = ((PolicyManager) ref);
         ListField<ContextPath> preUpdateWhitelistContexts = new ListFieldImpl<>(ContextPath.class);
-
-        for (String path : policyManager.getWhiteListContexts()) {
+        for (String path :  getWhitelistContexts(configuratorFactory.getConfigReader())) {
             preUpdateWhitelistContexts.add(new ContextPath(path));
         }
 

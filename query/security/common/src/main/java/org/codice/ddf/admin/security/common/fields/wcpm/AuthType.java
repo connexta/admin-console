@@ -13,13 +13,6 @@
  **/
 package org.codice.ddf.admin.security.common.fields.wcpm;
 
-import static org.codice.ddf.admin.common.message.DefaultMessages.emptyFieldError;
-import static org.codice.ddf.admin.common.message.DefaultMessages.invalidFieldError;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import org.codice.ddf.admin.api.action.Message;
 import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.common.fields.base.BaseEnumField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
@@ -60,38 +53,6 @@ public class AuthType extends BaseEnumField<String> {
                         new IdpAuth(),
                         new GuestAuth()),
                 authType);
-    }
-
-    @Override
-    public AuthType isRequired(boolean required) {
-        super.isRequired(required);
-        return this;
-    }
-
-    public AuthType getAuthTypeFromValue(String value) {
-        return new AuthType(getEnumValues().stream()
-                .filter(field -> field.getValue()
-                        .equalsIgnoreCase(value))
-                .findFirst()
-                .get());
-    }
-
-    @Override
-    public List<Message> validate() {
-        List<Message> validationMessages = super.validate();
-        if (!validationMessages.isEmpty()) {
-            return validationMessages;
-        }
-
-        if (getValue() == null || getValue().isEmpty()) {
-            if (isRequired()) {
-                validationMessages.add(emptyFieldError(fieldName()));
-            }
-        } else if (getAuthTypeFromValue(getValue()) == null) {
-            validationMessages.add(invalidFieldError(fieldName()));
-        }
-
-        return validationMessages;
     }
 
     protected static final class BasicAuth extends StringField {

@@ -15,26 +15,21 @@ package org.codice.ddf.admin.security.wcpm.actions.persist;
 
 import static org.codice.ddf.admin.common.message.DefaultMessages.failedPersistError;
 import static org.codice.ddf.admin.common.message.DefaultMessages.invalidClaimType;
-import static org.codice.ddf.admin.common.message.DefaultMessages.invalidFieldError;
 import static org.codice.ddf.admin.common.message.DefaultMessages.noRootContextError;
-import static org.codice.ddf.admin.security.common.fields.wcpm.services.PolicyManagerServiceProperties.STS_CLAIMS_CONFIGURATION_CONFIG_ID;
-import static org.codice.ddf.admin.security.common.fields.wcpm.services.PolicyManagerServiceProperties.STS_CLAIMS_PROPS_KEY_CLAIMS;
 import static org.codice.ddf.admin.security.wcpm.commons.ContextPolicyServiceProperties.POLICY_MANAGER_PID;
 import static org.codice.ddf.admin.security.wcpm.commons.ContextPolicyServiceProperties.ROOT_CONTEXT_PATH;
 import static org.codice.ddf.admin.security.wcpm.commons.ContextPolicyServiceProperties.contextPoliciesToPolicyManagerProps;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.actions.BaseAction;
 import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
+import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 import org.codice.ddf.admin.configurator.Configurator;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.configurator.OperationReport;
@@ -45,7 +40,7 @@ import com.google.common.collect.ImmutableList;
 
 public class SaveContextPolices extends BaseAction<ListField<ContextPolicyBin>> {
 
-    public static final String DEFAULT_FIELD_NAME = "saveContextPolicies";
+    public static final String ACTION_ID = "saveContextPolicies";
 
     public static final String DESCRIPTION =
             "Saves a list of policies to be applied to their corresponding context paths.";
@@ -54,14 +49,16 @@ public class SaveContextPolices extends BaseAction<ListField<ContextPolicyBin>> 
 
     private ListField<ContextPolicyBin> contextPolicies;
 
-    private PolicyManagerServiceProperties wcpmServiceProps = new PolicyManagerServiceProperties();
+    private PolicyManagerServiceProperties wcpmServiceProps;
 
     public SaveContextPolices(ConfiguratorFactory configuratorFactory) {
-        super(DEFAULT_FIELD_NAME, DESCRIPTION, new ListFieldImpl<>(ContextPolicyBin.class));
-        contextPolicies = new ListFieldImpl<>("policies", ContextPolicyBin.class);
-        contextPolicies.isRequired(true);
-        contextPolicies.getListFieldType().claimsMappingField().getListFieldType().isRequired(true);
+        super(ACTION_ID, DESCRIPTION, new ListFieldImpl<>(ContextPolicyBin.class));
+        contextPolicies = new ListFieldImpl<>("policies",
+                new ContextPolicyBin().useDefaultRequiredFields())
+                .isRequired(true);
+
         this.configuratorFactory = configuratorFactory;
+        wcpmServiceProps = new PolicyManagerServiceProperties();
     }
 
     @Override
@@ -71,55 +68,44 @@ public class SaveContextPolices extends BaseAction<ListField<ContextPolicyBin>> 
 
     @Override
     public ListField<ContextPolicyBin> performAction() {
-        checkRootPathExists();
-        checkClaimsValidity();
+        Configurator configurator = configuratorFactory.getConfigurator();
+        configurator.updateConfigFile(POLICY_MANAGER_PID,
+                contextPoliciesToPolicyManagerProps(contextPolicies),
+                true);
 
-        // Persist if no errors
-        if (!containsErrorMsgs()) {
-            Configurator configurator = configuratorFactory.getConfigurator();
-            configurator.updateConfigFile(POLICY_MANAGER_PID,
-                    contextPoliciesToPolicyManagerProps(contextPolicies),
-                    true);
+        // TODO: 4/14/17 Fix the contextPolicies.toString(), this will print the objects name
+        OperationReport configReport = configurator.commit(
+                "Web Context Policy saved with details: {}",
+                contextPolicies.toString());
 
-            // TODO: 4/14/17 Fix the contextPolicies.toString(), this will print the objects name
-            OperationReport configReport = configurator.commit(
-                    "Web Context Policy saved with details: {}",
-                    contextPolicies.toString());
-
-            if (configReport.containsFailedResults()) {
-                addArgumentMessage(failedPersistError(name()));
-            }
+        if (configReport.containsFailedResults()) {
+            addMessage(failedPersistError());
         }
-
         return wcpmServiceProps.contextPolicyServiceToContextPolicyFields(configuratorFactory);
     }
 
+    @Override
+    public void validate() {
+        super.validate();
+        checkRootPathExists();
+        checkClaimsValidity();
+    }
+
     private void checkClaimsValidity() {
-        Map<String, Object> stsConfig = configuratorFactory.getConfigReader()
-                .getConfig(STS_CLAIMS_CONFIGURATION_CONFIG_ID);
+        List<String> supportedClaims = wcpmServiceProps.getConfiguredStsClaims(configuratorFactory);
 
-        List<String> validClaims = (stsConfig != null) ?
-                Arrays.asList((String[]) stsConfig.get(STS_CLAIMS_PROPS_KEY_CLAIMS)) :
-                new ArrayList<>();
-
-        List<Map<String, String>> claims = contextPolicies.getList()
-                .stream()
-                .map(ContextPolicyBin::claimsMapping)
-                .collect(Collectors.toList());
-
-        if (claims.stream()
-                .map(policy -> policy.keySet())
-                .flatMap(Collection::stream)
-                .anyMatch(claim -> !validClaims.contains(claim))) {
-            addArgumentMessage(invalidClaimType(name()));
+        List<StringField> claimArgs = new ArrayList<>();
+        for (ContextPolicyBin bin : contextPolicies.getList()) {
+            claimArgs.addAll(bin.claimsMappingField()
+                    .getList()
+                    .stream()
+                    .map(entry -> entry.claimField())
+                    .collect(Collectors.toList()));
         }
 
-//        if(claims.stream()
-//                .map(Map::values)
-//                .flatMap(Collection::stream)
-//                .anyMatch(value -> value == null || value.isEmpty())) {
-//            addArgumentMessage(invalidFieldError(name()));
-//        }
+        claimArgs.stream()
+                .filter(claimArg -> !supportedClaims.contains(claimArg.getValue()))
+                .forEach(claimArg -> addArgumentMessage(invalidClaimType(claimArg.path())));
     }
 
     private void checkRootPathExists() {
@@ -128,7 +114,7 @@ public class SaveContextPolices extends BaseAction<ListField<ContextPolicyBin>> 
                 .map(ContextPolicyBin::contexts)
                 .flatMap(Collection::stream)
                 .noneMatch(ROOT_CONTEXT_PATH::equals)) {
-            addArgumentMessage(noRootContextError(name()));
+            addArgumentMessage(noRootContextError(contextPolicies.path()));
         }
     }
 }

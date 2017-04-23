@@ -60,12 +60,6 @@ public class CswSourceConfigurationField extends SourceConfigUnionField {
     }
 
     @Override
-    public CswSourceConfigurationField innerFieldRequired(boolean required, String fieldName) {
-        super.innerFieldRequired(required, fieldName);
-        return this;
-    }
-
-    @Override
     public void initializeFields() {
         super.initializeFields();
         outputSchema = new StringField("outputSchema");

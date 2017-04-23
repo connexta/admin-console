@@ -24,6 +24,8 @@ public interface Message {
 
     Message addSubpath(String subPath);
 
+    Message setPath(List<String> path);
+
     Message copy();
 
     enum MessageType {

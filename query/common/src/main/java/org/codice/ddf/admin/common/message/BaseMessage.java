@@ -60,10 +60,17 @@ public abstract class BaseMessage implements Message {
 
     @Override
     public BaseMessage addSubpath(String subPath) {
-        path.add(subPath);
+        path.add(0, subPath);
         return this;
     }
 
+    @Override
+    public Message setPath(List<String> path) {
+        this.path = path;
+        return this;
+    }
+
+    // TODO: tbatie - 4/22/17 - Get rid of this method and fix the way paths are stored
     public BaseMessage addFieldToPath(Field field) {
         path.add(field.fieldName());
         return this;

@@ -16,7 +16,9 @@ package org.codice.ddf.admin.security.wcpm.actions.persist
 import org.codice.ddf.admin.api.action.Action
 import org.codice.ddf.admin.api.action.ActionCreator
 import org.codice.ddf.admin.api.action.ActionReport
+import org.codice.ddf.admin.api.fields.Field
 import org.codice.ddf.admin.api.fields.ListField
+import org.codice.ddf.admin.common.actions.BaseAction
 import org.codice.ddf.admin.common.fields.base.ListFieldImpl
 import org.codice.ddf.admin.common.message.DefaultMessages
 import org.codice.ddf.admin.configurator.ConfigReader
@@ -24,6 +26,7 @@ import org.codice.ddf.admin.configurator.Configurator
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.configurator.OperationReport
 import org.codice.ddf.admin.security.common.fields.wcpm.ContextPolicyBin
+import org.codice.ddf.admin.security.common.fields.wcpm.Realm
 import org.codice.ddf.admin.security.wcpm.actions.WcpmActionCreator
 import org.codice.ddf.security.policy.context.impl.PolicyManager
 import spock.lang.Specification
@@ -92,7 +95,7 @@ class SaveContextPoliciesTest extends Specification {
         configReader.getConfig(_) >> stsConfig
 
         policyManager = new PolicyManager()
-        ListField<ContextPolicyBin> contextPolicies = new ListFieldImpl<>(ContextPolicyBin.class);
+        ListField<ContextPolicyBin> contextPolicies = new ListFieldImpl<>(ContextPolicyBin.class)
         contextPolicies.setValue(testData.policies)
         policyManager.setPolicies(transformServiceProps(contextPoliciesToPolicyManagerProps(contextPolicies)))
 
@@ -101,10 +104,10 @@ class SaveContextPoliciesTest extends Specification {
         configuratorFactory.getConfigurator() >> configurator
         configuratorFactory.getConfigReader() >> configReader
         actionCreator = new WcpmActionCreator(configuratorFactory)
-        action = actionCreator.createAction(SaveContextPolices.DEFAULT_FIELD_NAME)
+        action = actionCreator.createAction(SaveContextPolices.ACTION_ID)
     }
 
-    def 'Should pass with valid update' () {
+    def 'Pass with valid update' () {
         setup:
         operationReport.containsFailedResults() >> false
 
@@ -116,7 +119,7 @@ class SaveContextPoliciesTest extends Specification {
         report.messages().isEmpty()
     }
 
-    def 'Should report failed persists' () {
+    def 'Fail when failed to persist' () {
         setup:
         operationReport.containsFailedResults() >> true
 
@@ -127,11 +130,12 @@ class SaveContextPoliciesTest extends Specification {
         ActionReport report = action.process()
 
         then:
-        !report.messages().isEmpty()
+        report.messages().size() == 1
         report.messages()[0].code == DefaultMessages.FAILED_PERSIST
+        report.messages()[0].path == [SaveContextPolices.ACTION_ID]
     }
 
-    def 'Fail if no root context' () {
+    def 'Fail if no root context is present' () {
         setup:
         operationReport.containsFailedResults() >> false
         testData.policies[0].paths = [ '/test' ]
@@ -141,8 +145,9 @@ class SaveContextPoliciesTest extends Specification {
         ActionReport report = action.process()
 
         then:
-        !report.messages().isEmpty()
-        report.messages()[0].code == 'NO_ROOT_CONTEXT'
+        report.messages().size() == 1
+        report.messages()[0].code == DefaultMessages.NO_ROOT_CONTEXT
+        report.messages()[0].path == [SaveContextPolices.ACTION_ID, BaseAction.ARGUMENT, 'policies']
     }
 
     def 'Fail if invalid authType' () {
@@ -155,7 +160,9 @@ class SaveContextPoliciesTest extends Specification {
         ActionReport report = action.process()
 
         then:
-        thrown(RuntimeException)
+        report.messages().size() == 1
+        report.messages()[0].code == DefaultMessages.MISSING_REQUIRED_FIELD
+        report.messages()[0].path == [SaveContextPolices.ACTION_ID, BaseAction.ARGUMENT, 'policies', Field.INDEX_DELIMETER + 0, 'authTypes', ListFieldImpl.INDEX_DELIMETER + 1]
     }
 
     def 'Fail if no authType' () {
@@ -168,8 +175,9 @@ class SaveContextPoliciesTest extends Specification {
         ActionReport report = action.process()
 
         then:
-        !report.messages().isEmpty()
-        report.messages()[0].code == 'MISSING_REQUIRED_FIELD'
+        report.messages().size() == 1
+        report.messages()[0].code == DefaultMessages.MISSING_REQUIRED_FIELD
+        report.messages()[0].path == [SaveContextPolices.ACTION_ID, BaseAction.ARGUMENT, 'policies', Field.INDEX_DELIMETER + 0, 'authTypes']
     }
 
     def 'Fail if invalid realm' () {
@@ -182,7 +190,9 @@ class SaveContextPoliciesTest extends Specification {
         ActionReport report = action.process()
 
         then:
-        throw Exception
+        report.messages().size() == 1
+        report.messages()[0].code == DefaultMessages.MISSING_REQUIRED_FIELD
+        report.messages()[0].path == [SaveContextPolices.ACTION_ID, BaseAction.ARGUMENT, 'policies', Field.INDEX_DELIMETER + 0, Realm.DEFAULT_FIELD_NAME]
     }
 
     def 'Fail if no realm' () {
@@ -195,11 +205,12 @@ class SaveContextPoliciesTest extends Specification {
         ActionReport report = action.process()
 
         then:
-        !report.messages().isEmpty()
-        report.messages()[0].code == 'MISSING_REQUIRED_FIELD'
+        report.messages().size() == 1
+        report.messages()[0].code == DefaultMessages.MISSING_REQUIRED_FIELD
+        report.messages()[0].path == [SaveContextPolices.ACTION_ID, BaseAction.ARGUMENT, 'policies', Field.INDEX_DELIMETER + 0, Realm.DEFAULT_FIELD_NAME]
     }
 
-    def 'Pass is no claims Mapping' () {
+    def 'Pass if no claims Mapping' () {
         setup:
         operationReport.containsFailedResults() >> false
         testData.policies[0].claimsMapping = null
@@ -212,7 +223,7 @@ class SaveContextPoliciesTest extends Specification {
         report.messages().isEmpty()
     }
 
-    def 'Fail if claim with no value ' () {
+    def 'Fail if claim entry with no value ' () {
         setup:
         operationReport.containsFailedResults() >> false
         testData.policies[0].claimsMapping[0].claimValue = null
@@ -222,8 +233,24 @@ class SaveContextPoliciesTest extends Specification {
         ActionReport report = action.process()
 
         then:
-        !report.messages().isEmpty()
+        report.messages().size() == 1
         report.messages()[0].code == DefaultMessages.INVALID_FIELD
+        report.messages()[0].path == [SaveContextPolices.ACTION_ID, BaseAction.ARGUMENT, 'policies', Field.INDEX_DELIMETER + 0, 'claimsMapping', Field.INDEX_DELIMETER + 0, 'claimValue']
+    }
+
+    def 'Fail if claim is not supported' () {
+        setup:
+        operationReport.containsFailedResults() >> false
+        testData.policies[0].claimsMapping[0].claim = 'unsupportedClaim'
+
+        when:
+        action.setArguments(testData)
+        ActionReport report = action.process()
+
+        then:
+        report.messages().size() == 1
+        report.messages()[0].code == DefaultMessages.INVALID_CLAIM_TYPE
+        report.messages()[0].path == [SaveContextPolices.ACTION_ID, BaseAction.ARGUMENT, 'policies', Field.INDEX_DELIMETER + 0, 'claimsMapping', Field.INDEX_DELIMETER + 0, "claim"]
     }
 
     Map<String, Object> transformServiceProps(Map<String, Object> props) {

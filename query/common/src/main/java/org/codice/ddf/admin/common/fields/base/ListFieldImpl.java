@@ -41,7 +41,6 @@ public class ListFieldImpl<T extends Field> extends BaseField<List>
         super(fieldName, null, null, LIST);
         this.fields = new ArrayList<>();
         try {
-            // TODO: tbatie - 4/13/17 - Review if this is the correct way to do all this
             this.listFieldType = listFieldType.newInstance();
         } catch (InstantiationException | IllegalAccessException e) {
             throw new RuntimeException(String.format("Unable to create new instance of class [%s]. Ensure there is a default constructor for the ListFieldImpl to initialize.", listFieldType.getClass()));
@@ -75,9 +74,6 @@ public class ListFieldImpl<T extends Field> extends BaseField<List>
 
     @Override
     public List getValue() {
-//        if (fields == null) {
-//            return null;
-//        }
         return fields.stream()
                 .map(field -> field.getValue())
                 .collect(Collectors.toList());
@@ -92,6 +88,7 @@ public class ListFieldImpl<T extends Field> extends BaseField<List>
 
         for (Object val : values) {
             try {
+                // TODO: tbatie - 4/22/17 - Should we consider making a copy method that is enforced by the interface instead?
                 T newField = (T) getListFieldType().getClass()
                         .newInstance();
                 newField.setValue(val);
@@ -105,10 +102,8 @@ public class ListFieldImpl<T extends Field> extends BaseField<List>
 
     @Override
     public ListFieldImpl<T> add(T value) {
-        // TODO: 4/10/17 perform special validation for object fields
-        // TODO: 4/10/17 Copy the obj instead
-        value.isRequired(listFieldType.isRequired());
-        path().forEach(value::addToPath);
+        value.matchRequired(listFieldType);
+        getNewFieldPath().forEach(value::addToPath);
         fields.add(value);
         return this;
     }
@@ -128,12 +123,47 @@ public class ListFieldImpl<T extends Field> extends BaseField<List>
                     .map(field -> (List<Message>) field.validate())
                     .flatMap(Collection::stream)
                     .collect(Collectors.toList());
-
-            fieldValidationMsgs.forEach(msg -> msg.addSubpath(fieldName()));
             validationMsgs.addAll(fieldValidationMsgs);
         }
 
         return validationMsgs;
+    }
+
+    @Override
+    public ListField<T> matchRequired(Field fieldToMatch) {
+        super.matchRequired(fieldToMatch);
+        listFieldType.matchRequired(((ListField)fieldToMatch).getListFieldType());
+
+        for(Field field : getList()) {
+            field.matchRequired(listFieldType);
+        }
+
+        return this;
+    }
+
+    @Override
+    public ListFieldImpl<T> isRequired(boolean required) {
+        super.isRequired(required);
+        return this;
+    }
+
+    @Override
+    public void addToPath(String fieldName) {
+        super.addToPath(fieldName);
+        for(Field field : getList()) {
+            field.addToPath(fieldName);
+        }
+    }
+
+    public List<String> getNewFieldPath() {
+        List<String> newPath = new ArrayList<>();
+        newPath.add(INDEX_DELIMETER + fields.size());
+        newPath.add(fieldName());
+        newPath.addAll(path().stream()
+                .filter(subPath -> !subPath.equals(fieldName()))
+                .collect(Collectors.toList()));
+
+        return newPath;
     }
 }
 

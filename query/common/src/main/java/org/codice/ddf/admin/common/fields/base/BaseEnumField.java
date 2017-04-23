@@ -14,9 +14,9 @@
 package org.codice.ddf.admin.common.fields.base;
 
 import static org.codice.ddf.admin.api.fields.Field.FieldBaseType.ENUM;
+import static org.codice.ddf.admin.common.message.DefaultMessages.unsupportedEnum;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.api.action.Message;
@@ -25,8 +25,7 @@ import org.codice.ddf.admin.api.fields.Field;
 
 public abstract class BaseEnumField<S> extends BaseField<S> implements EnumField<S, Field<S>> {
 
-    // TODO: 4/18/17 phuffer -  Replace this list with a single value. look at removing overriding getValue()
-    private Field<S> enumValue;
+    private S enumValue;
 
     private List<Field<S>> enumValues;
 
@@ -39,7 +38,7 @@ public abstract class BaseEnumField<S> extends BaseField<S> implements EnumField
     public BaseEnumField(String fieldName, String fieldTypeName, String description,
             List<Field<S>> enumValues, Field<S> enumValue) {
         this(fieldName, fieldTypeName, description, enumValues);
-        this.enumValue = enumValue;
+        this.enumValue = enumValue == null ? null : enumValue.getValue();
     }
 
     @Override
@@ -49,44 +48,41 @@ public abstract class BaseEnumField<S> extends BaseField<S> implements EnumField
 
     @Override
     public S getValue() {
-        return enumValue == null ? null : enumValue.getValue();
+        return enumValue;
     }
 
     @Override
     public void setValue(S value) {
-        if (value == null) {
+        if(value == null) {
             enumValue = null;
-            return;
         }
 
-        Optional<Field<S>> matchedEnum = getEnumValues().stream()
-                .filter(supportedEnum -> supportedEnum.getValue()
-                        .equals(value))
-                .findFirst();
-
-        if (matchedEnum.isPresent()) {
-            enumValue = matchedEnum.get();
-        } else {
-            List<String> supportedValues = getEnumValues().stream()
-                    .map(supportedEnum -> supportedEnum.getValue()
-                            .toString())
-                    .collect(Collectors.toList());
-            throw new RuntimeException(String.join(
-                    "Unknown enum value [%s]. Supported enum values are: [%s]",
-                    value.toString(),
-                    String.join(",", supportedValues)));
+        for(Field<S> supportedEnum : getEnumValues()) {
+            if(supportedEnum.getValue().equals(value)) {
+                enumValue = supportedEnum.getValue();
+                return;
+            } else if(supportedEnum.getValue() instanceof String && ((String) supportedEnum.getValue()).equalsIgnoreCase((String) value)) {
+                enumValue = supportedEnum.getValue();
+                return;
+            }
         }
     }
 
     @Override
     public List<Message> validate() {
         List<Message> validationMsgs = super.validate();
-        if (!validationMsgs.isEmpty()) {
+        if(!validationMsgs.isEmpty()) {
             return validationMsgs;
         }
 
-        if (getValue() != null) {
-            validationMsgs.addAll(enumValue.validate());
+        if(getValue() != null) {
+            List<S> supportedValues = getEnumValues().stream()
+                    .map(field -> field.getValue())
+                    .collect(Collectors.toList());
+
+            if(!supportedValues.contains(getValue())) {
+                validationMsgs.add(unsupportedEnum(path()));
+            }
         }
 
         return validationMsgs;

@@ -14,6 +14,7 @@
 package org.codice.ddf.admin.security.common.fields.wcpm.services;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +38,15 @@ public class PolicyManagerServiceProperties {
     public static final String IDP_CLIENT_BUNDLE_NAME = "security-idp-client";
 
     public static final String IDP_SERVER_BUNDLE_NAME = "security-idp-server";
+
+    public List<String> getConfiguredStsClaims(ConfiguratorFactory configuratorFactory){
+        Map<String, Object> stsConfig = configuratorFactory.getConfigReader()
+                .getConfig(STS_CLAIMS_CONFIGURATION_CONFIG_ID);
+
+        return stsConfig != null ?
+                Arrays.asList((String[]) stsConfig.get(STS_CLAIMS_PROPS_KEY_CLAIMS)) :
+                new ArrayList<>();
+    }
 
     public ListField<ContextPolicyBin> contextPolicyServiceToContextPolicyFields(ConfiguratorFactory configurator) {
         ContextPolicyManager ref = configurator.getConfigReader().getServiceReference(ContextPolicyManager.class);

@@ -16,6 +16,8 @@ package org.codice.ddf.admin.security.wcpm.actions.persist
 import org.codice.ddf.admin.api.action.Action
 import org.codice.ddf.admin.api.action.ActionCreator
 import org.codice.ddf.admin.api.action.ActionReport
+import org.codice.ddf.admin.common.actions.BaseAction
+import org.codice.ddf.admin.common.fields.base.ListFieldImpl
 import org.codice.ddf.admin.configurator.ConfigReader
 import org.codice.ddf.admin.configurator.Configurator
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
@@ -46,10 +48,10 @@ class SaveWhitelistContextsTest extends Specification {
         configuratorFactory.getConfigReader() >>  configReader
         configReader.getServiceReference(_) >> policyManager
         actionCreator = new WcpmActionCreator(configuratorFactory)
-        action = actionCreator.createAction(SaveWhitelistContexts.DEFAULT_FIELD_NAME)
+        action = actionCreator.createAction(SaveWhitelistContexts.ACTION_ID)
     }
 
-    def 'Should set valid context list' () {
+    def 'Pass with valid context list' () {
         setup:
         def testMap = [ 'paths':[  '/test', '/path', '/' ] ]
         operationReport.containsFailedResults() >> false
@@ -63,7 +65,7 @@ class SaveWhitelistContextsTest extends Specification {
         report.result().getValue() == testMap.paths
     }
 
-    def 'Should fail if context path is invalid' () {
+    def 'Fail if context path is invalid' () {
         setup:
         def testMap = [ 'paths':[  '/test', '/path', '!@#(%^$(&(*' ] ]
         operationReport.containsFailedResults() >> false
@@ -74,9 +76,10 @@ class SaveWhitelistContextsTest extends Specification {
 
         then:
         report.messages()[0].code == 'INVALID_CONTEXT_PATH'
+        report.messages()[0].path == [SaveWhitelistContexts.ACTION_ID, BaseAction.ARGUMENT, 'paths', ListFieldImpl.INDEX_DELIMETER + 2]
     }
 
-    def 'Should fail if context path is empty' () {
+    def 'Fail if context path is empty' () {
         setup:
         def testMap = [ 'paths':[  '/test', '/path', '' ] ]
         operationReport.containsFailedResults() >> false
@@ -87,10 +90,11 @@ class SaveWhitelistContextsTest extends Specification {
 
         then:
         report.messages()[0].code == 'EMPTY_FIELD'
+        report.messages()[0].path == [SaveWhitelistContexts.ACTION_ID, BaseAction.ARGUMENT, 'paths', ListFieldImpl.INDEX_DELIMETER + 2]
     }
 
 
-    def 'Should pass if list is empty (whitelist contexts not required)' () {
+    def 'Pass if list is empty (whitelist contexts not required)' () {
         setup:
         def testMap = [ 'paths':[] ]
         operationReport.containsFailedResults() >> false
@@ -104,7 +108,7 @@ class SaveWhitelistContextsTest extends Specification {
         report.result().getValue() == []
     }
 
-    def 'Should report failed persists' () {
+    def 'Fail when fail to persist' () {
         setup:
         def testMap = [ 'paths':[  '/test', '/path', '/' ] ]
         operationReport.containsFailedResults() >> true
@@ -115,5 +119,6 @@ class SaveWhitelistContextsTest extends Specification {
 
         then:
         report.messages()[0].code == 'FAILED_PERSIST'
+        report.messages()[0].path == [SaveWhitelistContexts.ACTION_ID]
     }
 }

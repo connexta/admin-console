@@ -67,8 +67,6 @@ public abstract class BaseAction<T extends Field> implements Action<T> {
         getArguments().stream()
                 .filter(field -> args.containsKey(field.fieldName()))
                 .forEach(field -> field.setValue(args.get(field.fieldName())));
-
-        // TODO: tbatie - 3/16/17 - Add logger if a fieldName is not found
     }
 
     @Override
@@ -85,11 +83,21 @@ public abstract class BaseAction<T extends Field> implements Action<T> {
         return report.containsErrorMsgs();
     }
 
+    protected BaseAction addArgumentMessages(List<Message> msgs) {
+        msgs.forEach(msg -> addArgumentMessage(msg));
+        return this;
+    }
+
     protected BaseAction addArgumentMessage(Message msg) {
         Message copy = msg.copy();
-        copy.addSubpath(name);
         copy.addSubpath(ARGUMENT);
+        copy.addSubpath(name);
         report.addMessage(copy);
+        return this;
+    }
+
+    protected BaseAction addMessages(List<Message> msgs) {
+        msgs.forEach(msg -> addMessage(msg));
         return this;
     }
 
@@ -100,15 +108,6 @@ public abstract class BaseAction<T extends Field> implements Action<T> {
         return this;
     }
 
-    protected BaseAction addArgumentMessages(List<Message> msgs) {
-        msgs.forEach(msg -> addArgumentMessage(msg));
-        return this;
-    }
-
-    protected BaseAction addMessages(List<Message> msgs) {
-        msgs.forEach(msg -> addMessage(msg));
-        return this;
-    }
 
     public void validate() {
         getArguments().stream()

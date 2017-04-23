@@ -20,6 +20,4 @@ public interface ObjectField extends Field<Map<String, Object>> {
     List<Field> getFields();
 
     ObjectField allFieldsRequired(boolean required);
-
-    ObjectField innerFieldRequired(boolean required, String fieldName);
 }

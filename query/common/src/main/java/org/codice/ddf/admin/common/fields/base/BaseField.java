@@ -95,16 +95,20 @@ public abstract class BaseField<T> implements Field<T> {
     public List<Message> validate() {
         List<Message> errors = new ArrayList<>();
 
-        if(isRequired()) {
-            if (this instanceof ListFieldImpl && ((ListFieldImpl)this).getList().isEmpty()) {
-                errors.add(missingRequiredFieldError(fieldName()));
-            }
-
+        if (isRequired()) {
             if (getValue() == null) {
-                errors.add(missingRequiredFieldError(fieldName()));
+                errors.add(missingRequiredFieldError(path()));
+            } else if (getValue() instanceof List && ((List) getValue()).isEmpty()) {
+                errors.add(missingRequiredFieldError(path()));
             }
         }
 
         return errors;
+    }
+
+    @Override
+    public Field<T> matchRequired(Field<T> fieldToMatch) {
+        isRequired(fieldToMatch.isRequired());
+        return this;
     }
 }

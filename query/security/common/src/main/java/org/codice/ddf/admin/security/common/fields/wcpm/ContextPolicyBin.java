@@ -48,18 +48,8 @@ public class ContextPolicyBin extends BaseObjectField {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
     }
 
-    public ContextPolicyBin(boolean usePreferredConfig) {
-        this();
-        if(usePreferredConfig) {
-            contexts.isRequired(true);
-            authTypes.isRequired(true);
-            realm.isRequired(true);
-            claimsMapping.isRequired(false);
-        }
-    }
-
     public ContextPolicyBin realm(String realm) {
-        this.realm = new Realm().getRealmFromValue(realm);
+        this.realm.setValue(realm);
         return this;
     }
 
@@ -100,22 +90,14 @@ public class ContextPolicyBin extends BaseObjectField {
     }
 
     public ContextPolicyBin addAuthType(String authType) {
-        authTypes.add(new AuthType().getAuthTypeFromValue(authType));
-        return this;
-    }
-
-    public ContextPolicyBin addAuthType(AuthType authType) {
-        authTypes.add(authType);
+        AuthType newAuthType = new AuthType();
+        newAuthType.setValue(authType);
+        authTypes.add(newAuthType);
         return this;
     }
 
     public ContextPolicyBin authTypes(Collection<String> authTypes) {
         authTypes.forEach(authType -> addAuthType(authType));
-        return this;
-    }
-
-    public ContextPolicyBin contexts(Collection<String> contexts) {
-        contexts.forEach(context -> addContextPath(context));
         return this;
     }
 
@@ -159,5 +141,15 @@ public class ContextPolicyBin extends BaseObjectField {
         realm = new Realm();
         // TODO: 4/18/17 phuffer -  Replace with a MapField
         claimsMapping = new ListFieldImpl<>("claimsMapping", ClaimsMapEntry.class);
+    }
+
+    public ContextPolicyBin useDefaultRequiredFields() {
+        isRequired(true);
+        contexts.isRequired(true);
+        authTypes.isRequired(true);
+        authTypes.getListFieldType().isRequired(true);
+        realm.isRequired(true);
+        claimsMapping.isRequired(false);
+        return this;
     }
 }

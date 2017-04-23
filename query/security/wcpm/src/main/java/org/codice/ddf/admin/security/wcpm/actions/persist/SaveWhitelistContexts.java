@@ -33,7 +33,7 @@ import com.google.common.collect.ImmutableList;
 
 public class SaveWhitelistContexts extends BaseAction<ListField<ContextPath>> {
 
-    public static final String DEFAULT_FIELD_NAME = "saveWhitelistContexts";
+    public static final String ACTION_ID = "saveWhitelistContexts";
 
     public static final String DESCRIPTION =
             "Persists the given contexts paths as white listed contexts. White listing a context path will result in no security being applied to the given paths.";
@@ -43,9 +43,8 @@ public class SaveWhitelistContexts extends BaseAction<ListField<ContextPath>> {
     private ConfiguratorFactory configuratorFactory;
 
     public SaveWhitelistContexts(ConfiguratorFactory configuratorFactory) {
-        super(DEFAULT_FIELD_NAME, DESCRIPTION, new ListFieldImpl<>(ContextPath.class));
-        contexts = new ListFieldImpl<>("paths", ContextPath.class);
-        contexts.isRequired(true);
+        super(ACTION_ID, DESCRIPTION, new ListFieldImpl<>(ContextPath.class));
+        contexts = new ListFieldImpl<>("paths", new ContextPath());
         this.configuratorFactory = configuratorFactory;
     }
 
@@ -71,7 +70,7 @@ public class SaveWhitelistContexts extends BaseAction<ListField<ContextPath>> {
                 contexts.toString());
 
         if (configReport.containsFailedResults()) {
-            addArgumentMessage(failedPersistError(name()));
+            addMessage(failedPersistError());
             return preUpdateWhitelistContexts;
         } else {
             return contexts;

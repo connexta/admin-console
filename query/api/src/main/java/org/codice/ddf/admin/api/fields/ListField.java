@@ -23,5 +23,5 @@ public interface ListField<T extends Field> extends Field<List> {
 
     ListField<T> add(T field);
 
-    ListField addAll(Collection<T> fields);
+    ListField<T> addAll(Collection<T> fields);
 }

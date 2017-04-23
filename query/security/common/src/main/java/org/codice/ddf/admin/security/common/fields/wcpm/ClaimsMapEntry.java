@@ -59,6 +59,10 @@ public class ClaimsMapEntry extends BaseObjectField {
         return claimValue.getValue();
     }
 
+    public StringField claimField() {
+        return claim;
+    }
+
     @Override
     public ClaimsMapEntry isRequired(boolean required) {
         super.isRequired(required);
@@ -74,7 +78,7 @@ public class ClaimsMapEntry extends BaseObjectField {
 
         if(claim.getValue() != null) {
             if(claimValue.getValue() == null || claimValue.getValue().isEmpty()) {
-                validationMsgs.add(invalidFieldError(fieldName()));
+                validationMsgs.add(invalidFieldError(claimValue.path()));
             }
         }
 

@@ -26,7 +26,6 @@ import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.security.common.fields.wcpm.ContextPolicyBin;
 import org.codice.ddf.security.policy.context.ContextPolicy;
 import org.codice.ddf.security.policy.context.ContextPolicyManager;
-import org.codice.ddf.security.policy.context.impl.PolicyManager;
 
 public class PolicyManagerServiceProperties {
 
@@ -41,11 +40,11 @@ public class PolicyManagerServiceProperties {
 
     public ListField<ContextPolicyBin> contextPolicyServiceToContextPolicyFields(ConfiguratorFactory configurator) {
         ContextPolicyManager ref = configurator.getConfigReader().getServiceReference(ContextPolicyManager.class);
-        return policyManagerSettingsToBins((PolicyManager) ref);
+        return policyManagerSettingsToBins(ref);
     }
 
     // TODO: tbatie - 1/17/17 - (Ticket) Get rid of this PolicyManager reference and break this dependency.
-    public ListField<ContextPolicyBin> policyManagerSettingsToBins(PolicyManager policyManager) {
+    public ListField<ContextPolicyBin> policyManagerSettingsToBins(ContextPolicyManager policyManager) {
         List<ContextPolicyBin> policies = new ArrayList<>();
 
         Collection<ContextPolicy> allPolicies = policyManager.getAllContextPolicies();

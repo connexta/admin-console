@@ -78,7 +78,7 @@
         <dependency>
             <groupId>org.codice.ddf.admin.beta</groupId>
             <artifactId>configurator-api</artifactId>
-            <version>0.1.2-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>ddf.lib</groupId>

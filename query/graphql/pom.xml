@@ -117,7 +117,7 @@
                         <configuration>
                             <rules>
                                 <ArtifactSizeEnforcerRule implementation="org.codice.ddf.admin.beta.enforcer.ArtifactSizeEnforcerRule">
-                                    <maxArtifactSize>4.7_MB</maxArtifactSize>
+                                    <maxArtifactSize>2_MB</maxArtifactSize>
                                 </ArtifactSizeEnforcerRule>
                             </rules>
                         </configuration>

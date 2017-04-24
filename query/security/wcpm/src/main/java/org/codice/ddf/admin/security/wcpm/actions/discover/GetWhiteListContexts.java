@@ -13,7 +13,7 @@
  **/
 package org.codice.ddf.admin.security.wcpm.actions.discover;
 
-import static org.codice.ddf.admin.security.wcpm.commons.ContextPolicyServiceProperties.getWhitelistContexts;
+import static org.codice.ddf.admin.security.common.services.PolicyManagerServiceProperties.getWhitelistContexts;
 
 import java.util.List;
 

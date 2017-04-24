@@ -18,7 +18,7 @@ import org.codice.ddf.admin.common.actions.GetAction;
 import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.security.common.fields.wcpm.ContextPolicyBin;
-import org.codice.ddf.admin.security.common.fields.wcpm.services.PolicyManagerServiceProperties;
+import org.codice.ddf.admin.security.common.services.PolicyManagerServiceProperties;
 
 public class GetContextPolicies extends GetAction<ListField<ContextPolicyBin>> {
 

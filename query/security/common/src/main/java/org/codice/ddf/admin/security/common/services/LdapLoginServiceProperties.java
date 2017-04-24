@@ -11,32 +11,47 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.security.common.fields;
+package org.codice.ddf.admin.security.common.services;
 
 import java.util.Map;
 
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 
-public class ServiceCommons {
+public class LdapLoginServiceProperties {
 
+    // --- Ldap Login Service Properties
     public static final String LDAP_LOGIN_MANAGED_SERVICE_FACTORY_PID = "Ldap_Login_Config";
 
-    public static final String LDAP_CLAIMS_HANDLER_MANAGED_SERVICE_FACTORY_PID =
-            "Claims_Handler_Manager";
+    public static final String LDAP_LOGIN_FEATURE = "security-sts-ldaplogin";
+
+    public static final String LDAP_BIND_USER_DN = "ldapBindUserDn";
+
+    public static final String LDAP_BIND_USER_PASS = "ldapBindUserPass";
+
+    public static final String BIND_METHOD = "bindMethod";
+
+    //    public static final String KDC_ADDRESS = "kdcAddress";
+    public static final String REALM = "realm";
+
+    public static final String USER_NAME_ATTRIBUTE = "userNameAttribute";
+
+    public static final String USER_BASE_DN = "userBaseDn";
+
+    public static final String GROUP_BASE_DN = "groupBaseDn";
+
+    public static final String LDAP_URL = "ldapUrl";
+
+    public static final String START_TLS = "startTls";
+    // ---
 
     private ConfiguratorFactory configuratorFactory;
 
-    public ServiceCommons(ConfiguratorFactory configuratorFactory) {
+    public LdapLoginServiceProperties(ConfiguratorFactory configuratorFactory) {
         this.configuratorFactory = configuratorFactory;
     }
 
     public Map<String, Map<String, Object>> getLdapLoginManagedServices() {
         return configuratorFactory.getConfigReader()
                 .getManagedServiceConfigs(LDAP_LOGIN_MANAGED_SERVICE_FACTORY_PID);
-    }
-
-    public Map<String, Map<String, Object>> getLdapClaimsHandlerManagedServices() {
-        return configuratorFactory.getConfigReader()
-                .getManagedServiceConfigs(LDAP_CLAIMS_HANDLER_MANAGED_SERVICE_FACTORY_PID);
     }
 }

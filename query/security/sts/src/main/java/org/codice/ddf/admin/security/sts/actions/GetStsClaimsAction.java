@@ -13,18 +13,11 @@
  **/
 package org.codice.ddf.admin.security.sts.actions;
 
-import static org.codice.ddf.admin.security.common.fields.wcpm.services.PolicyManagerServiceProperties.STS_CLAIMS_CONFIGURATION_CONFIG_ID;
-import static org.codice.ddf.admin.security.common.fields.wcpm.services.PolicyManagerServiceProperties.STS_CLAIMS_PROPS_KEY_CLAIMS;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
 import org.codice.ddf.admin.common.actions.GetAction;
 import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.security.common.fields.sts.StsClaimField;
+import org.codice.ddf.admin.security.common.services.StsServiceProperties;
 
 public class GetStsClaimsAction extends GetAction<ListFieldImpl<StsClaimField>> {
 
@@ -42,14 +35,7 @@ public class GetStsClaimsAction extends GetAction<ListFieldImpl<StsClaimField>> 
     @Override
     public ListFieldImpl<StsClaimField> performAction() {
         ListFieldImpl<StsClaimField> claims = new ListFieldImpl<>(StsClaimField.class);
-        claims.setValue(getClaims());
+        claims.setValue(new StsServiceProperties().getConfiguredStsClaims(configuratorFactory));
         return claims;
-    }
-
-    private List<String> getClaims() {
-        Map<String, Object> stsConfig = configuratorFactory.getConfigReader().getConfig(STS_CLAIMS_CONFIGURATION_CONFIG_ID);
-        return (stsConfig != null && stsConfig.get(STS_CLAIMS_PROPS_KEY_CLAIMS) instanceof String[]) ?
-                Arrays.asList((String[])stsConfig.get(STS_CLAIMS_PROPS_KEY_CLAIMS)) :
-                new ArrayList<>();
     }
 }

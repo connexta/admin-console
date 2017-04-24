@@ -22,6 +22,7 @@ import org.codice.ddf.admin.configurator.ConfigReader
 import org.codice.ddf.admin.configurator.Configurator
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.configurator.OperationReport
+import org.codice.ddf.admin.security.common.services.PolicyManagerServiceProperties
 import org.codice.ddf.admin.security.wcpm.actions.WcpmActionCreator
 import org.codice.ddf.security.policy.context.impl.PolicyManager
 import spock.lang.Specification
@@ -46,7 +47,7 @@ class SaveWhitelistContextsTest extends Specification {
         configurator.commit(_,_) >> operationReport
         configuratorFactory.getConfigurator() >> configurator
         configuratorFactory.getConfigReader() >>  configReader
-        configReader.getServiceReference(_) >> policyManager
+        configReader.getConfig(_) >> { [ (PolicyManagerServiceProperties.WHITE_LIST_CONTEXT) : policyManager.getWhiteListContexts() ] }
         actionCreator = new WcpmActionCreator(configuratorFactory)
         action = actionCreator.createAction(SaveWhitelistContexts.ACTION_ID)
     }

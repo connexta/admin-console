@@ -46,6 +46,11 @@
             <version>${ddf.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.codice.ddf.admin.beta</groupId>
+            <artifactId>configurator-api</artifactId>
+            <version>0.1.3-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
     <build>

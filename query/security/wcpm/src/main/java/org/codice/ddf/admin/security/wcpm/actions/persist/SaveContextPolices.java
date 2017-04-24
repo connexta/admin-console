@@ -16,9 +16,8 @@ package org.codice.ddf.admin.security.wcpm.actions.persist;
 import static org.codice.ddf.admin.common.message.DefaultMessages.failedPersistError;
 import static org.codice.ddf.admin.common.message.DefaultMessages.invalidClaimType;
 import static org.codice.ddf.admin.common.message.DefaultMessages.noRootContextError;
-import static org.codice.ddf.admin.security.wcpm.commons.ContextPolicyServiceProperties.POLICY_MANAGER_PID;
-import static org.codice.ddf.admin.security.wcpm.commons.ContextPolicyServiceProperties.ROOT_CONTEXT_PATH;
-import static org.codice.ddf.admin.security.wcpm.commons.ContextPolicyServiceProperties.contextPoliciesToPolicyManagerProps;
+import static org.codice.ddf.admin.security.common.services.PolicyManagerServiceProperties.POLICY_MANAGER_PID;
+import static org.codice.ddf.admin.security.common.services.PolicyManagerServiceProperties.ROOT_CONTEXT_PATH;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,7 +33,8 @@ import org.codice.ddf.admin.configurator.Configurator;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.configurator.OperationReport;
 import org.codice.ddf.admin.security.common.fields.wcpm.ContextPolicyBin;
-import org.codice.ddf.admin.security.common.fields.wcpm.services.PolicyManagerServiceProperties;
+import org.codice.ddf.admin.security.common.services.PolicyManagerServiceProperties;
+import org.codice.ddf.admin.security.common.services.StsServiceProperties;
 
 import com.google.common.collect.ImmutableList;
 
@@ -51,6 +51,8 @@ public class SaveContextPolices extends BaseAction<ListField<ContextPolicyBin>> 
 
     private PolicyManagerServiceProperties wcpmServiceProps;
 
+    private StsServiceProperties stsServiceProps;
+
     public SaveContextPolices(ConfiguratorFactory configuratorFactory) {
         super(ACTION_ID, DESCRIPTION, new ListFieldImpl<>(ContextPolicyBin.class));
         contextPolicies = new ListFieldImpl<>("policies",
@@ -59,6 +61,7 @@ public class SaveContextPolices extends BaseAction<ListField<ContextPolicyBin>> 
 
         this.configuratorFactory = configuratorFactory;
         wcpmServiceProps = new PolicyManagerServiceProperties();
+        stsServiceProps = new StsServiceProperties();
     }
 
     @Override
@@ -70,7 +73,7 @@ public class SaveContextPolices extends BaseAction<ListField<ContextPolicyBin>> 
     public ListField<ContextPolicyBin> performAction() {
         Configurator configurator = configuratorFactory.getConfigurator();
         configurator.updateConfigFile(POLICY_MANAGER_PID,
-                contextPoliciesToPolicyManagerProps(contextPolicies),
+                new PolicyManagerServiceProperties().contextPoliciesToPolicyManagerProps(contextPolicies.getList()),
                 true);
 
         // TODO: 4/14/17 Fix the contextPolicies.toString(), this will print the objects name
@@ -92,7 +95,7 @@ public class SaveContextPolices extends BaseAction<ListField<ContextPolicyBin>> 
     }
 
     private void checkClaimsValidity() {
-        List<String> supportedClaims = wcpmServiceProps.getConfiguredStsClaims(configuratorFactory);
+        List<String> supportedClaims = stsServiceProps.getConfiguredStsClaims(configuratorFactory);
 
         List<StringField> claimArgs = new ArrayList<>();
         for (ContextPolicyBin bin : contextPolicies.getList()) {

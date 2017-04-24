@@ -13,8 +13,6 @@
  **/
 package org.codice.ddf.admin.security.wcpm.actions.discover;
 
-import static org.codice.ddf.admin.security.common.fields.wcpm.services.PolicyManagerServiceProperties.IDP_CLIENT_BUNDLE_NAME;
-
 import java.util.Arrays;
 
 import org.codice.ddf.admin.api.fields.ListField;
@@ -39,15 +37,11 @@ public class GetAuthTypes extends GetAction<ListField<AuthType>> {
 
     @Override
     public ListField<AuthType> performAction() {
-        // TODO: tbatie - 4/14/17 - Check the backend to see if these services are running
         ListField<AuthType> authTypes = new ListFieldImpl<>(AuthType.class).addAll(Arrays.asList(AuthType.BASIC_AUTH,
                 AuthType.SAML_AUTH,
                 AuthType.PKI_AUTH,
-                AuthType.GUEST_AUTH));
-
-        if (configuratorFactory.getConfigReader().isBundleStarted(IDP_CLIENT_BUNDLE_NAME)) {
-            authTypes.add(AuthType.IDP_AUTH);
-        }
+                AuthType.GUEST_AUTH,
+                AuthType.IDP_AUTH));
 
         return authTypes;
     }

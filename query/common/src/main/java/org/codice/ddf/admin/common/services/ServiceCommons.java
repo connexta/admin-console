@@ -19,7 +19,11 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang.text.StrSubstitutor;
 
-public class ServicesCommons {
+public class ServiceCommons {
+
+    public static final String SERVICE_PID_KEY = "service.pid";
+
+    public static final String FACTORY_PID_KEY = "service.factoryPid";
 
     public String resolveProperty(String str) {
         return StrSubstitutor.replaceSystemProperties(str);

@@ -27,12 +27,11 @@ import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.configurator.OperationReport
 import org.codice.ddf.admin.security.common.fields.wcpm.ContextPolicyBin
 import org.codice.ddf.admin.security.common.fields.wcpm.Realm
+import org.codice.ddf.admin.security.common.services.PolicyManagerServiceProperties
+import org.codice.ddf.admin.security.common.services.StsServiceProperties
 import org.codice.ddf.admin.security.wcpm.actions.WcpmActionCreator
 import org.codice.ddf.security.policy.context.impl.PolicyManager
 import spock.lang.Specification
-
-import static org.codice.ddf.admin.security.common.fields.wcpm.services.PolicyManagerServiceProperties.STS_CLAIMS_PROPS_KEY_CLAIMS
-import static org.codice.ddf.admin.security.wcpm.commons.ContextPolicyServiceProperties.*
 
 class SaveContextPoliciesTest extends Specification {
     ActionCreator actionCreator
@@ -87,17 +86,17 @@ class SaveContextPoliciesTest extends Specification {
         configuratorFactory = Mock(ConfiguratorFactory)
         configurator = Mock(Configurator)
         configReader = Mock(ConfigReader)
-        configurator.updateConfigFile({ it == POLICY_MANAGER_PID }, _, _) >> {
-            args -> policyManager.setPolicies(transformServiceProps(args[1]))
+        configurator.updateConfigFile({ it == PolicyManagerServiceProperties.POLICY_MANAGER_PID }, _, _) >> {
+            args -> policyManager.setPolicies(args[1])
         }
 
-        stsConfig = [ (STS_CLAIMS_PROPS_KEY_CLAIMS) : testClaims ]
+        stsConfig = [(StsServiceProperties.STS_CLAIMS_PROPS_KEY_CLAIMS): testClaims ]
         configReader.getConfig(_) >> stsConfig
 
         policyManager = new PolicyManager()
         ListField<ContextPolicyBin> contextPolicies = new ListFieldImpl<>(ContextPolicyBin.class)
         contextPolicies.setValue(testData.policies)
-        policyManager.setPolicies(transformServiceProps(contextPoliciesToPolicyManagerProps(contextPolicies)))
+        policyManager.setPolicies(new PolicyManagerServiceProperties().contextPoliciesToPolicyManagerProps(contextPolicies.getList()))
 
         configurator.commit(_,_) >> operationReport
         configReader.getServiceReference(_) >> policyManager
@@ -251,13 +250,5 @@ class SaveContextPoliciesTest extends Specification {
         report.messages().size() == 1
         report.messages()[0].code == DefaultMessages.INVALID_CLAIM_TYPE
         report.messages()[0].path == [SaveContextPolices.ACTION_ID, BaseAction.ARGUMENT, 'policies', Field.INDEX_DELIMETER + 0, 'claimsMapping', Field.INDEX_DELIMETER + 0, "claim"]
-    }
-
-    Map<String, Object> transformServiceProps(Map<String, Object> props) {
-        Map<String, String[]> transformedProps = new HashMap<>()
-        transformedProps.put(REALMS, (String[]) props.get(REALMS))
-        transformedProps.put(REQUIRED_ATTRIBUTES, (String[]) props.get(REQUIRED_ATTRIBUTES))
-        transformedProps.put(AUTH_TYPES, (String[]) props.get(AUTH_TYPES))
-        return transformedProps;
     }
 }

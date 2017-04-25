@@ -28,7 +28,7 @@ public abstract class BaseAction<T extends Field> implements Action<T> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseAction.class);
 
-    private String name;
+    private String actionId;
 
     private String description;
 
@@ -36,8 +36,8 @@ public abstract class BaseAction<T extends Field> implements Action<T> {
 
     private ActionReportImpl<T> report;
 
-    public BaseAction(String name, String description, T returnType) {
-        this.name = name;
+    public BaseAction(String actionId, String description, T returnType) {
+        this.actionId = actionId;
         this.description = description;
         this.returnType = returnType;
         report = new ActionReportImpl<T>();
@@ -45,7 +45,7 @@ public abstract class BaseAction<T extends Field> implements Action<T> {
 
     @Override
     public String id() {
-        return name;
+        return actionId;
     }
 
     @Override
@@ -91,7 +91,7 @@ public abstract class BaseAction<T extends Field> implements Action<T> {
     protected BaseAction addArgumentMessage(Message msg) {
         Message copy = msg.copy();
         copy.addSubpath(ARGUMENT);
-        copy.addSubpath(name);
+        copy.addSubpath(actionId);
         report.addMessage(copy);
         return this;
     }
@@ -103,7 +103,7 @@ public abstract class BaseAction<T extends Field> implements Action<T> {
 
     protected BaseAction addMessage(Message msg) {
         Message copy = msg.copy();
-        copy.addSubpath(name);
+        copy.addSubpath(actionId);
         report.addMessage(copy);
         return this;
     }

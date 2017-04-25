@@ -102,7 +102,8 @@ public class ListFieldImpl<T extends Field> extends BaseField<List>
     @Override
     public ListFieldImpl<T> add(T value) {
         value.matchRequired(listFieldType);
-        getNewFieldPath().forEach(value::updatePath);
+        value.fieldName(INDEX_DELIMETER + fields.size());
+        value.updatePath(path());
         fields.add(value);
         return this;
     }
@@ -143,20 +144,14 @@ public class ListFieldImpl<T extends Field> extends BaseField<List>
     }
 
     @Override
-    public void updatePath(String fieldName) {
-        super.updatePath(fieldName);
-        getList().forEach(field -> field.updatePath(fieldName));
+    public void updatePath(List<String> path) {
+        super.updatePath(path);
+        getList().forEach(field -> field.updatePath(path()));
     }
 
-    public List<String> getNewFieldPath() {
-        List<String> newPath = new ArrayList<>();
-        newPath.add(INDEX_DELIMETER + fields.size());
-        newPath.add(fieldName());
-        newPath.addAll(path().stream()
-                .filter(subPath -> !subPath.equals(fieldName()))
-                .collect(Collectors.toList()));
-
-        return newPath;
+    @Override
+    public void fieldName(String fieldName) {
+        super.fieldName(fieldName);
+        getList().forEach(field -> field.updatePath(path()));
     }
 }
-

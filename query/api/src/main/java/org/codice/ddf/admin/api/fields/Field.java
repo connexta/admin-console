@@ -23,6 +23,8 @@ public interface Field<T> {
 
     String fieldName();
 
+    void fieldName(String fieldName);
+
     String fieldTypeName();
 
     FieldBaseType fieldBaseType();
@@ -43,11 +45,11 @@ public interface Field<T> {
     List<String> path();
 
     /**
-     * Adds a sub-path to the list of Strings that describes this {@code Field}'s path.
+     * Sets the unique path to reach the {@code Field}.
      *
-     * @param subPath unique identifier to add to the path
+     * @param path uniquely identifiable path
      */
-    void updatePath(String subPath);
+    void updatePath(List<String> path);
 
     boolean isRequired();
 

@@ -79,6 +79,7 @@ class SaveWhitelistContextsTest extends Specification {
         then:
         report.messages()[0].code == DefaultMessages.INVALID_CONTEXT_PATH
         report.messages()[0].path == [SaveWhitelistContexts.ACTION_ID, BaseAction.ARGUMENT, 'paths', ListFieldImpl.INDEX_DELIMETER + 2]
+        report.result() == null
     }
 
     def 'Fail if context path is empty' () {
@@ -93,6 +94,7 @@ class SaveWhitelistContextsTest extends Specification {
         then:
         report.messages()[0].code == DefaultMessages.EMPTY_FIELD
         report.messages()[0].path == [SaveWhitelistContexts.ACTION_ID, BaseAction.ARGUMENT, 'paths', ListFieldImpl.INDEX_DELIMETER + 2]
+        report.result() == null
     }
 
 
@@ -122,5 +124,6 @@ class SaveWhitelistContextsTest extends Specification {
         then:
         report.messages()[0].code == DefaultMessages.FAILED_PERSIST
         report.messages()[0].path == [SaveWhitelistContexts.ACTION_ID]
+        report.result() == null
     }
 }

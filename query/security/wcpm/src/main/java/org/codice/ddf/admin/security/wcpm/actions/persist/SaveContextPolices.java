@@ -76,7 +76,7 @@ public class SaveContextPolices extends BaseAction<ListField<ContextPolicyBin>> 
                 new PolicyManagerServiceProperties().contextPoliciesToPolicyManagerProps(contextPolicies.getList()),
                 true);
 
-        // TODO: 4/14/17 Fix the contextPolicies.toString(), this will print the objects name
+        // TODO: tbatie - 4/25/17 - Should we have to provide a auditMessage to the configurator? We're going to continually forget to do this. It should audit the pid changed, the diff and the user that did it instead in my opinion
         OperationReport configReport = configurator.commit(
                 "Web Context Policy saved with details: {}",
                 contextPolicies.toString());

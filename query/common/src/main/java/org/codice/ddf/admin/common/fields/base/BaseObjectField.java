@@ -32,7 +32,7 @@ public abstract class BaseObjectField extends BaseField<Map<String, Object>>
             FieldBaseType baseType) {
         super(fieldName, fieldTypeName, description, baseType);
         initializeFields();
-        getFields().forEach(field -> field.updatePath(fieldName()));
+        getFields().forEach(field -> field.updatePath(path()));
     }
 
     public BaseObjectField(String fieldName, String fieldTypeName, String description) {
@@ -84,9 +84,15 @@ public abstract class BaseObjectField extends BaseField<Map<String, Object>>
     }
 
     @Override
-    public void updatePath(String fieldName) {
-        super.updatePath(fieldName);
-        getFields().forEach(child -> child.updatePath(fieldName));
+    public void updatePath(List<String> path) {
+        super.updatePath(path);
+        getFields().forEach(child -> child.updatePath(path()));
+    }
+
+    @Override
+    public void fieldName(String fieldName) {
+        super.fieldName(fieldName);
+        getFields().forEach(child -> child.updatePath(path()));
     }
 
     @Override

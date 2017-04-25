@@ -82,13 +82,13 @@ public class LdapTestSettings extends TestAction {
                 .get();
 
         if (!checkDirExists(settings.baseUserDn(), ldapConnection)) {
-            addArgumentMessage(BASE_USER_DN_NOT_FOUND.addFieldToPath(settings.baseUserDnField()));
+            addArgumentMessage(BASE_USER_DN_NOT_FOUND.setPath(settings.path()));
         } else {
             addArgumentMessages(checkUsersInDir(settings, ldapConnection));
         }
 
         if (!checkDirExists(settings.baseGroupDn(), ldapConnection)) {
-            addArgumentMessage(BASE_GROUP_DN_NOT_FOUND.addFieldToPath(settings.baseGroupDnField()));
+            addArgumentMessage(BASE_GROUP_DN_NOT_FOUND.setPath(settings.path()));
         } else {
             // First check the group objectClass is on at least one entry in the directory
             addArgumentMessages(checkGroupObjectClass(settings, ldapConnection));
@@ -137,8 +137,8 @@ public class LdapTestSettings extends TestAction {
                 1);
 
         if (baseUsersResults.isEmpty()) {
-            errors.add(NO_USERS_IN_BASE_USER_DN.addFieldToPath(ldapSettings.baseUserDnField()));
-            errors.add(USER_NAME_ATTRIBUTE_NOT_FOUND.addFieldToPath(ldapSettings.usernameAttributeField()));
+            errors.add(NO_USERS_IN_BASE_USER_DN.setPath(ldapSettings.baseUserDnField().path()));
+            errors.add(USER_NAME_ATTRIBUTE_NOT_FOUND.setPath(ldapSettings.usernameAttributeField().path()));
         }
 
         return errors;
@@ -162,8 +162,8 @@ public class LdapTestSettings extends TestAction {
                 1);
 
         if (baseGroupResults.isEmpty()) {
-            errors.add(NO_GROUPS_IN_BASE_GROUP_DN.addFieldToPath(settings.baseGroupDnField()));
-            errors.add(NO_GROUPS_IN_BASE_GROUP_DN.addFieldToPath(settings.groupObjectClassField()));
+            errors.add(NO_GROUPS_IN_BASE_GROUP_DN.setPath(settings.baseGroupDnField().path()));
+            errors.add(NO_GROUPS_IN_BASE_GROUP_DN.setPath(settings.groupObjectClassField().path()));
         }
 
         return errors;
@@ -180,7 +180,7 @@ public class LdapTestSettings extends TestAction {
                 1);
 
         if (groups.isEmpty()) {
-            errors.add(NO_GROUPS_WITH_MEMBERS.addFieldToPath(settings.groupAttributeHoldingMemberField()));
+            errors.add(NO_GROUPS_WITH_MEMBERS.setPath(settings.groupAttributeHoldingMemberField().path()));
         } else {
             errors.addAll(checkReferencedUser(settings, ldapConnection, groups.get(0)));
         }
@@ -202,10 +202,10 @@ public class LdapTestSettings extends TestAction {
         String userFilter = split.get(0);
         String checkUserBase = String.join(",", split.subList(1, split.size()));
         if (!checkUserBase.equalsIgnoreCase(settings.baseUserDn())) {
-            errors.add(NO_REFERENCED_MEMBER.addFieldToPath(settings.memberAttributeReferencedInGroupField()));
+            errors.add(NO_REFERENCED_MEMBER.setPath(settings.memberAttributeReferencedInGroupField().path()));
         }
         if (!userFilter.split("=")[0].equalsIgnoreCase(settings.memberAttributeReferencedInGroup())) {
-            errors.add(NO_REFERENCED_MEMBER.addFieldToPath(settings.memberAttributeReferencedInGroupField()));
+            errors.add(NO_REFERENCED_MEMBER.setPath(settings.memberAttributeReferencedInGroupField().path()));
         }
         List<SearchResultEntry> foundMember = utils.getLdapQueryResults(ldapConnection,
                 settings.baseUserDn(),
@@ -214,7 +214,7 @@ public class LdapTestSettings extends TestAction {
                 1);
 
         if (foundMember.isEmpty()) {
-            errors.add(NO_REFERENCED_MEMBER.addFieldToPath(settings.memberAttributeReferencedInGroupField()));
+            errors.add(NO_REFERENCED_MEMBER.setPath(settings.memberAttributeReferencedInGroupField().path()));
         }
 
         return errors;

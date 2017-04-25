@@ -47,22 +47,7 @@ public class ActionReportImpl<T extends Field> implements ActionReport<T> {
         this.result = result;
     }
 
-    public void addMessages(List<Message> messages) {
-        this.messages.addAll(messages);
-    }
-
     public void addMessage(Message message) {
-        // TODO: tbatie - 4/22/17 - This is a temporary fix for the additional fieldName added to the message path when specifying a list index
-        List<String> newPath = new ArrayList<>();
-        List<String> msgPath = message.getPath();
-        for(int i = 0; i < msgPath.size(); i++) {
-            if(i == 0) {
-                newPath.add(msgPath.get(i));
-            } else if(i > 0 && !msgPath.get(i - 1).contains(INDEX_DELIMETER)) {
-                newPath.add(msgPath.get(i));
-            }
-        }
-        message.setPath(newPath);
         messages.add(message);
     }
 

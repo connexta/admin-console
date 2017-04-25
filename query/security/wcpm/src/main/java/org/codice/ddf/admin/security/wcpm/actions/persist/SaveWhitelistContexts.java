@@ -54,12 +54,6 @@ public class SaveWhitelistContexts extends BaseAction<ListField<ContextPath>> {
 
     @Override
     public ListField<ContextPath> performAction() {
-
-        ListField<ContextPath> preUpdateWhitelistContexts = new ListFieldImpl<>(ContextPath.class);
-        for (String path : getWhitelistContexts(configuratorFactory.getConfigReader())) {
-            preUpdateWhitelistContexts.add(new ContextPath(path));
-        }
-
         Configurator configurator = configuratorFactory.getConfigurator();
         configurator.updateConfigFile(PolicyManagerServiceProperties.POLICY_MANAGER_PID,
                 new PolicyManagerServiceProperties().whiteListToPolicyManagerProps(contexts),
@@ -69,12 +63,6 @@ public class SaveWhitelistContexts extends BaseAction<ListField<ContextPath>> {
                 "Whitelist Contexts saved with details: {}",
                 contexts.toString());
 
-        // TODO: tbatie - 4/23/17 - We need to discuss whether we want to return values even if it fails
-        if (configReport.containsFailedResults()) {
-            addMessage(failedPersistError());
-            return preUpdateWhitelistContexts;
-        } else {
-            return contexts;
-        }
+        return configReport.containsFailedResults() ? null : contexts;
     }
 }

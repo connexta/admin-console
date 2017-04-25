@@ -69,10 +69,4 @@ public abstract class BaseMessage implements Message {
         this.path = path;
         return this;
     }
-
-    // TODO: tbatie - 4/22/17 - Get rid of this method and fix the way paths are stored
-    public BaseMessage addFieldToPath(Field field) {
-        path.add(field.fieldName());
-        return this;
-    }
 }

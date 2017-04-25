@@ -43,6 +43,7 @@
     <feature name="admin-beta-federation" install="manual" version="${project.version}"
              description="DDF Admin Federation (Beta)">
         <feature prerequisite="true">admin-beta-core</feature>
+        <bundle>mvn:ddf.catalog.core/catalog-core-api/${ddf.version}</bundle>
         <bundle>mvn:org.codice.ddf.admin.beta/admin-query-sources-impl/${project.version}</bundle>
     </feature>
 

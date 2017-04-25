@@ -27,11 +27,31 @@ public class DefaultMessages {
 
     public static final String INVALID_HOSTNAME = "INVALID_HOSTNAME";
 
+    public static final String INVALID_CONTEXT_PATH = "INVALID_CONTEXT_PATH";
+
     public static final String FAILED_PERSIST = "FAILED_PERSIST";
 
     public static final String UNSUPPORTED_ENUM = "UNSUPPORTED_ENUM";
 
-    public static final String INVALID_CONTEXT_PATH = "INVALID_CONTEXT_PATH";
+    public static final String UNKNOWN_ENDPOINT = "UNKNOWN_ENDPOINT";
+
+    public static final String CANNOT_CONNECT = "CANNOT_CONNECT";
+
+    public static final String CERT_ERROR = "CERT_ERROR";
+
+    public static final String UNTRUSTED_CA = "UNTRUSTED_CA";
+
+    public static final String INTERNAL_ERROR = "INTERNAL_ERROR";
+
+    public static final String FAILED_UPDATE_ERROR = "FAILED_UPDATE_ERROR";
+
+    public static final String FAILED_DELETE_ERROR = "FAILED_DELETE_ERROR";
+
+    public static final ErrorMessage INTERNAL_ERROR_MESSAGE = new ErrorMessage(INTERNAL_ERROR);
+
+    public static ErrorMessage failedPersistError(List<String> path) {
+        return new ErrorMessage(FAILED_PERSIST, path);
+    }
 
     public static ErrorMessage unsupportedEnum(List<String> path) {
         return new ErrorMessage(UNSUPPORTED_ENUM, path);
@@ -63,5 +83,33 @@ public class DefaultMessages {
 
     public static ErrorMessage invalidContextPathError(List<String> path) {
         return new ErrorMessage(INVALID_CONTEXT_PATH, path);
+    }
+
+    public static ErrorMessage unknownEndpointError(String pathOrigin) {
+        return new ErrorMessage(UNKNOWN_ENDPOINT, pathOrigin);
+    }
+
+    public static ErrorMessage cannotConnectError(String pathOrigin) {
+        return new ErrorMessage(CANNOT_CONNECT, pathOrigin);
+    }
+
+    public static ErrorMessage certError(String pathOrigin) {
+        return new ErrorMessage(CERT_ERROR, pathOrigin);
+    }
+
+    public static ErrorMessage failedUpdateError(List<String> path) {
+        return new ErrorMessage(FAILED_UPDATE_ERROR, path);
+    }
+
+    public static ErrorMessage failedDeleteError(List<String> path) {
+        return new ErrorMessage(FAILED_DELETE_ERROR, path);
+    }
+
+    /*
+        Warnings
+     */
+
+    public static WarningMessage unstrustedCaWarning(String pathOrigin) {
+        return new WarningMessage(UNTRUSTED_CA, pathOrigin);
     }
 }

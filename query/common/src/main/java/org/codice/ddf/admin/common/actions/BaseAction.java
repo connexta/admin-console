@@ -111,9 +111,17 @@ public abstract class BaseAction<T extends Field> implements Action<T> {
 
     public void validate() {
         getArguments().stream()
+                .filter(Field::isRequired)
                 .map(Field::validate)
                 .flatMap(Collection<Message>::stream)
-                .forEach(msg -> addArgumentMessage(msg));
+                .forEach(this::addArgumentMessage);
+
+        getArguments().stream()
+                .filter(field -> !field.isRequired())
+                .filter(field -> field.getValue() != null)
+                .map(Field::validate)
+                .flatMap(Collection<Message>::stream)
+                .forEach(this::addArgumentMessage);
     }
 
     public abstract T performAction();

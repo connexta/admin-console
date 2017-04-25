@@ -17,6 +17,8 @@ import java.util.List;
 
 import org.codice.ddf.admin.api.fields.Field;
 
+import com.google.common.collect.ImmutableList;
+
 public class OpensearchSourceConfigurationField extends SourceConfigUnionField {
 
     private static final String FIELD_TYPE_NAME = "OpenSearchConfiguration";
@@ -29,7 +31,7 @@ public class OpensearchSourceConfigurationField extends SourceConfigUnionField {
 
     @Override
     public List<Field> getFields() {
-        // TODO: tbatie - 2/28/17 - Add additional fields once implemented
-        return super.getFields();
+        return new ImmutableList.Builder<Field>().addAll(super.getFields())
+                .build();
     }
 }

@@ -17,6 +17,8 @@ import java.util.List;
 
 import org.codice.ddf.admin.api.fields.Field;
 
+import com.google.common.collect.ImmutableList;
+
 public class WfsSourceConfigurationField extends SourceConfigUnionField {
 
     public static final String FIELD_TYPE_NAME = "WfsSourceConfiguration";
@@ -30,8 +32,7 @@ public class WfsSourceConfigurationField extends SourceConfigUnionField {
 
     @Override
     public List<Field> getFields() {
-        // TODO: tbatie - 2/28/17 - Add additional fields once implemented
-        return super.getFields();
+        return new ImmutableList.Builder<Field>().addAll(super.getFields())
+                .build();
     }
-
 }

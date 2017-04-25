@@ -13,22 +13,50 @@
  **/
 package org.codice.ddf.admin.common.fields.common;
 
+import static org.codice.ddf.admin.common.message.DefaultMessages.invalidFieldError;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.List;
+
+import org.codice.ddf.admin.api.action.Message;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class UrlField extends StringField {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(UrlField.class);
 
     public static final String DEFAULT_FIELD_NAME = "url";
 
     public static final String FIELD_TYPE_NAME = "URL";
 
     public static final String DESCRIPTION =
-            "An address that identifies a particular file on the Internet, usually consisting of the protocol, as http, followed by the domain name.";
+            "An address that identifies a particular file on the Internet, usually consisting of the protocol, such as HTTP, followed by the domain name.";
+
+    public UrlField() {
+        this(DEFAULT_FIELD_NAME);
+    }
 
     public UrlField(String fieldName) {
         super(fieldName, FIELD_TYPE_NAME, DESCRIPTION);
     }
 
-    public UrlField() {
-        super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
+    @Override
+    public List<Message> validate() {
+        List<Message> validationMsgs = super.validate();
+        if(!validationMsgs.isEmpty()) {
+            return validationMsgs;
+        }
+
+        try {
+            new URL(getValue());
+        } catch (MalformedURLException e) {
+            LOGGER.debug("Failed to validate URL [{}].", getValue());
+            validationMsgs.add(invalidFieldError(fieldName()));
+        }
+
+        return validationMsgs;
     }
 }

@@ -45,6 +45,14 @@ public class CswSourceConfigurationField extends SourceConfigUnionField {
         return this;
     }
 
+    public String outputSchema() {
+        return outputSchema.getValue();
+    }
+
+    public String forceSpatialFilter() {
+        return forceSpatialFilter.getValue();
+    }
+
     @Override
     public List<Field> getFields() {
         return new ImmutableList.Builder<Field>().addAll(super.getFields())

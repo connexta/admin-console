@@ -24,7 +24,9 @@ import org.codice.ddf.admin.configurator.impl.ConfiguratorFactoryImpl;
 import org.codice.ddf.admin.ldap.actions.LdapActionCreator;
 import org.codice.ddf.admin.security.sts.StsActionCreator;
 import org.codice.ddf.admin.security.wcpm.actions.WcpmActionCreator;
-import org.codice.ddf.admin.sources.SourceActionCreator;
+import org.codice.ddf.admin.sources.csw.CswActionCreator;
+import org.codice.ddf.admin.sources.opensearch.OpenSearchActionCreator;
+import org.codice.ddf.admin.sources.wfs.WfsActionCreator;
 import org.codice.ddf.admin.utils.conn.ConnectionActionCreator;
 
 import com.google.common.collect.ImmutableList;
@@ -38,8 +40,10 @@ public class SchemaGenerator {
         final List<ActionCreator> GRAPHQL_PROVIDERS = ImmutableList.of(new StsActionCreator(new ConfiguratorFactoryImpl()),
                 new ConnectionActionCreator(),
                 new LdapActionCreator(new ConfiguratorFactoryImpl()),
-                new SourceActionCreator(),
-                new WcpmActionCreator(new ConfiguratorFactoryImpl()));
+                new WcpmActionCreator(new ConfiguratorFactoryImpl()),
+                new CswActionCreator(),
+                new WfsActionCreator(),
+                new OpenSearchActionCreator());
 
         servlet.setActionCreators(GRAPHQL_PROVIDERS);
         String schemaResult = servlet.executeQuery(IntrospectionQuery.INTROSPECTION_QUERY);

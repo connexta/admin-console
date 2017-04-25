@@ -57,21 +57,19 @@ public class SourceInfoField extends BaseObjectField {
         return this;
     }
 
+    public SourceConfigUnionField config() {
+        return config;
+    }
+
     @Override
     public List<Field> getFields() {
         return ImmutableList.of(isAvailable, sourceHandlerName, config);
     }
 
     @Override
-    public SourceInfoField allFieldsRequired(boolean required) {
-        super.allFieldsRequired(required);
-        return this;
-    }
-
-    @Override
     public void initializeFields() {
-        isAvailable = new BooleanField("isAvailable");
-        sourceHandlerName = new StringField("sourceHandlerName");
         config = new SourceConfigUnionField();
+        sourceHandlerName = new StringField("sourceHandlerName");
+        isAvailable = new BooleanField("isAvailable");
     }
 }

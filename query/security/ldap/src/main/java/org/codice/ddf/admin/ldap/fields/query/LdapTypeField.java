@@ -38,7 +38,7 @@ public class LdapTypeField extends BaseEnumField<String> {
     static final String EMBEDDED = "embeddedLdap";
 
     public LdapTypeField() {
-        this(null);
+        this(new StringField(null));
     }
 
     // TODO: tbatie - 3/27/17 - Add constructor for supporting additional authtypes. Do this for all enum fields

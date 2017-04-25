@@ -14,8 +14,8 @@
 package org.codice.ddf.admin.security.wcpm.actions.persist;
 
 import static org.codice.ddf.admin.common.message.DefaultMessages.failedPersistError;
-import static org.codice.ddf.admin.common.message.DefaultMessages.invalidClaimType;
-import static org.codice.ddf.admin.common.message.DefaultMessages.noRootContextError;
+import static org.codice.ddf.admin.security.common.SecurityMessages.invalidClaimType;
+import static org.codice.ddf.admin.security.common.SecurityMessages.noRootContextError;
 import static org.codice.ddf.admin.security.common.services.PolicyManagerServiceProperties.POLICY_MANAGER_PID;
 import static org.codice.ddf.admin.security.common.services.PolicyManagerServiceProperties.ROOT_CONTEXT_PATH;
 
@@ -84,7 +84,8 @@ public class SaveContextPolices extends BaseAction<ListField<ContextPolicyBin>> 
         if (configReport.containsFailedResults()) {
             addMessage(failedPersistError());
         }
-        return wcpmServiceProps.contextPolicyServiceToContextPolicyFields(configuratorFactory);
+
+        return containsErrorMsgs() ? null : contextPolicies;
     }
 
     @Override

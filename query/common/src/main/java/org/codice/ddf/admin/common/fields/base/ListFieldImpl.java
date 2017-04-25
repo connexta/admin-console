@@ -88,7 +88,6 @@ public class ListFieldImpl<T extends Field> extends BaseField<List>
 
         for (Object val : values) {
             try {
-                // TODO: tbatie - 4/22/17 - Should we consider making a copy method that is enforced by the interface instead?
                 T newField = (T) getListFieldType().getClass()
                         .newInstance();
                 newField.setValue(val);
@@ -103,7 +102,7 @@ public class ListFieldImpl<T extends Field> extends BaseField<List>
     @Override
     public ListFieldImpl<T> add(T value) {
         value.matchRequired(listFieldType);
-        getNewFieldPath().forEach(value::addToPath);
+        getNewFieldPath().forEach(value::updatePath);
         fields.add(value);
         return this;
     }
@@ -132,12 +131,8 @@ public class ListFieldImpl<T extends Field> extends BaseField<List>
     @Override
     public ListField<T> matchRequired(Field fieldToMatch) {
         super.matchRequired(fieldToMatch);
-        listFieldType.matchRequired(((ListField)fieldToMatch).getListFieldType());
-
-        for(Field field : getList()) {
-            field.matchRequired(listFieldType);
-        }
-
+        listFieldType.matchRequired(((ListField) fieldToMatch).getListFieldType());
+        getList().forEach(field -> field.matchRequired(listFieldType));
         return this;
     }
 
@@ -148,11 +143,9 @@ public class ListFieldImpl<T extends Field> extends BaseField<List>
     }
 
     @Override
-    public void addToPath(String fieldName) {
-        super.addToPath(fieldName);
-        for(Field field : getList()) {
-            field.addToPath(fieldName);
-        }
+    public void updatePath(String fieldName) {
+        super.updatePath(fieldName);
+        getList().forEach(field -> field.updatePath(fieldName));
     }
 
     public List<String> getNewFieldPath() {

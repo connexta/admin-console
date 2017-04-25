@@ -87,7 +87,7 @@ public abstract class BaseField<T> implements Field<T> {
     }
 
     @Override
-    public void addToPath(String fieldName) {
+    public void updatePath(String fieldName) {
         path.push(fieldName);
     }
 

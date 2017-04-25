@@ -56,11 +56,11 @@ public class GraphQLTransformCommons {
             }
 
             fields.add(GraphQLFieldDefinition.newFieldDefinition()
-                    .name(action.name())
+                    .name(action.id())
                     .type(GraphQLTransformOutput.fieldToGraphQLOutputType(action.returnType()))
                     .description(action.description())
                     .argument(graphQLArgs)
-                    .dataFetcher(env -> actionFieldDataFetch(env, action.name(), creator))
+                    .dataFetcher(env -> actionFieldDataFetch(env, action.id(), creator))
                     .build());
         }
         return fields;

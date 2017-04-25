@@ -36,6 +36,7 @@
              description="DDF Admin Core (Beta)">
         <feature prerequisite="true">admin-beta-temp-configurator</feature>
         <bundle>mvn:com.google.code.gson/gson/${gson.version}</bundle>
+        <bundle>mvn:com.google.guava/guava/${guava.version}</bundle>
         <bundle>mvn:org.codice.ddf.admin.beta/admin-api/${project.version}</bundle>
         <bundle>mvn:org.codice.ddf.admin.beta/config-handler-router/${project.version}</bundle>
     </feature>

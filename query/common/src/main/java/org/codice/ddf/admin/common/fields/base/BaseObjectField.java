@@ -32,7 +32,7 @@ public abstract class BaseObjectField extends BaseField<Map<String, Object>>
             FieldBaseType baseType) {
         super(fieldName, fieldTypeName, description, baseType);
         initializeFields();
-        getFields().forEach(field -> field.addToPath(fieldName()));
+        getFields().forEach(field -> field.updatePath(fieldName()));
     }
 
     public BaseObjectField(String fieldName, String fieldTypeName, String description) {
@@ -84,14 +84,19 @@ public abstract class BaseObjectField extends BaseField<Map<String, Object>>
     }
 
     @Override
-    public void addToPath(String fieldName) {
-        super.addToPath(fieldName);
-        getFields().forEach(child -> child.addToPath(fieldName));
+    public void updatePath(String fieldName) {
+        super.updatePath(fieldName);
+        getFields().forEach(child -> child.updatePath(fieldName));
     }
 
     @Override
     public Field matchRequired(Field field) {
         super.matchRequired(field);
+
+        if(!(field instanceof ObjectField)) {
+            throw new RuntimeException("Cannot match required field that is not of type ObjectField.");
+        }
+
         for(Field subField : ((ObjectField)field).getFields()) {
             for(Field toSetSubField : getFields()) {
                 if(toSetSubField.fieldName().equals(subField.fieldName())) {

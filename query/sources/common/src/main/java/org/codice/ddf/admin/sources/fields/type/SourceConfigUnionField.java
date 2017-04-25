@@ -62,8 +62,8 @@ public class SourceConfigUnionField extends BaseUnionField {
         return creds;
     }
 
-    public SourceConfigUnionField id(String id) {
-        this.pid.setValue(id);
+    public SourceConfigUnionField pid(String pid) {
+        this.pid.setValue(pid);
         return this;
     }
 

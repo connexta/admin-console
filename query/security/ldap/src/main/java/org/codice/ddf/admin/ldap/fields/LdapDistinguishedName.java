@@ -13,6 +13,8 @@
  **/
 package org.codice.ddf.admin.ldap.fields;
 
+import static org.codice.ddf.admin.ldap.actions.commons.LdapMessages.invalidDnFormatError;
+
 import java.util.List;
 
 import org.codice.ddf.admin.api.action.Message;
@@ -45,7 +47,7 @@ public class LdapDistinguishedName extends StringField {
         }
 
         if(getValue() != null && !isValidDN(getValue())) {
-            validationMsgs.add(LdapMessages.invalidDnFormatError(fieldName()));
+            validationMsgs.add(invalidDnFormatError(fieldName()));
         }
 
         return validationMsgs;

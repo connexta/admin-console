@@ -58,7 +58,7 @@ public abstract class BaseActionCreator implements ActionCreator {
     public Action createAction(String actionId) {
         Optional<Action> foundAction = Stream.concat(getDiscoveryActions().stream(),
                 getPersistActions().stream())
-                .filter(action -> action.name()
+                .filter(action -> action.id()
                         .equals(actionId))
                 .findFirst();
 
@@ -68,7 +68,7 @@ public abstract class BaseActionCreator implements ActionCreator {
 
         List<String> allActionIds = Stream.concat(getDiscoveryActions().stream(),
                 getPersistActions().stream())
-                .map(Action::name)
+                .map(Action::id)
                 .collect(Collectors.toList());
 
         LOGGER.debug("Unknown actionId {} for handler {}. Known action id's are [{}]",

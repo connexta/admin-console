@@ -63,6 +63,10 @@ public class ClaimsMapEntry extends BaseObjectField {
         return claim;
     }
 
+    public StringField claimValueField() {
+        return claimValue;
+    }
+
     @Override
     public ClaimsMapEntry isRequired(boolean required) {
         super.isRequired(required);

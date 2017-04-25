@@ -18,6 +18,7 @@ import org.codice.ddf.admin.api.action.ActionCreator
 import org.codice.ddf.admin.api.action.ActionReport
 import org.codice.ddf.admin.common.actions.BaseAction
 import org.codice.ddf.admin.common.fields.base.ListFieldImpl
+import org.codice.ddf.admin.common.message.DefaultMessages
 import org.codice.ddf.admin.configurator.ConfigReader
 import org.codice.ddf.admin.configurator.Configurator
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
@@ -76,7 +77,7 @@ class SaveWhitelistContextsTest extends Specification {
         ActionReport report = action.process()
 
         then:
-        report.messages()[0].code == 'INVALID_CONTEXT_PATH'
+        report.messages()[0].code == DefaultMessages.INVALID_CONTEXT_PATH
         report.messages()[0].path == [SaveWhitelistContexts.ACTION_ID, BaseAction.ARGUMENT, 'paths', ListFieldImpl.INDEX_DELIMETER + 2]
     }
 
@@ -90,7 +91,7 @@ class SaveWhitelistContextsTest extends Specification {
         ActionReport report = action.process()
 
         then:
-        report.messages()[0].code == 'EMPTY_FIELD'
+        report.messages()[0].code == DefaultMessages.EMPTY_FIELD
         report.messages()[0].path == [SaveWhitelistContexts.ACTION_ID, BaseAction.ARGUMENT, 'paths', ListFieldImpl.INDEX_DELIMETER + 2]
     }
 
@@ -119,7 +120,7 @@ class SaveWhitelistContextsTest extends Specification {
         ActionReport report = action.process()
 
         then:
-        report.messages()[0].code == 'FAILED_PERSIST'
+        report.messages()[0].code == DefaultMessages.FAILED_PERSIST
         report.messages()[0].path == [SaveWhitelistContexts.ACTION_ID]
     }
 }

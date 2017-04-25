@@ -25,6 +25,7 @@ import org.codice.ddf.admin.configurator.ConfigReader
 import org.codice.ddf.admin.configurator.Configurator
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.configurator.OperationReport
+import org.codice.ddf.admin.security.common.SecurityMessages
 import org.codice.ddf.admin.security.common.fields.wcpm.ContextPolicyBin
 import org.codice.ddf.admin.security.common.fields.wcpm.Realm
 import org.codice.ddf.admin.security.common.services.PolicyManagerServiceProperties
@@ -116,15 +117,14 @@ class SaveContextPoliciesTest extends Specification {
 
         then:
         report.messages().isEmpty()
+        report.result().getValue() == testData.policies
     }
 
     def 'Fail when failed to persist' () {
         setup:
         operationReport.containsFailedResults() >> true
 
-
         when:
-        Action action = actionCreator.createAction('saveContextPolicies')
         action.setArguments(testData)
         ActionReport report = action.process()
 
@@ -132,6 +132,7 @@ class SaveContextPoliciesTest extends Specification {
         report.messages().size() == 1
         report.messages()[0].code == DefaultMessages.FAILED_PERSIST
         report.messages()[0].path == [SaveContextPolices.ACTION_ID]
+        report.result() == null
     }
 
     def 'Fail if no root context is present' () {
@@ -145,8 +146,9 @@ class SaveContextPoliciesTest extends Specification {
 
         then:
         report.messages().size() == 1
-        report.messages()[0].code == DefaultMessages.NO_ROOT_CONTEXT
+        report.messages()[0].code == SecurityMessages.NO_ROOT_CONTEXT
         report.messages()[0].path == [SaveContextPolices.ACTION_ID, BaseAction.ARGUMENT, 'policies']
+        report.result() == null
     }
 
     def 'Fail if invalid authType' () {
@@ -162,6 +164,7 @@ class SaveContextPoliciesTest extends Specification {
         report.messages().size() == 1
         report.messages()[0].code == DefaultMessages.MISSING_REQUIRED_FIELD
         report.messages()[0].path == [SaveContextPolices.ACTION_ID, BaseAction.ARGUMENT, 'policies', Field.INDEX_DELIMETER + 0, 'authTypes', ListFieldImpl.INDEX_DELIMETER + 1]
+        report.result() == null
     }
 
     def 'Fail if no authType' () {
@@ -177,6 +180,8 @@ class SaveContextPoliciesTest extends Specification {
         report.messages().size() == 1
         report.messages()[0].code == DefaultMessages.MISSING_REQUIRED_FIELD
         report.messages()[0].path == [SaveContextPolices.ACTION_ID, BaseAction.ARGUMENT, 'policies', Field.INDEX_DELIMETER + 0, 'authTypes']
+        report.result() == null
+
     }
 
     def 'Fail if invalid realm' () {
@@ -192,6 +197,7 @@ class SaveContextPoliciesTest extends Specification {
         report.messages().size() == 1
         report.messages()[0].code == DefaultMessages.MISSING_REQUIRED_FIELD
         report.messages()[0].path == [SaveContextPolices.ACTION_ID, BaseAction.ARGUMENT, 'policies', Field.INDEX_DELIMETER + 0, Realm.DEFAULT_FIELD_NAME]
+        report.result() == null
     }
 
     def 'Fail if no realm' () {
@@ -207,12 +213,13 @@ class SaveContextPoliciesTest extends Specification {
         report.messages().size() == 1
         report.messages()[0].code == DefaultMessages.MISSING_REQUIRED_FIELD
         report.messages()[0].path == [SaveContextPolices.ACTION_ID, BaseAction.ARGUMENT, 'policies', Field.INDEX_DELIMETER + 0, Realm.DEFAULT_FIELD_NAME]
+        report.result() == null
     }
 
     def 'Pass if no claims Mapping' () {
         setup:
         operationReport.containsFailedResults() >> false
-        testData.policies[0].claimsMapping = null
+        testData.policies[0].claimsMapping = []
 
         when:
         action.setArguments(testData)
@@ -220,6 +227,7 @@ class SaveContextPoliciesTest extends Specification {
 
         then:
         report.messages().isEmpty()
+        report.result().getValue() == testData.policies
     }
 
     def 'Fail if claim entry with no value ' () {
@@ -233,8 +241,9 @@ class SaveContextPoliciesTest extends Specification {
 
         then:
         report.messages().size() == 1
-        report.messages()[0].code == DefaultMessages.INVALID_FIELD
+        report.messages()[0].code == DefaultMessages.MISSING_REQUIRED_FIELD
         report.messages()[0].path == [SaveContextPolices.ACTION_ID, BaseAction.ARGUMENT, 'policies', Field.INDEX_DELIMETER + 0, 'claimsMapping', Field.INDEX_DELIMETER + 0, 'claimValue']
+        report.result() == null
     }
 
     def 'Fail if claim is not supported' () {
@@ -248,7 +257,8 @@ class SaveContextPoliciesTest extends Specification {
 
         then:
         report.messages().size() == 1
-        report.messages()[0].code == DefaultMessages.INVALID_CLAIM_TYPE
+        report.messages()[0].code == SecurityMessages.INVALID_CLAIM_TYPE
         report.messages()[0].path == [SaveContextPolices.ACTION_ID, BaseAction.ARGUMENT, 'policies', Field.INDEX_DELIMETER + 0, 'claimsMapping', Field.INDEX_DELIMETER + 0, "claim"]
+        report.result() == null
     }
 }

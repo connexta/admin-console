@@ -35,7 +35,9 @@ public class GetStsClaimsAction extends GetAction<ListFieldImpl<StsClaimField>> 
     @Override
     public ListFieldImpl<StsClaimField> performAction() {
         ListFieldImpl<StsClaimField> claims = new ListFieldImpl<>(StsClaimField.class);
-        claims.setValue(new StsServiceProperties().getConfiguredStsClaims(configuratorFactory));
+        new StsServiceProperties().getConfiguredStsClaims(configuratorFactory)
+                .stream()
+                .forEach(claimStr -> claims.add(new StsClaimField(claimStr)));
         return claims;
     }
 }

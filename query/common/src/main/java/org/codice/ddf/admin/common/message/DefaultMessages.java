@@ -27,23 +27,14 @@ public class DefaultMessages {
 
     public static final String INVALID_HOSTNAME = "INVALID_HOSTNAME";
 
-    public static final String INVALID_CONTEXT_PATH = "INVALID_CONTEXT_PATH";
-
-    public static final String NO_ROOT_CONTEXT = "NO_ROOT_CONTEXT";
-
     public static final String FAILED_PERSIST = "FAILED_PERSIST";
-
-    public static final String INVALID_CLAIM_TYPE = "INVALID_CLAIM_TYPE";
 
     public static final String UNSUPPORTED_ENUM = "UNSUPPORTED_ENUM";
 
+    public static final String INVALID_CONTEXT_PATH = "INVALID_CONTEXT_PATH";
+
     public static ErrorMessage unsupportedEnum(List<String> path) {
         return new ErrorMessage(UNSUPPORTED_ENUM, path);
-    }
-
-    // TODO: tbatie - 4/22/17 - Move the security related messages to the security commons
-    public static ErrorMessage noRootContextError(List<String> path) {
-        return new ErrorMessage(NO_ROOT_CONTEXT, path);
     }
 
     public static ErrorMessage failedPersistError() {
@@ -52,10 +43,6 @@ public class DefaultMessages {
 
     public static ErrorMessage invalidFieldError(List<String> path) {
         return new ErrorMessage(INVALID_FIELD, path);
-    }
-
-    public static ErrorMessage invalidContextPathError(List<String> path) {
-        return new ErrorMessage(INVALID_CONTEXT_PATH, path);
     }
 
     public static ErrorMessage invalidPortRangeError(List<String> path) {
@@ -74,8 +61,7 @@ public class DefaultMessages {
         return new ErrorMessage(INVALID_HOSTNAME, path);
     }
 
-    public static ErrorMessage invalidClaimType(List<String> path) {
-        return new ErrorMessage(INVALID_CLAIM_TYPE, path);
+    public static ErrorMessage invalidContextPathError(List<String> path) {
+        return new ErrorMessage(INVALID_CONTEXT_PATH, path);
     }
-
 }

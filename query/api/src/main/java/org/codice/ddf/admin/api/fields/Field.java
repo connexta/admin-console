@@ -47,7 +47,7 @@ public interface Field<T> {
      *
      * @param subPath unique identifier to add to the path
      */
-    void addToPath(String subPath);
+    void updatePath(String subPath);
 
     boolean isRequired();
 

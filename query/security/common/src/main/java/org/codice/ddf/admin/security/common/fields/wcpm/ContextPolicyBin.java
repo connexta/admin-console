@@ -149,6 +149,8 @@ public class ContextPolicyBin extends BaseObjectField {
         authTypes.isRequired(true);
         authTypes.getListFieldType().isRequired(true);
         realm.isRequired(true);
+        claimsMapping.getListFieldType().claimField().isRequired(true);
+        claimsMapping.getListFieldType().claimValueField().isRequired(true);
         claimsMapping.isRequired(false);
         return this;
     }

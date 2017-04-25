@@ -44,7 +44,7 @@ public abstract class BaseAction<T extends Field> implements Action<T> {
     }
 
     @Override
-    public String name() {
+    public String id() {
         return name;
     }
 

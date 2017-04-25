@@ -31,12 +31,11 @@ public interface Action<T extends Field> {
     String ARGUMENT = "__argument";
 
     /**
-     * Returns the unique name of the Action
+     * Returns the unique id of the Action
      *
-     * @return name
+     * @return id
      */
-    // TODO: 4/13/17 Change to id instead
-    String name();
+    String id();
 
     /**
      * Returns a description of what the Action is designed to perform and any clarity about it's implementation.

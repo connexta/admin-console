@@ -20,9 +20,12 @@ import static org.codice.ddf.admin.configurator.impl.ConfigValidator.validateStr
 import java.lang.management.ManagementFactory;
 import java.nio.file.Path;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -39,6 +42,7 @@ import org.codice.ddf.ui.admin.api.ConfigurationAdminMBean;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -351,6 +355,23 @@ public class ConfiguratorImpl implements Configurator, ConfigReader {
         }
 
         return context.getService(ref);
+    }
+
+    @Override
+    public <S> Collection<S> getServices(Class<S> serviceClass, String filter)
+            throws ConfiguratorException {
+        BundleContext context = getBundleContext();
+
+        try {
+            Collection<ServiceReference<S>> refs = context.getServiceReferences(serviceClass, filter);
+
+            List<S> services = new ArrayList<>();
+            refs.forEach(ref -> services.add(context.getService(ref)));
+            return services;
+        } catch (InvalidSyntaxException e) {
+            LOGGER.debug("Invalid filter [{}].", filter, e);
+            throw new ConfiguratorException(String.format("Received invalid filter [%s]", filter));
+        }
     }
 
     private String registerHandler(Operation handler) {

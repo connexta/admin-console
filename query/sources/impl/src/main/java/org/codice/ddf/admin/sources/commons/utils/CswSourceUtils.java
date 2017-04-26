@@ -21,7 +21,6 @@ import static org.codice.ddf.admin.sources.commons.services.CswServiceProperties
 import static org.codice.ddf.admin.sources.commons.services.CswServiceProperties.CSW_PROFILE_FACTORY_PID;
 import static org.codice.ddf.admin.sources.commons.services.CswServiceProperties.CSW_SPEC_FACTORY_PID;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 

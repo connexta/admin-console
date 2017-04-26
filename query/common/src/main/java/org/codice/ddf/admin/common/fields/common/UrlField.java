@@ -54,7 +54,7 @@ public class UrlField extends StringField {
             new URL(getValue());
         } catch (MalformedURLException e) {
             LOGGER.debug("Failed to validate URL [{}].", getValue());
-            validationMsgs.add(invalidFieldError(fieldName()));
+            validationMsgs.add(invalidFieldError(path()));
         }
 
         return validationMsgs;

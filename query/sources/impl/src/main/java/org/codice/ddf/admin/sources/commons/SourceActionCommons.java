@@ -57,7 +57,7 @@ public class SourceActionCommons {
                 config.toString());
 
         if (report.containsFailedResults()) {
-            validationMsgs.add(failedPersistError(config.fieldName()));
+            validationMsgs.add(failedPersistError(config.path()));
         }
 
         return validationMsgs;

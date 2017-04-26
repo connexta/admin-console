@@ -75,7 +75,9 @@ public class Result<T> {
         return this;
     }
 
-    public List<Message> resultMessages() { return resultMessages; }
+    public List<Message> resultMessages() {
+        return resultMessages;
+    }
 
     public Result<T> resultMessages(List<Message> messages) {
         resultMessages = messages;

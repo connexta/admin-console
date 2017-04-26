@@ -19,7 +19,6 @@ import static org.codice.ddf.admin.sources.commons.SourceUtilCommons.SOURCES_NAM
 import static org.codice.ddf.admin.sources.commons.SourceUtilCommons.createDocument;
 import static org.codice.ddf.admin.sources.commons.services.OpenSearchServiceProperties.OPENSEARCH_FACTORY_PID;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 

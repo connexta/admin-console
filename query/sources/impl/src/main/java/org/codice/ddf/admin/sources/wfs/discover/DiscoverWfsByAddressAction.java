@@ -18,11 +18,11 @@ import static org.codice.ddf.admin.sources.commons.SourceActionCommons.createSou
 import java.util.List;
 
 import org.codice.ddf.admin.api.fields.Field;
+import org.codice.ddf.admin.common.Result;
 import org.codice.ddf.admin.common.actions.BaseAction;
 import org.codice.ddf.admin.common.fields.common.AddressField;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
 import org.codice.ddf.admin.common.fields.common.UrlField;
-import org.codice.ddf.admin.common.Result;
 import org.codice.ddf.admin.sources.commons.utils.WfsSourceUtils;
 import org.codice.ddf.admin.sources.fields.SourceInfoField;
 import org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField;

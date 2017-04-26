@@ -13,8 +13,6 @@
  **/
 package org.codice.ddf.admin.common.actions;
 
-import static org.codice.ddf.admin.api.fields.Field.INDEX_DELIMETER;
-
 import java.util.ArrayList;
 import java.util.List;
 

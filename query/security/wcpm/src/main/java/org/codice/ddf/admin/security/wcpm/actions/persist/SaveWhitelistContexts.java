@@ -14,7 +14,6 @@
 package org.codice.ddf.admin.security.wcpm.actions.persist;
 
 import static org.codice.ddf.admin.common.message.DefaultMessages.failedPersistError;
-import static org.codice.ddf.admin.security.common.services.PolicyManagerServiceProperties.getWhitelistContexts;
 
 import java.util.List;
 
@@ -62,6 +61,10 @@ public class SaveWhitelistContexts extends BaseAction<ListField<ContextPath>> {
         OperationReport configReport = configurator.commit(
                 "Whitelist Contexts saved with details: {}",
                 contexts.toString());
+
+        if(configReport.containsFailedResults()) {
+            addMessage(failedPersistError());
+        }
 
         return configReport.containsFailedResults() ? null : contexts;
     }

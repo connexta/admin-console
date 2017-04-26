@@ -17,7 +17,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.codice.ddf.admin.api.action.Message;
-import org.codice.ddf.admin.api.fields.Field;
 
 public abstract class BaseMessage implements Message {
 

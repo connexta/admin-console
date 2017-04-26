@@ -19,7 +19,6 @@ import java.util.List;
 
 import org.codice.ddf.admin.api.action.Message;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
-import org.codice.ddf.admin.ldap.actions.commons.LdapMessages;
 import org.forgerock.opendj.ldap.DN;
 
 public class LdapDistinguishedName extends StringField {

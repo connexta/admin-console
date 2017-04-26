@@ -11,7 +11,7 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.security.common.fields.wcpm.services;
+package org.codice.ddf.admin.security.common.services;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,29 +22,73 @@ import java.util.stream.Collectors;
 import org.apache.commons.collections.ListUtils;
 import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
+import org.codice.ddf.admin.common.fields.common.ContextPath;
+import org.codice.ddf.admin.common.services.ServiceCommons;
+import org.codice.ddf.admin.configurator.ConfigReader;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.security.common.fields.wcpm.ContextPolicyBin;
 import org.codice.ddf.security.policy.context.ContextPolicy;
 import org.codice.ddf.security.policy.context.ContextPolicyManager;
 
+import com.google.common.collect.ImmutableMap;
+
 public class PolicyManagerServiceProperties {
 
-    public static final String STS_CLAIMS_CONFIGURATION_CONFIG_ID =
-            "ddf.security.sts.client.configuration";
+    // --- Policy manager props
+    public static final String POLICY_MANAGER_PID =
+            "org.codice.ddf.security.policy.context.impl.PolicyManager";
 
-    public static final String STS_CLAIMS_PROPS_KEY_CLAIMS = "claims";
+    public static final String AUTH_TYPES = "authenticationTypes";
+
+    public static final String REALMS = "realms";
+
+    public static final String REQUIRED_ATTRIBUTES = "requiredAttributes";
+
+    public static final String WHITE_LIST_CONTEXT = "whiteListContexts";
+
+    // ---
+
+    public static final String ROOT_CONTEXT_PATH = "/";
 
     public static final String IDP_CLIENT_BUNDLE_NAME = "security-idp-client";
 
     public static final String IDP_SERVER_BUNDLE_NAME = "security-idp-server";
 
-    public ListField<ContextPolicyBin> contextPolicyServiceToContextPolicyFields(ConfiguratorFactory configurator) {
-        ContextPolicyManager ref = configurator.getConfigReader().getServiceReference(ContextPolicyManager.class);
-        return policyManagerSettingsToBins(ref);
+    public Map<String, Object> contextPoliciesToPolicyManagerProps(
+            List<ContextPolicyBin> contextPolicies) {
+        List<String> realmsProps = new ArrayList<>();
+        List<String> authTypesProps = new ArrayList<>();
+        List<String> reqAttrisProps = new ArrayList<>();
+
+        for (ContextPolicyBin bin : contextPolicies) {
+            bin.contexts()
+                    .forEach(context -> {
+                        realmsProps.add(context + "=" + bin.realm());
+                        authTypesProps.add(context + "=" + String.join("|", bin.authTypes()));
+                        if (bin.claimsMapping()
+                                .isEmpty()) {
+                            reqAttrisProps.add(context + "=");
+                        } else {
+                            reqAttrisProps.add(context + "={" + String.join(";",
+                                    bin.claimsMapping()
+                                            .entrySet()
+                                            .stream()
+                                            .map(entry -> entry.getKey() + "=" + entry.getValue())
+                                            .collect(Collectors.toList())) + "}");
+                        }
+                    });
+        }
+
+        return ImmutableMap.of(AUTH_TYPES,
+                authTypesProps.toArray(new String[0]),
+                REALMS,
+                realmsProps.toArray(new String[0]),
+                REQUIRED_ATTRIBUTES,
+                reqAttrisProps.toArray(new String[0]));
     }
 
-    // TODO: tbatie - 1/17/17 - (Ticket) Get rid of this PolicyManager reference and break this dependency.
-    public ListField<ContextPolicyBin> policyManagerSettingsToBins(ContextPolicyManager policyManager) {
+    public ListField<ContextPolicyBin> contextPolicyServiceToContextPolicyFields(ConfiguratorFactory configurator) {
+        ContextPolicyManager policyManager = configurator.getConfigReader().getServiceReference(ContextPolicyManager.class);
         List<ContextPolicyBin> policies = new ArrayList<>();
 
         Collection<ContextPolicy> allPolicies = policyManager.getAllContextPolicies();
@@ -79,7 +123,7 @@ public class PolicyManagerServiceProperties {
         return policiesField;
     }
 
-    public boolean hasSameRequiredAttributes(ContextPolicyBin bin,
+    private boolean hasSameRequiredAttributes(ContextPolicyBin bin,
             Map<String, String> mappingsToCheck) {
 
         if (!(bin.claimsMapping()
@@ -97,5 +141,21 @@ public class PolicyManagerServiceProperties {
                         .equals(binMapping.getValue()))
                 .findFirst()
                 .isPresent();
+    }
+
+    public Map<String, Object> whiteListToPolicyManagerProps(ListField<ContextPath> contexts) {
+        List<String> serviceContexts =
+                contexts.getValue() == null ? new ArrayList<>() : contexts.getValue();
+        return ImmutableMap.of(WHITE_LIST_CONTEXT, serviceContexts);
+    }
+
+    public static List<String> getWhitelistContexts(ConfigReader reader) {
+        Object whitelistProp = reader.getConfig(POLICY_MANAGER_PID).get(WHITE_LIST_CONTEXT);
+
+        if(whitelistProp != null && whitelistProp instanceof String[]) {
+            return new ServiceCommons().resolveProperties((String[])whitelistProp);
+        }
+
+        return new ArrayList<>();
     }
 }

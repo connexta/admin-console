@@ -45,10 +45,6 @@ public class ActionReportImpl<T extends Field> implements ActionReport<T> {
         this.result = result;
     }
 
-    public void addMessages(List<Message> messages) {
-        this.messages.addAll(messages);
-    }
-
     public void addMessage(Message message) {
         messages.add(message);
     }

@@ -17,7 +17,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.codice.ddf.admin.api.action.Message;
-import org.codice.ddf.admin.api.fields.Field;
 
 public abstract class BaseMessage implements Message {
 
@@ -60,12 +59,13 @@ public abstract class BaseMessage implements Message {
 
     @Override
     public BaseMessage addSubpath(String subPath) {
-        path.add(subPath);
+        path.add(0, subPath);
         return this;
     }
 
-    public BaseMessage addFieldToPath(Field field) {
-        path.add(field.fieldName());
+    @Override
+    public Message setPath(List<String> path) {
+        this.path = path;
         return this;
     }
 }

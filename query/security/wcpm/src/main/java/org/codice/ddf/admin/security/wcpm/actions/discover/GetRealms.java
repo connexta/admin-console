@@ -13,10 +13,14 @@
  **/
 package org.codice.ddf.admin.security.wcpm.actions.discover;
 
+import static org.codice.ddf.admin.security.common.services.PolicyManagerServiceProperties.IDP_SERVER_BUNDLE_NAME;
+
 import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.actions.GetAction;
 import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
+import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.security.common.fields.wcpm.Realm;
+import org.codice.ddf.admin.security.common.services.LdapLoginServiceProperties;
 
 public class GetRealms extends GetAction<ListField<Realm>> {
 
@@ -24,14 +28,31 @@ public class GetRealms extends GetAction<ListField<Realm>> {
 
     public static final String DESCRIPTION = "Retrieves all currently configured realms.";
 
-    public GetRealms() {
+    ConfiguratorFactory configuratorFactory;
+
+    LdapLoginServiceProperties serviceCommons;
+
+    public GetRealms(ConfiguratorFactory configuratorFactory) {
         super(FIELD_NAME, DESCRIPTION, new ListFieldImpl<>(Realm.class));
+        this.configuratorFactory = configuratorFactory;
+        serviceCommons = new LdapLoginServiceProperties(configuratorFactory);
     }
 
     @Override
     public ListField<Realm> performAction() {
-        // TODO: 3/31/17 Make reference to the ldap action creator once it is implemented clear.
-        return new ListFieldImpl<>(Realm.class).add(Realm.KARAF_REALM)
-                .add(Realm.LDAP_REALM);
+        ListField<Realm> realms = new ListFieldImpl<>(Realm.class);
+        realms.add(Realm.KARAF_REALM);
+
+
+        if (configuratorFactory.getConfigReader()
+                .isBundleStarted(IDP_SERVER_BUNDLE_NAME)) {
+            // TODO: 4/19/17 How are we going to treat/display IdP as an auth type
+        }
+
+        if(!serviceCommons.getLdapLoginManagedServices().keySet().isEmpty()) {
+            realms.add(Realm.LDAP_REALM);
+        }
+
+        return realms;
     }
 }

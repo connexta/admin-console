@@ -14,9 +14,6 @@
 package org.codice.ddf.admin.security.wcpm.actions.persist;
 
 import static org.codice.ddf.admin.common.message.DefaultMessages.failedPersistError;
-import static org.codice.ddf.admin.security.wcpm.commons.ContextPolicyServiceProperties.POLICY_MANAGER_PID;
-import static org.codice.ddf.admin.security.wcpm.commons.ContextPolicyServiceProperties.getWhitelistContexts;
-import static org.codice.ddf.admin.security.wcpm.commons.ContextPolicyServiceProperties.whiteListToPolicyManagerProps;
 
 import java.util.List;
 
@@ -28,12 +25,13 @@ import org.codice.ddf.admin.common.fields.common.ContextPath;
 import org.codice.ddf.admin.configurator.Configurator;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.configurator.OperationReport;
+import org.codice.ddf.admin.security.common.services.PolicyManagerServiceProperties;
 
 import com.google.common.collect.ImmutableList;
 
 public class SaveWhitelistContexts extends BaseAction<ListField<ContextPath>> {
 
-    public static final String DEFAULT_FIELD_NAME = "saveWhitelistContexts";
+    public static final String ACTION_ID = "saveWhitelistContexts";
 
     public static final String DESCRIPTION =
             "Persists the given contexts paths as white listed contexts. White listing a context path will result in no security being applied to the given paths.";
@@ -43,9 +41,8 @@ public class SaveWhitelistContexts extends BaseAction<ListField<ContextPath>> {
     private ConfiguratorFactory configuratorFactory;
 
     public SaveWhitelistContexts(ConfiguratorFactory configuratorFactory) {
-        super(DEFAULT_FIELD_NAME, DESCRIPTION, new ListFieldImpl<>(ContextPath.class));
-        contexts = new ListFieldImpl<>("paths", ContextPath.class);
-        contexts.isRequired(true);
+        super(ACTION_ID, DESCRIPTION, new ListFieldImpl<>(ContextPath.class));
+        contexts = new ListFieldImpl<>("paths", new ContextPath());
         this.configuratorFactory = configuratorFactory;
     }
 
@@ -56,25 +53,19 @@ public class SaveWhitelistContexts extends BaseAction<ListField<ContextPath>> {
 
     @Override
     public ListField<ContextPath> performAction() {
-        ListField<ContextPath> preUpdateWhitelistContexts = new ListFieldImpl<>(ContextPath.class);
-        for (String path :  getWhitelistContexts(configuratorFactory.getConfigReader())) {
-            preUpdateWhitelistContexts.add(new ContextPath(path));
-        }
-
         Configurator configurator = configuratorFactory.getConfigurator();
-        configurator.updateConfigFile(POLICY_MANAGER_PID,
-                whiteListToPolicyManagerProps(contexts),
+        configurator.updateConfigFile(PolicyManagerServiceProperties.POLICY_MANAGER_PID,
+                new PolicyManagerServiceProperties().whiteListToPolicyManagerProps(contexts),
                 true);
 
         OperationReport configReport = configurator.commit(
                 "Whitelist Contexts saved with details: {}",
                 contexts.toString());
 
-        if (configReport.containsFailedResults()) {
-            addArgumentMessage(failedPersistError(name()));
-            return preUpdateWhitelistContexts;
-        } else {
-            return contexts;
+        if(configReport.containsFailedResults()) {
+            addMessage(failedPersistError());
         }
+
+        return configReport.containsFailedResults() ? null : contexts;
     }
 }

@@ -13,6 +13,8 @@
  **/
 package org.codice.ddf.admin.common.message;
 
+import java.util.List;
+
 public class DefaultMessages {
 
     public static final String MISSING_REQUIRED_FIELD = "MISSING_REQUIRED_FIELD";
@@ -25,41 +27,41 @@ public class DefaultMessages {
 
     public static final String INVALID_HOSTNAME = "INVALID_HOSTNAME";
 
-    public static final String INVALID_CONTEXT_PATH = "INVALID_CONTEXT_PATH";
-
-    public static final String NO_ROOT_CONTEXT = "NO_ROOT_CONTEXT";
-
     public static final String FAILED_PERSIST = "FAILED_PERSIST";
 
-    public static ErrorMessage noRootContextError(String pathOrigin) {
-        return new ErrorMessage(NO_ROOT_CONTEXT, pathOrigin);
+    public static final String UNSUPPORTED_ENUM = "UNSUPPORTED_ENUM";
+
+    public static final String INVALID_CONTEXT_PATH = "INVALID_CONTEXT_PATH";
+
+    public static ErrorMessage unsupportedEnum(List<String> path) {
+        return new ErrorMessage(UNSUPPORTED_ENUM, path);
     }
 
-    public static ErrorMessage failedPersistError(String pathOrigin) {
-        return new ErrorMessage(FAILED_PERSIST, pathOrigin);
+    public static ErrorMessage failedPersistError() {
+        return new ErrorMessage(FAILED_PERSIST);
     }
 
-    public static ErrorMessage invalidFieldError(String pathOrigin) {
-        return new ErrorMessage(INVALID_FIELD, pathOrigin);
+    public static ErrorMessage invalidFieldError(List<String> path) {
+        return new ErrorMessage(INVALID_FIELD, path);
     }
 
-    public static ErrorMessage invalidContextPathError(String pathOrigin) {
-        return new ErrorMessage(INVALID_CONTEXT_PATH, pathOrigin);
+    public static ErrorMessage invalidPortRangeError(List<String> path) {
+        return new ErrorMessage(INVALID_PORT_RANGE, path);
     }
 
-    public static ErrorMessage invalidPortRangeError(String pathOrigin) {
-        return new ErrorMessage(INVALID_PORT_RANGE, pathOrigin);
+    public static ErrorMessage missingRequiredFieldError(List<String> path) {
+        return new ErrorMessage(MISSING_REQUIRED_FIELD, path);
     }
 
-    public static ErrorMessage missingRequiredFieldError(String pathOrigin) {
-        return new ErrorMessage(MISSING_REQUIRED_FIELD, pathOrigin);
+    public static ErrorMessage emptyFieldError(List<String> path) {
+        return new ErrorMessage(EMPTY_FIELD, path);
     }
 
-    public static ErrorMessage emptyFieldError(String pathOrigin) {
-        return new ErrorMessage(EMPTY_FIELD, pathOrigin);
+    public static ErrorMessage invalidHostnameError(List<String> path) {
+        return new ErrorMessage(INVALID_HOSTNAME, path);
     }
 
-    public static ErrorMessage invalidHostnameError(String pathOrigin) {
-        return new ErrorMessage(INVALID_HOSTNAME, pathOrigin);
+    public static ErrorMessage invalidContextPathError(List<String> path) {
+        return new ErrorMessage(INVALID_CONTEXT_PATH, path);
     }
 }

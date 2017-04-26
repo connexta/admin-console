@@ -37,11 +37,12 @@ public class GetAuthTypes extends GetAction<ListField<AuthType>> {
 
     @Override
     public ListField<AuthType> performAction() {
-        // TODO: tbatie - 4/14/17 - Check the backend to see if these services are running
-        return new ListFieldImpl<>(AuthType.class).addAll(Arrays.asList(AuthType.BASIC_AUTH,
+        ListField<AuthType> authTypes = new ListFieldImpl<>(AuthType.class).addAll(Arrays.asList(AuthType.BASIC_AUTH,
                 AuthType.SAML_AUTH,
                 AuthType.PKI_AUTH,
                 AuthType.GUEST_AUTH,
                 AuthType.IDP_AUTH));
+
+        return authTypes;
     }
 }

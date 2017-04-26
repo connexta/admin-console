@@ -14,29 +14,33 @@
 package org.codice.ddf.admin.security.wcpm.actions.persist;
 
 import static org.codice.ddf.admin.common.message.DefaultMessages.failedPersistError;
-import static org.codice.ddf.admin.common.message.DefaultMessages.noRootContextError;
-import static org.codice.ddf.admin.security.wcpm.commons.ContextPolicyServiceProperties.POLICY_MANAGER_PID;
-import static org.codice.ddf.admin.security.wcpm.commons.ContextPolicyServiceProperties.ROOT_CONTEXT_PATH;
-import static org.codice.ddf.admin.security.wcpm.commons.ContextPolicyServiceProperties.contextPoliciesToPolicyManagerProps;
+import static org.codice.ddf.admin.security.common.SecurityMessages.invalidClaimType;
+import static org.codice.ddf.admin.security.common.SecurityMessages.noRootContextError;
+import static org.codice.ddf.admin.security.common.services.PolicyManagerServiceProperties.POLICY_MANAGER_PID;
+import static org.codice.ddf.admin.security.common.services.PolicyManagerServiceProperties.ROOT_CONTEXT_PATH;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.actions.BaseAction;
 import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
+import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 import org.codice.ddf.admin.configurator.Configurator;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.configurator.OperationReport;
 import org.codice.ddf.admin.security.common.fields.wcpm.ContextPolicyBin;
-import org.codice.ddf.admin.security.common.fields.wcpm.services.PolicyManagerServiceProperties;
+import org.codice.ddf.admin.security.common.services.PolicyManagerServiceProperties;
+import org.codice.ddf.admin.security.common.services.StsServiceProperties;
 
 import com.google.common.collect.ImmutableList;
 
 public class SaveContextPolices extends BaseAction<ListField<ContextPolicyBin>> {
 
-    public static final String DEFAULT_FIELD_NAME = "saveContextPolicies";
+    public static final String ACTION_ID = "saveContextPolicies";
 
     public static final String DESCRIPTION =
             "Saves a list of policies to be applied to their corresponding context paths.";
@@ -45,12 +49,19 @@ public class SaveContextPolices extends BaseAction<ListField<ContextPolicyBin>> 
 
     private ListField<ContextPolicyBin> contextPolicies;
 
-    private PolicyManagerServiceProperties wcpmServiceProps = new PolicyManagerServiceProperties();
+    private PolicyManagerServiceProperties wcpmServiceProps;
+
+    private StsServiceProperties stsServiceProps;
 
     public SaveContextPolices(ConfiguratorFactory configuratorFactory) {
-        super(DEFAULT_FIELD_NAME, DESCRIPTION, new ListFieldImpl<>(ContextPolicyBin.class));
-        contextPolicies = new ListFieldImpl<>("policies", ContextPolicyBin.class);
+        super(ACTION_ID, DESCRIPTION, new ListFieldImpl<>(ContextPolicyBin.class));
+        contextPolicies = new ListFieldImpl<>("policies",
+                new ContextPolicyBin().useDefaultRequiredFields())
+                .isRequired(true);
+
         this.configuratorFactory = configuratorFactory;
+        wcpmServiceProps = new PolicyManagerServiceProperties();
+        stsServiceProps = new StsServiceProperties();
     }
 
     @Override
@@ -60,29 +71,54 @@ public class SaveContextPolices extends BaseAction<ListField<ContextPolicyBin>> 
 
     @Override
     public ListField<ContextPolicyBin> performAction() {
+        Configurator configurator = configuratorFactory.getConfigurator();
+        configurator.updateConfigFile(POLICY_MANAGER_PID,
+                new PolicyManagerServiceProperties().contextPoliciesToPolicyManagerProps(contextPolicies.getList()),
+                true);
 
+        // TODO: tbatie - 4/25/17 - Should we have to provide a auditMessage to the configurator? We're going to continually forget to do this. It should audit the pid changed, the diff and the user that did it instead in my opinion
+        OperationReport configReport = configurator.commit(
+                "Web Context Policy saved with details: {}",
+                contextPolicies.toString());
+
+        if (configReport.containsFailedResults()) {
+            addMessage(failedPersistError());
+        }
+
+        return containsErrorMsgs() ? null : contextPolicies;
+    }
+
+    @Override
+    public void validate() {
+        super.validate();
+        checkRootPathExists();
+        checkClaimsValidity();
+    }
+
+    private void checkClaimsValidity() {
+        List<String> supportedClaims = stsServiceProps.getConfiguredStsClaims(configuratorFactory);
+
+        List<StringField> claimArgs = new ArrayList<>();
+        for (ContextPolicyBin bin : contextPolicies.getList()) {
+            claimArgs.addAll(bin.claimsMappingField()
+                    .getList()
+                    .stream()
+                    .map(entry -> entry.claimField())
+                    .collect(Collectors.toList()));
+        }
+
+        claimArgs.stream()
+                .filter(claimArg -> !supportedClaims.contains(claimArg.getValue()))
+                .forEach(claimArg -> addArgumentMessage(invalidClaimType(claimArg.path())));
+    }
+
+    private void checkRootPathExists() {
         if (contextPolicies.getList()
                 .stream()
                 .map(ContextPolicyBin::contexts)
                 .flatMap(Collection::stream)
                 .noneMatch(ROOT_CONTEXT_PATH::equals)) {
-            // TODO return some kind of error message here indicating the error
-            addArgumentMessage(noRootContextError(name()));
-        } else {
-            Configurator configurator = configuratorFactory.getConfigurator();
-            configurator.updateConfigFile(POLICY_MANAGER_PID,
-                    contextPoliciesToPolicyManagerProps(contextPolicies),
-                    true);
-
-            OperationReport configReport = configurator.commit(
-                    "Web Context Policy saved with details: {}",
-                    contextPolicies.toString());
-
-            if (configReport.containsFailedResults()) {
-                addArgumentMessage(failedPersistError(name()));
-            }
+            addArgumentMessage(noRootContextError(contextPolicies.path()));
         }
-
-        return wcpmServiceProps.contextPolicyServiceToContextPolicyFields(configuratorFactory);
     }
 }

@@ -38,7 +38,7 @@ public class SourceConfigUnionField extends BaseUnionField {
                     new WfsSourceConfigurationField(),
                     new OpensearchSourceConfigurationField());
 
-    protected PidField id;
+    protected PidField pid;
 
     protected StringField sourceName;
 
@@ -54,8 +54,16 @@ public class SourceConfigUnionField extends BaseUnionField {
         super(FIELD_NAME, fieldTypeName, description, UNION_TYPES, true);
     }
 
-    public SourceConfigUnionField id(String id) {
-        this.id.setValue(id);
+    public PidField pidField() {
+        return pid;
+    }
+
+    public CredentialsField credentials() {
+        return creds;
+    }
+
+    public SourceConfigUnionField pid(String pid) {
+        this.pid.setValue(pid);
         return this;
     }
 
@@ -77,12 +85,12 @@ public class SourceConfigUnionField extends BaseUnionField {
 
     @Override
     public List<Field> getFields() {
-        return ImmutableList.of(id, sourceName, endpointUrl, creds);
+        return ImmutableList.of(pid, sourceName, endpointUrl, creds);
     }
 
     @Override
     public void initializeFields() {
-        id = new PidField();
+        pid = new PidField();
         sourceName = new StringField("sourceName");
         endpointUrl = new UrlField("endpointUrl");
         creds = new CredentialsField();

@@ -12,7 +12,14 @@
  **/
 -->
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+
     <service id="stsActionCreator" interface="org.codice.ddf.admin.api.action.ActionCreator">
-        <bean class="org.codice.ddf.admin.security.sts.StsActionCreator" />
+        <bean class="org.codice.ddf.admin.security.sts.StsActionCreator" >
+            <argument ref="configuratorFactory" />
+        </bean>
     </service>
+
+    <reference id="configuratorFactory"
+               interface="org.codice.ddf.admin.configurator.ConfiguratorFactory"
+               availability="mandatory" filter="(type=txact)"/>
 </blueprint>

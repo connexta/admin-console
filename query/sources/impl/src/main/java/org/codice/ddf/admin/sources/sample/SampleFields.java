@@ -29,7 +29,7 @@ public class SampleFields {
                     .sourceName("cswSourceName")
                     .credentials("sampleUsername", "samplePassword")
                     .endpointUrl("cswUrl")
-                    .id("cswId");
+                    .pid("cswId");
 
     public static final SourceInfoField SAMPLE_CSW_SOURCE_INFO =
             new SourceInfoField().sourceHandlerName("cswHandler")
@@ -40,7 +40,7 @@ public class SampleFields {
             new WfsSourceConfigurationField().sourceName("wfsSourceName")
                     .credentials("sampleUsername", "samplePassword")
                     .endpointUrl("wfsUrl")
-                    .id("wfsId");
+                    .pid("wfsId");
 
     public static final SourceInfoField SAMPLE_WFS_SOURCE_INFO =
             new SourceInfoField().sourceHandlerName("wfsHandler")
@@ -51,7 +51,7 @@ public class SampleFields {
             new OpensearchSourceConfigurationField().sourceName("opensearchSourceName")
                     .credentials("sampleUsername", "samplePassword")
                     .endpointUrl("opensearchUrl")
-                    .id("opensearchId");
+                    .pid("opensearchId");
 
     public static final SourceInfoField SAMPLE_OPENSEARCH_SOURCE_INFO =
             new SourceInfoField().sourceHandlerName("opensearchHandler")

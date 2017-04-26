@@ -11,13 +11,27 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.api.fields;
+package org.codice.ddf.admin.common.services;
 
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
-public interface ObjectField extends Field<Map<String, Object>> {
-    List<Field> getFields();
+import org.apache.commons.lang.text.StrSubstitutor;
 
-    ObjectField allFieldsRequired(boolean required);
+public class ServiceCommons {
+
+    public static final String SERVICE_PID_KEY = "service.pid";
+
+    public static final String FACTORY_PID_KEY = "service.factoryPid";
+
+    public String resolveProperty(String str) {
+        return StrSubstitutor.replaceSystemProperties(str);
+    }
+
+    public List<String> resolveProperties(String... list) {
+        return Arrays.stream(list)
+                .map(str -> resolveProperty(str))
+                .collect(Collectors.toList());
+    }
 }

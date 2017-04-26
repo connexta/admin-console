@@ -49,13 +49,13 @@ public class HostnameField extends StringField {
         }
 
         if(getValue() != null && !validHostname(getValue())) {
-            validationMsgs.add(invalidHostnameError(fieldName()));
+            validationMsgs.add(invalidHostnameError(path()));
         }
 
         return validationMsgs;
     }
 
     public boolean validHostname(String hostname) {
-        return HOST_NAME_PATTERN.matcher(getValue()).matches();
+        return HOST_NAME_PATTERN.matcher(hostname).matches();
     }
 }

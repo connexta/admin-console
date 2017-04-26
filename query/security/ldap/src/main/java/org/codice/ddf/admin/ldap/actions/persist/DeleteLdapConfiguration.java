@@ -42,7 +42,7 @@ public class DeleteLdapConfiguration extends BaseAction<ListField<LdapConfigurat
         super(NAME, DESCRIPTION, new ListFieldImpl<>("configs", LdapConfigurationField.class));
         pid = new PidField();
         this.configuratorFactory = configuratorFactory;
-        serviceCommons = new LdapServiceCommons();
+        serviceCommons = new LdapServiceCommons(configuratorFactory);
     }
 
     @Override

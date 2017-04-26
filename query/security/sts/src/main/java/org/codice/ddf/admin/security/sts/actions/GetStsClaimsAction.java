@@ -15,7 +15,9 @@ package org.codice.ddf.admin.security.sts.actions;
 
 import org.codice.ddf.admin.common.actions.GetAction;
 import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
+import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.security.common.fields.sts.StsClaimField;
+import org.codice.ddf.admin.security.common.services.StsServiceProperties;
 
 public class GetStsClaimsAction extends GetAction<ListFieldImpl<StsClaimField>> {
 
@@ -23,14 +25,19 @@ public class GetStsClaimsAction extends GetAction<ListFieldImpl<StsClaimField>> 
 
     public static final String DESCRIPTION = "All currently configured claims the STS supports.";
 
-    public GetStsClaimsAction() {
+    ConfiguratorFactory configuratorFactory;
+
+    public GetStsClaimsAction(ConfiguratorFactory configurator) {
         super(NAME, DESCRIPTION, new ListFieldImpl<>(StsClaimField.class));
+        this.configuratorFactory = configurator;
     }
 
     @Override
-    public ListFieldImpl performAction() {
-        StsClaimField claim = new StsClaimField();
-        claim.setValue("testClaim");
-        return new ListFieldImpl<>(StsClaimField.class).add(claim);
+    public ListFieldImpl<StsClaimField> performAction() {
+        ListFieldImpl<StsClaimField> claims = new ListFieldImpl<>(StsClaimField.class);
+        new StsServiceProperties().getConfiguredStsClaims(configuratorFactory)
+                .stream()
+                .forEach(claimStr -> claims.add(new StsClaimField(claimStr)));
+        return claims;
     }
 }

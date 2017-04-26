@@ -13,6 +13,7 @@
  **/
 package org.codice.ddf.admin.common.fields.base
 
+import org.codice.ddf.admin.api.fields.Field
 import org.codice.ddf.admin.api.fields.ObjectField
 import org.codice.ddf.admin.common.fields.TestObjectField
 import org.codice.ddf.admin.common.fields.base.scalar.StringField
@@ -29,7 +30,7 @@ class ListFieldImplTest extends Specification {
 
         then:
         listField.path() == [LIST_FIELD_NAME]
-        listField.getList().get(0).path() == [LIST_FIELD_NAME, StringField.DEFAULT_FIELD_NAME]
+        listField.getList().get(0).path() == [LIST_FIELD_NAME, Field.INDEX_DELIMETER + 0]
     }
 
     def 'test the path of ObjectFields and their inner fields in listfields'() {
@@ -44,7 +45,7 @@ class ListFieldImplTest extends Specification {
 
         then:
         parentPath == [LIST_FIELD_NAME]
-        objectFieldPath == [parentPath, TestObjectField.DEFAULT_FIELD_NAME].flatten()
+        objectFieldPath == [parentPath, Field.INDEX_DELIMETER + 0].flatten()
         innerObjectFieldPath == [objectFieldPath, TestObjectField.InnerTestObjectField.DEFAULT_FIELD_NAME].flatten()
         subFieldOfInnerObjectFieldPath == [innerObjectFieldPath, StringField.DEFAULT_FIELD_NAME].flatten()
     }

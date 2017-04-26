@@ -41,11 +41,16 @@ public class ListFieldImpl<T extends Field> extends BaseField<List>
         super(fieldName, null, null, LIST);
         this.fields = new ArrayList<>();
         try {
-            // TODO: tbatie - 4/13/17 - Review if this is the correct way to do all this
             this.listFieldType = listFieldType.newInstance();
         } catch (InstantiationException | IllegalAccessException e) {
             throw new RuntimeException(String.format("Unable to create new instance of class [%s]. Ensure there is a default constructor for the ListFieldImpl to initialize.", listFieldType.getClass()));
         }
+    }
+
+    public ListFieldImpl(String fieldName, T listFieldType) {
+        super(fieldName, null, null, LIST);
+        this.fields = new ArrayList<>();
+        this.listFieldType = listFieldType;
     }
 
     public ListFieldImpl(Class<T> listFieldType, List<T> values) {
@@ -96,10 +101,9 @@ public class ListFieldImpl<T extends Field> extends BaseField<List>
 
     @Override
     public ListFieldImpl<T> add(T value) {
-        // TODO: 4/10/17 perform special validation for object fields
-        // TODO: 4/10/17 Copy the obj instead
-        value.isRequired(listFieldType.isRequired());
-        path().forEach(value::addToPath);
+        value.matchRequired(listFieldType);
+        value.fieldName(INDEX_DELIMETER + fields.size());
+        value.updatePath(path());
         fields.add(value);
         return this;
     }
@@ -114,16 +118,40 @@ public class ListFieldImpl<T extends Field> extends BaseField<List>
     public List<Message> validate() {
         List<Message> validationMsgs = super.validate();
 
-        if (validationMsgs.isEmpty()) {
+        if (validationMsgs.isEmpty() && (getList() != null)) {
             List<Message> fieldValidationMsgs = getList().stream()
                     .map(field -> (List<Message>) field.validate())
                     .flatMap(Collection::stream)
                     .collect(Collectors.toList());
-
-            fieldValidationMsgs.forEach(msg -> msg.addSubpath(fieldName()));
             validationMsgs.addAll(fieldValidationMsgs);
         }
 
         return validationMsgs;
+    }
+
+    @Override
+    public ListField<T> matchRequired(Field fieldToMatch) {
+        super.matchRequired(fieldToMatch);
+        listFieldType.matchRequired(((ListField) fieldToMatch).getListFieldType());
+        getList().forEach(field -> field.matchRequired(listFieldType));
+        return this;
+    }
+
+    @Override
+    public ListFieldImpl<T> isRequired(boolean required) {
+        super.isRequired(required);
+        return this;
+    }
+
+    @Override
+    public void updatePath(List<String> path) {
+        super.updatePath(path);
+        getList().forEach(field -> field.updatePath(path()));
+    }
+
+    @Override
+    public void fieldName(String fieldName) {
+        super.fieldName(fieldName);
+        getList().forEach(field -> field.updatePath(path()));
     }
 }

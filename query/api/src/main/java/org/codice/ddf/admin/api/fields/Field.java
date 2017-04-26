@@ -18,7 +18,12 @@ import java.util.List;
 import org.codice.ddf.admin.api.action.Message;
 
 public interface Field<T> {
+
+    String INDEX_DELIMETER = "__index:";
+
     String fieldName();
+
+    void fieldName(String fieldName);
 
     String fieldTypeName();
 
@@ -40,15 +45,17 @@ public interface Field<T> {
     List<String> path();
 
     /**
-     * Adds a sub-path to the list of Strings that describes this {@code Field}'s path.
+     * Sets the unique path to reach the {@code Field}.
      *
-     * @param subPath unique identifier to add to the path
+     * @param path uniquely identifiable path
      */
-    void addToPath(String subPath);
+    void updatePath(List<String> path);
 
     boolean isRequired();
 
     Field<T> isRequired(boolean required);
+
+    Field<T> matchRequired(Field<T> fieldToMatch);
 
     enum FieldBaseType {
         STRING, INTEGER, FLOAT, BOOLEAN, LIST, OBJECT, ENUM, UNION

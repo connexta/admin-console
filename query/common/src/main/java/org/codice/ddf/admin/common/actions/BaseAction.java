@@ -28,7 +28,7 @@ public abstract class BaseAction<T extends Field> implements Action<T> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseAction.class);
 
-    private String name;
+    private String actionId;
 
     private String description;
 
@@ -36,16 +36,16 @@ public abstract class BaseAction<T extends Field> implements Action<T> {
 
     private ActionReportImpl<T> report;
 
-    public BaseAction(String name, String description, T returnType) {
-        this.name = name;
+    public BaseAction(String actionId, String description, T returnType) {
+        this.actionId = actionId;
         this.description = description;
         this.returnType = returnType;
         report = new ActionReportImpl<T>();
     }
 
     @Override
-    public String name() {
-        return name;
+    public String id() {
+        return actionId;
     }
 
     @Override
@@ -67,8 +67,6 @@ public abstract class BaseAction<T extends Field> implements Action<T> {
         getArguments().stream()
                 .filter(field -> args.containsKey(field.fieldName()))
                 .forEach(field -> field.setValue(args.get(field.fieldName())));
-
-        // TODO: tbatie - 3/16/17 - Add logger if a fieldName is not found
     }
 
     @Override
@@ -85,23 +83,16 @@ public abstract class BaseAction<T extends Field> implements Action<T> {
         return report.containsErrorMsgs();
     }
 
-    protected BaseAction addArgumentMessage(Message msg) {
-        Message copy = msg.copy();
-        copy.addSubpath(name);
-        copy.addSubpath(ARGUMENT);
-        report.addMessage(copy);
-        return this;
-    }
-
-    protected BaseAction addMessage(Message msg) {
-        Message copy = msg.copy();
-        copy.addSubpath(name);
-        report.addMessage(copy);
-        return this;
-    }
-
     protected BaseAction addArgumentMessages(List<Message> msgs) {
         msgs.forEach(msg -> addArgumentMessage(msg));
+        return this;
+    }
+
+    protected BaseAction addArgumentMessage(Message msg) {
+        Message copy = msg.copy();
+        copy.addSubpath(ARGUMENT);
+        copy.addSubpath(actionId);
+        report.addMessage(copy);
         return this;
     }
 
@@ -109,6 +100,14 @@ public abstract class BaseAction<T extends Field> implements Action<T> {
         msgs.forEach(msg -> addMessage(msg));
         return this;
     }
+
+    protected BaseAction addMessage(Message msg) {
+        Message copy = msg.copy();
+        copy.addSubpath(actionId);
+        report.addMessage(copy);
+        return this;
+    }
+
 
     public void validate() {
         getArguments().stream()

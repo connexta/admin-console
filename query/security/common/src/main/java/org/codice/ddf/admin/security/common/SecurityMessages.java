@@ -11,23 +11,24 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.common.services;
+package org.codice.ddf.admin.security.common;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import org.apache.commons.lang.text.StrSubstitutor;
+import org.codice.ddf.admin.common.message.ErrorMessage;
 
-public class ServicesCommons {
+public class SecurityMessages {
 
-    public String resolveProperty(String str) {
-        return StrSubstitutor.replaceSystemProperties(str);
+
+    public static final String NO_ROOT_CONTEXT = "NO_ROOT_CONTEXT";
+
+    public static final String INVALID_CLAIM_TYPE = "INVALID_CLAIM_TYPE";
+
+    public static ErrorMessage noRootContextError(List<String> path) {
+        return new ErrorMessage(NO_ROOT_CONTEXT, path);
     }
 
-    public List<String> resolveProperties(String... list) {
-        return Arrays.stream(list)
-                .map(str -> resolveProperty(str))
-                .collect(Collectors.toList());
+    public static ErrorMessage invalidClaimType(List<String> path) {
+        return new ErrorMessage(INVALID_CLAIM_TYPE, path);
     }
 }

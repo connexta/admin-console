@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.api.action.Message;
+import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.api.fields.ObjectField;
 
 public abstract class BaseObjectField extends BaseField<Map<String, Object>>
@@ -31,7 +32,7 @@ public abstract class BaseObjectField extends BaseField<Map<String, Object>>
             FieldBaseType baseType) {
         super(fieldName, fieldTypeName, description, baseType);
         initializeFields();
-        getFields().forEach(field -> field.addToPath(fieldName()));
+        getFields().forEach(field -> field.updatePath(path()));
     }
 
     public BaseObjectField(String fieldName, String fieldTypeName, String description) {
@@ -65,7 +66,6 @@ public abstract class BaseObjectField extends BaseField<Map<String, Object>>
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList()));
 
-        validationErrors.forEach(msg -> msg.addSubpath(fieldName()));
         return validationErrors;
     }
 
@@ -84,20 +84,34 @@ public abstract class BaseObjectField extends BaseField<Map<String, Object>>
     }
 
     @Override
-    public BaseObjectField innerFieldRequired(boolean required, String fieldName) {
-        if (required) {
-            isRequired(true);
+    public void updatePath(List<String> path) {
+        super.updatePath(path);
+        getFields().forEach(child -> child.updatePath(path()));
+    }
+
+    @Override
+    public void fieldName(String fieldName) {
+        super.fieldName(fieldName);
+        getFields().forEach(child -> child.updatePath(path()));
+    }
+
+    @Override
+    public Field matchRequired(Field field) {
+        super.matchRequired(field);
+
+        if(!(field instanceof ObjectField)) {
+            throw new RuntimeException("Cannot match required field that is not of type ObjectField.");
         }
 
-        getFields().stream()
-                .filter(field -> field.fieldName()
-                        .equals(fieldName))
-                .forEach(field -> field.isRequired(required));
+        for(Field subField : ((ObjectField)field).getFields()) {
+            for(Field toSetSubField : getFields()) {
+                if(toSetSubField.fieldName().equals(subField.fieldName())) {
+                    toSetSubField.matchRequired(subField);
+                    break;
+                }
+            }
+        }
 
-        getFields().stream()
-                .filter(field -> field instanceof ObjectField)
-                .map(ObjectField.class::cast)
-                .forEach(objField -> objField.innerFieldRequired(required, fieldName));
         return this;
     }
 
@@ -106,10 +120,4 @@ public abstract class BaseObjectField extends BaseField<Map<String, Object>>
      * in this method, and is also returned by the {@link ObjectField#getFields()}, will have the {@code ObjectField} added to its path.
      */
     public abstract void initializeFields();
-
-    @Override
-    public void addToPath(String fieldName) {
-        super.addToPath(fieldName);
-        getFields().forEach(child -> child.addToPath(fieldName));
-    }
 }

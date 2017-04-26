@@ -27,10 +27,6 @@ import org.xml.sax.SAXException;
 
 public class SourceUtilCommons {
 
-    public static final String DISCOVERED_URL = "discoveredUrl";
-
-    public static final String DISCOVERED_SOURCES = "discoveredSources";
-
     /*********************************************************
      * NamespaceContext for Xpath queries
      *********************************************************/

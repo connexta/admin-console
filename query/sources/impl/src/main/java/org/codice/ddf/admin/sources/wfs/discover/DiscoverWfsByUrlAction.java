@@ -14,7 +14,6 @@
 package org.codice.ddf.admin.sources.wfs.discover;
 
 import static org.codice.ddf.admin.sources.commons.SourceActionCommons.createSourceInfoField;
-import static org.codice.ddf.admin.sources.commons.SourceUtilCommons.DISCOVERED_SOURCES;
 
 import java.util.List;
 
@@ -22,9 +21,10 @@ import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.common.actions.BaseAction;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
 import org.codice.ddf.admin.common.fields.common.UrlField;
-import org.codice.ddf.admin.sources.commons.utils.DiscoveredUrl;
+import org.codice.ddf.admin.common.Result;
 import org.codice.ddf.admin.sources.commons.utils.WfsSourceUtils;
 import org.codice.ddf.admin.sources.fields.SourceInfoField;
+import org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField;
 
 import com.google.common.collect.ImmutableList;
 
@@ -57,14 +57,12 @@ public class DiscoverWfsByUrlAction extends BaseAction<SourceInfoField> {
 
     @Override
     public SourceInfoField performAction() {
-        DiscoveredUrl discoveredUrl = wfsSourceUtils.getPreferredWfsConfig(endpointUrl, credentialsField);
-        discoveredUrl.getMessages()
-                .forEach(this::addArgumentMessage);
-
-        if (discoveredUrl.get(DISCOVERED_SOURCES) != null) {
-            return createSourceInfoField(ID, true, discoveredUrl.get(DISCOVERED_SOURCES));
+        Result<SourceConfigUnionField> configResult = wfsSourceUtils.getPreferredWfsConfig(endpointUrl, credentialsField);
+        addArgumentMessages(configResult.argumentMessages());
+        if(containsErrorMsgs()) {
+            return null;
         }
 
-        return null;
+        return createSourceInfoField(ID, true, configResult.get());
     }
 }

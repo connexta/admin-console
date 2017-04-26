@@ -15,14 +15,11 @@ package org.codice.ddf.admin.sources.commons.utils;
 
 import static org.codice.ddf.admin.common.message.DefaultMessages.INTERNAL_ERROR_MESSAGE;
 import static org.codice.ddf.admin.common.message.DefaultMessages.unknownEndpointError;
-import static org.codice.ddf.admin.sources.commons.SourceUtilCommons.DISCOVERED_SOURCES;
-import static org.codice.ddf.admin.sources.commons.SourceUtilCommons.DISCOVERED_URL;
 import static org.codice.ddf.admin.sources.commons.SourceUtilCommons.SOURCES_NAMESPACE_CONTEXT;
 import static org.codice.ddf.admin.sources.commons.SourceUtilCommons.createDocument;
 import static org.codice.ddf.admin.sources.commons.services.WfsServiceProperties.WFS1_FACTORY_PID;
 import static org.codice.ddf.admin.sources.commons.services.WfsServiceProperties.WFS2_FACTORY_PID;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -30,9 +27,11 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.codice.ddf.admin.common.Result;
 import org.codice.ddf.admin.common.fields.common.AddressField;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
 import org.codice.ddf.admin.common.fields.common.UrlField;
+import org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField;
 import org.codice.ddf.admin.sources.fields.type.WfsSourceConfigurationField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,19 +73,15 @@ public class WfsSourceUtils {
      *
      * @param urlField URL to probe for WFS capabilities
      * @param creds    optional username and password to add to Basic Auth header
-     * @return A {@link DiscoveredUrl} containing containing a discovered URL on success,
-     * or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
+     * @return a {@link Result} containing the {@link UrlField} or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
      */
-    public DiscoveredUrl sendWfsCapabilitiesRequest(UrlField urlField, CredentialsField creds) {
-        DiscoveredUrl discoveredUrl = requestUtils.sendGetRequest(urlField,
-                creds,
-                GET_CAPABILITIES_PARAMS);
-        if (discoveredUrl.hasErrors()) {
-            return discoveredUrl;
+    public Result<UrlField> sendWfsCapabilitiesRequest(UrlField urlField, CredentialsField creds) {
+        Result result = requestUtils.sendGetRequest(urlField, creds, GET_CAPABILITIES_PARAMS);
+        if (result.hasErrors()) {
+            return new Result<UrlField>().argumentMessages(result.argumentMessages());
         }
 
-        discoveredUrl.put(DISCOVERED_URL, urlField);
-        return discoveredUrl;
+        return new Result<>(urlField);
     }
 
     /**
@@ -94,10 +89,9 @@ public class WfsSourceUtils {
      *
      * @param addressField address to probe for WFS capabilities
      * @param creds        optional username to add to Basic Auth header
-     * @return A {@link DiscoveredUrl} containing containing a discovered URL on success,
-     * or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
+     * @return @return a {@link Result} containing the {@link UrlField} or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
      */
-    public DiscoveredUrl discoverWfsUrl(AddressField addressField, CredentialsField creds) {
+    public Result<UrlField> discoverWfsUrl(AddressField addressField, CredentialsField creds) {
         return URL_FORMATS.stream()
                 .map(format -> String.format(format, addressField.hostname(), addressField.port()))
                 .map(url -> {
@@ -107,10 +101,9 @@ public class WfsSourceUtils {
                     return urlField;
                 })
                 .map(urlField -> sendWfsCapabilitiesRequest(urlField, creds))
-                .filter(discoveredUrl -> !discoveredUrl.hasErrors())
+                .filter(result -> !result.hasErrors())
                 .findFirst()
-                .orElse(new DiscoveredUrl(Collections.singletonList(unknownEndpointError(
-                        addressField.fieldName()))));
+                .orElse(new Result<UrlField>().argumentMessage(unknownEndpointError(addressField.fieldName())));
     }
 
     /**
@@ -118,25 +111,24 @@ public class WfsSourceUtils {
      *
      * @param urlField WFS URL to probe for a configuration
      * @param creds    optional username to add to Basic Auth header
-     * @return A {@link DiscoveredUrl} containing containing a discovered URL on success,
-     * or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
+     * @return @return a {@link Result} containing the preferred {@link SourceConfigUnionField} or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
      */
-    public DiscoveredUrl getPreferredWfsConfig(UrlField urlField, CredentialsField creds) {
-        DiscoveredUrl discoveredUrl = sendWfsCapabilitiesRequest(urlField, creds);
+    public Result<SourceConfigUnionField> getPreferredWfsConfig(UrlField urlField, CredentialsField creds) {
+        Result<String> urlResult = requestUtils.sendGetRequest(urlField, creds, GET_CAPABILITIES_PARAMS);
 
-        if (discoveredUrl.hasErrors()) {
-            return discoveredUrl;
+        if (urlResult.hasErrors()) {
+            return new Result<SourceConfigUnionField>().argumentMessages(urlResult.argumentMessages());
         }
 
-        DiscoveredUrl url = new DiscoveredUrl();
-        String requestBody = discoveredUrl.get(RequestUtils.CONTENT);
+        Result<SourceConfigUnionField> result = new Result<>();
+        String requestBody = urlResult.get();
         Document capabilitiesXml;
         try {
             capabilitiesXml = createDocument(requestBody);
         } catch (Exception e) {
             LOGGER.debug("Failed to read response from WFS endpoint.");
-            url.addMessage(INTERNAL_ERROR_MESSAGE);
-            return url;
+            result.argumentMessage(INTERNAL_ERROR_MESSAGE);
+            return result;
         }
 
         WfsSourceConfigurationField preferredConfig = new WfsSourceConfigurationField();
@@ -154,20 +146,17 @@ public class WfsSourceUtils {
                     .evaluate(capabilitiesXml);
         } catch (XPathExpressionException e) {
             LOGGER.debug("Failed to parse XML response.");
-            url.addMessage(INTERNAL_ERROR_MESSAGE);
-            return url;
+            result.argumentMessage(INTERNAL_ERROR_MESSAGE);
+            return result;
         }
         switch (wfsVersion) {
         case "2.0.0":
-            url.put(DISCOVERED_SOURCES, preferredConfig.factoryPid(WFS2_FACTORY_PID));
-            return url;
+            return result.value(preferredConfig.factoryPid(WFS2_FACTORY_PID));
         case "1.0.0":
-            url.put(DISCOVERED_SOURCES, preferredConfig.factoryPid(WFS1_FACTORY_PID));
-            return url;
+            return result.value(preferredConfig.factoryPid(WFS1_FACTORY_PID));
         default:
             LOGGER.debug("Unsupported WFS version discovered.");
-            url.addMessage(unknownEndpointError(urlField.fieldName()));
-            return url;
+            return result.argumentMessage(unknownEndpointError(urlField.fieldName()));
         }
     }
 }

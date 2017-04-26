@@ -14,8 +14,6 @@
 package org.codice.ddf.admin.sources.opensearch.discover;
 
 import static org.codice.ddf.admin.sources.commons.SourceActionCommons.createSourceInfoField;
-import static org.codice.ddf.admin.sources.commons.SourceUtilCommons.DISCOVERED_SOURCES;
-import static org.codice.ddf.admin.sources.commons.SourceUtilCommons.DISCOVERED_URL;
 
 import java.util.List;
 
@@ -24,9 +22,10 @@ import org.codice.ddf.admin.common.actions.BaseAction;
 import org.codice.ddf.admin.common.fields.common.AddressField;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
 import org.codice.ddf.admin.common.fields.common.UrlField;
-import org.codice.ddf.admin.sources.commons.utils.DiscoveredUrl;
 import org.codice.ddf.admin.sources.commons.utils.OpenSearchSourceUtils;
+import org.codice.ddf.admin.common.Result;
 import org.codice.ddf.admin.sources.fields.SourceInfoField;
+import org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField;
 
 import com.google.common.collect.ImmutableList;
 
@@ -60,23 +59,19 @@ public class DiscoverOpenSearchByAddressAction extends BaseAction<SourceInfoFiel
 
     @Override
     public SourceInfoField performAction() {
-        DiscoveredUrl discoveredUrl = openSearchSourceUtils.discoverOpenSearchUrl(addressField,
-                credentialsField);
+        Result<UrlField> discoveredUrl = openSearchSourceUtils.discoverOpenSearchUrl(addressField, credentialsField);
 
-        UrlField testUrl = discoveredUrl.get(DISCOVERED_URL);
-        discoveredUrl.getMessages()
-                .forEach(this::addArgumentMessage);
-
-        if (testUrl != null) {
-            discoveredUrl = openSearchSourceUtils.getOpenSearchConfig(testUrl, credentialsField);
-            discoveredUrl.getMessages()
-                    .forEach(this::addArgumentMessage);
+        if(discoveredUrl.isNotPresent()) {
+            addArgumentMessages(discoveredUrl.argumentMessages());
+            return null;
         }
 
-        if (discoveredUrl.get(DISCOVERED_SOURCES) != null) {
-            return createSourceInfoField(ID, true, discoveredUrl.get(DISCOVERED_SOURCES));
+        Result<SourceConfigUnionField> configResult = openSearchSourceUtils.getOpenSearchConfig(discoveredUrl.get(), credentialsField);
+        if(configResult.isPresent()) {
+            return createSourceInfoField(ID, true, configResult.get());
         }
 
+        addArgumentMessages(configResult.argumentMessages());
         return null;
     }
 }

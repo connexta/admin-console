@@ -15,8 +15,6 @@ package org.codice.ddf.admin.sources.commons.utils;
 
 import static org.codice.ddf.admin.common.message.DefaultMessages.INTERNAL_ERROR_MESSAGE;
 import static org.codice.ddf.admin.common.message.DefaultMessages.unknownEndpointError;
-import static org.codice.ddf.admin.sources.commons.SourceUtilCommons.DISCOVERED_SOURCES;
-import static org.codice.ddf.admin.sources.commons.SourceUtilCommons.DISCOVERED_URL;
 import static org.codice.ddf.admin.sources.commons.SourceUtilCommons.SOURCES_NAMESPACE_CONTEXT;
 import static org.codice.ddf.admin.sources.commons.SourceUtilCommons.createDocument;
 import static org.codice.ddf.admin.sources.commons.services.CswServiceProperties.CSW_GMD_FACTORY_PID;
@@ -31,10 +29,12 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 
+import org.codice.ddf.admin.common.Result;
 import org.codice.ddf.admin.common.fields.common.AddressField;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
 import org.codice.ddf.admin.common.fields.common.UrlField;
 import org.codice.ddf.admin.sources.fields.type.CswSourceConfigurationField;
+import org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -80,19 +80,16 @@ public class CswSourceUtils {
      *
      * @param urlField the url endpoint
      * @param creds    optional credentials for basic authentication
-     * @return A {@link DiscoveredUrl} containing containing a discovered URL on success,
-     * or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
+     * @return a {@link Result} containing the {@link UrlField} or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
      */
-    public DiscoveredUrl sendCswCapabilitiesRequest(UrlField urlField, CredentialsField creds) {
-        DiscoveredUrl discoveredUrl = requestUtils.sendGetRequest(urlField,
-                creds,
+    public Result<UrlField> sendCswCapabilitiesRequest(UrlField urlField, CredentialsField creds) {
+        Result result = requestUtils.sendGetRequest(urlField, creds,
                 GET_CAPABILITIES_PARAMS);
-        if (discoveredUrl.hasErrors()) {
-            return discoveredUrl;
+        if (result.hasErrors()) {
+            return new Result<UrlField>().argumentMessages(result.argumentMessages());
         }
 
-        discoveredUrl.put(DISCOVERED_URL, urlField);
-        return discoveredUrl;
+        return new Result<>(urlField);
     }
 
     /**
@@ -100,10 +97,9 @@ public class CswSourceUtils {
      *
      * @param addressField address to probe for CSW capabilities
      * @param creds        optional credentials for basic authentication
-     * @return A {@link DiscoveredUrl} containing containing a discovered URL on success,
-     * or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
+     * @return a {@link Result} containing the {@link UrlField} or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
      */
-    public DiscoveredUrl discoverCswUrl(AddressField addressField, CredentialsField creds) {
+    public Result<UrlField> discoverCswUrl(AddressField addressField, CredentialsField creds) {
         return URL_FORMATS.stream()
                 .map(format -> String.format(format, addressField.hostname(), addressField.port()))
                 .map(url -> {
@@ -113,10 +109,9 @@ public class CswSourceUtils {
                     return urlField;
                 })
                 .map(urlField -> sendCswCapabilitiesRequest(urlField, creds))
-                .filter(discoveredUrl -> !discoveredUrl.hasErrors())
+                .filter(result -> !result.hasErrors())
                 .findFirst()
-                .orElse(new DiscoveredUrl(Collections.singletonList(unknownEndpointError(
-                        addressField.fieldName()))));
+                .orElse(new Result<UrlField>().argumentMessage(unknownEndpointError(addressField.fieldName())));
     }
 
     /**
@@ -124,24 +119,23 @@ public class CswSourceUtils {
      *
      * @param urlField A URL of an endpoint with CSW capabilities
      * @param creds    optional credentials for basic authentication
-     * @return A {@link DiscoveredUrl} containing containing a discovered URL on success,
-     * or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
+     * @return a {@link Result} containing the {@link SourceConfigUnionField} or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
      */
-    public DiscoveredUrl getPreferredCswConfig(UrlField urlField, CredentialsField creds) {
-        DiscoveredUrl discoveredUrl = sendCswCapabilitiesRequest(urlField, creds);
-        if (discoveredUrl.hasErrors()) {
-            return discoveredUrl;
+    public Result<SourceConfigUnionField> getPreferredCswConfig(UrlField urlField, CredentialsField creds) {
+        Result<String> getResponseBody = requestUtils.sendGetRequest(urlField, creds,
+                GET_CAPABILITIES_PARAMS);
+        if (getResponseBody.hasErrors()) {
+            return new Result<SourceConfigUnionField>().argumentMessages(getResponseBody.argumentMessages());
         }
 
-        DiscoveredUrl url = new DiscoveredUrl();
-        String requestBody = discoveredUrl.get(RequestUtils.CONTENT);
+        Result<SourceConfigUnionField> configResult = new Result<>();
+        String requestBody = getResponseBody.get();
         Document capabilitiesXml;
         try {
             capabilitiesXml = createDocument(requestBody);
         } catch (Exception e) {
             LOGGER.debug("Failed to create XML document from response.");
-            url.addMessage(INTERNAL_ERROR_MESSAGE);
-            return url;
+            return configResult.argumentMessage(INTERNAL_ERROR_MESSAGE);
         }
 
         CswSourceConfigurationField preferred = new CswSourceConfigurationField();
@@ -157,8 +151,7 @@ public class CswSourceUtils {
         try {
             if ((Boolean) xpath.compile(HAS_CATALOG_METACARD_EXP)
                     .evaluate(capabilitiesXml, XPathConstants.BOOLEAN)) {
-                url.put(DISCOVERED_SOURCES, preferred.factoryPid(CSW_PROFILE_FACTORY_PID));
-                return url;
+                return configResult.value(preferred.factoryPid(CSW_PROFILE_FACTORY_PID));
             }
         } catch (Exception e) {
             LOGGER.debug("Failed to compile DDF Profile CSW discovery XPath expression.");
@@ -167,10 +160,8 @@ public class CswSourceUtils {
         try {
             if ((Boolean) xpath.compile(HAS_GMD_ISO_EXP)
                     .evaluate(capabilitiesXml, XPathConstants.BOOLEAN)) {
-                url.put(DISCOVERED_SOURCES,
-                        preferred.outputSchema(GMD_OUTPUT_SCHEMA)
-                                .factoryPid(CSW_GMD_FACTORY_PID));
-                return url;
+                return configResult.value(preferred.outputSchema(GMD_OUTPUT_SCHEMA)
+                        .factoryPid(CSW_GMD_FACTORY_PID));
             }
         } catch (Exception e) {
             LOGGER.debug("Failed to compile GMD CSW discovery XPath expression.");
@@ -179,17 +170,14 @@ public class CswSourceUtils {
         try {
             String outputSchema = xpath.compile(GET_FIRST_OUTPUT_SCHEMA)
                     .evaluate(capabilitiesXml);
-            url.put(DISCOVERED_SOURCES,
-                    preferred.outputSchema(outputSchema)
-                            .factoryPid(CSW_SPEC_FACTORY_PID));
-            return url;
+            return configResult.value(preferred.outputSchema(outputSchema)
+                    .factoryPid(CSW_SPEC_FACTORY_PID));
         } catch (Exception e) {
             LOGGER.debug("Failed to compile generic CSW specification discovery XPath expression.");
         }
 
         LOGGER.debug("URL [{}] responded to GetCapabilities request, but response was not readable",
                 urlField.getValue());
-        url.addMessage(INTERNAL_ERROR_MESSAGE);
-        return url;
+        return configResult.argumentMessage(INTERNAL_ERROR_MESSAGE);
     }
 }

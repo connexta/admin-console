@@ -14,7 +14,6 @@
 package org.codice.ddf.admin.sources.commons.utils;
 
 import static java.net.HttpURLConnection.HTTP_OK;
-
 import static org.codice.ddf.admin.common.message.DefaultMessages.cannotConnectError;
 
 import java.io.IOException;
@@ -22,7 +21,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -31,6 +29,7 @@ import javax.ws.rs.core.Response;
 
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.codice.ddf.admin.api.action.Message;
+import org.codice.ddf.admin.common.Result;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
 import org.codice.ddf.admin.common.fields.common.UrlField;
 import org.codice.ddf.cxf.SecureCxfClientFactory;
@@ -41,10 +40,6 @@ public class RequestUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RequestUtils.class);
 
-    public static final String CONTENT = "content";
-
-    public static final String STATUS_CODE = "statusCode";
-
     private static final int PING_TIMEOUT = 500;
 
     /**
@@ -52,10 +47,9 @@ public class RequestUtils {
      *
      * @param urlField contains the URL to send the get request to
      * @param creds    option credentials consisting of a username and password
-     * @return A {@link DiscoveredUrl} containing containing a discovered URL on success,
-     * or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
+     * @return a {@link Result} containing the GET request response body or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
      */
-    public DiscoveredUrl sendGetRequest(UrlField urlField, CredentialsField creds,
+    public Result<String> sendGetRequest(UrlField urlField, CredentialsField creds,
             Map<String, String> queryParams) {
         WebClient client = generateClient(urlField, creds);
 
@@ -68,16 +62,16 @@ public class RequestUtils {
             response = client.get();
         } catch(ProcessingException e) {
             LOGGER.debug("Processing exception while sending GET request to [{}].", urlField.getValue(), e);
-            return new DiscoveredUrl(Collections.singletonList(cannotConnectError(urlField.fieldName())));
+            return new Result<String>().argumentMessage(cannotConnectError(urlField.fieldName()));
         }
 
         if (response.getStatus() != HTTP_OK || response.readEntity(String.class)
                 .equals("")) {
             LOGGER.debug("Bad or empty response received from sending GET to {}.",
                     urlField.getValue());
-            return new DiscoveredUrl(Collections.singletonList(cannotConnectError(urlField.fieldName())));
+            return new Result<String>().argumentMessage(cannotConnectError(urlField.fieldName()));
         }
-        return new DiscoveredUrl(responseToMap(response));
+        return new Result<>(response.readEntity(String.class));
     }
 
     /**
@@ -87,10 +81,9 @@ public class RequestUtils {
      * @param creds       optional credentials consisting of a username and password
      * @param contentType Mime type of the post body
      * @param content     Body of the post request
-     * @return A {@link DiscoveredUrl} containing containing a discovered URL on success,
-     * or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
+     * @return a {@link Result} containing the POST request response body or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
      */
-    public DiscoveredUrl sendPostRequest(UrlField urlField, CredentialsField creds,
+    public Result sendPostRequest(UrlField urlField, CredentialsField creds,
             String contentType, String content) {
         WebClient client = generateClient(urlField, creds);
 
@@ -100,18 +93,17 @@ public class RequestUtils {
         if (response.getStatus() != HTTP_OK || response.readEntity(String.class)
                 .equals("")) {
             LOGGER.debug("Bad or empty response received from sending POST to {}.", urlField.getValue());
-            return new DiscoveredUrl(Collections.singletonList(cannotConnectError(urlField.fieldName())));
+            return new Result().argumentMessage(cannotConnectError(urlField.fieldName()));
         }
 
-        return new DiscoveredUrl(responseToMap(response));
+        return new Result<>(response.readEntity(String.class));
     }
 
     /**
      * Attempts to open a connection to a URL.
      *
      * @param urlField {@link UrlField} containing the URL to connect to
-     * @return A {@link DiscoveredUrl} containing containing a discovered URL on success,
-     * or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
+     * @return an empty {@code List} on success, or {@link org.codice.ddf.admin.common.message.ErrorMessage}s on failure.
      */
     public List<Message> endpointIsReachable(UrlField urlField) {
         List<Message> errors = new ArrayList<>();
@@ -138,12 +130,5 @@ public class RequestUtils {
                         username,
                         password);
         return clientFactory.getClient();
-    }
-
-    protected Map<String, Object> responseToMap(Response response) {
-        Map<String, Object> requestResults = new HashMap<>();
-        requestResults.put(STATUS_CODE, response.getStatus());
-        requestResults.put(CONTENT, response.readEntity(String.class));
-        return requestResults;
     }
 }

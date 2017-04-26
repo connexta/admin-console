@@ -15,8 +15,6 @@ package org.codice.ddf.admin.sources.commons.utils;
 
 import static org.codice.ddf.admin.common.message.DefaultMessages.INTERNAL_ERROR_MESSAGE;
 import static org.codice.ddf.admin.common.message.DefaultMessages.unknownEndpointError;
-import static org.codice.ddf.admin.sources.commons.SourceUtilCommons.DISCOVERED_SOURCES;
-import static org.codice.ddf.admin.sources.commons.SourceUtilCommons.DISCOVERED_URL;
 import static org.codice.ddf.admin.sources.commons.SourceUtilCommons.SOURCES_NAMESPACE_CONTEXT;
 import static org.codice.ddf.admin.sources.commons.SourceUtilCommons.createDocument;
 import static org.codice.ddf.admin.sources.commons.services.OpenSearchServiceProperties.OPENSEARCH_FACTORY_PID;
@@ -30,10 +28,12 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.codice.ddf.admin.common.Result;
 import org.codice.ddf.admin.common.fields.common.AddressField;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
 import org.codice.ddf.admin.common.fields.common.UrlField;
 import org.codice.ddf.admin.sources.fields.type.OpensearchSourceConfigurationField;
+import org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -73,13 +73,12 @@ public class OpenSearchSourceUtils {
      *
      * @param urlField The URL to probe for OpenSearch capabilities
      * @param creds    optional credentials to send with Basic Auth header
-     * @return A {@link DiscoveredUrl} containing containing a discovered URL on success,
-     * or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
+     * @return @return a {@link Result} containing the {@link SourceConfigUnionField} or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
      */
-    public DiscoveredUrl getOpenSearchConfig(UrlField urlField, CredentialsField creds) {
-        DiscoveredUrl results = verifyOpenSearchCapabilities(urlField, creds);
-        if (results.hasErrors()) {
-            return results;
+    public Result<SourceConfigUnionField> getOpenSearchConfig(UrlField urlField, CredentialsField creds) {
+        Result<UrlField> result = verifyOpenSearchCapabilities(urlField, creds);
+        if (result.hasErrors()) {
+            return new Result<SourceConfigUnionField>().argumentMessages(result.argumentMessages());
         }
 
         OpensearchSourceConfigurationField config = new OpensearchSourceConfigurationField();
@@ -89,26 +88,24 @@ public class OpenSearchSourceUtils {
                 .username(creds.username())
                 .password(creds.password());
 
-        results.put(DISCOVERED_SOURCES, config);
-        return results;
+        return new Result<>(config);
     }
 
-    protected DiscoveredUrl verifyOpenSearchCapabilities(UrlField urlField,
-            CredentialsField creds) {
-        DiscoveredUrl discoveredUrl = requestUtils.sendGetRequest(urlField,
+    protected Result<UrlField> verifyOpenSearchCapabilities(UrlField urlField, CredentialsField creds) {
+        Result<String> getResponseBody = requestUtils.sendGetRequest(urlField,
                 creds,
                 GET_CAPABILITIES_PARAMS);
-        if (discoveredUrl.hasErrors()) {
-            return discoveredUrl;
+        if (getResponseBody.hasErrors()) {
+            return new Result<UrlField>().argumentMessages(getResponseBody.argumentMessages());
         }
 
+        Result<UrlField> url = new Result<>();
         Document capabilitiesXml;
         try {
-            capabilitiesXml = createDocument(discoveredUrl.get(RequestUtils.CONTENT));
+            capabilitiesXml = createDocument(getResponseBody.get());
         } catch (Exception e) {
             LOGGER.debug("Failed to read response from OpenSearch endpoint.");
-            discoveredUrl.addMessage(INTERNAL_ERROR_MESSAGE);
-            return discoveredUrl;
+            return url.argumentMessage(INTERNAL_ERROR_MESSAGE);
         }
 
         XPath xpath = XPathFactory.newInstance()
@@ -117,16 +114,13 @@ public class OpenSearchSourceUtils {
         try {
             if ((Boolean) xpath.compile(TOTAL_RESULTS_XPATH)
                     .evaluate(capabilitiesXml, XPathConstants.BOOLEAN)) {
-                discoveredUrl.put(DISCOVERED_URL, urlField);
-                return discoveredUrl;
+                return url.value(urlField);
             }
         } catch (XPathExpressionException e) {
             LOGGER.debug("Failed to compile OpenSearch totalResults XPath.");
-            discoveredUrl.addMessage(INTERNAL_ERROR_MESSAGE);
-            return discoveredUrl;
+            return url.argumentMessage(INTERNAL_ERROR_MESSAGE);
         }
-        discoveredUrl.addMessage(unknownEndpointError(urlField.fieldName()));
-        return discoveredUrl;
+        return url.argumentMessage(unknownEndpointError(urlField.fieldName()));
     }
 
     /**
@@ -134,10 +128,9 @@ public class OpenSearchSourceUtils {
      *
      * @param addressField hostname and port to probe for OpenSearch capabilities
      * @param creds        optional credentials for basic authentication
-     * @return A {@link DiscoveredUrl} containing containing a discovered URL on success,
-     * or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
+     * @return a {@link Result} containing the {@link UrlField} or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
      */
-    public DiscoveredUrl discoverOpenSearchUrl(AddressField addressField, CredentialsField creds) {
+    public Result<UrlField> discoverOpenSearchUrl(AddressField addressField, CredentialsField creds) {
         return URL_FORMATS.stream()
                 .map(format -> String.format(format, addressField.hostname(), addressField.port()))
                 .map(url -> {
@@ -149,7 +142,6 @@ public class OpenSearchSourceUtils {
                 .map(urlField -> verifyOpenSearchCapabilities(urlField, creds))
                 .filter(discoveredUrl -> !discoveredUrl.hasErrors())
                 .findFirst()
-                .orElse(new DiscoveredUrl(Collections.singletonList(unknownEndpointError(
-                        addressField.fieldName()))));
+                .orElse(new Result<UrlField>().argumentMessage(unknownEndpointError(addressField.fieldName())));
     }
 }

@@ -14,8 +14,6 @@
 package org.codice.ddf.admin.sources.wfs.discover;
 
 import static org.codice.ddf.admin.sources.commons.SourceActionCommons.createSourceInfoField;
-import static org.codice.ddf.admin.sources.commons.SourceUtilCommons.DISCOVERED_SOURCES;
-import static org.codice.ddf.admin.sources.commons.SourceUtilCommons.DISCOVERED_URL;
 
 import java.util.List;
 
@@ -24,9 +22,10 @@ import org.codice.ddf.admin.common.actions.BaseAction;
 import org.codice.ddf.admin.common.fields.common.AddressField;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
 import org.codice.ddf.admin.common.fields.common.UrlField;
-import org.codice.ddf.admin.sources.commons.utils.DiscoveredUrl;
+import org.codice.ddf.admin.common.Result;
 import org.codice.ddf.admin.sources.commons.utils.WfsSourceUtils;
 import org.codice.ddf.admin.sources.fields.SourceInfoField;
+import org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField;
 
 import com.google.common.collect.ImmutableList;
 
@@ -60,22 +59,20 @@ public class DiscoverWfsByAddressAction extends BaseAction<SourceInfoField> {
 
     @Override
     public SourceInfoField performAction() {
-        DiscoveredUrl discoveredUrl = wfsSourceUtils.discoverWfsUrl(addressField, credentialsField);
+        Result<UrlField> discoveredUrl = wfsSourceUtils.discoverWfsUrl(addressField, credentialsField);
+        addArgumentMessages(discoveredUrl.argumentMessages());
 
-        UrlField testUrl = discoveredUrl.get(DISCOVERED_URL);
-        discoveredUrl.getMessages()
-                .forEach(this::addArgumentMessage);
-
-        if (testUrl != null) {
-            discoveredUrl = wfsSourceUtils.getPreferredWfsConfig(testUrl, credentialsField);
-            discoveredUrl.getMessages()
-                    .forEach(this::addArgumentMessage);
+        if(containsErrorMsgs()) {
+            return null;
         }
 
-        if (discoveredUrl.get(DISCOVERED_SOURCES) != null) {
-            return createSourceInfoField(ID, true, discoveredUrl.get(DISCOVERED_SOURCES));
+        Result<SourceConfigUnionField> configResult = wfsSourceUtils.getPreferredWfsConfig(discoveredUrl.get(), credentialsField);
+        addArgumentMessages(configResult.argumentMessages());
+
+        if(containsErrorMsgs()) {
+            return null;
         }
 
-        return null;
+        return createSourceInfoField(ID, true, configResult.get());
     }
 }

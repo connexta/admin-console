@@ -14,8 +14,6 @@
 package org.codice.ddf.admin.sources.csw.discover;
 
 import static org.codice.ddf.admin.sources.commons.SourceActionCommons.createSourceInfoField;
-import static org.codice.ddf.admin.sources.commons.SourceUtilCommons.DISCOVERED_SOURCES;
-import static org.codice.ddf.admin.sources.commons.SourceUtilCommons.DISCOVERED_URL;
 
 import java.util.List;
 
@@ -25,8 +23,9 @@ import org.codice.ddf.admin.common.fields.common.AddressField;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
 import org.codice.ddf.admin.common.fields.common.UrlField;
 import org.codice.ddf.admin.sources.commons.utils.CswSourceUtils;
-import org.codice.ddf.admin.sources.commons.utils.DiscoveredUrl;
+import org.codice.ddf.admin.common.Result;
 import org.codice.ddf.admin.sources.fields.SourceInfoField;
+import org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField;
 
 import com.google.common.collect.ImmutableList;
 
@@ -45,9 +44,20 @@ public class DiscoverCswByAddressAction extends BaseAction<SourceInfoField> {
 
     public DiscoverCswByAddressAction() {
         super(ID, DESCRIPTION, new SourceInfoField());
-        cswSourceUtils = new CswSourceUtils();
         credentialsField = new CredentialsField();
         addressField = new AddressField();
+        addressField.allFieldsRequired(true);
+
+        if(cswSourceUtils == null) {
+            cswSourceUtils = new CswSourceUtils();
+        }
+    }
+
+    public DiscoverCswByAddressAction(CswSourceUtils cswSourceUtils) {
+        super(ID, DESCRIPTION, new SourceInfoField());
+        credentialsField = new CredentialsField();
+        addressField = new AddressField();
+        this.cswSourceUtils = cswSourceUtils;
 
         addressField.allFieldsRequired(true);
     }
@@ -59,22 +69,18 @@ public class DiscoverCswByAddressAction extends BaseAction<SourceInfoField> {
 
     @Override
     public SourceInfoField performAction() {
-        DiscoveredUrl discoveredUrl = cswSourceUtils.discoverCswUrl(addressField, credentialsField);
-
-        UrlField testUrl = discoveredUrl.get(DISCOVERED_URL);
-        discoveredUrl.getMessages()
-                .forEach(this::addMessage);
-
-        if (testUrl != null) {
-            discoveredUrl = cswSourceUtils.getPreferredCswConfig(testUrl, credentialsField);
-            discoveredUrl.getMessages()
-                    .forEach(this::addMessage);
+        Result<UrlField> discoveredUrl = cswSourceUtils.discoverCswUrl(addressField, credentialsField);
+        addArgumentMessages(discoveredUrl.argumentMessages());
+        if(containsErrorMsgs()) {
+            return null;
         }
 
-        if (discoveredUrl.get(DISCOVERED_SOURCES) != null) {
-            return createSourceInfoField(ID, true, discoveredUrl.get(DISCOVERED_SOURCES));
+        Result<SourceConfigUnionField> configResult = cswSourceUtils.getPreferredCswConfig(discoveredUrl.get(), credentialsField);
+        addArgumentMessages(configResult.argumentMessages());
+        if(containsErrorMsgs()) {
+            return null;
         }
 
-        return null;
+        return createSourceInfoField(ID, true, configResult.get());
     }
 }

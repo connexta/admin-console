@@ -14,7 +14,6 @@
 package org.codice.ddf.admin.sources.opensearch.discover;
 
 import static org.codice.ddf.admin.sources.commons.SourceActionCommons.createSourceInfoField;
-import static org.codice.ddf.admin.sources.commons.SourceUtilCommons.DISCOVERED_SOURCES;
 
 import java.util.List;
 
@@ -22,9 +21,10 @@ import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.common.actions.BaseAction;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
 import org.codice.ddf.admin.common.fields.common.UrlField;
-import org.codice.ddf.admin.sources.commons.utils.DiscoveredUrl;
 import org.codice.ddf.admin.sources.commons.utils.OpenSearchSourceUtils;
+import org.codice.ddf.admin.common.Result;
 import org.codice.ddf.admin.sources.fields.SourceInfoField;
+import org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField;
 
 import com.google.common.collect.ImmutableList;
 
@@ -57,15 +57,13 @@ public class DiscoverOpenSearchByUrlAction extends BaseAction<SourceInfoField> {
 
     @Override
     public SourceInfoField performAction() {
-        DiscoveredUrl discoveredUrl = openSearchSourceUtils.getOpenSearchConfig(endpointUrl,
-                credentialsField);
-        discoveredUrl.getMessages()
-                .forEach(this::addArgumentMessage);
+        Result<SourceConfigUnionField> configResult = openSearchSourceUtils.getOpenSearchConfig(endpointUrl, credentialsField);
+        addArgumentMessages(configResult.argumentMessages());
 
-        if (discoveredUrl.get(DISCOVERED_SOURCES) != null) {
-            return createSourceInfoField(ID, true, discoveredUrl.get(DISCOVERED_SOURCES));
+        if(containsErrorMsgs()) {
+            return null;
         }
 
-        return null;
+        return createSourceInfoField(ID, true, configResult.get());
     }
 }

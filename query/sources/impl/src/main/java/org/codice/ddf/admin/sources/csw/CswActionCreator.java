@@ -28,7 +28,7 @@ import com.google.common.collect.ImmutableList;
 
 public class CswActionCreator extends BaseActionCreator {
 
-    private static final String NAME = "csw";
+    private static final String ID = "csw";
 
     private static final String TYPE_NAME = "Csw";
 
@@ -40,7 +40,7 @@ public class CswActionCreator extends BaseActionCreator {
 
 
     public CswActionCreator() {
-        super(NAME, TYPE_NAME, DESCRIPTION);
+        super(ID, TYPE_NAME, DESCRIPTION);
     }
 
     @Override

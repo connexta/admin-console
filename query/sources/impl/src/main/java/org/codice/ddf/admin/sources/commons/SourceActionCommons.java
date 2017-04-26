@@ -96,7 +96,7 @@ public class SourceActionCommons {
 
         Configurator configurator = configuratorFactory.getConfigurator();
         configurator.deleteManagedService(servicePid.getValue());
-        OperationReport report = configurator.commit("Deleted CSW source with pid [{}].",
+        OperationReport report = configurator.commit("Deleted source with pid [{}].",
                 servicePid.getValue());
 
         if (report.containsFailedResults()) {

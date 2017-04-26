@@ -13,17 +13,21 @@
  **/
 package org.codice.ddf.admin.sources.csw.discover
 
+import org.codice.ddf.admin.sources.commons.utils.CswSourceUtils
 import spock.lang.Specification
 
 class DiscoverCswByAddressActionTest extends Specification {
 
     DiscoverCswByAddressAction discoverCswByAddressAction
 
+    CswSourceUtils cswSourceUtils
+
+
     def setup() {
-        discoverCswByAddressAction = new DiscoverCswByAddressAction()
+
     }
 
-    def 'dummy'() {
+    def 'test no discovered '() {
         assert true
     }
 }

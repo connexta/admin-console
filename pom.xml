@@ -37,7 +37,7 @@
 
         <ddf.version>2.10.2</ddf.version>
         <ddf.support.version>2.3.6</ddf.support.version>
-        <guava.version>21.0</guava.version>
+        <guava.version>18.0</guava.version>
         <karaf.version>4.0.7</karaf.version>
         <groovy.version>2.4.7</groovy.version>
         <commons-lang.version>2.6</commons-lang.version>

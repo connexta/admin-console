@@ -25,7 +25,6 @@
     <name>DDF :: Admin (Beta) :: GraphQL Schema</name>
 
     <dependencies>
-
         <dependency>
             <groupId>com.graphql-java</groupId>
             <artifactId>graphql-java-servlet</artifactId>
@@ -69,7 +68,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>18.0</version>
+            <version>${guava.version}</version>
         </dependency>
         <dependency>
             <groupId>commons-lang</groupId>

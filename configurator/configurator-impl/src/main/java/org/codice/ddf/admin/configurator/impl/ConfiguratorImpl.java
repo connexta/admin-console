@@ -24,7 +24,9 @@ import java.util.Collections;
 import java.util.Deque;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.management.MBeanServerInvocationHandler;
 import javax.management.MalformedObjectNameException;
@@ -39,6 +41,7 @@ import org.codice.ddf.ui.admin.api.ConfigurationAdminMBean;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -351,6 +354,21 @@ public class ConfiguratorImpl implements Configurator, ConfigReader {
         }
 
         return context.getService(ref);
+    }
+
+    @Override
+    public <S> Set<S> getServices(Class<S> serviceClass, String filter)
+            throws ConfiguratorException {
+        BundleContext context = getBundleContext();
+        try {
+            return context.getServiceReferences(serviceClass, filter)
+                    .stream()
+                    .map(context::getService)
+                    .collect(Collectors.toSet());
+        } catch (InvalidSyntaxException e) {
+            LOGGER.debug("Invalid filter [{}].", filter, e);
+            throw new ConfiguratorException(String.format("Received invalid filter [%s]", filter));
+        }
     }
 
     private String registerHandler(Operation handler) {

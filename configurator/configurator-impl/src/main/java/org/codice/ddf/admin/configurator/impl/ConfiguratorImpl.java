@@ -20,14 +20,13 @@ import static org.codice.ddf.admin.configurator.impl.ConfigValidator.validateStr
 import java.lang.management.ManagementFactory;
 import java.nio.file.Path;
 import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.management.MBeanServerInvocationHandler;
 import javax.management.MalformedObjectNameException;
@@ -358,16 +357,14 @@ public class ConfiguratorImpl implements Configurator, ConfigReader {
     }
 
     @Override
-    public <S> Collection<S> getServices(Class<S> serviceClass, String filter)
+    public <S> Set<S> getServices(Class<S> serviceClass, String filter)
             throws ConfiguratorException {
         BundleContext context = getBundleContext();
-
         try {
-            Collection<ServiceReference<S>> refs = context.getServiceReferences(serviceClass, filter);
-
-            List<S> services = new ArrayList<>();
-            refs.forEach(ref -> services.add(context.getService(ref)));
-            return services;
+            return context.getServiceReferences(serviceClass, filter)
+                    .stream()
+                    .map(context::getService)
+                    .collect(Collectors.toSet());
         } catch (InvalidSyntaxException e) {
             LOGGER.debug("Invalid filter [{}].", filter, e);
             throw new ConfiguratorException(String.format("Received invalid filter [%s]", filter));

@@ -14,8 +14,8 @@
 package org.codice.ddf.admin.configurator;
 
 import java.nio.file.Path;
-import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Provides reader methods to system configuration items.
@@ -84,8 +84,8 @@ public interface ConfigReader {
      * @param <S> service interface
      * @param serviceClass Class of service to retrieve
      * @param filter the filter expression or {@code null} for all services, null returns all services
-     * @return list of services of the serviceClass
+     * @return a set of services of the serviceClass
      * @throws ConfiguratorException if any errors occur
      */
-    <S> Collection<S> getServices(Class<S> serviceClass, String filter) throws ConfiguratorException;
+    <S> Set<S> getServices(Class<S> serviceClass, String filter) throws ConfiguratorException;
 }

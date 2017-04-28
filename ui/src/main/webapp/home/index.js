@@ -160,7 +160,7 @@ SourceConfigTiles = muiThemeable()(SourceConfigTiles)
 
 let LdapConfigTiles = ({ ldapConfigs, submittingPids, muiTheme }) => {
   if (ldapConfigs.length === 0) {
-    return <div style={{ margin: '20px', color: muiTheme.palette.textColor }}>No LDAP Servers Configured</div>
+    return <div style={{ paddingLeft: 20, paddingBottom: 20, color: muiTheme.palette.textColor }}>No LDAP Servers Configured</div>
   }
 
   return (

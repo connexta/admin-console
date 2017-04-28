@@ -1,10 +1,18 @@
 import inject from 'react-tap-event-plugin'
 import React from 'react'
-import { render } from 'react-dom'
-import { Router, createMemoryHistory, hashHistory, RouterContext, match } from 'react-router'
+import ReactDOM from 'react-dom'
+import { createMemoryHistory, RouterContext, match } from 'react-router'
 import deepForceUpdate from 'react-deep-force-update'
+import { AppContainer } from 'react-hot-loader'
 
-import { routes } from './app'
+import App, { routes } from './app'
+
+const render = Component =>
+  ReactDOM.render(
+    <AppContainer>
+      <Component />
+    </AppContainer>,
+    document.getElementById('root'))
 
 if (!window.SERVER_RENDER) {
   inject()
@@ -12,33 +20,13 @@ if (!window.SERVER_RENDER) {
 
 if (process.env.NODE_ENV === 'production') {
   if (!window.SERVER_RENDER) {
-    render(<Router history={hashHistory} routes={routes} />, document.getElementById('root'))
+    render(App)
   }
 }
 
 if (process.env.NODE_ENV !== 'production') {
-  let instance
-  const AppContainer = require('react-hot-loader').AppContainer
-
-  instance = render(
-    <AppContainer errorReporter={({ error }) => { throw error }}>
-      <Router history={hashHistory} routes={routes} />
-    </AppContainer>,
-    document.getElementById('root'))
-
-  module.hot.accept('./app', () => {
-    // If you use Webpack 2 in ES modules mode, you can
-    // use <App /> here rather than require() a <NextApp />.
-    try {
-      const routes = require('./app').routes
-      instance = render(
-        <AppContainer errorReporter={({ error }) => { throw error }}>
-          <Router history={hashHistory} routes={routes} />
-        </AppContainer>,
-        document.getElementById('root'))
-    } catch (e) {}
-  })
-
+  let instance = render(App)
+  module.hot.accept('./app', () => { instance = render(require('./app').default) })
   window.forceUpdateThemeing = () => setTimeout(() => deepForceUpdate(instance), 0)
 }
 

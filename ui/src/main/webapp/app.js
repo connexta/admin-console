@@ -2,6 +2,7 @@ import React from 'react'
 import { Provider, connect } from 'react-redux'
 import { ApolloProvider } from 'react-apollo'
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
+import { Router, hashHistory } from 'react-router'
 
 import store from './store'
 import client from './client'
@@ -86,3 +87,7 @@ export const routes = {
     { path: 'graphiql', component: GraphiQL }
   ]
 }
+
+export default () => (
+  <Router history={hashHistory} routes={routes} />
+)

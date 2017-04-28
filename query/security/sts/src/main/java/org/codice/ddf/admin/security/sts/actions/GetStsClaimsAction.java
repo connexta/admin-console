@@ -13,6 +13,8 @@
  **/
 package org.codice.ddf.admin.security.sts.actions;
 
+import java.util.List;
+
 import org.codice.ddf.admin.common.actions.GetAction;
 import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
@@ -34,10 +36,18 @@ public class GetStsClaimsAction extends GetAction<ListFieldImpl<StsClaimField>> 
 
     @Override
     public ListFieldImpl<StsClaimField> performAction() {
+        List<String> supportedClaims = new StsServiceProperties().getConfiguredStsClaims(
+                configuratorFactory);
+
         ListFieldImpl<StsClaimField> claims = new ListFieldImpl<>(StsClaimField.class);
-        new StsServiceProperties().getConfiguredStsClaims(configuratorFactory)
-                .stream()
-                .forEach(claimStr -> claims.add(new StsClaimField(claimStr)));
+
+        supportedClaims.stream()
+                .forEach(claim -> {
+                    StsClaimField claimField = new StsClaimField();
+                    claimField.setValue(claim);
+                    claims.add(claimField);
+                });
+
         return claims;
     }
 }

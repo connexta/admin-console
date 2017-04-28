@@ -23,12 +23,6 @@ if (process.env.NODE_ENV !== 'production') {
 import { updateThemeColor, setThemePreset } from './actions'
 import { getTheme } from './reducer'
 
-const LinkHomeIcon = (props) => (
-  <Link to='/'>
-    <HomeIcon {...props} />
-  </Link>
-)
-
 const isInIframe = () => {
   return window !== window.top
 }
@@ -66,8 +60,8 @@ class AppBarView extends Component {
         <AppBar
           style={getAppBarStyle()}
           iconElementLeft={
-            <IconButton>
-              <LinkHomeIcon />
+            <IconButton containerElement={<Link to='/' />}>
+              <HomeIcon/>
             </IconButton>
           }
           iconElementRight={

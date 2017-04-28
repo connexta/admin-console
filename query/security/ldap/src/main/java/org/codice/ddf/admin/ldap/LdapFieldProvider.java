@@ -33,6 +33,7 @@ import org.codice.ddf.admin.ldap.persist.SaveLdapConfiguration;
 import org.codice.ddf.internal.admin.configurator.actions.FeatureActions;
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
 import org.codice.ddf.internal.admin.configurator.actions.PropertyActions;
+import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
 
 public class LdapFieldProvider extends BaseFieldProvider {
 
@@ -42,65 +43,52 @@ public class LdapFieldProvider extends BaseFieldProvider {
 
     public static final String DESCRIPTION = "Facilities for interacting with LDAP servers.";
 
-    //Discovery functions
-    private LdapRecommendedSettings getRecommendedSettings;
+    private final ConfiguratorFactory configuratorFactory;
 
-    private LdapTestConnection testConnection;
+    private final FeatureActions featureActions;
 
-    private LdapTestBind testBind;
+    private final ManagedServiceActions managedServiceActions;
 
-    private LdapTestSettings testSettings;
+    private final PropertyActions propertyActions;
 
-    private LdapQuery runLdapQuery;
-
-    private LdapUserAttributes getLdapUserAttributes;
-
-    private LdapConfigurations getLdapConfigs;
-
-    //Mutation functions
-    private SaveLdapConfiguration saveConfig;
-
-    private DeleteLdapConfiguration deleteConfig;
-
-    private InstallEmbeddedLdap installEmbeddedLdap;
+    private final ServiceActions serviceActions;
 
     public LdapFieldProvider(ConfiguratorFactory configuratorFactory, FeatureActions featureActions,
-            ManagedServiceActions managedServiceActions, PropertyActions propertyActions) {
+            ManagedServiceActions managedServiceActions, PropertyActions propertyActions,
+            ServiceActions serviceActions) {
         super(NAME, TYPE_NAME, DESCRIPTION);
-        getRecommendedSettings = new LdapRecommendedSettings();
-        testConnection = new LdapTestConnection();
-        testBind = new LdapTestBind();
-        testSettings = new LdapTestSettings();
-        runLdapQuery = new LdapQuery();
-        getLdapUserAttributes = new LdapUserAttributes();
-        getLdapConfigs = new LdapConfigurations(configuratorFactory,
-                managedServiceActions,
-                propertyActions);
-
-        saveConfig = new SaveLdapConfiguration(configuratorFactory,
-                propertyActions,
-                featureActions,
-                managedServiceActions);
-        deleteConfig = new DeleteLdapConfiguration(configuratorFactory,
-                propertyActions,
-                managedServiceActions);
-        installEmbeddedLdap = new InstallEmbeddedLdap(configuratorFactory, featureActions);
-        updateInnerFieldPaths();
+        this.configuratorFactory = configuratorFactory;
+        this.featureActions = featureActions;
+        this.managedServiceActions = managedServiceActions;
+        this.propertyActions = propertyActions;
+        this.serviceActions = serviceActions;
     }
 
     @Override
     public List<Field> getDiscoveryFields() {
-        return Arrays.asList(testConnection,
-                testBind,
-                getRecommendedSettings,
-                testSettings,
-                runLdapQuery,
-                getLdapUserAttributes,
-                getLdapConfigs);
+        return Arrays.asList(new LdapRecommendedSettings(),
+                new LdapTestConnection(),
+                new LdapTestBind(),
+                new LdapTestSettings(),
+                new LdapQuery(),
+                new LdapUserAttributes(),
+                new LdapConfigurations(configuratorFactory,
+                        managedServiceActions,
+                        propertyActions,
+                        serviceActions));
     }
 
     @Override
     public List<FunctionField> getMutationFunctions() {
-        return Arrays.asList(saveConfig, deleteConfig, installEmbeddedLdap);
+        return Arrays.asList(new SaveLdapConfiguration(configuratorFactory,
+                        featureActions,
+                        managedServiceActions,
+                        propertyActions,
+                        serviceActions),
+                new DeleteLdapConfiguration(configuratorFactory,
+                        managedServiceActions,
+                        propertyActions,
+                        serviceActions),
+                new InstallEmbeddedLdap(configuratorFactory, featureActions));
     }
 }

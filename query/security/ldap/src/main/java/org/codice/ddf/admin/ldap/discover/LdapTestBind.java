@@ -28,7 +28,7 @@ import com.google.common.collect.ImmutableList;
 
 public class LdapTestBind extends TestFunctionField {
 
-    public static final String NAME = "testBind";
+    public static final String ID = "testBind";
 
     public static final String DESCRIPTION =
             "Attempts to bind a user to the given ldap connection given the ldap bind user credentials.";
@@ -38,9 +38,9 @@ public class LdapTestBind extends TestFunctionField {
     private LdapTestingUtils utils;
 
     public LdapTestBind() {
-        super(NAME, DESCRIPTION);
-        conn = new LdapConnectionField();
-        creds = new LdapBindUserInfo();
+        super(ID, DESCRIPTION);
+        conn = new LdapConnectionField().useDefaultRequired();
+        creds = new LdapBindUserInfo().useDefaultRequired();
         utils = new LdapTestingUtils();
         updateArgumentPaths();
     }
@@ -55,7 +55,14 @@ public class LdapTestBind extends TestFunctionField {
     public BooleanField performFunction() {
         LdapConnectionAttempt connectionAttempt = utils.bindUserToLdapConnection(conn, creds);
         addResultMessages(connectionAttempt.messages());
+        addArgumentMessages(connectionAttempt.argumentMessages());
+
         return new BooleanField(connectionAttempt.connection().isPresent());
+    }
+
+
+    public void setTestingUtils(LdapTestingUtils utils) {
+        this.utils = utils;
     }
 
     @Override

@@ -25,7 +25,7 @@ import org.codice.ddf.admin.common.fields.common.CredentialsField;
 import com.google.common.collect.ImmutableList;
 
 public class LdapBindUserInfo extends BaseObjectField {
-    public static final String FIELD_NAME = "bindInfo";
+    public static final String DEFAULT_FIELD_NAME = "bindInfo";
 
     public static final String FIELD_TYPE_NAME = "BindUserInfo";
 
@@ -39,11 +39,30 @@ public class LdapBindUserInfo extends BaseObjectField {
     private LdapRealm realm;
 
     public LdapBindUserInfo() {
-        super(FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
+        super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
         creds = new CredentialsField();
         bindMethod = new LdapBindMethod();
         realm = new LdapRealm();
         updateInnerFieldPaths();
+    }
+
+    public LdapBindUserInfo useDefaultRequired() {
+        creds.useDefaultRequiredFields();
+        bindMethod.isRequired(true);
+        return this;
+    }
+
+    @Override
+    public List<ErrorMessage> validate() {
+        if(bindMethod() != null && bindMethod().equals(DIGEST_MD5_SASL)) {
+            realm.isRequired(true);
+        }
+        return super.validate();
+    }
+
+    @Override
+    public List<Field> getFields() {
+        return ImmutableList.of(creds, bindMethod, realm);
     }
 
     public LdapBindUserInfo username(String username) {
@@ -76,18 +95,5 @@ public class LdapBindUserInfo extends BaseObjectField {
 
     public String realm() {
         return realm.getValue();
-    }
-
-    @Override
-    public List<ErrorMessage> validate() {
-        if(bindMethod().equals(DIGEST_MD5_SASL)) {
-            realm.isRequired(true);
-        }
-        return super.validate();
-    }
-
-    @Override
-    public List<Field> getFields() {
-        return ImmutableList.of(creds, bindMethod, realm);
     }
 }

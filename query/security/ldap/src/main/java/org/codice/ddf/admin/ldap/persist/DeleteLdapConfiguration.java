@@ -13,6 +13,9 @@
  **/
 package org.codice.ddf.admin.ldap.persist;
 
+import static org.codice.ddf.admin.common.report.message.DefaultMessages.failedDeleteError;
+import static org.codice.ddf.admin.common.report.message.DefaultMessages.noExistingConfigError;
+
 import java.util.List;
 
 import org.codice.ddf.admin.api.DataType;
@@ -24,10 +27,12 @@ import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.configurator.Configurator;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.configurator.OperationReport;
+import org.codice.ddf.admin.ldap.commons.LdapTestingUtils;
 import org.codice.ddf.admin.ldap.commons.services.LdapServiceCommons;
 import org.codice.ddf.admin.ldap.fields.config.LdapConfigurationField;
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
 import org.codice.ddf.internal.admin.configurator.actions.PropertyActions;
+import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
 
 import com.google.common.collect.ImmutableList;
 
@@ -39,23 +44,31 @@ public class DeleteLdapConfiguration extends BaseFunctionField<ListField<LdapCon
 
     private PidField pid;
 
-    private ConfiguratorFactory configuratorFactory;
-
-    private final PropertyActions propertyActions;
+    private final ConfiguratorFactory configuratorFactory;
 
     private final ManagedServiceActions managedServiceActions;
 
+    private final PropertyActions propertyActions;
+
+    private final ServiceActions serviceActions;
+
     private LdapServiceCommons serviceCommons;
 
+    private LdapTestingUtils testingUtils;
+
     public DeleteLdapConfiguration(ConfiguratorFactory configuratorFactory,
-            PropertyActions propertyActions, ManagedServiceActions managedServiceActions) {
+            ManagedServiceActions managedServiceActions, PropertyActions propertyActions,
+            ServiceActions serviceActions) {
         super(NAME, DESCRIPTION, new ListFieldImpl<>("configs", LdapConfigurationField.class));
-        this.propertyActions = propertyActions;
         this.managedServiceActions = managedServiceActions;
+        this.propertyActions = propertyActions;
+        this.serviceActions = serviceActions;
         pid = new PidField();
         updateArgumentPaths();
         this.configuratorFactory = configuratorFactory;
         serviceCommons = new LdapServiceCommons(this.propertyActions, this.managedServiceActions);
+        testingUtils = new LdapTestingUtils();
+
     }
 
     @Override
@@ -66,19 +79,35 @@ public class DeleteLdapConfiguration extends BaseFunctionField<ListField<LdapCon
     @Override
     public ListField<LdapConfigurationField> performFunction() {
         Configurator configurator = configuratorFactory.getConfigurator();
-
         configurator.add(managedServiceActions.delete(pid.getValue()));
         OperationReport report =
                 configurator.commit("LDAP Configuration deleted for servicePid: {}",
                         pid.getValue());
-        // TODO: tbatie - 4/3/17 - Add error reporting here
+
+        if (report.containsFailedResults()) {
+            addResultMessage(failedDeleteError());
+        }
+
         return serviceCommons.getLdapConfigurations();
+    }
+
+    @Override
+    public void validate() {
+        super.validate();
+        if (containsErrorMsgs()) {
+            return;
+        }
+
+        if (!testingUtils.serviceExists(pid.getValue(), serviceActions)) {
+            addArgumentMessage(noExistingConfigError(pid.path()));
+        }
     }
 
     @Override
     public FunctionField<ListField<LdapConfigurationField>> newInstance() {
         return new DeleteLdapConfiguration(configuratorFactory,
+                managedServiceActions,
                 propertyActions,
-                managedServiceActions);
+                serviceActions);
     }
 }

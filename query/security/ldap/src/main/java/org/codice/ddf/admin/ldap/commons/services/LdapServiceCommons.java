@@ -15,7 +15,7 @@ package org.codice.ddf.admin.ldap.commons.services;
 
 import static org.codice.ddf.admin.common.services.ServiceCommons.SERVICE_PID_KEY;
 import static org.codice.ddf.admin.ldap.fields.config.LdapUseCase.ATTRIBUTE_STORE;
-import static org.codice.ddf.admin.ldap.fields.config.LdapUseCase.LOGIN;
+import static org.codice.ddf.admin.ldap.fields.config.LdapUseCase.AUTHENTICATION;
 import static org.codice.ddf.admin.ldap.fields.connection.LdapEncryptionMethodField.LDAPS;
 
 import java.net.URI;
@@ -56,8 +56,8 @@ public class LdapServiceCommons {
     }
 
     public ListField<LdapConfigurationField> getLdapConfigurations() {
-        List<LdapConfigurationField> ldapLoginConfigs = new LdapClaimsHandlerServiceProperties(
-                managedServiceActions).getLdapClaimsHandlerManagedServices()
+        List<LdapConfigurationField> ldapLoginConfigs = new LdapLoginServiceProperties(
+                managedServiceActions).getLdapLoginManagedServices()
                 .values()
                 .stream()
                 .map(this::ldapLoginServiceToLdapConfiguration)
@@ -208,7 +208,7 @@ public class LdapServiceCommons {
                 props))
                 .baseUserDn(mapStringValue(LdapLoginServiceProperties.USER_BASE_DN, props))
                 .baseGroupDn(mapStringValue(LdapLoginServiceProperties.GROUP_BASE_DN, props))
-                .useCase(LOGIN);
+                .useCase(AUTHENTICATION);
 
         return new LdapConfigurationField().connection(connection)
                 .bindUserInfo(bindUserInfo)

@@ -27,7 +27,7 @@ import com.google.common.collect.ImmutableList;
 
 public class LdapTestConnection extends TestFunctionField {
 
-    public static final String NAME = "testConnect";
+    public static final String ID = "testConnect";
 
     public static final String DESCRIPTION =
             "Attempts to established a connection with the given connection configuration";
@@ -36,10 +36,11 @@ public class LdapTestConnection extends TestFunctionField {
     private LdapTestingUtils utils;
 
     public LdapTestConnection() {
-        super(NAME, DESCRIPTION);
-        connection = new LdapConnectionField();
-        utils = new LdapTestingUtils();
+        super(ID, DESCRIPTION);
+        connection = new LdapConnectionField().useDefaultRequired();
         updateArgumentPaths();
+
+        utils = new LdapTestingUtils();
     }
 
     @Override
@@ -52,7 +53,13 @@ public class LdapTestConnection extends TestFunctionField {
     public BooleanField performFunction() {
         LdapConnectionAttempt connectionAttempt = utils.getLdapConnection(connection);
         addResultMessages(connectionAttempt.messages());
+        addArgumentMessages(connectionAttempt.argumentMessages());
+
         return new BooleanField(connectionAttempt.connection().isPresent());
+    }
+
+    public void setTestingUtils(LdapTestingUtils utils) {
+        this.utils = utils;
     }
 
     @Override

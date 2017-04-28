@@ -15,6 +15,8 @@ package org.codice.ddf.admin.common.report.message;
 
 import java.util.List;
 
+import org.codice.ddf.admin.api.report.ErrorMessage;
+
 public class DefaultMessages {
 
     public static final String MISSING_REQUIRED_FIELD = "MISSING_REQUIRED_FIELD";
@@ -37,6 +39,7 @@ public class DefaultMessages {
 
     public static final String CANNOT_CONNECT = "CANNOT_CONNECT";
 
+    // TODO: tbatie - 5/30/17 - Collapse the persist errors down to one
     public static final String FAILED_UPDATE_ERROR = "FAILED_UPDATE";
 
     public static final String FAILED_DELETE_ERROR = "FAILED_DELETE";
@@ -49,9 +52,15 @@ public class DefaultMessages {
 
     public static final String UNAUTHORIZED = "UNAUTHORIZED";
 
+    public static final String FAILED_TEST_SETUP = "FAILED_TEST_SETUP";
+
     public static final String DUPLICATE_MAP_KEY = "DUPLICATE_MAP_KEY";
 
-    public static ErrorMessageImpl failedPersistError() {
+    public static ErrorMessage failedTestSetup() {
+        return new ErrorMessageImpl(FAILED_TEST_SETUP);
+    }
+
+    public static ErrorMessage failedPersistError() {
         return new ErrorMessageImpl(FAILED_PERSIST);
     }
 

@@ -45,8 +45,8 @@ public class LdapRecommendedSettings extends BaseFunctionField<LdapRecommendedSe
 
     public LdapRecommendedSettings() {
         super(NAME, DESCRIPTION, new LdapRecommendedSettingsField());
-        conn = new LdapConnectionField();
-        creds = new LdapBindUserInfo();
+        conn = new LdapConnectionField().useDefaultRequired();
+        creds = new LdapBindUserInfo().useDefaultRequired();
         ldapType = new LdapTypeField();
         utils = new LdapTestingUtils();
         updateArgumentPaths();
@@ -61,6 +61,7 @@ public class LdapRecommendedSettings extends BaseFunctionField<LdapRecommendedSe
     public LdapRecommendedSettingsField performFunction() {
         LdapConnectionAttempt connectionAttempt = utils.bindUserToLdapConnection(conn, creds);
         addResultMessages(connectionAttempt.messages());
+        addArgumentMessages(connectionAttempt.argumentMessages());
         if(!connectionAttempt.connection().isPresent()) {
             return null;
         }

@@ -19,6 +19,7 @@
             <argument ref="featureActions"/>
             <argument ref="managedServiceActions"/>
             <argument ref="propertyActions"/>
+            <argument ref="serviceActions"/>
         </bean>
     </service>
 
@@ -36,6 +37,10 @@
 
     <reference id="propertyActions"
                interface="org.codice.ddf.internal.admin.configurator.actions.PropertyActions"
+               availability="mandatory"/>
+
+    <reference id="serviceActions"
+               interface="org.codice.ddf.internal.admin.configurator.actions.ServiceActions"
                availability="mandatory"/>
 
 </blueprint>

@@ -39,9 +39,15 @@ import com.google.common.collect.ImmutableList;
 
 public class LdapQuery extends BaseFunctionField<ListField<MapField>> {
 
-    public static final String NAME = "query";
+    public static final String ID = "query";
 
     public static final String DESCRIPTION = "Executes a query against LDAP.";
+
+    public static final int DEFAULT_MAX_QUERY_RESULTS = 25;
+
+    public static final String MAX_QUERY_FIELD_NAME = "maxQueryResults";
+
+    public static final String QUERY_BASE_FIELD_NAME = "queryBase";
 
     private LdapConnectionField conn;
 
@@ -49,27 +55,29 @@ public class LdapQuery extends BaseFunctionField<ListField<MapField>> {
 
     private IntegerField maxQueryResults;
 
-    private LdapDistinguishedName dn;
+    private LdapDistinguishedName queryBase;
 
     private LdapQueryField query;
 
     private LdapTestingUtils utils;
 
     public LdapQuery() {
-        super(NAME, DESCRIPTION, new ListFieldImpl<>(MapField.class));
-        conn = new LdapConnectionField();
-        creds = new LdapBindUserInfo();
-        maxQueryResults = new IntegerField("maxQueryResults");
-        dn = new LdapDistinguishedName("queryBase");
+        super(ID, DESCRIPTION, new ListFieldImpl<>(MapField.class));
+        conn = new LdapConnectionField().useDefaultRequired();
+        creds = new LdapBindUserInfo().useDefaultRequired();
+        maxQueryResults = new IntegerField(MAX_QUERY_FIELD_NAME);
+        queryBase = new LdapDistinguishedName(QUERY_BASE_FIELD_NAME);
+        queryBase.isRequired(true);
         query = new LdapQueryField();
-        utils = new LdapTestingUtils();
+        query.isRequired(true);
         updateArgumentPaths();
+
+        utils = new LdapTestingUtils();
     }
 
     @Override
     public List<DataType> getArguments() {
-        // TODO: tbatie - 4/3/17 - Add other args
-        return ImmutableList.of(conn, creds, dn, maxQueryResults, query);
+        return ImmutableList.of(conn, creds, maxQueryResults, queryBase, query);
     }
 
     @Override
@@ -77,17 +85,19 @@ public class LdapQuery extends BaseFunctionField<ListField<MapField>> {
 
         LdapConnectionAttempt connectionAttempt = utils.bindUserToLdapConnection(conn, creds);
         addResultMessages(connectionAttempt.messages());
+        addArgumentMessages(connectionAttempt.argumentMessages());
+        ListField<MapField> entries = new ListFieldImpl<>(MapField.class);
 
-        if(!connectionAttempt.connection().isPresent()) {
+        if(containsErrorMsgs()) {
             return null;
         }
 
         List<SearchResultEntry> searchResults = utils.getLdapQueryResults(
                 connectionAttempt.connection().get(),
-                dn.getValue(),
+                queryBase.getValue(),
                 query.getValue(),
                 SearchScope.WHOLE_SUBTREE,
-                maxQueryResults.getValue());
+                maxQueryResults.getValue() == null ? DEFAULT_MAX_QUERY_RESULTS : maxQueryResults.getValue());
 
         List<MapField> convertedSearchResults = new ArrayList<>();
 
@@ -111,7 +121,11 @@ public class LdapQuery extends BaseFunctionField<ListField<MapField>> {
             convertedSearchResults.add(entryMap);
         }
 
-        return new ListFieldImpl<>(MapField.class).addAll(convertedSearchResults);
+        return entries.addAll(convertedSearchResults);
+    }
+
+    public void setTestingUtils(LdapTestingUtils utils) {
+        this.utils = utils;
     }
 
     @Override

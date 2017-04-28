@@ -38,6 +38,10 @@ public class LdapDistinguishedName extends StringField {
         super(fieldName, FIELD_TYPE_NAME, DESCRIPTION);
     }
 
+    public LdapDistinguishedName dn(String dn) {
+        setValue(dn);
+        return this;
+    }
     @Override
     public List<ErrorMessage> validate() {
         List<ErrorMessage> validationMsgs = super.validate();
@@ -46,7 +50,7 @@ public class LdapDistinguishedName extends StringField {
         }
 
         if(getValue() != null && !isValidDN(getValue())) {
-            validationMsgs.add(invalidDnFormatError(fieldName()));
+            validationMsgs.add(invalidDnFormatError(path()));
         }
 
         return validationMsgs;

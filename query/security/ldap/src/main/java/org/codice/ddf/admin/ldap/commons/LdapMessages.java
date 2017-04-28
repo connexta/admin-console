@@ -13,28 +13,52 @@
  **/
 package org.codice.ddf.admin.ldap.commons;
 
+import java.util.List;
+
+import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.codice.ddf.admin.common.report.message.ErrorMessageImpl;
 
 public class LdapMessages {
 
-    public static final ErrorMessageImpl CANNOT_CONFIGURE = new ErrorMessageImpl("CANNOT_CONFIGURE");
-    public static final ErrorMessageImpl CANNOT_CONNECT = new ErrorMessageImpl("CANNOT_CONNECT");
-    public static final ErrorMessageImpl CANNOT_BIND = new ErrorMessageImpl("CANNOT_BIND");
+    public static final String CANNOT_BIND = "CANNOT_BIND";
 
-    public static final ErrorMessageImpl BASE_USER_DN_NOT_FOUND = new ErrorMessageImpl("BASE_USER_DN_NOT_FOUND");
-    public static final ErrorMessageImpl BASE_GROUP_DN_NOT_FOUND = new ErrorMessageImpl("BASE_GROUP_DN_NOT_FOUND");
-
-    public static final ErrorMessageImpl NO_USERS_IN_BASE_USER_DN = new ErrorMessageImpl("NO_USERS_IN_BASE_USER_DN");
-    public static final ErrorMessageImpl NO_GROUPS_IN_BASE_GROUP_DN = new ErrorMessageImpl("NO_GROUPS_IN_BASE_GROUP_DN");
-    public static final ErrorMessageImpl NO_GROUPS_WITH_MEMBERS = new ErrorMessageImpl("NO_GROUPS_WITH_MEMBERS");
-    public static final ErrorMessageImpl NO_REFERENCED_MEMBER = new ErrorMessageImpl("NO_REFERENCED_MEMBER");
-    public static final ErrorMessageImpl USER_NAME_ATTRIBUTE_NOT_FOUND = new ErrorMessageImpl("USER_NAME_ATTRIBUTE_NOT_FOUND");
-
-    public static ErrorMessageImpl invalidDnFormatError(String pathOrigin) {
-        return  new ErrorMessageImpl("INVALID_DN", pathOrigin);
+    public static ErrorMessage cannotBindError(List<String> path) {
+        return new ErrorMessageImpl(CANNOT_BIND, path);
     }
 
-    public static ErrorMessageImpl invalidQueryError(String pathOrigin) {
-        return new ErrorMessageImpl("INVALID_QUERY", pathOrigin);
+    public static ErrorMessage invalidDnFormatError(List<String> path) {
+        return  new ErrorMessageImpl("INVALID_DN", path);
+    }
+
+    public static ErrorMessage invalidQueryError(List<String> path) {
+        return new ErrorMessageImpl("INVALID_QUERY", path);
+    }
+
+    public static ErrorMessage serviceAlreadyExistsWarning(List<String> path) {
+        return new ErrorMessageImpl("IDENTICAL_SERVICE_EXISTS", path);
+    }
+
+    public static ErrorMessage dnDoesNotExistError(List<String> pathOrigin) {
+        return new ErrorMessageImpl("DN_DOES_NOT_EXIST", pathOrigin);
+    }
+
+    public static ErrorMessage noUsersInBaseUserDnError(List<String> path) {
+        return new ErrorMessageImpl("NO_USERS_IN_BASE_USER_DN", path);
+    }
+
+    public static ErrorMessage noGroupsInBaseGroupDnError(List<String> path) {
+        return new ErrorMessageImpl("NO_GROUPS_IN_BASE_GROUP_DN", path);
+    }
+
+    public static ErrorMessage noGroupsWithMembersWarning(List<String> path) {
+        return new ErrorMessageImpl("NO_GROUPS_WITH_MEMBERS", path);
+    }
+
+    public static ErrorMessage noReferencedMemberWarning(List<String> path) {
+        return new ErrorMessageImpl("NO_REFERENCED_MEMBER", path);
+    }
+
+    public static ErrorMessage userNameAttributeNotFoundWarning(List<String> path) {
+        return new ErrorMessageImpl("USER_NAME_ATTRIBUTE_NOT_FOUND", path);
     }
 }

@@ -13,22 +13,30 @@
  **/
 package org.codice.ddf.admin.ldap.commons;
 
-import static org.codice.ddf.admin.ldap.commons.LdapMessages.CANNOT_BIND;
-import static org.codice.ddf.admin.ldap.commons.LdapMessages.CANNOT_CONFIGURE;
-import static org.codice.ddf.admin.ldap.commons.LdapMessages.CANNOT_CONNECT;
+import static org.codice.ddf.admin.common.report.message.DefaultMessages.cannotConnectError;
+import static org.codice.ddf.admin.common.report.message.DefaultMessages.failedTestSetup;
 import static org.codice.ddf.admin.ldap.fields.connection.LdapBindMethod.DIGEST_MD5_SASL;
 import static org.codice.ddf.admin.ldap.fields.connection.LdapBindMethod.SIMPLE;
 import static org.codice.ddf.admin.ldap.fields.connection.LdapEncryptionMethodField.LDAPS;
 import static org.codice.ddf.admin.ldap.fields.connection.LdapEncryptionMethodField.START_TLS;
 
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import javax.net.ssl.SSLContext;
 
+import org.codice.ddf.admin.api.report.Message;
+import org.codice.ddf.admin.ldap.commons.services.LdapServiceCommons;
+import org.codice.ddf.admin.ldap.fields.config.LdapConfigurationField;
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindUserInfo;
 import org.codice.ddf.admin.ldap.fields.connection.LdapConnectionField;
+import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
+import org.codice.ddf.internal.admin.configurator.actions.PropertyActions;
+import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.LDAPConnectionFactory;
 import org.forgerock.opendj.ldap.LDAPOptions;
@@ -45,25 +53,32 @@ public class LdapTestingUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LdapTestingUtils.class);
 
+    public static final String CIPHER_SUITES_SYS_PROP = "https.cipherSuites";
+
+    public static final String HTTP_PROTOCOLS_SYS_PROP = "https.protocols";
+
     /**
      * Attempts to connect to the given ldap address given the hostname, port, and encryptionMethod
-     *
+     * <p>
      * Possible message types: CANNOT_CONFIGURE, CANNOT_CONNECT
+     *
      * @return
      */
     public LdapConnectionAttempt getLdapConnection(LdapConnectionField connection) {
         LDAPOptions ldapOptions = new LDAPOptions();
 
         try {
-            if (connection.encryptionMethod().equals(LDAPS)) {
-                ldapOptions.setSSLContext(SSLContext.getDefault());
-            } else if (connection.encryptionMethod().equals(START_TLS)) {
+            if (connection.encryptionMethod()
+                    .equals(LDAPS)) {
+                ldapOptions.setSSLContext(getSslContext());
+            } else if (connection.encryptionMethod()
+                    .equals(START_TLS)) {
                 ldapOptions.setUseStartTLS(true);
             }
 
-            ldapOptions.addEnabledCipherSuite(System.getProperty("https.cipherSuites")
+            ldapOptions.addEnabledCipherSuite(System.getProperty(CIPHER_SUITES_SYS_PROP)
                     .split(","));
-            ldapOptions.addEnabledProtocol(System.getProperty("https.protocols")
+            ldapOptions.addEnabledProtocol(System.getProperty(HTTP_PROTOCOLS_SYS_PROP)
                     .split(","));
 
             //sets the classloader so it can find the grizzly protocol handler class
@@ -71,20 +86,20 @@ public class LdapTestingUtils {
 
         } catch (Exception e) {
             LOGGER.debug("Error prepping LDAP connection", e);
-            return new LdapConnectionAttempt(CANNOT_CONFIGURE);
+            return new LdapConnectionAttempt().addMessage(failedTestSetup());
         }
 
         Connection ldapConnection;
 
-        try {
-            ldapConnection = new LDAPConnectionFactory(connection.hostname(),
-                    connection.port(),
-                    ldapOptions).getConnection();
+        try (LDAPConnectionFactory connectionFactory = new LDAPConnectionFactory(connection.hostname(),
+                connection.port(),
+                ldapOptions)) {
+            ldapConnection = connectionFactory.getConnection();
         } catch (Exception e) {
             LOGGER.debug("Error opening LDAP connection to [{}:{}]",
                     connection.hostname(),
                     connection.port());
-            return new LdapConnectionAttempt(CANNOT_CONNECT);
+            return new LdapConnectionAttempt().addArgumentMessage(cannotConnectError(connection.path()));
         }
 
         return new LdapConnectionAttempt(ldapConnection);
@@ -92,75 +107,49 @@ public class LdapTestingUtils {
 
     /**
      * Binds the user to the LDAP connection.
-     *
+     * <p>
      * Possible message types: CANNOT_CONFIGURE, CANNOT_CONNECT, CANNOT_BIND
+     *
      * @param connField
      * @param bindInfo
      * @return
      */
-    public LdapConnectionAttempt bindUserToLdapConnection(LdapConnectionField connField, LdapBindUserInfo bindInfo) {
+    public LdapConnectionAttempt bindUserToLdapConnection(LdapConnectionField connField,
+            LdapBindUserInfo bindInfo) {
+        // This ConnectionAttempt intentionally not closed as its internal connection is bound
+        // and rewrapped in a new ConnectionAttempt. It is only closed in the case of a bind
+        // failure.
         LdapConnectionAttempt connectionAttempt = getLdapConnection(connField);
-        if(!connectionAttempt.connection().isPresent()) {
+        if (!connectionAttempt.connection()
+                .isPresent()) {
             return connectionAttempt;
         }
 
-        Connection connection = connectionAttempt.connection().get();
+        Connection connection = connectionAttempt.connection()
+                .get();
 
         try {
             BindRequest bindRequest = selectBindMethod(bindInfo.bindMethod(),
-                    bindInfo.credentials().username(),
-                    bindInfo.credentials().password(),
+                    bindInfo.credentials()
+                            .username(),
+                    bindInfo.credentials()
+                            .password(),
                     bindInfo.realm(),
                     null);
             connection.bind(bindRequest);
         } catch (Exception e) {
             LOGGER.debug("Error binding to LDAP", e);
-            return new LdapConnectionAttempt(CANNOT_BIND);
+            try {
+                connectionAttempt.close();
+            } catch (IOException closeException) {
+                LOGGER.warn("Error closing LDAP connection", closeException);
+            }
+            return new LdapConnectionAttempt().addArgumentMessage(LdapMessages.cannotBindError(
+                    bindInfo.path()))
+                    .connection(null);
         }
 
         return new LdapConnectionAttempt(connection);
-    }
-
-    private static BindRequest selectBindMethod(String bindMethod, String bindUser,
-            String password, String realm, String kdcAddress) {
-        BindRequest request;
-
-        switch (bindMethod) {
-        case SIMPLE:
-            request = Requests.newSimpleBindRequest(bindUser, password.toCharArray());
-            break;
-//                case SASL:
-//                    request = Requests.newPlainSASLBindRequest(bindUserDN,
-//                            bindUserCredentials.toCharArray());
-//                    break;
-//                case GSSAPI_SASL:
-//                    request = Requests.newGSSAPISASLBindRequest(bindUserDN,
-//                            bindUserCredentials.toCharArray());
-//                    ((GSSAPISASLBindRequest) request).setRealm(realm);
-//                    ((GSSAPISASLBindRequest) request).setKDCAddress(kdcAddress);
-//                    break;
-        case DIGEST_MD5_SASL:
-            request = Requests.newDigestMD5SASLBindRequest(bindUser,
-                    password.toCharArray());
-            ((DigestMD5SASLBindRequest) request).setCipher(DigestMD5SASLBindRequest.CIPHER_HIGH);
-            ((DigestMD5SASLBindRequest) request).getQOPs()
-                    .clear();
-            ((DigestMD5SASLBindRequest) request).getQOPs()
-                    .add(DigestMD5SASLBindRequest.QOP_AUTH_CONF);
-            ((DigestMD5SASLBindRequest) request).getQOPs()
-                    .add(DigestMD5SASLBindRequest.QOP_AUTH_INT);
-            ((DigestMD5SASLBindRequest) request).getQOPs()
-                    .add(DigestMD5SASLBindRequest.QOP_AUTH);
-            if (realm != null && !realm.equals("")) {
-                ((DigestMD5SASLBindRequest) request).setRealm(realm);
-            }
-            break;
-        default:
-            request = Requests.newSimpleBindRequest(bindUser, password.toCharArray());
-            break;
-        }
-
-        return request;
     }
 
     /**
@@ -201,5 +190,107 @@ public class LdapTestingUtils {
 
         reader.close();
         return entries;
+    }
+
+    private static BindRequest selectBindMethod(String bindMethod, String bindUser, String password,
+            String realm, String kdcAddress) {
+        BindRequest request;
+
+        // TODO RAP 31 Jan 17: These case statements should operate in a case-insensitive manner
+        switch (bindMethod) {
+        //        case SASL:
+        //            request = Requests.newPlainSASLBindRequest(bindUserDN,
+        //                    bindUserCredentials.toCharArray());
+        //            break;
+        //        case GSSAPI_SASL:
+        //            request = Requests.newGSSAPISASLBindRequest(bindUserDN,
+        //                    bindUserCredentials.toCharArray());
+        //            ((GSSAPISASLBindRequest) request).setRealm(realm);
+        //            ((GSSAPISASLBindRequest) request).setKDCAddress(kdcAddress);
+        //            break;
+        case DIGEST_MD5_SASL:
+            request = Requests.newDigestMD5SASLBindRequest(bindUser, password.toCharArray());
+            ((DigestMD5SASLBindRequest) request).setCipher(DigestMD5SASLBindRequest.CIPHER_HIGH);
+            ((DigestMD5SASLBindRequest) request).getQOPs()
+                    .clear();
+            ((DigestMD5SASLBindRequest) request).getQOPs()
+                    .add(DigestMD5SASLBindRequest.QOP_AUTH_CONF);
+            ((DigestMD5SASLBindRequest) request).getQOPs()
+                    .add(DigestMD5SASLBindRequest.QOP_AUTH_INT);
+            ((DigestMD5SASLBindRequest) request).getQOPs()
+                    .add(DigestMD5SASLBindRequest.QOP_AUTH);
+            if (realm != null && !realm.equals("")) {
+                ((DigestMD5SASLBindRequest) request).setRealm(realm);
+            }
+            break;
+        case SIMPLE:
+        default:
+            request = Requests.newSimpleBindRequest(bindUser, password.toCharArray());
+            break;
+        }
+
+        return request;
+    }
+
+    /**
+     * Checks if the given pid retrieves any properties. If no properties are found or the properties are empty then fail.
+     *
+     * @param pid
+     * @param serviceActions
+     * @return with the serviceExists or not
+     */
+    public boolean serviceExists(String pid, ServiceActions serviceActions) {
+        Map configProps = serviceActions.read(pid);
+        if (configProps != null && !configProps.isEmpty()) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Checks for existing LDAP configurations with the same hostname and port of the {@code configuration}.
+     * If there is an existing configuration, warnings will be returned. If there are no existing configurations
+     * an empty {@code List} will be returned.
+     * <p>
+     * Possible warning types: IDENTICAL_SERVICE_EXISTS
+     *
+     * @param newConfig           configuration to check for existing configurations for
+     * @return {@code List} with {@link Message}s containing warnings if there are existing configurations that match
+     * the {@code configuration}, or empty {@code List} if no matches
+     */
+    public List<Message> ldapConnectionExists(LdapConfigurationField newConfig,
+            ManagedServiceActions managedServiceActions, PropertyActions propertyActions) {
+        List<Message> msgs = new ArrayList<>();
+        LdapServiceCommons serviceCommons = new LdapServiceCommons(propertyActions,
+                managedServiceActions);
+        List<LdapConfigurationField> existingConfigs = serviceCommons.getLdapConfigurations()
+                .getList();
+
+        boolean identicalServiceExists = existingConfigs.stream()
+                .anyMatch(existingConfig -> identicalSettingsExist(existingConfig, newConfig));
+
+        if (identicalServiceExists) {
+            msgs.add(LdapMessages.serviceAlreadyExistsWarning(newConfig.path()));
+        }
+
+        return Collections.emptyList();
+    }
+
+    // TODO: ping host names to see if the they resolve to the same host
+    private boolean identicalSettingsExist(LdapConfigurationField existingConfiguration,
+            LdapConfigurationField newConfiguration) {
+        return existingConfiguration.connectionField()
+                .hostname()
+                .equals(newConfiguration.connectionField()
+                        .hostname()) && existingConfiguration.connectionField()
+                .port() == existingConfiguration.connectionField()
+                .port() && existingConfiguration.settingsField()
+                .useCase()
+                .equals(newConfiguration.settingsField()
+                        .useCase());
+    }
+
+    public SSLContext getSslContext() throws NoSuchAlgorithmException {
+        return SSLContext.getDefault();
     }
 }

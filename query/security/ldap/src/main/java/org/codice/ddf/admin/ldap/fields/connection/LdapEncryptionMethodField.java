@@ -21,7 +21,7 @@ import com.google.common.collect.ImmutableList;
 
 public class LdapEncryptionMethodField extends BaseEnumField<String> {
 
-    public static final String FIELD_NAME = "encryption";
+    public static final String DEFAULT_FIELD_NAME = "encryption";
 
     public static final String FIELD_TYPE_NAME = "EncryptionMethod";
 
@@ -48,7 +48,7 @@ public class LdapEncryptionMethodField extends BaseEnumField<String> {
     }
 
     protected LdapEncryptionMethodField(DataType<String> encryptionMethod) {
-        super(FIELD_NAME,
+        super(DEFAULT_FIELD_NAME,
                 FIELD_TYPE_NAME,
                 DESCRIPTION,
                 ImmutableList.of(new NoEncryption(),

@@ -27,17 +27,19 @@ public class LdapUseCase extends BaseEnumField<String> {
 
     public static final String DESCRIPTION = "Describes the intended use of the LDAP settings.";
 
-    public static final String LOGIN = "Login";
+    public static final String AUTHENTICATION = "Authentication";
 
     public static final String ATTRIBUTE_STORE = "AttributeStore";
 
-    public static final String LOGIN_AND_ATTRIBUTE_STORE = "LoginAndAttributeStore";
+    public static final String AUTHENTICATION_AND_ATTRIBUTE_STORE =
+            "AuthenticationAndAttributeStore";
 
-    public static final LdapUseCase LOGIN_FIELD = new LdapUseCase(new Login());
+    public static final LdapUseCase AUTHENTICATION_FIELD = new LdapUseCase(new Authentication());
 
     public static final LdapUseCase ATTRIBUTE_STORE_FIELD = new LdapUseCase(new AttributeStore());
 
-    public static final LdapUseCase LOGIN_AND_ATTRIBUTE_STORE_FIELD = new LdapUseCase(new LoginAndAttributeStore());
+    public static final LdapUseCase AUTHENTICATION_AND_ATTRIBUTE_STORE_FIELD =
+            new LdapUseCase(new AuthenticationAndAttributeStore());
 
     public LdapUseCase() {
         this(null);
@@ -48,22 +50,24 @@ public class LdapUseCase extends BaseEnumField<String> {
         super(DEFAULT_FIELD_NAME,
                 FIELD_TYPE_NAME,
                 DESCRIPTION,
-                ImmutableList.of(new Login(), new AttributeStore(), new LoginAndAttributeStore()),
+                ImmutableList.of(new Authentication(),
+                        new AttributeStore(),
+                        new AuthenticationAndAttributeStore()),
                 bindMethod);
     }
 
-    protected static final class Login extends StringField {
+    protected static final class Authentication extends StringField {
 
         public static final String DESCRIPTION =
                 "Indicates the LDAP is intended to be used as a source to login into.";
 
-        public Login() {
-            super(LOGIN, LOGIN, DESCRIPTION);
+        public Authentication() {
+            super(AUTHENTICATION, AUTHENTICATION, DESCRIPTION);
         }
 
         @Override
         public String getValue() {
-            return LOGIN;
+            return AUTHENTICATION;
         }
     }
 
@@ -81,17 +85,19 @@ public class LdapUseCase extends BaseEnumField<String> {
         }
     }
 
-    protected static final class LoginAndAttributeStore extends StringField {
+    protected static final class AuthenticationAndAttributeStore extends StringField {
         public static final String DESCRIPTION =
                 "Inticates the LDAP is intended to be used as both a source of login and a store for retrieving attributes of entries.";
 
-        public LoginAndAttributeStore() {
-            super(LOGIN_AND_ATTRIBUTE_STORE, LOGIN_AND_ATTRIBUTE_STORE, DESCRIPTION);
+        public AuthenticationAndAttributeStore() {
+            super(AUTHENTICATION_AND_ATTRIBUTE_STORE,
+                    AUTHENTICATION_AND_ATTRIBUTE_STORE,
+                    DESCRIPTION);
         }
 
         @Override
         public String getValue() {
-            return LOGIN_AND_ATTRIBUTE_STORE;
+            return AUTHENTICATION_AND_ATTRIBUTE_STORE;
         }
     }
 }

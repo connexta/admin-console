@@ -70,9 +70,10 @@ public class CredentialsField extends BaseObjectField {
         return username.getValue();
     }
 
-    public void useDefaultRequired() {
+    public CredentialsField useDefaultRequiredFields() {
         username.isRequired(true);
         password.isRequired(true);
+        return this;
     }
 
     @Override

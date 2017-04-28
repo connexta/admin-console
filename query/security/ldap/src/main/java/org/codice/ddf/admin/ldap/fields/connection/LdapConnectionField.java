@@ -23,7 +23,7 @@ import org.codice.ddf.admin.common.fields.common.PortField;
 import com.google.common.collect.ImmutableList;
 
 public class LdapConnectionField extends BaseObjectField {
-    public static final String FIELD_NAME = "connection";
+    public static final String DEFAULT_FIELD_NAME = "connection";
 
     public static final String FIELD_TYPE_NAME = "LdapConnection";
 
@@ -37,7 +37,7 @@ public class LdapConnectionField extends BaseObjectField {
     private LdapEncryptionMethodField encryptionMethod;
 
     public LdapConnectionField() {
-        super(FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
+        super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
         hostname = new HostnameField();
         port = new PortField();
         encryptionMethod = new LdapEncryptionMethodField();
@@ -55,7 +55,6 @@ public class LdapConnectionField extends BaseObjectField {
     }
 
     public LdapConnectionField encryptionMethod(String encryptionMethod) {
-        // TODO: tbatie - 4/2/17 - Make a method for matching the enum value like in the auth types once that is pushed
         this.encryptionMethod.setValue(encryptionMethod);
         return this;
     }
@@ -70,6 +69,25 @@ public class LdapConnectionField extends BaseObjectField {
 
     public String encryptionMethod(){
         return encryptionMethod.getValue();
+    }
+
+    public HostnameField hostnameField() {
+        return hostname;
+    }
+
+    public PortField portField() {
+        return port;
+    }
+
+    public LdapEncryptionMethodField encryptionField() {
+        return encryptionMethod;
+    }
+
+    public LdapConnectionField useDefaultRequired() {
+        hostname.isRequired(true);
+        port.isRequired(true);
+        encryptionMethod.isRequired(true);
+        return this;
     }
 
     @Override

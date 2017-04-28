@@ -17,7 +17,7 @@ import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 
 public class StsClaimField extends StringField {
 
-    public static final String DEFAULT_FIELD_NAME = "key";
+    public static final String DEFAULT_FIELD_NAME = "claim";
 
     public static final String FIELD_NAME_TYPE = "StsClaim";
 

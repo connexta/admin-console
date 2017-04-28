@@ -69,8 +69,8 @@ public class ContextPolicyBin extends BaseObjectField {
     }
 
     public ContextPolicyBin addClaimsMapping(String claim, String claimValue) {
-        claimsMapping.add(new ClaimsMapEntry().claim(claim)
-                .claimValue(claimValue));
+        claimsMapping.add(new ClaimsMapEntry().key(claim)
+                .value(claimValue));
         return this;
     }
 
@@ -82,8 +82,8 @@ public class ContextPolicyBin extends BaseObjectField {
     public ContextPolicyBin addClaimsMap(Map<String, String> claimsMap) {
         List<ClaimsMapEntry> claims = claimsMap.entrySet()
                 .stream()
-                .map(entry -> new ClaimsMapEntry().claim(entry.getKey())
-                        .claimValue(entry.getValue()))
+                .map(entry -> new ClaimsMapEntry().key(entry.getKey())
+                        .value(entry.getValue()))
                 .collect(Collectors.toList());
         claimsMapping.addAll(claims);
         return this;
@@ -115,7 +115,7 @@ public class ContextPolicyBin extends BaseObjectField {
 
     public Map<String, String> claimsMapping() {
         Map<String, String> mapping = new HashMap<>();
-        claimsMapping.getList().forEach(entry -> mapping.put(entry.claim(), entry.claimValue()));
+        claimsMapping.getList().forEach(entry -> mapping.put(entry.key(), entry.value()));
         return mapping;
     }
 

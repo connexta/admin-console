@@ -23,6 +23,7 @@ import org.codice.ddf.admin.common.fields.base.BaseObjectField;
 import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 import org.codice.ddf.admin.ldap.fields.LdapDistinguishedName;
+import org.codice.ddf.admin.security.common.fields.wcpm.ClaimsMapEntry;
 
 import com.google.common.collect.ImmutableList;
 
@@ -49,7 +50,7 @@ public class LdapSettingsField extends BaseObjectField {
 
     private StringField memberAttributeReferencedInGroup;
 
-    private ListField<LdapAttributeEntryField> attributeMap;
+    private ListField<ClaimsMapEntry> attributeMap;
 
     private LdapUseCase useCase;
 
@@ -101,7 +102,7 @@ public class LdapSettingsField extends BaseObjectField {
         Map<String, String> attributes = new HashMap<>();
         attributeMap.getList()
                 .stream()
-                .forEach(entry -> attributes.put(entry.stsClaim(), entry.userAttribute()));
+                .forEach(entry -> attributes.put(entry.key(), entry.value()));
         return attributes;
     }
 
@@ -138,7 +139,7 @@ public class LdapSettingsField extends BaseObjectField {
         return memberAttributeReferencedInGroup;
     }
 
-    public ListField<LdapAttributeEntryField> attributeMapField() {
+    public ListField<ClaimsMapEntry> attributeMapField() {
         return attributeMap;
     }
 
@@ -169,8 +170,8 @@ public class LdapSettingsField extends BaseObjectField {
     }
 
     public LdapSettingsField mappingEntry(String claim, String attribute) {
-        attributeMap.add(new LdapAttributeEntryField().stsClaim(claim)
-                .userAttribute(attribute));
+        attributeMap.add(new ClaimsMapEntry().key(claim)
+                .value(attribute));
         return this;
     }
 
@@ -187,8 +188,8 @@ public class LdapSettingsField extends BaseObjectField {
     public LdapSettingsField attributeMapField(Map<String, String> mapping) {
         mapping.entrySet()
                 .stream()
-                .forEach(entry -> attributeMap.add(new LdapAttributeEntryField().stsClaim(entry.getKey())
-                        .userAttribute(entry.getValue())));
+                .forEach(entry -> attributeMap.add(new ClaimsMapEntry().key(entry.getKey())
+                        .value(entry.getValue())));
         return this;
     }
 
@@ -206,7 +207,7 @@ public class LdapSettingsField extends BaseObjectField {
         this.groupMembershipAttribute = new StringField("groupMembershipAttribute");
         this.groupAttributeHoldingMember = new StringField("groupAttributeHoldingMember");
         this.memberAttributeReferencedInGroup = new StringField("memberAttributeReferencedInGroup");
-        this.attributeMap = new ListFieldImpl<>("attributeMapping", LdapAttributeEntryField.class);
+        this.attributeMap = new ListFieldImpl<>("attributeMapping", ClaimsMapEntry.class);
         this.useCase = new LdapUseCase();
     }
 }

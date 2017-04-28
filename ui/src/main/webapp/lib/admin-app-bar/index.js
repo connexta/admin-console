@@ -61,7 +61,7 @@ class AppBarView extends Component {
           style={getAppBarStyle()}
           iconElementLeft={
             <IconButton containerElement={<Link to='/' />}>
-              <HomeIcon/>
+              <HomeIcon />
             </IconButton>
           }
           iconElementRight={

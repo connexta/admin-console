@@ -65,7 +65,7 @@ const App = ({ children }) => (
           <Modal />
           <Backdrop>
             <AdminAppBar />
-            <div style={{maxWidth: 960, margin: '0 auto'}}>{children}</div>
+            <div style={{ maxWidth: 960, margin: '0 auto', padding: '0 20px' }}>{children}</div>
             <Exception />
           </Backdrop>
           <DevTools />

@@ -16,6 +16,7 @@ let BackdropView = ({ muiTheme, children, ...rest }) => {
     fixed.height = '100%'
   } else {
     fixed.minHeight = '100vh'
+    fixed.height = '100%'
   }
 
   return (

@@ -31,40 +31,44 @@ public class ClaimsMapEntry extends BaseObjectField {
     public static final String FIELD_TYPE_NAME = "ClaimsMapEntry";
 
     public static final String DESCRIPTION =
-            "Represents a mapping of a claim subject to a specific claim value";
+            "Represents a mapping of a key subject to a specific key value";
 
-    private StringField claim;
+    public static final String KEY_FIELD_NAME = "key";
 
-    private StringField claimValue;
+    public static final String VALUE_FIELD_NAME = "value";
+
+    private StringField key;
+
+    private StringField value;
 
     public ClaimsMapEntry() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
     }
 
-    public ClaimsMapEntry claim(String claim) {
-        this.claim.setValue(claim);
+    public ClaimsMapEntry key(String key) {
+        this.key.setValue(key);
         return this;
     }
 
-    public ClaimsMapEntry claimValue(String claimValue) {
-        this.claimValue.setValue(claimValue);
+    public ClaimsMapEntry value(String value) {
+        this.value.setValue(value);
         return this;
     }
 
-    public String claim() {
-        return claim.getValue();
+    public String key() {
+        return key.getValue();
     }
 
-    public String claimValue() {
-        return claimValue.getValue();
+    public String value() {
+        return value.getValue();
     }
 
     public StringField claimField() {
-        return claim;
+        return key;
     }
 
     public StringField claimValueField() {
-        return claimValue;
+        return value;
     }
 
     @Override
@@ -76,13 +80,14 @@ public class ClaimsMapEntry extends BaseObjectField {
     @Override
     public List<Message> validate() {
         List<Message> validationMsgs = super.validate();
-        if(!validationMsgs.isEmpty()) {
+        if (!validationMsgs.isEmpty()) {
             return validationMsgs;
         }
 
-        if(claim.getValue() != null) {
-            if(claimValue.getValue() == null || claimValue.getValue().isEmpty()) {
-                validationMsgs.add(invalidFieldError(claimValue.path()));
+        if (key.getValue() != null) {
+            if (value.getValue() == null || value.getValue()
+                    .isEmpty()) {
+                validationMsgs.add(invalidFieldError(value.path()));
             }
         }
 
@@ -91,12 +96,12 @@ public class ClaimsMapEntry extends BaseObjectField {
 
     @Override
     public List<Field> getFields() {
-        return ImmutableList.of(claim, claimValue);
+        return ImmutableList.of(key, value);
     }
 
     @Override
     public void initializeFields() {
-        claim = new StringField("claim");
-        claimValue = new StringField("claimValue");
+        key = new StringField(KEY_FIELD_NAME);
+        value = new StringField(VALUE_FIELD_NAME);
     }
 }

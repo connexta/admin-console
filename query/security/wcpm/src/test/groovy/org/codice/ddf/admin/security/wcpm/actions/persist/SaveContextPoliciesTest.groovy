@@ -26,6 +26,7 @@ import org.codice.ddf.admin.configurator.Configurator
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.configurator.OperationReport
 import org.codice.ddf.admin.security.common.SecurityMessages
+import org.codice.ddf.admin.security.common.fields.wcpm.ClaimsMapEntry
 import org.codice.ddf.admin.security.common.fields.wcpm.ContextPolicyBin
 import org.codice.ddf.admin.security.common.fields.wcpm.Realm
 import org.codice.ddf.admin.security.common.services.PolicyManagerServiceProperties
@@ -59,24 +60,24 @@ class SaveContextPoliciesTest extends Specification {
         testData = [
                 policies: [
                         [
-                                paths        : [ '/' ],
-                                authTypes    : [ 'basic' ],
+                                paths        : ['/'],
+                                authTypes    : ['basic'],
                                 realm        : 'karaf',
                                 claimsMapping: [
                                         [
-                                                claim     : 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role',
-                                                claimValue: 'system-admin'
+                                                (ClaimsMapEntry.KEY_FIELD_NAME)  : 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role',
+                                                (ClaimsMapEntry.VALUE_FIELD_NAME): 'system-admin'
                                         ]
                                 ]
                         ],
                         [
-                                paths        : [ '/test' ],
-                                authTypes    : [ 'SAML', 'PKI' ],
+                                paths        : ['/test'],
+                                authTypes    : ['SAML', 'PKI'],
                                 realm        : 'karaf',
                                 claimsMapping: [
                                         [
-                                                claim     : 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role',
-                                                claimValue: 'system-admin'
+                                                (ClaimsMapEntry.KEY_FIELD_NAME)  : 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role',
+                                                (ClaimsMapEntry.VALUE_FIELD_NAME): 'system-admin'
                                         ]
                                 ]
                         ]
@@ -87,11 +88,13 @@ class SaveContextPoliciesTest extends Specification {
         configuratorFactory = Mock(ConfiguratorFactory)
         configurator = Mock(Configurator)
         configReader = Mock(ConfigReader)
-        configurator.updateConfigFile({ it == PolicyManagerServiceProperties.POLICY_MANAGER_PID }, _, _) >> {
+        configurator.updateConfigFile({
+            it == PolicyManagerServiceProperties.POLICY_MANAGER_PID
+        }, _, _) >> {
             args -> policyManager.setPolicies(args[1])
         }
 
-        stsConfig = [(StsServiceProperties.STS_CLAIMS_PROPS_KEY_CLAIMS): testClaims ]
+        stsConfig = [(StsServiceProperties.STS_CLAIMS_PROPS_KEY_CLAIMS): testClaims]
         configReader.getConfig(_) >> stsConfig
 
         policyManager = new PolicyManager()
@@ -99,7 +102,7 @@ class SaveContextPoliciesTest extends Specification {
         contextPolicies.setValue(testData.policies)
         policyManager.setPolicies(new PolicyManagerServiceProperties().contextPoliciesToPolicyManagerProps(contextPolicies.getList()))
 
-        configurator.commit(_,_) >> operationReport
+        configurator.commit(_, _) >> operationReport
         configReader.getServiceReference(_) >> policyManager
         configuratorFactory.getConfigurator() >> configurator
         configuratorFactory.getConfigReader() >> configReader
@@ -107,7 +110,7 @@ class SaveContextPoliciesTest extends Specification {
         action = actionCreator.createAction(SaveContextPolices.ACTION_ID)
     }
 
-    def 'Pass with valid update' () {
+    def 'Pass with valid update'() {
         setup:
         operationReport.containsFailedResults() >> false
 
@@ -120,7 +123,7 @@ class SaveContextPoliciesTest extends Specification {
         report.result().getValue() == testData.policies
     }
 
-    def 'Fail when failed to persist' () {
+    def 'Fail when failed to persist'() {
         setup:
         operationReport.containsFailedResults() >> true
 
@@ -135,10 +138,10 @@ class SaveContextPoliciesTest extends Specification {
         report.result() == null
     }
 
-    def 'Fail if no root context is present' () {
+    def 'Fail if no root context is present'() {
         setup:
         operationReport.containsFailedResults() >> false
-        testData.policies[0].paths = [ '/test' ]
+        testData.policies[0].paths = ['/test']
 
         when:
         action.setArguments(testData)
@@ -151,10 +154,10 @@ class SaveContextPoliciesTest extends Specification {
         report.result() == null
     }
 
-    def 'Fail if invalid authType' () {
+    def 'Fail if invalid authType'() {
         setup:
         operationReport.containsFailedResults() >> false
-        testData.policies[0].authTypes = [ 'PKI', 'COFFEE' ]
+        testData.policies[0].authTypes = ['PKI', 'COFFEE']
 
         when:
         action.setArguments(testData)
@@ -167,7 +170,7 @@ class SaveContextPoliciesTest extends Specification {
         report.result() == null
     }
 
-    def 'Fail if no authType' () {
+    def 'Fail if no authType'() {
         setup:
         operationReport.containsFailedResults() >> false
         testData.policies[0].authTypes = []
@@ -184,7 +187,7 @@ class SaveContextPoliciesTest extends Specification {
 
     }
 
-    def 'Fail if invalid realm' () {
+    def 'Fail if invalid realm'() {
         setup:
         operationReport.containsFailedResults() >> false
         testData.policies[0].realm = 'COFFEE'
@@ -200,7 +203,7 @@ class SaveContextPoliciesTest extends Specification {
         report.result() == null
     }
 
-    def 'Fail if no realm' () {
+    def 'Fail if no realm'() {
         setup:
         operationReport.containsFailedResults() >> false
         testData.policies[0].realm = null
@@ -216,7 +219,7 @@ class SaveContextPoliciesTest extends Specification {
         report.result() == null
     }
 
-    def 'Pass if no claims Mapping' () {
+    def 'Pass if no claims Mapping'() {
         setup:
         operationReport.containsFailedResults() >> false
         testData.policies[0].claimsMapping = []
@@ -230,10 +233,10 @@ class SaveContextPoliciesTest extends Specification {
         report.result().getValue() == testData.policies
     }
 
-    def 'Fail if claim entry with no value ' () {
+    def 'Fail if claim entry with no value '() {
         setup:
         operationReport.containsFailedResults() >> false
-        testData.policies[0].claimsMapping[0].claimValue = null
+        testData.policies[0].claimsMapping[0][ClaimsMapEntry.VALUE_FIELD_NAME] = null
 
         when:
         action.setArguments(testData)
@@ -242,14 +245,14 @@ class SaveContextPoliciesTest extends Specification {
         then:
         report.messages().size() == 1
         report.messages()[0].code == DefaultMessages.MISSING_REQUIRED_FIELD
-        report.messages()[0].path == [SaveContextPolices.ACTION_ID, BaseAction.ARGUMENT, 'policies', Field.INDEX_DELIMETER + 0, 'claimsMapping', Field.INDEX_DELIMETER + 0, 'claimValue']
+        report.messages()[0].path == [SaveContextPolices.ACTION_ID, BaseAction.ARGUMENT, 'policies', Field.INDEX_DELIMETER + 0, 'claimsMapping', Field.INDEX_DELIMETER + 0, ClaimsMapEntry.VALUE_FIELD_NAME]
         report.result() == null
     }
 
-    def 'Fail if claim is not supported' () {
+    def 'Fail if claim is not supported'() {
         setup:
         operationReport.containsFailedResults() >> false
-        testData.policies[0].claimsMapping[0].claim = 'unsupportedClaim'
+        testData.policies[0].claimsMapping[0][ClaimsMapEntry.KEY_FIELD_NAME] = 'unsupportedClaim'
 
         when:
         action.setArguments(testData)
@@ -258,7 +261,7 @@ class SaveContextPoliciesTest extends Specification {
         then:
         report.messages().size() == 1
         report.messages()[0].code == SecurityMessages.INVALID_CLAIM_TYPE
-        report.messages()[0].path == [SaveContextPolices.ACTION_ID, BaseAction.ARGUMENT, 'policies', Field.INDEX_DELIMETER + 0, 'claimsMapping', Field.INDEX_DELIMETER + 0, "claim"]
+        report.messages()[0].path == [SaveContextPolices.ACTION_ID, BaseAction.ARGUMENT, 'policies', Field.INDEX_DELIMETER + 0, 'claimsMapping', Field.INDEX_DELIMETER + 0, ClaimsMapEntry.KEY_FIELD_NAME]
         report.result() == null
     }
 }

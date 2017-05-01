@@ -53,25 +53,24 @@ public class DiscoverOpenSearchByAddressAction extends BaseAction<SourceInfoFiel
     }
 
     @Override
-    public List<Field> getArguments() {
-        return ImmutableList.of(addressField, credentialsField);
-    }
-
-    @Override
     public SourceInfoField performAction() {
         Result<UrlField> discoveredUrl = openSearchSourceUtils.discoverOpenSearchUrl(addressField, credentialsField);
-
-        if(discoveredUrl.isNotPresent()) {
-            addArgumentMessages(discoveredUrl.argumentMessages());
+        addArgumentMessages(discoveredUrl.argumentMessages());
+        if(containsErrorMsgs()) {
             return null;
         }
 
         Result<SourceConfigUnionField> configResult = openSearchSourceUtils.getOpenSearchConfig(discoveredUrl.get(), credentialsField);
-        if(configResult.isPresent()) {
-            return createSourceInfoField(ID, true, configResult.get());
+        addArgumentMessages(configResult.argumentMessages());
+        if(containsErrorMsgs()) {
+            return null;
         }
 
-        addArgumentMessages(configResult.argumentMessages());
-        return null;
+        return createSourceInfoField(ID, true, configResult.get());
+    }
+
+    @Override
+    public List<Field> getArguments() {
+        return ImmutableList.of(addressField, credentialsField);
     }
 }

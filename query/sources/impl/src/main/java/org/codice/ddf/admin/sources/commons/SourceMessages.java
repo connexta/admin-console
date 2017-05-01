@@ -23,11 +23,17 @@ public class SourceMessages {
 
     public static final String NO_SOURCE_CONFIG_ERROR = "NO_SOURCE_CONFIG_ERROR";
 
+    public static final String UNKNOWN_SOURCE_TYPE = "UNKNOWN_SOURCE_TYPE";
+
     public static ErrorMessage duplicateSourceNameError(List<String> path) {
         return new ErrorMessage(DUPLICATE_SOURCE_NAME, path);
     }
 
     public static ErrorMessage noConfigFoundError(List<String> path) {
         return new ErrorMessage(NO_SOURCE_CONFIG_ERROR, path);
+    }
+
+    public static ErrorMessage unknownSourceTypeError(List<String> path) {
+        return new ErrorMessage(UNKNOWN_SOURCE_TYPE, path);
     }
 }

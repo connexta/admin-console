@@ -57,6 +57,14 @@ public class SourceInfoField extends BaseObjectField {
         return this;
     }
 
+    public String sourceHandlerName() {
+        return sourceHandlerName.getValue();
+    }
+
+    public Boolean isAvailable() {
+        return isAvailable.getValue();
+    }
+
     public SourceConfigUnionField config() {
         return config;
     }

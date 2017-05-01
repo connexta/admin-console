@@ -59,7 +59,6 @@ public class DiscoverOpenSearchByUrlAction extends BaseAction<SourceInfoField> {
     public SourceInfoField performAction() {
         Result<SourceConfigUnionField> configResult = openSearchSourceUtils.getOpenSearchConfig(endpointUrl, credentialsField);
         addArgumentMessages(configResult.argumentMessages());
-
         if(containsErrorMsgs()) {
             return null;
         }

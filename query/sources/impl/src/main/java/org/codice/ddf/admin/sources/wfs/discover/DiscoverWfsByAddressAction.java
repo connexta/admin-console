@@ -53,26 +53,24 @@ public class DiscoverWfsByAddressAction extends BaseAction<SourceInfoField> {
     }
 
     @Override
-    public List<Field> getArguments() {
-        return ImmutableList.of(addressField, credentialsField);
-    }
-
-    @Override
     public SourceInfoField performAction() {
         Result<UrlField> discoveredUrl = wfsSourceUtils.discoverWfsUrl(addressField, credentialsField);
         addArgumentMessages(discoveredUrl.argumentMessages());
-
         if(containsErrorMsgs()) {
             return null;
         }
 
         Result<SourceConfigUnionField> configResult = wfsSourceUtils.getPreferredWfsConfig(discoveredUrl.get(), credentialsField);
         addArgumentMessages(configResult.argumentMessages());
-
         if(containsErrorMsgs()) {
             return null;
         }
 
         return createSourceInfoField(ID, true, configResult.get());
+    }
+
+    @Override
+    public List<Field> getArguments() {
+        return ImmutableList.of(addressField, credentialsField);
     }
 }

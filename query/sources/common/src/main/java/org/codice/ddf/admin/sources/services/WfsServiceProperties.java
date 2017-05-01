@@ -11,20 +11,17 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  */
-package org.codice.ddf.admin.sources.commons.services;
+package org.codice.ddf.admin.sources.services;
 
-import static org.codice.ddf.admin.sources.commons.services.SourceServiceProperties.FACTORY_PID_KEY;
-import static org.codice.ddf.admin.sources.commons.services.SourceServiceProperties.ID;
-import static org.codice.ddf.admin.sources.commons.services.SourceServiceProperties.PASSWORD;
-import static org.codice.ddf.admin.sources.commons.services.SourceServiceProperties.PORT;
-import static org.codice.ddf.admin.sources.commons.services.SourceServiceProperties.SERVICE_PID_KEY;
-import static org.codice.ddf.admin.sources.commons.services.SourceServiceProperties.SOURCE_HOSTNAME;
-import static org.codice.ddf.admin.sources.commons.services.SourceServiceProperties.USERNAME;
+import static org.codice.ddf.admin.common.services.ServiceCommons.FACTORY_PID_KEY;
+import static org.codice.ddf.admin.common.services.ServiceCommons.SERVICE_PID_KEY;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
+import org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField;
 import org.codice.ddf.admin.sources.fields.type.WfsSourceConfigurationField;
 
 import com.google.common.collect.ImmutableList;
@@ -36,8 +33,21 @@ public class WfsServiceProperties {
 
     public static final String WFS2_FACTORY_PID = "Wfs_v2_0_0_Federated_Source";
 
+    public static final String USERNAME = "username";
+
+    public static final String PASSWORD = "password";
+
+    public static final String ID = "id";
+
+    public static final String SOURCE_HOSTNAME = "sourceHostName";
+
+    public static final String PORT = "sourcePort";
+
     public static final List<String> WFS_FACTORY_PIDS = ImmutableList.of(WFS1_FACTORY_PID,
             WFS2_FACTORY_PID);
+
+    public static final Function<Map<String, Object>, SourceConfigUnionField>
+            SERVICE_PROPS_TO_WFS_CONFIG = WfsServiceProperties::servicePropsToWfsConfig;
 
     public static final WfsSourceConfigurationField servicePropsToWfsConfig(
             Map<String, Object> props) {

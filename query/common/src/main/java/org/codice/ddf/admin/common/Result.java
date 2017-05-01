@@ -13,30 +13,21 @@
  */
 package org.codice.ddf.admin.common;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-
-import org.codice.ddf.admin.api.action.Message;
 
 /**
  * A wrapper for an object which also contains argument and result messages.
  *
  * @param <T> type that is wrapped
  */
-public class Result<T> {
+// TODO: 4/28/17 phuffer - should we refactor ActionReport to extend this?
+public class Result<T> extends Messages {
 
     private Optional<T> value;
 
-    private List<Message> argumentMessages;
-
-    private List<Message> resultMessages;
-
     public Result() {
+        super();
         this.value = Optional.empty();
-        argumentMessages = new ArrayList<>();
-        resultMessages = new ArrayList<>();
     }
 
     public Result(T value) {
@@ -59,40 +50,5 @@ public class Result<T> {
 
     public T get() {
         return value.get();
-    }
-
-    public List<Message> argumentMessages() {
-        return argumentMessages;
-    }
-
-    public Result<T> argumentMessages(List<Message> messages) {
-        argumentMessages = messages;
-        return this;
-    }
-
-    public Result<T> argumentMessage(Message message) {
-        argumentMessages.add(message);
-        return this;
-    }
-
-    public List<Message> resultMessages() {
-        return resultMessages;
-    }
-
-    public Result<T> resultMessages(List<Message> messages) {
-        resultMessages = messages;
-        return this;
-    }
-
-    public Result<T> resultMessage(Message message) {
-        resultMessages.add(message);
-        return this;
-    }
-
-    public boolean hasErrors() {
-        return !argumentMessages.stream()
-                .filter(message -> message.getType() == Message.MessageType.ERROR)
-                .collect(Collectors.toList())
-                .isEmpty();
     }
 }

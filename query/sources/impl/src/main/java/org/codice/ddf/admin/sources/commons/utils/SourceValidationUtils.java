@@ -13,15 +13,15 @@
  */
 package org.codice.ddf.admin.sources.commons.utils;
 
-import static org.codice.ddf.admin.common.message.DefaultMessages.failedUpdateError;
+import static org.codice.ddf.admin.sources.commons.SourceActionCommons.getAllSourceConfigurations;
 import static org.codice.ddf.admin.sources.commons.SourceMessages.duplicateSourceNameError;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
-import org.apache.commons.collections.MapUtils;
 import org.codice.ddf.admin.api.action.Message;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 import org.codice.ddf.admin.configurator.ConfigReader;
@@ -30,6 +30,7 @@ import org.codice.ddf.admin.sources.fields.ServicePid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ddf.catalog.service.ConfiguredService;
 import ddf.catalog.source.FederatedSource;
 
 public class SourceValidationUtils {
@@ -37,63 +38,64 @@ public class SourceValidationUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger(SourceValidationUtils.class);
 
     /**
-     * Gets the config from the given servicePid and checks that the config is present, and also that
-     * no other configs have the same name as any existing sources.
-     *
-     * @param servicePid servicePid of configuration to check
-     * @param sourceName source name to check against existing source names
-     * @param configuratorFactory configurator factory for persisting
-     * @return an empty {@code List} on success, or a {@code List} containing {@link org.codice.ddf.admin.common.message.ErrorMessage}s
-     * on failure
-     */
-    public static List<Message> validUpdateConfig(ServicePid servicePid, StringField sourceName,
-            ConfiguratorFactory configuratorFactory) {
-        ConfigReader configReader = configuratorFactory.getConfigReader();
-        Map<String, Object> existingConfig = configReader.getConfig(servicePid.getValue());
-        List<Message> validationMsgs = new ArrayList<>();
-
-        if (MapUtils.isNotEmpty(existingConfig)) {
-            if (existingConfig.get("id") != null && !existingConfig.get("id")
-                    .equals(sourceName.getValue())) {
-                validationMsgs.addAll(validateSourceName(sourceName, configuratorFactory));
-            }
-        } else {
-            validationMsgs.add(failedUpdateError(servicePid.path()));
-        }
-
-        return validationMsgs;
-    }
-
-    /**
      * Validates the {@code sourceName} against the existing source names in the system. An empty {@link List} will be returned
      * if there are no existing source names with with name {@code sourceName}, or a {@code List} containing
      * {@link Message}s if there are errors.
      *
-     * @param sourceName source name to validate
+     * @param sourceName          source name to validate
      * @param configuratorFactory configurator factory for reading FederatedSource service references
+     * @param servicePid          if provided, signifies this is an update on the configuration identified by the pid and if the sourceName
+     *                            matches the servicePid's configuration's sourceName, it is a valid sourceName
      * @return a {@code List} of {@link Message}s containing a {@link org.codice.ddf.admin.sources.commons.SourceMessages#DUPLICATE_SOURCE_NAME} error, or an empty {@link List}
      * if there are no duplicate source names found
      */
     // TODO: 4/24/17 phuffer -  adding a duplicate name should be valid as long as the Active Binding is different
     public static List<Message> validateSourceName(StringField sourceName,
-            ConfiguratorFactory configuratorFactory) {
-        boolean matchFound = false;
+            ConfiguratorFactory configuratorFactory, ServicePid servicePid) {
+        ConfigReader configReader = configuratorFactory.getConfigReader();
+        Set<FederatedSource> sources = configReader.getServices(FederatedSource.class, null);
 
-        Collection<FederatedSource> sources = configuratorFactory.getConfigReader().getServices(FederatedSource.class, null);
+        getAllSourceConfigurations(configuratorFactory);
 
-        for (FederatedSource source : sources) {
-            if (source.getId()
+        if(servicePid != null && servicePid.getValue() != null) {
+            Map<String, Object> existingConfig = configReader.getConfig(servicePid.getValue());
+            if (existingConfig.get("id") != null && existingConfig.get("id")
                     .equals(sourceName.getValue())) {
-                matchFound = true;
-                break;
+                return Collections.emptyList();
             }
         }
 
-        List<Message> errors = new ArrayList<>();
+        boolean matchFound = sources.stream()
+                .map(source -> source.getId())
+                .anyMatch(id -> id.equals(sourceName.getValue()));
+
         if (matchFound) {
-            errors.add(duplicateSourceNameError(sourceName.path()));
+            LOGGER.debug("Found duplicate source name for name [{}] while persisting a source.",
+                    sourceName.getValue());
+            return Collections.singletonList(duplicateSourceNameError(sourceName.path()));
         }
 
-        return errors;
+        // Try to find the name through the config id if the service reference failed. This is a work around
+        // for OpenSearch sources (but will work for any source that's a ConfiguredService) always returning
+        // the default name from the getId() method.
+        matchFound = sources.stream()
+                .map(source -> {
+                    if (source instanceof ConfiguredService) {
+                        return ((ConfiguredService) source).getConfigurationPid();
+                    }
+                    return null;
+                })
+                .filter(Objects::nonNull)
+                .map(configReader::getConfig)
+                .map(config -> config.get("id"))
+                .anyMatch(id -> id.equals(sourceName.getValue()));
+
+        if (matchFound) {
+            LOGGER.debug("Found duplicate source name for name [{}] while persisting a source.",
+                    sourceName.getValue());
+            return Collections.singletonList(duplicateSourceNameError(sourceName.path()));
+        }
+
+        return Collections.emptyList();
     }
 }

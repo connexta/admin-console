@@ -27,9 +27,6 @@ import org.xml.sax.SAXException;
 
 public class SourceUtilCommons {
 
-    /*********************************************************
-     * NamespaceContext for Xpath queries
-     *********************************************************/
     public static final NamespaceContext SOURCES_NAMESPACE_CONTEXT = new NamespaceContext() {
         @Override
         public String getNamespaceURI(String prefix) {
@@ -66,11 +63,11 @@ public class SourceUtilCommons {
         }
     };
 
-    public static Document createDocument(String str)
+    public static Document createDocument(String body)
             throws ParserConfigurationException, IOException, SAXException {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setNamespaceAware(true);
         return factory.newDocumentBuilder()
-                .parse(new InputSource(new StringReader(str)));
+                .parse(new InputSource(new StringReader(body)));
     }
 }

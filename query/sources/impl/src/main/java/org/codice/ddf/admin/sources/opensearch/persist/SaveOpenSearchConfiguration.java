@@ -13,21 +13,18 @@
  */
 package org.codice.ddf.admin.sources.opensearch.persist;
 
+import static org.codice.ddf.admin.common.message.DefaultMessages.noExistingConfigError;
+import static org.codice.ddf.admin.common.services.ServiceCommons.configExists;
+import static org.codice.ddf.admin.common.services.ServiceCommons.update;
 import static org.codice.ddf.admin.sources.commons.SourceActionCommons.createSourceInfoField;
-import static org.codice.ddf.admin.sources.commons.SourceActionCommons.persist;
-import static org.codice.ddf.admin.sources.commons.SourceActionCommons.updateConfig;
-import static org.codice.ddf.admin.sources.commons.services.OpenSearchServiceProperties.openSearchConfigToServiceProps;
-import static org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField.ENDPOINT_URL_FIELD;
-import static org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField.FACTORY_PID_FIELD;
-import static org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField.SOURCE_NAME_FIELD;
+import static org.codice.ddf.admin.sources.commons.SourceActionCommons.persistSource;
+import static org.codice.ddf.admin.sources.commons.utils.SourceValidationUtils.validateSourceName;
+import static org.codice.ddf.admin.sources.services.OpenSearchServiceProperties.openSearchConfigToServiceProps;
 
 import java.util.List;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.codice.ddf.admin.api.action.Message;
 import org.codice.ddf.admin.api.fields.Field;
-import org.codice.ddf.admin.api.fields.ObjectField;
 import org.codice.ddf.admin.common.actions.BaseAction;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.sources.fields.ServicePid;
@@ -54,56 +51,43 @@ public class SaveOpenSearchConfiguration extends BaseAction<SourceInfoField> {
         super(ID, DESCRIPTION, new SourceInfoField());
         config = new OpensearchSourceConfigurationField();
         servicePid = new ServicePid();
-
         config.isRequired(true);
-        setRequiredField(config, FACTORY_PID_FIELD, true);
-        setRequiredField(config, SOURCE_NAME_FIELD, true);
-        setRequiredField(config, ENDPOINT_URL_FIELD, true);
-
+        config.factoryPidField().isRequired(true);
+        config.sourceNameField().isRequired(true);
+        config.endpointUrlField().isRequired(true);
         this.configuratorFactory = configuratorFactory;
     }
 
     @Override
     public SourceInfoField performAction() {
         if (StringUtils.isNotEmpty(servicePid.getValue())) {
-            return updateExistingConfig();
+            addArgumentMessages(update(servicePid, openSearchConfigToServiceProps(config), configuratorFactory));
+        } else {
+            addArgumentMessages(persistSource(config, openSearchConfigToServiceProps(config), configuratorFactory));
         }
-        return persistNewConfig();
+
+        if(containsErrorMsgs()) {
+            return null;
+        }
+        return createSourceInfoField(ID, true, config);
+    }
+
+    @Override
+    public void validate() {
+        super.validate();
+        if(containsErrorMsgs()) {
+            return;
+        }
+
+        if(servicePid.getValue() != null && !configExists(servicePid.getValue(), configuratorFactory)) {
+            addArgumentMessage(noExistingConfigError(servicePid.path()));
+        } else {
+            addArgumentMessages(validateSourceName(config.sourceNameField(), configuratorFactory, servicePid));
+        }
     }
 
     @Override
     public List<Field> getArguments() {
         return ImmutableList.of(config, servicePid);
-    }
-
-    private SourceInfoField updateExistingConfig() {
-        List<Message> results = updateConfig(servicePid, config, configuratorFactory, openSearchConfigToServiceProps(config));
-
-        if(CollectionUtils.isNotEmpty(results)) {
-            results.forEach(this::addArgumentMessage);
-            return null;
-        }
-
-        return createSourceInfoField(ID, true, config);
-    }
-
-    private SourceInfoField persistNewConfig() {
-        List<Message> results = persist(config, configuratorFactory, openSearchConfigToServiceProps(config));
-
-        if (CollectionUtils.isNotEmpty(results)) {
-            results.forEach(this::addArgumentMessage);
-            return null;
-        }
-
-        return createSourceInfoField(ID, true, config);
-    }
-
-    private void setRequiredField(ObjectField objectField, String fieldName, boolean required) {
-        objectField.getFields()
-                .stream()
-                .filter(field -> field.fieldName()
-                        .equals(fieldName))
-                .findFirst()
-                .ifPresent(field -> field.isRequired(required));
     }
 }

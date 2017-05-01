@@ -17,7 +17,10 @@ import java.util.List;
 
 import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
+import org.codice.ddf.admin.common.fields.common.UrlField;
+import org.codice.ddf.admin.sources.services.CswServiceProperties;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
 
 public class CswSourceConfigurationField extends SourceConfigUnionField {
@@ -27,9 +30,17 @@ public class CswSourceConfigurationField extends SourceConfigUnionField {
     public static final String DESCRIPTION =
             "Represents a CSW configuration containing properties to be saved.";
 
+    public static final String OUTPUT_SCHEMA = CswServiceProperties.OUTPUT_SCHEMA;
+
+    public static final String FORCED_SPATIAL_FILTER = CswServiceProperties.FORCE_SPATIAL_FILTER;
+
+    public static final String EVENT_SERVICE_ADDRESS = CswServiceProperties.EVENT_SERVICE_ADDRESS;
+
     private StringField outputSchema;
 
     private StringField forceSpatialFilter;
+
+    private UrlField eventServiceAddress;
 
     public CswSourceConfigurationField() {
         super(FIELD_TYPE_NAME, DESCRIPTION);
@@ -45,20 +56,33 @@ public class CswSourceConfigurationField extends SourceConfigUnionField {
         return this;
     }
 
+    public CswSourceConfigurationField eventServiceAddress(String url) {
+        this.eventServiceAddress.setValue(url);
+        return this;
+    }
+
     public String outputSchema() {
         return outputSchema.getValue();
+    }
+
+    public StringField outputSchemaField() {
+        return outputSchema;
     }
 
     public String forceSpatialFilter() {
         return forceSpatialFilter.getValue();
     }
 
-    @Override
-    public List<Field> getFields() {
-        return new ImmutableList.Builder<Field>().addAll(super.getFields())
-                .add(outputSchema)
-                .add(forceSpatialFilter)
-                .build();
+    public StringField forceSpatialFilterField() {
+        return  forceSpatialFilter;
+    }
+
+    public String eventServiceAddress() {
+        return eventServiceAddress.getValue();
+    }
+
+    public UrlField getEventServiceAddressField() {
+        return eventServiceAddress;
     }
 
     @Override
@@ -70,7 +94,28 @@ public class CswSourceConfigurationField extends SourceConfigUnionField {
     @Override
     public void initializeFields() {
         super.initializeFields();
-        outputSchema = new StringField("outputSchema");
-        forceSpatialFilter = new StringField("forceSpatialFilter");
+        outputSchema = new StringField(OUTPUT_SCHEMA);
+        forceSpatialFilter = new StringField(FORCED_SPATIAL_FILTER);
+        eventServiceAddress = new UrlField(EVENT_SERVICE_ADDRESS);
+    }
+
+    @Override
+    public List<Field> getFields() {
+        // TODO: 4/28/17 phuffer -  Add additional fields once implemented
+        return new ImmutableList.Builder<Field>().addAll(super.getFields())
+                .add(outputSchema)
+                .add(forceSpatialFilter)
+                .add(eventServiceAddress)
+                .build();
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add(OUTPUT_SCHEMA, outputSchema())
+                .add(FORCED_SPATIAL_FILTER, forceSpatialFilter())
+                .add(EVENT_SERVICE_ADDRESS, eventServiceAddress())
+                .addValue(super.toString())
+                .toString();
     }
 }

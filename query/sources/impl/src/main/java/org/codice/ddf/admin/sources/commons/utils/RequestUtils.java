@@ -41,8 +41,10 @@ public class RequestUtils {
 
     private static final int PING_TIMEOUT = 500;
 
+    private static final Integer CXF_CLIENT_TIMEOUT = 10000;
+
     /**
-     * Sends a get request to the specified URL. It does NOT check the response status code or body.
+     * Sends a get request to the specified URL and returns the content of the response.
      *
      * @param urlField contains the URL to send the get request to
      * @param creds    option credentials consisting of a username and password
@@ -51,26 +53,30 @@ public class RequestUtils {
     public Result<String> sendGetRequest(UrlField urlField, CredentialsField creds,
             Map<String, String> queryParams) {
         WebClient client = generateClient(urlField, creds);
-
-        for (Map.Entry<String, String> e : queryParams.entrySet()) {
-            client.query(e.getKey(), e.getValue());
-        }
+        queryParams.entrySet()
+                .forEach(entry -> client.query(entry.getKey(), entry.getValue()));
 
         Response response;
+        Result<String> responseBody = new Result<>();
         try {
             response = client.get();
-        } catch(ProcessingException e) {
-            LOGGER.debug("Processing exception while sending GET request to [{}].", urlField.getValue(), e);
-            return new Result<String>().argumentMessage(cannotConnectError(urlField.fieldName()));
+        } catch (ProcessingException e) {
+            // TODO: 4/27/17 phuffer - figure out how cert errors are handled here
+            LOGGER.debug("Processing exception while sending GET request to [{}].",
+                    urlField.getValue(),
+                    e);
+            responseBody.argumentMessage(cannotConnectError(urlField.path()));
+            return responseBody;
         }
 
         if (response.getStatus() != HTTP_OK || response.readEntity(String.class)
                 .equals("")) {
             LOGGER.debug("Bad or empty response received from sending GET to {}.",
                     urlField.getValue());
-            return new Result<String>().argumentMessage(cannotConnectError(urlField.fieldName()));
+            responseBody.argumentMessage(cannotConnectError(urlField.path()));
+            return responseBody;
         }
-        return new Result<>(response.readEntity(String.class));
+        return responseBody.value(response.readEntity(String.class));
     }
 
     /**
@@ -82,20 +88,22 @@ public class RequestUtils {
      * @param content     Body of the post request
      * @return a {@link Result} containing the POST request response body or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
      */
-    public Result sendPostRequest(UrlField urlField, CredentialsField creds,
+    public Result<String> sendPostRequest(UrlField urlField, CredentialsField creds,
             String contentType, String content) {
         WebClient client = generateClient(urlField, creds);
-
         Response response = client.type(contentType)
                 .post(content);
 
+        Result<String> responseBodyResult = new Result<>();
         if (response.getStatus() != HTTP_OK || response.readEntity(String.class)
                 .equals("")) {
-            LOGGER.debug("Bad or empty response received from sending POST to {}.", urlField.getValue());
-            return new Result().argumentMessage(cannotConnectError(urlField.fieldName()));
+            LOGGER.debug("Bad or empty response received from sending POST to {}.",
+                    urlField.getValue());
+            responseBodyResult.argumentMessage(cannotConnectError(urlField.path()));
+            return responseBodyResult;
         }
 
-        return new Result<>(response.readEntity(String.class));
+        return responseBodyResult.value(response.readEntity(String.class));
     }
 
     /**
@@ -113,19 +121,32 @@ public class RequestUtils {
             LOGGER.debug("Successfully reached {}.", urlField);
         } catch (IOException e) {
             LOGGER.debug("Failed to reach {}, returning an error.", urlField, e);
-            errors.add(cannotConnectError(urlField.fieldName()));
+            errors.add(cannotConnectError(urlField.path()));
         }
         return errors;
     }
 
+    // TODO: 4/28/17 phuffer - explore creating a client with disableCnCheck to true if first attempt at discovery fails
     private WebClient generateClient(UrlField url, CredentialsField creds) {
         String username = creds == null ? null : creds.username();
         String password = creds == null ? null : creds.password();
 
         SecureCxfClientFactory<WebClient> clientFactory =
                 username == null && password == null ? new SecureCxfClientFactory<>(url.getValue(),
-                        WebClient.class) : new SecureCxfClientFactory<>(url.getValue(),
                         WebClient.class,
+                        null,
+                        null,
+                        false,
+                        false,
+                        CXF_CLIENT_TIMEOUT,
+                        CXF_CLIENT_TIMEOUT) : new SecureCxfClientFactory<>(url.getValue(),
+                        WebClient.class,
+                        null,
+                        null,
+                        false,
+                        false,
+                        CXF_CLIENT_TIMEOUT,
+                        CXF_CLIENT_TIMEOUT,
                         username,
                         password);
         return clientFactory.getClient();

@@ -25,6 +25,7 @@ import org.codice.ddf.admin.common.fields.common.UrlField;
 import org.codice.ddf.admin.sources.fields.FactoryPid;
 import org.codice.ddf.admin.sources.fields.ServicePid;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
 
 public class SourceConfigUnionField extends BaseUnionField {
@@ -68,6 +69,7 @@ public class SourceConfigUnionField extends BaseUnionField {
         super(FIELD_NAME, fieldTypeName, description, UNION_TYPES, true);
     }
 
+    // Setters
     public SourceConfigUnionField factoryPid(String factoryPid) {
         this.factoryPid.setValue(factoryPid);
         return this;
@@ -100,6 +102,7 @@ public class SourceConfigUnionField extends BaseUnionField {
         return this;
     }
 
+    // Getters
     public String sourceName() {
         return sourceName.getValue();
     }
@@ -116,8 +119,16 @@ public class SourceConfigUnionField extends BaseUnionField {
         return factoryPid.getValue();
     }
 
+    public FactoryPid factoryPidField() {
+        return factoryPid;
+    }
+
     public String servicePid() {
         return servicePid.getValue();
+    }
+
+    public ServicePid servicePidField() {
+        return servicePid;
     }
 
     public AddressField address() {
@@ -126,6 +137,10 @@ public class SourceConfigUnionField extends BaseUnionField {
 
     public String endpointUrl() {
         return endpointUrl.getValue();
+    }
+
+    public UrlField endpointUrlField() {
+        return endpointUrl;
     }
 
     @Override
@@ -141,5 +156,19 @@ public class SourceConfigUnionField extends BaseUnionField {
         endpointUrl = new UrlField(ENDPOINT_URL_FIELD);
         creds = new CredentialsField();
         address = new AddressField();
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("factoryPid", factoryPid())
+                .add("servicePid", servicePid())
+                .add("sourceName", sourceName())
+                .add("sourcePort", address().port())
+                .add("hostname", address().hostname())
+                .add("endpointUrl", endpointUrl())
+                .add("sourceUserName", credentials().username())
+                .add("sourceUserPassword", "*****")
+                .toString();
     }
 }

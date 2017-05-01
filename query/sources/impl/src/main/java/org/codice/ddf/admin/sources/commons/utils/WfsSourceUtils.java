@@ -13,12 +13,11 @@
  */
 package org.codice.ddf.admin.sources.commons.utils;
 
-import static org.codice.ddf.admin.common.message.DefaultMessages.INTERNAL_ERROR_MESSAGE;
 import static org.codice.ddf.admin.common.message.DefaultMessages.unknownEndpointError;
 import static org.codice.ddf.admin.sources.commons.SourceUtilCommons.SOURCES_NAMESPACE_CONTEXT;
 import static org.codice.ddf.admin.sources.commons.SourceUtilCommons.createDocument;
-import static org.codice.ddf.admin.sources.commons.services.WfsServiceProperties.WFS1_FACTORY_PID;
-import static org.codice.ddf.admin.sources.commons.services.WfsServiceProperties.WFS2_FACTORY_PID;
+import static org.codice.ddf.admin.sources.services.WfsServiceProperties.WFS1_FACTORY_PID;
+import static org.codice.ddf.admin.sources.services.WfsServiceProperties.WFS2_FACTORY_PID;
 
 import java.util.List;
 import java.util.Map;
@@ -27,6 +26,7 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.codice.ddf.admin.api.action.Message;
 import org.codice.ddf.admin.common.Result;
 import org.codice.ddf.admin.common.fields.common.AddressField;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
@@ -75,13 +75,9 @@ public class WfsSourceUtils {
      * @param creds    optional username and password to add to Basic Auth header
      * @return a {@link Result} containing the {@link UrlField} or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
      */
-    public Result<UrlField> sendWfsCapabilitiesRequest(UrlField urlField, CredentialsField creds) {
-        Result result = requestUtils.sendGetRequest(urlField, creds, GET_CAPABILITIES_PARAMS);
-        if (result.hasErrors()) {
-            return new Result<UrlField>().argumentMessages(result.argumentMessages());
-        }
-
-        return new Result<>(urlField);
+    public List<Message> sendWfsCapabilitiesRequest(UrlField urlField, CredentialsField creds) {
+        Result<String> result = requestUtils.sendGetRequest(urlField, creds, GET_CAPABILITIES_PARAMS);
+        return result.allMessages();
     }
 
     /**
@@ -92,18 +88,21 @@ public class WfsSourceUtils {
      * @return @return a {@link Result} containing the {@link UrlField} or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
      */
     public Result<UrlField> discoverWfsUrl(AddressField addressField, CredentialsField creds) {
+        Result<UrlField> defaultResult = new Result<>();
+        defaultResult.argumentMessage(unknownEndpointError(addressField.path()));
+
         return URL_FORMATS.stream()
                 .map(format -> String.format(format, addressField.hostname(), addressField.port()))
                 .map(url -> {
-                    // TODO: 4/19/17 phuffer - override this guys path with addressField
                     UrlField urlField = new UrlField(addressField.fieldName());
+                    urlField.updatePath(addressField.path());
                     urlField.setValue(url);
                     return urlField;
                 })
-                .map(urlField -> sendWfsCapabilitiesRequest(urlField, creds))
-                .filter(result -> !result.hasErrors())
+                .filter(urlField -> sendWfsCapabilitiesRequest(urlField, creds).isEmpty())
+                .map(Result::new)
                 .findFirst()
-                .orElse(new Result<UrlField>().argumentMessage(unknownEndpointError(addressField.fieldName())));
+                .orElse(defaultResult);
     }
 
     /**
@@ -114,21 +113,22 @@ public class WfsSourceUtils {
      * @return @return a {@link Result} containing the preferred {@link SourceConfigUnionField} or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
      */
     public Result<SourceConfigUnionField> getPreferredWfsConfig(UrlField urlField, CredentialsField creds) {
-        Result<String> urlResult = requestUtils.sendGetRequest(urlField, creds, GET_CAPABILITIES_PARAMS);
+        Result<String> responseBodyResult = requestUtils.sendGetRequest(urlField, creds, GET_CAPABILITIES_PARAMS);
+        Result<SourceConfigUnionField> configResult = new Result<>();
+        if (responseBodyResult.hasErrors()) {
+            configResult.argumentMessages(responseBodyResult.argumentMessages());
+            return configResult;
 
-        if (urlResult.hasErrors()) {
-            return new Result<SourceConfigUnionField>().argumentMessages(urlResult.argumentMessages());
         }
 
-        Result<SourceConfigUnionField> result = new Result<>();
-        String requestBody = urlResult.get();
+        String requestBody = responseBodyResult.get();
         Document capabilitiesXml;
         try {
             capabilitiesXml = createDocument(requestBody);
         } catch (Exception e) {
             LOGGER.debug("Failed to read response from WFS endpoint.");
-            result.argumentMessage(INTERNAL_ERROR_MESSAGE);
-            return result;
+            configResult.argumentMessage(unknownEndpointError(urlField.path()));
+            return configResult;
         }
 
         WfsSourceConfigurationField preferredConfig = new WfsSourceConfigurationField();
@@ -146,17 +146,18 @@ public class WfsSourceUtils {
                     .evaluate(capabilitiesXml);
         } catch (XPathExpressionException e) {
             LOGGER.debug("Failed to parse XML response.");
-            result.argumentMessage(INTERNAL_ERROR_MESSAGE);
-            return result;
+            configResult.argumentMessage(unknownEndpointError(urlField.path()));
+            return configResult;
         }
         switch (wfsVersion) {
         case "2.0.0":
-            return result.value(preferredConfig.factoryPid(WFS2_FACTORY_PID));
+            return configResult.value(preferredConfig.factoryPid(WFS2_FACTORY_PID));
         case "1.0.0":
-            return result.value(preferredConfig.factoryPid(WFS1_FACTORY_PID));
+            return configResult.value(preferredConfig.factoryPid(WFS1_FACTORY_PID));
         default:
             LOGGER.debug("Unsupported WFS version discovered.");
-            return result.argumentMessage(unknownEndpointError(urlField.fieldName()));
+            configResult.argumentMessage(unknownEndpointError(urlField.path()));
+            return configResult;
         }
     }
 }

@@ -45,18 +45,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>18.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpcore</artifactId>
-            <version>4.4.5</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.5.2</version>
+            <version>${guava.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -101,14 +90,6 @@
             <artifactId>security-core-api</artifactId>
             <version>${ddf.version}</version>
         </dependency>
-
-        <!--Spock dependencies-->
-        <dependency>
-            <groupId>ddf.lib</groupId>
-            <artifactId>spock-shaded</artifactId>
-            <version>${ddf.version}</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -122,8 +103,6 @@
                             admin-query-common,
                             admin-query-sources-common,
                             commons-lang3,
-                            httpclient,
-                            httpcore,
 
                             <!--TODO: Clean this up once we make CxfClientFactory OSGi friendly-->
                             security-rest-cxfwrapper,
@@ -157,7 +136,7 @@
                             <rules>
                                 <ArtifactSizeEnforcerRule
                                         implementation="org.codice.ddf.admin.beta.enforcer.ArtifactSizeEnforcerRule">
-                                    <maxArtifactSize>4.2_MB</maxArtifactSize>
+                                    <maxArtifactSize>3.2_MB</maxArtifactSize>
                                 </ArtifactSizeEnforcerRule>
                             </rules>
                         </configuration>
@@ -182,17 +161,17 @@
                                         <limit>
                                             <counter>INSTRUCTION</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.00</minimum>
+                                            <minimum>0.25</minimum>
                                         </limit>
                                         <limit>
                                             <counter>BRANCH</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.00</minimum>
+                                            <minimum>0.21</minimum>
                                         </limit>
                                         <limit>
                                             <counter>COMPLEXITY</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.00</minimum>
+                                            <minimum>0.24</minimum>
                                         </limit>
                                     </limits>
                                 </rule>

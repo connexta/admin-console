@@ -13,30 +13,32 @@
  */
 package org.codice.ddf.admin.sources.commons;
 
-import static org.codice.ddf.admin.common.message.DefaultMessages.failedDeleteError;
 import static org.codice.ddf.admin.common.message.DefaultMessages.failedPersistError;
-import static org.codice.ddf.admin.common.message.DefaultMessages.failedUpdateError;
-import static org.codice.ddf.admin.sources.commons.SourceMessages.noConfigFoundError;
-import static org.codice.ddf.admin.sources.commons.utils.SourceValidationUtils.validUpdateConfig;
-import static org.codice.ddf.admin.sources.commons.utils.SourceValidationUtils.validateSourceName;
+import static org.codice.ddf.admin.common.services.ServiceCommons.persist;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.codice.ddf.admin.api.action.Message;
-import org.codice.ddf.admin.configurator.Configurator;
+import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
+import org.codice.ddf.admin.configurator.ConfigReader;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
-import org.codice.ddf.admin.configurator.OperationReport;
 import org.codice.ddf.admin.sources.fields.ServicePid;
 import org.codice.ddf.admin.sources.fields.SourceInfoField;
 import org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField;
+
+import ddf.catalog.source.ConnectedSource;
+import ddf.catalog.source.FederatedSource;
 
 public class SourceActionCommons {
 
     public static SourceInfoField createSourceInfoField(String sourceHandlerName,
             boolean isAvailable, SourceConfigUnionField config) {
+        config.credentials().password("*****");
         SourceInfoField sourceInfoField = new SourceInfoField();
         sourceInfoField.sourceHandlerName(sourceHandlerName);
         sourceInfoField.isAvaliable(isAvailable);
@@ -44,66 +46,53 @@ public class SourceActionCommons {
         return sourceInfoField;
     }
 
-    public static List<Message> persist(SourceConfigUnionField config, ConfiguratorFactory configuratorFactory,
-            Map<String, Object> serviceProps) {
-        List<Message> validationMsgs = validateSourceName(config.sourceNameField(), configuratorFactory);
-        if (CollectionUtils.isNotEmpty(validationMsgs)) {
-            return validationMsgs;
+    public static List<Message> persistSource(SourceConfigUnionField config,
+            Map<String, Object> serviceProps, ConfiguratorFactory configuratorFactory) {
+        if (!persist(serviceProps, config.factoryPid(), configuratorFactory)) {
+            return Collections.singletonList(failedPersistError(config.path()));
         }
-
-        Configurator configurator = configuratorFactory.getConfigurator();
-        configurator.createManagedService(config.factoryPid(), serviceProps);
-        OperationReport report = configurator.commit("Source saved with details: {}",
-                config.toString());
-
-        if (report.containsFailedResults()) {
-            validationMsgs.add(failedPersistError(config.path()));
-        }
-
-        return validationMsgs;
+        return Collections.emptyList();
     }
 
-    public static List<Message> updateConfig(ServicePid servicePid, SourceConfigUnionField config,
-            ConfiguratorFactory configuratorFactory, Map<String, Object> newConfig) {
-        List<Message> validationMsgs = validUpdateConfig(servicePid,
-                config.sourceNameField(),
-                configuratorFactory);
+    /**
+     * Gets the configurations for the given factoryPids using the {@link ConfiguratorFactory}. A mapper is used
+     * to transform the service properties to a {@link SourceConfigUnionField}.
+     *
+     * @param factoryPids factory pids to lookup configurations for
+     * @param mapper a {@link Function} taking a map of string to objects and returning a {@code SourceConfigUnionField}
+     * @param selector a {@code ServicePid} to select a single configuration, returns all configs when null or empty
+     * @return a list of {@code SourceInfoField}s configured in the system
+     */
+    public static ListFieldImpl<SourceInfoField> getSourceConfigurations(List<String> factoryPids, Function<Map<String, Object>, SourceConfigUnionField> mapper,
+            ServicePid selector, ConfiguratorFactory configuratorFactory, String actionHandlerId) {
+        ListFieldImpl<SourceInfoField> sourceInfoListField = new ListFieldImpl<>(SourceInfoField.class);
+        ConfigReader configReader = configuratorFactory.getConfigReader();
 
-        if (CollectionUtils.isNotEmpty(validationMsgs)) {
-            return validationMsgs;
+        if (StringUtils.isNotEmpty(selector.getValue())) {
+            SourceConfigUnionField config = mapper.apply(configReader.getConfig(selector.getValue()));
+            sourceInfoListField.add(createSourceInfoField(actionHandlerId, true, config));
+            return sourceInfoListField;
         }
 
-        Configurator configurator = configuratorFactory.getConfigurator();
-        configurator.updateConfigFile(servicePid.getValue(), newConfig, true);
-        OperationReport report = configurator.commit("Updated config with pid [{}].",
-                servicePid.getValue());
+        factoryPids.stream()
+                .flatMap(factoryPid -> configReader.getManagedServiceConfigs(factoryPid)
+                        .values()
+                        .stream())
+                .map(mapper)
+                .forEach(config -> sourceInfoListField.add(createSourceInfoField(actionHandlerId, true, config)));
 
-        if(report.containsFailedResults()) {
-            validationMsgs.add(failedUpdateError(config.path()));
-        }
+        return sourceInfoListField;
 
-        return validationMsgs;
     }
 
-    public static List<Message> deleteConfig(ServicePid servicePid,
-            ConfiguratorFactory configuratorFactory, Map<String, Object> configToDelete) {
-        List<Message> errors = new ArrayList<>();
 
-        if (configToDelete.isEmpty()) {
-            errors.add(noConfigFoundError(servicePid.path()));
-            return errors;
-        }
+    public static ListFieldImpl<SourceInfoField> getAllSourceConfigurations(ConfiguratorFactory configuratorFactory) {
+        ListFieldImpl<SourceInfoField> sourceInfoListField = new ListFieldImpl<>(SourceInfoField.class);
+        ConfigReader configReader = configuratorFactory.getConfigReader();
 
-        Configurator configurator = configuratorFactory.getConfigurator();
-        configurator.deleteManagedService(servicePid.getValue());
-        OperationReport report = configurator.commit("Deleted source with pid [{}].",
-                servicePid.getValue());
+        Set<FederatedSource> federatedSources = configReader.getServices(FederatedSource.class, null);
+        Set<ConnectedSource> connectedSource = configReader.getServices(ConnectedSource.class, null);
 
-        if (report.containsFailedResults()) {
-            errors.add(failedDeleteError(servicePid.path()));
-            return errors;
-        }
-
-        return errors;
+        return sourceInfoListField;
     }
 }

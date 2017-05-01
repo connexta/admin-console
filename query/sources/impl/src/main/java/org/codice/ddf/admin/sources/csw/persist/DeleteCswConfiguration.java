@@ -13,18 +13,18 @@
  */
 package org.codice.ddf.admin.sources.csw.persist;
 
+import static org.codice.ddf.admin.common.message.DefaultMessages.failedDeleteError;
+import static org.codice.ddf.admin.common.message.DefaultMessages.noExistingConfigError;
+import static org.codice.ddf.admin.common.services.ServiceCommons.configExists;
+import static org.codice.ddf.admin.common.services.ServiceCommons.delete;
 import static org.codice.ddf.admin.sources.commons.SourceActionCommons.createSourceInfoField;
-import static org.codice.ddf.admin.sources.commons.SourceActionCommons.deleteConfig;
-import static org.codice.ddf.admin.sources.commons.services.CswServiceProperties.servicePropsToCswConfig;
+import static org.codice.ddf.admin.sources.commons.SourceActionCommons.getAllSourceConfigurations;
+import static org.codice.ddf.admin.sources.services.CswServiceProperties.servicePropsToCswConfig;
 
 import java.util.List;
-import java.util.Map;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.codice.ddf.admin.api.action.Message;
 import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.common.actions.BaseAction;
-import org.codice.ddf.admin.configurator.ConfigReader;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.sources.fields.ServicePid;
 import org.codice.ddf.admin.sources.fields.SourceInfoField;
@@ -36,7 +36,7 @@ public class DeleteCswConfiguration extends BaseAction<SourceInfoField> {
     public static final String ID = "deleteCswSource";
 
     public static final String DESCRIPTION =
-            "Deletes a CSW source configuration and returns the deleted configuration.";
+            "Deletes a CSW source configuration provided by the servicePid and returns the deleted configuration.";
 
     private ServicePid servicePid;
 
@@ -52,16 +52,25 @@ public class DeleteCswConfiguration extends BaseAction<SourceInfoField> {
 
     @Override
     public SourceInfoField performAction() {
-        ConfigReader configReader = configuratorFactory.getConfigReader();
-        Map<String, Object> configToDelete = configReader.getConfig(servicePid.getValue());
-
-        List<Message> results = deleteConfig(servicePid, configuratorFactory, configToDelete);
-        if (CollectionUtils.isNotEmpty(results)) {
-            results.forEach(this::addArgumentMessage);
+        if(!delete(servicePid.getValue(), configuratorFactory)) {
+            addArgumentMessage(failedDeleteError(servicePid.path()));
             return null;
         }
 
-        return createSourceInfoField(ID, false, servicePropsToCswConfig(configToDelete));
+        getAllSourceConfigurations(configuratorFactory);
+        return createSourceInfoField(ID, false, servicePropsToCswConfig(configuratorFactory.getConfigReader().getConfig(servicePid.getValue())));
+    }
+
+    @Override
+    public void validate() {
+        super.validate();
+        if (containsErrorMsgs()) {
+            return;
+        }
+
+        if (!configExists(servicePid.getValue(), configuratorFactory)) {
+            addArgumentMessage(noExistingConfigError(servicePid.path()));
+        }
     }
 
     @Override

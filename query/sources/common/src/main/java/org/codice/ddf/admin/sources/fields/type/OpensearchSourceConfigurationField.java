@@ -31,6 +31,7 @@ public class OpensearchSourceConfigurationField extends SourceConfigUnionField {
 
     @Override
     public List<Field> getFields() {
+        // TODO: 4/28/17 phuffer -  Add additional fields once implemented
         return new ImmutableList.Builder<Field>().addAll(super.getFields())
                 .build();
     }

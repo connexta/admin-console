@@ -21,7 +21,7 @@ public class ServicePid extends StringField {
 
     public static final String FIELD_TYPE_NAME = "ServicePid";
 
-    public static final String DESCRIPTION = "A unique ID used for persisting a configuration.";
+    public static final String DESCRIPTION = "A unique ID used for identifying a configuration.";
 
     public ServicePid() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);

@@ -26,24 +26,15 @@
     <name>DDF :: Admin (Beta) :: Sources :: Common</name>
     <dependencies>
         <dependency>
-            <groupId>org.codice.ddf.admin.beta</groupId>
-            <artifactId>admin-query-common</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpcore</artifactId>
-            <version>4.4.5</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.5.2</version>
-        </dependency>
-        <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>${guava.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.codice.ddf.admin.beta</groupId>
+            <artifactId>admin-query-common</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.codice.ddf.admin.beta</groupId>
@@ -55,6 +46,7 @@
             <artifactId>configurator-api</artifactId>
             <version>${project.version}</version>
         </dependency>
+
         <dependency>
             <groupId>ddf.platform.security</groupId>
             <artifactId>security-rest-cxfwrapper</artifactId>

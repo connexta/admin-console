@@ -43,11 +43,19 @@ public class DefaultMessages {
 
     public static final String INTERNAL_ERROR = "INTERNAL_ERROR";
 
-    public static final String FAILED_UPDATE_ERROR = "FAILED_UPDATE_ERROR";
+    public static final String FAILED_UPDATE_ERROR = "FAILED_UPDATE";
 
-    public static final String FAILED_DELETE_ERROR = "FAILED_DELETE_ERROR";
+    public static final String FAILED_DELETE_ERROR = "FAILED_DELETE";
+
+    public static final String INVALID_URL_ERROR = "INVALID_URL";
+
+    public static final String NO_EXISTING_CONFIG = "NO_EXISTING_CONFIG";
 
     public static final ErrorMessage INTERNAL_ERROR_MESSAGE = new ErrorMessage(INTERNAL_ERROR);
+
+    public static ErrorMessage failedPersistError() {
+        return new ErrorMessage(FAILED_PERSIST);
+    }
 
     public static ErrorMessage failedPersistError(List<String> path) {
         return new ErrorMessage(FAILED_PERSIST, path);
@@ -57,9 +65,6 @@ public class DefaultMessages {
         return new ErrorMessage(UNSUPPORTED_ENUM, path);
     }
 
-    public static ErrorMessage failedPersistError() {
-        return new ErrorMessage(FAILED_PERSIST);
-    }
 
     public static ErrorMessage missingKeyValue(List<String> path) {
         return new ErrorMessage(MISSING_KEY_VALUE, path);
@@ -85,16 +90,16 @@ public class DefaultMessages {
         return new ErrorMessage(INVALID_CONTEXT_PATH, path);
     }
 
-    public static ErrorMessage unknownEndpointError(String pathOrigin) {
-        return new ErrorMessage(UNKNOWN_ENDPOINT, pathOrigin);
+    public static ErrorMessage unknownEndpointError(List<String> path) {
+        return new ErrorMessage(UNKNOWN_ENDPOINT, path);
     }
 
-    public static ErrorMessage cannotConnectError(String pathOrigin) {
-        return new ErrorMessage(CANNOT_CONNECT, pathOrigin);
+    public static ErrorMessage cannotConnectError(List<String> path) {
+        return new ErrorMessage(CANNOT_CONNECT, path);
     }
 
-    public static ErrorMessage certError(String pathOrigin) {
-        return new ErrorMessage(CERT_ERROR, pathOrigin);
+    public static ErrorMessage certError(List<String> path) {
+        return new ErrorMessage(CERT_ERROR, path);
     }
 
     public static ErrorMessage failedUpdateError(List<String> path) {
@@ -105,11 +110,19 @@ public class DefaultMessages {
         return new ErrorMessage(FAILED_DELETE_ERROR, path);
     }
 
+    public static ErrorMessage invalidUrlError(List<String> path) {
+        return new ErrorMessage(INVALID_URL_ERROR, path);
+    }
+
+    public static ErrorMessage noExistingConfigError(List<String> path) {
+        return new ErrorMessage(NO_EXISTING_CONFIG, path);
+    }
+
     /*
         Warnings
      */
 
-    public static WarningMessage unstrustedCaWarning(String pathOrigin) {
-        return new WarningMessage(UNTRUSTED_CA, pathOrigin);
+    public static WarningMessage unstrustedCaWarning(List<String> path) {
+        return new WarningMessage(UNTRUSTED_CA, path);
     }
 }

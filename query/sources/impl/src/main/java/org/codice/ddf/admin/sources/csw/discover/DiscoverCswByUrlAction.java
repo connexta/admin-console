@@ -33,7 +33,7 @@ public class DiscoverCswByUrlAction extends BaseAction<SourceInfoField> {
     public static final String ID = "discoverCswByUrl";
 
     public static final String DESCRIPTION =
-            "Attempts to discover aCSW source given a URL, and optional username and password.";
+            "Attempts to discover a CSW source given a URL, and optional username and password.";
 
     private UrlField endpointUrl;
 
@@ -46,14 +46,12 @@ public class DiscoverCswByUrlAction extends BaseAction<SourceInfoField> {
         cswSourceUtils = new CswSourceUtils();
         credentialsField = new CredentialsField();
         endpointUrl = new UrlField("endpointUrl");
-
         endpointUrl.isRequired(true);
-        credentialsField.allFieldsRequired(false);
     }
 
-    @Override
-    public List<Field> getArguments() {
-        return ImmutableList.of(endpointUrl, credentialsField);
+    public DiscoverCswByUrlAction(CswSourceUtils cswSourceUtils) {
+        this();
+        this.cswSourceUtils = cswSourceUtils;
     }
 
     @Override
@@ -64,5 +62,10 @@ public class DiscoverCswByUrlAction extends BaseAction<SourceInfoField> {
             return null;
         }
         return createSourceInfoField(ID, true, configResult.get());
+    }
+
+    @Override
+    public List<Field> getArguments() {
+        return ImmutableList.of(endpointUrl, credentialsField);
     }
 }

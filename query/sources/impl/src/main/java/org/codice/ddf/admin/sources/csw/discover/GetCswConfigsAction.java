@@ -13,18 +13,16 @@
  */
 package org.codice.ddf.admin.sources.csw.discover;
 
-import static org.codice.ddf.admin.sources.commons.SourceActionCommons.createSourceInfoField;
-import static org.codice.ddf.admin.sources.commons.services.CswServiceProperties.CSW_FACTORY_PIDS;
+import static org.codice.ddf.admin.sources.commons.SourceActionCommons.getSourceConfigurations;
+import static org.codice.ddf.admin.sources.services.CswServiceProperties.CSW_FACTORY_PIDS;
+import static org.codice.ddf.admin.sources.services.CswServiceProperties.SERVICE_PROPS_TO_CSW_CONFIG;
 
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.common.actions.BaseAction;
 import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
-import org.codice.ddf.admin.configurator.ConfigReader;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
-import org.codice.ddf.admin.sources.commons.services.CswServiceProperties;
 import org.codice.ddf.admin.sources.fields.ServicePid;
 import org.codice.ddf.admin.sources.fields.SourceInfoField;
 
@@ -45,41 +43,19 @@ public class GetCswConfigsAction extends BaseAction<ListFieldImpl<SourceInfoFiel
         super(ID, DESCRIPTION, new ListFieldImpl<>(SourceInfoField.class));
         this.configuratorFactory = configuratorFactory;
         servicePid = new ServicePid();
-        servicePid.isRequired(false);
+    }
+
+    @Override
+    public ListFieldImpl<SourceInfoField> performAction() {
+        return getSourceConfigurations(CSW_FACTORY_PIDS,
+                SERVICE_PROPS_TO_CSW_CONFIG,
+                servicePid,
+                configuratorFactory,
+                ID);
     }
 
     @Override
     public List<Field> getArguments() {
         return ImmutableList.of(servicePid);
-    }
-
-    @Override
-    public ListFieldImpl<SourceInfoField> performAction() {
-        ListFieldImpl<SourceInfoField> sourceInfoListField =
-                new ListFieldImpl<>(SourceInfoField.class);
-        ConfigReader configReader = configuratorFactory.getConfigReader();
-
-        CSW_FACTORY_PIDS.stream()
-                .flatMap(factoryPid -> configReader.getManagedServiceConfigs(factoryPid)
-                        .values()
-                        .stream())
-                .map(CswServiceProperties::servicePropsToCswConfig)
-                .filter(config -> {
-                    if (StringUtils.isNotEmpty(servicePid.getValue())) {
-                        return config.servicePid()
-                                .equals(servicePid.getValue());
-                    }
-                    return true;
-                })
-                .forEach(config -> sourceInfoListField.add(createSourceInfoField(ID,
-                        true,
-                        config)));
-
-        sourceInfoListField.getList()
-                .forEach(source -> source.config()
-                        .credentials()
-                        .password("*****"));
-
-        return sourceInfoListField;
     }
 }

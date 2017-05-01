@@ -13,7 +13,7 @@
  **/
 package org.codice.ddf.admin.common.fields.common;
 
-import static org.codice.ddf.admin.common.message.DefaultMessages.invalidFieldError;
+import static org.codice.ddf.admin.common.message.DefaultMessages.invalidUrlError;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -50,11 +50,13 @@ public class UrlField extends StringField {
             return validationMsgs;
         }
 
-        try {
-            new URL(getValue());
-        } catch (MalformedURLException e) {
-            LOGGER.debug("Failed to validate URL [{}].", getValue());
-            validationMsgs.add(invalidFieldError(path()));
+        if(getValue() != null) {
+            try {
+                new URL(getValue());
+            } catch (MalformedURLException e) {
+                LOGGER.debug("Failed to validate URL [{}].", getValue());
+                validationMsgs.add(invalidUrlError(path()));
+            }
         }
 
         return validationMsgs;

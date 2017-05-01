@@ -17,9 +17,9 @@ import static org.codice.ddf.admin.common.message.DefaultMessages.INTERNAL_ERROR
 import static org.codice.ddf.admin.common.message.DefaultMessages.unknownEndpointError;
 import static org.codice.ddf.admin.sources.commons.SourceUtilCommons.SOURCES_NAMESPACE_CONTEXT;
 import static org.codice.ddf.admin.sources.commons.SourceUtilCommons.createDocument;
-import static org.codice.ddf.admin.sources.commons.services.CswServiceProperties.CSW_GMD_FACTORY_PID;
-import static org.codice.ddf.admin.sources.commons.services.CswServiceProperties.CSW_PROFILE_FACTORY_PID;
-import static org.codice.ddf.admin.sources.commons.services.CswServiceProperties.CSW_SPEC_FACTORY_PID;
+import static org.codice.ddf.admin.sources.services.CswServiceProperties.CSW_GMD_FACTORY_PID;
+import static org.codice.ddf.admin.sources.services.CswServiceProperties.CSW_PROFILE_FACTORY_PID;
+import static org.codice.ddf.admin.sources.services.CswServiceProperties.CSW_SPEC_FACTORY_PID;
 
 import java.util.List;
 import java.util.Map;
@@ -28,6 +28,7 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 
+import org.codice.ddf.admin.api.action.Message;
 import org.codice.ddf.admin.common.Result;
 import org.codice.ddf.admin.common.fields.common.AddressField;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
@@ -75,20 +76,16 @@ public class CswSourceUtils {
     }
 
     /**
-     * Confirms whether or not an endpoint has CSW capabilities.
+     * Confirms whether or not an endpoint has CSW capabilities and returns the URL if it does.
      *
      * @param urlField the url endpoint
      * @param creds    optional credentials for basic authentication
-     * @return a {@link Result} containing the {@link UrlField} or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
+     * @return a {@code List} containing {@link org.codice.ddf.admin.common.message.ErrorMessage}s on failure.
      */
-    public Result<UrlField> sendCswCapabilitiesRequest(UrlField urlField, CredentialsField creds) {
+    public List<Message> sendCswCapabilitiesRequest(UrlField urlField, CredentialsField creds) {
         Result result = requestUtils.sendGetRequest(urlField, creds,
                 GET_CAPABILITIES_PARAMS);
-        if (result.hasErrors()) {
-            return new Result<UrlField>().argumentMessages(result.argumentMessages());
-        }
-
-        return new Result<>(urlField);
+        return result.allMessages();
     }
 
     /**
@@ -99,18 +96,21 @@ public class CswSourceUtils {
      * @return a {@link Result} containing the {@link UrlField} or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
      */
     public Result<UrlField> discoverCswUrl(AddressField addressField, CredentialsField creds) {
+        Result<UrlField> defaultResult = new Result<>();
+        defaultResult.argumentMessage(unknownEndpointError(addressField.path()));
+
         return URL_FORMATS.stream()
                 .map(format -> String.format(format, addressField.hostname(), addressField.port()))
                 .map(url -> {
-                    // TODO: 4/19/17 phuffer - override this guys path with addressField
                     UrlField urlField = new UrlField(addressField.fieldName());
                     urlField.setValue(url);
+                    urlField.updatePath(addressField.path());
                     return urlField;
                 })
-                .map(urlField -> sendCswCapabilitiesRequest(urlField, creds))
-                .filter(result -> !result.hasErrors())
+                .filter(urlField -> sendCswCapabilitiesRequest(urlField, creds).isEmpty())
+                .map(Result::new)
                 .findFirst()
-                .orElse(new Result<UrlField>().argumentMessage(unknownEndpointError(addressField.fieldName())));
+                .orElse(defaultResult);
     }
 
     /**
@@ -121,20 +121,23 @@ public class CswSourceUtils {
      * @return a {@link Result} containing the {@link SourceConfigUnionField} or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
      */
     public Result<SourceConfigUnionField> getPreferredCswConfig(UrlField urlField, CredentialsField creds) {
-        Result<String> getResponseBody = requestUtils.sendGetRequest(urlField, creds,
+        Result<String> responseBodyResult = requestUtils.sendGetRequest(urlField, creds,
                 GET_CAPABILITIES_PARAMS);
-        if (getResponseBody.hasErrors()) {
-            return new Result<SourceConfigUnionField>().argumentMessages(getResponseBody.argumentMessages());
-        }
 
         Result<SourceConfigUnionField> configResult = new Result<>();
-        String requestBody = getResponseBody.get();
+        if (responseBodyResult.hasErrors()) {
+            configResult.argumentMessages(responseBodyResult.argumentMessages());
+            return configResult;
+        }
+
+        String requestBody = responseBodyResult.get();
         Document capabilitiesXml;
         try {
             capabilitiesXml = createDocument(requestBody);
         } catch (Exception e) {
             LOGGER.debug("Failed to create XML document from response.");
-            return configResult.argumentMessage(INTERNAL_ERROR_MESSAGE);
+            configResult.argumentMessage(INTERNAL_ERROR_MESSAGE);
+            return configResult;
         }
 
         CswSourceConfigurationField preferred = new CswSourceConfigurationField();
@@ -175,8 +178,9 @@ public class CswSourceUtils {
             LOGGER.debug("Failed to compile generic CSW specification discovery XPath expression.");
         }
 
-        LOGGER.debug("URL [{}] responded to GetCapabilities request, but response was not readable",
+        LOGGER.debug("URL [{}] responded to GetCapabilities request, but response was not readable.",
                 urlField.getValue());
-        return configResult.argumentMessage(INTERNAL_ERROR_MESSAGE);
+        configResult.argumentMessage(unknownEndpointError(urlField.path()));
+        return configResult;
     }
 }

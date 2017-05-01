@@ -11,22 +11,19 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  */
-package org.codice.ddf.admin.sources.commons.services;
+package org.codice.ddf.admin.sources.services;
 
-import static org.codice.ddf.admin.sources.commons.services.SourceServiceProperties.FACTORY_PID_KEY;
-import static org.codice.ddf.admin.sources.commons.services.SourceServiceProperties.ID;
-import static org.codice.ddf.admin.sources.commons.services.SourceServiceProperties.PASSWORD;
-import static org.codice.ddf.admin.sources.commons.services.SourceServiceProperties.PORT;
-import static org.codice.ddf.admin.sources.commons.services.SourceServiceProperties.SERVICE_PID_KEY;
-import static org.codice.ddf.admin.sources.commons.services.SourceServiceProperties.SOURCE_HOSTNAME;
-import static org.codice.ddf.admin.sources.commons.services.SourceServiceProperties.USERNAME;
+import static org.codice.ddf.admin.common.services.ServiceCommons.FACTORY_PID_KEY;
+import static org.codice.ddf.admin.common.services.ServiceCommons.SERVICE_PID_KEY;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import org.codice.ddf.admin.sources.fields.type.OpensearchSourceConfigurationField;
+import org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField;
 
 public class OpenSearchServiceProperties {
 
@@ -34,8 +31,22 @@ public class OpenSearchServiceProperties {
 
     public static final String ENDPOINT_URL = "endpointUrl";
 
+    public static final String USERNAME = "username";
+
+    public static final String PASSWORD = "password";
+
+    public static final String ID = "id";
+
+    public static final String SOURCE_HOSTNAME = "sourceHostName";
+
+    public static final String PORT = "sourcePort";
+
     public static final List<String> OPENSEARCH_FACTORY_PIDS = Collections.singletonList(
             OPENSEARCH_FACTORY_PID);
+
+    public static final Function<Map<String, Object>, SourceConfigUnionField>
+            SERVICE_PROPS_TO_OPENSEARCH_CONFIG =
+            OpenSearchServiceProperties::servicePropsToOpenSearchConfig;
 
     public static final OpensearchSourceConfigurationField servicePropsToOpenSearchConfig(
             Map<String, Object> props) {

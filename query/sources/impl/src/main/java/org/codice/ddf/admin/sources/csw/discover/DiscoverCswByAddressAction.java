@@ -47,24 +47,13 @@ public class DiscoverCswByAddressAction extends BaseAction<SourceInfoField> {
         credentialsField = new CredentialsField();
         addressField = new AddressField();
         addressField.allFieldsRequired(true);
-
-        if(cswSourceUtils == null) {
-            cswSourceUtils = new CswSourceUtils();
-        }
+        cswSourceUtils = new CswSourceUtils();
     }
 
     public DiscoverCswByAddressAction(CswSourceUtils cswSourceUtils) {
-        super(ID, DESCRIPTION, new SourceInfoField());
-        credentialsField = new CredentialsField();
-        addressField = new AddressField();
+        this();
         this.cswSourceUtils = cswSourceUtils;
 
-        addressField.allFieldsRequired(true);
-    }
-
-    @Override
-    public List<Field> getArguments() {
-        return ImmutableList.of(addressField, credentialsField);
     }
 
     @Override
@@ -82,5 +71,10 @@ public class DiscoverCswByAddressAction extends BaseAction<SourceInfoField> {
         }
 
         return createSourceInfoField(ID, true, configResult.get());
+    }
+
+    @Override
+    public List<Field> getArguments() {
+        return ImmutableList.of(addressField, credentialsField);
     }
 }

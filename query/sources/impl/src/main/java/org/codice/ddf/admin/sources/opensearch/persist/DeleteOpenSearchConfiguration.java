@@ -17,20 +17,18 @@ import static org.codice.ddf.admin.common.message.DefaultMessages.failedDeleteEr
 import static org.codice.ddf.admin.common.message.DefaultMessages.noExistingConfigError;
 import static org.codice.ddf.admin.common.services.ServiceCommons.configExists;
 import static org.codice.ddf.admin.common.services.ServiceCommons.delete;
-import static org.codice.ddf.admin.sources.commons.SourceActionCommons.createSourceInfoField;
-import static org.codice.ddf.admin.sources.services.OpenSearchServiceProperties.servicePropsToOpenSearchConfig;
 
 import java.util.List;
 
 import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.common.actions.BaseAction;
+import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.sources.fields.ServicePid;
-import org.codice.ddf.admin.sources.fields.SourceInfoField;
 
 import com.google.common.collect.ImmutableList;
 
-public class DeleteOpenSearchConfiguration extends BaseAction<SourceInfoField> {
+public class DeleteOpenSearchConfiguration extends BaseAction<BooleanField> {
     public static final String ID = "deleteOpenSearchSource";
 
     public static final String DESCRIPTION =
@@ -41,19 +39,19 @@ public class DeleteOpenSearchConfiguration extends BaseAction<SourceInfoField> {
     private ConfiguratorFactory configuratorFactory;
 
     public DeleteOpenSearchConfiguration(ConfiguratorFactory configuratorFactory) {
-        super(ID, DESCRIPTION, new SourceInfoField());
+        super(ID, DESCRIPTION, new BooleanField());
         this.configuratorFactory = configuratorFactory;
         servicePid = new ServicePid();
         servicePid.isRequired(true);
     }
 
     @Override
-    public SourceInfoField performAction() {
+    public BooleanField performAction() {
         if(!delete(servicePid.getValue(), configuratorFactory)) {
             addArgumentMessage(failedDeleteError(servicePid.path()));
             return null;
         }
-        return createSourceInfoField(ID, false, servicePropsToOpenSearchConfig(configuratorFactory.getConfigReader().getConfig(servicePid.getValue())));
+        return new BooleanField(true);
     }
 
     @Override

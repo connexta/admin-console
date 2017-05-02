@@ -77,7 +77,7 @@ class DeleteCswConfigurationTest extends Specification {
 
         then:
         report.result() != null
-        assertConfig(report.result(), DeleteCswConfiguration.ID, configToDelete, S_PID)
+        report.result().getValue() == true
     }
 
     def 'test no config found with provided servicePid'() {

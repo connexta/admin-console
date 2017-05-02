@@ -13,7 +13,6 @@
  */
 package org.codice.ddf.admin.sources.commons.utils;
 
-import static org.codice.ddf.admin.sources.commons.SourceActionCommons.getAllSourceConfigurations;
 import static org.codice.ddf.admin.sources.commons.SourceMessages.duplicateSourceNameError;
 
 import java.util.Collections;
@@ -54,8 +53,6 @@ public class SourceValidationUtils {
             ConfiguratorFactory configuratorFactory, ServicePid servicePid) {
         ConfigReader configReader = configuratorFactory.getConfigReader();
         Set<FederatedSource> sources = configReader.getServices(FederatedSource.class, null);
-
-        getAllSourceConfigurations(configuratorFactory);
 
         if(servicePid != null && servicePid.getValue() != null) {
             Map<String, Object> existingConfig = configReader.getConfig(servicePid.getValue());

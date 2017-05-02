@@ -19,7 +19,6 @@ import static org.codice.ddf.admin.common.services.ServiceCommons.persist;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Function;
 
 import org.apache.commons.lang.StringUtils;
@@ -30,9 +29,6 @@ import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.sources.fields.ServicePid;
 import org.codice.ddf.admin.sources.fields.SourceInfoField;
 import org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField;
-
-import ddf.catalog.source.ConnectedSource;
-import ddf.catalog.source.FederatedSource;
 
 public class SourceActionCommons {
 
@@ -83,16 +79,5 @@ public class SourceActionCommons {
 
         return sourceInfoListField;
 
-    }
-
-
-    public static ListFieldImpl<SourceInfoField> getAllSourceConfigurations(ConfiguratorFactory configuratorFactory) {
-        ListFieldImpl<SourceInfoField> sourceInfoListField = new ListFieldImpl<>(SourceInfoField.class);
-        ConfigReader configReader = configuratorFactory.getConfigReader();
-
-        Set<FederatedSource> federatedSources = configReader.getServices(FederatedSource.class, null);
-        Set<ConnectedSource> connectedSource = configReader.getServices(ConnectedSource.class, null);
-
-        return sourceInfoListField;
     }
 }

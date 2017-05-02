@@ -17,7 +17,11 @@ import org.codice.ddf.admin.api.action.Action
 import org.codice.ddf.admin.api.fields.Field
 import org.codice.ddf.admin.common.Result
 import org.codice.ddf.admin.common.actions.BaseAction
-import org.codice.ddf.admin.common.fields.common.*
+import org.codice.ddf.admin.common.fields.common.AddressField
+import org.codice.ddf.admin.common.fields.common.CredentialsField
+import org.codice.ddf.admin.common.fields.common.HostnameField
+import org.codice.ddf.admin.common.fields.common.PortField
+import org.codice.ddf.admin.common.fields.common.UrlField
 import org.codice.ddf.admin.common.message.DefaultMessages
 import org.codice.ddf.admin.common.message.ErrorMessage
 import org.codice.ddf.admin.sources.commons.utils.CswSourceUtils
@@ -25,15 +29,20 @@ import org.codice.ddf.admin.sources.fields.SourceInfoField
 import org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField
 import spock.lang.Specification
 
+import static org.codice.ddf.admin.sources.SourceTestCommons.discoverByAddressActionArgs
+import static org.codice.ddf.admin.sources.SourceTestCommons.refreshDiscoverByAddressActionArgs
+
 class DiscoverCswByAddressActionTest extends Specification {
 
     Action discoverCswByAddressAction
 
     CswSourceUtils cswSourceUtils
 
-    static ADDRESS_FIELD_PATH = [DiscoverCswByAddressAction.ID, BaseAction.ARGUMENT, AddressField.DEFAULT_FIELD_NAME]
+    static BASE_PATH = [DiscoverCswByAddressAction.ID, BaseAction.ARGUMENT]
 
-    static CREDENTIALS_FIELD_PATH = [DiscoverCswByAddressAction.ID, BaseAction.ARGUMENT, CredentialsField.DEFAULT_FIELD_NAME]
+    static ADDRESS_FIELD_PATH = [BASE_PATH, AddressField.DEFAULT_FIELD_NAME].flatten()
+
+    static CREDENTIALS_FIELD_PATH = [BASE_PATH, CredentialsField.DEFAULT_FIELD_NAME].flatten()
 
     static PORT_FIELD_PATH = [ADDRESS_FIELD_PATH, PortField.DEFAULT_FIELD_NAME].flatten()
 
@@ -43,23 +52,21 @@ class DiscoverCswByAddressActionTest extends Specification {
 
     static PASSWORD_FIELD_PATH = [CREDENTIALS_FIELD_PATH, CredentialsField.PASSWORD].flatten()
 
-    def actionArgs
-
     def setup() {
-        refreshActionArgs()
+        refreshDiscoverByAddressActionArgs()
         cswSourceUtils = Mock(CswSourceUtils)
         discoverCswByAddressAction = new DiscoverCswByAddressAction(cswSourceUtils)
-        discoverCswByAddressAction.setArguments(actionArgs)
+        discoverCswByAddressAction.setArguments(discoverByAddressActionArgs)
     }
 
-    def 'test errors during discover csw url'() {
+    def 'test configurator errors during discover csw url'() {
         when:
         def result = discoverCswByAddressAction.process()
 
         then:
         1 * cswSourceUtils.discoverCswUrl(_ as Field, _ as Field) >> createResult(true, [AddressField.DEFAULT_FIELD_NAME], null)
         result.result() == null
-        result.messages().get(0).path == [DiscoverCswByAddressAction.ID, BaseAction.ARGUMENT, AddressField.DEFAULT_FIELD_NAME]
+        result.messages().get(0).path == ADDRESS_FIELD_PATH
     }
 
     def 'test errors during getting preferred csw config'() {
@@ -70,26 +77,26 @@ class DiscoverCswByAddressActionTest extends Specification {
         1 * cswSourceUtils.discoverCswUrl(_ as Field, _ as Field) >> createResult(false, [], UrlField.class)
         1 * cswSourceUtils.getPreferredCswConfig(_ as Field, _ as Field) >> createResult(true, [AddressField.DEFAULT_FIELD_NAME], null)
         result.result() == null
-        result.messages().get(0).path == [DiscoverCswByAddressAction.ID, BaseAction.ARGUMENT, AddressField.DEFAULT_FIELD_NAME]
+        result.messages().get(0).path == ADDRESS_FIELD_PATH
     }
 
     def 'test csw successfully discovered'() {
         when:
-        def result = discoverCswByAddressAction.process()
+        def report = discoverCswByAddressAction.process()
 
         then:
         1 * cswSourceUtils.discoverCswUrl(_ as Field, _ as Field) >> createResult(false, [], UrlField.class)
         1 * cswSourceUtils.getPreferredCswConfig(_ as Field, _ as Field) >> createResult(false, [], SourceConfigUnionField.class)
-        result.result() instanceof SourceInfoField
-        ((SourceInfoField) result.result()).sourceHandlerName() == DiscoverCswByAddressAction.ID
-        ((SourceInfoField) result.result()).isAvailable()
-        ((SourceInfoField) result.result()).config() != null
+        report.result() instanceof SourceInfoField
+        ((SourceInfoField) report.result()).sourceHandlerName() == DiscoverCswByAddressAction.ID
+        ((SourceInfoField) report.result()).isAvailable()
+        ((SourceInfoField) report.result()).config() != null
     }
 
     def 'test failure due to missing required address field'() {
         setup:
-        actionArgs.put(AddressField.DEFAULT_FIELD_NAME, [(PortField.DEFAULT_FIELD_NAME):null,(HostnameField.DEFAULT_FIELD_NAME): null])
-        discoverCswByAddressAction.setArguments(actionArgs)
+        discoverByAddressActionArgs.put(AddressField.DEFAULT_FIELD_NAME, [(PortField.DEFAULT_FIELD_NAME):null,(HostnameField.DEFAULT_FIELD_NAME): null])
+        discoverCswByAddressAction.setArguments(discoverByAddressActionArgs)
 
         when:
         def report = discoverCswByAddressAction.process()
@@ -105,8 +112,8 @@ class DiscoverCswByAddressActionTest extends Specification {
 
     def 'test failure due to provided credentials that are empty'() {
         setup:
-        actionArgs.put(CredentialsField.DEFAULT_FIELD_NAME, [(CredentialsField.PASSWORD):'',(CredentialsField.USERNAME): ''])
-        discoverCswByAddressAction.setArguments(actionArgs)
+        discoverByAddressActionArgs.put(CredentialsField.DEFAULT_FIELD_NAME, [(CredentialsField.PASSWORD):'',(CredentialsField.USERNAME): ''])
+        discoverCswByAddressAction.setArguments(discoverByAddressActionArgs)
 
         when:
         def report = discoverCswByAddressAction.process()
@@ -131,18 +138,5 @@ class DiscoverCswByAddressActionTest extends Specification {
                 credentials() >> Mock(CredentialsField)
             }
         }
-    }
-
-    def refreshActionArgs() {
-        actionArgs = [
-            (AddressField.DEFAULT_FIELD_NAME)    : [
-                (PortField.DEFAULT_FIELD_NAME)    : 8993,
-                (HostnameField.DEFAULT_FIELD_NAME): "localhost"
-            ],
-            (CredentialsField.DEFAULT_FIELD_NAME): [
-                (CredentialsField.USERNAME): "admin",
-                (CredentialsField.PASSWORD): "admin"
-            ]
-        ]
     }
 }

@@ -18,7 +18,6 @@ import static org.codice.ddf.admin.common.message.DefaultMessages.noExistingConf
 import static org.codice.ddf.admin.common.services.ServiceCommons.configExists;
 import static org.codice.ddf.admin.common.services.ServiceCommons.delete;
 import static org.codice.ddf.admin.sources.commons.SourceActionCommons.createSourceInfoField;
-import static org.codice.ddf.admin.sources.commons.SourceActionCommons.getAllSourceConfigurations;
 import static org.codice.ddf.admin.sources.services.CswServiceProperties.servicePropsToCswConfig;
 
 import java.util.List;
@@ -57,7 +56,6 @@ public class DeleteCswConfiguration extends BaseAction<SourceInfoField> {
             return null;
         }
 
-        getAllSourceConfigurations(configuratorFactory);
         return createSourceInfoField(ID, false, servicePropsToCswConfig(configuratorFactory.getConfigReader().getConfig(servicePid.getValue())));
     }
 

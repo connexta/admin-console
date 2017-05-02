@@ -36,10 +36,6 @@ public class SourceConfigUnionField extends BaseUnionField {
 
     public static final String DESCRIPTION = "All supported source configuration types";
 
-    public static final String FACTORY_PID_FIELD = "factoryPid";
-
-    public static final String SERVICE_PID_FIELD = "servicePid";
-
     public static final String SOURCE_NAME_FIELD = "sourceName";
 
     public static final String ENDPOINT_URL_FIELD = "endpointUrl";
@@ -150,8 +146,8 @@ public class SourceConfigUnionField extends BaseUnionField {
 
     @Override
     public void initializeFields() {
-        factoryPid = new FactoryPid(FACTORY_PID_FIELD);
-        servicePid = new ServicePid(SERVICE_PID_FIELD);
+        factoryPid = new FactoryPid();
+        servicePid = new ServicePid();
         sourceName = new StringField(SOURCE_NAME_FIELD);
         endpointUrl = new UrlField(ENDPOINT_URL_FIELD);
         creds = new CredentialsField();

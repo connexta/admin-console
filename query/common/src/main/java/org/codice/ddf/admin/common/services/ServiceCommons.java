@@ -56,10 +56,7 @@ public class ServiceCommons {
     public static List<Message> update(StringField servicePidField, Map<String, Object> newConfig,
             ConfiguratorFactory configuratorFactory) {
         String servicePid = servicePidField.getValue();
-        Map<String, Object> existingConfig = configuratorFactory.getConfigReader()
-                .getConfig(servicePid);
-
-        if (existingConfig != null && existingConfig.isEmpty()) {
+        if (!configExists(servicePid, configuratorFactory)) {
             return Collections.singletonList(noExistingConfigError(servicePidField.path()));
         }
 

@@ -33,7 +33,7 @@ public class DeleteCswConfiguration extends BaseAction<BooleanField> {
     public static final String ID = "deleteCswSource";
 
     public static final String DESCRIPTION =
-            "Deletes a CSW source configuration provided by the servicePid and returns the deleted configuration.";
+            "Deletes a CSW source configuration provided by the servicePid and returns true on success and false on failure.";
 
     private ServicePid servicePid;
 
@@ -51,7 +51,7 @@ public class DeleteCswConfiguration extends BaseAction<BooleanField> {
     public BooleanField performAction() {
         if(!delete(servicePid.getValue(), configuratorFactory)) {
             addArgumentMessage(failedDeleteError(servicePid.path()));
-            return null;
+            return new BooleanField(false);
         }
         return new BooleanField(true);
     }

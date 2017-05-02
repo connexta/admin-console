@@ -16,7 +16,6 @@ package org.codice.ddf.admin.sources.csw.persist;
 import static org.codice.ddf.admin.common.message.DefaultMessages.noExistingConfigError;
 import static org.codice.ddf.admin.common.services.ServiceCommons.configExists;
 import static org.codice.ddf.admin.common.services.ServiceCommons.update;
-import static org.codice.ddf.admin.sources.commons.SourceActionCommons.createSourceInfoField;
 import static org.codice.ddf.admin.sources.commons.SourceActionCommons.persistSource;
 import static org.codice.ddf.admin.sources.commons.utils.SourceValidationUtils.validateSourceName;
 import static org.codice.ddf.admin.sources.services.CswServiceProperties.cswConfigToServiceProps;
@@ -26,19 +25,19 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.common.actions.BaseAction;
+import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.sources.fields.ServicePid;
-import org.codice.ddf.admin.sources.fields.SourceInfoField;
 import org.codice.ddf.admin.sources.fields.type.CswSourceConfigurationField;
 
 import com.google.common.collect.ImmutableList;
 
-public class SaveCswConfiguration extends BaseAction<SourceInfoField> {
+public class SaveCswConfiguration extends BaseAction<BooleanField> {
 
     public static final String ID = "saveCswSource";
 
     public static final String DESCRIPTION =
-            "Saves a CSW source configuration. If a pid is specified, the source configuration specified by the pid will be updated.";
+            "Saves a CSW source configuration. If a pid is specified, the source configuration specified by the pid will be updated. Returns true on success and false on failure.";
 
     private CswSourceConfigurationField config;
 
@@ -48,7 +47,7 @@ public class SaveCswConfiguration extends BaseAction<SourceInfoField> {
 
 
     public SaveCswConfiguration(ConfiguratorFactory configuratorFactory) {
-        super(ID, DESCRIPTION, new SourceInfoField());
+        super(ID, DESCRIPTION, new BooleanField());
         config = new CswSourceConfigurationField();
         servicePid = new ServicePid();
         config.isRequired(true);
@@ -59,7 +58,7 @@ public class SaveCswConfiguration extends BaseAction<SourceInfoField> {
     }
 
     @Override
-    public SourceInfoField performAction() {
+    public BooleanField performAction() {
         if (StringUtils.isNotEmpty(servicePid.getValue())) {
             addArgumentMessages(update(servicePid, cswConfigToServiceProps(config), configuratorFactory));
         } else {
@@ -67,9 +66,9 @@ public class SaveCswConfiguration extends BaseAction<SourceInfoField> {
         }
 
         if(containsErrorMsgs()) {
-            return null;
+            return new BooleanField(false);
         }
-        return createSourceInfoField(ID, true, config);
+        return new BooleanField(true);
     }
 
     @Override

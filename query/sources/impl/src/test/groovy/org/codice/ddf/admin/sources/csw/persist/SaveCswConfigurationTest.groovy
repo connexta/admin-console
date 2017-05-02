@@ -81,7 +81,7 @@ class SaveCswConfigurationTest extends Specification {
 
         then:
         report.result() != null
-        assertConfig(report.result(), SaveCswConfiguration.ID, actionArgs.get(SOURCE_CONFIG))
+        report.result().getValue() == true
     }
 
     def 'test fail to save new config due to duplicate source name'() {
@@ -105,7 +105,7 @@ class SaveCswConfigurationTest extends Specification {
         def report = saveCswConfiguration.process()
 
         then:
-        report.result() == null
+        report.result().getValue() == false
         report.messages().size() == 1
         report.messages().get(0).path == CONFIG_PATH
         report.messages().get(0).code == DefaultMessages.FAILED_PERSIST
@@ -124,7 +124,7 @@ class SaveCswConfigurationTest extends Specification {
 
         then:
         report.result() != null
-        assertConfig(report.result(), SaveCswConfiguration.ID, actionArgs.get(SOURCE_CONFIG))
+        report.result().getValue() == true
     }
 
     def 'test fail update config due to existing source name'() {
@@ -156,7 +156,7 @@ class SaveCswConfigurationTest extends Specification {
         def report = saveCswConfiguration.process()
 
         then:
-        report.result() == null
+        report.result().getValue() == false
         report.messages().size() == 1
         report.messages().get(0).path == SERVICE_PID_PATH
         report.messages().get(0).code == DefaultMessages.FAILED_UPDATE_ERROR
@@ -223,19 +223,6 @@ class SaveCswConfigurationTest extends Specification {
         report.messages().get(0).code == DefaultMessages.MISSING_REQUIRED_FIELD
     }
 
-    def assertConfig(Field field, String actionId, Map<String, Object> properties) {
-        def sourceInfo = (SourceInfoField) field
-        assert sourceInfo.isAvailable()
-        assert sourceInfo.sourceHandlerName() == actionId
-        assert sourceInfo.config().endpointUrl() == properties.get(ENDPOINT_URL)
-        assert sourceInfo.config().credentials().password() == "*****"
-        assert sourceInfo.config().credentials().username() == TEST_USERNAME
-        assert sourceInfo.config().sourceName() == TEST_SOURCENAME
-        assert sourceInfo.config().factoryPid() == F_PID
-        assert ((CswSourceConfigurationField)sourceInfo.config()).forceSpatialFilter() == TEST_SPATIAL_FILTER
-        assert ((CswSourceConfigurationField)sourceInfo.config()).outputSchema() == TEST_OUTPUT_SCHEMA
-        return true
-    }
 
     def mockReport(boolean hasError) {
         def report = Mock(OperationReport)

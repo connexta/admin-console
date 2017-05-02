@@ -32,7 +32,7 @@ public class DeleteOpenSearchConfiguration extends BaseAction<BooleanField> {
     public static final String ID = "deleteOpenSearchSource";
 
     public static final String DESCRIPTION =
-            "Deletes an OpenSearch source configuration and returns the deleted configuration.";
+            "Deletes an OpenSearch source configuration and returns true on success and false on failure.";
 
     private ServicePid servicePid;
 
@@ -49,7 +49,7 @@ public class DeleteOpenSearchConfiguration extends BaseAction<BooleanField> {
     public BooleanField performAction() {
         if(!delete(servicePid.getValue(), configuratorFactory)) {
             addArgumentMessage(failedDeleteError(servicePid.path()));
-            return null;
+            return new BooleanField(false);
         }
         return new BooleanField(true);
     }

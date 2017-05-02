@@ -91,7 +91,7 @@ class DeleteWfsConfigurationTest extends Specification {
         def report = deleteWfsConfiguration.process()
 
         then:
-        report.result() == null
+        report.result().getValue() == false
         report.messages().size() == 1
         report.messages().get(0).code == DefaultMessages.FAILED_DELETE_ERROR
         report.messages().get(0).path == SERVICE_PID_PATH

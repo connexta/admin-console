@@ -33,7 +33,7 @@ public class DeleteWfsConfiguration extends BaseAction<BooleanField> {
     public static final String ID = "deleteWfsSource";
 
     public static final String DESCRIPTION =
-            "Deletes a WFS source configuration and returns all existing source configurations.";
+            "Deletes a WFS source configuration specified by the servicePid and returns true on success and false on failure.";
 
     private ServicePid servicePid;
 
@@ -50,7 +50,7 @@ public class DeleteWfsConfiguration extends BaseAction<BooleanField> {
     public BooleanField performAction() {
         if(!delete(servicePid.getValue(), configuratorFactory)) {
             addArgumentMessage(failedDeleteError(servicePid.path()));
-            return null;
+            return new BooleanField(false);
         }
         return new BooleanField(true);
     }

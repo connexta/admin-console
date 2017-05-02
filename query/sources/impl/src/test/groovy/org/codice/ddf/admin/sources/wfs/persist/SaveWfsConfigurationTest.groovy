@@ -15,7 +15,6 @@ package org.codice.ddf.admin.sources.wfs.persist
 
 import ddf.catalog.source.FederatedSource
 import org.codice.ddf.admin.api.action.Action
-import org.codice.ddf.admin.api.fields.Field
 import org.codice.ddf.admin.common.actions.BaseAction
 import org.codice.ddf.admin.common.message.DefaultMessages
 import org.codice.ddf.admin.configurator.ConfigReader
@@ -23,7 +22,6 @@ import org.codice.ddf.admin.configurator.Configurator
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.configurator.OperationReport
 import org.codice.ddf.admin.sources.commons.SourceMessages
-import org.codice.ddf.admin.sources.fields.SourceInfoField
 import spock.lang.Specification
 
 import static org.codice.ddf.admin.sources.SourceTestCommons.*
@@ -76,8 +74,7 @@ class SaveWfsConfigurationTest extends Specification {
         def report = saveWfsConfiguration.process()
 
         then:
-        report.result() != null
-        assertConfig(report.result(), SaveWfsConfiguration.ID, saveConfigActionArgs.get(SOURCE_CONFIG))
+        report.result().getValue() == true
     }
 
     def 'test fail to save new config due to duplicate source name'() {
@@ -105,7 +102,7 @@ class SaveWfsConfigurationTest extends Specification {
         def report = saveWfsConfiguration.process()
 
         then:
-        report.result() == null
+        report.result().getValue() == false
         report.messages().size() == 1
         report.messages().get(0).code == DefaultMessages.FAILED_PERSIST
         report.messages().get(0).path == CONFIG_PATH
@@ -123,8 +120,7 @@ class SaveWfsConfigurationTest extends Specification {
         def report = saveWfsConfiguration.process()
 
         then:
-        report.result() != null
-        assertConfig(report.result(), SaveWfsConfiguration.ID, saveConfigActionArgs.get(SOURCE_CONFIG))
+        report.result().getValue() == true
     }
 
     def 'test fail update due to existing source name'() {
@@ -156,7 +152,7 @@ class SaveWfsConfigurationTest extends Specification {
         def report = saveWfsConfiguration.process()
 
         then:
-        report.result() == null
+        report.result().getValue() == false
         report.messages().size() == 1
         report.messages().get(0).path == SERVICE_PID_PATH
         report.messages().get(0).code == DefaultMessages.FAILED_UPDATE_ERROR
@@ -221,18 +217,6 @@ class SaveWfsConfigurationTest extends Specification {
         report.messages().size() == 1
         report.messages().get(0).path == ENDPOINT_URL_PATH
         report.messages().get(0).code == DefaultMessages.MISSING_REQUIRED_FIELD
-    }
-
-    def assertConfig(Field field, String actionId, Map<String, Object> properties) {
-        def sourceInfo = (SourceInfoField) field
-        assert sourceInfo.isAvailable()
-        assert sourceInfo.sourceHandlerName() == actionId
-        assert sourceInfo.config().endpointUrl() == properties.get(ENDPOINT_URL)
-        assert sourceInfo.config().credentials().password() == "*****"
-        assert sourceInfo.config().credentials().username() == TEST_USERNAME
-        assert sourceInfo.config().sourceName() == TEST_SOURCENAME
-        assert sourceInfo.config().factoryPid() == F_PID
-        return true
     }
 
     def mockReport(boolean hasError) {

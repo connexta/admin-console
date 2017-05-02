@@ -1,27 +1,34 @@
-package org.codice.ddf.admin.sources.opensearch.persist
+/**
+ * Copyright (c) Codice Foundation
+ * <p>
+ * This is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser
+ * General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or any later version.
+ * <p>
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details. A copy of the GNU Lesser General Public License
+ * is distributed along with this program and can be found at
+ * <http://www.gnu.org/licenses/lgpl.html>.
+ **/
+package org.codice.ddf.admin.sources.wfs.persist
 
 import org.codice.ddf.admin.api.action.Action
-import org.codice.ddf.admin.api.fields.Field
 import org.codice.ddf.admin.common.actions.BaseAction
 import org.codice.ddf.admin.common.message.DefaultMessages
 import org.codice.ddf.admin.configurator.ConfigReader
 import org.codice.ddf.admin.configurator.Configurator
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.configurator.OperationReport
-import org.codice.ddf.admin.sources.fields.SourceInfoField
-import org.codice.ddf.admin.sources.services.CswServiceProperties
 import spock.lang.Specification
 
 import static org.codice.ddf.admin.sources.SourceTestCommons.SERVICE_PID
-import static org.codice.ddf.admin.sources.SourceTestCommons.F_PID
-import static org.codice.ddf.admin.sources.SourceTestCommons.SOURCE_ID_1
 import static org.codice.ddf.admin.sources.SourceTestCommons.S_PID
-import static org.codice.ddf.admin.sources.SourceTestCommons.TEST_USERNAME
 import static org.codice.ddf.admin.sources.SourceTestCommons.configToBeDeleted
 
-class DeleteOpenSearchConfigurationTest extends Specification {
+class DeleteWfsConfigurationTest extends Specification {
 
-    Action deleteOpenSearchConfigurationAction
+    Action deleteWfsConfiguration
 
     ConfiguratorFactory configuratorFactory
 
@@ -29,7 +36,7 @@ class DeleteOpenSearchConfigurationTest extends Specification {
 
     Configurator configurator
 
-    static BASE_PATH = [DeleteOpenSearchConfiguration.ID, BaseAction.ARGUMENT]
+    static BASE_PATH = [DeleteWfsConfiguration.ID, BaseAction.ARGUMENT]
 
     static SERVICE_PID_PATH = [BASE_PATH, SERVICE_PID].flatten()
 
@@ -41,18 +48,20 @@ class DeleteOpenSearchConfigurationTest extends Specification {
         configReader = Mock(ConfigReader)
         configurator = Mock(Configurator)
         configuratorFactory = Mock(ConfiguratorFactory) {
-            getConfigurator() >> configurator
             getConfigReader() >> configReader
+            getConfigurator() >> getConfigurator()
         }
-        deleteOpenSearchConfigurationAction = new DeleteOpenSearchConfiguration(configuratorFactory)
+        deleteWfsConfiguration = new DeleteWfsConfiguration(configuratorFactory)
     }
 
     def 'test success delete config returns true'() {
-        when:
+        setup:
         configReader.getConfig(S_PID) >> configToBeDeleted
         configurator.commit(_, _) >> mockReport(false)
-        deleteOpenSearchConfigurationAction.setArguments(actionArgs)
-        def report = deleteOpenSearchConfigurationAction.process()
+        deleteWfsConfiguration.setArguments(actionArgs)
+
+        when:
+        def report = deleteWfsConfiguration.process()
 
         then:
         report.result() != null
@@ -60,10 +69,12 @@ class DeleteOpenSearchConfigurationTest extends Specification {
     }
 
     def 'test no config found with provided service pid'() {
-        when:
+        setup:
         configReader.getConfig(S_PID) >> [:]
-        deleteOpenSearchConfigurationAction.setArguments(actionArgs)
-        def report = deleteOpenSearchConfigurationAction.process()
+        deleteWfsConfiguration.setArguments(actionArgs)
+
+        when:
+        def report = deleteWfsConfiguration.process()
 
         then:
         report.result() == null
@@ -76,8 +87,8 @@ class DeleteOpenSearchConfigurationTest extends Specification {
         when:
         configReader.getConfig(S_PID) >> configToBeDeleted
         configurator.commit(_, _) >> mockReport(true)
-        deleteOpenSearchConfigurationAction.setArguments(actionArgs)
-        def report = deleteOpenSearchConfigurationAction.process()
+        deleteWfsConfiguration.setArguments(actionArgs)
+        def report = deleteWfsConfiguration.process()
 
         then:
         report.result() == null
@@ -88,7 +99,7 @@ class DeleteOpenSearchConfigurationTest extends Specification {
 
     def 'test failure due to required service pid argument not provided'() {
         when:
-        def report = deleteOpenSearchConfigurationAction.process()
+        def report = deleteWfsConfiguration.process()
 
         then:
         report.result() == null
@@ -99,27 +110,14 @@ class DeleteOpenSearchConfigurationTest extends Specification {
 
     def 'test failure due to service pid argument provided but empty'() {
         when:
-        deleteOpenSearchConfigurationAction.setArguments([(SERVICE_PID):''])
-        def report = deleteOpenSearchConfigurationAction.process()
+        deleteWfsConfiguration.setArguments([(SERVICE_PID):''])
+        def report = deleteWfsConfiguration.process()
 
         then:
         report.result() == null
         report.messages().size() == 1
         report.messages().get(0).code == DefaultMessages.EMPTY_FIELD
         report.messages().get(0).path == SERVICE_PID_PATH
-    }
-
-    def assertConfig(Field field, String actionId, Map<String, Object> properties, String servicePid) {
-        def sourceInfo = (SourceInfoField) field
-        assert !sourceInfo.isAvailable()
-        assert sourceInfo.sourceHandlerName() == actionId
-        assert sourceInfo.config().endpointUrl() == properties.get(CswServiceProperties.CSW_URL)
-        assert sourceInfo.config().credentials().password() == "*****"
-        assert sourceInfo.config().credentials().username() == TEST_USERNAME
-        assert sourceInfo.config().sourceName() == SOURCE_ID_1
-        assert sourceInfo.config().factoryPid() == F_PID
-        assert sourceInfo.config().servicePid() == servicePid
-        return true
     }
 
     def mockReport(boolean hasError) {

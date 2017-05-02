@@ -11,7 +11,7 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.sources.csw.discover
+package org.codice.ddf.admin.sources.wfs.discover
 
 import org.codice.ddf.admin.api.action.Action
 import org.codice.ddf.admin.api.fields.Field
@@ -21,58 +21,58 @@ import org.codice.ddf.admin.common.fields.common.CredentialsField
 import org.codice.ddf.admin.common.fields.common.UrlField
 import org.codice.ddf.admin.common.message.DefaultMessages
 import org.codice.ddf.admin.common.message.ErrorMessage
-import org.codice.ddf.admin.sources.commons.utils.CswSourceUtils
+import org.codice.ddf.admin.sources.commons.utils.WfsSourceUtils
 import org.codice.ddf.admin.sources.fields.SourceInfoField
 import org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField
 import spock.lang.Specification
 
 import static org.codice.ddf.admin.sources.SourceTestCommons.*
 
-class DiscoverCswByAddressActionTest extends Specification {
+class DiscoverWfsByAddressActionTest extends Specification {
 
-    Action discoverCswByAddressAction
+    Action discoverWfsAbyAddressAction
 
-    CswSourceUtils cswSourceUtils
+    WfsSourceUtils wfsSourceUtils
 
-    static BASE_PATH = [DiscoverCswByAddressAction.ID, BaseAction.ARGUMENT]
+    static BASE_PATH = [DiscoverWfsByAddressAction.ID, BaseAction.ARGUMENT]
 
     static ADDRESS_FIELD_PATH = [BASE_PATH, ADDRESS].flatten()
 
-    static CREDENTIALS_FIELD_PATH = [BASE_PATH, CREDENTIALS].flatten()
+    static HOSTNAME_FIELD_PATH = [ADDRESS_FIELD_PATH, HOSTNAME].flatten()
 
     static PORT_FIELD_PATH = [ADDRESS_FIELD_PATH, PORT].flatten()
 
-    static HOSTNAME_FIELD_PATH = [ADDRESS_FIELD_PATH, HOSTNAME].flatten()
-
-    static USERNAME_FIELD_PATH = [CREDENTIALS_FIELD_PATH, USERNAME].flatten()
+    static CREDENTIALS_FIELD_PATH = [BASE_PATH, CREDENTIALS].flatten()
 
     static PASSWORD_FIELD_PATH = [CREDENTIALS_FIELD_PATH, PASSWORD].flatten()
 
+    static USERNAME_FIELD_PATH = [CREDENTIALS_FIELD_PATH, USERNAME].flatten()
+
     def setup() {
         refreshDiscoverByAddressActionArgs()
-        cswSourceUtils = Mock(CswSourceUtils)
-        discoverCswByAddressAction = new DiscoverCswByAddressAction(cswSourceUtils)
-        discoverCswByAddressAction.setArguments(discoverByAddressActionArgs)
+        wfsSourceUtils = Mock(WfsSourceUtils)
+        discoverWfsAbyAddressAction = new DiscoverWfsByAddressAction(wfsSourceUtils)
+        discoverWfsAbyAddressAction.setArguments(discoverByAddressActionArgs)
     }
 
-    def 'test configurator errors during discover csw url'() {
+    def 'test errors during discover wfs url'() {
         when:
-        def report = discoverCswByAddressAction.process()
+        def report = discoverWfsAbyAddressAction.process()
 
         then:
-        1 * cswSourceUtils.discoverCswUrl(_ as Field, _ as Field) >> createResult(true, [ADDRESS], null)
+        1 * wfsSourceUtils.discoverWfsUrl(_ as Field, _ as Field) >> createResult(true, [ADDRESS], null)
         report.result() == null
         report.messages().size() == 1
         report.messages().get(0).path == ADDRESS_FIELD_PATH
     }
 
-    def 'test errors during getting preferred csw config'() {
+    def 'test errors during getting preferred wfs config'() {
         when:
-        def report = discoverCswByAddressAction.process()
+        def report = discoverWfsAbyAddressAction.process()
 
         then:
-        1 * cswSourceUtils.discoverCswUrl(_ as Field, _ as Field) >> createResult(false, [], UrlField.class)
-        1 * cswSourceUtils.getPreferredCswConfig(_ as Field, _ as Field) >> createResult(true, [ADDRESS], null)
+        1 * wfsSourceUtils.discoverWfsUrl(_ as Field, _ as Field) >> createResult(false, [], UrlField.class)
+        1 * wfsSourceUtils.getPreferredWfsConfig(_ as Field, _ as Field) >> createResult(true, [ADDRESS], null)
         report.result() == null
         report.messages().size() == 1
         report.messages().get(0).path == ADDRESS_FIELD_PATH
@@ -80,13 +80,13 @@ class DiscoverCswByAddressActionTest extends Specification {
 
     def 'test csw successfully discovered'() {
         when:
-        def report = discoverCswByAddressAction.process()
+        def report = discoverWfsAbyAddressAction.process()
 
         then:
-        1 * cswSourceUtils.discoverCswUrl(_ as Field, _ as Field) >> createResult(false, [], UrlField.class)
-        1 * cswSourceUtils.getPreferredCswConfig(_ as Field, _ as Field) >> createResult(false, [], SourceConfigUnionField.class)
-        report.result() instanceof SourceInfoField
-        ((SourceInfoField) report.result()).sourceHandlerName() == DiscoverCswByAddressAction.ID
+        1 * wfsSourceUtils.discoverWfsUrl(_ as Field, _ as Field) >> createResult(false, [], UrlField.class)
+        1 * wfsSourceUtils.getPreferredWfsConfig(_ as Field, _ as Field) >> createResult(false, [], SourceConfigUnionField.class)
+        report.result() != null
+        ((SourceInfoField) report.result()).sourceHandlerName() == DiscoverWfsByAddressAction.ID
         ((SourceInfoField) report.result()).isAvailable()
         ((SourceInfoField) report.result()).config() != null
     }
@@ -94,10 +94,10 @@ class DiscoverCswByAddressActionTest extends Specification {
     def 'test failure due to missing required address field'() {
         setup:
         discoverByAddressActionArgs.put(ADDRESS, [(PORT):null,(HOSTNAME): null])
-        discoverCswByAddressAction.setArguments(discoverByAddressActionArgs)
+        discoverWfsAbyAddressAction.setArguments(discoverByAddressActionArgs)
 
         when:
-        def report = discoverCswByAddressAction.process()
+        def report = discoverWfsAbyAddressAction.process()
 
         then:
         report.result() == null
@@ -111,10 +111,10 @@ class DiscoverCswByAddressActionTest extends Specification {
     def 'test failure due to invalid hostname' () {
         setup:
         discoverByAddressActionArgs.put(ADDRESS, [(PORT):8993,(HOSTNAME): 'h0s7n4m3!!'])
-        discoverCswByAddressAction.setArguments(discoverByAddressActionArgs)
+        discoverWfsAbyAddressAction.setArguments(discoverByAddressActionArgs)
 
         when:
-        def report = discoverCswByAddressAction.process()
+        def report = discoverWfsAbyAddressAction.process()
 
         then:
         report.result() == null
@@ -126,10 +126,10 @@ class DiscoverCswByAddressActionTest extends Specification {
     def 'test failure due to invalid port range'() {
         setup:
         discoverByAddressActionArgs.put(ADDRESS, [(PORT):port,(HOSTNAME): 'localhost'])
-        discoverCswByAddressAction.setArguments(discoverByAddressActionArgs)
+        discoverWfsAbyAddressAction.setArguments(discoverByAddressActionArgs)
 
         when:
-        def report = discoverCswByAddressAction.process()
+        def report = discoverWfsAbyAddressAction.process()
 
         then:
         report.result() == null
@@ -144,10 +144,10 @@ class DiscoverCswByAddressActionTest extends Specification {
     def 'test failure due to provided credentials that are empty'() {
         setup:
         discoverByAddressActionArgs.put(CREDENTIALS, [(PASSWORD):'',(USERNAME): ''])
-        discoverCswByAddressAction.setArguments(discoverByAddressActionArgs)
+        discoverWfsAbyAddressAction.setArguments(discoverByAddressActionArgs)
 
         when:
-        def report = discoverCswByAddressAction.process()
+        def report = discoverWfsAbyAddressAction.process()
 
         then:
         report.result() == null

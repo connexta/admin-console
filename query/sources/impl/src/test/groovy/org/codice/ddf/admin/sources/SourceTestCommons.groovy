@@ -105,7 +105,7 @@ class SourceTestCommons {
         ]
     ]
 
-    static deleteConfigActionArgs = [
+    static configToBeDeleted = [
             (PASSWORD)                    : TEST_PASSWORD,
             (ID)                          : SOURCE_ID_1,
             (FACTORY_PID_KEY)             : F_PID,

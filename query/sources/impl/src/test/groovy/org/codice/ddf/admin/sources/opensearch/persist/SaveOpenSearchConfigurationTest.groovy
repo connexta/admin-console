@@ -77,7 +77,7 @@ class SaveOpenSearchConfigurationTest extends Specification {
 
         then:
         report.result() != null
-        assertConfig(report.result(), SaveOpenSearchConfiguration.ID, saveConfigActionArgs.get(SOURCE_CONFIG), null)
+        assertConfig(report.result(), SaveOpenSearchConfiguration.ID, saveConfigActionArgs.get(SOURCE_CONFIG))
     }
 
     def 'test fail to save new config due to duplicate source name'() {
@@ -124,7 +124,7 @@ class SaveOpenSearchConfigurationTest extends Specification {
 
         then:
         report.result() != null
-        assertConfig(report.result(), SaveOpenSearchConfiguration.ID, saveConfigActionArgs.get(SOURCE_CONFIG), null)
+        assertConfig(report.result(), SaveOpenSearchConfiguration.ID, saveConfigActionArgs.get(SOURCE_CONFIG))
     }
 
     def 'test fail update config due to existing source name'() {
@@ -223,7 +223,7 @@ class SaveOpenSearchConfigurationTest extends Specification {
         report.messages().get(0).code == DefaultMessages.MISSING_REQUIRED_FIELD
     }
 
-    def assertConfig(Field field, String actionId, Map<String, Object> properties, String servicePid) {
+    def assertConfig(Field field, String actionId, Map<String, Object> properties) {
         def sourceInfo = (SourceInfoField) field
         assert sourceInfo.isAvailable()
         assert sourceInfo.sourceHandlerName() == actionId
@@ -232,9 +232,6 @@ class SaveOpenSearchConfigurationTest extends Specification {
         assert sourceInfo.config().credentials().username() == TEST_USERNAME
         assert sourceInfo.config().sourceName() == TEST_SOURCENAME
         assert sourceInfo.config().factoryPid() == F_PID
-        if(servicePid != null) {
-            assert sourceInfo.config().servicePid() == servicePid
-        }
         return true
     }
 

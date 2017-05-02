@@ -62,6 +62,7 @@ class DiscoverOpenSearchByAddressActionTest extends Specification {
         then:
         1 * openSearchSourceUtils.discoverOpenSearchUrl(_ as Field, _ as Field) >> createResult(true, [ADDRESS], null)
         report.result() == null
+        report.messages().size() == 1
         report.messages().get(0).path == ADDRESS_FIELD_PATH
     }
 
@@ -73,6 +74,7 @@ class DiscoverOpenSearchByAddressActionTest extends Specification {
         1 * openSearchSourceUtils.discoverOpenSearchUrl(_ as Field, _ as Field) >> createResult(false, [], UrlField.class)
         1 * openSearchSourceUtils.getOpenSearchConfig(_ as Field, _ as Field) >> createResult(true, [ADDRESS], null)
         report.result() == null
+        report.messages().size() == 1
         report.messages().get(0).path == ADDRESS_FIELD_PATH
     }
 
@@ -104,6 +106,39 @@ class DiscoverOpenSearchByAddressActionTest extends Specification {
         report.messages().get(0).path == HOSTNAME_FIELD_PATH
         report.messages().get(1).code == DefaultMessages.MISSING_REQUIRED_FIELD
         report.messages().get(1).path == PORT_FIELD_PATH
+    }
+
+    def 'test failure due to invalid hostname' () {
+        setup:
+        discoverByAddressActionArgs.put(ADDRESS, [(PORT):8993,(HOSTNAME): 'h0s7n4m3!!'])
+        discoverOpenSearchByAddressAction.setArguments(discoverByAddressActionArgs)
+
+        when:
+        def report = discoverOpenSearchByAddressAction.process()
+
+        then:
+        report.result() == null
+        report.messages().size() == 1
+        report.messages().get(0).code == DefaultMessages.INVALID_HOSTNAME
+        report.messages().get(0).path == HOSTNAME_FIELD_PATH
+    }
+
+    def 'test failure due to invalid port range'() {
+        setup:
+        discoverByAddressActionArgs.put(ADDRESS, [(PORT):port,(HOSTNAME): 'localhost'])
+        discoverOpenSearchByAddressAction.setArguments(discoverByAddressActionArgs)
+
+        when:
+        def report = discoverOpenSearchByAddressAction.process()
+
+        then:
+        report.result() == null
+        report.messages().size() == 1
+        report.messages().get(0).code == DefaultMessages.INVALID_PORT_RANGE
+        report.messages().get(0).path == PORT_FIELD_PATH
+
+        where:
+        port << [-1, 65536]
     }
 
     def 'test failure due to provided credentials that are empty'() {

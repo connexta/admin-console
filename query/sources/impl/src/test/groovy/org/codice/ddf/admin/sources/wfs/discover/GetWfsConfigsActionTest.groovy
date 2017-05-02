@@ -11,7 +11,7 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.sources.opensearch.discover
+package org.codice.ddf.admin.sources.wfs.discover
 
 import org.codice.ddf.admin.api.action.Action
 import org.codice.ddf.admin.api.fields.Field
@@ -26,17 +26,17 @@ import spock.lang.Specification
 
 import static org.codice.ddf.admin.sources.SourceTestCommons.*
 
-class GetOpenSearchConfigsActionTest extends Specification {
+class GetWfsConfigsActionTest extends Specification {
 
-    static BASE_PATH = [GetOpenSearchConfigsAction.ID, BaseAction.ARGUMENT]
-
-    static SERVICE_PID_PATH = [BASE_PATH, SERVICE_PID].flatten()
-
-    Action getOpenSearchConfigsAction
+    Action getWfsConfigsAction
 
     ConfiguratorFactory configuratorFactory
 
     ConfigReader configReader
+
+    static BASE_PATH = [GetWfsConfigsAction.ID, BaseAction.ARGUMENT]
+
+    static SERVICE_PID_PATH = [BASE_PATH, SERVICE_PID].flatten()
 
     def actionArgs = [
         (SERVICE_PID) : S_PID_2
@@ -47,41 +47,42 @@ class GetOpenSearchConfigsActionTest extends Specification {
         configuratorFactory = Mock(ConfiguratorFactory) {
             getConfigReader() >> configReader
         }
-        getOpenSearchConfigsAction = new GetOpenSearchConfigsAction(configuratorFactory)
+        getWfsConfigsAction = new GetWfsConfigsAction(configuratorFactory)
     }
 
-    def 'test no servicePid argument returns all configs'() {
+    def 'test no service pid arugment returns all configs'() {
         when:
-        def report = getOpenSearchConfigsAction.process()
+        def report = getWfsConfigsAction.process()
         def list = ((ListField)report.result())
 
         then:
         1 * configReader.getManagedServiceConfigs(_ as String) >> baseManagedServiceConfigs
+        1 * configReader.getManagedServiceConfigs(_ as String) >> [:]
         report.result() != null
         list.getList().size() == 2
-        assertConfig(list.getList().get(0), 0, GetOpenSearchConfigsAction.ID, SOURCE_ID_1, S_PID_1)
-        assertConfig(list.getList().get(1), 1, GetOpenSearchConfigsAction.ID, SOURCE_ID_2, S_PID_2)
+        assertConfig(list.getList().get(0), 0, GetWfsConfigsAction.ID, SOURCE_ID_1, S_PID_1)
+        assertConfig(list.getList().get(1), 1, GetWfsConfigsAction.ID, SOURCE_ID_2, S_PID_2)
     }
 
     def 'test service pid filter returns 1 result'() {
         setup:
-        getOpenSearchConfigsAction.setArguments(actionArgs)
+        getWfsConfigsAction.setArguments(actionArgs)
 
         when:
-        def report = getOpenSearchConfigsAction.process()
+        def report = getWfsConfigsAction.process()
         def list = ((ListField)report.result())
 
         then:
         1 * configReader.getConfig(S_PID_2) >> baseManagedServiceConfigs.get(S_PID_2)
         report.result() != null
         list.getList().size() == 1
-        assertConfig(list.getList().get(0), 0, GetOpenSearchConfigsAction.ID, SOURCE_ID_2, S_PID_2)
+        assertConfig(list.getList().get(0), 0, GetWfsConfigsAction.ID, SOURCE_ID_2, S_PID_2)
     }
 
     def 'test failure due to provided but empty service pid field'() {
         when:
-        getOpenSearchConfigsAction.setArguments([(SERVICE_PID) : ''])
-        def report = getOpenSearchConfigsAction.process()
+        getWfsConfigsAction.setArguments([(SERVICE_PID) : ''])
+        def report = getWfsConfigsAction.process()
 
         then:
         report.result() == null

@@ -30,9 +30,17 @@ import static org.codice.ddf.admin.sources.SourceTestCommons.SERVICE_PID
 import static org.codice.ddf.admin.sources.SourceTestCommons.SOURCE_ID_1
 import static org.codice.ddf.admin.sources.SourceTestCommons.S_PID
 import static org.codice.ddf.admin.sources.SourceTestCommons.TEST_USERNAME
-import static org.codice.ddf.admin.sources.SourceTestCommons.deleteConfigActionArgs
+import static org.codice.ddf.admin.sources.SourceTestCommons.configToBeDeleted
 
 class DeleteCswConfigurationTest extends Specification {
+
+    Action deleteCswConfiguration
+
+    ConfiguratorFactory configuratorFactory
+
+    ConfigReader configReader
+
+    Configurator configurator
 
     static TEST_CSW_URL = "testCswUrl"
 
@@ -43,14 +51,6 @@ class DeleteCswConfigurationTest extends Specification {
     static BASE_PATH = [DeleteCswConfiguration.ID, BaseAction.ARGUMENT]
 
     static SERVICE_PID_PATH = [BASE_PATH, SERVICE_PID].flatten()
-
-    Action deleteCswConfiguration
-
-    ConfiguratorFactory configuratorFactory
-
-    ConfigReader configReader
-
-    Configurator configurator
 
     def actionArgs = [
         (SERVICE_PID) : S_PID
@@ -68,7 +68,7 @@ class DeleteCswConfigurationTest extends Specification {
         deleteCswConfiguration = new DeleteCswConfiguration(configuratorFactory)
     }
 
-    def 'test success delete config returns deleted config source info'() {
+    def 'test success delete config returns true'() {
         when:
         configReader.getConfig(S_PID) >> configToDelete
         configurator.commit(_, _) >> mockReport(false)
@@ -150,7 +150,7 @@ class DeleteCswConfigurationTest extends Specification {
     }
 
     def createCswConfigToDelete() {
-        configToDelete = deleteConfigActionArgs
+        configToDelete = configToBeDeleted
         configToDelete.put(EVENT_SERVICE_ADDRESS, TEST_EVENT_SERVICE_ADDRESS)
         configToDelete.put(CswServiceProperties.CSW_URL, TEST_CSW_URL)
         return configToDelete;

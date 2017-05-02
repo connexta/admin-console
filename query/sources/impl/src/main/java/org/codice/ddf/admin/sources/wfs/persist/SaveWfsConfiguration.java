@@ -35,7 +35,7 @@ import com.google.common.collect.ImmutableList;
 
 public class SaveWfsConfiguration extends BaseAction<SourceInfoField> {
 
-    private static final String ID = "saveWfsSource";
+    public static final String ID = "saveWfsSource";
 
     private static final String DESCRIPTION =
             "Saves a WFS source configuration. If a pid is specified, the source configuration specified by the pid will be updated.";

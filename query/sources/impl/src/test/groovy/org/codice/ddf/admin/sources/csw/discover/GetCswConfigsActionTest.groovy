@@ -66,12 +66,14 @@ class GetCswConfigsActionTest extends Specification {
         def list = ((ListField)report.result())
 
         then:
+        1 * configReader.getServices(_, _) >> [new TestSource(S_PID_1, true)]
+        1 * configReader.getServices(_, _) >> [new TestSource(S_PID_2, false)]
         1 * configReader.getManagedServiceConfigs(CswServiceProperties.CSW_PROFILE_FACTORY_PID) >> managedServiceConfigs
         2 * configReader.getManagedServiceConfigs(_ as String) >> [:]
         report.result() != null
         list.getList().size() == 2
-        assertConfig(list.getList().get(0), 0, GetCswConfigsAction.ID, managedServiceConfigs.get(S_PID_1), SOURCE_ID_1, S_PID_1)
-        assertConfig(list.getList().get(1), 1, GetCswConfigsAction.ID, managedServiceConfigs.get(S_PID_2), SOURCE_ID_2, S_PID_2)
+        assertConfig(list.getList().get(0), 0, GetCswConfigsAction.ID, managedServiceConfigs.get(S_PID_1), SOURCE_ID_1, S_PID_1, true)
+        assertConfig(list.getList().get(1), 1, GetCswConfigsAction.ID, managedServiceConfigs.get(S_PID_2), SOURCE_ID_2, S_PID_2, false)
     }
 
     def 'test service pid filter returns 1 result'() {
@@ -81,10 +83,12 @@ class GetCswConfigsActionTest extends Specification {
         def list = ((ListField)report.result())
 
         then:
+        1 * configReader.getServices(_, _) >> [new TestSource(S_PID_2, false)]
+        1 * configReader.getServices(_, _) >> []
         1 * configReader.getConfig(S_PID_2) >>  managedServiceConfigs.get(S_PID_2)
         report.result() != null
         list.getList().size() == 1
-        assertConfig(list.getList().get(0), 0, GetCswConfigsAction.ID, managedServiceConfigs.get(S_PID_2), SOURCE_ID_2, S_PID_2)
+        assertConfig(list.getList().get(0), 0, GetCswConfigsAction.ID, managedServiceConfigs.get(S_PID_2), SOURCE_ID_2, S_PID_2, false)
     }
 
     def 'test failure due to provided but empty servicePid field'() {
@@ -99,10 +103,10 @@ class GetCswConfigsActionTest extends Specification {
         report.messages().get(0).path == SERVICE_PID_PATH
     }
 
-    def assertConfig(Field field, int index, String actionId, Map<String, Object> properties, String sourceName, String servicePid) {
+    def assertConfig(Field field, int index, String actionId, Map<String, Object> properties, String sourceName, String servicePid, boolean availability) {
         def sourceInfo = (SourceInfoField) field
         assert sourceInfo.fieldName() == ListFieldImpl.INDEX_DELIMETER + index
-        assert sourceInfo.isAvailable()
+        assert sourceInfo.isAvailable() == availability
         assert sourceInfo.sourceHandlerName() == actionId
         assert sourceInfo.config().endpointUrl() == properties.get(CswServiceProperties.CSW_URL)
         assert sourceInfo.config().credentials().password() == "*****"
@@ -121,4 +125,6 @@ class GetCswConfigsActionTest extends Specification {
         managedServiceConfigs.get(S_PID_2).put((CswServiceProperties.CSW_URL), TEST_URL)
         return managedServiceConfigs
     }
+
+
 }

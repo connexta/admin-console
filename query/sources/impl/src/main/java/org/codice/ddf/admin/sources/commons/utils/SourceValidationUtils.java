@@ -13,13 +13,13 @@
  */
 package org.codice.ddf.admin.sources.commons.utils;
 
+import static org.codice.ddf.admin.sources.commons.SourceActionCommons.getAllSourceReferences;
 import static org.codice.ddf.admin.sources.commons.SourceMessages.duplicateSourceNameError;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 import org.codice.ddf.admin.api.action.Message;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
@@ -30,7 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ddf.catalog.service.ConfiguredService;
-import ddf.catalog.source.FederatedSource;
+import ddf.catalog.source.Source;
 
 public class SourceValidationUtils {
 
@@ -52,7 +52,7 @@ public class SourceValidationUtils {
     public static List<Message> validateSourceName(StringField sourceName,
             ConfiguratorFactory configuratorFactory, ServicePid servicePid) {
         ConfigReader configReader = configuratorFactory.getConfigReader();
-        Set<FederatedSource> sources = configReader.getServices(FederatedSource.class, null);
+        List<Source> sources = getAllSourceReferences(configuratorFactory);
 
         if(servicePid != null && servicePid.getValue() != null) {
             Map<String, Object> existingConfig = configReader.getConfig(servicePid.getValue());

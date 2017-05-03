@@ -51,23 +51,14 @@ public class OpenSearchServiceProperties {
     public static final OpensearchSourceConfigurationField servicePropsToOpenSearchConfig(
             Map<String, Object> props) {
         OpensearchSourceConfigurationField config = new OpensearchSourceConfigurationField();
-        config.factoryPid(
-                props.get(FACTORY_PID_KEY) == null ? null : (String) props.get(FACTORY_PID_KEY));
-        config.servicePid(
-                props.get(SERVICE_PID_KEY) == null ? null : (String) props.get(SERVICE_PID_KEY));
-        config.sourceName(props.get(ID) == null ? null : (String) props.get(ID));
-        config.address()
-                .hostname(props.get(SOURCE_HOSTNAME) == null ?
-                        null :
-                        (String) props.get(SOURCE_HOSTNAME));
-        config.address()
-                .port(props.get(PORT) == null ? 0 : (int) props.get(PORT));
-        config.endpointUrl(
-                props.get(ENDPOINT_URL) == null ? null : (String) props.get(ENDPOINT_URL));
-        config.credentials()
-                .username(props.get(USERNAME) == null ? null : (String) props.get(USERNAME));
-        config.credentials()
-                .password(props.get(PASSWORD) == null ? null : (String) props.get(PASSWORD));
+        config.factoryPid(mapStringValue(props, FACTORY_PID_KEY));
+        config.servicePid(mapStringValue(props, SERVICE_PID_KEY));
+        config.sourceName(mapStringValue(props, ID));
+        config.address().hostname(mapStringValue(props, SOURCE_HOSTNAME));
+        config.address().port(props.get(PORT) == null ? 0 : (int) props.get(PORT));
+        config.endpointUrl(mapStringValue(props, ENDPOINT_URL));
+        config.credentials().username(mapStringValue(props, USERNAME));
+        config.credentials().password(mapStringValue(props, PASSWORD));
         return config;
     }
 
@@ -89,5 +80,9 @@ public class OpenSearchServiceProperties {
                             .password());
         }
         return props;
+    }
+
+    private static String mapStringValue(Map<String, Object> props, String key) {
+        return props.get(key) == null ? null : (String) props.get(key);
     }
 }

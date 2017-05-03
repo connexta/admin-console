@@ -13,6 +13,13 @@
  **/
 package org.codice.ddf.admin.sources
 
+import ddf.catalog.data.ContentType
+import ddf.catalog.operation.QueryRequest
+import ddf.catalog.operation.SourceResponse
+import ddf.catalog.service.ConfiguredService
+import ddf.catalog.source.Source
+import ddf.catalog.source.SourceMonitor
+import ddf.catalog.source.UnsupportedQueryException
 import org.codice.ddf.admin.common.fields.common.*
 import org.codice.ddf.admin.common.services.ServiceCommons
 import org.codice.ddf.admin.sources.fields.FactoryPid
@@ -160,5 +167,75 @@ class SourceTestCommons {
                 (PASSWORD): TEST_PASSWORD
             ]
         ]
+    }
+
+    /**
+     * Needed to be able to successfully test the case where a Source is casted to a ConfiguredService
+     * for Source availabilities
+     */
+    static class TestSource implements Source, ConfiguredService {
+
+        boolean availability
+        String pid
+
+        TestSource(String pid, boolean availability) {
+            this.pid = pid
+            this.availability = availability
+        }
+
+        @Override
+        String getConfigurationPid() {
+            return pid
+        }
+
+        @Override
+        void setConfigurationPid(String s) {
+
+        }
+
+        @Override
+        boolean isAvailable() {
+            return availability
+        }
+
+        @Override
+        boolean isAvailable(SourceMonitor sourceMonitor) {
+            return false
+        }
+
+        @Override
+        SourceResponse query(QueryRequest queryRequest) throws UnsupportedQueryException {
+            return null
+        }
+
+        @Override
+        Set<ContentType> getContentTypes() {
+            return null
+        }
+
+        @Override
+        String getVersion() {
+            return null
+        }
+
+        @Override
+        String getId() {
+            return null
+        }
+
+        @Override
+        String getTitle() {
+            return null
+        }
+
+        @Override
+        String getDescription() {
+            return null
+        }
+
+        @Override
+        String getOrganization() {
+            return null
+        }
     }
 }

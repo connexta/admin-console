@@ -13,6 +13,7 @@
  **/
 package org.codice.ddf.admin.sources.opensearch.discover
 
+import ddf.catalog.source.Source
 import org.codice.ddf.admin.api.action.Action
 import org.codice.ddf.admin.api.fields.Field
 import org.codice.ddf.admin.api.fields.ListField
@@ -56,11 +57,13 @@ class GetOpenSearchConfigsActionTest extends Specification {
         def list = ((ListField)report.result())
 
         then:
+        1 * configReader.getServices(_, _) >> [new TestSource(S_PID_1, true)]
+        1 * configReader.getServices(_, _) >> [new TestSource(S_PID_2, false)]
         1 * configReader.getManagedServiceConfigs(_ as String) >> baseManagedServiceConfigs
         report.result() != null
         list.getList().size() == 2
-        assertConfig(list.getList().get(0), 0, GetOpenSearchConfigsAction.ID, SOURCE_ID_1, S_PID_1)
-        assertConfig(list.getList().get(1), 1, GetOpenSearchConfigsAction.ID, SOURCE_ID_2, S_PID_2)
+        assertConfig(list.getList().get(0), 0, GetOpenSearchConfigsAction.ID, SOURCE_ID_1, S_PID_1, true)
+        assertConfig(list.getList().get(1), 1, GetOpenSearchConfigsAction.ID, SOURCE_ID_2, S_PID_2, false)
     }
 
     def 'test service pid filter returns 1 result'() {
@@ -72,10 +75,12 @@ class GetOpenSearchConfigsActionTest extends Specification {
         def list = ((ListField)report.result())
 
         then:
+        1 * configReader.getServices(_, _) >> [new TestSource(S_PID_2, false)]
+        1 * configReader.getServices(_, _) >> []
         1 * configReader.getConfig(S_PID_2) >> baseManagedServiceConfigs.get(S_PID_2)
         report.result() != null
         list.getList().size() == 1
-        assertConfig(list.getList().get(0), 0, GetOpenSearchConfigsAction.ID, SOURCE_ID_2, S_PID_2)
+        assertConfig(list.getList().get(0), 0, GetOpenSearchConfigsAction.ID, SOURCE_ID_2, S_PID_2, false)
     }
 
     def 'test failure due to provided but empty service pid field'() {
@@ -90,10 +95,10 @@ class GetOpenSearchConfigsActionTest extends Specification {
         report.messages().get(0).path == SERVICE_PID_PATH
     }
 
-    def assertConfig(Field field, int index, String actionId, String sourceName, String servicePid) {
+    def assertConfig(Field field, int index, String actionId, String sourceName, String servicePid, boolean availability) {
         def sourceInfo = (SourceInfoField) field
         assert sourceInfo.fieldName() == ListFieldImpl.INDEX_DELIMETER + index
-        assert sourceInfo.isAvailable()
+        assert sourceInfo.isAvailable() == availability
         assert sourceInfo.sourceHandlerName() == actionId
         assert sourceInfo.config().credentials().password() == "*****"
         assert sourceInfo.config().credentials().username() == TEST_USERNAME
@@ -101,5 +106,12 @@ class GetOpenSearchConfigsActionTest extends Specification {
         assert sourceInfo.config().factoryPid() == F_PID
         assert sourceInfo.config().servicePid() == servicePid
         return true
+    }
+
+    def mockSource(String sourceName, String pid, boolean availability) {
+        def source = Mock(Source)
+        source.getId() >> sourceName
+        source.isAvailable() >> availability
+        return [source]
     }
 }

@@ -16,6 +16,7 @@ package org.codice.ddf.admin.sources.commons;
 import static org.codice.ddf.admin.common.message.DefaultMessages.failedPersistError;
 import static org.codice.ddf.admin.common.services.ServiceCommons.persist;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +30,11 @@ import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.sources.fields.ServicePid;
 import org.codice.ddf.admin.sources.fields.SourceInfoField;
 import org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField;
+
+import ddf.catalog.service.ConfiguredService;
+import ddf.catalog.source.ConnectedSource;
+import ddf.catalog.source.FederatedSource;
+import ddf.catalog.source.Source;
 
 public class SourceActionCommons {
 
@@ -67,6 +73,7 @@ public class SourceActionCommons {
         if (StringUtils.isNotEmpty(selector.getValue())) {
             SourceConfigUnionField config = mapper.apply(configReader.getConfig(selector.getValue()));
             sourceInfoListField.add(createSourceInfoField(actionHandlerId, true, config));
+            populateSourceAvailability(sourceInfoListField.getList(), configuratorFactory);
             return sourceInfoListField;
         }
 
@@ -75,9 +82,34 @@ public class SourceActionCommons {
                         .values()
                         .stream())
                 .map(mapper)
-                .forEach(config -> sourceInfoListField.add(createSourceInfoField(actionHandlerId, true, config)));
+                .forEach(config -> sourceInfoListField.add(createSourceInfoField(actionHandlerId, false, config)));
 
+        populateSourceAvailability(sourceInfoListField.getList(), configuratorFactory);
         return sourceInfoListField;
 
+    }
+
+    public static List<Source> getAllSourceReferences(ConfiguratorFactory configuratorFactory) {
+        List<Source> sources = new ArrayList<>();
+        ConfigReader configReader = configuratorFactory.getConfigReader();
+        sources.addAll(configReader.getServices(FederatedSource.class, null));
+        sources.addAll(configReader.getServices(ConnectedSource.class, null));
+        return sources;
+    }
+
+    private static void populateSourceAvailability(List<SourceInfoField> sourceInfoList,
+            ConfiguratorFactory configuratorFactory) {
+        List<Source> sources = getAllSourceReferences(configuratorFactory);
+        for (SourceInfoField sourceInfoField : sourceInfoList) {
+            for (Source source : sources) {
+                if(source instanceof ConfiguredService) {
+                    ConfiguredService service = (ConfiguredService) source;
+                    if (service.getConfigurationPid().equals(sourceInfoField.config().servicePid())) {
+                        sourceInfoField.isAvaliable(source.isAvailable());
+                        break;
+                    }
+                }
+            }
+        }
     }
 }

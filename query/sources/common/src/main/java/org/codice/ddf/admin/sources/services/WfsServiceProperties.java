@@ -52,22 +52,14 @@ public class WfsServiceProperties {
     public static final WfsSourceConfigurationField servicePropsToWfsConfig(
             Map<String, Object> props) {
         WfsSourceConfigurationField wfsConfig = new WfsSourceConfigurationField();
-        wfsConfig.factoryPid(
-                props.get(FACTORY_PID_KEY) == null ? null : (String) props.get(FACTORY_PID_KEY));
-        wfsConfig.servicePid(
-                props.get(SERVICE_PID_KEY) == null ? null : (String) props.get(SERVICE_PID_KEY));
-        wfsConfig.sourceName(props.get(ID) == null ? null : (String) props.get(ID));
-        wfsConfig.address()
-                .hostname(props.get(SOURCE_HOSTNAME) == null ?
-                        null :
-                        (String) props.get(SOURCE_HOSTNAME));
-        wfsConfig.address()
-                .port(props.get(PORT) == null ? 0 : (int) props.get(PORT));
-        wfsConfig.endpointUrl(props.get(WFS_URL) == null ? null : (String) props.get(WFS_URL));
-        wfsConfig.credentials()
-                .username(props.get(USERNAME) == null ? null : (String) props.get(USERNAME));
-        wfsConfig.credentials()
-                .password(props.get(PASSWORD) == null ? null : (String) props.get(PASSWORD));
+        wfsConfig.factoryPid(mapStringValue(props, FACTORY_PID_KEY));
+        wfsConfig.servicePid(mapStringValue(props, SERVICE_PID_KEY));
+        wfsConfig.sourceName(mapStringValue(props, ID));
+        wfsConfig.address().hostname(mapStringValue(props, SOURCE_HOSTNAME));
+        wfsConfig.address().port(props.get(PORT) == null ? 0 : (int) props.get(PORT));
+        wfsConfig.endpointUrl(mapStringValue(props, WFS_URL));
+        wfsConfig.credentials().username(mapStringValue(props, USERNAME));
+        wfsConfig.credentials().password(mapStringValue(props, PASSWORD));
         return wfsConfig;
     }
 
@@ -89,5 +81,9 @@ public class WfsServiceProperties {
                             .password());
         }
         return props;
+    }
+
+    private static String mapStringValue(Map<String, Object> props, String key) {
+        return props.get(key) == null ? null : (String) props.get(key);
     }
 }

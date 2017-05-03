@@ -61,38 +61,18 @@ public class CswServiceProperties {
             SERVICE_PROPS_TO_CSW_CONFIG = CswServiceProperties::servicePropsToCswConfig;
 
     public static final CswSourceConfigurationField servicePropsToCswConfig(
-            Map<String, Object> cswSourceProps) {
+            Map<String, Object> props) {
         CswSourceConfigurationField cswConfig = new CswSourceConfigurationField();
-        cswConfig.factoryPid(cswSourceProps.get(FACTORY_PID_KEY) == null ?
-                null :
-                (String) cswSourceProps.get(FACTORY_PID_KEY));
-        cswConfig.servicePid(cswSourceProps.get(SERVICE_PID_KEY) == null ?
-                null :
-                (String) cswSourceProps.get(SERVICE_PID_KEY));
-        cswConfig.sourceName(
-                cswSourceProps.get(ID) == null ? null : (String) cswSourceProps.get(ID));
-        cswConfig.address()
-                .hostname((cswSourceProps.get(SOURCE_HOSTNAME) == null ?
-                        null :
-                        (String) cswSourceProps.get(SOURCE_HOSTNAME)));
-        cswConfig.address()
-                .port(cswSourceProps.get(PORT) == null ? 0 : (int) cswSourceProps.get(PORT));
-        cswConfig.endpointUrl(
-                cswSourceProps.get(CSW_URL) == null ? null : (String) cswSourceProps.get(CSW_URL));
-        cswConfig.credentials()
-                .username(cswSourceProps.get(USERNAME) == null ?
-                        null :
-                        (String) cswSourceProps.get(USERNAME));
-        cswConfig.credentials()
-                .password(cswSourceProps.get(PASSWORD) == null ?
-                        null :
-                        (String) cswSourceProps.get(PASSWORD));
-        cswConfig.outputSchema(cswSourceProps.get(OUTPUT_SCHEMA) == null ?
-                null :
-                (String) cswSourceProps.get(OUTPUT_SCHEMA));
-        cswConfig.forceSpatialFilter(cswSourceProps.get(FORCE_SPATIAL_FILTER) == null ?
-                null :
-                (String) cswSourceProps.get(FORCE_SPATIAL_FILTER));
+        cswConfig.factoryPid(mapStringValue(props, FACTORY_PID_KEY));
+        cswConfig.servicePid(mapStringValue(props, SERVICE_PID_KEY));
+        cswConfig.sourceName(mapStringValue(props, ID));
+        cswConfig.address().hostname(mapStringValue(props, SOURCE_HOSTNAME));
+        cswConfig.address().port(props.get(PORT) == null ? 0 : (int) props.get(PORT));
+        cswConfig.endpointUrl(mapStringValue(props, CSW_URL));
+        cswConfig.credentials().username(mapStringValue(props, USERNAME));
+        cswConfig.credentials().password(mapStringValue(props, PASSWORD));
+        cswConfig.outputSchema(mapStringValue(props, OUTPUT_SCHEMA));
+        cswConfig.forceSpatialFilter(mapStringValue(props, FORCE_SPATIAL_FILTER));
         return cswConfig;
     }
 
@@ -127,5 +107,9 @@ public class CswServiceProperties {
             props.put(FORCE_SPATIAL_FILTER, config.forceSpatialFilter());
         }
         return props;
+    }
+
+    private static String mapStringValue(Map<String, Object> props, String key) {
+        return props.get(key) == null ? null : (String) props.get(key);
     }
 }

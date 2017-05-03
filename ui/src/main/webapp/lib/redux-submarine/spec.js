@@ -16,10 +16,4 @@ describe('submarine', () => {
     submarine.init((state) => state.test)
     expect(submarine({ test: 42 })).to.equal(42)
   })
-  it('should not allow multiple inits', () => {
-    const submarine = sub()
-    const selector = (state) => state.test
-    submarine.init(selector)
-    expect(() => submarine.init(selector)).to.throw(Error)
-  })
 })

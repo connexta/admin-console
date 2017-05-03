@@ -49,7 +49,7 @@ public class WfsServiceProperties {
     public static final Function<Map<String, Object>, SourceConfigUnionField>
             SERVICE_PROPS_TO_WFS_CONFIG = WfsServiceProperties::servicePropsToWfsConfig;
 
-    public static final WfsSourceConfigurationField servicePropsToWfsConfig(
+    public static WfsSourceConfigurationField servicePropsToWfsConfig(
             Map<String, Object> props) {
         WfsSourceConfigurationField wfsConfig = new WfsSourceConfigurationField();
         wfsConfig.factoryPid(mapStringValue(props, FACTORY_PID_KEY));
@@ -63,7 +63,7 @@ public class WfsServiceProperties {
         return wfsConfig;
     }
 
-    public static final Map<String, Object> wfsConfigToServiceProps(
+    public static Map<String, Object> wfsConfigToServiceProps(
             WfsSourceConfigurationField configuration) {
         HashMap<String, Object> props = new HashMap<>();
         props.put(ID, configuration.sourceName());
@@ -81,6 +81,19 @@ public class WfsServiceProperties {
                             .password());
         }
         return props;
+    }
+
+    public static void resolveWfsFactoryPid(WfsSourceConfigurationField config) {
+        switch (config.wfsVersion()) {
+        case "2.0.0":
+            config.factoryPid(WFS2_FACTORY_PID);
+            break;
+        case "1.0.0":
+            config.factoryPid(WFS1_FACTORY_PID);
+            break;
+        default:
+            throw new IllegalArgumentException(String.format("Invalid WFS version [%s].", config.wfsVersion()));
+        }
     }
 
     private static String mapStringValue(Map<String, Object> props, String key) {

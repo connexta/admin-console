@@ -51,6 +51,8 @@ public class DefaultMessages {
 
     public static final String NO_EXISTING_CONFIG = "NO_EXISTING_CONFIG";
 
+    public static final String UNSUPPORTED_VERSION = "UNSUPPORTED_VERSION";
+
     public static final ErrorMessage INTERNAL_ERROR_MESSAGE = new ErrorMessage(INTERNAL_ERROR);
 
     public static ErrorMessage failedPersistError() {
@@ -116,6 +118,10 @@ public class DefaultMessages {
 
     public static ErrorMessage noExistingConfigError(List<String> path) {
         return new ErrorMessage(NO_EXISTING_CONFIG, path);
+    }
+
+    public static ErrorMessage unsupportedVersionError(List<String> path) {
+        return new ErrorMessage(UNSUPPORTED_VERSION, path);
     }
 
     /*

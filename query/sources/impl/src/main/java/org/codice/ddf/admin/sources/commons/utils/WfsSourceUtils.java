@@ -16,8 +16,7 @@ package org.codice.ddf.admin.sources.commons.utils;
 import static org.codice.ddf.admin.common.message.DefaultMessages.unknownEndpointError;
 import static org.codice.ddf.admin.sources.commons.SourceUtilCommons.SOURCES_NAMESPACE_CONTEXT;
 import static org.codice.ddf.admin.sources.commons.SourceUtilCommons.createDocument;
-import static org.codice.ddf.admin.sources.services.WfsServiceProperties.WFS1_FACTORY_PID;
-import static org.codice.ddf.admin.sources.services.WfsServiceProperties.WFS2_FACTORY_PID;
+import static org.codice.ddf.admin.sources.services.WfsServiceProperties.resolveWfsFactoryPid;
 
 import java.util.List;
 import java.util.Map;
@@ -144,20 +143,19 @@ public class WfsSourceUtils {
         try {
             wfsVersion = xpath.compile(WFS_VERSION_EXP)
                     .evaluate(capabilitiesXml);
+            preferredConfig.wfsVersion(wfsVersion);
         } catch (XPathExpressionException e) {
             LOGGER.debug("Failed to parse XML response.");
             configResult.argumentMessage(unknownEndpointError(urlField.path()));
             return configResult;
         }
-        switch (wfsVersion) {
-        case "2.0.0":
-            return configResult.value(preferredConfig.factoryPid(WFS2_FACTORY_PID));
-        case "1.0.0":
-            return configResult.value(preferredConfig.factoryPid(WFS1_FACTORY_PID));
-        default:
-            LOGGER.debug("Unsupported WFS version discovered.");
+
+        try {
+            resolveWfsFactoryPid(preferredConfig);
+            configResult.value(preferredConfig);
+        } catch (IllegalArgumentException e) {
             configResult.argumentMessage(unknownEndpointError(urlField.path()));
-            return configResult;
         }
+        return configResult;
     }
 }

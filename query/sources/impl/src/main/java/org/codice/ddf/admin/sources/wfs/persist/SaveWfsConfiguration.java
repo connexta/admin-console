@@ -14,10 +14,12 @@
 package org.codice.ddf.admin.sources.wfs.persist;
 
 import static org.codice.ddf.admin.common.message.DefaultMessages.noExistingConfigError;
+import static org.codice.ddf.admin.common.message.DefaultMessages.unsupportedVersionError;
 import static org.codice.ddf.admin.common.services.ServiceCommons.configExists;
 import static org.codice.ddf.admin.common.services.ServiceCommons.update;
 import static org.codice.ddf.admin.sources.commons.SourceActionCommons.persistSource;
 import static org.codice.ddf.admin.sources.commons.utils.SourceValidationUtils.validateSourceName;
+import static org.codice.ddf.admin.sources.services.WfsServiceProperties.resolveWfsFactoryPid;
 import static org.codice.ddf.admin.sources.services.WfsServiceProperties.wfsConfigToServiceProps;
 
 import java.util.List;
@@ -51,7 +53,7 @@ public class SaveWfsConfiguration extends BaseAction<BooleanField> {
         config = new WfsSourceConfigurationField();
         servicePid = new ServicePid();
         config.isRequired(true);
-        config.factoryPidField().isRequired(true);
+        config.wfsVersionField().isRequired(true);
         config.sourceNameField().isRequired(true);
         config.endpointUrlField().isRequired(true);
         this.configuratorFactory = configuratorFactory;
@@ -75,6 +77,13 @@ public class SaveWfsConfiguration extends BaseAction<BooleanField> {
     public void validate() {
         super.validate();
         if(containsErrorMsgs()) {
+            return;
+        }
+
+        try {
+            resolveWfsFactoryPid(config);
+        } catch (IllegalArgumentException e) {
+            addArgumentMessage(unsupportedVersionError(config.wfsVersionField().path()));
             return;
         }
 

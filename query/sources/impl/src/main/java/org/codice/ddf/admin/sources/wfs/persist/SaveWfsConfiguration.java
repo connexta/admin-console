@@ -30,6 +30,7 @@ import org.codice.ddf.admin.common.actions.BaseAction;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.sources.fields.ServicePid;
+import org.codice.ddf.admin.sources.fields.WfsVersion;
 import org.codice.ddf.admin.sources.fields.type.WfsSourceConfigurationField;
 
 import com.google.common.collect.ImmutableList;
@@ -47,13 +48,15 @@ public class SaveWfsConfiguration extends BaseAction<BooleanField> {
 
     private ConfiguratorFactory configuratorFactory;
 
+    private WfsVersion wfsVersion;
 
     public SaveWfsConfiguration(ConfiguratorFactory configuratorFactory) {
         super(ID, DESCRIPTION, new BooleanField());
         config = new WfsSourceConfigurationField();
         servicePid = new ServicePid();
+        wfsVersion = new WfsVersion();
         config.isRequired(true);
-        config.wfsVersionField().isRequired(true);
+        wfsVersion.isRequired(true);
         config.sourceNameField().isRequired(true);
         config.endpointUrlField().isRequired(true);
         this.configuratorFactory = configuratorFactory;
@@ -61,6 +64,14 @@ public class SaveWfsConfiguration extends BaseAction<BooleanField> {
 
     @Override
     public BooleanField performAction() {
+        try {
+            String factoryPid = resolveWfsFactoryPid(wfsVersion.getValue());
+            config.factoryPid(factoryPid);
+        } catch (IllegalArgumentException e) {
+            addArgumentMessage(unsupportedVersionError(wfsVersion.path()));
+            return new BooleanField(false);
+        }
+
         if (StringUtils.isNotEmpty(servicePid.getValue())) {
             addArgumentMessages(update(servicePid, wfsConfigToServiceProps(config), configuratorFactory));
         } else {
@@ -80,13 +91,6 @@ public class SaveWfsConfiguration extends BaseAction<BooleanField> {
             return;
         }
 
-        try {
-            resolveWfsFactoryPid(config);
-        } catch (IllegalArgumentException e) {
-            addArgumentMessage(unsupportedVersionError(config.wfsVersionField().path()));
-            return;
-        }
-
         if(servicePid.getValue() != null && !configExists(servicePid.getValue(), configuratorFactory)) {
             addArgumentMessage(noExistingConfigError(servicePid.path()));
         } else {
@@ -96,6 +100,6 @@ public class SaveWfsConfiguration extends BaseAction<BooleanField> {
 
     @Override
     public List<Field> getArguments() {
-        return ImmutableList.of(config, servicePid);
+        return ImmutableList.of(config, servicePid, wfsVersion);
     }
 }

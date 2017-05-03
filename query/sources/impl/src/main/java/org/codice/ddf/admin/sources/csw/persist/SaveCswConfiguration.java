@@ -14,11 +14,13 @@
 package org.codice.ddf.admin.sources.csw.persist;
 
 import static org.codice.ddf.admin.common.message.DefaultMessages.noExistingConfigError;
+import static org.codice.ddf.admin.common.message.DefaultMessages.unsupportedVersionError;
 import static org.codice.ddf.admin.common.services.ServiceCommons.configExists;
 import static org.codice.ddf.admin.common.services.ServiceCommons.update;
 import static org.codice.ddf.admin.sources.commons.SourceActionCommons.persistSource;
 import static org.codice.ddf.admin.sources.commons.utils.SourceValidationUtils.validateSourceName;
 import static org.codice.ddf.admin.sources.services.CswServiceProperties.cswConfigToServiceProps;
+import static org.codice.ddf.admin.sources.services.CswServiceProperties.resolveCswFactoryPid;
 
 import java.util.List;
 
@@ -27,6 +29,7 @@ import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.common.actions.BaseAction;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
+import org.codice.ddf.admin.sources.fields.CswProfile;
 import org.codice.ddf.admin.sources.fields.ServicePid;
 import org.codice.ddf.admin.sources.fields.type.CswSourceConfigurationField;
 
@@ -43,6 +46,8 @@ public class SaveCswConfiguration extends BaseAction<BooleanField> {
 
     private ServicePid servicePid;
 
+    private CswProfile cswProfile;
+
     private ConfiguratorFactory configuratorFactory;
 
 
@@ -50,8 +55,9 @@ public class SaveCswConfiguration extends BaseAction<BooleanField> {
         super(ID, DESCRIPTION, new BooleanField());
         config = new CswSourceConfigurationField();
         servicePid = new ServicePid();
+        cswProfile = new CswProfile();
         config.isRequired(true);
-        config.factoryPidField().isRequired(true);
+        cswProfile.isRequired(true);
         config.sourceNameField().isRequired(true);
         config.endpointUrlField().isRequired(true);
         this.configuratorFactory = configuratorFactory;
@@ -59,6 +65,14 @@ public class SaveCswConfiguration extends BaseAction<BooleanField> {
 
     @Override
     public BooleanField performAction() {
+        try {
+            String factoryPid = resolveCswFactoryPid(cswProfile.getValue());
+            config.factoryPid(factoryPid);
+        } catch (IllegalArgumentException e) {
+            addArgumentMessage(unsupportedVersionError(cswProfile.path()));
+            return new BooleanField(false);
+        }
+
         if (StringUtils.isNotEmpty(servicePid.getValue())) {
             addArgumentMessages(update(servicePid, cswConfigToServiceProps(config), configuratorFactory));
         } else {
@@ -78,6 +92,8 @@ public class SaveCswConfiguration extends BaseAction<BooleanField> {
             return;
         }
 
+
+
         if(servicePid.getValue() != null && !configExists(servicePid.getValue(), configuratorFactory)) {
             addArgumentMessage(noExistingConfigError(servicePid.path()));
         } else {
@@ -87,6 +103,6 @@ public class SaveCswConfiguration extends BaseAction<BooleanField> {
 
     @Override
     public List<Field> getArguments() {
-        return ImmutableList.of(config, servicePid);
+        return ImmutableList.of(config, servicePid, cswProfile);
     }
 }

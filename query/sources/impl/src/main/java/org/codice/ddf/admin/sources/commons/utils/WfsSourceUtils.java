@@ -143,7 +143,6 @@ public class WfsSourceUtils {
         try {
             wfsVersion = xpath.compile(WFS_VERSION_EXP)
                     .evaluate(capabilitiesXml);
-            preferredConfig.wfsVersion(wfsVersion);
         } catch (XPathExpressionException e) {
             LOGGER.debug("Failed to parse XML response.");
             configResult.argumentMessage(unknownEndpointError(urlField.path()));
@@ -151,7 +150,8 @@ public class WfsSourceUtils {
         }
 
         try {
-            resolveWfsFactoryPid(preferredConfig);
+            String factoryPid = resolveWfsFactoryPid(wfsVersion);
+            preferredConfig.factoryPid(factoryPid);
             configResult.value(preferredConfig);
         } catch (IllegalArgumentException e) {
             configResult.argumentMessage(unknownEndpointError(urlField.path()));

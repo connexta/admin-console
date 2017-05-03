@@ -230,7 +230,7 @@ class SaveWfsConfigurationTest extends Specification {
 
     def 'test fail save due to missing required wfsVersion field'() {
         setup:
-        actionArgs.get(SOURCE_CONFIG).put(WFS_VERSION, null)
+        actionArgs.put(WFS_VERSION, null)
         saveWfsConfiguration.setArguments(actionArgs)
 
         when:
@@ -245,7 +245,7 @@ class SaveWfsConfigurationTest extends Specification {
 
     def 'test fail due to unsupported wfs version'() {
         setup:
-        actionArgs.get(SOURCE_CONFIG).put(WFS_VERSION, '1.2.3')
+        actionArgs.put(WFS_VERSION, '1.2.3')
         saveWfsConfiguration.setArguments(actionArgs)
 
         when:
@@ -261,7 +261,7 @@ class SaveWfsConfigurationTest extends Specification {
     def createWfsSaveArgs() {
         refreshSaveConfigActionArgs()
         actionArgs = saveConfigActionArgs
-        actionArgs.get(SOURCE_CONFIG).put(WFS_VERSION, TEST_WFS_VERSION)
+        actionArgs.put(WFS_VERSION, TEST_WFS_VERSION)
         return actionArgs
     }
 

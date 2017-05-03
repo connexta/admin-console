@@ -16,6 +16,9 @@ package org.codice.ddf.admin.sources.services;
 
 import static org.codice.ddf.admin.common.services.ServiceCommons.FACTORY_PID_KEY;
 import static org.codice.ddf.admin.common.services.ServiceCommons.SERVICE_PID_KEY;
+import static org.codice.ddf.admin.sources.fields.CswProfile.CSW_FEDERATION_PROFILE_SOURCE;
+import static org.codice.ddf.admin.sources.fields.CswProfile.CSW_SPEC_PROFILE_FEDERATED_SOURCE;
+import static org.codice.ddf.admin.sources.fields.CswProfile.GMD_CSW_ISO_FEDERATED_SOURCE;
 
 import java.util.HashMap;
 import java.util.List;
@@ -107,6 +110,19 @@ public class CswServiceProperties {
             props.put(FORCE_SPATIAL_FILTER, config.forceSpatialFilter());
         }
         return props;
+    }
+
+    public static String resolveCswFactoryPid(String cswProfile) {
+        switch(cswProfile) {
+        case CSW_FEDERATION_PROFILE_SOURCE:
+            return CSW_PROFILE_FACTORY_PID;
+        case GMD_CSW_ISO_FEDERATED_SOURCE:
+            return CSW_GMD_FACTORY_PID;
+        case CSW_SPEC_PROFILE_FEDERATED_SOURCE:
+            return CSW_SPEC_FACTORY_PID;
+        default:
+            throw new IllegalArgumentException(String.format("Invalid CSW Profile specified [%s].", cswProfile));
+        }
     }
 
     private static String mapStringValue(Map<String, Object> props, String key) {

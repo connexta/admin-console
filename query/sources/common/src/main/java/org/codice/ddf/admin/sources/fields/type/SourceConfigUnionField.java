@@ -43,7 +43,7 @@ public class SourceConfigUnionField extends BaseUnionField {
     private static final List<ObjectField> UNION_TYPES =
             ImmutableList.of(new CswSourceConfigurationField(),
                     new WfsSourceConfigurationField(),
-                    new OpensearchSourceConfigurationField());
+                    new OpenSearchSourceConfigurationField());
 
     protected FactoryPid factoryPid;
 

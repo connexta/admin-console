@@ -33,7 +33,7 @@ import org.codice.ddf.admin.common.Result;
 import org.codice.ddf.admin.common.fields.common.AddressField;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
 import org.codice.ddf.admin.common.fields.common.UrlField;
-import org.codice.ddf.admin.sources.fields.type.OpensearchSourceConfigurationField;
+import org.codice.ddf.admin.sources.fields.type.OpenSearchSourceConfigurationField;
 import org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,7 +85,7 @@ public class OpenSearchSourceUtils {
             return configResult;
         }
 
-        OpensearchSourceConfigurationField config = new OpensearchSourceConfigurationField();
+        OpenSearchSourceConfigurationField config = new OpenSearchSourceConfigurationField();
         config.endpointUrl(urlField.getValue())
                 .factoryPid(OPENSEARCH_FACTORY_PID)
                 .credentials()

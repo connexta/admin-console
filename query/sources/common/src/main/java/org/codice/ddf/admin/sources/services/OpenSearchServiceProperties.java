@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-import org.codice.ddf.admin.sources.fields.type.OpensearchSourceConfigurationField;
+import org.codice.ddf.admin.sources.fields.type.OpenSearchSourceConfigurationField;
 import org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField;
 
 public class OpenSearchServiceProperties {
@@ -48,9 +48,9 @@ public class OpenSearchServiceProperties {
             SERVICE_PROPS_TO_OPENSEARCH_CONFIG =
             OpenSearchServiceProperties::servicePropsToOpenSearchConfig;
 
-    public static final OpensearchSourceConfigurationField servicePropsToOpenSearchConfig(
+    public static final OpenSearchSourceConfigurationField servicePropsToOpenSearchConfig(
             Map<String, Object> props) {
-        OpensearchSourceConfigurationField config = new OpensearchSourceConfigurationField();
+        OpenSearchSourceConfigurationField config = new OpenSearchSourceConfigurationField();
         config.factoryPid(mapStringValue(props, FACTORY_PID_KEY));
         config.servicePid(mapStringValue(props, SERVICE_PID_KEY));
         config.sourceName(mapStringValue(props, ID));
@@ -63,7 +63,7 @@ public class OpenSearchServiceProperties {
     }
 
     public static final Map<String, Object> openSearchConfigToServiceProps(
-            OpensearchSourceConfigurationField config) {
+            OpenSearchSourceConfigurationField config) {
         HashMap<String, Object> props = new HashMap<>();
         props.put(ID, config.sourceName());
         props.put(ENDPOINT_URL, config.endpointUrl());

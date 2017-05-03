@@ -83,16 +83,14 @@ public class WfsServiceProperties {
         return props;
     }
 
-    public static void resolveWfsFactoryPid(WfsSourceConfigurationField config) {
-        switch (config.wfsVersion()) {
+    public static String resolveWfsFactoryPid(String wfsVersion) {
+        switch (wfsVersion) {
         case "2.0.0":
-            config.factoryPid(WFS2_FACTORY_PID);
-            break;
+            return WFS2_FACTORY_PID;
         case "1.0.0":
-            config.factoryPid(WFS1_FACTORY_PID);
-            break;
+            return WFS1_FACTORY_PID;
         default:
-            throw new IllegalArgumentException(String.format("Invalid WFS version [%s].", config.wfsVersion()));
+            throw new IllegalArgumentException(String.format("Invalid WFS version [%s].", wfsVersion));
         }
     }
 

@@ -28,7 +28,7 @@ import org.codice.ddf.admin.common.actions.BaseAction;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.sources.fields.ServicePid;
-import org.codice.ddf.admin.sources.fields.type.OpensearchSourceConfigurationField;
+import org.codice.ddf.admin.sources.fields.type.OpenSearchSourceConfigurationField;
 
 import com.google.common.collect.ImmutableList;
 
@@ -39,7 +39,7 @@ public class SaveOpenSearchConfiguration extends BaseAction<BooleanField> {
     public static final String DESCRIPTION =
             "Saves an OpenSearch source configuration. If a pid is specified, the source configuration specified by the pid will be updated. Returns true on success and false on failure.";
 
-    private OpensearchSourceConfigurationField config;
+    private OpenSearchSourceConfigurationField config;
 
     private ServicePid servicePid;
 
@@ -48,10 +48,9 @@ public class SaveOpenSearchConfiguration extends BaseAction<BooleanField> {
 
     public SaveOpenSearchConfiguration(ConfiguratorFactory configuratorFactory) {
         super(ID, DESCRIPTION, new BooleanField());
-        config = new OpensearchSourceConfigurationField();
+        config = new OpenSearchSourceConfigurationField();
         servicePid = new ServicePid();
         config.isRequired(true);
-        config.factoryPidField().isRequired(true);
         config.sourceNameField().isRequired(true);
         config.endpointUrlField().isRequired(true);
         this.configuratorFactory = configuratorFactory;

@@ -15,7 +15,6 @@ package org.codice.ddf.admin.sources.csw.persist
 
 import ddf.catalog.source.FederatedSource
 import org.codice.ddf.admin.api.action.Action
-import org.codice.ddf.admin.api.fields.Field
 import org.codice.ddf.admin.common.actions.BaseAction
 import org.codice.ddf.admin.common.message.DefaultMessages
 import org.codice.ddf.admin.configurator.ConfigReader
@@ -23,7 +22,7 @@ import org.codice.ddf.admin.configurator.Configurator
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.configurator.OperationReport
 import org.codice.ddf.admin.sources.commons.SourceMessages
-import org.codice.ddf.admin.sources.fields.SourceInfoField
+import org.codice.ddf.admin.sources.fields.CswProfile
 import org.codice.ddf.admin.sources.fields.type.CswSourceConfigurationField
 import spock.lang.Specification
 
@@ -35,6 +34,10 @@ class SaveCswConfigurationTest extends Specification {
 
     static TEST_OUTPUT_SCHEMA = 'testOutputSchema'
 
+    static TEST_CSW_PROFILE = CswProfile.CSW_FEDERATION_PROFILE_SOURCE
+
+    static CSW_PROFILE = CswProfile.DEFAULT_FIELD_NAME
+
     static BASE_PATH = [SaveCswConfiguration.ID, BaseAction.ARGUMENT]
 
     static CONFIG_PATH = [BASE_PATH, SOURCE_CONFIG].flatten()
@@ -44,6 +47,8 @@ class SaveCswConfigurationTest extends Specification {
     static SERVICE_PID_PATH = [BASE_PATH, SERVICE_PID].flatten()
 
     static SOURCE_NAME_PATH = [CONFIG_PATH, SOURCE_NAME].flatten()
+
+    static CSW_PROFILE_PATH = [BASE_PATH, CSW_PROFILE].flatten()
 
     Action saveCswConfiguration
 
@@ -223,6 +228,36 @@ class SaveCswConfigurationTest extends Specification {
         report.messages().get(0).code == DefaultMessages.MISSING_REQUIRED_FIELD
     }
 
+    def 'test fail save due to missing required csw profile field'() {
+        setup:
+        actionArgs.put(CSW_PROFILE, null)
+        saveCswConfiguration.setArguments(actionArgs)
+
+        when:
+        def report = saveCswConfiguration.process()
+
+        then:
+        report.result() == null
+        report.messages().size() == 1
+        report.messages().get(0).path == CSW_PROFILE_PATH
+        report.messages().get(0).code == DefaultMessages.MISSING_REQUIRED_FIELD
+    }
+
+    def 'test fail save due to invalid required csw profile field'() {
+        setup:
+        actionArgs.put(CSW_PROFILE, 'notAValidProfile')
+        saveCswConfiguration.setArguments(actionArgs)
+
+        when:
+        def report = saveCswConfiguration.process()
+
+        then:
+        report.result() == null
+        report.messages().size() == 1
+        report.messages().get(0).path == CSW_PROFILE_PATH
+        report.messages().get(0).code == DefaultMessages.MISSING_REQUIRED_FIELD
+    }
+
 
     def mockReport(boolean hasError) {
         def report = Mock(OperationReport)
@@ -235,6 +270,7 @@ class SaveCswConfigurationTest extends Specification {
         actionArgs = saveConfigActionArgs
         actionArgs.get(SOURCE_CONFIG).put(CswSourceConfigurationField.FORCED_SPATIAL_FILTER, TEST_SPATIAL_FILTER)
         actionArgs.get(SOURCE_CONFIG).put(CswSourceConfigurationField.OUTPUT_SCHEMA, TEST_OUTPUT_SCHEMA)
+        actionArgs.put(CSW_PROFILE, TEST_CSW_PROFILE)
         return actionArgs
     }
 }

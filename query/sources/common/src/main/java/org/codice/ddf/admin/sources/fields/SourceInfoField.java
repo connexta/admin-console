@@ -25,7 +25,11 @@ import com.google.common.collect.ImmutableList;
 
 public class SourceInfoField extends BaseObjectField {
 
-    private static final String DEFAULT_FIELD_NAME = "sourceInfo";
+    public static final String DEFAULT_FIELD_NAME = "sourceInfo";
+
+    public static final String SOURCE_HANDLER_FIELD_NAME = "sourceHandlerName";
+
+    public static final String IS_AVAILABLE_FIELD_NAME = "isAvailable";
 
     private static final String FIELD_TYPE_NAME = "SourceInfo";
 
@@ -77,7 +81,7 @@ public class SourceInfoField extends BaseObjectField {
     @Override
     public void initializeFields() {
         config = new SourceConfigUnionField();
-        sourceHandlerName = new StringField("sourceHandlerName");
-        isAvailable = new BooleanField("isAvailable");
+        sourceHandlerName = new StringField(SOURCE_HANDLER_FIELD_NAME);
+        isAvailable = new BooleanField(IS_AVAILABLE_FIELD_NAME);
     }
 }

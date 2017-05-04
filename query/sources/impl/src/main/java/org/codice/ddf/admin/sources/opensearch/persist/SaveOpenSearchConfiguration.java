@@ -14,10 +14,11 @@
 package org.codice.ddf.admin.sources.opensearch.persist;
 
 import static org.codice.ddf.admin.common.message.DefaultMessages.noExistingConfigError;
-import static org.codice.ddf.admin.common.services.ServiceCommons.configExists;
-import static org.codice.ddf.admin.common.services.ServiceCommons.update;
-import static org.codice.ddf.admin.sources.commons.SourceActionCommons.persistSource;
+import static org.codice.ddf.admin.common.services.ServiceCommons.serviceConfigurationExists;
+import static org.codice.ddf.admin.common.services.ServiceCommons.updateService;
+import static org.codice.ddf.admin.sources.commons.SourceActionCommons.persistSourceConfiguration;
 import static org.codice.ddf.admin.sources.commons.utils.SourceValidationUtils.validateSourceName;
+import static org.codice.ddf.admin.sources.services.OpenSearchServiceProperties.OPENSEARCH_FACTORY_PID;
 import static org.codice.ddf.admin.sources.services.OpenSearchServiceProperties.openSearchConfigToServiceProps;
 
 import java.util.List;
@@ -51,6 +52,7 @@ public class SaveOpenSearchConfiguration extends BaseAction<BooleanField> {
         config = new OpenSearchSourceConfigurationField();
         servicePid = new ServicePid();
         config.isRequired(true);
+        config.factoryPid(OPENSEARCH_FACTORY_PID);
         config.sourceNameField().isRequired(true);
         config.endpointUrlField().isRequired(true);
         this.configuratorFactory = configuratorFactory;
@@ -59,15 +61,11 @@ public class SaveOpenSearchConfiguration extends BaseAction<BooleanField> {
     @Override
     public BooleanField performAction() {
         if (StringUtils.isNotEmpty(servicePid.getValue())) {
-            addArgumentMessages(update(servicePid, openSearchConfigToServiceProps(config), configuratorFactory));
+            addArgumentMessages(updateService(servicePid, openSearchConfigToServiceProps(config), configuratorFactory));
         } else {
-            addArgumentMessages(persistSource(config, openSearchConfigToServiceProps(config), configuratorFactory));
+            addArgumentMessages(persistSourceConfiguration(config, openSearchConfigToServiceProps(config), configuratorFactory));
         }
-
-        if(containsErrorMsgs()) {
-            return new BooleanField(false);
-        }
-        return new BooleanField(true);
+        return new BooleanField(containsErrorMsgs());
     }
 
     @Override
@@ -77,7 +75,7 @@ public class SaveOpenSearchConfiguration extends BaseAction<BooleanField> {
             return;
         }
 
-        if(servicePid.getValue() != null && !configExists(servicePid.getValue(), configuratorFactory)) {
+        if(servicePid.getValue() != null && !serviceConfigurationExists(servicePid.getValue(), configuratorFactory)) {
             addArgumentMessage(noExistingConfigError(servicePid.path()));
         } else {
             addArgumentMessages(validateSourceName(config.sourceNameField(), configuratorFactory, servicePid));

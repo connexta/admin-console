@@ -36,9 +36,9 @@ public class SourceConfigUnionField extends BaseUnionField {
 
     public static final String DESCRIPTION = "All supported source configuration types";
 
-    public static final String SOURCE_NAME_FIELD = "sourceName";
+    public static final String SOURCE_NAME_FIELD_NAME = "sourceName";
 
-    public static final String ENDPOINT_URL_FIELD = "endpointUrl";
+    public static final String ENDPOINT_URL_FIELD_NAME = "endpointUrl";
 
     private static final List<ObjectField> UNION_TYPES =
             ImmutableList.of(new CswSourceConfigurationField(),
@@ -148,8 +148,8 @@ public class SourceConfigUnionField extends BaseUnionField {
     public void initializeFields() {
         factoryPid = new FactoryPid();
         servicePid = new ServicePid();
-        sourceName = new StringField(SOURCE_NAME_FIELD);
-        endpointUrl = new UrlField(ENDPOINT_URL_FIELD);
+        sourceName = new StringField(SOURCE_NAME_FIELD_NAME);
+        endpointUrl = new UrlField(ENDPOINT_URL_FIELD_NAME);
         creds = new CredentialsField();
         address = new AddressField();
     }

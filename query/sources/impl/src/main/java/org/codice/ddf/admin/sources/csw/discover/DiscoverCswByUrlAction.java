@@ -43,10 +43,10 @@ public class DiscoverCswByUrlAction extends BaseAction<SourceInfoField> {
 
     public DiscoverCswByUrlAction() {
         super(ID, DESCRIPTION, new SourceInfoField());
-        cswSourceUtils = new CswSourceUtils();
         credentialsField = new CredentialsField();
         endpointUrl = new UrlField("endpointUrl");
         endpointUrl.isRequired(true);
+        cswSourceUtils = new CswSourceUtils();
     }
 
     public DiscoverCswByUrlAction(CswSourceUtils cswSourceUtils) {

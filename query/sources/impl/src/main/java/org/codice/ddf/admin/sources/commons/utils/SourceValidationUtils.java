@@ -26,15 +26,11 @@ import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 import org.codice.ddf.admin.configurator.ConfigReader;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.sources.fields.ServicePid;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import ddf.catalog.service.ConfiguredService;
 import ddf.catalog.source.Source;
 
 public class SourceValidationUtils {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(SourceValidationUtils.class);
 
     /**
      * Validates the {@code sourceName} against the existing source names in the system. An empty {@link List} will be returned
@@ -67,8 +63,6 @@ public class SourceValidationUtils {
                 .anyMatch(id -> id.equals(sourceName.getValue()));
 
         if (matchFound) {
-            LOGGER.debug("Found duplicate source name for name [{}] while persisting a source.",
-                    sourceName.getValue());
             return Collections.singletonList(duplicateSourceNameError(sourceName.path()));
         }
 
@@ -88,8 +82,6 @@ public class SourceValidationUtils {
                 .anyMatch(id -> id.equals(sourceName.getValue()));
 
         if (matchFound) {
-            LOGGER.debug("Found duplicate source name for name [{}] while persisting a source.",
-                    sourceName.getValue());
             return Collections.singletonList(duplicateSourceNameError(sourceName.path()));
         }
 

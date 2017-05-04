@@ -102,7 +102,6 @@
                         <Embed-Dependency>
                             admin-query-common,
                             admin-query-sources-common,
-                            commons-lang3,
 
                             <!--TODO: Clean this up once we make CxfClientFactory OSGi friendly-->
                             security-rest-cxfwrapper,
@@ -136,7 +135,7 @@
                             <rules>
                                 <ArtifactSizeEnforcerRule
                                         implementation="org.codice.ddf.admin.beta.enforcer.ArtifactSizeEnforcerRule">
-                                    <maxArtifactSize>3.2_MB</maxArtifactSize>
+                                    <maxArtifactSize>2.8_MB</maxArtifactSize>
                                 </ArtifactSizeEnforcerRule>
                             </rules>
                         </configuration>

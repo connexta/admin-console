@@ -33,7 +33,7 @@ public class GetCswConfigsAction extends BaseAction<ListFieldImpl<SourceInfoFiel
     public static final String ID = "cswConfigs";
 
     public static final String DESCRIPTION =
-            "Retrieves all currently configured CSW sources. If a the pid argument is specified, only the source configuration with that pid will be returned.";
+            "Retrieves all currently configured CSW sources. If the pid argument is specified, only the source configuration with that pid will be returned.";
 
     private ServicePid servicePid;
 
@@ -41,8 +41,8 @@ public class GetCswConfigsAction extends BaseAction<ListFieldImpl<SourceInfoFiel
 
     public GetCswConfigsAction(ConfiguratorFactory configuratorFactory) {
         super(ID, DESCRIPTION, new ListFieldImpl<>(SourceInfoField.class));
-        this.configuratorFactory = configuratorFactory;
         servicePid = new ServicePid();
+        this.configuratorFactory = configuratorFactory;
     }
 
     @Override

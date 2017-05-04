@@ -32,10 +32,10 @@ public class OpenSearchActionCreator extends BaseActionCreator {
 
     private static final String TYPE_NAME = "OpenSearch";
 
-    private static final String DESCRIPTION = "OpenSearch description.";
+    private static final String DESCRIPTION =
+            "A specification for querying geospatial data using standard data formats. This is a source that implements the OpenSearch specification.";
 
     private ConfiguratorFactory configuratorFactory;
-
 
     public OpenSearchActionCreator() {
         super(ID, TYPE_NAME, DESCRIPTION);

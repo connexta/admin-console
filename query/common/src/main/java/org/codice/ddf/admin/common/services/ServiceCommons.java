@@ -45,7 +45,7 @@ public class ServiceCommons {
                 .collect(Collectors.toList());
     }
 
-    public static boolean persist(Map<String, Object> serviceProps, String factoryPid,
+    public static boolean createManagedService(Map<String, Object> serviceProps, String factoryPid,
             ConfiguratorFactory configuratorFactory) {
         Configurator configurator = configuratorFactory.getConfigurator();
         configurator.createManagedService(factoryPid, serviceProps);
@@ -53,10 +53,10 @@ public class ServiceCommons {
                 .containsFailedResults();
     }
 
-    public static List<Message> update(StringField servicePidField, Map<String, Object> newConfig,
+    public static List<Message> updateService(StringField servicePidField, Map<String, Object> newConfig,
             ConfiguratorFactory configuratorFactory) {
         String servicePid = servicePidField.getValue();
-        if (!configExists(servicePid, configuratorFactory)) {
+        if (!serviceConfigurationExists(servicePid, configuratorFactory)) {
             return Collections.singletonList(noExistingConfigError(servicePidField.path()));
         }
 
@@ -73,14 +73,14 @@ public class ServiceCommons {
         return Collections.emptyList();
     }
 
-    public static boolean delete(String servicePid, ConfiguratorFactory configuratorFactory) {
+    public static boolean deleteService(String servicePid, ConfiguratorFactory configuratorFactory) {
         Configurator configurator = configuratorFactory.getConfigurator();
         configurator.deleteManagedService(servicePid);
         return !configurator.commit("Deleted source with pid [{}].", servicePid)
                 .containsFailedResults();
     }
 
-    public static boolean configExists(String servicePid, ConfiguratorFactory configuratorFactory) {
+    public static boolean serviceConfigurationExists(String servicePid, ConfiguratorFactory configuratorFactory) {
         return !configuratorFactory.getConfigReader()
                 .getConfig(servicePid)
                 .isEmpty();

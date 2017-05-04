@@ -13,12 +13,6 @@
  **/
 package org.codice.ddf.admin.sources.fields.type;
 
-import java.util.List;
-
-import org.codice.ddf.admin.api.fields.Field;
-
-import com.google.common.collect.ImmutableList;
-
 public class WfsSourceConfigurationField extends SourceConfigUnionField {
 
     public static final String FIELD_TYPE_NAME = "WfsSourceConfiguration";
@@ -33,12 +27,5 @@ public class WfsSourceConfigurationField extends SourceConfigUnionField {
     @Override
     public void initializeFields() {
         super.initializeFields();
-    }
-
-    @Override
-    public List<Field> getFields() {
-        // TODO: 4/28/17 phuffer -  Add additional fields once implemented
-        return new ImmutableList.Builder<Field>().addAll(super.getFields())
-                .build();
     }
 }

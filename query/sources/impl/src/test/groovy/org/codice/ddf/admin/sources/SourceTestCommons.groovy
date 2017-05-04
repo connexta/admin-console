@@ -28,13 +28,13 @@ import org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField
 
 class SourceTestCommons {
 
-    static final ENDPOINT_URL = SourceConfigUnionField.ENDPOINT_URL_FIELD
+    static final ENDPOINT_URL = SourceConfigUnionField.ENDPOINT_URL_FIELD_NAME
 
     static final CREDENTIALS = CredentialsField.DEFAULT_FIELD_NAME
 
-    static final USERNAME = CredentialsField.USERNAME
+    static final USERNAME = CredentialsField.USERNAME_FIELD_NAME
 
-    static final PASSWORD = CredentialsField.PASSWORD
+    static final PASSWORD = CredentialsField.PASSWORD_FIELD_NAME
 
     static final ADDRESS = AddressField.DEFAULT_FIELD_NAME
 
@@ -50,7 +50,7 @@ class SourceTestCommons {
 
     static final SERVICE_PID_KEY = ServiceCommons.SERVICE_PID_KEY
 
-    static final SOURCE_NAME = SourceConfigUnionField.SOURCE_NAME_FIELD
+    static final SOURCE_NAME = SourceConfigUnionField.SOURCE_NAME_FIELD_NAME
 
     static final FACTORY_PID = FactoryPid.DEFAULT_FIELD_NAME
 

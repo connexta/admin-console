@@ -42,11 +42,11 @@ public class DiscoverWfsByUrlAction extends BaseAction<SourceInfoField> {
 
     public DiscoverWfsByUrlAction() {
         super(ID, DESCRIPTION, new SourceInfoField());
-        wfsSourceUtils = new WfsSourceUtils();
         endpointUrl = new UrlField("endpointUrl");
         credentialsField = new CredentialsField();
         endpointUrl.isRequired(true);
         credentialsField.allFieldsRequired(false);
+        wfsSourceUtils = new WfsSourceUtils();
     }
 
     public DiscoverWfsByUrlAction(WfsSourceUtils wfsSourceUtils) {

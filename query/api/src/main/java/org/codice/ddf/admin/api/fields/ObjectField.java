@@ -22,7 +22,7 @@ import java.util.Map;
 public interface ObjectField extends Field<Map<String, Object>> {
 
     /**
-     * Returns all the {@link Field}s held by this {@code ObjectField}.
+     * Returns all the internal {@link Field}s held by this {@code ObjectField}.
      *
      * @return a {@code List} of this {@code ObjectField}'s {@link Field}s.
      */

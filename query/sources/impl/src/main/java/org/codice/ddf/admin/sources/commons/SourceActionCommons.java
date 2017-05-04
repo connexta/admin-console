@@ -14,7 +14,7 @@
 package org.codice.ddf.admin.sources.commons;
 
 import static org.codice.ddf.admin.common.message.DefaultMessages.failedPersistError;
-import static org.codice.ddf.admin.common.services.ServiceCommons.persist;
+import static org.codice.ddf.admin.common.services.ServiceCommons.createManagedService;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -48,9 +48,9 @@ public class SourceActionCommons {
         return sourceInfoField;
     }
 
-    public static List<Message> persistSource(SourceConfigUnionField config,
+    public static List<Message> persistSourceConfiguration(SourceConfigUnionField config,
             Map<String, Object> serviceProps, ConfiguratorFactory configuratorFactory) {
-        if (!persist(serviceProps, config.factoryPid(), configuratorFactory)) {
+        if (!createManagedService(serviceProps, config.factoryPid(), configuratorFactory)) {
             return Collections.singletonList(failedPersistError(config.path()));
         }
         return Collections.emptyList();

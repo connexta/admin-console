@@ -46,7 +46,7 @@ public class DiscoverCswByAddressAction extends BaseAction<SourceInfoField> {
         super(ID, DESCRIPTION, new SourceInfoField());
         credentialsField = new CredentialsField();
         addressField = new AddressField();
-        addressField.allFieldsRequired(true);
+        addressField.useDefaultRequired();
         cswSourceUtils = new CswSourceUtils();
     }
 

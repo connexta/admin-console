@@ -29,9 +29,9 @@ public class CredentialsField extends BaseObjectField {
 
     public static final String DESCRIPTION = "Credentials required for authentication.";
 
-    public static final String USERNAME = "username";
+    public static final String USERNAME_FIELD_NAME = "username";
 
-    public static final String PASSWORD = "password";
+    public static final String PASSWORD_FIELD_NAME = "password";
 
     private StringField username;
 
@@ -66,7 +66,7 @@ public class CredentialsField extends BaseObjectField {
 
     @Override
     public void initializeFields() {
-        this.username = new StringField(USERNAME);
-        this.password = new StringField(PASSWORD);
+        this.username = new StringField(USERNAME_FIELD_NAME);
+        this.password = new StringField(PASSWORD_FIELD_NAME);
     }
 }

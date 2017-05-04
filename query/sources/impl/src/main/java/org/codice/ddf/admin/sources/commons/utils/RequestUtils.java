@@ -39,10 +39,6 @@ public class RequestUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RequestUtils.class);
 
-    private static final int PING_TIMEOUT = 500;
-
-    private static final Integer CXF_CLIENT_TIMEOUT = 10000;
-
     /**
      * Sends a get request to the specified URL and returns the content of the response.
      *
@@ -61,7 +57,6 @@ public class RequestUtils {
         try {
             response = client.get();
         } catch (ProcessingException e) {
-            // TODO: 4/27/17 phuffer - figure out how cert errors are handled here
             LOGGER.debug("Processing exception while sending GET request to [{}].",
                     urlField.getValue(),
                     e);
@@ -116,7 +111,7 @@ public class RequestUtils {
         List<Message> errors = new ArrayList<>();
         try {
             URLConnection urlConnection = (new URL(urlField.getValue()).openConnection());
-            urlConnection.setConnectTimeout(PING_TIMEOUT);
+            urlConnection.setConnectTimeout(500);
             urlConnection.connect();
             LOGGER.debug("Successfully reached {}.", urlField);
         } catch (IOException e) {
@@ -126,27 +121,14 @@ public class RequestUtils {
         return errors;
     }
 
-    // TODO: 4/28/17 phuffer - explore creating a client with disableCnCheck to true if first attempt at discovery fails
     private WebClient generateClient(UrlField url, CredentialsField creds) {
         String username = creds == null ? null : creds.username();
         String password = creds == null ? null : creds.password();
 
         SecureCxfClientFactory<WebClient> clientFactory =
                 username == null && password == null ? new SecureCxfClientFactory<>(url.getValue(),
+                        WebClient.class) : new SecureCxfClientFactory<>(url.getValue(),
                         WebClient.class,
-                        null,
-                        null,
-                        false,
-                        false,
-                        CXF_CLIENT_TIMEOUT,
-                        CXF_CLIENT_TIMEOUT) : new SecureCxfClientFactory<>(url.getValue(),
-                        WebClient.class,
-                        null,
-                        null,
-                        false,
-                        false,
-                        CXF_CLIENT_TIMEOUT,
-                        CXF_CLIENT_TIMEOUT,
                         username,
                         password);
         return clientFactory.getClient();

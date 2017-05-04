@@ -54,6 +54,11 @@ public class AddressField extends BaseObjectField {
         return this.hostname.getValue();
     }
 
+    public void useDefaultRequired() {
+        hostname.isRequired(true);
+        port.isRequired(true);
+    }
+
     @Override
     public List<Field> getFields() {
         return ImmutableList.of(hostname, port);

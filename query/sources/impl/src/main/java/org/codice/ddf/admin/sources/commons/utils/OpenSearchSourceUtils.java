@@ -139,9 +139,6 @@ public class OpenSearchSourceUtils {
      * @return a {@link Result} containing the discovered {@link UrlField} or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
      */
     public Result<UrlField> discoverOpenSearchUrl(AddressField addressField, CredentialsField creds) {
-        Result<UrlField> defaultResult = new Result<>();
-        defaultResult.argumentMessage(unknownEndpointError(addressField.path()));
-
         return URL_FORMATS.stream()
                 .map(format -> String.format(format, addressField.hostname(), addressField.port()))
                 .map(url -> {
@@ -153,6 +150,12 @@ public class OpenSearchSourceUtils {
                 .filter(urlField -> verifyOpenSearchCapabilities(urlField, creds).isEmpty())
                 .map(Result::new)
                 .findFirst()
-                .orElse(defaultResult);
+                .orElse(createDefaultResult(addressField));
+    }
+
+    private Result<UrlField> createDefaultResult(AddressField addressField) {
+        Result<UrlField> defaultResult = new Result<>();
+        defaultResult.argumentMessage(unknownEndpointError(addressField.path()));
+        return defaultResult;
     }
 }

@@ -27,11 +27,16 @@ public class WfsVersion extends BaseEnumField<String> {
 
     public static final String TYPE_NAME = "WfsVersion";
 
-    public static final String DESCRIPTION = "The version of the WFS source.";
+    public static final String DESCRIPTION =
+            "The WFS version number specifying the specification version for the client and server to operate with. The version number contains three non-negative integers in the form \"x.y.z\" where y and z shall not exceed 99. Refer to OGC 06-121r3 section 7.3.1 for more information.";
 
     public static final String WFS_10 = "1.0.0";
 
     public static final String WFS_20 = "2.0.0";
+
+    public static final String WFS_10_FIELD_NAME = "WFS_10";
+
+    public static final String WFS_20_FIELD_NAME = "WFS_20";
 
     public WfsVersion() {
         this(null);
@@ -56,7 +61,7 @@ public class WfsVersion extends BaseEnumField<String> {
                 "Indicates a server implements version 1.0.0 of the WFS specification.";
 
         public Wfs10() {
-            super("Wfs10", TYPE_NAME, DESCRIPTION);
+            super(WFS_10_FIELD_NAME, TYPE_NAME, DESCRIPTION);
         }
 
         @Override
@@ -71,7 +76,7 @@ public class WfsVersion extends BaseEnumField<String> {
                 "Indicates a server implements version 2.0.0 of the WFS specification.";
 
         public Wfs20() {
-            super("Wfs20", TYPE_NAME, DESCRIPTION);
+            super(WFS_20_FIELD_NAME, TYPE_NAME, DESCRIPTION);
         }
 
         @Override

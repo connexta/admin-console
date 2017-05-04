@@ -96,9 +96,6 @@ public class CswSourceUtils {
      * @return a {@link Result} containing the {@link UrlField} or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
      */
     public Result<UrlField> discoverCswUrl(AddressField addressField, CredentialsField creds) {
-        Result<UrlField> defaultResult = new Result<>();
-        defaultResult.argumentMessage(unknownEndpointError(addressField.path()));
-
         return URL_FORMATS.stream()
                 .map(format -> String.format(format, addressField.hostname(), addressField.port()))
                 .map(url -> {
@@ -110,7 +107,7 @@ public class CswSourceUtils {
                 .filter(urlField -> sendCswCapabilitiesRequest(urlField, creds).isEmpty())
                 .map(Result::new)
                 .findFirst()
-                .orElse(defaultResult);
+                .orElse(createDefaultResult(addressField));
     }
 
     /**
@@ -182,5 +179,11 @@ public class CswSourceUtils {
                 urlField.getValue());
         configResult.argumentMessage(unknownEndpointError(urlField.path()));
         return configResult;
+    }
+
+    private Result<UrlField> createDefaultResult(AddressField addressField) {
+        Result<UrlField> defaultResult = new Result<>();
+        defaultResult.argumentMessage(unknownEndpointError(addressField.path()));
+        return defaultResult;
     }
 }

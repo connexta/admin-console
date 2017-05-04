@@ -15,9 +15,9 @@ package org.codice.ddf.admin.sources.wfs.persist;
 
 import static org.codice.ddf.admin.common.message.DefaultMessages.noExistingConfigError;
 import static org.codice.ddf.admin.common.message.DefaultMessages.unsupportedVersionError;
-import static org.codice.ddf.admin.common.services.ServiceCommons.configExists;
-import static org.codice.ddf.admin.common.services.ServiceCommons.update;
-import static org.codice.ddf.admin.sources.commons.SourceActionCommons.persistSource;
+import static org.codice.ddf.admin.common.services.ServiceCommons.serviceConfigurationExists;
+import static org.codice.ddf.admin.common.services.ServiceCommons.updateService;
+import static org.codice.ddf.admin.sources.commons.SourceActionCommons.persistSourceConfiguration;
 import static org.codice.ddf.admin.sources.commons.utils.SourceValidationUtils.validateSourceName;
 import static org.codice.ddf.admin.sources.services.WfsServiceProperties.resolveWfsFactoryPid;
 import static org.codice.ddf.admin.sources.services.WfsServiceProperties.wfsConfigToServiceProps;
@@ -73,15 +73,11 @@ public class SaveWfsConfiguration extends BaseAction<BooleanField> {
         }
 
         if (StringUtils.isNotEmpty(servicePid.getValue())) {
-            addArgumentMessages(update(servicePid, wfsConfigToServiceProps(config), configuratorFactory));
+            addArgumentMessages(updateService(servicePid, wfsConfigToServiceProps(config), configuratorFactory));
         } else {
-            addArgumentMessages(persistSource(config, wfsConfigToServiceProps(config), configuratorFactory));
+            addArgumentMessages(persistSourceConfiguration(config, wfsConfigToServiceProps(config), configuratorFactory));
         }
-
-        if(containsErrorMsgs()) {
-            return new BooleanField(false);
-        }
-        return new BooleanField(true);
+        return new BooleanField(containsErrorMsgs());
     }
 
     @Override
@@ -91,7 +87,7 @@ public class SaveWfsConfiguration extends BaseAction<BooleanField> {
             return;
         }
 
-        if(servicePid.getValue() != null && !configExists(servicePid.getValue(), configuratorFactory)) {
+        if(servicePid.getValue() != null && !serviceConfigurationExists(servicePid.getValue(), configuratorFactory)) {
             addArgumentMessage(noExistingConfigError(servicePid.path()));
         } else {
             addArgumentMessages(validateSourceName(config.sourceNameField(), configuratorFactory, servicePid));

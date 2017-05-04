@@ -15,8 +15,8 @@ package org.codice.ddf.admin.sources.csw.persist;
 
 import static org.codice.ddf.admin.common.message.DefaultMessages.failedDeleteError;
 import static org.codice.ddf.admin.common.message.DefaultMessages.noExistingConfigError;
-import static org.codice.ddf.admin.common.services.ServiceCommons.configExists;
-import static org.codice.ddf.admin.common.services.ServiceCommons.delete;
+import static org.codice.ddf.admin.common.services.ServiceCommons.deleteService;
+import static org.codice.ddf.admin.common.services.ServiceCommons.serviceConfigurationExists;
 
 import java.util.List;
 
@@ -49,7 +49,7 @@ public class DeleteCswConfiguration extends BaseAction<BooleanField> {
 
     @Override
     public BooleanField performAction() {
-        if(!delete(servicePid.getValue(), configuratorFactory)) {
+        if(!deleteService(servicePid.getValue(), configuratorFactory)) {
             addArgumentMessage(failedDeleteError(servicePid.path()));
             return new BooleanField(false);
         }
@@ -63,7 +63,7 @@ public class DeleteCswConfiguration extends BaseAction<BooleanField> {
             return;
         }
 
-        if (!configExists(servicePid.getValue(), configuratorFactory)) {
+        if (!serviceConfigurationExists(servicePid.getValue(), configuratorFactory)) {
             addArgumentMessage(noExistingConfigError(servicePid.path()));
         }
     }

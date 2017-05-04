@@ -13,8 +13,6 @@
  **/
 package org.codice.ddf.admin.sources.fields.type;
 
-import static org.codice.ddf.admin.sources.services.OpenSearchServiceProperties.OPENSEARCH_FACTORY_PID;
-
 import java.util.List;
 
 import org.codice.ddf.admin.api.fields.Field;
@@ -25,11 +23,10 @@ public class OpenSearchSourceConfigurationField extends SourceConfigUnionField {
 
     private static final String FIELD_TYPE_NAME = "OpenSearchConfiguration";
 
-    private static final String DESCRIPTION = "A specification for querying geospatial data when federating. Query a Metadata Catalog via OpenSearch specifications for query searches.";
+    private static final String DESCRIPTION = "Represents an OpenSearch configuration containing properties to be saved.";
 
     public OpenSearchSourceConfigurationField() {
         super(FIELD_TYPE_NAME, DESCRIPTION);
-        factoryPid(OPENSEARCH_FACTORY_PID);
     }
 
     @Override

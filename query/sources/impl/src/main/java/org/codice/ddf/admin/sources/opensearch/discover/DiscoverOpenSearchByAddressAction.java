@@ -47,7 +47,7 @@ public class DiscoverOpenSearchByAddressAction extends BaseAction<SourceInfoFiel
         openSearchSourceUtils = new OpenSearchSourceUtils();
         addressField = new AddressField();
         credentialsField = new CredentialsField();
-        addressField.allFieldsRequired(true);
+        addressField.useDefaultRequired();
         credentialsField.allFieldsRequired(false);
     }
 

@@ -37,10 +37,6 @@ public class DefaultMessages {
 
     public static final String CANNOT_CONNECT = "CANNOT_CONNECT";
 
-    public static final String CERT_ERROR = "CERT_ERROR";
-
-    public static final String UNTRUSTED_CA = "UNTRUSTED_CA";
-
     public static final String INTERNAL_ERROR = "INTERNAL_ERROR";
 
     public static final String FAILED_UPDATE_ERROR = "FAILED_UPDATE";
@@ -100,10 +96,6 @@ public class DefaultMessages {
         return new ErrorMessage(CANNOT_CONNECT, path);
     }
 
-    public static ErrorMessage certError(List<String> path) {
-        return new ErrorMessage(CERT_ERROR, path);
-    }
-
     public static ErrorMessage failedUpdateError(List<String> path) {
         return new ErrorMessage(FAILED_UPDATE_ERROR, path);
     }
@@ -122,13 +114,5 @@ public class DefaultMessages {
 
     public static ErrorMessage unsupportedVersionError(List<String> path) {
         return new ErrorMessage(UNSUPPORTED_VERSION, path);
-    }
-
-    /*
-        Warnings
-     */
-
-    public static WarningMessage unstrustedCaWarning(List<String> path) {
-        return new WarningMessage(UNTRUSTED_CA, path);
     }
 }

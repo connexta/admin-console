@@ -42,11 +42,11 @@ public class DiscoverOpenSearchByUrlAction extends BaseAction<SourceInfoField> {
 
     public DiscoverOpenSearchByUrlAction() {
         super(ID, DESCRIPTION, new SourceInfoField());
-        openSearchSourceUtils = new OpenSearchSourceUtils();
         endpointUrl = new UrlField("endpointUrl");
         credentialsField = new CredentialsField();
         endpointUrl.isRequired(true);
         credentialsField.allFieldsRequired(false);
+        openSearchSourceUtils = new OpenSearchSourceUtils();
     }
 
     public DiscoverOpenSearchByUrlAction(OpenSearchSourceUtils openSearchSourceUtils) {

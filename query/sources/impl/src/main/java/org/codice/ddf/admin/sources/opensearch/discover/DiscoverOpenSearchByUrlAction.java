@@ -18,7 +18,7 @@ import static org.codice.ddf.admin.sources.commons.SourceActionCommons.createSou
 import java.util.List;
 
 import org.codice.ddf.admin.api.fields.Field;
-import org.codice.ddf.admin.common.Result;
+import org.codice.ddf.admin.common.ReportWithResult;
 import org.codice.ddf.admin.common.actions.BaseAction;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
 import org.codice.ddf.admin.common.fields.common.UrlField;
@@ -61,7 +61,7 @@ public class DiscoverOpenSearchByUrlAction extends BaseAction<SourceInfoField> {
 
     @Override
     public SourceInfoField performAction() {
-        Result<SourceConfigUnionField> configResult = openSearchSourceUtils.getOpenSearchConfig(endpointUrl, credentialsField);
+        ReportWithResult<SourceConfigUnionField> configResult = openSearchSourceUtils.getOpenSearchConfig(endpointUrl, credentialsField);
         addArgumentMessages(configResult.argumentMessages());
         if(containsErrorMsgs()) {
             return null;

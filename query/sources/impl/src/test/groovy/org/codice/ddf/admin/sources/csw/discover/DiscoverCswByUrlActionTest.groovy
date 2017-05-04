@@ -15,7 +15,7 @@ package org.codice.ddf.admin.sources.csw.discover
 
 import org.codice.ddf.admin.api.action.Action
 import org.codice.ddf.admin.api.fields.Field
-import org.codice.ddf.admin.common.Result
+import org.codice.ddf.admin.common.ReportWithResult
 import org.codice.ddf.admin.common.actions.BaseAction
 import org.codice.ddf.admin.common.fields.common.CredentialsField
 import org.codice.ddf.admin.common.message.DefaultMessages
@@ -143,9 +143,9 @@ class DiscoverCswByUrlActionTest extends Specification {
 
     def createResult(boolean hasError, List path, Class clazz) {
         if (hasError) {
-            return new Result().argumentMessage(new ErrorMessage("code", path))
+            return new ReportWithResult().argumentMessage(new ErrorMessage("code", path))
         }
-        return Mock(Result) {
+        return Mock(ReportWithResult) {
             argumentMessages() >> []
             get() >> Mock(clazz) {
                 path() >> path

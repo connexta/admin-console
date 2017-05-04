@@ -20,35 +20,33 @@ import java.util.Optional;
  *
  * @param <T> type that is wrapped
  */
-// TODO: 4/28/17 phuffer - should we refactor ActionReport to extend this?
-public class Result<T> extends Messages {
+public class ReportWithResult<T> extends Report {
 
-    private Optional<T> value;
+    private Optional<T> result;
 
-    public Result() {
+    public ReportWithResult() {
         super();
-        this.value = Optional.empty();
+        this.result = Optional.empty();
     }
 
-    public Result(T value) {
+    public ReportWithResult(T result) {
         this();
-        this.value = Optional.of(value);
+        this.result = Optional.of(result);
     }
 
-    public Result<T> value(T value) {
-        this.value = Optional.of(value);
-        return this;
+    public void result(T value) {
+        this.result = Optional.of(value);
     }
 
     public boolean isPresent() {
-        return value.isPresent();
+        return result.isPresent();
     }
 
     public boolean isNotPresent() {
         return !isPresent();
     }
 
-    public T get() {
-        return value.get();
+    public T result() {
+        return result.get();
     }
 }

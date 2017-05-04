@@ -18,7 +18,7 @@ import static org.codice.ddf.admin.sources.commons.SourceActionCommons.createSou
 import java.util.List;
 
 import org.codice.ddf.admin.api.fields.Field;
-import org.codice.ddf.admin.common.Result;
+import org.codice.ddf.admin.common.ReportWithResult;
 import org.codice.ddf.admin.common.actions.BaseAction;
 import org.codice.ddf.admin.common.fields.common.AddressField;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
@@ -58,13 +58,13 @@ public class DiscoverWfsByAddressAction extends BaseAction<SourceInfoField> {
 
     @Override
     public SourceInfoField performAction() {
-        Result<UrlField> discoveredUrl = wfsSourceUtils.discoverWfsUrl(addressField, credentialsField);
+        ReportWithResult<UrlField> discoveredUrl = wfsSourceUtils.discoverWfsUrl(addressField, credentialsField);
         addArgumentMessages(discoveredUrl.argumentMessages());
         if(containsErrorMsgs()) {
             return null;
         }
 
-        Result<SourceConfigUnionField> configResult = wfsSourceUtils.getPreferredWfsConfig(discoveredUrl.get(), credentialsField);
+        ReportWithResult<SourceConfigUnionField> configResult = wfsSourceUtils.getPreferredWfsConfig(discoveredUrl.get(), credentialsField);
         addArgumentMessages(configResult.argumentMessages());
         if(containsErrorMsgs()) {
             return null;

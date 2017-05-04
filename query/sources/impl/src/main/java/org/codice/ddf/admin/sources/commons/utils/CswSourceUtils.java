@@ -29,7 +29,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 
 import org.codice.ddf.admin.api.action.Message;
-import org.codice.ddf.admin.common.Result;
+import org.codice.ddf.admin.common.ReportWithResult;
 import org.codice.ddf.admin.common.fields.common.AddressField;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
 import org.codice.ddf.admin.common.fields.common.UrlField;
@@ -83,9 +83,9 @@ public class CswSourceUtils {
      * @return a {@code List} containing {@link org.codice.ddf.admin.common.message.ErrorMessage}s on failure.
      */
     public List<Message> sendCswCapabilitiesRequest(UrlField urlField, CredentialsField creds) {
-        Result result = requestUtils.sendGetRequest(urlField, creds,
+        ReportWithResult result = requestUtils.sendGetRequest(urlField, creds,
                 GET_CAPABILITIES_PARAMS);
-        return result.allMessages();
+        return result.messages();
     }
 
     /**
@@ -93,9 +93,9 @@ public class CswSourceUtils {
      *
      * @param addressField address to probe for CSW capabilities
      * @param creds        optional credentials for basic authentication
-     * @return a {@link Result} containing the {@link UrlField} or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
+     * @return a {@link ReportWithResult} containing the {@link UrlField} or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
      */
-    public Result<UrlField> discoverCswUrl(AddressField addressField, CredentialsField creds) {
+    public ReportWithResult<UrlField> discoverCswUrl(AddressField addressField, CredentialsField creds) {
         return URL_FORMATS.stream()
                 .map(format -> String.format(format, addressField.hostname(), addressField.port()))
                 .map(url -> {
@@ -105,7 +105,7 @@ public class CswSourceUtils {
                     return urlField;
                 })
                 .filter(urlField -> sendCswCapabilitiesRequest(urlField, creds).isEmpty())
-                .map(Result::new)
+                .map(ReportWithResult::new)
                 .findFirst()
                 .orElse(createDefaultResult(addressField));
     }
@@ -115,13 +115,13 @@ public class CswSourceUtils {
      *
      * @param urlField A URL of an endpoint with CSW capabilities
      * @param creds    optional credentials for basic authentication
-     * @return a {@link Result} containing the {@link SourceConfigUnionField} or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
+     * @return a {@link ReportWithResult} containing the {@link SourceConfigUnionField} or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
      */
-    public Result<SourceConfigUnionField> getPreferredCswConfig(UrlField urlField, CredentialsField creds) {
-        Result<String> responseBodyResult = requestUtils.sendGetRequest(urlField, creds,
+    public ReportWithResult<SourceConfigUnionField> getPreferredCswConfig(UrlField urlField, CredentialsField creds) {
+        ReportWithResult<String> responseBodyResult = requestUtils.sendGetRequest(urlField, creds,
                 GET_CAPABILITIES_PARAMS);
 
-        Result<SourceConfigUnionField> configResult = new Result<>();
+        ReportWithResult<SourceConfigUnionField> configResult = new ReportWithResult<>();
         if (responseBodyResult.hasErrors()) {
             configResult.argumentMessages(responseBodyResult.argumentMessages());
             return configResult;
@@ -150,7 +150,7 @@ public class CswSourceUtils {
         try {
             if ((Boolean) xpath.compile(HAS_CATALOG_METACARD_EXP)
                     .evaluate(capabilitiesXml, XPathConstants.BOOLEAN)) {
-                return configResult.value(preferred.factoryPid(CSW_PROFILE_FACTORY_PID));
+                return configResult.result(preferred.factoryPid(CSW_PROFILE_FACTORY_PID));
             }
         } catch (Exception e) {
             LOGGER.debug("Failed to compile DDF Profile CSW discovery XPath expression.");
@@ -159,7 +159,7 @@ public class CswSourceUtils {
         try {
             if ((Boolean) xpath.compile(HAS_GMD_ISO_EXP)
                     .evaluate(capabilitiesXml, XPathConstants.BOOLEAN)) {
-                return configResult.value(preferred.outputSchema(GMD_OUTPUT_SCHEMA)
+                return configResult.result(preferred.outputSchema(GMD_OUTPUT_SCHEMA)
                         .factoryPid(CSW_GMD_FACTORY_PID));
             }
         } catch (Exception e) {
@@ -169,7 +169,7 @@ public class CswSourceUtils {
         try {
             String outputSchema = xpath.compile(GET_FIRST_OUTPUT_SCHEMA)
                     .evaluate(capabilitiesXml);
-            return configResult.value(preferred.outputSchema(outputSchema)
+            return configResult.result(preferred.outputSchema(outputSchema)
                     .factoryPid(CSW_SPEC_FACTORY_PID));
         } catch (Exception e) {
             LOGGER.debug("Failed to compile generic CSW specification discovery XPath expression.");
@@ -181,8 +181,8 @@ public class CswSourceUtils {
         return configResult;
     }
 
-    private Result<UrlField> createDefaultResult(AddressField addressField) {
-        Result<UrlField> defaultResult = new Result<>();
+    private ReportWithResult<UrlField> createDefaultResult(AddressField addressField) {
+        ReportWithResult<UrlField> defaultResult = new ReportWithResult<>();
         defaultResult.argumentMessage(unknownEndpointError(addressField.path()));
         return defaultResult;
     }

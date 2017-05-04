@@ -29,7 +29,7 @@ import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.codice.ddf.admin.api.action.Message;
-import org.codice.ddf.admin.common.Result;
+import org.codice.ddf.admin.common.ReportWithResult;
 import org.codice.ddf.admin.common.fields.common.AddressField;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
 import org.codice.ddf.admin.common.fields.common.UrlField;
@@ -71,15 +71,15 @@ public class OpenSearchSourceUtils {
 
     /**
      * Attempts to create an OpenSearch configuration with the provided URL and credentials. If a configuration
-     * is not found or created, the {@link Result}'s messages will have errors.
+     * is not found or created, the {@link ReportWithResult}'s messages will have errors.
      *
      * @param urlField The URL to probe for OpenSearch capabilities
      * @param creds    optional credentials to send with Basic Auth header
-     * @return @return a {@link Result} containing the {@link SourceConfigUnionField} or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
+     * @return @return a {@link ReportWithResult} containing the {@link SourceConfigUnionField} or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
      */
-    public Result<SourceConfigUnionField> getOpenSearchConfig(UrlField urlField, CredentialsField creds) {
+    public ReportWithResult<SourceConfigUnionField> getOpenSearchConfig(UrlField urlField, CredentialsField creds) {
         List<Message> errors = verifyOpenSearchCapabilities(urlField, creds);
-        Result<SourceConfigUnionField> configResult = new Result<>();
+        ReportWithResult<SourceConfigUnionField> configResult = new ReportWithResult<>();
         if (CollectionUtils.isNotEmpty(errors)) {
             configResult.argumentMessages(errors);
             return configResult;
@@ -91,7 +91,7 @@ public class OpenSearchSourceUtils {
                 .credentials()
                 .username(creds.username())
                 .password(creds.password());
-        return configResult.value(config);
+        return configResult.result(config);
     }
 
     /**
@@ -102,10 +102,10 @@ public class OpenSearchSourceUtils {
      * @return empty list on successful verification, otherwise a list containing an {@link org.codice.ddf.admin.common.message.ErrorMessage}
      */
     protected List<Message> verifyOpenSearchCapabilities(UrlField urlField, CredentialsField creds) {
-        Result<String> result = requestUtils.sendGetRequest(urlField, creds,
+        ReportWithResult<String> result = requestUtils.sendGetRequest(urlField, creds,
                 GET_CAPABILITIES_PARAMS);
         if (result.hasErrors()) {
-            return result.allMessages();
+            return result.messages();
         }
 
         Document capabilitiesXml;
@@ -136,9 +136,9 @@ public class OpenSearchSourceUtils {
      *
      * @param addressField hostname and port to probe for OpenSearch capabilities
      * @param creds        optional credentials for authentication
-     * @return a {@link Result} containing the discovered {@link UrlField} or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
+     * @return a {@link ReportWithResult} containing the discovered {@link UrlField} or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
      */
-    public Result<UrlField> discoverOpenSearchUrl(AddressField addressField, CredentialsField creds) {
+    public ReportWithResult<UrlField> discoverOpenSearchUrl(AddressField addressField, CredentialsField creds) {
         return URL_FORMATS.stream()
                 .map(format -> String.format(format, addressField.hostname(), addressField.port()))
                 .map(url -> {
@@ -148,13 +148,13 @@ public class OpenSearchSourceUtils {
                     return urlField;
                 })
                 .filter(urlField -> verifyOpenSearchCapabilities(urlField, creds).isEmpty())
-                .map(Result::new)
+                .map(ReportWithResult::new)
                 .findFirst()
                 .orElse(createDefaultResult(addressField));
     }
 
-    private Result<UrlField> createDefaultResult(AddressField addressField) {
-        Result<UrlField> defaultResult = new Result<>();
+    private ReportWithResult<UrlField> createDefaultResult(AddressField addressField) {
+        ReportWithResult<UrlField> defaultResult = new ReportWithResult<>();
         defaultResult.argumentMessage(unknownEndpointError(addressField.path()));
         return defaultResult;
     }

@@ -26,7 +26,7 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.codice.ddf.admin.api.action.Message;
-import org.codice.ddf.admin.common.Result;
+import org.codice.ddf.admin.common.ReportWithResult;
 import org.codice.ddf.admin.common.fields.common.AddressField;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
 import org.codice.ddf.admin.common.fields.common.UrlField;
@@ -72,11 +72,11 @@ public class WfsSourceUtils {
      *
      * @param urlField URL to probe for WFS capabilities
      * @param creds    optional username and password to add to Basic Auth header
-     * @return a {@link Result} containing the {@link UrlField} or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
+     * @return a {@link ReportWithResult} containing the {@link UrlField} or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
      */
     public List<Message> sendWfsCapabilitiesRequest(UrlField urlField, CredentialsField creds) {
-        Result<String> result = requestUtils.sendGetRequest(urlField, creds, GET_CAPABILITIES_PARAMS);
-        return result.allMessages();
+        ReportWithResult<String> result = requestUtils.sendGetRequest(urlField, creds, GET_CAPABILITIES_PARAMS);
+        return result.messages();
     }
 
     /**
@@ -84,9 +84,9 @@ public class WfsSourceUtils {
      *
      * @param addressField address to probe for WFS capabilities
      * @param creds        optional username to add to Basic Auth header
-     * @return @return a {@link Result} containing the {@link UrlField} or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
+     * @return @return a {@link ReportWithResult} containing the {@link UrlField} or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
      */
-    public Result<UrlField> discoverWfsUrl(AddressField addressField, CredentialsField creds) {
+    public ReportWithResult<UrlField> discoverWfsUrl(AddressField addressField, CredentialsField creds) {
         return URL_FORMATS.stream()
                 .map(format -> String.format(format, addressField.hostname(), addressField.port()))
                 .map(url -> {
@@ -96,7 +96,7 @@ public class WfsSourceUtils {
                     return urlField;
                 })
                 .filter(urlField -> sendWfsCapabilitiesRequest(urlField, creds).isEmpty())
-                .map(Result::new)
+                .map(ReportWithResult::new)
                 .findFirst()
                 .orElse(createDefaultResult(addressField));
     }
@@ -106,11 +106,11 @@ public class WfsSourceUtils {
      *
      * @param urlField WFS URL to probe for a configuration
      * @param creds    optional username to add to Basic Auth header
-     * @return @return a {@link Result} containing the preferred {@link SourceConfigUnionField} or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
+     * @return @return a {@link ReportWithResult} containing the preferred {@link SourceConfigUnionField} or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
      */
-    public Result<SourceConfigUnionField> getPreferredWfsConfig(UrlField urlField, CredentialsField creds) {
-        Result<String> responseBodyResult = requestUtils.sendGetRequest(urlField, creds, GET_CAPABILITIES_PARAMS);
-        Result<SourceConfigUnionField> configResult = new Result<>();
+    public ReportWithResult<SourceConfigUnionField> getPreferredWfsConfig(UrlField urlField, CredentialsField creds) {
+        ReportWithResult<String> responseBodyResult = requestUtils.sendGetRequest(urlField, creds, GET_CAPABILITIES_PARAMS);
+        ReportWithResult<SourceConfigUnionField> configResult = new ReportWithResult<>();
         if (responseBodyResult.hasErrors()) {
             configResult.argumentMessages(responseBodyResult.argumentMessages());
             return configResult;
@@ -149,15 +149,15 @@ public class WfsSourceUtils {
         try {
             String factoryPid = resolveWfsFactoryPid(wfsVersion);
             preferredConfig.factoryPid(factoryPid);
-            configResult.value(preferredConfig);
+            configResult.result(preferredConfig);
         } catch (IllegalArgumentException e) {
             configResult.argumentMessage(unknownEndpointError(urlField.path()));
         }
         return configResult;
     }
 
-    private Result<UrlField> createDefaultResult(AddressField addressField) {
-        Result<UrlField> defaultResult = new Result<>();
+    private ReportWithResult<UrlField> createDefaultResult(AddressField addressField) {
+        ReportWithResult<UrlField> defaultResult = new ReportWithResult<>();
         defaultResult.argumentMessage(unknownEndpointError(addressField.path()));
         return defaultResult;
     }

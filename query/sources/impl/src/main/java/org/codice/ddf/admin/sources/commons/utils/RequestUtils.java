@@ -28,7 +28,7 @@ import javax.ws.rs.core.Response;
 
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.codice.ddf.admin.api.action.Message;
-import org.codice.ddf.admin.common.Result;
+import org.codice.ddf.admin.common.ReportWithResult;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
 import org.codice.ddf.admin.common.fields.common.UrlField;
 import org.codice.ddf.cxf.SecureCxfClientFactory;
@@ -44,16 +44,16 @@ public class RequestUtils {
      *
      * @param urlField contains the URL to send the get request to
      * @param creds    option credentials consisting of a username and password
-     * @return a {@link Result} containing the GET request response body or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
+     * @return a {@link ReportWithResult} containing the GET request response body or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
      */
-    public Result<String> sendGetRequest(UrlField urlField, CredentialsField creds,
+    public ReportWithResult<String> sendGetRequest(UrlField urlField, CredentialsField creds,
             Map<String, String> queryParams) {
         WebClient client = generateClient(urlField, creds);
         queryParams.entrySet()
                 .forEach(entry -> client.query(entry.getKey(), entry.getValue()));
 
         Response response;
-        Result<String> responseBody = new Result<>();
+        ReportWithResult<String> responseBody = new ReportWithResult<>();
         try {
             response = client.get();
         } catch (ProcessingException e) {
@@ -71,7 +71,7 @@ public class RequestUtils {
             responseBody.argumentMessage(cannotConnectError(urlField.path()));
             return responseBody;
         }
-        return responseBody.value(response.readEntity(String.class));
+        return responseBody.result(response.readEntity(String.class));
     }
 
     /**
@@ -81,15 +81,15 @@ public class RequestUtils {
      * @param creds       optional credentials consisting of a username and password
      * @param contentType Mime type of the post body
      * @param content     Body of the post request
-     * @return a {@link Result} containing the POST request response body or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
+     * @return a {@link ReportWithResult} containing the POST request response body or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
      */
-    public Result<String> sendPostRequest(UrlField urlField, CredentialsField creds,
+    public ReportWithResult<String> sendPostRequest(UrlField urlField, CredentialsField creds,
             String contentType, String content) {
         WebClient client = generateClient(urlField, creds);
         Response response = client.type(contentType)
                 .post(content);
 
-        Result<String> responseBodyResult = new Result<>();
+        ReportWithResult<String> responseBodyResult = new ReportWithResult<>();
         if (response.getStatus() != HTTP_OK || response.readEntity(String.class)
                 .equals("")) {
             LOGGER.debug("Bad or empty response received from sending POST to {}.",
@@ -98,7 +98,7 @@ public class RequestUtils {
             return responseBodyResult;
         }
 
-        return responseBodyResult.value(response.readEntity(String.class));
+        return responseBodyResult.result(response.readEntity(String.class));
     }
 
     /**

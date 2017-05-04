@@ -20,13 +20,13 @@ import java.util.stream.Collectors;
 import org.apache.commons.collections.ListUtils;
 import org.codice.ddf.admin.api.action.Message;
 
-public class Messages {
+public class Report {
 
     private List<Message> argumentMessages;
 
     private List<Message> resultMessages;
 
-    public Messages() {
+    public Report() {
         argumentMessages = new ArrayList<>();
         resultMessages = new ArrayList<>();
     }
@@ -35,12 +35,12 @@ public class Messages {
         return argumentMessages;
     }
 
-    public Messages argumentMessages(List<Message> messages) {
+    public Report argumentMessages(List<Message> messages) {
         argumentMessages = messages;
         return this;
     }
 
-    public Messages argumentMessage(Message message) {
+    public Report argumentMessage(Message message) {
         argumentMessages.add(message);
         return this;
     }
@@ -49,25 +49,25 @@ public class Messages {
         return resultMessages;
     }
 
-    public Messages resultMessages(List<Message> messages) {
+    public Report resultMessages(List<Message> messages) {
         resultMessages = messages;
         return this;
     }
 
-    public Messages resultMessage(Message message) {
+    public Report resultMessage(Message message) {
         resultMessages.add(message);
         return this;
     }
 
-    public List<Message> allMessages() {
+    public List<Message> messages() {
         return ListUtils.union(argumentMessages, resultMessages);
     }
 
-    public Messages copyResultMessages(Messages messages) {
+    public Report copyResultMessages(Report messages) {
         return resultMessages(messages.resultMessages());
     }
 
-    public Messages copyArgumentMessages(Messages messages) {
+    public Report copyArgumentMessages(Report messages) {
         return argumentMessages(messages.resultMessages());
     }
 

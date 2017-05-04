@@ -21,7 +21,7 @@ public class DefaultMessages {
 
     public static final String EMPTY_FIELD = "EMPTY_FIELD";
 
-    public static final String INVALID_FIELD = "INVALID_FIELD";
+    public static final String MISSING_KEY_VALUE = "MISSING_KEY_VALUE";
 
     public static final String INVALID_PORT_RANGE = "INVALID_PORT_RANGE";
 
@@ -41,8 +41,8 @@ public class DefaultMessages {
         return new ErrorMessage(FAILED_PERSIST);
     }
 
-    public static ErrorMessage invalidFieldError(List<String> path) {
-        return new ErrorMessage(INVALID_FIELD, path);
+    public static ErrorMessage missingKeyValue(List<String> path) {
+        return new ErrorMessage(MISSING_KEY_VALUE, path);
     }
 
     public static ErrorMessage invalidPortRangeError(List<String> path) {

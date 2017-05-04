@@ -13,7 +13,7 @@
  **/
 package org.codice.ddf.admin.security.common.fields.wcpm;
 
-import static org.codice.ddf.admin.common.message.DefaultMessages.invalidFieldError;
+import static org.codice.ddf.admin.common.message.DefaultMessages.missingKeyValue;
 
 import java.util.List;
 
@@ -87,7 +87,7 @@ public class ClaimsMapEntry extends BaseObjectField {
         if (key.getValue() != null) {
             if (value.getValue() == null || value.getValue()
                     .isEmpty()) {
-                validationMsgs.add(invalidFieldError(value.path()));
+                validationMsgs.add(missingKeyValue(value.path()));
             }
         }
 

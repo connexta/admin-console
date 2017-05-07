@@ -13,6 +13,13 @@
  **/
 package org.codice.ddf.admin.sources.fields.type;
 
+import java.util.List;
+
+import org.codice.ddf.admin.api.fields.Field;
+import org.codice.ddf.admin.sources.fields.WfsVersion;
+
+import com.google.common.collect.ImmutableList;
+
 public class WfsSourceConfigurationField extends SourceConfigUnionField {
 
     public static final String FIELD_TYPE_NAME = "WfsSourceConfiguration";
@@ -20,12 +27,35 @@ public class WfsSourceConfigurationField extends SourceConfigUnionField {
     public static final String DESCRIPTION =
             "Represents a WFS configuration containing properties to be saved.";
 
+    private WfsVersion wfsVersion;
+
     public WfsSourceConfigurationField() {
         super(FIELD_TYPE_NAME, DESCRIPTION);
+    }
+
+    public WfsSourceConfigurationField wfsVersion(String wfsVersion) {
+        this.wfsVersion.setValue(wfsVersion);
+        return this;
+    }
+
+    public String wfsVersion() {
+        return wfsVersion.getValue();
+    }
+
+    public WfsVersion wfsVersionField() {
+        return wfsVersion;
+    }
+
+    @Override
+    public List<Field> getFields() {
+        return new ImmutableList.Builder<Field>().addAll(super.getFields())
+                .add(wfsVersion)
+                .build();
     }
 
     @Override
     public void initializeFields() {
         super.initializeFields();
+        wfsVersion = new WfsVersion();
     }
 }

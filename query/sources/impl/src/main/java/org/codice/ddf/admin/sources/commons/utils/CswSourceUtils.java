@@ -17,9 +17,9 @@ import static org.codice.ddf.admin.common.message.DefaultMessages.INTERNAL_ERROR
 import static org.codice.ddf.admin.common.message.DefaultMessages.unknownEndpointError;
 import static org.codice.ddf.admin.sources.commons.SourceUtilCommons.SOURCES_NAMESPACE_CONTEXT;
 import static org.codice.ddf.admin.sources.commons.SourceUtilCommons.createDocument;
-import static org.codice.ddf.admin.sources.services.CswServiceProperties.CSW_GMD_FACTORY_PID;
-import static org.codice.ddf.admin.sources.services.CswServiceProperties.CSW_PROFILE_FACTORY_PID;
-import static org.codice.ddf.admin.sources.services.CswServiceProperties.CSW_SPEC_FACTORY_PID;
+import static org.codice.ddf.admin.sources.fields.CswProfile.CSW_FEDERATION_PROFILE_SOURCE;
+import static org.codice.ddf.admin.sources.fields.CswProfile.CSW_SPEC_PROFILE_FEDERATED_SOURCE;
+import static org.codice.ddf.admin.sources.fields.CswProfile.GMD_CSW_ISO_FEDERATED_SOURCE;
 
 import java.util.List;
 import java.util.Map;
@@ -122,12 +122,12 @@ public class CswSourceUtils {
                 GET_CAPABILITIES_PARAMS);
 
         ReportWithResult<SourceConfigUnionField> configResult = new ReportWithResult<>();
-        if (responseBodyResult.hasErrors()) {
+        if (responseBodyResult.containsErrorMsgs()) {
             configResult.argumentMessages(responseBodyResult.argumentMessages());
             return configResult;
         }
 
-        String requestBody = responseBodyResult.get();
+        String requestBody = responseBodyResult.result();
         Document capabilitiesXml;
         try {
             capabilitiesXml = createDocument(requestBody);
@@ -150,7 +150,8 @@ public class CswSourceUtils {
         try {
             if ((Boolean) xpath.compile(HAS_CATALOG_METACARD_EXP)
                     .evaluate(capabilitiesXml, XPathConstants.BOOLEAN)) {
-                return configResult.result(preferred.factoryPid(CSW_PROFILE_FACTORY_PID));
+                configResult.result(preferred.cswProfile(CSW_FEDERATION_PROFILE_SOURCE));
+                return configResult;
             }
         } catch (Exception e) {
             LOGGER.debug("Failed to compile DDF Profile CSW discovery XPath expression.");
@@ -159,8 +160,9 @@ public class CswSourceUtils {
         try {
             if ((Boolean) xpath.compile(HAS_GMD_ISO_EXP)
                     .evaluate(capabilitiesXml, XPathConstants.BOOLEAN)) {
-                return configResult.result(preferred.outputSchema(GMD_OUTPUT_SCHEMA)
-                        .factoryPid(CSW_GMD_FACTORY_PID));
+                configResult.result(preferred.outputSchema(GMD_OUTPUT_SCHEMA)
+                        .cswProfile(GMD_CSW_ISO_FEDERATED_SOURCE));
+                return configResult;
             }
         } catch (Exception e) {
             LOGGER.debug("Failed to compile GMD CSW discovery XPath expression.");
@@ -169,8 +171,9 @@ public class CswSourceUtils {
         try {
             String outputSchema = xpath.compile(GET_FIRST_OUTPUT_SCHEMA)
                     .evaluate(capabilitiesXml);
-            return configResult.result(preferred.outputSchema(outputSchema)
-                    .factoryPid(CSW_SPEC_FACTORY_PID));
+            configResult.result(preferred.outputSchema(outputSchema)
+                    .cswProfile(CSW_SPEC_PROFILE_FEDERATED_SOURCE));
+            return configResult;
         } catch (Exception e) {
             LOGGER.debug("Failed to compile generic CSW specification discovery XPath expression.");
         }

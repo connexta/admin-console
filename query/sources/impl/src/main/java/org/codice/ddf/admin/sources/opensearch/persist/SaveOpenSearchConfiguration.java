@@ -13,10 +13,11 @@
  */
 package org.codice.ddf.admin.sources.opensearch.persist;
 
+import static org.codice.ddf.admin.common.message.DefaultMessages.failedPersistError;
 import static org.codice.ddf.admin.common.message.DefaultMessages.noExistingConfigError;
+import static org.codice.ddf.admin.common.services.ServiceCommons.createManagedService;
 import static org.codice.ddf.admin.common.services.ServiceCommons.serviceConfigurationExists;
 import static org.codice.ddf.admin.common.services.ServiceCommons.updateService;
-import static org.codice.ddf.admin.sources.commons.SourceActionCommons.persistSourceConfiguration;
 import static org.codice.ddf.admin.sources.commons.utils.SourceValidationUtils.validateSourceName;
 import static org.codice.ddf.admin.sources.services.OpenSearchServiceProperties.OPENSEARCH_FACTORY_PID;
 import static org.codice.ddf.admin.sources.services.OpenSearchServiceProperties.openSearchConfigToServiceProps;
@@ -27,8 +28,8 @@ import org.apache.commons.lang.StringUtils;
 import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.common.actions.BaseAction;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
+import org.codice.ddf.admin.common.fields.common.ServicePid;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
-import org.codice.ddf.admin.sources.fields.ServicePid;
 import org.codice.ddf.admin.sources.fields.type.OpenSearchSourceConfigurationField;
 
 import com.google.common.collect.ImmutableList;
@@ -52,7 +53,6 @@ public class SaveOpenSearchConfiguration extends BaseAction<BooleanField> {
         config = new OpenSearchSourceConfigurationField();
         servicePid = new ServicePid();
         config.isRequired(true);
-        config.factoryPid(OPENSEARCH_FACTORY_PID);
         config.sourceNameField().isRequired(true);
         config.endpointUrlField().isRequired(true);
         this.configuratorFactory = configuratorFactory;
@@ -61,11 +61,13 @@ public class SaveOpenSearchConfiguration extends BaseAction<BooleanField> {
     @Override
     public BooleanField performAction() {
         if (StringUtils.isNotEmpty(servicePid.getValue())) {
-            addArgumentMessages(updateService(servicePid, openSearchConfigToServiceProps(config), configuratorFactory));
+            addArgumentMessages(updateService(servicePid, openSearchConfigToServiceProps(config), configuratorFactory).argumentMessages());
         } else {
-            addArgumentMessages(persistSourceConfiguration(config, openSearchConfigToServiceProps(config), configuratorFactory));
+            if(createManagedService(openSearchConfigToServiceProps(config), OPENSEARCH_FACTORY_PID, configuratorFactory).containsErrorMsgs()) {
+                addArgumentMessage(failedPersistError(config.path()));
+            }
         }
-        return new BooleanField(containsErrorMsgs());
+        return new BooleanField(!containsErrorMsgs());
     }
 
     @Override

@@ -64,13 +64,13 @@ public class DiscoverOpenSearchByAddressAction extends BaseAction<SourceInfoFiel
             return null;
         }
 
-        ReportWithResult<SourceConfigUnionField> configResult = openSearchSourceUtils.getOpenSearchConfig(discoveredUrl.get(), credentialsField);
+        ReportWithResult<SourceConfigUnionField> configResult = openSearchSourceUtils.getOpenSearchConfig(discoveredUrl.result(), credentialsField);
         addArgumentMessages(configResult.argumentMessages());
         if(containsErrorMsgs()) {
             return null;
         }
 
-        return createSourceInfoField(ID, true, configResult.get());
+        return createSourceInfoField(ID, true, configResult.result());
     }
 
     @Override

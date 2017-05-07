@@ -64,13 +64,13 @@ public class DiscoverWfsByAddressAction extends BaseAction<SourceInfoField> {
             return null;
         }
 
-        ReportWithResult<SourceConfigUnionField> configResult = wfsSourceUtils.getPreferredWfsConfig(discoveredUrl.get(), credentialsField);
+        ReportWithResult<SourceConfigUnionField> configResult = wfsSourceUtils.getPreferredWfsConfig(discoveredUrl.result(), credentialsField);
         addArgumentMessages(configResult.argumentMessages());
         if(containsErrorMsgs()) {
             return null;
         }
 
-        return createSourceInfoField(ID, true, configResult.get());
+        return createSourceInfoField(ID, true, configResult.result());
     }
 
     @Override

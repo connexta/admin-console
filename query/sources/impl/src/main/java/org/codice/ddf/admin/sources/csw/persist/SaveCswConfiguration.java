@@ -13,11 +13,12 @@
  **/
 package org.codice.ddf.admin.sources.csw.persist;
 
+import static org.codice.ddf.admin.common.message.DefaultMessages.failedPersistError;
 import static org.codice.ddf.admin.common.message.DefaultMessages.noExistingConfigError;
 import static org.codice.ddf.admin.common.message.DefaultMessages.unsupportedVersionError;
+import static org.codice.ddf.admin.common.services.ServiceCommons.createManagedService;
 import static org.codice.ddf.admin.common.services.ServiceCommons.serviceConfigurationExists;
 import static org.codice.ddf.admin.common.services.ServiceCommons.updateService;
-import static org.codice.ddf.admin.sources.commons.SourceActionCommons.persistSourceConfiguration;
 import static org.codice.ddf.admin.sources.commons.utils.SourceValidationUtils.validateSourceName;
 import static org.codice.ddf.admin.sources.services.CswServiceProperties.cswConfigToServiceProps;
 import static org.codice.ddf.admin.sources.services.CswServiceProperties.resolveCswFactoryPid;
@@ -28,9 +29,8 @@ import org.apache.commons.lang.StringUtils;
 import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.common.actions.BaseAction;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
+import org.codice.ddf.admin.common.fields.common.ServicePid;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
-import org.codice.ddf.admin.sources.fields.CswProfile;
-import org.codice.ddf.admin.sources.fields.ServicePid;
 import org.codice.ddf.admin.sources.fields.type.CswSourceConfigurationField;
 
 import com.google.common.collect.ImmutableList;
@@ -46,18 +46,14 @@ public class SaveCswConfiguration extends BaseAction<BooleanField> {
 
     private ServicePid servicePid;
 
-    private CswProfile cswProfile;
-
     private ConfiguratorFactory configuratorFactory;
-
 
     public SaveCswConfiguration(ConfiguratorFactory configuratorFactory) {
         super(ID, DESCRIPTION, new BooleanField());
         config = new CswSourceConfigurationField();
         servicePid = new ServicePid();
-        cswProfile = new CswProfile();
         config.isRequired(true);
-        cswProfile.isRequired(true);
+        config.cswProfileField().isRequired(true);
         config.sourceNameField().isRequired(true);
         config.endpointUrlField().isRequired(true);
         this.configuratorFactory = configuratorFactory;
@@ -65,20 +61,22 @@ public class SaveCswConfiguration extends BaseAction<BooleanField> {
 
     @Override
     public BooleanField performAction() {
+        String factoryPid;
         try {
-            String factoryPid = resolveCswFactoryPid(cswProfile.getValue());
-            config.factoryPid(factoryPid);
+            factoryPid = resolveCswFactoryPid(config.cswProfile());
         } catch (IllegalArgumentException e) {
-            addArgumentMessage(unsupportedVersionError(cswProfile.path()));
+            addArgumentMessage(unsupportedVersionError(config.cswProfileField().path()));
             return new BooleanField(false);
         }
 
         if (StringUtils.isNotEmpty(servicePid.getValue())) {
-            addArgumentMessages(updateService(servicePid, cswConfigToServiceProps(config), configuratorFactory));
+            addArgumentMessages(updateService(servicePid, cswConfigToServiceProps(config), configuratorFactory).argumentMessages());
         } else {
-            addArgumentMessages(persistSourceConfiguration(config, cswConfigToServiceProps(config), configuratorFactory));
+            if (createManagedService(cswConfigToServiceProps(config), factoryPid, configuratorFactory).containsErrorMsgs()) {
+                addArgumentMessage(failedPersistError(config.path()));
+            }
         }
-        return new BooleanField(containsErrorMsgs());
+        return new BooleanField(!containsErrorMsgs());
     }
 
     @Override
@@ -97,6 +95,6 @@ public class SaveCswConfiguration extends BaseAction<BooleanField> {
 
     @Override
     public List<Field> getArguments() {
-        return ImmutableList.of(config, servicePid, cswProfile);
+        return ImmutableList.of(config, servicePid);
     }
 }

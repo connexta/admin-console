@@ -13,21 +13,16 @@
  */
 package org.codice.ddf.admin.sources.commons;
 
-import static org.codice.ddf.admin.common.message.DefaultMessages.failedPersistError;
-import static org.codice.ddf.admin.common.services.ServiceCommons.createManagedService;
-
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
 import org.apache.commons.lang.StringUtils;
-import org.codice.ddf.admin.api.action.Message;
 import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
+import org.codice.ddf.admin.common.fields.common.ServicePid;
 import org.codice.ddf.admin.configurator.ConfigReader;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
-import org.codice.ddf.admin.sources.fields.ServicePid;
 import org.codice.ddf.admin.sources.fields.SourceInfoField;
 import org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField;
 
@@ -46,14 +41,6 @@ public class SourceActionCommons {
         sourceInfoField.isAvaliable(isAvailable);
         sourceInfoField.configuration(config);
         return sourceInfoField;
-    }
-
-    public static List<Message> persistSourceConfiguration(SourceConfigUnionField config,
-            Map<String, Object> serviceProps, ConfiguratorFactory configuratorFactory) {
-        if (!createManagedService(serviceProps, config.factoryPid(), configuratorFactory)) {
-            return Collections.singletonList(failedPersistError(config.path()));
-        }
-        return Collections.emptyList();
     }
 
     /**

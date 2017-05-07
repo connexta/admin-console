@@ -13,7 +13,6 @@
  */
 package org.codice.ddf.admin.sources.wfs.persist;
 
-import static org.codice.ddf.admin.common.message.DefaultMessages.failedDeleteError;
 import static org.codice.ddf.admin.common.message.DefaultMessages.noExistingConfigError;
 import static org.codice.ddf.admin.common.services.ServiceCommons.deleteService;
 import static org.codice.ddf.admin.common.services.ServiceCommons.serviceConfigurationExists;
@@ -23,8 +22,8 @@ import java.util.List;
 import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.common.actions.BaseAction;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
+import org.codice.ddf.admin.common.fields.common.ServicePid;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
-import org.codice.ddf.admin.sources.fields.ServicePid;
 
 import com.google.common.collect.ImmutableList;
 
@@ -48,11 +47,8 @@ public class DeleteWfsConfiguration extends BaseAction<BooleanField> {
 
     @Override
     public BooleanField performAction() {
-        if(!deleteService(servicePid.getValue(), configuratorFactory)) {
-            addArgumentMessage(failedDeleteError(servicePid.path()));
-            return new BooleanField(false);
-        }
-        return new BooleanField(true);
+        addArgumentMessages(deleteService(servicePid, configuratorFactory).argumentMessages());
+        return new BooleanField(!containsErrorMsgs());
     }
 
     @Override

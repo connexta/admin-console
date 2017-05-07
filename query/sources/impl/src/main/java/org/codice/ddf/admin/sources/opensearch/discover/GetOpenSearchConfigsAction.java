@@ -22,8 +22,8 @@ import java.util.List;
 import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.common.actions.BaseAction;
 import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
+import org.codice.ddf.admin.common.fields.common.ServicePid;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
-import org.codice.ddf.admin.sources.fields.ServicePid;
 import org.codice.ddf.admin.sources.fields.SourceInfoField;
 
 import com.google.common.collect.ImmutableList;

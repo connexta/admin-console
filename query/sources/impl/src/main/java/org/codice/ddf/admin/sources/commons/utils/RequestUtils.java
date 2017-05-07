@@ -71,7 +71,8 @@ public class RequestUtils {
             responseBody.argumentMessage(cannotConnectError(urlField.path()));
             return responseBody;
         }
-        return responseBody.result(response.readEntity(String.class));
+        responseBody.result(response.readEntity(String.class));
+        return responseBody;
     }
 
     /**
@@ -98,7 +99,8 @@ public class RequestUtils {
             return responseBodyResult;
         }
 
-        return responseBodyResult.result(response.readEntity(String.class));
+        responseBodyResult.result(response.readEntity(String.class));
+        return responseBodyResult;
     }
 
     /**

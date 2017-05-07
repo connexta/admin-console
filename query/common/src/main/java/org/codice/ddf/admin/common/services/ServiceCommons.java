@@ -13,6 +13,8 @@
  **/
 package org.codice.ddf.admin.common.services;
 
+import static org.codice.ddf.admin.common.message.DefaultMessages.failedDeleteError;
+import static org.codice.ddf.admin.common.message.DefaultMessages.failedPersistError;
 import static org.codice.ddf.admin.common.message.DefaultMessages.failedUpdateError;
 import static org.codice.ddf.admin.common.message.DefaultMessages.noExistingConfigError;
 
@@ -24,7 +26,9 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang.text.StrSubstitutor;
 import org.codice.ddf.admin.api.action.Message;
+import org.codice.ddf.admin.common.Report;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
+import org.codice.ddf.admin.common.fields.common.ServicePid;
 import org.codice.ddf.admin.configurator.Configurator;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.configurator.OperationReport;
@@ -45,39 +49,50 @@ public class ServiceCommons {
                 .collect(Collectors.toList());
     }
 
-    public static boolean createManagedService(Map<String, Object> serviceProps, String factoryPid,
+    public static Report createManagedService(Map<String, Object> serviceProps, String factoryPid,
             ConfiguratorFactory configuratorFactory) {
+        Report report = new Report();
         Configurator configurator = configuratorFactory.getConfigurator();
+
         configurator.createManagedService(factoryPid, serviceProps);
-        return !configurator.commit("Service saved with details [{}]", serviceProps.toString())
-                .containsFailedResults();
+        if(configurator.commit("Service saved with details [{}]", serviceProps.toString())
+                .containsFailedResults()) {
+            report.argumentMessage(failedPersistError());
+        }
+        return report;
     }
 
-    public static List<Message> updateService(StringField servicePidField, Map<String, Object> newConfig,
+    public static Report updateService(ServicePid servicePidField, Map<String, Object> newConfig,
             ConfiguratorFactory configuratorFactory) {
+        Report report = new Report();
         String servicePid = servicePidField.getValue();
         if (!serviceConfigurationExists(servicePid, configuratorFactory)) {
-            return Collections.singletonList(noExistingConfigError(servicePidField.path()));
+            report.argumentMessage(noExistingConfigError(servicePidField.path()));
+            return report;
         }
 
         Configurator configurator = configuratorFactory.getConfigurator();
         configurator.updateConfigFile(servicePid, newConfig, true);
-        OperationReport report = configurator.commit(
+        OperationReport operationReport = configurator.commit(
                 "Updated config with pid [{}] and new service properties [{}]",
                 servicePid,
                 newConfig.toString());
-        if (report.containsFailedResults()) {
-            return Collections.singletonList(failedUpdateError(servicePidField.path()));
+        if (operationReport.containsFailedResults()) {
+            return report.argumentMessage(failedUpdateError(servicePidField.path()));
         }
 
-        return Collections.emptyList();
+        return report;
     }
 
-    public static boolean deleteService(String servicePid, ConfiguratorFactory configuratorFactory) {
+    public static Report deleteService(StringField servicePid, ConfiguratorFactory configuratorFactory) {
+        Report report = new Report();
         Configurator configurator = configuratorFactory.getConfigurator();
-        configurator.deleteManagedService(servicePid);
-        return !configurator.commit("Deleted source with pid [{}].", servicePid)
-                .containsFailedResults();
+        configurator.deleteManagedService(servicePid.getValue());
+        if(configurator.commit("Deleted source with pid [{}].", servicePid.getValue())
+                .containsFailedResults()) {
+            report.argumentMessage(failedDeleteError(servicePid.path()));
+        }
+        return report;
     }
 
     public static boolean serviceConfigurationExists(String servicePid, ConfiguratorFactory configuratorFactory) {

@@ -21,9 +21,8 @@ import org.codice.ddf.admin.common.fields.base.BaseUnionField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 import org.codice.ddf.admin.common.fields.common.AddressField;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
+import org.codice.ddf.admin.common.fields.common.ServicePid;
 import org.codice.ddf.admin.common.fields.common.UrlField;
-import org.codice.ddf.admin.sources.fields.FactoryPid;
-import org.codice.ddf.admin.sources.fields.ServicePid;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
@@ -34,7 +33,7 @@ public class SourceConfigUnionField extends BaseUnionField {
 
     public static final String FIELD_TYPE_NAME = "SourceConfiguration";
 
-    public static final String DESCRIPTION = "All supported source configuration types";
+    public static final String DESCRIPTION = "All supported source configuration types.";
 
     public static final String SOURCE_NAME_FIELD_NAME = "sourceName";
 
@@ -44,8 +43,6 @@ public class SourceConfigUnionField extends BaseUnionField {
             ImmutableList.of(new CswSourceConfigurationField(),
                     new WfsSourceConfigurationField(),
                     new OpenSearchSourceConfigurationField());
-
-    protected FactoryPid factoryPid;
 
     protected ServicePid servicePid;
 
@@ -66,10 +63,6 @@ public class SourceConfigUnionField extends BaseUnionField {
     }
 
     // Setters
-    public SourceConfigUnionField factoryPid(String factoryPid) {
-        this.factoryPid.setValue(factoryPid);
-        return this;
-    }
 
     public SourceConfigUnionField servicePid(String servicePid) {
         this.servicePid.setValue(servicePid);
@@ -111,14 +104,6 @@ public class SourceConfigUnionField extends BaseUnionField {
         return this.creds;
     }
 
-    public String factoryPid() {
-        return factoryPid.getValue();
-    }
-
-    public FactoryPid factoryPidField() {
-        return factoryPid;
-    }
-
     public String servicePid() {
         return servicePid.getValue();
     }
@@ -141,12 +126,11 @@ public class SourceConfigUnionField extends BaseUnionField {
 
     @Override
     public List<Field> getFields() {
-        return ImmutableList.of(factoryPid, servicePid, sourceName, endpointUrl, creds, address);
+        return ImmutableList.of(servicePid, sourceName, endpointUrl, creds, address);
     }
 
     @Override
     public void initializeFields() {
-        factoryPid = new FactoryPid();
         servicePid = new ServicePid();
         sourceName = new StringField(SOURCE_NAME_FIELD_NAME);
         endpointUrl = new UrlField(ENDPOINT_URL_FIELD_NAME);
@@ -157,7 +141,6 @@ public class SourceConfigUnionField extends BaseUnionField {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("factoryPid", factoryPid())
                 .add("servicePid", servicePid())
                 .add("sourceName", sourceName())
                 .add("sourcePort", address().port())

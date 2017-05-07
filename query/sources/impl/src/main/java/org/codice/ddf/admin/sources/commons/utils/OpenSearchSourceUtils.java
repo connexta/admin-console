@@ -16,7 +16,6 @@ package org.codice.ddf.admin.sources.commons.utils;
 import static org.codice.ddf.admin.common.message.DefaultMessages.unknownEndpointError;
 import static org.codice.ddf.admin.sources.commons.SourceUtilCommons.SOURCES_NAMESPACE_CONTEXT;
 import static org.codice.ddf.admin.sources.commons.SourceUtilCommons.createDocument;
-import static org.codice.ddf.admin.sources.services.OpenSearchServiceProperties.OPENSEARCH_FACTORY_PID;
 
 import java.util.Collections;
 import java.util.List;
@@ -87,11 +86,11 @@ public class OpenSearchSourceUtils {
 
         OpenSearchSourceConfigurationField config = new OpenSearchSourceConfigurationField();
         config.endpointUrl(urlField.getValue())
-                .factoryPid(OPENSEARCH_FACTORY_PID)
                 .credentials()
                 .username(creds.username())
                 .password(creds.password());
-        return configResult.result(config);
+        configResult.result(config);
+        return configResult;
     }
 
     /**
@@ -102,15 +101,15 @@ public class OpenSearchSourceUtils {
      * @return empty list on successful verification, otherwise a list containing an {@link org.codice.ddf.admin.common.message.ErrorMessage}
      */
     protected List<Message> verifyOpenSearchCapabilities(UrlField urlField, CredentialsField creds) {
-        ReportWithResult<String> result = requestUtils.sendGetRequest(urlField, creds,
+        ReportWithResult<String> responseBodyResult = requestUtils.sendGetRequest(urlField, creds,
                 GET_CAPABILITIES_PARAMS);
-        if (result.hasErrors()) {
-            return result.messages();
+        if (responseBodyResult.containsErrorMsgs()) {
+            return responseBodyResult.messages();
         }
 
         Document capabilitiesXml;
         try {
-            capabilitiesXml = createDocument(result.get());
+            capabilitiesXml = createDocument(responseBodyResult.result());
         } catch (Exception e) {
             LOGGER.debug("Failed to read response from OpenSearch endpoint.");
             return Collections.singletonList(unknownEndpointError(urlField.path()));

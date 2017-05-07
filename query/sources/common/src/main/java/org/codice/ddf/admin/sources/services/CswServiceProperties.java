@@ -14,7 +14,6 @@
 
 package org.codice.ddf.admin.sources.services;
 
-import static org.codice.ddf.admin.common.services.ServiceCommons.FACTORY_PID_KEY;
 import static org.codice.ddf.admin.common.services.ServiceCommons.SERVICE_PID_KEY;
 import static org.codice.ddf.admin.sources.fields.CswProfile.CSW_FEDERATION_PROFILE_SOURCE;
 import static org.codice.ddf.admin.sources.fields.CswProfile.CSW_SPEC_PROFILE_FEDERATED_SOURCE;
@@ -66,7 +65,6 @@ public class CswServiceProperties {
     public static final CswSourceConfigurationField servicePropsToCswConfig(
             Map<String, Object> props) {
         CswSourceConfigurationField cswConfig = new CswSourceConfigurationField();
-        cswConfig.factoryPid(mapStringValue(props, FACTORY_PID_KEY));
         cswConfig.servicePid(mapStringValue(props, SERVICE_PID_KEY));
         cswConfig.sourceName(mapStringValue(props, ID));
         cswConfig.address().hostname(mapStringValue(props, SOURCE_HOSTNAME));
@@ -86,22 +84,15 @@ public class CswServiceProperties {
         props.put(CSW_URL, config.endpointUrl());
         if (config.eventServiceAddress() != null) {
             props.put(EVENT_SERVICE_ADDRESS, config.eventServiceAddress());
-        } else if (config.factoryPid() != null && !config.factoryPid()
-                .equals(CSW_GMD_FACTORY_PID)) {
+        } else if (config.cswProfile().equals(GMD_CSW_ISO_FEDERATED_SOURCE)) {
             props.put(EVENT_SERVICE_ADDRESS, config.endpointUrl() + "/subscription");
         }
 
-        if (config.credentials()
-                .username() != null) {
-            props.put(USERNAME,
-                    config.credentials()
-                            .username());
+        if (config.credentials().username() != null) {
+            props.put(USERNAME, config.credentials().username());
         }
-        if (config.credentials()
-                .password() != null) {
-            props.put(PASSWORD,
-                    config.credentials()
-                            .password());
+        if (config.credentials().password() != null) {
+            props.put(PASSWORD, config.credentials().password());
         }
         if (config.outputSchema() != null) {
             props.put(OUTPUT_SCHEMA, config.outputSchema());

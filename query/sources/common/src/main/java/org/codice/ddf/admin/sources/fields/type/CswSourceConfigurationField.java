@@ -18,6 +18,7 @@ import java.util.List;
 import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 import org.codice.ddf.admin.common.fields.common.UrlField;
+import org.codice.ddf.admin.sources.fields.CswProfile;
 import org.codice.ddf.admin.sources.services.CswServiceProperties;
 
 import com.google.common.base.MoreObjects;
@@ -42,6 +43,8 @@ public class CswSourceConfigurationField extends SourceConfigUnionField {
 
     private UrlField eventServiceAddress;
 
+    private CswProfile cswProfile;
+
     public CswSourceConfigurationField() {
         super(FIELD_TYPE_NAME, DESCRIPTION);
     }
@@ -61,8 +64,17 @@ public class CswSourceConfigurationField extends SourceConfigUnionField {
         return this;
     }
 
+    public CswSourceConfigurationField cswProfile(String cswProfile) {
+        this.cswProfile.setValue(cswProfile);
+        return this;
+    }
+
     public String outputSchema() {
         return outputSchema.getValue();
+    }
+
+    public CswProfile cswProfileField() {
+        return cswProfile;
     }
 
     public StringField outputSchemaField() {
@@ -81,6 +93,10 @@ public class CswSourceConfigurationField extends SourceConfigUnionField {
         return eventServiceAddress.getValue();
     }
 
+    public String cswProfile() {
+        return cswProfile.getValue();
+    }
+
     public UrlField getEventServiceAddressField() {
         return eventServiceAddress;
     }
@@ -97,6 +113,7 @@ public class CswSourceConfigurationField extends SourceConfigUnionField {
         outputSchema = new StringField(OUTPUT_SCHEMA);
         forceSpatialFilter = new StringField(FORCED_SPATIAL_FILTER);
         eventServiceAddress = new UrlField(EVENT_SERVICE_ADDRESS);
+        cswProfile = new CswProfile();
     }
 
     @Override
@@ -105,6 +122,7 @@ public class CswSourceConfigurationField extends SourceConfigUnionField {
                 .add(outputSchema)
                 .add(forceSpatialFilter)
                 .add(eventServiceAddress)
+                .add(cswProfile)
                 .build();
     }
 

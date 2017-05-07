@@ -16,7 +16,6 @@ package org.codice.ddf.admin.sources.commons.utils;
 import static org.codice.ddf.admin.common.message.DefaultMessages.unknownEndpointError;
 import static org.codice.ddf.admin.sources.commons.SourceUtilCommons.SOURCES_NAMESPACE_CONTEXT;
 import static org.codice.ddf.admin.sources.commons.SourceUtilCommons.createDocument;
-import static org.codice.ddf.admin.sources.services.WfsServiceProperties.resolveWfsFactoryPid;
 
 import java.util.List;
 import java.util.Map;
@@ -111,13 +110,13 @@ public class WfsSourceUtils {
     public ReportWithResult<SourceConfigUnionField> getPreferredWfsConfig(UrlField urlField, CredentialsField creds) {
         ReportWithResult<String> responseBodyResult = requestUtils.sendGetRequest(urlField, creds, GET_CAPABILITIES_PARAMS);
         ReportWithResult<SourceConfigUnionField> configResult = new ReportWithResult<>();
-        if (responseBodyResult.hasErrors()) {
+        if (responseBodyResult.containsErrorMsgs()) {
             configResult.argumentMessages(responseBodyResult.argumentMessages());
             return configResult;
 
         }
 
-        String requestBody = responseBodyResult.get();
+        String requestBody = responseBodyResult.result();
         Document capabilitiesXml;
         try {
             capabilitiesXml = createDocument(requestBody);
@@ -147,9 +146,7 @@ public class WfsSourceUtils {
         }
 
         try {
-            String factoryPid = resolveWfsFactoryPid(wfsVersion);
-            preferredConfig.factoryPid(factoryPid);
-            configResult.result(preferredConfig);
+            configResult.result(preferredConfig.wfsVersion(wfsVersion));
         } catch (IllegalArgumentException e) {
             configResult.argumentMessage(unknownEndpointError(urlField.path()));
         }

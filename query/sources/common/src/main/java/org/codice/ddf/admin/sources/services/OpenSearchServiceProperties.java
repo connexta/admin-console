@@ -13,7 +13,6 @@
  */
 package org.codice.ddf.admin.sources.services;
 
-import static org.codice.ddf.admin.common.services.ServiceCommons.FACTORY_PID_KEY;
 import static org.codice.ddf.admin.common.services.ServiceCommons.SERVICE_PID_KEY;
 
 import java.util.Collections;
@@ -51,11 +50,10 @@ public class OpenSearchServiceProperties {
     public static final OpenSearchSourceConfigurationField servicePropsToOpenSearchConfig(
             Map<String, Object> props) {
         OpenSearchSourceConfigurationField config = new OpenSearchSourceConfigurationField();
-        config.factoryPid(mapStringValue(props, FACTORY_PID_KEY));
         config.servicePid(mapStringValue(props, SERVICE_PID_KEY));
         config.sourceName(mapStringValue(props, ID));
         config.address().hostname(mapStringValue(props, SOURCE_HOSTNAME));
-        config.address().port(props.get(PORT) == null ? 0 : (int) props.get(PORT));
+        config.address().port(props.get(PORT) == null ? -1 : (int) props.get(PORT));
         config.endpointUrl(mapStringValue(props, ENDPOINT_URL));
         config.credentials().username(mapStringValue(props, USERNAME));
         config.credentials().password(mapStringValue(props, PASSWORD));
@@ -67,17 +65,11 @@ public class OpenSearchServiceProperties {
         HashMap<String, Object> props = new HashMap<>();
         props.put(ID, config.sourceName());
         props.put(ENDPOINT_URL, config.endpointUrl());
-        if (config.credentials()
-                .username() != null) {
-            props.put(USERNAME,
-                    config.credentials()
-                            .username());
+        if (config.credentials().username() != null) {
+            props.put(USERNAME, config.credentials().username());
         }
-        if (config.credentials()
-                .password() != null) {
-            props.put(PASSWORD,
-                    config.credentials()
-                            .password());
+        if (config.credentials().password() != null) {
+            props.put(PASSWORD, config.credentials().password());
         }
         return props;
     }

@@ -11,23 +11,23 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.sources.fields;
+package org.codice.ddf.admin.common.fields.common;
 
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 
-public class FactoryPid extends StringField {
-    public static final String DEFAULT_FIELD_NAME = "factoryPid";
+public class ServicePid extends StringField {
 
-    public static final String FIELD_TYPE_NAME = "FactoryPid";
+    public static final String DEFAULT_FIELD_NAME = "servicePid";
 
-    public static final String DESCRIPTION =
-            "A unique ID used for persisting a configuration with a factory.";
+    public static final String FIELD_TYPE_NAME = "ServicePid";
 
-    public FactoryPid() {
-        this(DEFAULT_FIELD_NAME);
+    public static final String DESCRIPTION = "A unique ID used for identifying a configuration.";
+
+    public ServicePid() {
+        super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
     }
 
-    public FactoryPid(String fieldName) {
+    public ServicePid(String fieldName) {
         super(fieldName, FIELD_TYPE_NAME, DESCRIPTION);
     }
 }

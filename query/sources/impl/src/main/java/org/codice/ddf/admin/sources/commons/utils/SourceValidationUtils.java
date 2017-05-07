@@ -23,9 +23,9 @@ import java.util.Objects;
 
 import org.codice.ddf.admin.api.action.Message;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
+import org.codice.ddf.admin.common.fields.common.ServicePid;
 import org.codice.ddf.admin.configurator.ConfigReader;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
-import org.codice.ddf.admin.sources.fields.ServicePid;
 
 import ddf.catalog.service.ConfiguredService;
 import ddf.catalog.source.Source;

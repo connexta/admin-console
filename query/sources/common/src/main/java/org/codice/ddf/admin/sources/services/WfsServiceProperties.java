@@ -13,7 +13,6 @@
  */
 package org.codice.ddf.admin.sources.services;
 
-import static org.codice.ddf.admin.common.services.ServiceCommons.FACTORY_PID_KEY;
 import static org.codice.ddf.admin.common.services.ServiceCommons.SERVICE_PID_KEY;
 
 import java.util.HashMap;
@@ -52,11 +51,10 @@ public class WfsServiceProperties {
     public static WfsSourceConfigurationField servicePropsToWfsConfig(
             Map<String, Object> props) {
         WfsSourceConfigurationField wfsConfig = new WfsSourceConfigurationField();
-        wfsConfig.factoryPid(mapStringValue(props, FACTORY_PID_KEY));
         wfsConfig.servicePid(mapStringValue(props, SERVICE_PID_KEY));
         wfsConfig.sourceName(mapStringValue(props, ID));
         wfsConfig.address().hostname(mapStringValue(props, SOURCE_HOSTNAME));
-        wfsConfig.address().port(props.get(PORT) == null ? 0 : (int) props.get(PORT));
+        wfsConfig.address().port(props.get(PORT) == null ? -1 : (int) props.get(PORT));
         wfsConfig.endpointUrl(mapStringValue(props, WFS_URL));
         wfsConfig.credentials().username(mapStringValue(props, USERNAME));
         wfsConfig.credentials().password(mapStringValue(props, PASSWORD));
@@ -68,17 +66,11 @@ public class WfsServiceProperties {
         HashMap<String, Object> props = new HashMap<>();
         props.put(ID, configuration.sourceName());
         props.put(WFS_URL, configuration.endpointUrl());
-        if (configuration.credentials()
-                .username() != null) {
-            props.put(USERNAME,
-                    configuration.credentials()
-                            .username());
+        if (configuration.credentials().username() != null) {
+            props.put(USERNAME, configuration.credentials().username());
         }
-        if (configuration.credentials()
-                .password() != null) {
-            props.put(PASSWORD,
-                    configuration.credentials()
-                            .password());
+        if (configuration.credentials().password() != null) {
+            props.put(PASSWORD, configuration.credentials().password());
         }
         return props;
     }

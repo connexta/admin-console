@@ -67,6 +67,6 @@ public class DiscoverWfsByUrlAction extends BaseAction<SourceInfoField> {
             return null;
         }
 
-        return createSourceInfoField(ID, true, configResult.get());
+        return createSourceInfoField(ID, true, configResult.result());
     }
 }

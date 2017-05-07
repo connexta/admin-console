@@ -64,13 +64,13 @@ public class DiscoverCswByAddressAction extends BaseAction<SourceInfoField> {
             return null;
         }
 
-        ReportWithResult<SourceConfigUnionField> configResult = cswSourceUtils.getPreferredCswConfig(discoveredUrl.get(), credentialsField);
+        ReportWithResult<SourceConfigUnionField> configResult = cswSourceUtils.getPreferredCswConfig(discoveredUrl.result(), credentialsField);
         addArgumentMessages(configResult.argumentMessages());
         if(containsErrorMsgs()) {
             return null;
         }
 
-        return createSourceInfoField(ID, true, configResult.get());
+        return createSourceInfoField(ID, true, configResult.result());
     }
 
     @Override

@@ -61,7 +61,7 @@ public class DiscoverCswByUrlAction extends BaseAction<SourceInfoField> {
         if(containsErrorMsgs()) {
             return null;
         }
-        return createSourceInfoField(ID, true, configResult.get());
+        return createSourceInfoField(ID, true, configResult.result());
     }
 
     @Override

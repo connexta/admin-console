@@ -71,7 +71,7 @@ public class Report {
         return argumentMessages(messages.resultMessages());
     }
 
-    public boolean hasErrors() {
+    public boolean containsErrorMsgs() {
         return !argumentMessages.stream()
                 .filter(message -> message.getType() == Message.MessageType.ERROR)
                 .collect(Collectors.toList())

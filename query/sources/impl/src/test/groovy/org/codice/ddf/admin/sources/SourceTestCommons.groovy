@@ -22,8 +22,6 @@ import ddf.catalog.source.SourceMonitor
 import ddf.catalog.source.UnsupportedQueryException
 import org.codice.ddf.admin.common.fields.common.*
 import org.codice.ddf.admin.common.services.ServiceCommons
-import org.codice.ddf.admin.sources.fields.FactoryPid
-import org.codice.ddf.admin.sources.fields.ServicePid
 import org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField
 
 class SourceTestCommons {
@@ -52,7 +50,7 @@ class SourceTestCommons {
 
     static final SOURCE_NAME = SourceConfigUnionField.SOURCE_NAME_FIELD_NAME
 
-    static final FACTORY_PID = FactoryPid.DEFAULT_FIELD_NAME
+    static final FACTORY_PID = 'DELETE ME PLEASE'
 
     static final SOURCE_CONFIG = SourceConfigUnionField.FIELD_NAME
 

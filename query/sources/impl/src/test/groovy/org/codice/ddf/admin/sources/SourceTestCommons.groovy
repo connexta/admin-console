@@ -42,7 +42,7 @@ class SourceTestCommons {
 
     static final URL = UrlField.DEFAULT_FIELD_NAME
 
-    static final SERVICE_PID = ServicePid.DEFAULT_FIELD_NAME
+    static final SERVICE_PID = PidField.DEFAULT_FIELD_NAME
 
     static final FACTORY_PID_KEY = ServiceCommons.FACTORY_PID_KEY
 

@@ -48,7 +48,6 @@ public class DiscoverWfsByAddressAction extends BaseAction<SourceInfoField> {
         addressField = new AddressField();
         credentialsField = new CredentialsField();
         addressField.useDefaultRequired();
-        credentialsField.allFieldsRequired(false);
     }
 
     public DiscoverWfsByAddressAction(WfsSourceUtils wfsSourceUtils) {

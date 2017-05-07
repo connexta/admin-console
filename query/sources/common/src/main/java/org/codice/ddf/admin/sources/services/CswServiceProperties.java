@@ -65,7 +65,7 @@ public class CswServiceProperties {
     public static final CswSourceConfigurationField servicePropsToCswConfig(
             Map<String, Object> props) {
         CswSourceConfigurationField cswConfig = new CswSourceConfigurationField();
-        cswConfig.servicePid(mapStringValue(props, SERVICE_PID_KEY));
+        cswConfig.pid(mapStringValue(props, SERVICE_PID_KEY));
         cswConfig.sourceName(mapStringValue(props, ID));
         cswConfig.address().hostname(mapStringValue(props, SOURCE_HOSTNAME));
         cswConfig.address().port(props.get(PORT) == null ? -1 : (int) props.get(PORT));

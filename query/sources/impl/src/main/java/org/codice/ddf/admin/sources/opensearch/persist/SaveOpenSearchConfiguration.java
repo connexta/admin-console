@@ -28,7 +28,7 @@ import org.apache.commons.lang.StringUtils;
 import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.common.actions.BaseAction;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
-import org.codice.ddf.admin.common.fields.common.ServicePid;
+import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.sources.fields.type.OpenSearchSourceConfigurationField;
 
@@ -43,7 +43,7 @@ public class SaveOpenSearchConfiguration extends BaseAction<BooleanField> {
 
     private OpenSearchSourceConfigurationField config;
 
-    private ServicePid servicePid;
+    private PidField pid;
 
     private ConfiguratorFactory configuratorFactory;
 
@@ -51,7 +51,7 @@ public class SaveOpenSearchConfiguration extends BaseAction<BooleanField> {
     public SaveOpenSearchConfiguration(ConfiguratorFactory configuratorFactory) {
         super(ID, DESCRIPTION, new BooleanField());
         config = new OpenSearchSourceConfigurationField();
-        servicePid = new ServicePid();
+        pid = new PidField();
         config.isRequired(true);
         config.sourceNameField().isRequired(true);
         config.endpointUrlField().isRequired(true);
@@ -60,8 +60,8 @@ public class SaveOpenSearchConfiguration extends BaseAction<BooleanField> {
 
     @Override
     public BooleanField performAction() {
-        if (StringUtils.isNotEmpty(servicePid.getValue())) {
-            addArgumentMessages(updateService(servicePid, openSearchConfigToServiceProps(config), configuratorFactory).argumentMessages());
+        if (StringUtils.isNotEmpty(pid.getValue())) {
+            addArgumentMessages(updateService(pid, openSearchConfigToServiceProps(config), configuratorFactory).argumentMessages());
         } else {
             if(createManagedService(openSearchConfigToServiceProps(config), OPENSEARCH_FACTORY_PID, configuratorFactory).containsErrorMsgs()) {
                 addArgumentMessage(failedPersistError(config.path()));
@@ -77,15 +77,16 @@ public class SaveOpenSearchConfiguration extends BaseAction<BooleanField> {
             return;
         }
 
-        if(servicePid.getValue() != null && !serviceConfigurationExists(servicePid.getValue(), configuratorFactory)) {
-            addArgumentMessage(noExistingConfigError(servicePid.path()));
+        if(pid.getValue() != null && !serviceConfigurationExists(pid.getValue(), configuratorFactory)) {
+            addArgumentMessage(noExistingConfigError(pid.path()));
         } else {
-            addArgumentMessages(validateSourceName(config.sourceNameField(), configuratorFactory, servicePid));
+            addArgumentMessages(validateSourceName(config.sourceNameField(), configuratorFactory,
+                    pid).argumentMessages());
         }
     }
 
     @Override
     public List<Field> getArguments() {
-        return ImmutableList.of(config, servicePid);
+        return ImmutableList.of(config, pid);
     }
 }

@@ -17,7 +17,6 @@ import static org.codice.ddf.admin.common.message.DefaultMessages.unknownEndpoin
 import static org.codice.ddf.admin.sources.commons.SourceUtilCommons.SOURCES_NAMESPACE_CONTEXT;
 import static org.codice.ddf.admin.sources.commons.SourceUtilCommons.createDocument;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -27,7 +26,7 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.codice.ddf.admin.api.action.Message;
+import org.codice.ddf.admin.common.Report;
 import org.codice.ddf.admin.common.ReportWithResult;
 import org.codice.ddf.admin.common.fields.common.AddressField;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
@@ -77,10 +76,10 @@ public class OpenSearchSourceUtils {
      * @return @return a {@link ReportWithResult} containing the {@link SourceConfigUnionField} or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
      */
     public ReportWithResult<SourceConfigUnionField> getOpenSearchConfig(UrlField urlField, CredentialsField creds) {
-        List<Message> errors = verifyOpenSearchCapabilities(urlField, creds);
+        Report errors = verifyOpenSearchCapabilities(urlField, creds);
         ReportWithResult<SourceConfigUnionField> configResult = new ReportWithResult<>();
-        if (CollectionUtils.isNotEmpty(errors)) {
-            configResult.argumentMessages(errors);
+        if (CollectionUtils.isNotEmpty(errors.argumentMessages())) {
+            configResult.argumentMessages(errors.argumentMessages());
             return configResult;
         }
 
@@ -100,11 +99,11 @@ public class OpenSearchSourceUtils {
      * @param creds optional credentials for authentication
      * @return empty list on successful verification, otherwise a list containing an {@link org.codice.ddf.admin.common.message.ErrorMessage}
      */
-    protected List<Message> verifyOpenSearchCapabilities(UrlField urlField, CredentialsField creds) {
+    protected Report verifyOpenSearchCapabilities(UrlField urlField, CredentialsField creds) {
         ReportWithResult<String> responseBodyResult = requestUtils.sendGetRequest(urlField, creds,
                 GET_CAPABILITIES_PARAMS);
         if (responseBodyResult.containsErrorMsgs()) {
-            return responseBodyResult.messages();
+            return responseBodyResult;
         }
 
         Document capabilitiesXml;
@@ -112,7 +111,8 @@ public class OpenSearchSourceUtils {
             capabilitiesXml = createDocument(responseBodyResult.result());
         } catch (Exception e) {
             LOGGER.debug("Failed to read response from OpenSearch endpoint.");
-            return Collections.singletonList(unknownEndpointError(urlField.path()));
+            responseBodyResult.argumentMessage(unknownEndpointError(urlField.path()));
+            return responseBodyResult;
         }
 
         XPath xpath = XPathFactory.newInstance()
@@ -121,13 +121,16 @@ public class OpenSearchSourceUtils {
         try {
             if ((Boolean) xpath.compile(TOTAL_RESULTS_XPATH)
                     .evaluate(capabilitiesXml, XPathConstants.BOOLEAN)) {
-                return Collections.emptyList();
+                return responseBodyResult;
             }
         } catch (XPathExpressionException e) {
             LOGGER.debug("Failed to compile OpenSearch totalResults XPath.");
-            return Collections.singletonList(unknownEndpointError(urlField.path()));
+            responseBodyResult.argumentMessage(unknownEndpointError(urlField.path()));
+            return responseBodyResult;
+
         }
-        return Collections.singletonList(unknownEndpointError(urlField.path()));
+        responseBodyResult.argumentMessage(unknownEndpointError(urlField.path()));
+        return responseBodyResult;
     }
 
     /**
@@ -146,7 +149,7 @@ public class OpenSearchSourceUtils {
                     urlField.setValue(url);
                     return urlField;
                 })
-                .filter(urlField -> verifyOpenSearchCapabilities(urlField, creds).isEmpty())
+                .filter(urlField -> verifyOpenSearchCapabilities(urlField, creds).messages().isEmpty())
                 .map(ReportWithResult::new)
                 .findFirst()
                 .orElse(createDefaultResult(addressField));

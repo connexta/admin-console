@@ -24,7 +24,7 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.codice.ddf.admin.api.action.Message;
+import org.codice.ddf.admin.common.Report;
 import org.codice.ddf.admin.common.ReportWithResult;
 import org.codice.ddf.admin.common.fields.common.AddressField;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
@@ -73,9 +73,8 @@ public class WfsSourceUtils {
      * @param creds    optional username and password to add to Basic Auth header
      * @return a {@link ReportWithResult} containing the {@link UrlField} or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
      */
-    public List<Message> sendWfsCapabilitiesRequest(UrlField urlField, CredentialsField creds) {
-        ReportWithResult<String> result = requestUtils.sendGetRequest(urlField, creds, GET_CAPABILITIES_PARAMS);
-        return result.messages();
+    public Report sendWfsCapabilitiesRequest(UrlField urlField, CredentialsField creds) {
+        return requestUtils.sendGetRequest(urlField, creds, GET_CAPABILITIES_PARAMS);
     }
 
     /**
@@ -94,7 +93,7 @@ public class WfsSourceUtils {
                     urlField.setValue(url);
                     return urlField;
                 })
-                .filter(urlField -> sendWfsCapabilitiesRequest(urlField, creds).isEmpty())
+                .filter(urlField -> sendWfsCapabilitiesRequest(urlField, creds).messages().isEmpty())
                 .map(ReportWithResult::new)
                 .findFirst()
                 .orElse(createDefaultResult(addressField));

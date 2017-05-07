@@ -51,7 +51,7 @@ public class WfsServiceProperties {
     public static WfsSourceConfigurationField servicePropsToWfsConfig(
             Map<String, Object> props) {
         WfsSourceConfigurationField wfsConfig = new WfsSourceConfigurationField();
-        wfsConfig.servicePid(mapStringValue(props, SERVICE_PID_KEY));
+        wfsConfig.pid(mapStringValue(props, SERVICE_PID_KEY));
         wfsConfig.sourceName(mapStringValue(props, ID));
         wfsConfig.address().hostname(mapStringValue(props, SOURCE_HOSTNAME));
         wfsConfig.address().port(props.get(PORT) == null ? -1 : (int) props.get(PORT));

@@ -29,7 +29,7 @@ import org.apache.commons.lang.StringUtils;
 import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.common.actions.BaseAction;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
-import org.codice.ddf.admin.common.fields.common.ServicePid;
+import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.sources.fields.type.CswSourceConfigurationField;
 
@@ -44,14 +44,14 @@ public class SaveCswConfiguration extends BaseAction<BooleanField> {
 
     private CswSourceConfigurationField config;
 
-    private ServicePid servicePid;
+    private PidField pid;
 
     private ConfiguratorFactory configuratorFactory;
 
     public SaveCswConfiguration(ConfiguratorFactory configuratorFactory) {
         super(ID, DESCRIPTION, new BooleanField());
         config = new CswSourceConfigurationField();
-        servicePid = new ServicePid();
+        pid = new PidField();
         config.isRequired(true);
         config.cswProfileField().isRequired(true);
         config.sourceNameField().isRequired(true);
@@ -69,8 +69,8 @@ public class SaveCswConfiguration extends BaseAction<BooleanField> {
             return new BooleanField(false);
         }
 
-        if (StringUtils.isNotEmpty(servicePid.getValue())) {
-            addArgumentMessages(updateService(servicePid, cswConfigToServiceProps(config), configuratorFactory).argumentMessages());
+        if (StringUtils.isNotEmpty(pid.getValue())) {
+            addArgumentMessages(updateService(pid, cswConfigToServiceProps(config), configuratorFactory).argumentMessages());
         } else {
             if (createManagedService(cswConfigToServiceProps(config), factoryPid, configuratorFactory).containsErrorMsgs()) {
                 addArgumentMessage(failedPersistError(config.path()));
@@ -86,15 +86,15 @@ public class SaveCswConfiguration extends BaseAction<BooleanField> {
             return;
         }
 
-        if(servicePid.getValue() != null && !serviceConfigurationExists(servicePid.getValue(), configuratorFactory)) {
-            addArgumentMessage(noExistingConfigError(servicePid.path()));
+        if(pid.getValue() != null && !serviceConfigurationExists(pid.getValue(), configuratorFactory)) {
+            addArgumentMessage(noExistingConfigError(pid.path()));
         } else {
-            addArgumentMessages(validateSourceName(config.sourceNameField(), configuratorFactory, servicePid));
+            addArgumentMessages(validateSourceName(config.sourceNameField(), configuratorFactory, pid).argumentMessages());
         }
     }
 
     @Override
     public List<Field> getArguments() {
-        return ImmutableList.of(config, servicePid);
+        return ImmutableList.of(config, pid);
     }
 }

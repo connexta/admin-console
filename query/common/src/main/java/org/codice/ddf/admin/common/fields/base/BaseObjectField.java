@@ -69,7 +69,6 @@ public abstract class BaseObjectField extends BaseField<Map<String, Object>>
                 .map(field -> (List<Message>) field.validate())
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList()));
-
         return validationErrors;
     }
 

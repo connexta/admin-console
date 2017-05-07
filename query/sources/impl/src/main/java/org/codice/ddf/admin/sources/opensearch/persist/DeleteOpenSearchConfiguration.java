@@ -22,7 +22,7 @@ import java.util.List;
 import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.common.actions.BaseAction;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
-import org.codice.ddf.admin.common.fields.common.ServicePid;
+import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 
 import com.google.common.collect.ImmutableList;
@@ -33,20 +33,20 @@ public class DeleteOpenSearchConfiguration extends BaseAction<BooleanField> {
     public static final String DESCRIPTION =
             "Deletes an OpenSearch source configuration and returns true on success and false on failure.";
 
-    private ServicePid servicePid;
+    private PidField pid;
 
     private ConfiguratorFactory configuratorFactory;
 
     public DeleteOpenSearchConfiguration(ConfiguratorFactory configuratorFactory) {
         super(ID, DESCRIPTION, new BooleanField());
         this.configuratorFactory = configuratorFactory;
-        servicePid = new ServicePid();
-        servicePid.isRequired(true);
+        pid = new PidField();
+        pid.isRequired(true);
     }
 
     @Override
     public BooleanField performAction() {
-        addArgumentMessages(deleteService(servicePid, configuratorFactory).argumentMessages());
+        addArgumentMessages(deleteService(pid, configuratorFactory).argumentMessages());
         return new BooleanField(!containsErrorMsgs());
     }
 
@@ -57,13 +57,13 @@ public class DeleteOpenSearchConfiguration extends BaseAction<BooleanField> {
             return;
         }
 
-        if(!serviceConfigurationExists(servicePid.getValue(), configuratorFactory)) {
-            addArgumentMessage(noExistingConfigError(servicePid.path()));
+        if(!serviceConfigurationExists(pid.getValue(), configuratorFactory)) {
+            addArgumentMessage(noExistingConfigError(pid.path()));
         }
     }
 
     @Override
     public List<Field> getArguments() {
-        return ImmutableList.of(servicePid);
+        return ImmutableList.of(pid);
     }
 }

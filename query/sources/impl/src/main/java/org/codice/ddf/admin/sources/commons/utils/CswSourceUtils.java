@@ -28,7 +28,7 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 
-import org.codice.ddf.admin.api.action.Message;
+import org.codice.ddf.admin.common.Report;
 import org.codice.ddf.admin.common.ReportWithResult;
 import org.codice.ddf.admin.common.fields.common.AddressField;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
@@ -80,12 +80,11 @@ public class CswSourceUtils {
      *
      * @param urlField the url endpoint
      * @param creds    optional credentials for basic authentication
-     * @return a {@code List} containing {@link org.codice.ddf.admin.common.message.ErrorMessage}s on failure.
+     * @return a {@link Report} containing {@link org.codice.ddf.admin.common.message.ErrorMessage}s on failure.
      */
-    public List<Message> sendCswCapabilitiesRequest(UrlField urlField, CredentialsField creds) {
-        ReportWithResult result = requestUtils.sendGetRequest(urlField, creds,
+    public Report sendCswCapabilitiesRequest(UrlField urlField, CredentialsField creds) {
+        return requestUtils.sendGetRequest(urlField, creds,
                 GET_CAPABILITIES_PARAMS);
-        return result.messages();
     }
 
     /**
@@ -104,7 +103,7 @@ public class CswSourceUtils {
                     urlField.updatePath(addressField.path());
                     return urlField;
                 })
-                .filter(urlField -> sendCswCapabilitiesRequest(urlField, creds).isEmpty())
+                .filter(urlField -> sendCswCapabilitiesRequest(urlField, creds).messages().isEmpty())
                 .map(ReportWithResult::new)
                 .findFirst()
                 .orElse(createDefaultResult(addressField));

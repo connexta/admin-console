@@ -19,16 +19,14 @@ import static org.codice.ddf.admin.common.message.DefaultMessages.failedUpdateEr
 import static org.codice.ddf.admin.common.message.DefaultMessages.noExistingConfigError;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.text.StrSubstitutor;
-import org.codice.ddf.admin.api.action.Message;
 import org.codice.ddf.admin.common.Report;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
-import org.codice.ddf.admin.common.fields.common.ServicePid;
+import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.configurator.Configurator;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.configurator.OperationReport;
@@ -62,7 +60,7 @@ public class ServiceCommons {
         return report;
     }
 
-    public static Report updateService(ServicePid servicePidField, Map<String, Object> newConfig,
+    public static Report updateService(PidField servicePidField, Map<String, Object> newConfig,
             ConfiguratorFactory configuratorFactory) {
         Report report = new Report();
         String servicePid = servicePidField.getValue();

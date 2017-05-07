@@ -50,7 +50,7 @@ public class OpenSearchServiceProperties {
     public static final OpenSearchSourceConfigurationField servicePropsToOpenSearchConfig(
             Map<String, Object> props) {
         OpenSearchSourceConfigurationField config = new OpenSearchSourceConfigurationField();
-        config.servicePid(mapStringValue(props, SERVICE_PID_KEY));
+        config.pid(mapStringValue(props, SERVICE_PID_KEY));
         config.sourceName(mapStringValue(props, ID));
         config.address().hostname(mapStringValue(props, SOURCE_HOSTNAME));
         config.address().port(props.get(PORT) == null ? -1 : (int) props.get(PORT));

@@ -112,8 +112,7 @@ class GetCswConfigsActionTest extends Specification {
         assert sourceInfo.config().credentials().password() == "*****"
         assert sourceInfo.config().credentials().username() == TEST_USERNAME
         assert sourceInfo.config().sourceName() == sourceName
-        assert sourceInfo.config().factoryPid() == F_PID
-        assert sourceInfo.config().servicePid() == servicePid
+        assert sourceInfo.config().pid() == servicePid
         return true
     }
 

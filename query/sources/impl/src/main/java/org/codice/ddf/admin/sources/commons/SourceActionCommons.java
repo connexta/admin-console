@@ -20,7 +20,7 @@ import java.util.function.Function;
 
 import org.apache.commons.lang.StringUtils;
 import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
-import org.codice.ddf.admin.common.fields.common.ServicePid;
+import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.configurator.ConfigReader;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.sources.fields.SourceInfoField;
@@ -37,7 +37,6 @@ public class SourceActionCommons {
             boolean isAvailable, SourceConfigUnionField config) {
         config.credentials().password("*****");
         SourceInfoField sourceInfoField = new SourceInfoField();
-        sourceInfoField.sourceHandlerName(sourceHandlerName);
         sourceInfoField.isAvaliable(isAvailable);
         sourceInfoField.configuration(config);
         return sourceInfoField;
@@ -49,11 +48,11 @@ public class SourceActionCommons {
      *
      * @param factoryPids factory pids to lookup configurations for
      * @param mapper a {@link Function} taking a map of string to objects and returning a {@code SourceConfigUnionField}
-     * @param selector a {@code ServicePid} to select a single configuration, returns all configs when null or empty
+     * @param selector a servicePid to select a single configuration, returns all configs when null or empty
      * @return a list of {@code SourceInfoField}s configured in the system
      */
     public static ListFieldImpl<SourceInfoField> getSourceConfigurations(List<String> factoryPids, Function<Map<String, Object>, SourceConfigUnionField> mapper,
-            ServicePid selector, ConfiguratorFactory configuratorFactory, String actionHandlerId) {
+            PidField selector, ConfiguratorFactory configuratorFactory, String actionHandlerId) {
         ListFieldImpl<SourceInfoField> sourceInfoListField = new ListFieldImpl<>(SourceInfoField.class);
         ConfigReader configReader = configuratorFactory.getConfigReader();
 
@@ -91,7 +90,7 @@ public class SourceActionCommons {
             for (Source source : sources) {
                 if(source instanceof ConfiguredService) {
                     ConfiguredService service = (ConfiguredService) source;
-                    if (service.getConfigurationPid().equals(sourceInfoField.config().servicePid())) {
+                    if (service.getConfigurationPid().equals(sourceInfoField.config().pid())) {
                         sourceInfoField.isAvaliable(source.isAvailable());
                         break;
                     }

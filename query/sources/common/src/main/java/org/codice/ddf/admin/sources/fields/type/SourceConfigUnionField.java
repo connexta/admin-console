@@ -21,7 +21,7 @@ import org.codice.ddf.admin.common.fields.base.BaseUnionField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 import org.codice.ddf.admin.common.fields.common.AddressField;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
-import org.codice.ddf.admin.common.fields.common.ServicePid;
+import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.common.fields.common.UrlField;
 
 import com.google.common.base.MoreObjects;
@@ -44,7 +44,7 @@ public class SourceConfigUnionField extends BaseUnionField {
                     new WfsSourceConfigurationField(),
                     new OpenSearchSourceConfigurationField());
 
-    protected ServicePid servicePid;
+    protected PidField pidField;
 
     protected StringField sourceName;
 
@@ -64,8 +64,8 @@ public class SourceConfigUnionField extends BaseUnionField {
 
     // Setters
 
-    public SourceConfigUnionField servicePid(String servicePid) {
-        this.servicePid.setValue(servicePid);
+    public SourceConfigUnionField pid(String servicePid) {
+        this.pidField.setValue(servicePid);
         return this;
     }
 
@@ -104,12 +104,12 @@ public class SourceConfigUnionField extends BaseUnionField {
         return this.creds;
     }
 
-    public String servicePid() {
-        return servicePid.getValue();
+    public String pid() {
+        return pidField.getValue();
     }
 
-    public ServicePid servicePidField() {
-        return servicePid;
+    public PidField pidField() {
+        return pidField;
     }
 
     public AddressField address() {
@@ -126,12 +126,12 @@ public class SourceConfigUnionField extends BaseUnionField {
 
     @Override
     public List<Field> getFields() {
-        return ImmutableList.of(servicePid, sourceName, endpointUrl, creds, address);
+        return ImmutableList.of(pidField, sourceName, endpointUrl, creds, address);
     }
 
     @Override
     public void initializeFields() {
-        servicePid = new ServicePid();
+        pidField = new PidField();
         sourceName = new StringField(SOURCE_NAME_FIELD_NAME);
         endpointUrl = new UrlField(ENDPOINT_URL_FIELD_NAME);
         creds = new CredentialsField();
@@ -141,7 +141,7 @@ public class SourceConfigUnionField extends BaseUnionField {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("servicePid", servicePid())
+                .add("pid", pid())
                 .add("sourceName", sourceName())
                 .add("sourcePort", address().port())
                 .add("hostname", address().hostname())

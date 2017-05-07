@@ -29,7 +29,7 @@ import org.apache.commons.lang.StringUtils;
 import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.common.actions.BaseAction;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
-import org.codice.ddf.admin.common.fields.common.ServicePid;
+import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.sources.fields.type.WfsSourceConfigurationField;
 
@@ -40,18 +40,18 @@ public class SaveWfsConfiguration extends BaseAction<BooleanField> {
     public static final String ID = "saveWfsSource";
 
     private static final String DESCRIPTION =
-            "Saves a WFS source configuration. If a pid is specified, the source configuration specified by the pid will be updated. Returns true on success and false on failure.";
+            "Saves a WFS source configuration. If a servicePid is specified, the source configuration specified by the pid will be updated. Returns true on success and false on failure.";
 
     private WfsSourceConfigurationField config;
 
-    private ServicePid servicePid;
+    private PidField pid;
 
     private ConfiguratorFactory configuratorFactory;
 
     public SaveWfsConfiguration(ConfiguratorFactory configuratorFactory) {
         super(ID, DESCRIPTION, new BooleanField());
         config = new WfsSourceConfigurationField();
-        servicePid = new ServicePid();
+        pid = new PidField();
         config.isRequired(true);
         config.wfsVersionField().isRequired(true);
         config.sourceNameField().isRequired(true);
@@ -69,8 +69,8 @@ public class SaveWfsConfiguration extends BaseAction<BooleanField> {
             return new BooleanField(false);
         }
 
-        if (StringUtils.isNotEmpty(servicePid.getValue())) {
-            addArgumentMessages(updateService(servicePid, wfsConfigToServiceProps(config), configuratorFactory).argumentMessages());
+        if (StringUtils.isNotEmpty(pid.getValue())) {
+            addArgumentMessages(updateService(pid, wfsConfigToServiceProps(config), configuratorFactory).argumentMessages());
         } else {
             if(createManagedService(wfsConfigToServiceProps(config), factoryPid, configuratorFactory).containsErrorMsgs()) {
                 addArgumentMessage(failedPersistError(config.path()));
@@ -86,15 +86,16 @@ public class SaveWfsConfiguration extends BaseAction<BooleanField> {
             return;
         }
 
-        if(servicePid.getValue() != null && !serviceConfigurationExists(servicePid.getValue(), configuratorFactory)) {
-            addArgumentMessage(noExistingConfigError(servicePid.path()));
+        if(pid.getValue() != null && !serviceConfigurationExists(pid.getValue(), configuratorFactory)) {
+            addArgumentMessage(noExistingConfigError(pid.path()));
         } else {
-            addArgumentMessages(validateSourceName(config.sourceNameField(), configuratorFactory, servicePid));
+            addArgumentMessages(validateSourceName(config.sourceNameField(), configuratorFactory,
+                    pid).argumentMessages());
         }
     }
 
     @Override
     public List<Field> getArguments() {
-        return ImmutableList.of(config, servicePid);
+        return ImmutableList.of(config, pid);
     }
 }

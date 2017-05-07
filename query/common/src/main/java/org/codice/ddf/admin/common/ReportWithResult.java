@@ -35,7 +35,7 @@ public class ReportWithResult<T> extends Report {
     }
 
     public void result(T value) {
-        this.result = Optional.of(value);
+        this.result = Optional.ofNullable(value);
     }
 
     public boolean isPresent() {
@@ -47,6 +47,6 @@ public class ReportWithResult<T> extends Report {
     }
 
     public T result() {
-        return result.get();
+        return result.orElseGet(() -> null);
     }
 }

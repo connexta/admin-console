@@ -22,7 +22,7 @@ import java.util.List;
 import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.common.actions.BaseAction;
 import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
-import org.codice.ddf.admin.common.fields.common.ServicePid;
+import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.sources.fields.SourceInfoField;
 
@@ -35,24 +35,24 @@ public class GetWfsConfigsAction extends BaseAction<ListFieldImpl<SourceInfoFiel
     public static final String DESCRIPTION =
             "Retrieves all currently configured WFS sources. If a source pid is specified, only that source configuration will be returned.";
 
-    private ServicePid servicePid;
+    private PidField pid;
 
     private ConfiguratorFactory configuratorFactory;
 
     public GetWfsConfigsAction(ConfiguratorFactory configuratorFactory) {
         super(ID, DESCRIPTION, new ListFieldImpl<>(SourceInfoField.class));
         this.configuratorFactory = configuratorFactory;
-        servicePid = new ServicePid();
+        pid = new PidField();
     }
 
     @Override
     public ListFieldImpl<SourceInfoField> performAction() {
         return getSourceConfigurations(WFS_FACTORY_PIDS,
-                SERVICE_PROPS_TO_WFS_CONFIG, servicePid, configuratorFactory, ID);
+                SERVICE_PROPS_TO_WFS_CONFIG, pid, configuratorFactory, ID);
     }
 
     @Override
     public List<Field> getArguments() {
-        return ImmutableList.of(servicePid);
+        return ImmutableList.of(pid);
     }
 }

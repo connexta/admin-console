@@ -25,7 +25,6 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.codice.ddf.admin.common.Report;
 import org.codice.ddf.admin.common.ReportWithResult;
 import org.codice.ddf.admin.common.fields.common.AddressField;
@@ -69,17 +68,17 @@ public class OpenSearchSourceUtils {
 
     /**
      * Attempts to create an OpenSearch configuration with the provided URL and credentials. If a configuration
-     * is not found or created, the {@link ReportWithResult}'s messages will have errors.
+     * is not found or created, the {@link ReportWithResult}'s will have errors.
      *
      * @param urlField The URL to probe for OpenSearch capabilities
      * @param creds    optional credentials to send with Basic Auth header
-     * @return @return a {@link ReportWithResult} containing the {@link SourceConfigUnionField} or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
+     * @return a {@link ReportWithResult} containing the {@link SourceConfigUnionField} or containing {@link org.codice.ddf.admin.common.message.ErrorMessage}s on failure.
      */
     public ReportWithResult<SourceConfigUnionField> getOpenSearchConfig(UrlField urlField, CredentialsField creds) {
         Report errors = verifyOpenSearchCapabilities(urlField, creds);
         ReportWithResult<SourceConfigUnionField> configResult = new ReportWithResult<>();
-        if (CollectionUtils.isNotEmpty(errors.argumentMessages())) {
-            configResult.argumentMessages(errors.argumentMessages());
+        if (errors.containsErrorMsgs()) {
+            configResult.addMessages(errors);
             return configResult;
         }
 
@@ -97,7 +96,7 @@ public class OpenSearchSourceUtils {
      *
      * @param urlField endpoint url to verify
      * @param creds optional credentials for authentication
-     * @return empty list on successful verification, otherwise a list containing an {@link org.codice.ddf.admin.common.message.ErrorMessage}
+     * @return an empty {@code Report} on success, otherwise a {@code Report} containing {@link org.codice.ddf.admin.common.message.ErrorMessage}s
      */
     protected Report verifyOpenSearchCapabilities(UrlField urlField, CredentialsField creds) {
         ReportWithResult<String> responseBodyResult = requestUtils.sendGetRequest(urlField, creds,
@@ -138,7 +137,7 @@ public class OpenSearchSourceUtils {
      *
      * @param addressField hostname and port to probe for OpenSearch capabilities
      * @param creds        optional credentials for authentication
-     * @return a {@link ReportWithResult} containing the discovered {@link UrlField} or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
+     * @return a {@link ReportWithResult} containing the discovered {@link UrlField} on success, or containing {@link org.codice.ddf.admin.common.message.ErrorMessage}s on failure.
      */
     public ReportWithResult<UrlField> discoverOpenSearchUrl(AddressField addressField, CredentialsField creds) {
         return URL_FORMATS.stream()

@@ -48,7 +48,7 @@ public class GetOpenSearchConfigsAction extends BaseAction<ListFieldImpl<SourceI
     @Override
     public ListFieldImpl<SourceInfoField> performAction() {
         return getSourceConfigurations(OPENSEARCH_FACTORY_PIDS,
-                SERVICE_PROPS_TO_OPENSEARCH_CONFIG, pid, configuratorFactory, ID);
+                SERVICE_PROPS_TO_OPENSEARCH_CONFIG, pid, configuratorFactory);
     }
 
     @Override

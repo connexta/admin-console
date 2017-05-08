@@ -58,18 +58,18 @@ public class DiscoverOpenSearchByAddressAction extends BaseAction<SourceInfoFiel
     @Override
     public SourceInfoField performAction() {
         ReportWithResult<UrlField> discoveredUrl = openSearchSourceUtils.discoverOpenSearchUrl(addressField, credentialsField);
-        addArgumentMessages(discoveredUrl.argumentMessages());
+        addMessages(discoveredUrl);
         if(containsErrorMsgs()) {
             return null;
         }
 
         ReportWithResult<SourceConfigUnionField> configResult = openSearchSourceUtils.getOpenSearchConfig(discoveredUrl.result(), credentialsField);
-        addArgumentMessages(configResult.argumentMessages());
+        addMessages(configResult);
         if(containsErrorMsgs()) {
             return null;
         }
 
-        return createSourceInfoField(ID, true, configResult.result());
+        return createSourceInfoField(true, configResult.result());
     }
 
     @Override

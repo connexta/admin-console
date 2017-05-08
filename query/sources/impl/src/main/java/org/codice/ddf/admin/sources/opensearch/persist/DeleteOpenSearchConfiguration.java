@@ -46,7 +46,7 @@ public class DeleteOpenSearchConfiguration extends BaseAction<BooleanField> {
 
     @Override
     public BooleanField performAction() {
-        addArgumentMessages(deleteService(pid, configuratorFactory).argumentMessages());
+        addMessages(deleteService(pid, configuratorFactory));
         return new BooleanField(!containsErrorMsgs());
     }
 

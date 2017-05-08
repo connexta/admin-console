@@ -70,7 +70,7 @@ public class SaveCswConfiguration extends BaseAction<BooleanField> {
         }
 
         if (StringUtils.isNotEmpty(pid.getValue())) {
-            addArgumentMessages(updateService(pid, cswConfigToServiceProps(config), configuratorFactory).argumentMessages());
+            addMessages(updateService(pid, cswConfigToServiceProps(config), configuratorFactory));
         } else {
             if (createManagedService(cswConfigToServiceProps(config), factoryPid, configuratorFactory).containsErrorMsgs()) {
                 addArgumentMessage(failedPersistError(config.path()));
@@ -89,7 +89,7 @@ public class SaveCswConfiguration extends BaseAction<BooleanField> {
         if(pid.getValue() != null && !serviceConfigurationExists(pid.getValue(), configuratorFactory)) {
             addArgumentMessage(noExistingConfigError(pid.path()));
         } else {
-            addArgumentMessages(validateSourceName(config.sourceNameField(), configuratorFactory, pid).argumentMessages());
+            addMessages(validateSourceName(config.sourceNameField(), configuratorFactory, pid));
         }
     }
 

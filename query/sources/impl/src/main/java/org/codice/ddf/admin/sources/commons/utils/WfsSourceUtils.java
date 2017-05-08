@@ -71,7 +71,7 @@ public class WfsSourceUtils {
      *
      * @param urlField URL to probe for WFS capabilities
      * @param creds    optional username and password to add to Basic Auth header
-     * @return a {@link ReportWithResult} containing the {@link UrlField} or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
+     * @return a {@link ReportWithResult} containing the {@link UrlField}, or containing {@link org.codice.ddf.admin.common.message.ErrorMessage}s on failure.
      */
     public Report sendWfsCapabilitiesRequest(UrlField urlField, CredentialsField creds) {
         return requestUtils.sendGetRequest(urlField, creds, GET_CAPABILITIES_PARAMS);
@@ -82,7 +82,7 @@ public class WfsSourceUtils {
      *
      * @param addressField address to probe for WFS capabilities
      * @param creds        optional username to add to Basic Auth header
-     * @return @return a {@link ReportWithResult} containing the {@link UrlField} or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
+     * @return a {@link ReportWithResult} containing the {@link UrlField} or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
      */
     public ReportWithResult<UrlField> discoverWfsUrl(AddressField addressField, CredentialsField creds) {
         return URL_FORMATS.stream()
@@ -104,13 +104,13 @@ public class WfsSourceUtils {
      *
      * @param urlField WFS URL to probe for a configuration
      * @param creds    optional username to add to Basic Auth header
-     * @return @return a {@link ReportWithResult} containing the preferred {@link SourceConfigUnionField} or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
+     * @return a {@link ReportWithResult} containing the preferred {@link SourceConfigUnionField}, or containing {@link org.codice.ddf.admin.common.message.ErrorMessage}s on failure.
      */
     public ReportWithResult<SourceConfigUnionField> getPreferredWfsConfig(UrlField urlField, CredentialsField creds) {
         ReportWithResult<String> responseBodyResult = requestUtils.sendGetRequest(urlField, creds, GET_CAPABILITIES_PARAMS);
         ReportWithResult<SourceConfigUnionField> configResult = new ReportWithResult<>();
         if (responseBodyResult.containsErrorMsgs()) {
-            configResult.argumentMessages(responseBodyResult.argumentMessages());
+            configResult.addMessages(responseBodyResult);
             return configResult;
 
         }

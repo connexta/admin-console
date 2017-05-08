@@ -61,11 +61,11 @@ public class DiscoverWfsByUrlAction extends BaseAction<SourceInfoField> {
     @Override
     public SourceInfoField performAction() {
         ReportWithResult<SourceConfigUnionField> configResult = wfsSourceUtils.getPreferredWfsConfig(endpointUrl, credentialsField);
-        addArgumentMessages(configResult.argumentMessages());
+        addMessages(configResult);
         if(containsErrorMsgs()) {
             return null;
         }
 
-        return createSourceInfoField(ID, true, configResult.result());
+        return createSourceInfoField(true, configResult.result());
     }
 }

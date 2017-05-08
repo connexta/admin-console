@@ -61,7 +61,7 @@ public class SaveOpenSearchConfiguration extends BaseAction<BooleanField> {
     @Override
     public BooleanField performAction() {
         if (StringUtils.isNotEmpty(pid.getValue())) {
-            addArgumentMessages(updateService(pid, openSearchConfigToServiceProps(config), configuratorFactory).argumentMessages());
+            addMessages(updateService(pid, openSearchConfigToServiceProps(config), configuratorFactory));
         } else {
             if(createManagedService(openSearchConfigToServiceProps(config), OPENSEARCH_FACTORY_PID, configuratorFactory).containsErrorMsgs()) {
                 addArgumentMessage(failedPersistError(config.path()));
@@ -80,8 +80,7 @@ public class SaveOpenSearchConfiguration extends BaseAction<BooleanField> {
         if(pid.getValue() != null && !serviceConfigurationExists(pid.getValue(), configuratorFactory)) {
             addArgumentMessage(noExistingConfigError(pid.path()));
         } else {
-            addArgumentMessages(validateSourceName(config.sourceNameField(), configuratorFactory,
-                    pid).argumentMessages());
+            addMessages(validateSourceName(config.sourceNameField(), configuratorFactory, pid));
         }
     }
 

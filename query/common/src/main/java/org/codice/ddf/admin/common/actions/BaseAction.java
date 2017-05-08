@@ -21,6 +21,7 @@ import org.codice.ddf.admin.api.action.Action;
 import org.codice.ddf.admin.api.action.ActionReport;
 import org.codice.ddf.admin.api.action.Message;
 import org.codice.ddf.admin.api.fields.Field;
+import org.codice.ddf.admin.common.Report;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -108,6 +109,10 @@ public abstract class BaseAction<T extends Field> implements Action<T> {
         return this;
     }
 
+    protected BaseAction addMessages(Report report) {
+        this.report.addMessages(report);
+        return this;
+    }
 
     public void validate() {
         getArguments().stream()

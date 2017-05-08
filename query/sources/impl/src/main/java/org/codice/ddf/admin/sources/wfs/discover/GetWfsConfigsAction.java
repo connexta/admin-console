@@ -48,7 +48,7 @@ public class GetWfsConfigsAction extends BaseAction<ListFieldImpl<SourceInfoFiel
     @Override
     public ListFieldImpl<SourceInfoField> performAction() {
         return getSourceConfigurations(WFS_FACTORY_PIDS,
-                SERVICE_PROPS_TO_WFS_CONFIG, pid, configuratorFactory, ID);
+                SERVICE_PROPS_TO_WFS_CONFIG, pid, configuratorFactory);
     }
 
     @Override

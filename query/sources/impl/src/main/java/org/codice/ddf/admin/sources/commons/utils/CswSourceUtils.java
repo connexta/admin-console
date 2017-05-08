@@ -13,7 +13,6 @@
  */
 package org.codice.ddf.admin.sources.commons.utils;
 
-import static org.codice.ddf.admin.common.message.DefaultMessages.INTERNAL_ERROR_MESSAGE;
 import static org.codice.ddf.admin.common.message.DefaultMessages.unknownEndpointError;
 import static org.codice.ddf.admin.sources.commons.SourceUtilCommons.SOURCES_NAMESPACE_CONTEXT;
 import static org.codice.ddf.admin.sources.commons.SourceUtilCommons.createDocument;
@@ -80,7 +79,7 @@ public class CswSourceUtils {
      *
      * @param urlField the url endpoint
      * @param creds    optional credentials for basic authentication
-     * @return a {@link Report} containing {@link org.codice.ddf.admin.common.message.ErrorMessage}s on failure.
+     * @return an empty {@link Report} on success, or containing {@link org.codice.ddf.admin.common.message.ErrorMessage}s on failure.
      */
     public Report sendCswCapabilitiesRequest(UrlField urlField, CredentialsField creds) {
         return requestUtils.sendGetRequest(urlField, creds,
@@ -122,7 +121,7 @@ public class CswSourceUtils {
 
         ReportWithResult<SourceConfigUnionField> configResult = new ReportWithResult<>();
         if (responseBodyResult.containsErrorMsgs()) {
-            configResult.argumentMessages(responseBodyResult.argumentMessages());
+            configResult.addMessages(responseBodyResult);
             return configResult;
         }
 
@@ -132,7 +131,7 @@ public class CswSourceUtils {
             capabilitiesXml = createDocument(requestBody);
         } catch (Exception e) {
             LOGGER.debug("Failed to create XML document from response.");
-            configResult.argumentMessage(INTERNAL_ERROR_MESSAGE);
+            configResult.argumentMessage(unknownEndpointError(urlField.path()));
             return configResult;
         }
 

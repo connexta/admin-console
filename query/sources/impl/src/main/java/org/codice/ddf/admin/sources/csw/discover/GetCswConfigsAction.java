@@ -49,8 +49,7 @@ public class GetCswConfigsAction extends BaseAction<ListFieldImpl<SourceInfoFiel
     public ListFieldImpl<SourceInfoField> performAction() {
         return getSourceConfigurations(CSW_FACTORY_PIDS,
                 SERVICE_PROPS_TO_CSW_CONFIG, pid,
-                configuratorFactory,
-                ID);
+                configuratorFactory);
     }
 
     @Override

@@ -33,8 +33,7 @@ import ddf.catalog.source.Source;
 
 public class SourceActionCommons {
 
-    public static SourceInfoField createSourceInfoField(String sourceHandlerName,
-            boolean isAvailable, SourceConfigUnionField config) {
+    public static SourceInfoField createSourceInfoField(boolean isAvailable, SourceConfigUnionField config) {
         config.credentials().password("*****");
         SourceInfoField sourceInfoField = new SourceInfoField();
         sourceInfoField.isAvaliable(isAvailable);
@@ -52,13 +51,13 @@ public class SourceActionCommons {
      * @return a list of {@code SourceInfoField}s configured in the system
      */
     public static ListFieldImpl<SourceInfoField> getSourceConfigurations(List<String> factoryPids, Function<Map<String, Object>, SourceConfigUnionField> mapper,
-            PidField selector, ConfiguratorFactory configuratorFactory, String actionHandlerId) {
+            PidField selector, ConfiguratorFactory configuratorFactory) {
         ListFieldImpl<SourceInfoField> sourceInfoListField = new ListFieldImpl<>(SourceInfoField.class);
         ConfigReader configReader = configuratorFactory.getConfigReader();
 
         if (StringUtils.isNotEmpty(selector.getValue())) {
             SourceConfigUnionField config = mapper.apply(configReader.getConfig(selector.getValue()));
-            sourceInfoListField.add(createSourceInfoField(actionHandlerId, true, config));
+            sourceInfoListField.add(createSourceInfoField(true, config));
             populateSourceAvailability(sourceInfoListField.getList(), configuratorFactory);
             return sourceInfoListField;
         }
@@ -68,7 +67,7 @@ public class SourceActionCommons {
                         .values()
                         .stream())
                 .map(mapper)
-                .forEach(config -> sourceInfoListField.add(createSourceInfoField(actionHandlerId, false, config)));
+                .forEach(config -> sourceInfoListField.add(createSourceInfoField(false, config)));
 
         populateSourceAvailability(sourceInfoListField.getList(), configuratorFactory);
         return sourceInfoListField;

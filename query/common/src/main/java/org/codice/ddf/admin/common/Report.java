@@ -63,12 +63,9 @@ public class Report {
         return ListUtils.union(argumentMessages, resultMessages);
     }
 
-    public Report copyResultMessages(Report messages) {
-        return resultMessages(messages.resultMessages());
-    }
-
-    public Report copyArgumentMessages(Report messages) {
-        return argumentMessages(messages.resultMessages());
+    public Report addMessages(Report report) {
+        resultMessages(report.resultMessages());
+        return argumentMessages(report.argumentMessages());
     }
 
     public boolean containsErrorMsgs() {

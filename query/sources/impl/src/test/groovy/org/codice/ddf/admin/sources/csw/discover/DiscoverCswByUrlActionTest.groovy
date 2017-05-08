@@ -74,7 +74,6 @@ class DiscoverCswByUrlActionTest extends Specification {
         then:
         1 * cswSourceUtils.getPreferredCswConfig(_ as Field, _ as Field) >> createResult(false, [URL], SourceConfigUnionField.class)
         report.result() instanceof SourceInfoField
-        ((SourceInfoField) report.result()).sourceHandlerName() == DiscoverCswByUrlAction.ID
         ((SourceInfoField) report.result()).isAvailable()
         ((SourceInfoField) report.result()).config() != null
     }
@@ -142,12 +141,16 @@ class DiscoverCswByUrlActionTest extends Specification {
     }
 
     def createResult(boolean hasError, List path, Class clazz) {
-        if (hasError) {
-            return new ReportWithResult().argumentMessage(new ErrorMessage("code", path))
+        if(hasError) {
+            return Mock(ReportWithResult) {
+                argumentMessages() >> [new ErrorMessage("code", path)]
+                resultMessages() >> []
+            }
         }
         return Mock(ReportWithResult) {
             argumentMessages() >> []
-            get() >> Mock(clazz) {
+            resultMessages() >> []
+            result() >> Mock(clazz) {
                 path() >> path
                 credentials() >> Mock(CredentialsField)
             }

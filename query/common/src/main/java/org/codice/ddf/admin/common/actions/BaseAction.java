@@ -110,7 +110,8 @@ public abstract class BaseAction<T extends Field> implements Action<T> {
     }
 
     protected BaseAction addMessages(Report report) {
-        this.report.addMessages(report);
+        addMessages(report.resultMessages());
+        addArgumentMessages(report.argumentMessages());
         return this;
     }
 

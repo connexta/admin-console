@@ -44,11 +44,11 @@ class SaveCswConfigurationTest extends Specification {
 
     static ENDPOINT_URL_PATH = [CONFIG_PATH, ENDPOINT_URL].flatten()
 
-    static SERVICE_PID_PATH = [BASE_PATH, SERVICE_PID].flatten()
+    static SERVICE_PID_PATH = [BASE_PATH, PID].flatten()
 
     static SOURCE_NAME_PATH = [CONFIG_PATH, SOURCE_NAME].flatten()
 
-    static CSW_PROFILE_PATH = [BASE_PATH, CSW_PROFILE].flatten()
+    static CSW_PROFILE_PATH = [CONFIG_PATH, CSW_PROFILE].flatten()
 
     Action saveCswConfiguration
 
@@ -118,7 +118,7 @@ class SaveCswConfigurationTest extends Specification {
 
     def 'test update configuration successful'() {
         setup:
-        actionArgs.put(SERVICE_PID, S_PID)
+        actionArgs.put(PID, S_PID)
         saveCswConfiguration.setArguments(actionArgs)
         configReader.getConfig(_) >> [(ID):TEST_SOURCENAME]
         configReader.getServices(_, _) >> []
@@ -134,7 +134,7 @@ class SaveCswConfigurationTest extends Specification {
 
     def 'test fail update config due to existing source name'() {
         setup:
-        actionArgs.put(SERVICE_PID, S_PID)
+        actionArgs.put(PID, S_PID)
         saveCswConfiguration.setArguments(actionArgs)
         configReader.getConfig(_) >> [(ID):'someOtherSourceName']
         configReader.getServices(_, _) >> federatedSources
@@ -151,7 +151,7 @@ class SaveCswConfigurationTest extends Specification {
 
     def 'test fail to update config due to failure to commit'() {
         setup:
-        actionArgs.put(SERVICE_PID, S_PID)
+        actionArgs.put(PID, S_PID)
         saveCswConfiguration.setArguments(actionArgs)
         configReader.getConfig(_) >> [(ID):TEST_SOURCENAME]
         configReader.getServices(_, _) >> []
@@ -169,7 +169,7 @@ class SaveCswConfigurationTest extends Specification {
 
     def 'test fail to update config due to no existing source'() {
         setup:
-        actionArgs.put(SERVICE_PID, S_PID)
+        actionArgs.put(PID, S_PID)
         saveCswConfiguration.setArguments(actionArgs)
         configReader.getConfig(S_PID) >> [:]
 
@@ -185,7 +185,7 @@ class SaveCswConfigurationTest extends Specification {
 
     def 'test fail update due to empty servicePid'() {
         setup:
-        actionArgs.put(SERVICE_PID, '')
+        actionArgs.put(PID, '')
         saveCswConfiguration.setArguments(actionArgs)
 
         when:
@@ -230,7 +230,7 @@ class SaveCswConfigurationTest extends Specification {
 
     def 'test fail save due to missing required csw profile field'() {
         setup:
-        actionArgs.put(CSW_PROFILE, null)
+        actionArgs.get(SOURCE_CONFIG).put(CSW_PROFILE, null)
         saveCswConfiguration.setArguments(actionArgs)
 
         when:
@@ -245,7 +245,7 @@ class SaveCswConfigurationTest extends Specification {
 
     def 'test fail save due to invalid required csw profile field'() {
         setup:
-        actionArgs.put(CSW_PROFILE, 'notAValidProfile')
+        actionArgs.get(SOURCE_CONFIG).put(CSW_PROFILE, 'notAValidProfile')
         saveCswConfiguration.setArguments(actionArgs)
 
         when:
@@ -270,7 +270,7 @@ class SaveCswConfigurationTest extends Specification {
         actionArgs = saveConfigActionArgs
         actionArgs.get(SOURCE_CONFIG).put(CswSourceConfigurationField.FORCED_SPATIAL_FILTER, TEST_SPATIAL_FILTER)
         actionArgs.get(SOURCE_CONFIG).put(CswSourceConfigurationField.OUTPUT_SCHEMA, TEST_OUTPUT_SCHEMA)
-        actionArgs.put(CSW_PROFILE, TEST_CSW_PROFILE)
+        actionArgs.get(SOURCE_CONFIG).put(CSW_PROFILE, TEST_CSW_PROFILE)
         return actionArgs
     }
 }

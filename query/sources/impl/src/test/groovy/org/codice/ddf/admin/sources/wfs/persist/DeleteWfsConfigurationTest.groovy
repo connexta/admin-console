@@ -22,7 +22,7 @@ import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.configurator.OperationReport
 import spock.lang.Specification
 
-import static org.codice.ddf.admin.sources.SourceTestCommons.SERVICE_PID
+import static org.codice.ddf.admin.sources.SourceTestCommons.PID
 import static org.codice.ddf.admin.sources.SourceTestCommons.S_PID
 import static org.codice.ddf.admin.sources.SourceTestCommons.configToBeDeleted
 
@@ -38,10 +38,10 @@ class DeleteWfsConfigurationTest extends Specification {
 
     static BASE_PATH = [DeleteWfsConfiguration.ID, BaseAction.ARGUMENT]
 
-    static SERVICE_PID_PATH = [BASE_PATH, SERVICE_PID].flatten()
+    static PID_PATH = [BASE_PATH, PID].flatten()
 
     def actionArgs = [
-        (SERVICE_PID) : S_PID
+        (PID): S_PID
     ]
 
     def setup() {
@@ -68,7 +68,7 @@ class DeleteWfsConfigurationTest extends Specification {
         report.result().getValue() == true
     }
 
-    def 'test no config found with provided service pid'() {
+    def 'test no config found with provided pid'() {
         setup:
         configReader.getConfig(S_PID) >> [:]
         deleteWfsConfiguration.setArguments(actionArgs)
@@ -80,10 +80,10 @@ class DeleteWfsConfigurationTest extends Specification {
         report.result() == null
         report.messages().size() == 1
         report.messages().get(0).code == DefaultMessages.NO_EXISTING_CONFIG
-        report.messages().get(0).path == SERVICE_PID_PATH
+        report.messages().get(0).path == PID_PATH
     }
 
-    def 'test error while committing delete configuration with given service pid'() {
+    def 'test error while committing delete configuration with given pid'() {
         when:
         configReader.getConfig(S_PID) >> configToBeDeleted
         configurator.commit(_, _) >> mockReport(true)
@@ -94,10 +94,10 @@ class DeleteWfsConfigurationTest extends Specification {
         report.result().getValue() == false
         report.messages().size() == 1
         report.messages().get(0).code == DefaultMessages.FAILED_DELETE_ERROR
-        report.messages().get(0).path == SERVICE_PID_PATH
+        report.messages().get(0).path == PID_PATH
     }
 
-    def 'test failure due to required service pid argument not provided'() {
+    def 'test failure due to required pid argument not provided'() {
         when:
         def report = deleteWfsConfiguration.process()
 
@@ -105,19 +105,19 @@ class DeleteWfsConfigurationTest extends Specification {
         report.result() == null
         report.messages().size() == 1
         report.messages().get(0).code == DefaultMessages.MISSING_REQUIRED_FIELD
-        report.messages().get(0).path == SERVICE_PID_PATH
+        report.messages().get(0).path == PID_PATH
     }
 
-    def 'test failure due to service pid argument provided but empty'() {
+    def 'test failure due to pid argument provided but empty'() {
         when:
-        deleteWfsConfiguration.setArguments([(SERVICE_PID):''])
+        deleteWfsConfiguration.setArguments([(PID):''])
         def report = deleteWfsConfiguration.process()
 
         then:
         report.result() == null
         report.messages().size() == 1
         report.messages().get(0).code == DefaultMessages.EMPTY_FIELD
-        report.messages().get(0).path == SERVICE_PID_PATH
+        report.messages().get(0).path == PID_PATH
     }
 
     def mockReport(boolean hasError) {

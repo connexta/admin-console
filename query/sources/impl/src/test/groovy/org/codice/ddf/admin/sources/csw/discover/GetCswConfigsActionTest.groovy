@@ -37,7 +37,7 @@ class GetCswConfigsActionTest extends Specification {
 
     static BASE_PATH = [GetCswConfigsAction.ID, BaseAction.ARGUMENT]
 
-    static SERVICE_PID_PATH = [BASE_PATH, SERVICE_PID].flatten()
+    static PID_PATH = [BASE_PATH, PID].flatten()
 
     Action getCswConfigsAction
 
@@ -46,7 +46,7 @@ class GetCswConfigsActionTest extends Specification {
     ConfigReader configReader
 
     def actionArgs = [
-        (SERVICE_PID) : S_PID_2
+        (PID): S_PID_2
     ]
 
     Map<String, Map<String, Object>> managedServiceConfigs = createCswManagedServiceConfigs()
@@ -60,7 +60,7 @@ class GetCswConfigsActionTest extends Specification {
         getCswConfigsAction = new GetCswConfigsAction(configuratorFactory)
     }
 
-    def 'test no servicePid argument returns all configs'() {
+    def 'test no pid argument returns all configs'() {
         when:
         def report = getCswConfigsAction.process()
         def list = ((ListField)report.result())
@@ -72,11 +72,11 @@ class GetCswConfigsActionTest extends Specification {
         2 * configReader.getManagedServiceConfigs(_ as String) >> [:]
         report.result() != null
         list.getList().size() == 2
-        assertConfig(list.getList().get(0), 0, GetCswConfigsAction.ID, managedServiceConfigs.get(S_PID_1), SOURCE_ID_1, S_PID_1, true)
-        assertConfig(list.getList().get(1), 1, GetCswConfigsAction.ID, managedServiceConfigs.get(S_PID_2), SOURCE_ID_2, S_PID_2, false)
+        assertConfig(list.getList().get(0), 0, managedServiceConfigs.get(S_PID_1), SOURCE_ID_1, S_PID_1, true)
+        assertConfig(list.getList().get(1), 1, managedServiceConfigs.get(S_PID_2), SOURCE_ID_2, S_PID_2, false)
     }
 
-    def 'test service pid filter returns 1 result'() {
+    def 'test pid filter returns 1 result'() {
         when:
         getCswConfigsAction.setArguments(actionArgs)
         def report = getCswConfigsAction.process()
@@ -88,31 +88,30 @@ class GetCswConfigsActionTest extends Specification {
         1 * configReader.getConfig(S_PID_2) >>  managedServiceConfigs.get(S_PID_2)
         report.result() != null
         list.getList().size() == 1
-        assertConfig(list.getList().get(0), 0, GetCswConfigsAction.ID, managedServiceConfigs.get(S_PID_2), SOURCE_ID_2, S_PID_2, false)
+        assertConfig(list.getList().get(0), 0, managedServiceConfigs.get(S_PID_2), SOURCE_ID_2, S_PID_2, false)
     }
 
-    def 'test failure due to provided but empty servicePid field'() {
+    def 'test failure due to provided but empty pid field'() {
         when:
-        getCswConfigsAction.setArguments([(SERVICE_PID) : ''])
+        getCswConfigsAction.setArguments([(PID): ''])
         def report = getCswConfigsAction.process()
 
         then:
         report.result() == null
         report.messages().size() == 1
         report.messages().get(0).code == DefaultMessages.EMPTY_FIELD
-        report.messages().get(0).path == SERVICE_PID_PATH
+        report.messages().get(0).path == PID_PATH
     }
 
-    def assertConfig(Field field, int index, String actionId, Map<String, Object> properties, String sourceName, String servicePid, boolean availability) {
+    def assertConfig(Field field, int index, Map<String, Object> properties, String sourceName, String pid, boolean availability) {
         def sourceInfo = (SourceInfoField) field
         assert sourceInfo.fieldName() == ListFieldImpl.INDEX_DELIMETER + index
         assert sourceInfo.isAvailable() == availability
-        assert sourceInfo.sourceHandlerName() == actionId
         assert sourceInfo.config().endpointUrl() == properties.get(CswServiceProperties.CSW_URL)
         assert sourceInfo.config().credentials().password() == "*****"
         assert sourceInfo.config().credentials().username() == TEST_USERNAME
         assert sourceInfo.config().sourceName() == sourceName
-        assert sourceInfo.config().pid() == servicePid
+        assert sourceInfo.config().pid() == pid
         return true
     }
 
@@ -124,6 +123,4 @@ class GetCswConfigsActionTest extends Specification {
         managedServiceConfigs.get(S_PID_2).put((CswServiceProperties.CSW_URL), TEST_URL)
         return managedServiceConfigs
     }
-
-
 }

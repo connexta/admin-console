@@ -86,7 +86,6 @@ class DiscoverOpenSearchByAddressActionTest extends Specification {
         1 * openSearchSourceUtils.discoverOpenSearchUrl(_ as Field, _ as Field) >> createResult(false, [], UrlField.class)
         1 * openSearchSourceUtils.getOpenSearchConfig(_ as Field, _ as Field) >> createResult(false, [], SourceConfigUnionField.class)
         report.result() instanceof SourceInfoField
-        ((SourceInfoField) report.result()).sourceHandlerName() == DiscoverOpenSearchByAddressAction.ID
         ((SourceInfoField) report.result()).isAvailable()
         ((SourceInfoField) report.result()).config() != null
     }
@@ -160,11 +159,15 @@ class DiscoverOpenSearchByAddressActionTest extends Specification {
 
     def createResult(boolean hasError, List path, Class clazz) {
         if(hasError) {
-            return new ReportWithResult().argumentMessage(new ErrorMessage("code", path))
+            return Mock(ReportWithResult) {
+                argumentMessages() >> [new ErrorMessage("code", path)]
+                resultMessages() >> []
+            }
         }
         return Mock(ReportWithResult) {
             argumentMessages() >> []
-            get() >> Mock(clazz) {
+            resultMessages() >> []
+            result() >> Mock(clazz) {
                 path() >> path
                 credentials() >> Mock(CredentialsField)
             }

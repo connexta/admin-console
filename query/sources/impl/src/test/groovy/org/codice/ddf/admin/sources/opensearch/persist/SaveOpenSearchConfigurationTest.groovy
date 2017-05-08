@@ -15,7 +15,6 @@ package org.codice.ddf.admin.sources.opensearch.persist
 
 import ddf.catalog.source.FederatedSource
 import org.codice.ddf.admin.api.action.Action
-import org.codice.ddf.admin.api.fields.Field
 import org.codice.ddf.admin.common.actions.BaseAction
 import org.codice.ddf.admin.common.message.DefaultMessages
 import org.codice.ddf.admin.configurator.ConfigReader
@@ -23,7 +22,6 @@ import org.codice.ddf.admin.configurator.Configurator
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.configurator.OperationReport
 import org.codice.ddf.admin.sources.commons.SourceMessages
-import org.codice.ddf.admin.sources.fields.SourceInfoField
 import spock.lang.Specification
 
 import static org.codice.ddf.admin.sources.SourceTestCommons.*
@@ -38,7 +36,7 @@ class SaveOpenSearchConfigurationTest extends Specification {
 
     static ENDPOINT_URL_PATH = [CONFIG_PATH, ENDPOINT_URL].flatten()
 
-    static SERVICE_PID_PATH = [BASE_PATH, SERVICE_PID].flatten()
+    static PID_PATH = [BASE_PATH, PID].flatten()
 
     Action saveOpenSearchConfiguration
 
@@ -112,7 +110,7 @@ class SaveOpenSearchConfigurationTest extends Specification {
 
     def 'test update configuration successful'() {
         setup:
-        saveConfigActionArgs.put(SERVICE_PID, S_PID)
+        saveConfigActionArgs.put(PID, S_PID)
         saveOpenSearchConfiguration.setArguments(saveConfigActionArgs)
         configReader.getConfig(_) >> [(ID):TEST_SOURCENAME]
         configReader.getServices(_, _) >> []
@@ -127,7 +125,7 @@ class SaveOpenSearchConfigurationTest extends Specification {
 
     def 'test fail update config due to existing source name'() {
         setup:
-        saveConfigActionArgs.put(SERVICE_PID, S_PID)
+        saveConfigActionArgs.put(PID, S_PID)
         saveOpenSearchConfiguration.setArguments(saveConfigActionArgs)
         configReader.getConfig(_) >> [(ID):'someOtherSourceName']
         configReader.getServices(_, _) >> federatedSources
@@ -144,7 +142,7 @@ class SaveOpenSearchConfigurationTest extends Specification {
 
     def 'test fail to update config due to failure to commit'() {
         setup:
-        saveConfigActionArgs.put(SERVICE_PID, S_PID)
+        saveConfigActionArgs.put(PID, S_PID)
         saveOpenSearchConfiguration.setArguments(saveConfigActionArgs)
         configReader.getConfig(_) >> [(ID):TEST_SOURCENAME]
         configReader.getServices(_, _) >> []
@@ -156,13 +154,13 @@ class SaveOpenSearchConfigurationTest extends Specification {
         then:
         report.result().getValue() == false
         report.messages().size() == 1
-        report.messages().get(0).path == SERVICE_PID_PATH
+        report.messages().get(0).path == PID_PATH
         report.messages().get(0).code == DefaultMessages.FAILED_UPDATE_ERROR
     }
 
     def 'test fail update config due to no existing source'() {
         setup:
-        saveConfigActionArgs.put(SERVICE_PID, S_PID)
+        saveConfigActionArgs.put(PID, S_PID)
         saveOpenSearchConfiguration.setArguments(saveConfigActionArgs)
         configReader.getConfig(S_PID) >> [:]
 
@@ -173,12 +171,12 @@ class SaveOpenSearchConfigurationTest extends Specification {
         report.result() == null
         report.messages().size() == 1
         report.messages().get(0).code == DefaultMessages.NO_EXISTING_CONFIG
-        report.messages().get(0).path == SERVICE_PID_PATH
+        report.messages().get(0).path == PID_PATH
     }
 
-    def 'test fail update due to empty service pid'() {
+    def 'test fail update due to empty pid'() {
         setup:
-        saveConfigActionArgs.put(SERVICE_PID, '')
+        saveConfigActionArgs.put(PID, '')
         saveOpenSearchConfiguration.setArguments(saveConfigActionArgs)
 
         when:
@@ -187,11 +185,11 @@ class SaveOpenSearchConfigurationTest extends Specification {
         then:
         report.result() == null
         report.messages().size() == 1
-        report.messages().get(0).path == SERVICE_PID_PATH
+        report.messages().get(0).path == PID_PATH
         report.messages().get(0).code == DefaultMessages.EMPTY_FIELD
     }
 
-    def 'test fail save due to missing required sourcename field'() {
+    def 'test fail save due to missing required source name field'() {
         setup:
         saveConfigActionArgs.get(SOURCE_CONFIG).put(SOURCE_NAME, null)
         saveOpenSearchConfiguration.setArguments(saveConfigActionArgs)

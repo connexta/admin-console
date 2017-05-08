@@ -14,7 +14,6 @@
 package org.codice.ddf.admin.sources.csw.discover
 
 import org.codice.ddf.admin.api.action.Action
-import org.codice.ddf.admin.api.fields.Field
 import org.codice.ddf.admin.common.ReportWithResult
 import org.codice.ddf.admin.common.actions.BaseAction
 import org.codice.ddf.admin.common.fields.common.CredentialsField
@@ -60,7 +59,7 @@ class DiscoverCswByAddressActionTest extends Specification {
         def report = discoverCswByAddressAction.process()
 
         then:
-        1 * cswSourceUtils.discoverCswUrl(_ as Field, _ as Field) >> createResult(true, [ADDRESS], null)
+        1 * cswSourceUtils.discoverCswUrl(_, _) >> createResult(true, [ADDRESS], null)
         report.result() == null
         report.messages().size() == 1
         report.messages().get(0).path == ADDRESS_FIELD_PATH
@@ -71,8 +70,8 @@ class DiscoverCswByAddressActionTest extends Specification {
         def report = discoverCswByAddressAction.process()
 
         then:
-        1 * cswSourceUtils.discoverCswUrl(_ as Field, _ as Field) >> createResult(false, [], UrlField.class)
-        1 * cswSourceUtils.getPreferredCswConfig(_ as Field, _ as Field) >> createResult(true, [ADDRESS], null)
+        1 * cswSourceUtils.discoverCswUrl(_, _) >> createResult(false, [], UrlField.class)
+        1 * cswSourceUtils.getPreferredCswConfig(_, _) >> createResult(true, [ADDRESS], null)
         report.result() == null
         report.messages().size() == 1
         report.messages().get(0).path == ADDRESS_FIELD_PATH
@@ -83,10 +82,9 @@ class DiscoverCswByAddressActionTest extends Specification {
         def report = discoverCswByAddressAction.process()
 
         then:
-        1 * cswSourceUtils.discoverCswUrl(_ as Field, _ as Field) >> createResult(false, [], UrlField.class)
-        1 * cswSourceUtils.getPreferredCswConfig(_ as Field, _ as Field) >> createResult(false, [], SourceConfigUnionField.class)
+        1 * cswSourceUtils.discoverCswUrl(_, _) >> createResult(false, [], UrlField.class)
+        1 * cswSourceUtils.getPreferredCswConfig(_, _) >> createResult(false, [], SourceConfigUnionField.class)
         report.result() instanceof SourceInfoField
-        ((SourceInfoField) report.result()).sourceHandlerName() == DiscoverCswByAddressAction.ID
         ((SourceInfoField) report.result()).isAvailable()
         ((SourceInfoField) report.result()).config() != null
     }
@@ -160,11 +158,15 @@ class DiscoverCswByAddressActionTest extends Specification {
 
     def createResult(boolean hasError, List path, Class clazz) {
         if(hasError) {
-            return new ReportWithResult().argumentMessage(new ErrorMessage("code", path))
+            return Mock(ReportWithResult) {
+                argumentMessages() >> [new ErrorMessage("code", path)]
+                resultMessages() >> []
+            }
         }
         return Mock(ReportWithResult) {
             argumentMessages() >> []
-            get() >> Mock(clazz) {
+            resultMessages() >> []
+            result() >> Mock(clazz) {
                 path() >> path
                 credentials() >> Mock(CredentialsField)
             }

@@ -43,10 +43,10 @@ class DeleteCswConfigurationTest extends Specification {
 
     static BASE_PATH = [DeleteCswConfiguration.ID, BaseAction.ARGUMENT]
 
-    static SERVICE_PID_PATH = [BASE_PATH, SERVICE_PID].flatten()
+    static SERVICE_PID_PATH = [BASE_PATH, PID].flatten()
 
     def actionArgs = [
-        (SERVICE_PID) : S_PID
+        (PID): S_PID
     ]
 
     def configToDelete = createCswConfigToDelete()
@@ -113,7 +113,7 @@ class DeleteCswConfigurationTest extends Specification {
 
     def 'test failure due to service pid argument provided but empty'() {
         when:
-        deleteCswConfiguration.setArguments([(SERVICE_PID) : ""])
+        deleteCswConfiguration.setArguments([(PID): ""])
         def report = deleteCswConfiguration.process()
 
         then:

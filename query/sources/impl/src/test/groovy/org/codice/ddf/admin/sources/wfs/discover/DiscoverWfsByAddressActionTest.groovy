@@ -86,7 +86,6 @@ class DiscoverWfsByAddressActionTest extends Specification {
         1 * wfsSourceUtils.discoverWfsUrl(_ as Field, _ as Field) >> createResult(false, [], UrlField.class)
         1 * wfsSourceUtils.getPreferredWfsConfig(_ as Field, _ as Field) >> createResult(false, [], SourceConfigUnionField.class)
         report.result() != null
-        ((SourceInfoField) report.result()).sourceHandlerName() == DiscoverWfsByAddressAction.ID
         ((SourceInfoField) report.result()).isAvailable()
         ((SourceInfoField) report.result()).config() != null
     }
@@ -160,11 +159,15 @@ class DiscoverWfsByAddressActionTest extends Specification {
 
     def createResult(boolean hasError, List path, Class clazz) {
         if(hasError) {
-            return new ReportWithResult().argumentMessage(new ErrorMessage("code", path))
+            return Mock(ReportWithResult) {
+                argumentMessages() >> [new ErrorMessage("code", path)]
+                resultMessages() >> []
+            }
         }
         return Mock(ReportWithResult) {
             argumentMessages() >> []
-            get() >> Mock(clazz) {
+            resultMessages() >> []
+            result() >> Mock(clazz) {
                 path() >> path
                 credentials() >> Mock(CredentialsField)
             }

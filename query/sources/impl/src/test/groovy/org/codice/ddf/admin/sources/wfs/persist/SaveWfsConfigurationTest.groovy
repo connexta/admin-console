@@ -35,13 +35,13 @@ class SaveWfsConfigurationTest extends Specification {
 
     static SOURCE_NAME_PATH = [CONFIG_PATH, SOURCE_NAME].flatten()
 
-    static SERVICE_PID_PATH = [BASE_PATH, SERVICE_PID].flatten()
+    static PID_PATH = [BASE_PATH, PID].flatten()
 
     static ENDPOINT_URL_PATH = [CONFIG_PATH, ENDPOINT_URL].flatten()
 
     static WFS_VERSION = WfsVersion.DEFAULT_FIELD_NAME;
 
-    static WFS_VERSION_PATH = [BASE_PATH, WFS_VERSION].flatten()
+    static WFS_VERSION_PATH = [CONFIG_PATH, WFS_VERSION].flatten()
 
     static TEST_WFS_VERSION = '1.0.0'
 
@@ -119,7 +119,7 @@ class SaveWfsConfigurationTest extends Specification {
 
     def 'test update configuration successful'() {
         setup:
-        actionArgs.put(SERVICE_PID, S_PID)
+        actionArgs.put(PID, S_PID)
         saveWfsConfiguration.setArguments(actionArgs)
         configReader.getConfig(_ as String) >> [(ID):TEST_SOURCENAME]
         configReader.getServices(_, _) >> []
@@ -134,7 +134,7 @@ class SaveWfsConfigurationTest extends Specification {
 
     def 'test fail update due to existing source name'() {
         setup:
-        actionArgs.put(SERVICE_PID, S_PID)
+        actionArgs.put(PID, S_PID)
         saveWfsConfiguration.setArguments(actionArgs)
         configReader.getConfig(_) >> [(ID):'someOtherSourceName']
         configReader.getServices(_, _) >> federatedSources
@@ -151,7 +151,7 @@ class SaveWfsConfigurationTest extends Specification {
 
     def 'test fail update due to failure to commit'() {
         setup:
-        actionArgs.put(SERVICE_PID, S_PID)
+        actionArgs.put(PID, S_PID)
         saveWfsConfiguration.setArguments(actionArgs)
         configReader.getConfig(_) >> [(ID):TEST_SOURCENAME]
         configReader.getServices(_, _) >> []
@@ -163,13 +163,13 @@ class SaveWfsConfigurationTest extends Specification {
         then:
         report.result().getValue() == false
         report.messages().size() == 1
-        report.messages().get(0).path == SERVICE_PID_PATH
+        report.messages().get(0).path == PID_PATH
         report.messages().get(0).code == DefaultMessages.FAILED_UPDATE_ERROR
     }
 
-    def 'test fail update config due to no existing config specified by service pid'() {
+    def 'test fail update config due to no existing config specified by pid'() {
         setup:
-        actionArgs.put(SERVICE_PID, S_PID)
+        actionArgs.put(PID, S_PID)
         saveWfsConfiguration.setArguments(actionArgs)
         configReader.getConfig(S_PID) >> [:]
 
@@ -180,12 +180,12 @@ class SaveWfsConfigurationTest extends Specification {
         report.result() == null
         report.messages().size() == 1
         report.messages().get(0).code == DefaultMessages.NO_EXISTING_CONFIG
-        report.messages().get(0).path == SERVICE_PID_PATH
+        report.messages().get(0).path == PID_PATH
     }
 
-    def 'test fail update due to provided but empty service pid'() {
+    def 'test fail update due to provided but empty pid'() {
         setup:
-        actionArgs.put(SERVICE_PID, '')
+        actionArgs.put(PID, '')
         saveWfsConfiguration.setArguments(actionArgs)
 
         when:
@@ -195,7 +195,7 @@ class SaveWfsConfigurationTest extends Specification {
         report.result() == null
         report.messages().size() == 1
         report.messages().get(0).code == DefaultMessages.EMPTY_FIELD
-        report.messages().get(0).path == SERVICE_PID_PATH
+        report.messages().get(0).path == PID_PATH
     }
 
     def 'test fail save due to missing required source name field'() {
@@ -230,7 +230,7 @@ class SaveWfsConfigurationTest extends Specification {
 
     def 'test fail save due to missing required wfsVersion field'() {
         setup:
-        actionArgs.put(WFS_VERSION, null)
+        actionArgs.get(SOURCE_CONFIG).put(WFS_VERSION, null)
         saveWfsConfiguration.setArguments(actionArgs)
 
         when:
@@ -245,7 +245,7 @@ class SaveWfsConfigurationTest extends Specification {
 
     def 'test fail due to unsupported wfs version'() {
         setup:
-        actionArgs.put(WFS_VERSION, '1.2.3')
+        actionArgs.get(SOURCE_CONFIG).put(WFS_VERSION, '1.2.3')
         saveWfsConfiguration.setArguments(actionArgs)
 
         when:
@@ -261,7 +261,7 @@ class SaveWfsConfigurationTest extends Specification {
     def createWfsSaveArgs() {
         refreshSaveConfigActionArgs()
         actionArgs = saveConfigActionArgs
-        actionArgs.put(WFS_VERSION, TEST_WFS_VERSION)
+        actionArgs.get(SOURCE_CONFIG).put(WFS_VERSION, TEST_WFS_VERSION)
         return actionArgs
     }
 

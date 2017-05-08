@@ -36,10 +36,10 @@ class GetWfsConfigsActionTest extends Specification {
 
     static BASE_PATH = [GetWfsConfigsAction.ID, BaseAction.ARGUMENT]
 
-    static SERVICE_PID_PATH = [BASE_PATH, SERVICE_PID].flatten()
+    static PID_PATH = [BASE_PATH, PID].flatten()
 
     def actionArgs = [
-        (SERVICE_PID) : S_PID_2
+        (PID): S_PID_2
     ]
 
     def setup() {
@@ -50,7 +50,7 @@ class GetWfsConfigsActionTest extends Specification {
         getWfsConfigsAction = new GetWfsConfigsAction(configuratorFactory)
     }
 
-    def 'test no service pid arugment returns all configs'() {
+    def 'test no pid argument returns all configs'() {
         setup:
         configReader.getServices(_, _) >> []
 
@@ -66,11 +66,11 @@ class GetWfsConfigsActionTest extends Specification {
         1 * configReader.getManagedServiceConfigs(_ as String) >> [:]
         report.result() != null
         list.getList().size() == 2
-        assertConfig(list.getList().get(0), 0, GetWfsConfigsAction.ID, SOURCE_ID_1, S_PID_1, true)
-        assertConfig(list.getList().get(1), 1, GetWfsConfigsAction.ID, SOURCE_ID_2, S_PID_2, false)
+        assertConfig(list.getList().get(0), 0, SOURCE_ID_1, S_PID_1, true)
+        assertConfig(list.getList().get(1), 1, SOURCE_ID_2, S_PID_2, false)
     }
 
-    def 'test service pid filter returns 1 result'() {
+    def 'test pid filter returns 1 result'() {
         setup:
         getWfsConfigsAction.setArguments(actionArgs)
 
@@ -84,30 +84,29 @@ class GetWfsConfigsActionTest extends Specification {
         1 * configReader.getConfig(S_PID_2) >> baseManagedServiceConfigs.get(S_PID_2)
         report.result() != null
         list.getList().size() == 1
-        assertConfig(list.getList().get(0), 0, GetWfsConfigsAction.ID, SOURCE_ID_2, S_PID_2, false)
+        assertConfig(list.getList().get(0), 0, SOURCE_ID_2, S_PID_2, false)
     }
 
-    def 'test failure due to provided but empty service pid field'() {
+    def 'test failure due to provided but empty pid field'() {
         when:
-        getWfsConfigsAction.setArguments([(SERVICE_PID) : ''])
+        getWfsConfigsAction.setArguments([(PID): ''])
         def report = getWfsConfigsAction.process()
 
         then:
         report.result() == null
         report.messages().size() == 1
         report.messages().get(0).code == DefaultMessages.EMPTY_FIELD
-        report.messages().get(0).path == SERVICE_PID_PATH
+        report.messages().get(0).path == PID_PATH
     }
 
-    def assertConfig(Field field, int index, String actionId, String sourceName, String servicePid, boolean availability) {
+    def assertConfig(Field field, int index, String sourceName, String pid, boolean availability) {
         def sourceInfo = (SourceInfoField) field
         assert sourceInfo.fieldName() == ListFieldImpl.INDEX_DELIMETER + index
         assert sourceInfo.isAvailable() == availability
-        assert sourceInfo.sourceHandlerName() == actionId
         assert sourceInfo.config().credentials().password() == "*****"
         assert sourceInfo.config().credentials().username() == TEST_USERNAME
         assert sourceInfo.config().sourceName() == sourceName
-        assert sourceInfo.config().pid() == servicePid
+        assert sourceInfo.config().pid() == pid
         return true
     }
 }

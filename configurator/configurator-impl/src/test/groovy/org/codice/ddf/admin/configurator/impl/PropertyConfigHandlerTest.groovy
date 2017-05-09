@@ -37,7 +37,7 @@ class PropertyConfigHandlerTest extends Specification {
         initProps.put('key1', 'val1')
         initProps.put('key2', 'val2')
         initProps.put('key3', 'val3')
-        file.newWriter().with {
+        file.newWriter().withWriter {
             initProps.store(it, null)
         }
     }

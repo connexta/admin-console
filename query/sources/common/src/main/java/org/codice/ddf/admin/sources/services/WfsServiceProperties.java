@@ -47,10 +47,6 @@ public class WfsServiceProperties {
 
     public static final String ID = "id";
 
-    public static final String SOURCE_HOSTNAME = "sourceHostName";
-
-    public static final String PORT = "sourcePort";
-
     public static final List<String> WFS_FACTORY_PIDS = ImmutableList.of(WFS1_FACTORY_PID,
             WFS2_FACTORY_PID);
 

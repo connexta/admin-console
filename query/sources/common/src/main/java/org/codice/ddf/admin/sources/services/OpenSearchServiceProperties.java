@@ -34,11 +34,9 @@ public class OpenSearchServiceProperties {
 
     public static final String PASSWORD = "password";
 
+    public static final String SHORTNAME = "shortname";
+
     public static final String ID = "id";
-
-    public static final String SOURCE_HOSTNAME = "sourceHostName";
-
-    public static final String PORT = "sourcePort";
 
     public static final List<String> OPENSEARCH_FACTORY_PIDS = Collections.singletonList(
             OPENSEARCH_FACTORY_PID);
@@ -61,7 +59,7 @@ public class OpenSearchServiceProperties {
     public static final Map<String, Object> openSearchConfigToServiceProps(
             OpenSearchSourceConfigurationField config) {
         HashMap<String, Object> props = new HashMap<>();
-        props.put(ID, config.sourceName());
+        props.put(SHORTNAME, config.sourceName());
         props.put(ENDPOINT_URL, config.endpointUrl());
         if (config.credentials().username() != null) {
             props.put(USERNAME, config.credentials().username());

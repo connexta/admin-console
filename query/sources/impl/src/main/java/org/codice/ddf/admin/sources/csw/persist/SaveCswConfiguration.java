@@ -89,7 +89,7 @@ public class SaveCswConfiguration extends BaseAction<BooleanField> {
         if(pid.getValue() != null && !serviceConfigurationExists(pid.getValue(), configuratorFactory)) {
             addArgumentMessage(noExistingConfigError(pid.path()));
         } else {
-            addMessages(validateSourceName(config.sourceNameField(), configuratorFactory, pid));
+            addMessages(validateSourceName(config.sourceNameField(), configuratorFactory));
         }
     }
 

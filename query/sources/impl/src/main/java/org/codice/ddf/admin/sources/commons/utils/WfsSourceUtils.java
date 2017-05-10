@@ -93,7 +93,7 @@ public class WfsSourceUtils {
                     urlField.setValue(url);
                     return urlField;
                 })
-                .filter(urlField -> sendWfsCapabilitiesRequest(urlField, creds).messages().isEmpty())
+                .filter(urlField -> !sendWfsCapabilitiesRequest(urlField, creds).containsErrorMsgs())
                 .map(ReportWithResult::new)
                 .findFirst()
                 .orElse(createDefaultResult(addressField));

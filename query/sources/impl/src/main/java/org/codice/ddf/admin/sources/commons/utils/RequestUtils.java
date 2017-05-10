@@ -64,14 +64,14 @@ public class RequestUtils {
             return responseBody;
         }
 
-        if (response.getStatus() != HTTP_OK || response.readEntity(String.class)
-                .equals("")) {
+        String responseString = response.readEntity(String.class);
+        if (response.getStatus() != HTTP_OK || responseString.equals("")) {
             LOGGER.debug("Bad or empty response received from sending GET to {}.",
                     urlField.getValue());
             responseBody.argumentMessage(cannotConnectError(urlField.path()));
             return responseBody;
         }
-        responseBody.result(response.readEntity(String.class));
+        responseBody.result(responseString);
         return responseBody;
     }
 

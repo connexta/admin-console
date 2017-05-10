@@ -19,11 +19,8 @@ import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.api.fields.ObjectField;
 import org.codice.ddf.admin.common.fields.base.BaseUnionField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
-import org.codice.ddf.admin.common.fields.common.AddressField;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
-import org.codice.ddf.admin.common.fields.common.HostnameField;
 import org.codice.ddf.admin.common.fields.common.PidField;
-import org.codice.ddf.admin.common.fields.common.PortField;
 import org.codice.ddf.admin.common.fields.common.UrlField;
 
 import com.google.common.base.MoreObjects;
@@ -53,8 +50,6 @@ public class SourceConfigUnionField extends BaseUnionField {
     protected UrlField endpointUrl;
 
     protected CredentialsField creds;
-
-    protected AddressField address;
 
     public SourceConfigUnionField() {
         super(FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION, UNION_TYPES, false);
@@ -87,12 +82,6 @@ public class SourceConfigUnionField extends BaseUnionField {
         return this;
     }
 
-    public SourceConfigUnionField address(String hostname, int port) {
-        address.hostname(hostname);
-        address.port(port);
-        return this;
-    }
-
     // Getters
     public String sourceName() {
         return sourceName.getValue();
@@ -114,10 +103,6 @@ public class SourceConfigUnionField extends BaseUnionField {
         return pidField;
     }
 
-    public AddressField address() {
-        return address;
-    }
-
     public String endpointUrl() {
         return endpointUrl.getValue();
     }
@@ -128,7 +113,7 @@ public class SourceConfigUnionField extends BaseUnionField {
 
     @Override
     public List<Field> getFields() {
-        return ImmutableList.of(pidField, sourceName, endpointUrl, creds, address);
+        return ImmutableList.of(pidField, sourceName, endpointUrl, creds);
     }
 
     @Override
@@ -137,7 +122,6 @@ public class SourceConfigUnionField extends BaseUnionField {
         sourceName = new StringField(SOURCE_NAME_FIELD_NAME);
         endpointUrl = new UrlField(ENDPOINT_URL_FIELD_NAME);
         creds = new CredentialsField();
-        address = new AddressField();
     }
 
     @Override
@@ -145,8 +129,6 @@ public class SourceConfigUnionField extends BaseUnionField {
         return MoreObjects.toStringHelper(this)
                 .add(PidField.DEFAULT_FIELD_NAME, pid())
                 .add(SOURCE_NAME_FIELD_NAME, sourceName())
-                .add(PortField.DEFAULT_FIELD_NAME, address().port())
-                .add(HostnameField.DEFAULT_FIELD_NAME, address().hostname())
                 .add(ENDPOINT_URL_FIELD_NAME, endpointUrl())
                 .add(CredentialsField.USERNAME_FIELD_NAME, credentials().username())
                 .add(CredentialsField.PASSWORD_FIELD_NAME, "*****")

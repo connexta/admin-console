@@ -52,8 +52,6 @@ public class OpenSearchServiceProperties {
         OpenSearchSourceConfigurationField config = new OpenSearchSourceConfigurationField();
         config.pid(mapStringValue(props, SERVICE_PID_KEY));
         config.sourceName(mapStringValue(props, ID));
-        config.address().hostname(mapStringValue(props, SOURCE_HOSTNAME));
-        config.address().port(props.get(PORT) == null ? -1 : (int) props.get(PORT));
         config.endpointUrl(mapStringValue(props, ENDPOINT_URL));
         config.credentials().username(mapStringValue(props, USERNAME));
         config.credentials().password(mapStringValue(props, PASSWORD));

@@ -102,7 +102,7 @@ public class CswSourceUtils {
                     urlField.updatePath(addressField.path());
                     return urlField;
                 })
-                .filter(urlField -> sendCswCapabilitiesRequest(urlField, creds).messages().isEmpty())
+                .filter(urlField -> !sendCswCapabilitiesRequest(urlField, creds).containsErrorMsgs())
                 .map(ReportWithResult::new)
                 .findFirst()
                 .orElse(createDefaultResult(addressField));

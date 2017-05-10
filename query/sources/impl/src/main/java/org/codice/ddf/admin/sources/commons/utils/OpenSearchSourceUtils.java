@@ -148,7 +148,7 @@ public class OpenSearchSourceUtils {
                     urlField.setValue(url);
                     return urlField;
                 })
-                .filter(urlField -> verifyOpenSearchCapabilities(urlField, creds).messages().isEmpty())
+                .filter(urlField -> !verifyOpenSearchCapabilities(urlField, creds).containsErrorMsgs())
                 .map(ReportWithResult::new)
                 .findFirst()
                 .orElse(createDefaultResult(addressField));

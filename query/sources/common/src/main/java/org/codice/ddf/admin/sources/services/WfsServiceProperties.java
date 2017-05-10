@@ -66,8 +66,6 @@ public class WfsServiceProperties {
         WfsSourceConfigurationField wfsConfig = new WfsSourceConfigurationField();
         wfsConfig.pid(mapStringValue(props, SERVICE_PID_KEY));
         wfsConfig.sourceName(mapStringValue(props, ID));
-        wfsConfig.address().hostname(mapStringValue(props, SOURCE_HOSTNAME));
-        wfsConfig.address().port(props.get(PORT) == null ? -1 : (int) props.get(PORT));
         wfsConfig.endpointUrl(mapStringValue(props, WFS_URL));
         wfsConfig.credentials().username(mapStringValue(props, USERNAME));
         wfsConfig.credentials().password(mapStringValue(props, PASSWORD));

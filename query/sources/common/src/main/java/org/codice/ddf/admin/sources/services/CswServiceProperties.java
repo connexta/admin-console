@@ -79,10 +79,6 @@ public class CswServiceProperties {
         CswSourceConfigurationField cswConfig = new CswSourceConfigurationField();
         cswConfig.pid(mapStringValue(props, SERVICE_PID_KEY));
         cswConfig.sourceName(mapStringValue(props, ID));
-        cswConfig.address()
-                .hostname(mapStringValue(props, SOURCE_HOSTNAME));
-        cswConfig.address()
-                .port(props.get(PORT) == null ? -1 : (int) props.get(PORT));
         cswConfig.endpointUrl(mapStringValue(props, CSW_URL));
         cswConfig.credentials()
                 .username(mapStringValue(props, USERNAME));

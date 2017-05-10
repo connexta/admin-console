@@ -23,6 +23,7 @@ import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.configurator.OperationReport
 import org.codice.ddf.admin.sources.commons.SourceMessages
 import org.codice.ddf.admin.sources.fields.CswProfile
+import org.codice.ddf.admin.sources.fields.CswSpatialOperator
 import org.codice.ddf.admin.sources.fields.type.CswSourceConfigurationField
 import spock.lang.Specification
 
@@ -30,13 +31,13 @@ import static org.codice.ddf.admin.sources.SourceTestCommons.*
 
 class SaveCswConfigurationTest extends Specification {
 
-    static TEST_SPATIAL_FILTER = 'testForcedSpatialFeature'
-
     static TEST_OUTPUT_SCHEMA = 'testOutputSchema'
 
     static TEST_CSW_PROFILE = CswProfile.CSW_FEDERATION_PROFILE_SOURCE
 
     static CSW_PROFILE = CswProfile.DEFAULT_FIELD_NAME
+
+    static SPATIAL_OPERATOR = CswSpatialOperator.DEFAULT_FIELD_NAME
 
     static BASE_PATH = [SaveCswConfiguration.ID, BaseAction.ARGUMENT]
 
@@ -49,6 +50,8 @@ class SaveCswConfigurationTest extends Specification {
     static SOURCE_NAME_PATH = [CONFIG_PATH, SOURCE_NAME].flatten()
 
     static CSW_PROFILE_PATH = [CONFIG_PATH, CSW_PROFILE].flatten()
+
+    static SPATIAL_OPERATOR_PATH = [CONFIG_PATH, SPATIAL_OPERATOR].flatten()
 
     Action saveCswConfiguration
 
@@ -255,9 +258,23 @@ class SaveCswConfigurationTest extends Specification {
         report.result() == null
         report.messages().size() == 1
         report.messages().get(0).path == CSW_PROFILE_PATH
-        report.messages().get(0).code == DefaultMessages.MISSING_REQUIRED_FIELD
+        report.messages().get(0).code == DefaultMessages.UNSUPPORTED_ENUM
     }
 
+    def 'test fail to save due to invalid csw spatial operator'() {
+        setup:
+        actionArgs.get(SOURCE_CONFIG).put(SPATIAL_OPERATOR, 'notAValidOperator')
+        saveCswConfiguration.setArguments(actionArgs)
+
+        when:
+        def report = saveCswConfiguration.process()
+
+        then:
+        report.result() == null
+        report.messages().size() == 1
+        report.messages().get(0).path == SPATIAL_OPERATOR_PATH
+        report.messages().get(0).code == DefaultMessages.UNSUPPORTED_ENUM
+    }
 
     def mockReport(boolean hasError) {
         def report = Mock(OperationReport)
@@ -268,8 +285,7 @@ class SaveCswConfigurationTest extends Specification {
     def createCswSaveArgs() {
         refreshSaveConfigActionArgs()
         actionArgs = saveConfigActionArgs
-        actionArgs.get(SOURCE_CONFIG).put(CswSourceConfigurationField.FORCED_SPATIAL_FILTER, TEST_SPATIAL_FILTER)
-        actionArgs.get(SOURCE_CONFIG).put(CswSourceConfigurationField.OUTPUT_SCHEMA, TEST_OUTPUT_SCHEMA)
+        actionArgs.get(SOURCE_CONFIG).put(CswSourceConfigurationField.OUTPUT_SCHEMA_FIELD_NAME, TEST_OUTPUT_SCHEMA)
         actionArgs.get(SOURCE_CONFIG).put(CSW_PROFILE, TEST_CSW_PROFILE)
         return actionArgs
     }

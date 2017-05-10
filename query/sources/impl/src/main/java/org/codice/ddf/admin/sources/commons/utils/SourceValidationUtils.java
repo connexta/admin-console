@@ -46,7 +46,6 @@ public class SourceValidationUtils {
     public static Report validateSourceName(StringField sourceName,
             ConfiguratorFactory configuratorFactory, PidField servicePid) {
         ConfigReader configReader = configuratorFactory.getConfigReader();
-        List<Source> sources = getAllSourceReferences(configuratorFactory);
         Report report = new Report();
 
         if(servicePid != null && servicePid.getValue() != null) {
@@ -57,6 +56,7 @@ public class SourceValidationUtils {
             }
         }
 
+        List<Source> sources = getAllSourceReferences(configuratorFactory);
         boolean matchFound = sources.stream()
                 .map(source -> source.getId())
                 .anyMatch(id -> id.equals(sourceName.getValue()));

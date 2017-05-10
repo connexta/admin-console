@@ -50,8 +50,6 @@ class SourceTestCommons {
 
     static final SOURCE_NAME = SourceConfigUnionField.SOURCE_NAME_FIELD_NAME
 
-    static final FACTORY_PID = 'DELETE ME PLEASE'
-
     static final SOURCE_CONFIG = SourceConfigUnionField.FIELD_NAME
 
     static final ID = 'id'
@@ -121,7 +119,6 @@ class SourceTestCommons {
     static saveConfigActionArgs = [
         (SOURCE_CONFIG): [
             (ENDPOINT_URL): "https://localhost:8993",
-            (FACTORY_PID) : F_PID,
             (SOURCE_NAME) : TEST_SOURCENAME,
             (CREDENTIALS) : [
                 (USERNAME): TEST_USERNAME,
@@ -134,7 +131,6 @@ class SourceTestCommons {
         saveConfigActionArgs = [
             (SOURCE_CONFIG): [
                 (ENDPOINT_URL): "https://localhost:8993",
-                (FACTORY_PID) : F_PID,
                 (SOURCE_NAME) : TEST_SOURCENAME,
                 (CREDENTIALS) : [
                     (USERNAME): TEST_USERNAME,

@@ -13,6 +13,7 @@
  */
 package org.codice.ddf.admin.sources.services;
 
+import static org.codice.ddf.admin.common.services.ServiceCommons.FACTORY_PID_KEY;
 import static org.codice.ddf.admin.common.services.ServiceCommons.SERVICE_PID_KEY;
 
 import java.util.HashMap;
@@ -20,12 +21,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+import org.codice.ddf.admin.sources.fields.WfsVersion;
 import org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField;
 import org.codice.ddf.admin.sources.fields.type.WfsSourceConfigurationField;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableList;
 
 public class WfsServiceProperties {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(WfsServiceProperties.class);
+
     public static final String WFS_URL = "wfsUrl";
 
     public static final String WFS1_FACTORY_PID = "Wfs_v1_0_0_Federated_Source";
@@ -48,6 +57,10 @@ public class WfsServiceProperties {
     public static final Function<Map<String, Object>, SourceConfigUnionField>
             SERVICE_PROPS_TO_WFS_CONFIG = WfsServiceProperties::servicePropsToWfsConfig;
 
+    private static final BiMap<String, String> WFS_VERSION_MAPPING = ImmutableBiMap.of(
+            WfsVersion.WFS_VERSION_1, WFS1_FACTORY_PID,
+            WfsVersion.WFS_VERSION_2, WFS2_FACTORY_PID);
+
     public static WfsSourceConfigurationField servicePropsToWfsConfig(
             Map<String, Object> props) {
         WfsSourceConfigurationField wfsConfig = new WfsSourceConfigurationField();
@@ -58,6 +71,10 @@ public class WfsServiceProperties {
         wfsConfig.endpointUrl(mapStringValue(props, WFS_URL));
         wfsConfig.credentials().username(mapStringValue(props, USERNAME));
         wfsConfig.credentials().password(mapStringValue(props, PASSWORD));
+        try {
+            wfsConfig.wfsVersion(wfsFactoryPidToVersion(mapStringValue(props, FACTORY_PID_KEY)));
+        } catch (IllegalArgumentException ignored) {
+        }
         return wfsConfig;
     }
 
@@ -75,15 +92,22 @@ public class WfsServiceProperties {
         return props;
     }
 
-    public static String resolveWfsFactoryPid(String wfsVersion) {
-        switch (wfsVersion) {
-        case "2.0.0":
-            return WFS2_FACTORY_PID;
-        case "1.0.0":
-            return WFS1_FACTORY_PID;
-        default:
+    public static String wfsVersionToFactoryPid(String wfsVersion) throws IllegalArgumentException {
+        String factoryPid = WFS_VERSION_MAPPING.get(wfsVersion);
+        if(factoryPid == null) {
+            LOGGER.debug("Received invalid wfsVersion [{}]. Valid values are [{}]", wfsVersion, WFS_VERSION_MAPPING.values());
             throw new IllegalArgumentException(String.format("Invalid WFS version [%s].", wfsVersion));
         }
+        return factoryPid;
+    }
+
+    public static String wfsFactoryPidToVersion(String factoryPid) throws IllegalArgumentException {
+        String wfsVersion = WFS_VERSION_MAPPING.inverse().get(factoryPid);
+        if(wfsVersion == null) {
+            LOGGER.debug("Received invalid factoryPid [{}]. Valid values are [{}]", factoryPid, WFS_VERSION_MAPPING.keySet());
+            throw new IllegalArgumentException(String.format("Invalid WFS version [%s].", factoryPid));
+        }
+        return wfsVersion;
     }
 
     private static String mapStringValue(Map<String, Object> props, String key) {

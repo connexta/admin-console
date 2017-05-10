@@ -17,9 +17,10 @@ import java.util.List;
 
 import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
+import org.codice.ddf.admin.common.fields.common.SchemaField;
 import org.codice.ddf.admin.common.fields.common.UrlField;
 import org.codice.ddf.admin.sources.fields.CswProfile;
-import org.codice.ddf.admin.sources.services.CswServiceProperties;
+import org.codice.ddf.admin.sources.fields.CswSpatialOperator;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
@@ -31,15 +32,17 @@ public class CswSourceConfigurationField extends SourceConfigUnionField {
     public static final String DESCRIPTION =
             "Represents a CSW configuration containing properties to be saved.";
 
-    public static final String OUTPUT_SCHEMA = CswServiceProperties.OUTPUT_SCHEMA;
+    public static final String OUTPUT_SCHEMA_FIELD_NAME = "outputSchema";
 
-    public static final String FORCED_SPATIAL_FILTER = CswServiceProperties.FORCE_SPATIAL_FILTER;
+    public static final String EVENT_SERVICE_ADDRESS_FIELD_NAME = "eventServiceAddress";
 
-    public static final String EVENT_SERVICE_ADDRESS = CswServiceProperties.EVENT_SERVICE_ADDRESS;
+    public static final String CSW_PROFILE_FIELD_NAME = CswProfile.DEFAULT_FIELD_NAME;
 
-    private StringField outputSchema;
+    public static final String SPATIAL_OPERATOR_FIELD_NAME = CswSpatialOperator.DEFAULT_FIELD_NAME;
 
-    private StringField forceSpatialFilter;
+    private SchemaField outputSchema;
+
+    private CswSpatialOperator spatialOperator;
 
     private UrlField eventServiceAddress;
 
@@ -54,8 +57,8 @@ public class CswSourceConfigurationField extends SourceConfigUnionField {
         return this;
     }
 
-    public CswSourceConfigurationField forceSpatialFilter(String forceSpatialFilter) {
-        this.forceSpatialFilter.setValue(forceSpatialFilter);
+    public CswSourceConfigurationField spatialOperator(String spatialOperator) {
+        this.spatialOperator.setValue(spatialOperator);
         return this;
     }
 
@@ -81,12 +84,12 @@ public class CswSourceConfigurationField extends SourceConfigUnionField {
         return outputSchema;
     }
 
-    public String forceSpatialFilter() {
-        return forceSpatialFilter.getValue();
+    public String spatialOperator() {
+        return spatialOperator.getValue();
     }
 
-    public StringField forceSpatialFilterField() {
-        return  forceSpatialFilter;
+    public CswSpatialOperator spatialOperatorField() {
+        return spatialOperator;
     }
 
     public String eventServiceAddress() {
@@ -110,28 +113,29 @@ public class CswSourceConfigurationField extends SourceConfigUnionField {
     @Override
     public void initializeFields() {
         super.initializeFields();
-        outputSchema = new StringField(OUTPUT_SCHEMA);
-        forceSpatialFilter = new StringField(FORCED_SPATIAL_FILTER);
-        eventServiceAddress = new UrlField(EVENT_SERVICE_ADDRESS);
+        outputSchema = new SchemaField(OUTPUT_SCHEMA_FIELD_NAME);
+        eventServiceAddress = new UrlField(EVENT_SERVICE_ADDRESS_FIELD_NAME);
         cswProfile = new CswProfile();
+        spatialOperator = new CswSpatialOperator();
     }
 
     @Override
     public List<Field> getFields() {
         return new ImmutableList.Builder<Field>().addAll(super.getFields())
                 .add(outputSchema)
-                .add(forceSpatialFilter)
                 .add(eventServiceAddress)
                 .add(cswProfile)
+                .add(spatialOperator)
                 .build();
     }
 
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add(OUTPUT_SCHEMA, outputSchema())
-                .add(FORCED_SPATIAL_FILTER, forceSpatialFilter())
-                .add(EVENT_SERVICE_ADDRESS, eventServiceAddress())
+                .add(OUTPUT_SCHEMA_FIELD_NAME, outputSchema())
+                .add(EVENT_SERVICE_ADDRESS_FIELD_NAME, eventServiceAddress())
+                .add(CSW_PROFILE_FIELD_NAME, cswProfile())
+                .add(SPATIAL_OPERATOR_FIELD_NAME, spatialOperator())
                 .addValue(super.toString())
                 .toString();
     }

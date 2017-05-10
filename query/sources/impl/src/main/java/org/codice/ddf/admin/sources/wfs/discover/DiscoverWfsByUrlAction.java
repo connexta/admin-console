@@ -14,6 +14,7 @@
 package org.codice.ddf.admin.sources.wfs.discover;
 
 import static org.codice.ddf.admin.sources.commons.SourceActionCommons.createSourceInfoField;
+import static org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField.ENDPOINT_URL_FIELD_NAME;
 
 import java.util.List;
 
@@ -34,6 +35,8 @@ public class DiscoverWfsByUrlAction extends BaseAction<SourceInfoField> {
     public static final String DESCRIPTION =
             "Attempts to discover a WFS source given a URL, and optional username and password.";
 
+    public static final String URL_FIELD_NAME = ENDPOINT_URL_FIELD_NAME;
+
     private UrlField endpointUrl;
 
     private CredentialsField credentialsField;
@@ -42,7 +45,7 @@ public class DiscoverWfsByUrlAction extends BaseAction<SourceInfoField> {
 
     public DiscoverWfsByUrlAction() {
         super(ID, DESCRIPTION, new SourceInfoField());
-        endpointUrl = new UrlField("endpointUrl");
+        endpointUrl = new UrlField(URL_FIELD_NAME);
         credentialsField = new CredentialsField();
         endpointUrl.isRequired(true);
         wfsSourceUtils = new WfsSourceUtils();

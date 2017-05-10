@@ -17,6 +17,7 @@ import static org.codice.ddf.admin.api.fields.Field.FieldBaseType.ENUM;
 import static org.codice.ddf.admin.common.message.DefaultMessages.unsupportedEnum;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.api.action.Message;
@@ -53,19 +54,20 @@ public abstract class BaseEnumField<S> extends BaseField<S> implements EnumField
 
     @Override
     public void setValue(S value) {
-        if(value == null) {
-            enumValue = null;
-        }
-
-        for(Field<S> supportedEnum : getEnumValues()) {
-            if(supportedEnum.getValue().equals(value)) {
-                enumValue = supportedEnum.getValue();
-                return;
-            } else if(supportedEnum.getValue() instanceof String && ((String) supportedEnum.getValue()).equalsIgnoreCase((String) value)) {
-                enumValue = supportedEnum.getValue();
-                return;
+        Optional<S> matchedValue = Optional.empty();
+        if (value != null) {
+            for (Field<S> supportedEnum : getEnumValues()) {
+                if (supportedEnum.getValue().equals(value)) {
+                    matchedValue = Optional.of(supportedEnum.getValue());
+                    break;
+                } else if (supportedEnum.getValue() instanceof String
+                        && ((String) supportedEnum.getValue()).equalsIgnoreCase((String) value)) {
+                    matchedValue = Optional.of(supportedEnum.getValue());
+                    break;
+                }
             }
         }
+        enumValue = matchedValue.orElse(value);
     }
 
     @Override
@@ -77,7 +79,7 @@ public abstract class BaseEnumField<S> extends BaseField<S> implements EnumField
 
         if(getValue() != null) {
             List<S> supportedValues = getEnumValues().stream()
-                    .map(field -> field.getValue())
+                    .map(Field::getValue)
                     .collect(Collectors.toList());
 
             if(!supportedValues.contains(getValue())) {

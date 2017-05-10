@@ -14,6 +14,7 @@
 
 package org.codice.ddf.admin.sources.services;
 
+import static org.codice.ddf.admin.common.services.ServiceCommons.FACTORY_PID_KEY;
 import static org.codice.ddf.admin.common.services.ServiceCommons.SERVICE_PID_KEY;
 import static org.codice.ddf.admin.sources.fields.CswProfile.CSW_FEDERATION_PROFILE_SOURCE;
 import static org.codice.ddf.admin.sources.fields.CswProfile.CSW_SPEC_PROFILE_FEDERATED_SOURCE;
@@ -26,10 +27,16 @@ import java.util.function.Function;
 
 import org.codice.ddf.admin.sources.fields.type.CswSourceConfigurationField;
 import org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableList;
 
 public class CswServiceProperties {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CswServiceProperties.class);
 
     public static final String CSW_URL = "cswUrl";
 
@@ -62,18 +69,31 @@ public class CswServiceProperties {
     public static final Function<Map<String, Object>, SourceConfigUnionField>
             SERVICE_PROPS_TO_CSW_CONFIG = CswServiceProperties::servicePropsToCswConfig;
 
+    private static final BiMap<String, String> CSW_PROFILE_MAPPING = ImmutableBiMap.of(
+            CSW_FEDERATION_PROFILE_SOURCE, CSW_PROFILE_FACTORY_PID,
+            GMD_CSW_ISO_FEDERATED_SOURCE, CSW_GMD_FACTORY_PID,
+            CSW_SPEC_PROFILE_FEDERATED_SOURCE, CSW_SPEC_FACTORY_PID);
+
     public static final CswSourceConfigurationField servicePropsToCswConfig(
             Map<String, Object> props) {
         CswSourceConfigurationField cswConfig = new CswSourceConfigurationField();
         cswConfig.pid(mapStringValue(props, SERVICE_PID_KEY));
         cswConfig.sourceName(mapStringValue(props, ID));
-        cswConfig.address().hostname(mapStringValue(props, SOURCE_HOSTNAME));
-        cswConfig.address().port(props.get(PORT) == null ? -1 : (int) props.get(PORT));
+        cswConfig.address()
+                .hostname(mapStringValue(props, SOURCE_HOSTNAME));
+        cswConfig.address()
+                .port(props.get(PORT) == null ? -1 : (int) props.get(PORT));
         cswConfig.endpointUrl(mapStringValue(props, CSW_URL));
-        cswConfig.credentials().username(mapStringValue(props, USERNAME));
-        cswConfig.credentials().password(mapStringValue(props, PASSWORD));
+        cswConfig.credentials()
+                .username(mapStringValue(props, USERNAME));
+        cswConfig.credentials()
+                .password(mapStringValue(props, PASSWORD));
         cswConfig.outputSchema(mapStringValue(props, OUTPUT_SCHEMA));
-        cswConfig.forceSpatialFilter(mapStringValue(props, FORCE_SPATIAL_FILTER));
+        cswConfig.spatialOperator(mapStringValue(props, FORCE_SPATIAL_FILTER));
+        try {
+            cswConfig.cswProfile(factoryPidToCswProfile(mapStringValue(props, FACTORY_PID_KEY)));
+        } catch (IllegalArgumentException ignored) {
+        }
         return cswConfig;
     }
 
@@ -97,23 +117,33 @@ public class CswServiceProperties {
         if (config.outputSchema() != null) {
             props.put(OUTPUT_SCHEMA, config.outputSchema());
         }
-        if (config.forceSpatialFilter() != null) {
-            props.put(FORCE_SPATIAL_FILTER, config.forceSpatialFilter());
+        if (config.spatialOperator() != null) {
+            props.put(FORCE_SPATIAL_FILTER, config.spatialOperator());
         }
         return props;
     }
 
-    public static String resolveCswFactoryPid(String cswProfile) {
-        switch(cswProfile) {
-        case CSW_FEDERATION_PROFILE_SOURCE:
-            return CSW_PROFILE_FACTORY_PID;
-        case GMD_CSW_ISO_FEDERATED_SOURCE:
-            return CSW_GMD_FACTORY_PID;
-        case CSW_SPEC_PROFILE_FEDERATED_SOURCE:
-            return CSW_SPEC_FACTORY_PID;
-        default:
-            throw new IllegalArgumentException(String.format("Invalid CSW Profile specified [%s].", cswProfile));
+    public static String cswProfileToFactoryPid(String cswProfile) throws IllegalArgumentException {
+        String factoryPid = CSW_PROFILE_MAPPING.get(cswProfile);
+        if (factoryPid == null) {
+            LOGGER.debug("Received invalid cswProfile [{}]. Valid values are [{}]", cswProfile, CSW_PROFILE_MAPPING.values());
+            throw new IllegalArgumentException(String.format(
+                    "Invalid cswProfile mapping specified [%s].",
+                    cswProfile));
         }
+        return factoryPid;
+    }
+
+    public static String factoryPidToCswProfile(String factoryPid) throws IllegalArgumentException {
+        String cswProfile = CSW_PROFILE_MAPPING.inverse()
+                .get(factoryPid);
+        if (cswProfile == null) {
+            LOGGER.debug("Received invalid factoryPid [{}]. Valid values are [{}]", factoryPid, CSW_PROFILE_MAPPING.keySet());
+            throw new IllegalArgumentException(String.format(
+                    "Invalid factoryPid mapping specified [%s].",
+                    factoryPid));
+        }
+        return cswProfile;
     }
 
     private static String mapStringValue(Map<String, Object> props, String key) {

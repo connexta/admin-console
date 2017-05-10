@@ -14,6 +14,7 @@
 package org.codice.ddf.admin.sources.csw.discover;
 
 import static org.codice.ddf.admin.sources.commons.SourceActionCommons.createSourceInfoField;
+import static org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField.ENDPOINT_URL_FIELD_NAME;
 
 import java.util.List;
 
@@ -35,6 +36,8 @@ public class DiscoverCswByUrlAction extends BaseAction<SourceInfoField> {
     public static final String DESCRIPTION =
             "Attempts to discover a CSW source given a URL, and optional username and password.";
 
+    public static final String URL_FIELD_NAME = ENDPOINT_URL_FIELD_NAME;
+
     private UrlField endpointUrl;
 
     private CredentialsField credentialsField;
@@ -44,7 +47,7 @@ public class DiscoverCswByUrlAction extends BaseAction<SourceInfoField> {
     public DiscoverCswByUrlAction() {
         super(ID, DESCRIPTION, new SourceInfoField());
         credentialsField = new CredentialsField();
-        endpointUrl = new UrlField("endpointUrl");
+        endpointUrl = new UrlField(URL_FIELD_NAME);
         endpointUrl.isRequired(true);
         cswSourceUtils = new CswSourceUtils();
     }

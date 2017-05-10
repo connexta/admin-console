@@ -21,7 +21,9 @@ import org.codice.ddf.admin.common.fields.base.ListFieldImpl
 import org.codice.ddf.admin.common.message.DefaultMessages
 import org.codice.ddf.admin.configurator.ConfigReader
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
+import org.codice.ddf.admin.sources.fields.CswProfile
 import org.codice.ddf.admin.sources.fields.SourceInfoField
+import org.codice.ddf.admin.sources.fields.type.CswSourceConfigurationField
 import org.codice.ddf.admin.sources.services.CswServiceProperties
 import spock.lang.Specification
 
@@ -34,6 +36,8 @@ class GetCswConfigsActionTest extends Specification {
     static TEST_URL = "testCswUrl"
 
     static TEST_EVENT_SERVICE_ADDRESS = 'testEventServiceAddress'
+
+    static TEST_FACTORY_PID = CswServiceProperties.CSW_PROFILE_FACTORY_PID
 
     static BASE_PATH = [GetCswConfigsAction.ID, BaseAction.ARGUMENT]
 
@@ -68,14 +72,13 @@ class GetCswConfigsActionTest extends Specification {
         then:
         1 * configReader.getServices(_, _) >> [new TestSource(S_PID_1, true)]
         1 * configReader.getServices(_, _) >> [new TestSource(S_PID_2, false)]
-        1 * configReader.getManagedServiceConfigs(CswServiceProperties.CSW_PROFILE_FACTORY_PID) >> managedServiceConfigs
+        1 * configReader.getManagedServiceConfigs(TEST_FACTORY_PID) >> managedServiceConfigs
         2 * configReader.getManagedServiceConfigs(_ as String) >> [:]
         report.result() != null
         list.getList().size() == 2
         assertConfig(list.getList().get(0), 0, managedServiceConfigs.get(S_PID_1), SOURCE_ID_1, S_PID_1, true)
         assertConfig(list.getList().get(1), 1, managedServiceConfigs.get(S_PID_2), SOURCE_ID_2, S_PID_2, false)
     }
-
     def 'test pid filter returns 1 result'() {
         when:
         getCswConfigsAction.setArguments(actionArgs)
@@ -112,6 +115,7 @@ class GetCswConfigsActionTest extends Specification {
         assert sourceInfo.config().credentials().username() == TEST_USERNAME
         assert sourceInfo.config().sourceName() == sourceName
         assert sourceInfo.config().pid() == pid
+        assert ((CswSourceConfigurationField)sourceInfo.config()).cswProfile() == CswProfile.CSW_FEDERATION_PROFILE_SOURCE
         return true
     }
 
@@ -119,8 +123,10 @@ class GetCswConfigsActionTest extends Specification {
         managedServiceConfigs = baseManagedServiceConfigs
         managedServiceConfigs.get(S_PID_1).put((EVENT_SERVICE_ADDRESS), TEST_EVENT_SERVICE_ADDRESS)
         managedServiceConfigs.get(S_PID_1).put((CswServiceProperties.CSW_URL), TEST_URL)
+        managedServiceConfigs.get(S_PID_1).put(FACTORY_PID_KEY, TEST_FACTORY_PID)
         managedServiceConfigs.get(S_PID_2).put((EVENT_SERVICE_ADDRESS), TEST_EVENT_SERVICE_ADDRESS)
         managedServiceConfigs.get(S_PID_2).put((CswServiceProperties.CSW_URL), TEST_URL)
+        managedServiceConfigs.get(S_PID_2).put(FACTORY_PID_KEY, TEST_FACTORY_PID)
         return managedServiceConfigs
     }
 }

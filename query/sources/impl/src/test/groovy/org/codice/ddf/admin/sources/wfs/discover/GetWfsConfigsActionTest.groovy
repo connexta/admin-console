@@ -22,6 +22,7 @@ import org.codice.ddf.admin.common.message.DefaultMessages
 import org.codice.ddf.admin.configurator.ConfigReader
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.sources.fields.SourceInfoField
+import org.codice.ddf.admin.sources.services.WfsServiceProperties
 import spock.lang.Specification
 
 import static org.codice.ddf.admin.sources.SourceTestCommons.*
@@ -34,15 +35,20 @@ class GetWfsConfigsActionTest extends Specification {
 
     ConfigReader configReader
 
+    static TEST_FACTORY_PID = WfsServiceProperties.WFS1_FACTORY_PID
+
     static BASE_PATH = [GetWfsConfigsAction.ID, BaseAction.ARGUMENT]
 
     static PID_PATH = [BASE_PATH, PID].flatten()
+
+    def managedServiceConfigs
 
     def actionArgs = [
         (PID): S_PID_2
     ]
 
     def setup() {
+        managedServiceConfigs = createWfsManagedServiceConfigs()
         configReader = Mock(ConfigReader)
         configuratorFactory = Mock(ConfiguratorFactory) {
             getConfigReader() >> configReader
@@ -108,5 +114,12 @@ class GetWfsConfigsActionTest extends Specification {
         assert sourceInfo.config().sourceName() == sourceName
         assert sourceInfo.config().pid() == pid
         return true
+    }
+
+    def createWfsManagedServiceConfigs() {
+        managedServiceConfigs = baseManagedServiceConfigs
+        managedServiceConfigs.get(S_PID_1).put(FACTORY_PID_KEY, TEST_FACTORY_PID)
+        managedServiceConfigs.get(S_PID_2).put(FACTORY_PID_KEY, TEST_FACTORY_PID)
+        return managedServiceConfigs
     }
 }

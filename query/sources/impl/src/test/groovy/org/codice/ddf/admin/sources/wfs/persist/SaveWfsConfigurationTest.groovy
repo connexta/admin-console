@@ -43,7 +43,7 @@ class SaveWfsConfigurationTest extends Specification {
 
     static WFS_VERSION_PATH = [CONFIG_PATH, WFS_VERSION].flatten()
 
-    static TEST_WFS_VERSION = '1.0.0'
+    static TEST_WFS_VERSION = WfsVersion.WFS_VERSION_1
 
     Action saveWfsConfiguration
 
@@ -255,7 +255,7 @@ class SaveWfsConfigurationTest extends Specification {
         report.result() == null
         report.messages().size() == 1
         report.messages().get(0).path == WFS_VERSION_PATH
-        report.messages().get(0).code == DefaultMessages.MISSING_REQUIRED_FIELD
+        report.messages().get(0).code == DefaultMessages.UNSUPPORTED_ENUM
     }
 
     def createWfsSaveArgs() {

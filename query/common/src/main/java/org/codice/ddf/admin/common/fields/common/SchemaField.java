@@ -11,15 +11,23 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.sources.fields.type;
+package org.codice.ddf.admin.common.fields.common;
 
-public class OpenSearchSourceConfigurationField extends SourceConfigUnionField {
+import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 
-    private static final String FIELD_TYPE_NAME = "OpenSearchConfiguration";
+public class SchemaField extends StringField {
 
-    private static final String DESCRIPTION = "Represents an OpenSearch configuration containing properties to be saved.";
+    public static final String DEFAULT_FIELD_NAME = "schema";
 
-    public OpenSearchSourceConfigurationField() {
-        super(FIELD_TYPE_NAME, DESCRIPTION);
+    public static final String FIELD_TYPE_NAME = "Schema";
+
+    public static final String DESCRIPTION = "A schema used to validate a source input.";
+
+    public SchemaField() {
+        super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
+    }
+
+    public SchemaField(String fieldName) {
+        super(fieldName, FIELD_TYPE_NAME, DESCRIPTION);
     }
 }

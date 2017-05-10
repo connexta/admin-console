@@ -21,7 +21,7 @@ import static org.codice.ddf.admin.common.services.ServiceCommons.serviceConfigu
 import static org.codice.ddf.admin.common.services.ServiceCommons.updateService;
 import static org.codice.ddf.admin.sources.commons.utils.SourceValidationUtils.validateSourceName;
 import static org.codice.ddf.admin.sources.services.CswServiceProperties.cswConfigToServiceProps;
-import static org.codice.ddf.admin.sources.services.CswServiceProperties.resolveCswFactoryPid;
+import static org.codice.ddf.admin.sources.services.CswServiceProperties.cswProfileToFactoryPid;
 
 import java.util.List;
 
@@ -63,7 +63,7 @@ public class SaveCswConfiguration extends BaseAction<BooleanField> {
     public BooleanField performAction() {
         String factoryPid;
         try {
-            factoryPid = resolveCswFactoryPid(config.cswProfile());
+            factoryPid = cswProfileToFactoryPid(config.cswProfile());
         } catch (IllegalArgumentException e) {
             addArgumentMessage(unsupportedVersionError(config.cswProfileField().path()));
             return new BooleanField(false);

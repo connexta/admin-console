@@ -21,7 +21,9 @@ import org.codice.ddf.admin.common.fields.base.BaseUnionField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 import org.codice.ddf.admin.common.fields.common.AddressField;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
+import org.codice.ddf.admin.common.fields.common.HostnameField;
 import org.codice.ddf.admin.common.fields.common.PidField;
+import org.codice.ddf.admin.common.fields.common.PortField;
 import org.codice.ddf.admin.common.fields.common.UrlField;
 
 import com.google.common.base.MoreObjects;
@@ -141,13 +143,13 @@ public class SourceConfigUnionField extends BaseUnionField {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("pid", pid())
-                .add("sourceName", sourceName())
-                .add("sourcePort", address().port())
-                .add("hostname", address().hostname())
-                .add("endpointUrl", endpointUrl())
-                .add("sourceUserName", credentials().username())
-                .add("sourceUserPassword", "*****")
+                .add(PidField.DEFAULT_FIELD_NAME, pid())
+                .add(SOURCE_NAME_FIELD_NAME, sourceName())
+                .add(PortField.DEFAULT_FIELD_NAME, address().port())
+                .add(HostnameField.DEFAULT_FIELD_NAME, address().hostname())
+                .add(ENDPOINT_URL_FIELD_NAME, endpointUrl())
+                .add(CredentialsField.USERNAME_FIELD_NAME, credentials().username())
+                .add(CredentialsField.PASSWORD_FIELD_NAME, "*****")
                 .toString();
     }
 }

@@ -20,8 +20,8 @@ import static org.codice.ddf.admin.common.services.ServiceCommons.createManagedS
 import static org.codice.ddf.admin.common.services.ServiceCommons.serviceConfigurationExists;
 import static org.codice.ddf.admin.common.services.ServiceCommons.updateService;
 import static org.codice.ddf.admin.sources.commons.utils.SourceValidationUtils.validateSourceName;
-import static org.codice.ddf.admin.sources.services.WfsServiceProperties.resolveWfsFactoryPid;
 import static org.codice.ddf.admin.sources.services.WfsServiceProperties.wfsConfigToServiceProps;
+import static org.codice.ddf.admin.sources.services.WfsServiceProperties.wfsVersionToFactoryPid;
 
 import java.util.List;
 
@@ -63,7 +63,7 @@ public class SaveWfsConfiguration extends BaseAction<BooleanField> {
     public BooleanField performAction() {
         String factoryPid;
         try {
-            factoryPid = resolveWfsFactoryPid(config.wfsVersion());
+            factoryPid = wfsVersionToFactoryPid(config.wfsVersion());
         } catch (IllegalArgumentException e) {
             addArgumentMessage(unsupportedVersionError(config.wfsVersionField().path()));
             return new BooleanField(false);

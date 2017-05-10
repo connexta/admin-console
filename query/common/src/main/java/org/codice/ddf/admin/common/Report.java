@@ -36,7 +36,7 @@ public class Report {
     }
 
     public Report argumentMessages(List<Message> messages) {
-        argumentMessages = messages;
+        argumentMessages.addAll(messages);
         return this;
     }
 
@@ -50,7 +50,7 @@ public class Report {
     }
 
     public Report resultMessages(List<Message> messages) {
-        resultMessages = messages;
+        resultMessages.addAll(messages);
         return this;
     }
 

@@ -69,7 +69,7 @@ import ddf.security.common.audit.SecurityLogger;
 public class ConfiguratorImpl implements Configurator, ConfigReader {
     private static final Logger LOGGER = LoggerFactory.getLogger(ConfiguratorImpl.class);
 
-    private final Map<String, Operation> configHandlers = new LinkedHashMap<>();
+    private final Map<UUID, Operation> configHandlers = new LinkedHashMap<>();
 
     /**
      * Sequentially invokes all the {@link Operation}s, committing their changes. If a failure
@@ -87,7 +87,7 @@ public class ConfiguratorImpl implements Configurator, ConfigReader {
      */
     public OperationReport commit(String auditMessage, String... auditParams) {
         OperationReport report = commit();
-        if (report.isTransactionSucceeded()) {
+        if (report.hasTransactionSucceeded()) {
             SecurityLogger.audit(auditMessage, (Object[]) auditParams);
         }
 
@@ -104,7 +104,7 @@ public class ConfiguratorImpl implements Configurator, ConfigReader {
      */
     public OperationReport commit() {
         OperationReport configReport = new OperationReportImpl();
-        for (Map.Entry<String, Operation> row : configHandlers.entrySet()) {
+        for (Map.Entry<UUID, Operation> row : configHandlers.entrySet()) {
             try {
                 Object commitResult = row.getValue()
                         .commit();
@@ -134,7 +134,7 @@ public class ConfiguratorImpl implements Configurator, ConfigReader {
      * @return a lookup key that can be used to correlate this operation in the
      * final {@link OperationReport}
      */
-    public String startBundle(String bundleSymName) {
+    public UUID startBundle(String bundleSymName) {
         validateString(bundleSymName, "Missing bundle name");
         return registerHandler(BundleOperation.forStart(bundleSymName, getBundleContext()));
     }
@@ -146,7 +146,7 @@ public class ConfiguratorImpl implements Configurator, ConfigReader {
      * @return a lookup key that can be used to correlate this operation in the
      * final {@link OperationReport}
      */
-    public String stopBundle(String bundleSymName) {
+    public UUID stopBundle(String bundleSymName) {
         validateString(bundleSymName, "Missing bundle name");
         return registerHandler(BundleOperation.forStop(bundleSymName, getBundleContext()));
     }
@@ -174,7 +174,7 @@ public class ConfiguratorImpl implements Configurator, ConfigReader {
      * @return a lookup key that can be used to correlate this operation in the
      * final {@link OperationReport}
      */
-    public String startFeature(String featureName) {
+    public UUID startFeature(String featureName) {
         validateString(featureName, "Missing feature name");
         return registerHandler(FeatureOperation.forStart(featureName, getBundleContext()));
     }
@@ -186,7 +186,7 @@ public class ConfiguratorImpl implements Configurator, ConfigReader {
      * @return a lookup key that can be used to correlate this operation in the
      * final {@link OperationReport}
      */
-    public String stopFeature(String featureName) {
+    public UUID stopFeature(String featureName) {
         validateString(featureName, "Missing feature name");
         return registerHandler(FeatureOperation.forStop(featureName, getBundleContext()));
     }
@@ -211,7 +211,7 @@ public class ConfiguratorImpl implements Configurator, ConfigReader {
      * @return a lookup key that can be used to correlate this operation in the
      * final {@link OperationReport}
      */
-    public String createPropertyFile(Path propFile, Map<String, String> properties) {
+    public UUID createPropertyFile(Path propFile, Map<String, String> properties) {
         validatePropertiesPath(propFile);
         validateMap(properties, "Missing properties");
         return registerHandler(PropertyOperation.forCreate(propFile, properties));
@@ -224,7 +224,7 @@ public class ConfiguratorImpl implements Configurator, ConfigReader {
      * @return a lookup key that can be used to correlate this operation in the
      * final {@link OperationReport}
      */
-    public String deletePropertyFile(Path propFile) {
+    public UUID deletePropertyFile(Path propFile) {
         validatePropertiesPath(propFile);
         return registerHandler(PropertyOperation.forDelete(propFile));
     }
@@ -241,7 +241,7 @@ public class ConfiguratorImpl implements Configurator, ConfigReader {
      * @return a lookup key that can be used to correlate this operation in the
      * final {@link OperationReport}
      */
-    public String updatePropertyFile(Path propFile, Map<String, String> properties,
+    public UUID updatePropertyFile(Path propFile, Map<String, String> properties,
             boolean keepIgnored) {
         validatePropertiesPath(propFile);
         validateMap(properties, "Missing properties");
@@ -272,7 +272,7 @@ public class ConfiguratorImpl implements Configurator, ConfigReader {
      * @return a lookup key that can be used to correlate this operation in the
      * final {@link OperationReport}
      */
-    public String updateConfigFile(String configPid, Map<String, Object> configs,
+    public UUID updateConfigFile(String configPid, Map<String, Object> configs,
             boolean keepIgnored) {
         validateString(configPid, "Missing config id");
         validateMap(configs, "Missing configuration properties");
@@ -305,7 +305,7 @@ public class ConfiguratorImpl implements Configurator, ConfigReader {
      * @return a lookup key that can be used to correlate this operation in the
      * final {@link OperationReport}
      */
-    public String createManagedService(String factoryPid, Map<String, Object> configs) {
+    public UUID createManagedService(String factoryPid, Map<String, Object> configs) {
         validateString(factoryPid, "Missing factory id");
         validateMap(configs, "Missing configuration properties");
         return registerHandler(ManagedServiceOperation.forCreate(factoryPid,
@@ -321,7 +321,7 @@ public class ConfiguratorImpl implements Configurator, ConfigReader {
      * @return a lookup key that can be used to correlate this operation in the
      * final {@link OperationReport}
      */
-    public String deleteManagedService(String configPid) {
+    public UUID deleteManagedService(String configPid) {
         validateString(configPid, "Missing config id");
         return registerHandler(ManagedServiceOperation.forDelete(configPid,
                 getConfigAdmin(),
@@ -371,21 +371,20 @@ public class ConfiguratorImpl implements Configurator, ConfigReader {
         }
     }
 
-    private String registerHandler(Operation handler) {
-        String key = UUID.randomUUID()
-                .toString();
+    private UUID registerHandler(Operation handler) {
+        UUID key = UUID.randomUUID();
         configHandlers.put(key, handler);
         return key;
     }
 
-    private void rollback(String failedStep, OperationReport configReport,
+    private void rollback(UUID failedStep, OperationReport configReport,
             ConfiguratorException exception) {
         configReport.putResult(failedStep, ResultImpl.fail(exception));
 
-        Deque<Map.Entry<String, Operation>> undoStack = new ArrayDeque<>();
+        Deque<Map.Entry<UUID, Operation>> undoStack = new ArrayDeque<>();
         boolean skipRest = false;
 
-        for (Map.Entry<String, Operation> row : configHandlers.entrySet()) {
+        for (Map.Entry<UUID, Operation> row : configHandlers.entrySet()) {
             if (failedStep.equals(row.getKey())) {
                 skipRest = true;
             }
@@ -397,7 +396,7 @@ public class ConfiguratorImpl implements Configurator, ConfigReader {
             }
         }
 
-        for (Map.Entry<String, Operation> row : undoStack) {
+        for (Map.Entry<UUID, Operation> row : undoStack) {
             try {
                 row.getValue()
                         .rollback();

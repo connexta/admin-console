@@ -14,15 +14,29 @@
 package org.codice.ddf.admin.configurator;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
+ * Summary report for a {@link Configurator#commit()}.
+ * <p>
  * <b> This code is experimental. While this class is functional and tested, it may change or be
  * removed in a future version of the library. </b>
  */
 public interface OperationReport {
-    boolean isTransactionSucceeded();
+    /**
+     * Indicates if the transaction completed successfully with all tasks committing their changes.
+     *
+     * @return true if the transaction completed; else, false
+     */
+    boolean hasTransactionSucceeded();
 
-    Result getResult(String key);
+    /**
+     * Method to retrieve a specific task result from the report.
+     *
+     * @param key the UUID key returned from an initial setup call for a {@code Configurator} task
+     * @return the result of the task
+     */
+    Result getResult(UUID key);
 
     /**
      * An immutable list of Results that failed.
@@ -32,7 +46,18 @@ public interface OperationReport {
      */
     List<Result> getFailedResults();
 
+    /**
+     * Returns true if any tasks failed, causing failure results.
+     *
+     * @return true if any failures present; else, false
+     */
     boolean containsFailedResults();
 
-    void putResult(String key, Result result);
+    /**
+     * Used internally to populate the report. Clients should not call this method directly.
+     *
+     * @param key    the unique key of an operation
+     * @param result the result of the operation
+     */
+    void putResult(UUID key, Result result);
 }

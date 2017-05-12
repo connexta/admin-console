@@ -11,7 +11,7 @@ import Exception from './containers/exceptions'
 import Ldap from './wizards/ldap'
 import Sources from './wizards/sources'
 import { Home } from './home'
-import Wcpm from './adminTools/webContextPolicyManager'
+import Wcpm from './security/wcpm'
 
 import Banners from 'system-usage/Banners'
 import Modal from 'system-usage/Modal'

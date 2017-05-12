@@ -12,9 +12,9 @@ if (process.env.NODE_ENV === 'production') {
   enhancer = applyMiddleware(client.middleware(), thunk)
 }
 
-const asyncExceptionLoggger = (store) => (next) => async (action) => {
+const exceptionLoggger = (store) => (next) => (action) => {
   try {
-    return await next(action)
+    return next(action)
   } catch (e) {
     console.error(e)
     throw e
@@ -27,7 +27,7 @@ if (process.env.NODE_ENV !== 'production') {
   const debugSession =
     (window.location.href.match(/[?&]debug_session=([^&#]+)\b/) || [])[1]
   enhancer = compose(
-    applyMiddleware(asyncExceptionLoggger, client.middleware(), thunk),
+    applyMiddleware(exceptionLoggger, client.middleware(), thunk),
     DevTools.instrument(),
     persistState(debugSession, fromJS)
   )

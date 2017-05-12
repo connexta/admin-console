@@ -3,8 +3,8 @@ import muiThemeable from 'material-ui/styles/muiThemeable'
 
 import { description } from './styles.less'
 
-const Description = ({ children, muiTheme }) => (
-  <div className={description} style={{ color: muiTheme.palette.textColor }}>{children}</div>
+const Description = ({ children, muiTheme, style = {} }) => (
+  <div className={description} style={{ color: muiTheme.palette.textColor, ...style }}>{children}</div>
 )
 
 export default muiThemeable()(Description)

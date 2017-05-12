@@ -7,7 +7,7 @@ import systemUsage, { submarine as systemUsageSubmarine } from 'system-usage/red
 import polling, { submarine as pollingSubmarine } from 'redux-polling'
 import fetch, { submarine as fetchSubmarine } from 'redux-fetch'
 import wizard, { submarine as wizardSubmarine } from 'admin-wizard/reducer'
-import wcpm, { submarine as wcpmSubmarine } from '../adminTools/webContextPolicyManager/reducer'
+import wcpm, { submarine as wcpmSubmarine } from '../security/wcpm/reducer'
 import sourceWizard, { submarine as sourceSubmarine } from '../wizards/sources/reducer'
 import theme, { submarine as themeSubmarine } from 'admin-app-bar/reducer'
 

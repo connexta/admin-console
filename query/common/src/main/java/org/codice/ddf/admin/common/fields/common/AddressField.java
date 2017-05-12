@@ -10,11 +10,15 @@
  * Lesser General Public License for more details. A copy of the GNU Lesser General Public License
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
- **/
+ */
 package org.codice.ddf.admin.common.fields.common;
 
+import static org.codice.ddf.admin.common.message.DefaultMessages.missingRequiredFieldError;
+
+import java.util.Collections;
 import java.util.List;
 
+import org.codice.ddf.admin.api.action.Message;
 import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
 
@@ -26,47 +30,70 @@ public class AddressField extends BaseObjectField {
 
     public static final String FIELD_TYPE_NAME = "Address";
 
-    public static final String DESCRIPTION = "Represents a url base address.";
+    public static final String DESCRIPTION = "Represents an address given by either a hostname and port or a URL. If no fields are provided"
+            + " then a missing required field error will be given on the URL. If the URL is not provided and only one of the port or hostname are provided"
+            + " then a missing required field error will be returned for the appropriate missing field.";
 
-    private HostnameField hostname;
+    private HostField host;
 
-    private PortField port;
+    private UrlField url;
 
     public AddressField() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
     }
 
     public AddressField hostname(String hostname) {
-        this.hostname.setValue(hostname);
+        host.name(hostname);
         return this;
     }
 
     public AddressField port(int port) {
-        this.port.setValue(port);
+        host.port(port);
         return this;
     }
 
-    public Integer port() {
-        return this.port.getValue();
+    public AddressField url(String url) {
+        this.url.setValue(url);
+        return this;
     }
 
-    public String hostname() {
-        return this.hostname.getValue();
+    public HostField host() {
+        return host;
     }
 
-    public void useDefaultRequired() {
-        hostname.isRequired(true);
-        port.isRequired(true);
+    public String url() {
+        return url.getValue();
+    }
+
+    public UrlField urlField() {
+        return url;
+    }
+
+    @Override
+    public List<Message> validate() {
+        if (url.getValue() == null) {
+            if (host.port() != null && host.name() != null) {
+                return host.validate();
+            }
+            if (host.port() == null && host.name() != null) {
+                return Collections.singletonList(missingRequiredFieldError(host.portField().path()));
+            }
+            if (host.name() == null && host.port() != null) {
+                return Collections.singletonList(missingRequiredFieldError(host.hostnameField().path()));
+            }
+            return Collections.singletonList(missingRequiredFieldError(url.path()));
+        }
+        return url.validate();
     }
 
     @Override
     public List<Field> getFields() {
-        return ImmutableList.of(hostname, port);
+        return ImmutableList.of(host, url);
     }
 
     @Override
     public void initializeFields() {
-        hostname = new HostnameField();
-        port = new PortField();
+        host = new HostField();
+        url = new UrlField();
     }
 }

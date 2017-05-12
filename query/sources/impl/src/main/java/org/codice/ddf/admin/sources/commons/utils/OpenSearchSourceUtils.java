@@ -27,8 +27,8 @@ import javax.xml.xpath.XPathFactory;
 
 import org.codice.ddf.admin.common.Report;
 import org.codice.ddf.admin.common.ReportWithResult;
-import org.codice.ddf.admin.common.fields.common.AddressField;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
+import org.codice.ddf.admin.common.fields.common.HostField;
 import org.codice.ddf.admin.common.fields.common.UrlField;
 import org.codice.ddf.admin.sources.fields.type.OpenSearchSourceConfigurationField;
 import org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField;
@@ -135,28 +135,28 @@ public class OpenSearchSourceUtils {
     /**
      * Attempts to discover an OpenSearch endpoint from the given hostname and port
      *
-     * @param addressField hostname and port to probe for OpenSearch capabilities
+     * @param hostField hostname and port to probe for OpenSearch capabilities
      * @param creds        optional credentials for authentication
      * @return a {@link ReportWithResult} containing the discovered {@link UrlField} on success, or containing {@link org.codice.ddf.admin.common.message.ErrorMessage}s on failure.
      */
-    public ReportWithResult<UrlField> discoverOpenSearchUrl(AddressField addressField, CredentialsField creds) {
+    public ReportWithResult<UrlField> discoverOpenSearchUrl(HostField hostField, CredentialsField creds) {
         return URL_FORMATS.stream()
-                .map(format -> String.format(format, addressField.hostname(), addressField.port()))
+                .map(format -> String.format(format, hostField.name(), hostField.port()))
                 .map(url -> {
-                    UrlField urlField = new UrlField(addressField.fieldName());
-                    urlField.updatePath(addressField.path());
+                    UrlField urlField = new UrlField(hostField.fieldName());
+                    urlField.updatePath(hostField.path());
                     urlField.setValue(url);
                     return urlField;
                 })
                 .filter(urlField -> !verifyOpenSearchCapabilities(urlField, creds).containsErrorMsgs())
                 .map(ReportWithResult::new)
                 .findFirst()
-                .orElse(createDefaultResult(addressField));
+                .orElse(createDefaultResult(hostField));
     }
 
-    private ReportWithResult<UrlField> createDefaultResult(AddressField addressField) {
+    private ReportWithResult<UrlField> createDefaultResult(HostField hostField) {
         ReportWithResult<UrlField> defaultResult = new ReportWithResult<>();
-        defaultResult.argumentMessage(unknownEndpointError(addressField.path()));
+        defaultResult.argumentMessage(unknownEndpointError(hostField.path()));
         return defaultResult;
     }
 }

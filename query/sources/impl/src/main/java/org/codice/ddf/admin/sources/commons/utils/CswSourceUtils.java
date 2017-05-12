@@ -29,8 +29,8 @@ import javax.xml.xpath.XPathFactory;
 
 import org.codice.ddf.admin.common.Report;
 import org.codice.ddf.admin.common.ReportWithResult;
-import org.codice.ddf.admin.common.fields.common.AddressField;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
+import org.codice.ddf.admin.common.fields.common.HostField;
 import org.codice.ddf.admin.common.fields.common.UrlField;
 import org.codice.ddf.admin.sources.fields.type.CswSourceConfigurationField;
 import org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField;
@@ -54,6 +54,10 @@ public class CswSourceUtils {
             "https://%s:%d/csw");
 
     protected static final String GMD_OUTPUT_SCHEMA = "http://www.isotc211.org/2005/gmd";
+
+    protected static final String CSW_202_OUTPUT_SCHEMA = "http://www.opengis.net/cat/csw/2.0.2";
+
+    protected static final String METACARD_OUTPUT_SCHEMA = "urn:catalog:metacard";
 
     private static final String HAS_CATALOG_METACARD_EXP =
             "//ows:OperationsMetadata//ows:Operation[@name='GetRecords']/ows:Parameter[@name='OutputSchema' or @name='outputSchema']/ows:Value/text()='urn:catalog:metacard'";
@@ -89,23 +93,23 @@ public class CswSourceUtils {
     /**
      * Attempts to discover the source from the given hostname and port with optional basic authentication.
      *
-     * @param addressField address to probe for CSW capabilities
+     * @param hostField address to probe for CSW capabilities
      * @param creds        optional credentials for basic authentication
      * @return a {@link ReportWithResult} containing the {@link UrlField} or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
      */
-    public ReportWithResult<UrlField> discoverCswUrl(AddressField addressField, CredentialsField creds) {
+    public ReportWithResult<UrlField> discoverCswUrl(HostField hostField, CredentialsField creds) {
         return URL_FORMATS.stream()
-                .map(format -> String.format(format, addressField.hostname(), addressField.port()))
+                .map(format -> String.format(format, hostField.name(), hostField.port()))
                 .map(url -> {
-                    UrlField urlField = new UrlField(addressField.fieldName());
+                    UrlField urlField = new UrlField(hostField.fieldName());
                     urlField.setValue(url);
-                    urlField.updatePath(addressField.path());
+                    urlField.updatePath(hostField.path());
                     return urlField;
                 })
                 .filter(urlField -> !sendCswCapabilitiesRequest(urlField, creds).containsErrorMsgs())
                 .map(ReportWithResult::new)
                 .findFirst()
-                .orElse(createDefaultResult(addressField));
+                .orElse(createDefaultResult(hostField));
     }
 
     /**
@@ -148,7 +152,8 @@ public class CswSourceUtils {
         try {
             if ((Boolean) xpath.compile(HAS_CATALOG_METACARD_EXP)
                     .evaluate(capabilitiesXml, XPathConstants.BOOLEAN)) {
-                configResult.result(preferred.cswProfile(CSW_FEDERATION_PROFILE_SOURCE));
+                configResult.result(preferred.outputSchema(METACARD_OUTPUT_SCHEMA)
+                        .cswProfile(CSW_FEDERATION_PROFILE_SOURCE));
                 return configResult;
             }
         } catch (Exception e) {
@@ -167,9 +172,9 @@ public class CswSourceUtils {
         }
 
         try {
-            String outputSchema = xpath.compile(GET_FIRST_OUTPUT_SCHEMA)
+            xpath.compile(GET_FIRST_OUTPUT_SCHEMA)
                     .evaluate(capabilitiesXml);
-            configResult.result(preferred.outputSchema(outputSchema)
+            configResult.result(preferred.outputSchema(CSW_202_OUTPUT_SCHEMA)
                     .cswProfile(CSW_SPEC_PROFILE_FEDERATED_SOURCE));
             return configResult;
         } catch (Exception e) {
@@ -182,9 +187,9 @@ public class CswSourceUtils {
         return configResult;
     }
 
-    private ReportWithResult<UrlField> createDefaultResult(AddressField addressField) {
+    private ReportWithResult<UrlField> createDefaultResult(HostField hostField) {
         ReportWithResult<UrlField> defaultResult = new ReportWithResult<>();
-        defaultResult.argumentMessage(unknownEndpointError(addressField.path()));
+        defaultResult.argumentMessage(unknownEndpointError(hostField.path()));
         return defaultResult;
     }
 }

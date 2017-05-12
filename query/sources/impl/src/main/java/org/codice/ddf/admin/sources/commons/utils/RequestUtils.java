@@ -19,15 +19,13 @@ import static org.codice.ddf.admin.common.message.DefaultMessages.cannotConnectE
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.core.Response;
 
 import org.apache.cxf.jaxrs.client.WebClient;
-import org.codice.ddf.admin.api.action.Message;
+import org.codice.ddf.admin.common.Report;
 import org.codice.ddf.admin.common.ReportWithResult;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
 import org.codice.ddf.admin.common.fields.common.UrlField;
@@ -107,10 +105,10 @@ public class RequestUtils {
      * Attempts to open a connection to a URL.
      *
      * @param urlField {@link UrlField} containing the URL to connect to
-     * @return an empty {@code List} on success, or {@link org.codice.ddf.admin.common.message.ErrorMessage}s on failure.
+     * @return a {@link Report} containing no messages on success, or containing {@link org.codice.ddf.admin.common.message.ErrorMessage}s on failure.
      */
-    public List<Message> endpointIsReachable(UrlField urlField) {
-        List<Message> errors = new ArrayList<>();
+    public Report endpointIsReachable(UrlField urlField) {
+        Report report = new Report();
         try {
             URLConnection urlConnection = (new URL(urlField.getValue()).openConnection());
             urlConnection.setConnectTimeout(500);
@@ -118,9 +116,9 @@ public class RequestUtils {
             LOGGER.debug("Successfully reached {}.", urlField);
         } catch (IOException e) {
             LOGGER.debug("Failed to reach {}, returning an error.", urlField, e);
-            errors.add(cannotConnectError(urlField.path()));
+            report.argumentMessage(cannotConnectError(urlField.path()));
         }
-        return errors;
+        return report;
     }
 
     private WebClient generateClient(UrlField url, CredentialsField creds) {

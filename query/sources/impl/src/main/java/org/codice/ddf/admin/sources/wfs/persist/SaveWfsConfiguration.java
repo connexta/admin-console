@@ -61,17 +61,17 @@ public class SaveWfsConfiguration extends BaseAction<BooleanField> {
 
     @Override
     public BooleanField performAction() {
-        String factoryPid;
-        try {
-            factoryPid = wfsVersionToFactoryPid(config.wfsVersion());
-        } catch (IllegalArgumentException e) {
-            addArgumentMessage(unsupportedVersionError(config.wfsVersionField().path()));
-            return new BooleanField(false);
-        }
-
         if (StringUtils.isNotEmpty(pid.getValue())) {
             addMessages(updateService(pid, wfsConfigToServiceProps(config), configuratorFactory));
         } else {
+            String factoryPid;
+            try {
+                factoryPid = wfsVersionToFactoryPid(config.wfsVersion());
+            } catch (IllegalArgumentException e) {
+                addArgumentMessage(unsupportedVersionError(config.wfsVersionField().path()));
+                return new BooleanField(false);
+            }
+
             if(createManagedService(wfsConfigToServiceProps(config), factoryPid, configuratorFactory).containsErrorMsgs()) {
                 addArgumentMessage(failedPersistError(config.path()));
             }

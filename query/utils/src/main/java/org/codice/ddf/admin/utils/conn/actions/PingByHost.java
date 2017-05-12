@@ -18,20 +18,20 @@ import java.util.List;
 import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.common.actions.TestAction;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
-import org.codice.ddf.admin.common.fields.common.AddressField;
+import org.codice.ddf.admin.common.fields.common.HostField;
 
 import com.google.common.collect.ImmutableList;
 
-public class PingByAddress extends TestAction {
+public class PingByHost extends TestAction {
     public static final String NAME = "pingByAddress";
 
-    public static final String DESCRIPTION = "Attempts to reach the given address";
+    public static final String DESCRIPTION = "Attempts to reach the given address.";
 
-    private AddressField address;
+    private HostField address;
 
-    public PingByAddress() {
+    public PingByHost() {
         super(NAME, DESCRIPTION);
-        address = new AddressField();
+        address = new HostField();
     }
 
     @Override

@@ -22,6 +22,8 @@ import org.codice.ddf.admin.common.message.DefaultMessages
 import org.codice.ddf.admin.configurator.ConfigReader
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.sources.fields.SourceInfoField
+import org.codice.ddf.admin.sources.fields.WfsVersion
+import org.codice.ddf.admin.sources.fields.type.WfsSourceConfigurationField
 import org.codice.ddf.admin.sources.services.WfsServiceProperties
 import spock.lang.Specification
 
@@ -35,7 +37,13 @@ class GetWfsConfigsActionTest extends Specification {
 
     ConfigReader configReader
 
-    static TEST_FACTORY_PID = WfsServiceProperties.WFS1_FACTORY_PID
+    static TEST_WFS_VERSION_1 = WfsVersion.WFS_VERSION_1
+
+    static TEST_WFS_VERSION_2 = WfsVersion.WFS_VERSION_2
+
+    static TEST_FACTORY_PID_1 = WfsServiceProperties.WFS1_FACTORY_PID
+
+    static TEST_FACTORY_PID_2 = WfsServiceProperties.WFS2_FACTORY_PID
 
     static BASE_PATH = [GetWfsConfigsAction.ID, BaseAction.ARGUMENT]
 
@@ -60,7 +68,6 @@ class GetWfsConfigsActionTest extends Specification {
         setup:
         configReader.getServices(_, _) >> []
 
-
         when:
         def report = getWfsConfigsAction.process()
         def list = ((ListField)report.result())
@@ -68,12 +75,12 @@ class GetWfsConfigsActionTest extends Specification {
         then:
         1 * configReader.getServices(_, _) >> [new TestSource(S_PID_1, true)]
         1 * configReader.getServices(_, _) >> [new TestSource(S_PID_2, false)]
-        1 * configReader.getManagedServiceConfigs(_ as String) >> baseManagedServiceConfigs
+        1 * configReader.getManagedServiceConfigs(_ as String) >> managedServiceConfigs
         1 * configReader.getManagedServiceConfigs(_ as String) >> [:]
         report.result() != null
         list.getList().size() == 2
-        assertConfig(list.getList().get(0), 0, SOURCE_ID_1, S_PID_1, true)
-        assertConfig(list.getList().get(1), 1, SOURCE_ID_2, S_PID_2, false)
+        assertConfig(list.getList().get(0), 0, SOURCE_ID_1, S_PID_1, true, TEST_WFS_VERSION_1)
+        assertConfig(list.getList().get(1), 1, SOURCE_ID_2, S_PID_2, false, TEST_WFS_VERSION_2)
     }
 
     def 'test pid filter returns 1 result'() {
@@ -87,10 +94,10 @@ class GetWfsConfigsActionTest extends Specification {
         then:
         1 * configReader.getServices(_, _) >> [new TestSource(S_PID_2, false)]
         1 * configReader.getServices(_, _) >> []
-        1 * configReader.getConfig(S_PID_2) >> baseManagedServiceConfigs.get(S_PID_2)
+        1 * configReader.getConfig(S_PID_2) >> managedServiceConfigs.get(S_PID_2)
         report.result() != null
         list.getList().size() == 1
-        assertConfig(list.getList().get(0), 0, SOURCE_ID_2, S_PID_2, false)
+        assertConfig(list.getList().get(0), 0, SOURCE_ID_2, S_PID_2, false, TEST_WFS_VERSION_2)
     }
 
     def 'test failure due to provided but empty pid field'() {
@@ -105,7 +112,7 @@ class GetWfsConfigsActionTest extends Specification {
         report.messages().get(0).path == PID_PATH
     }
 
-    def assertConfig(Field field, int index, String sourceName, String pid, boolean availability) {
+    def assertConfig(Field field, int index, String sourceName, String pid, boolean availability, String wfsVersion) {
         def sourceInfo = (SourceInfoField) field
         assert sourceInfo.fieldName() == ListFieldImpl.INDEX_DELIMETER + index
         assert sourceInfo.isAvailable() == availability
@@ -113,13 +120,14 @@ class GetWfsConfigsActionTest extends Specification {
         assert sourceInfo.config().credentials().username() == TEST_USERNAME
         assert sourceInfo.config().sourceName() == sourceName
         assert sourceInfo.config().pid() == pid
+        assert ((WfsSourceConfigurationField)sourceInfo.config()).wfsVersion() == wfsVersion
         return true
     }
 
     def createWfsManagedServiceConfigs() {
         managedServiceConfigs = baseManagedServiceConfigs
-        managedServiceConfigs.get(S_PID_1).put(FACTORY_PID_KEY, TEST_FACTORY_PID)
-        managedServiceConfigs.get(S_PID_2).put(FACTORY_PID_KEY, TEST_FACTORY_PID)
+        managedServiceConfigs.get(S_PID_1).put(FACTORY_PID_KEY, TEST_FACTORY_PID_1)
+        managedServiceConfigs.get(S_PID_2).put(FACTORY_PID_KEY, TEST_FACTORY_PID_2)
         return managedServiceConfigs
     }
 }

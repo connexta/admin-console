@@ -33,6 +33,7 @@ import com.google.common.collect.ImmutableList;
 
 import graphql.introspection.IntrospectionQuery;
 
+
 public class SchemaGenerator {
 
     public static void main(String[] args) throws IOException, URISyntaxException {

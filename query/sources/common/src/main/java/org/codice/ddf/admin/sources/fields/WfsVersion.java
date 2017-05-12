@@ -30,9 +30,9 @@ public class WfsVersion extends BaseEnumField<String> {
     public static final String DESCRIPTION =
             "The WFS version number specifying the specification version for the client and server to operate with. The version number contains three non-negative integers in the form \"x.y.z\" where y and z shall not exceed 99. Refer to OGC 06-121r3 section 7.3.1 for more information.";
 
-    public static final String WFS_VERSION_1 = "1.0";
+    public static final String WFS_VERSION_1 = "1.0.0";
 
-    public static final String WFS_VERSION_2 = "2.0";
+    public static final String WFS_VERSION_2 = "2.0.0";
 
     public static final String WFS_10_FIELD_NAME = "WFS_10";
 

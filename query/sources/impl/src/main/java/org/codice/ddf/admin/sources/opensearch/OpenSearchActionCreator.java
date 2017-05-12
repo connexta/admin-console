@@ -18,8 +18,7 @@ import java.util.List;
 import org.codice.ddf.admin.api.action.Action;
 import org.codice.ddf.admin.common.actions.BaseActionCreator;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
-import org.codice.ddf.admin.sources.opensearch.discover.DiscoverOpenSearchByAddressAction;
-import org.codice.ddf.admin.sources.opensearch.discover.DiscoverOpenSearchByUrlAction;
+import org.codice.ddf.admin.sources.opensearch.discover.DiscoverOpenSearchAction;
 import org.codice.ddf.admin.sources.opensearch.discover.GetOpenSearchConfigsAction;
 import org.codice.ddf.admin.sources.opensearch.persist.DeleteOpenSearchConfiguration;
 import org.codice.ddf.admin.sources.opensearch.persist.SaveOpenSearchConfiguration;
@@ -43,9 +42,8 @@ public class OpenSearchActionCreator extends BaseActionCreator {
 
     @Override
     public List<Action> getDiscoveryActions() {
-        return ImmutableList.of(new DiscoverOpenSearchByAddressAction(),
-                new GetOpenSearchConfigsAction(configuratorFactory),
-                new DiscoverOpenSearchByUrlAction());
+        return ImmutableList.of(new DiscoverOpenSearchAction(),
+                new GetOpenSearchConfigsAction(configuratorFactory));
     }
 
     @Override

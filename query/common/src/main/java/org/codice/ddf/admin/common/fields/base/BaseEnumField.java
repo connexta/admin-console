@@ -17,8 +17,6 @@ import static org.codice.ddf.admin.api.fields.Field.FieldBaseType.ENUM;
 import static org.codice.ddf.admin.common.message.DefaultMessages.unsupportedEnum;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.api.action.Message;
 import org.codice.ddf.admin.api.fields.EnumField;
@@ -54,39 +52,27 @@ public abstract class BaseEnumField<S> extends BaseField<S> implements EnumField
 
     @Override
     public void setValue(S value) {
-        Optional<S> matchedValue = Optional.empty();
-        if (value != null) {
-            for (Field<S> supportedEnum : getEnumValues()) {
-                if (supportedEnum.getValue().equals(value)) {
-                    matchedValue = Optional.of(supportedEnum.getValue());
-                    break;
-                } else if (supportedEnum.getValue() instanceof String
-                        && ((String) supportedEnum.getValue()).equalsIgnoreCase((String) value)) {
-                    matchedValue = Optional.of(supportedEnum.getValue());
-                    break;
-                }
-            }
+        if(value != null) {
+            enumValue = getEnumValues().stream()
+                    .map(Field::getValue)
+                    .filter(o -> o.equals(value) || (o instanceof String && o.toString()
+                            .equalsIgnoreCase(value.toString())))
+                    .findFirst()
+                    .orElse(value);
         }
-        enumValue = matchedValue.orElse(value);
     }
 
     @Override
     public List<Message> validate() {
         List<Message> validationMsgs = super.validate();
-        if(!validationMsgs.isEmpty()) {
-            return validationMsgs;
-        }
 
-        if(getValue() != null) {
-            List<S> supportedValues = getEnumValues().stream()
+        if(validationMsgs.isEmpty() && getValue() != null) {
+            if (getEnumValues().stream()
                     .map(Field::getValue)
-                    .collect(Collectors.toList());
-
-            if(!supportedValues.contains(getValue())) {
+                    .noneMatch(v -> v.equals(getValue()))) {
                 validationMsgs.add(unsupportedEnum(path()));
             }
         }
-
         return validationMsgs;
     }
 }

@@ -10,7 +10,7 @@
  * Lesser General Public License for more details. A copy of the GNU Lesser General Public License
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
- */
+ **/
 package org.codice.ddf.admin.sources.opensearch.discover;
 
 import static org.codice.ddf.admin.sources.commons.SourceActionCommons.createSourceInfoField;
@@ -29,51 +29,62 @@ import org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField;
 
 import com.google.common.collect.ImmutableList;
 
-public class DiscoverOpenSearchByAddressAction extends BaseAction<SourceInfoField> {
+public class DiscoverOpenSearchAction extends BaseAction<SourceInfoField> {
 
-    public static final String ID = "discoverOpenSearchByAddress";
+    public static final String ID = "discoverOpenSearch";
 
     public static final String DESCRIPTION =
-            "Attempts to discover OpenSearch sources with the given hostname and port, and optionally a username and password if authentication is enabled.";
+            "Attempts to discover an OpenSearch source using the given hostname "
+                    + "and port or URL. Either the hostname and port are required, or the URL is required. If both sets "
+                    + "are provided, then the discovery will be attempted with the URL. If no arguments are given, "
+                    + "then a missing required field error on the URL field will be returned.";
 
-    private AddressField addressField;
+    private CredentialsField credentials;
 
-    private CredentialsField credentialsField;
+    private AddressField address;
 
     private OpenSearchSourceUtils openSearchSourceUtils;
 
-    public DiscoverOpenSearchByAddressAction() {
+    public DiscoverOpenSearchAction() {
         super(ID, DESCRIPTION, new SourceInfoField());
+        credentials = new CredentialsField();
+        address = new AddressField();
+        address.isRequired(true);
         openSearchSourceUtils = new OpenSearchSourceUtils();
-        addressField = new AddressField();
-        credentialsField = new CredentialsField();
-        addressField.useDefaultRequired();
     }
 
-    public DiscoverOpenSearchByAddressAction(OpenSearchSourceUtils openSearchSourceUtils) {
+    public DiscoverOpenSearchAction(OpenSearchSourceUtils openSearchSourceUtils) {
         this();
         this.openSearchSourceUtils = openSearchSourceUtils;
     }
 
     @Override
     public SourceInfoField performAction() {
-        ReportWithResult<UrlField> discoveredUrl = openSearchSourceUtils.discoverOpenSearchUrl(addressField, credentialsField);
-        addMessages(discoveredUrl);
-        if(containsErrorMsgs()) {
-            return null;
-        }
+        ReportWithResult<SourceConfigUnionField> configResult;
+        if (address.url() != null) {
+            configResult = openSearchSourceUtils.getOpenSearchConfig(address.urlField(), credentials);
+            addMessages(configResult);
+            if (containsErrorMsgs()) {
+                return null;
+            }
+        } else {
+            ReportWithResult<UrlField> discoveredUrl = openSearchSourceUtils.discoverOpenSearchUrl(address.host(), credentials);
+            addMessages(discoveredUrl);
+            if (containsErrorMsgs()) {
+                return null;
+            }
 
-        ReportWithResult<SourceConfigUnionField> configResult = openSearchSourceUtils.getOpenSearchConfig(discoveredUrl.result(), credentialsField);
-        addMessages(configResult);
-        if(containsErrorMsgs()) {
-            return null;
+            configResult = openSearchSourceUtils.getOpenSearchConfig(discoveredUrl.result(), credentials);
+            addMessages(configResult);
+            if (containsErrorMsgs()) {
+                return null;
+            }
         }
-
         return createSourceInfoField(true, configResult.result());
     }
 
     @Override
     public List<Field> getArguments() {
-        return ImmutableList.of(addressField, credentialsField);
+        return ImmutableList.of(credentials, address);
     }
 }

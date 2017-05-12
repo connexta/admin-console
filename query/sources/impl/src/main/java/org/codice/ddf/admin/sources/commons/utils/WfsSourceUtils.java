@@ -26,8 +26,8 @@ import javax.xml.xpath.XPathFactory;
 
 import org.codice.ddf.admin.common.Report;
 import org.codice.ddf.admin.common.ReportWithResult;
-import org.codice.ddf.admin.common.fields.common.AddressField;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
+import org.codice.ddf.admin.common.fields.common.HostField;
 import org.codice.ddf.admin.common.fields.common.UrlField;
 import org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField;
 import org.codice.ddf.admin.sources.fields.type.WfsSourceConfigurationField;
@@ -80,23 +80,23 @@ public class WfsSourceUtils {
     /**
      * Attempts to discover a WFS endpoint at a given hostname and port
      *
-     * @param addressField address to probe for WFS capabilities
+     * @param hostField address to probe for WFS capabilities
      * @param creds        optional username to add to Basic Auth header
      * @return a {@link ReportWithResult} containing the {@link UrlField} or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
      */
-    public ReportWithResult<UrlField> discoverWfsUrl(AddressField addressField, CredentialsField creds) {
+    public ReportWithResult<UrlField> discoverWfsUrl(HostField hostField, CredentialsField creds) {
         return URL_FORMATS.stream()
-                .map(format -> String.format(format, addressField.hostname(), addressField.port()))
+                .map(format -> String.format(format, hostField.name(), hostField.port()))
                 .map(url -> {
-                    UrlField urlField = new UrlField(addressField.fieldName());
-                    urlField.updatePath(addressField.path());
+                    UrlField urlField = new UrlField(hostField.fieldName());
+                    urlField.updatePath(hostField.path());
                     urlField.setValue(url);
                     return urlField;
                 })
                 .filter(urlField -> !sendWfsCapabilitiesRequest(urlField, creds).containsErrorMsgs())
                 .map(ReportWithResult::new)
                 .findFirst()
-                .orElse(createDefaultResult(addressField));
+                .orElse(createDefaultResult(hostField));
     }
 
     /**
@@ -152,9 +152,9 @@ public class WfsSourceUtils {
         return configResult;
     }
 
-    private ReportWithResult<UrlField> createDefaultResult(AddressField addressField) {
+    private ReportWithResult<UrlField> createDefaultResult(HostField hostField) {
         ReportWithResult<UrlField> defaultResult = new ReportWithResult<>();
-        defaultResult.argumentMessage(unknownEndpointError(addressField.path()));
+        defaultResult.argumentMessage(unknownEndpointError(hostField.path()));
         return defaultResult;
     }
 }

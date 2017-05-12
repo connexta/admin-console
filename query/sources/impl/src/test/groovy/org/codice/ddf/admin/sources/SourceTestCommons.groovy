@@ -34,13 +34,15 @@ class SourceTestCommons {
 
     static final PASSWORD = CredentialsField.PASSWORD_FIELD_NAME
 
+    static final HOST = HostField.DEFAULT_FIELD_NAME
+
     static final ADDRESS = AddressField.DEFAULT_FIELD_NAME
 
     static final PORT = PortField.DEFAULT_FIELD_NAME
 
     static final HOSTNAME = HostnameField.DEFAULT_FIELD_NAME
 
-    static final URL = UrlField.DEFAULT_FIELD_NAME
+    static final URL_NAME = UrlField.DEFAULT_FIELD_NAME
 
     static final PID = PidField.DEFAULT_FIELD_NAME
 
@@ -73,21 +75,25 @@ class SourceTestCommons {
     static TEST_SOURCENAME = "testSourceName"
 
     static discoverByAddressActionArgs = [
-        (ADDRESS)    : [
-            (PORT)    : 8993,
-            (HOSTNAME): "localhost"
+        (ADDRESS): [
+            (HOST)       : [
+                (PORT)    : 8993,
+                (HOSTNAME): "localhost"
+            ]
         ],
         (CREDENTIALS): [
-            (USERNAME): TEST_USERNAME,
-            (PASSWORD): TEST_PASSWORD
+                (USERNAME): TEST_USERNAME,
+                (PASSWORD): TEST_PASSWORD
         ]
     ]
 
     static discoverByUrlActionArgs = [
-        (ENDPOINT_URL): "http://localhost:8993/sevices/csw",
-        (CREDENTIALS) : [
-            (USERNAME): TEST_USERNAME,
-            (PASSWORD): TEST_PASSWORD
+        (ADDRESS) : [
+            (URL_NAME)   : "http://localhost:8993/sevices/csw",
+        ],
+        (CREDENTIALS): [
+                (USERNAME): TEST_USERNAME,
+                (PASSWORD): TEST_PASSWORD
         ]
     ]
 
@@ -142,23 +148,27 @@ class SourceTestCommons {
 
     static refreshDiscoverByAddressActionArgs() {
         discoverByAddressActionArgs = [
-            (ADDRESS)    : [
-                (PORT)    : 8993,
-                (HOSTNAME): "localhost"
+            (ADDRESS): [
+                (HOST)       : [
+                    (PORT)    : 8993,
+                    (HOSTNAME): "localhost"
+                ]
             ],
             (CREDENTIALS): [
-                (USERNAME): TEST_USERNAME,
-                (PASSWORD): TEST_PASSWORD
+                    (USERNAME): TEST_USERNAME,
+                    (PASSWORD): TEST_PASSWORD
             ]
         ]
     }
 
     static refreshDiscoverByUrlActionArgs() {
         discoverByUrlActionArgs = [
-            (ENDPOINT_URL): "http://localhost:8993/sevices/csw",
-            (CREDENTIALS) : [
-                (USERNAME): TEST_USERNAME,
-                (PASSWORD): TEST_PASSWORD
+            (ADDRESS) : [
+                (URL_NAME)   : "http://localhost:8993/sevices/csw"
+            ],
+            (CREDENTIALS): [
+                    (USERNAME): TEST_USERNAME,
+                    (PASSWORD): TEST_PASSWORD
             ]
         ]
     }

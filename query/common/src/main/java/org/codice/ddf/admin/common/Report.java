@@ -15,10 +15,11 @@ package org.codice.ddf.admin.common;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.apache.commons.collections.ListUtils;
 import org.codice.ddf.admin.api.action.Message;
+
+import com.google.common.collect.ImmutableList;
 
 public class Report {
 
@@ -32,7 +33,7 @@ public class Report {
     }
 
     public List<Message> argumentMessages() {
-        return argumentMessages;
+        return ImmutableList.copyOf(argumentMessages);
     }
 
     public Report argumentMessages(List<Message> messages) {
@@ -46,7 +47,7 @@ public class Report {
     }
 
     public List<Message> resultMessages() {
-        return resultMessages;
+        return ImmutableList.copyOf(resultMessages);
     }
 
     public Report resultMessages(List<Message> messages) {
@@ -64,14 +65,12 @@ public class Report {
     }
 
     public Report addMessages(Report report) {
-        resultMessages(report.resultMessages());
-        return argumentMessages(report.argumentMessages());
+        return resultMessages(report.resultMessages()).argumentMessages(report.argumentMessages());
     }
 
     public boolean containsErrorMsgs() {
-        return !messages().stream()
-                .filter(message -> message.getType() == Message.MessageType.ERROR)
-                .collect(Collectors.toList())
-                .isEmpty();
+        return messages().stream()
+                .map(Message::getType)
+                .anyMatch(Message.MessageType.ERROR::equals);
     }
 }

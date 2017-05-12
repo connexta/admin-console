@@ -10,7 +10,7 @@
  * Lesser General Public License for more details. A copy of the GNU Lesser General Public License
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
- */
+ **/
 package org.codice.ddf.admin.sources.wfs.discover;
 
 import static org.codice.ddf.admin.sources.commons.SourceActionCommons.createSourceInfoField;
@@ -29,51 +29,62 @@ import org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField;
 
 import com.google.common.collect.ImmutableList;
 
-public class DiscoverWfsByAddressAction extends BaseAction<SourceInfoField> {
+public class DiscoverWfsAction extends BaseAction<SourceInfoField> {
 
-    public static final String ID = "discoverWfsByAddress";
+    public static final String ID = "discoverWfs";
 
     public static final String DESCRIPTION =
-            "Attempts to discover WFS sources with the given hostname and port, and optionally a username and password if authentication is enabled.";
+            "Attempts to discover a WFS source using the given hostname "
+                    + "and port or URL. Either the hostname and port are required, or the URL is required. If both sets "
+                    + "are provided, then the discovery will be attempted with the URL. If no arguments are given, "
+                    + "then a missing required field error on the URL field will be returned.";
 
-    private AddressField addressField;
+    private CredentialsField credentials;
 
-    private CredentialsField credentialsField;
+    private AddressField address;
 
     private WfsSourceUtils wfsSourceUtils;
 
-    public DiscoverWfsByAddressAction() {
+    public DiscoverWfsAction() {
         super(ID, DESCRIPTION, new SourceInfoField());
+        credentials = new CredentialsField();
+        address = new AddressField();
+        address.isRequired(true);
         wfsSourceUtils = new WfsSourceUtils();
-        addressField = new AddressField();
-        credentialsField = new CredentialsField();
-        addressField.useDefaultRequired();
     }
 
-    public DiscoverWfsByAddressAction(WfsSourceUtils wfsSourceUtils) {
+    public DiscoverWfsAction(WfsSourceUtils wfsSourceUtils) {
         this();
         this.wfsSourceUtils = wfsSourceUtils;
     }
 
     @Override
     public SourceInfoField performAction() {
-        ReportWithResult<UrlField> discoveredUrl = wfsSourceUtils.discoverWfsUrl(addressField, credentialsField);
-        addMessages(discoveredUrl);
-        if(containsErrorMsgs()) {
-            return null;
-        }
+        ReportWithResult<SourceConfigUnionField> configResult;
+        if (address.url() != null) {
+            configResult = wfsSourceUtils.getPreferredWfsConfig(address.urlField(), credentials);
+            addMessages(configResult);
+            if (containsErrorMsgs()) {
+                return null;
+            }
+        } else {
+            ReportWithResult<UrlField> discoveredUrl = wfsSourceUtils.discoverWfsUrl(address.host(), credentials);
+            addMessages(discoveredUrl);
+            if (containsErrorMsgs()) {
+                return null;
+            }
 
-        ReportWithResult<SourceConfigUnionField> configResult = wfsSourceUtils.getPreferredWfsConfig(discoveredUrl.result(), credentialsField);
-        addMessages(configResult);
-        if(containsErrorMsgs()) {
-            return null;
+            configResult = wfsSourceUtils.getPreferredWfsConfig(discoveredUrl.result(), credentials);
+            addMessages(configResult);
+            if (containsErrorMsgs()) {
+                return null;
+            }
         }
-
         return createSourceInfoField(true, configResult.result());
     }
 
     @Override
     public List<Field> getArguments() {
-        return ImmutableList.of(addressField, credentialsField);
+        return ImmutableList.of(credentials, address);
     }
 }

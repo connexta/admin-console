@@ -22,11 +22,16 @@ import org.codice.ddf.admin.common.message.DefaultMessages
 import org.codice.ddf.admin.configurator.ConfigReader
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.sources.fields.SourceInfoField
+import org.codice.ddf.admin.sources.services.OpenSearchServiceProperties
 import spock.lang.Specification
 
 import static org.codice.ddf.admin.sources.SourceTestCommons.*
 
 class GetOpenSearchConfigsActionTest extends Specification {
+
+    static SHORT_NAME = OpenSearchServiceProperties.SHORTNAME
+
+    static TEST_SHORT_NAME = "openSearchSource"
 
     static BASE_PATH = [GetOpenSearchConfigsAction.ID, BaseAction.ARGUMENT]
 
@@ -38,11 +43,14 @@ class GetOpenSearchConfigsActionTest extends Specification {
 
     ConfigReader configReader
 
+    def managedServiceConfigs
+
     def actionArgs = [
         (PID): S_PID_2
     ]
 
     def setup() {
+        managedServiceConfigs = createOpenSearchManagedServiceConfigs()
         configReader = Mock(ConfigReader)
         configuratorFactory = Mock(ConfiguratorFactory) {
             getConfigReader() >> configReader
@@ -61,8 +69,8 @@ class GetOpenSearchConfigsActionTest extends Specification {
         1 * configReader.getManagedServiceConfigs(_ as String) >> baseManagedServiceConfigs
         report.result() != null
         list.getList().size() == 2
-        assertConfig(list.getList().get(0), 0, SOURCE_ID_1, S_PID_1, true)
-        assertConfig(list.getList().get(1), 1, SOURCE_ID_2, S_PID_2, false)
+        assertConfig(list.getList().get(0), 0, TEST_SHORT_NAME, S_PID_1, true)
+        assertConfig(list.getList().get(1), 1, TEST_SHORT_NAME, S_PID_2, false)
     }
 
     def 'test pid filter returns 1 result'() {
@@ -79,7 +87,7 @@ class GetOpenSearchConfigsActionTest extends Specification {
         1 * configReader.getConfig(S_PID_2) >> baseManagedServiceConfigs.get(S_PID_2)
         report.result() != null
         list.getList().size() == 1
-        assertConfig(list.getList().get(0), 0, SOURCE_ID_2, S_PID_2, false)
+        assertConfig(list.getList().get(0), 0, TEST_SHORT_NAME, S_PID_2, false)
     }
 
     def 'test failure due to provided but empty pid field'() {
@@ -92,6 +100,13 @@ class GetOpenSearchConfigsActionTest extends Specification {
         report.messages().size() == 1
         report.messages().get(0).code == DefaultMessages.EMPTY_FIELD
         report.messages().get(0).path == SERVICE_PID_PATH
+    }
+
+    def createOpenSearchManagedServiceConfigs() {
+        managedServiceConfigs = baseManagedServiceConfigs
+        managedServiceConfigs.get(S_PID_1).put(SHORT_NAME, TEST_SHORT_NAME)
+        managedServiceConfigs.get(S_PID_2).put(SHORT_NAME, TEST_SHORT_NAME)
+        return managedServiceConfigs
     }
 
     def assertConfig(Field field, int index, String sourceName, String pid, boolean availability) {

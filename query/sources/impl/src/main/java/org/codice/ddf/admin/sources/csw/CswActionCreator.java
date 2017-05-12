@@ -18,8 +18,7 @@ import java.util.List;
 import org.codice.ddf.admin.api.action.Action;
 import org.codice.ddf.admin.common.actions.BaseActionCreator;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
-import org.codice.ddf.admin.sources.csw.discover.DiscoverCswByAddressAction;
-import org.codice.ddf.admin.sources.csw.discover.DiscoverCswByUrlAction;
+import org.codice.ddf.admin.sources.csw.discover.DiscoverCswAction;
 import org.codice.ddf.admin.sources.csw.discover.GetCswConfigsAction;
 import org.codice.ddf.admin.sources.csw.persist.DeleteCswConfiguration;
 import org.codice.ddf.admin.sources.csw.persist.SaveCswConfiguration;
@@ -45,9 +44,8 @@ public class CswActionCreator extends BaseActionCreator {
 
     @Override
     public List<Action> getDiscoveryActions() {
-        return ImmutableList.of(new DiscoverCswByAddressAction(),
-                new GetCswConfigsAction(configuratorFactory),
-                new DiscoverCswByUrlAction());
+        return ImmutableList.of(new GetCswConfigsAction(configuratorFactory),
+                new DiscoverCswAction());
     }
 
     @Override

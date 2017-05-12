@@ -18,8 +18,7 @@ import java.util.List;
 import org.codice.ddf.admin.api.action.Action;
 import org.codice.ddf.admin.common.actions.BaseActionCreator;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
-import org.codice.ddf.admin.sources.wfs.discover.DiscoverWfsByAddressAction;
-import org.codice.ddf.admin.sources.wfs.discover.DiscoverWfsByUrlAction;
+import org.codice.ddf.admin.sources.wfs.discover.DiscoverWfsAction;
 import org.codice.ddf.admin.sources.wfs.discover.GetWfsConfigsAction;
 import org.codice.ddf.admin.sources.wfs.persist.DeleteWfsConfiguration;
 import org.codice.ddf.admin.sources.wfs.persist.SaveWfsConfiguration;
@@ -44,9 +43,8 @@ public class WfsActionCreator extends BaseActionCreator {
 
     @Override
     public List<Action> getDiscoveryActions() {
-        return ImmutableList.of(new DiscoverWfsByAddressAction(),
-                new GetWfsConfigsAction(configuratorFactory),
-                new DiscoverWfsByUrlAction());
+        return ImmutableList.of(new DiscoverWfsAction(),
+                new GetWfsConfigsAction(configuratorFactory));
     }
 
     @Override

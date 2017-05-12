@@ -29,52 +29,62 @@ import org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField;
 
 import com.google.common.collect.ImmutableList;
 
-public class DiscoverCswByAddressAction extends BaseAction<SourceInfoField> {
+public class DiscoverCswAction extends BaseAction<SourceInfoField> {
 
-    public static final String ID = "discoverCswByAddress";
+    public static final String ID = "discoverCsw";
 
     public static final String DESCRIPTION =
-            "Attempts to discover CSW sources with the given hostname and port, and optionally a username and password if authentication is enabled.";
+            "Attempts to discover a CSW source using the given hostname "
+                    + "and port or URL. Either the hostname and port are required, or the URL is required. If both sets "
+                    + "are provided, then the discovery will be attempted with the URL. If no arguments are given, "
+                    + "then a missing required field error on the URL field will be returned.";
 
-    private AddressField addressField;
+    private CredentialsField credentials;
 
-    private CredentialsField credentialsField;
+    private AddressField address;
 
     private CswSourceUtils cswSourceUtils;
 
-    public DiscoverCswByAddressAction() {
+    public DiscoverCswAction() {
         super(ID, DESCRIPTION, new SourceInfoField());
-        credentialsField = new CredentialsField();
-        addressField = new AddressField();
-        addressField.useDefaultRequired();
+        credentials = new CredentialsField();
+        address = new AddressField();
+        address.isRequired(true);
         cswSourceUtils = new CswSourceUtils();
     }
 
-    public DiscoverCswByAddressAction(CswSourceUtils cswSourceUtils) {
+    public DiscoverCswAction(CswSourceUtils cswSourceUtils) {
         this();
         this.cswSourceUtils = cswSourceUtils;
-
     }
 
     @Override
     public SourceInfoField performAction() {
-        ReportWithResult<UrlField> discoveredUrl = cswSourceUtils.discoverCswUrl(addressField, credentialsField);
-        addMessages(discoveredUrl);
-        if(containsErrorMsgs()) {
-            return null;
-        }
+        ReportWithResult<SourceConfigUnionField> configResult;
+        if (address.url() != null) {
+            configResult = cswSourceUtils.getPreferredCswConfig(address.urlField(), credentials);
+            addMessages(configResult);
+            if (containsErrorMsgs()) {
+                return null;
+            }
+        } else {
+            ReportWithResult<UrlField> discoveredUrl = cswSourceUtils.discoverCswUrl(address.host(), credentials);
+            addMessages(discoveredUrl);
+            if (containsErrorMsgs()) {
+                return null;
+            }
 
-        ReportWithResult<SourceConfigUnionField> configResult = cswSourceUtils.getPreferredCswConfig(discoveredUrl.result(), credentialsField);
-        addMessages(configResult);
-        if(containsErrorMsgs()) {
-            return null;
+            configResult = cswSourceUtils.getPreferredCswConfig(discoveredUrl.result(), credentials);
+            addMessages(configResult);
+            if (containsErrorMsgs()) {
+                return null;
+            }
         }
-
         return createSourceInfoField(true, configResult.result());
     }
 
     @Override
     public List<Field> getArguments() {
-        return ImmutableList.of(addressField, credentialsField);
+        return ImmutableList.of(credentials, address);
     }
 }

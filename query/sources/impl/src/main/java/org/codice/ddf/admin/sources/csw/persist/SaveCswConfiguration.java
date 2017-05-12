@@ -61,17 +61,17 @@ public class SaveCswConfiguration extends BaseAction<BooleanField> {
 
     @Override
     public BooleanField performAction() {
-        String factoryPid;
-        try {
-            factoryPid = cswProfileToFactoryPid(config.cswProfile());
-        } catch (IllegalArgumentException e) {
-            addArgumentMessage(unsupportedVersionError(config.cswProfileField().path()));
-            return new BooleanField(false);
-        }
-
         if (StringUtils.isNotEmpty(pid.getValue())) {
             addMessages(updateService(pid, cswConfigToServiceProps(config), configuratorFactory));
         } else {
+            String factoryPid;
+            try {
+                factoryPid = cswProfileToFactoryPid(config.cswProfile());
+            } catch (IllegalArgumentException e) {
+                addArgumentMessage(unsupportedVersionError(config.cswProfileField().path()));
+                return new BooleanField(false);
+            }
+
             if (createManagedService(cswConfigToServiceProps(config), factoryPid, configuratorFactory).containsErrorMsgs()) {
                 addArgumentMessage(failedPersistError(config.path()));
             }

@@ -17,7 +17,7 @@ import java.util.List;
 
 import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
-import org.codice.ddf.admin.common.fields.common.SchemaField;
+import org.codice.ddf.admin.sources.fields.CswOutputSchemaField;
 import org.codice.ddf.admin.common.fields.common.UrlField;
 import org.codice.ddf.admin.sources.fields.CswProfile;
 import org.codice.ddf.admin.sources.fields.CswSpatialOperator;
@@ -32,7 +32,7 @@ public class CswSourceConfigurationField extends SourceConfigUnionField {
     public static final String DESCRIPTION =
             "Represents a CSW configuration containing properties to be saved.";
 
-    public static final String OUTPUT_SCHEMA_FIELD_NAME = "outputSchema";
+    public static final String OUTPUT_SCHEMA_FIELD_NAME = CswOutputSchemaField.DEFAULT_FIELD_NAME;
 
     public static final String EVENT_SERVICE_ADDRESS_FIELD_NAME = "eventServiceAddress";
 
@@ -40,7 +40,7 @@ public class CswSourceConfigurationField extends SourceConfigUnionField {
 
     public static final String SPATIAL_OPERATOR_FIELD_NAME = CswSpatialOperator.DEFAULT_FIELD_NAME;
 
-    private SchemaField outputSchema;
+    private CswOutputSchemaField outputSchema;
 
     private CswSpatialOperator spatialOperator;
 
@@ -100,7 +100,7 @@ public class CswSourceConfigurationField extends SourceConfigUnionField {
         return cswProfile.getValue();
     }
 
-    public UrlField getEventServiceAddressField() {
+    public UrlField eventServiceAddressField() {
         return eventServiceAddress;
     }
 
@@ -113,7 +113,7 @@ public class CswSourceConfigurationField extends SourceConfigUnionField {
     @Override
     public void initializeFields() {
         super.initializeFields();
-        outputSchema = new SchemaField(OUTPUT_SCHEMA_FIELD_NAME);
+        outputSchema = new CswOutputSchemaField(OUTPUT_SCHEMA_FIELD_NAME);
         eventServiceAddress = new UrlField(EVENT_SERVICE_ADDRESS_FIELD_NAME);
         cswProfile = new CswProfile();
         spatialOperator = new CswSpatialOperator();

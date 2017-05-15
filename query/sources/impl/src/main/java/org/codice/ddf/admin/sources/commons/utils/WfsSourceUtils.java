@@ -96,7 +96,7 @@ public class WfsSourceUtils {
                 .filter(urlField -> !sendWfsCapabilitiesRequest(urlField, creds).containsErrorMsgs())
                 .map(ReportWithResult::new)
                 .findFirst()
-                .orElse(createDefaultResult(hostField));
+                .orElse(new ReportWithResult<UrlField>().argumentMessage(unknownEndpointError(hostField.path())));
     }
 
     /**
@@ -150,11 +150,5 @@ public class WfsSourceUtils {
             configResult.argumentMessage(unknownEndpointError(urlField.path()));
         }
         return configResult;
-    }
-
-    private ReportWithResult<UrlField> createDefaultResult(HostField hostField) {
-        ReportWithResult<UrlField> defaultResult = new ReportWithResult<>();
-        defaultResult.argumentMessage(unknownEndpointError(hostField.path()));
-        return defaultResult;
     }
 }

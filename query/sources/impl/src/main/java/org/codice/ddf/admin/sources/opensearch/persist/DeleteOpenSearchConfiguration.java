@@ -56,10 +56,7 @@ public class DeleteOpenSearchConfiguration extends BaseAction<BooleanField> {
         if(containsErrorMsgs()) {
             return;
         }
-
-        if(!serviceConfigurationExists(pid.getValue(), configuratorFactory)) {
-            addArgumentMessage(noExistingConfigError(pid.path()));
-        }
+        addMessages(serviceConfigurationExists(pid, configuratorFactory));
     }
 
     @Override

@@ -34,10 +34,8 @@ public class DiscoverCswAction extends BaseAction<SourceInfoField> {
     public static final String ID = "discoverCsw";
 
     public static final String DESCRIPTION =
-            "Attempts to discover a CSW source using the given hostname "
-                    + "and port or URL. Either the hostname and port are required, or the URL is required. If both sets "
-                    + "are provided, then the discovery will be attempted with the URL. If no arguments are given, "
-                    + "then a missing required field error on the URL field will be returned.";
+            "Attempts to discover a CSW source using the given hostname and port or URL. If a URL is provided, "
+                    + "it will take precedence over a hostname and port.";
 
     private CredentialsField credentials;
 

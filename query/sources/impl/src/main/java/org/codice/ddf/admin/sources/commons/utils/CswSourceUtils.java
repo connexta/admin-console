@@ -109,7 +109,7 @@ public class CswSourceUtils {
                 .filter(urlField -> !sendCswCapabilitiesRequest(urlField, creds).containsErrorMsgs())
                 .map(ReportWithResult::new)
                 .findFirst()
-                .orElse(createDefaultResult(hostField));
+                .orElse(new ReportWithResult<UrlField>().argumentMessage(unknownEndpointError(hostField.path())));
     }
 
     /**
@@ -164,7 +164,8 @@ public class CswSourceUtils {
             if ((Boolean) xpath.compile(HAS_GMD_ISO_EXP)
                     .evaluate(capabilitiesXml, XPathConstants.BOOLEAN)) {
                 configResult.result(preferred.outputSchema(GMD_OUTPUT_SCHEMA)
-                        .cswProfile(GMD_CSW_ISO_FEDERATED_SOURCE));
+                        .cswProfile(GMD_CSW_ISO_FEDERATED_SOURCE)
+                        .eventServiceAddress(urlField.getValue() + "/subscription"));
                 return configResult;
             }
         } catch (Exception e) {
@@ -185,11 +186,5 @@ public class CswSourceUtils {
                 urlField.getValue());
         configResult.argumentMessage(unknownEndpointError(urlField.path()));
         return configResult;
-    }
-
-    private ReportWithResult<UrlField> createDefaultResult(HostField hostField) {
-        ReportWithResult<UrlField> defaultResult = new ReportWithResult<>();
-        defaultResult.argumentMessage(unknownEndpointError(hostField.path()));
-        return defaultResult;
     }
 }

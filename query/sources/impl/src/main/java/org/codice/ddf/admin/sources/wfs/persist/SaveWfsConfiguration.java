@@ -14,8 +14,6 @@
 package org.codice.ddf.admin.sources.wfs.persist;
 
 import static org.codice.ddf.admin.common.message.DefaultMessages.failedPersistError;
-import static org.codice.ddf.admin.common.message.DefaultMessages.noExistingConfigError;
-import static org.codice.ddf.admin.common.message.DefaultMessages.unsupportedVersionError;
 import static org.codice.ddf.admin.common.services.ServiceCommons.createManagedService;
 import static org.codice.ddf.admin.common.services.ServiceCommons.serviceConfigurationExists;
 import static org.codice.ddf.admin.common.services.ServiceCommons.updateService;
@@ -64,14 +62,7 @@ public class SaveWfsConfiguration extends BaseAction<BooleanField> {
         if (StringUtils.isNotEmpty(pid.getValue())) {
             addMessages(updateService(pid, wfsConfigToServiceProps(config), configuratorFactory));
         } else {
-            String factoryPid;
-            try {
-                factoryPid = wfsVersionToFactoryPid(config.wfsVersion());
-            } catch (IllegalArgumentException e) {
-                addArgumentMessage(unsupportedVersionError(config.wfsVersionField().path()));
-                return new BooleanField(false);
-            }
-
+            String factoryPid = wfsVersionToFactoryPid(config.wfsVersion());
             if(createManagedService(wfsConfigToServiceProps(config), factoryPid, configuratorFactory).containsErrorMsgs()) {
                 addArgumentMessage(failedPersistError(config.path()));
             }
@@ -86,8 +77,8 @@ public class SaveWfsConfiguration extends BaseAction<BooleanField> {
             return;
         }
 
-        if(pid.getValue() != null && !serviceConfigurationExists(pid.getValue(), configuratorFactory)) {
-            addArgumentMessage(noExistingConfigError(pid.path()));
+        if(pid.getValue() != null) {
+            addMessages(serviceConfigurationExists(pid, configuratorFactory));
         } else {
             addMessages(validateSourceName(config.sourceNameField(), configuratorFactory));
         }

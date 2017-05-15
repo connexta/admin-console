@@ -30,9 +30,9 @@ public class AddressField extends BaseObjectField {
 
     public static final String FIELD_TYPE_NAME = "Address";
 
-    public static final String DESCRIPTION = "Represents an address given by either a hostname and port or a URL. If no fields are provided"
-            + " then a missing required field error will be given on the URL. If the URL is not provided and only one of the port or hostname are provided"
-            + " then a missing required field error will be returned for the appropriate missing field.";
+    public static final String DESCRIPTION =
+            "Represents an address given by either a hostname and port or a URL. When this field is a required,"
+                    + " a URL or hostname and port must be provided.";
 
     private HostField host;
 
@@ -71,19 +71,11 @@ public class AddressField extends BaseObjectField {
 
     @Override
     public List<Message> validate() {
-        if (url.getValue() == null) {
-            if (host.port() != null && host.name() != null) {
-                return host.validate();
-            }
-            if (host.port() == null && host.name() != null) {
-                return Collections.singletonList(missingRequiredFieldError(host.portField().path()));
-            }
-            if (host.name() == null && host.port() != null) {
-                return Collections.singletonList(missingRequiredFieldError(host.hostnameField().path()));
-            }
-            return Collections.singletonList(missingRequiredFieldError(url.path()));
+        if(isRequired() && url == null) {
+            host.isRequired(true);
+            host.useDefaultRequired();
         }
-        return url.validate();
+        return super.validate();
     }
 
     @Override

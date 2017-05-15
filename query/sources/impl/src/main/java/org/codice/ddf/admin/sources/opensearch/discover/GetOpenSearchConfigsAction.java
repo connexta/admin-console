@@ -13,6 +13,7 @@
  */
 package org.codice.ddf.admin.sources.opensearch.discover;
 
+import static org.codice.ddf.admin.common.services.ServiceCommons.serviceConfigurationExists;
 import static org.codice.ddf.admin.sources.commons.SourceActionCommons.getSourceConfigurations;
 import static org.codice.ddf.admin.sources.services.OpenSearchServiceProperties.OPENSEARCH_FACTORY_PIDS;
 import static org.codice.ddf.admin.sources.services.OpenSearchServiceProperties.SERVICE_PROPS_TO_OPENSEARCH_CONFIG;
@@ -20,6 +21,7 @@ import static org.codice.ddf.admin.sources.services.OpenSearchServiceProperties.
 import java.util.List;
 
 import org.codice.ddf.admin.api.fields.Field;
+import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.actions.BaseAction;
 import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.fields.common.PidField;
@@ -28,7 +30,7 @@ import org.codice.ddf.admin.sources.fields.SourceInfoField;
 
 import com.google.common.collect.ImmutableList;
 
-public class GetOpenSearchConfigsAction extends BaseAction<ListFieldImpl<SourceInfoField>> {
+public class GetOpenSearchConfigsAction extends BaseAction<ListField<SourceInfoField>> {
 
     public static final String ID = "openSearchConfigs";
 
@@ -46,9 +48,21 @@ public class GetOpenSearchConfigsAction extends BaseAction<ListFieldImpl<SourceI
     }
 
     @Override
-    public ListFieldImpl<SourceInfoField> performAction() {
+    public ListField<SourceInfoField> performAction() {
         return getSourceConfigurations(OPENSEARCH_FACTORY_PIDS,
-                SERVICE_PROPS_TO_OPENSEARCH_CONFIG, pid, configuratorFactory);
+                SERVICE_PROPS_TO_OPENSEARCH_CONFIG, pid.getValue(), configuratorFactory);
+    }
+
+    @Override
+    public void validate() {
+        super.validate();
+        if(containsErrorMsgs()) {
+            return;
+        }
+
+        if(pid.getValue() != null) {
+            addMessages(serviceConfigurationExists(pid, configuratorFactory));
+        }
     }
 
     @Override

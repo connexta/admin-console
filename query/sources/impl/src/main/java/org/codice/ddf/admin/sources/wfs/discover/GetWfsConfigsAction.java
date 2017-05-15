@@ -13,6 +13,7 @@
  */
 package org.codice.ddf.admin.sources.wfs.discover;
 
+import static org.codice.ddf.admin.common.services.ServiceCommons.serviceConfigurationExists;
 import static org.codice.ddf.admin.sources.commons.SourceActionCommons.getSourceConfigurations;
 import static org.codice.ddf.admin.sources.services.WfsServiceProperties.SERVICE_PROPS_TO_WFS_CONFIG;
 import static org.codice.ddf.admin.sources.services.WfsServiceProperties.WFS_FACTORY_PIDS;
@@ -20,6 +21,7 @@ import static org.codice.ddf.admin.sources.services.WfsServiceProperties.WFS_FAC
 import java.util.List;
 
 import org.codice.ddf.admin.api.fields.Field;
+import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.actions.BaseAction;
 import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.fields.common.PidField;
@@ -28,7 +30,7 @@ import org.codice.ddf.admin.sources.fields.SourceInfoField;
 
 import com.google.common.collect.ImmutableList;
 
-public class GetWfsConfigsAction extends BaseAction<ListFieldImpl<SourceInfoField>> {
+public class GetWfsConfigsAction extends BaseAction<ListField<SourceInfoField>> {
 
     public static final String ID = "wfsConfigs";
 
@@ -46,9 +48,21 @@ public class GetWfsConfigsAction extends BaseAction<ListFieldImpl<SourceInfoFiel
     }
 
     @Override
-    public ListFieldImpl<SourceInfoField> performAction() {
+    public ListField<SourceInfoField> performAction() {
         return getSourceConfigurations(WFS_FACTORY_PIDS,
-                SERVICE_PROPS_TO_WFS_CONFIG, pid, configuratorFactory);
+                SERVICE_PROPS_TO_WFS_CONFIG, pid.getValue(), configuratorFactory);
+    }
+
+    @Override
+    public void validate() {
+        super.validate();
+        if(containsErrorMsgs()) {
+            return;
+        }
+
+        if(pid.getValue() != null) {
+            addMessages(serviceConfigurationExists(pid, configuratorFactory));
+        }
     }
 
     @Override

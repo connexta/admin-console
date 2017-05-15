@@ -14,6 +14,7 @@
 package org.codice.ddf.admin.sources.services;
 
 import static org.codice.ddf.admin.common.services.ServiceCommons.SERVICE_PID_KEY;
+import static org.codice.ddf.admin.common.services.ServiceCommons.mapValue;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -21,13 +22,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+import org.codice.ddf.admin.common.services.ServiceCommons;
 import org.codice.ddf.admin.sources.fields.type.OpenSearchSourceConfigurationField;
 import org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField;
 
 public class OpenSearchServiceProperties {
 
-    public static final String OPENSEARCH_FACTORY_PID = "OpenSearchSource";
-
+    // --- OpenSearch Service Properties
     public static final String ENDPOINT_URL = "endpointUrl";
 
     public static final String USERNAME = "username";
@@ -35,6 +36,9 @@ public class OpenSearchServiceProperties {
     public static final String PASSWORD = "password";
 
     public static final String SHORTNAME = "shortname";
+    // ---
+
+    public static final String OPENSEARCH_FACTORY_PID = "OpenSearchSource";
 
     public static final List<String> OPENSEARCH_FACTORY_PIDS = Collections.singletonList(
             OPENSEARCH_FACTORY_PID);
@@ -46,29 +50,21 @@ public class OpenSearchServiceProperties {
     public static final OpenSearchSourceConfigurationField servicePropsToOpenSearchConfig(
             Map<String, Object> props) {
         OpenSearchSourceConfigurationField config = new OpenSearchSourceConfigurationField();
-        config.pid(mapStringValue(props, SERVICE_PID_KEY));
-        config.sourceName(mapStringValue(props, SHORTNAME));
-        config.endpointUrl(mapStringValue(props, ENDPOINT_URL));
-        config.credentials().username(mapStringValue(props, USERNAME));
-        config.credentials().password(mapStringValue(props, PASSWORD));
+        config.pid(mapValue(props, SERVICE_PID_KEY));
+        config.sourceName(mapValue(props, SHORTNAME));
+        config.endpointUrl(mapValue(props, ENDPOINT_URL));
+        config.credentials().username(mapValue(props, USERNAME));
+        config.credentials().password(mapValue(props, PASSWORD));
         return config;
     }
 
     public static final Map<String, Object> openSearchConfigToServiceProps(
             OpenSearchSourceConfigurationField config) {
-        HashMap<String, Object> props = new HashMap<>();
-        props.put(SHORTNAME, config.sourceName());
-        props.put(ENDPOINT_URL, config.endpointUrl());
-        if (config.credentials().username() != null) {
-            props.put(USERNAME, config.credentials().username());
-        }
-        if (config.credentials().password() != null) {
-            props.put(PASSWORD, config.credentials().password());
-        }
-        return props;
-    }
-
-    private static String mapStringValue(Map<String, Object> props, String key) {
-        return props.get(key) == null ? null : (String) props.get(key);
+        return new ServiceCommons.ServicePropertyBuilder()
+            .putPropertyIfNotNull(SHORTNAME, config.sourceNameField())
+            .putPropertyIfNotNull(ENDPOINT_URL, config.endpointUrlField())
+            .putPropertyIfNotNull(USERNAME, config.credentials().usernameField())
+            .putPropertyIfNotNull(PASSWORD, config.credentials().passwordField())
+            .build();
     }
 }

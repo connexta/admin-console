@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 import org.apache.commons.lang.StringUtils;
+import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.configurator.ConfigReader;
@@ -43,20 +44,21 @@ public class SourceActionCommons {
 
     /**
      * Gets the configurations for the given factoryPids using the {@link ConfiguratorFactory}. A mapper is used
-     * to transform the service properties to a {@link SourceConfigUnionField}.
+     * to transform the service properties to a {@link SourceConfigUnionField}. Providing the pid parameter
+     * will return only the configuration with that pid.
      *
      * @param factoryPids factory pids to lookup configurations for
      * @param mapper a {@link Function} taking a map of string to objects and returning a {@code SourceConfigUnionField}
-     * @param selector a servicePid to select a single configuration, returns all configs when null or empty
+     * @param pid a servicePid to select a single configuration, returns all configs when null or empty
      * @return a list of {@code SourceInfoField}s configured in the system
      */
-    public static ListFieldImpl<SourceInfoField> getSourceConfigurations(List<String> factoryPids, Function<Map<String, Object>, SourceConfigUnionField> mapper,
-            PidField selector, ConfiguratorFactory configuratorFactory) {
+    public static ListField<SourceInfoField> getSourceConfigurations(List<String> factoryPids, Function<Map<String, Object>, SourceConfigUnionField> mapper,
+            String pid, ConfiguratorFactory configuratorFactory) {
         ListFieldImpl<SourceInfoField> sourceInfoListField = new ListFieldImpl<>(SourceInfoField.class);
         ConfigReader configReader = configuratorFactory.getConfigReader();
 
-        if (StringUtils.isNotEmpty(selector.getValue())) {
-            SourceConfigUnionField config = mapper.apply(configReader.getConfig(selector.getValue()));
+        if (StringUtils.isNotEmpty(pid)) {
+            SourceConfigUnionField config = mapper.apply(configReader.getConfig(pid));
             sourceInfoListField.add(createSourceInfoField(true, config));
             populateSourceAvailability(sourceInfoListField.getList(), configuratorFactory);
             return sourceInfoListField;

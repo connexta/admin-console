@@ -14,8 +14,6 @@
 package org.codice.ddf.admin.sources.csw.persist;
 
 import static org.codice.ddf.admin.common.message.DefaultMessages.failedPersistError;
-import static org.codice.ddf.admin.common.message.DefaultMessages.noExistingConfigError;
-import static org.codice.ddf.admin.common.message.DefaultMessages.unsupportedVersionError;
 import static org.codice.ddf.admin.common.services.ServiceCommons.createManagedService;
 import static org.codice.ddf.admin.common.services.ServiceCommons.serviceConfigurationExists;
 import static org.codice.ddf.admin.common.services.ServiceCommons.updateService;
@@ -64,14 +62,7 @@ public class SaveCswConfiguration extends BaseAction<BooleanField> {
         if (StringUtils.isNotEmpty(pid.getValue())) {
             addMessages(updateService(pid, cswConfigToServiceProps(config), configuratorFactory));
         } else {
-            String factoryPid;
-            try {
-                factoryPid = cswProfileToFactoryPid(config.cswProfile());
-            } catch (IllegalArgumentException e) {
-                addArgumentMessage(unsupportedVersionError(config.cswProfileField().path()));
-                return new BooleanField(false);
-            }
-
+            String factoryPid = cswProfileToFactoryPid(config.cswProfile());
             if (createManagedService(cswConfigToServiceProps(config), factoryPid, configuratorFactory).containsErrorMsgs()) {
                 addArgumentMessage(failedPersistError(config.path()));
             }
@@ -86,8 +77,8 @@ public class SaveCswConfiguration extends BaseAction<BooleanField> {
             return;
         }
 
-        if(pid.getValue() != null && !serviceConfigurationExists(pid.getValue(), configuratorFactory)) {
-            addArgumentMessage(noExistingConfigError(pid.path()));
+        if(pid.getValue() != null) {
+            addMessages(serviceConfigurationExists(pid, configuratorFactory));
         } else {
             addMessages(validateSourceName(config.sourceNameField(), configuratorFactory));
         }

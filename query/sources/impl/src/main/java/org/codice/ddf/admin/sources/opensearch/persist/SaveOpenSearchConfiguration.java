@@ -14,7 +14,6 @@
 package org.codice.ddf.admin.sources.opensearch.persist;
 
 import static org.codice.ddf.admin.common.message.DefaultMessages.failedPersistError;
-import static org.codice.ddf.admin.common.message.DefaultMessages.noExistingConfigError;
 import static org.codice.ddf.admin.common.services.ServiceCommons.createManagedService;
 import static org.codice.ddf.admin.common.services.ServiceCommons.serviceConfigurationExists;
 import static org.codice.ddf.admin.common.services.ServiceCommons.updateService;
@@ -77,8 +76,8 @@ public class SaveOpenSearchConfiguration extends BaseAction<BooleanField> {
             return;
         }
 
-        if(pid.getValue() != null && !serviceConfigurationExists(pid.getValue(), configuratorFactory)) {
-            addArgumentMessage(noExistingConfigError(pid.path()));
+        if(pid.getValue() != null) {
+            addMessages(serviceConfigurationExists(pid, configuratorFactory));
         } else {
             addMessages(validateSourceName(config.sourceNameField(), configuratorFactory));
         }

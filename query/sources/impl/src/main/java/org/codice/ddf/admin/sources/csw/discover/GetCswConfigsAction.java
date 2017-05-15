@@ -13,6 +13,7 @@
  */
 package org.codice.ddf.admin.sources.csw.discover;
 
+import static org.codice.ddf.admin.common.services.ServiceCommons.serviceConfigurationExists;
 import static org.codice.ddf.admin.sources.commons.SourceActionCommons.getSourceConfigurations;
 import static org.codice.ddf.admin.sources.services.CswServiceProperties.CSW_FACTORY_PIDS;
 import static org.codice.ddf.admin.sources.services.CswServiceProperties.SERVICE_PROPS_TO_CSW_CONFIG;
@@ -20,6 +21,7 @@ import static org.codice.ddf.admin.sources.services.CswServiceProperties.SERVICE
 import java.util.List;
 
 import org.codice.ddf.admin.api.fields.Field;
+import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.actions.BaseAction;
 import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.fields.common.PidField;
@@ -28,7 +30,7 @@ import org.codice.ddf.admin.sources.fields.SourceInfoField;
 
 import com.google.common.collect.ImmutableList;
 
-public class GetCswConfigsAction extends BaseAction<ListFieldImpl<SourceInfoField>> {
+public class GetCswConfigsAction extends BaseAction<ListField<SourceInfoField>> {
 
     public static final String ID = "cswConfigs";
 
@@ -46,10 +48,22 @@ public class GetCswConfigsAction extends BaseAction<ListFieldImpl<SourceInfoFiel
     }
 
     @Override
-    public ListFieldImpl<SourceInfoField> performAction() {
+    public ListField<SourceInfoField> performAction() {
         return getSourceConfigurations(CSW_FACTORY_PIDS,
-                SERVICE_PROPS_TO_CSW_CONFIG, pid,
+                SERVICE_PROPS_TO_CSW_CONFIG, pid.getValue(),
                 configuratorFactory);
+    }
+
+    @Override
+    public void validate() {
+        super.validate();
+        if(containsErrorMsgs()) {
+            return;
+        }
+
+        if(pid.getValue() != null) {
+            addMessages(serviceConfigurationExists(pid, configuratorFactory));
+        }
     }
 
     @Override

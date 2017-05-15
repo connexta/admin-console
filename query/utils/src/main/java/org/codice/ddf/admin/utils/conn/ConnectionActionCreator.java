@@ -17,8 +17,7 @@ import java.util.List;
 
 import org.codice.ddf.admin.api.action.Action;
 import org.codice.ddf.admin.common.actions.BaseActionCreator;
-import org.codice.ddf.admin.utils.conn.actions.PingByHost;
-import org.codice.ddf.admin.utils.conn.actions.PingByUrl;
+import org.codice.ddf.admin.utils.conn.actions.PingByAddress;
 
 import com.google.common.collect.ImmutableList;
 
@@ -36,7 +35,7 @@ public class ConnectionActionCreator extends BaseActionCreator {
 
     @Override
     public List<Action> getDiscoveryActions() {
-        return ImmutableList.of(new PingByHost(), new PingByUrl());
+        return ImmutableList.of(new PingByAddress());
     }
 
     @Override

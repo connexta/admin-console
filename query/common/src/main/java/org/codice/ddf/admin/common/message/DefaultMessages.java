@@ -47,7 +47,7 @@ public class DefaultMessages {
 
     public static final String NO_EXISTING_CONFIG = "NO_EXISTING_CONFIG";
 
-    public static final String UNSUPPORTED_VERSION = "UNSUPPORTED_VERSION";
+    public static final String INVALID_URI_ERROR = "INVALID_URI";
 
     public static final ErrorMessage INTERNAL_ERROR_MESSAGE = new ErrorMessage(INTERNAL_ERROR);
 
@@ -108,11 +108,11 @@ public class DefaultMessages {
         return new ErrorMessage(INVALID_URL_ERROR, path);
     }
 
-    public static ErrorMessage noExistingConfigError(List<String> path) {
-        return new ErrorMessage(NO_EXISTING_CONFIG, path);
+    public static ErrorMessage invalidUriError(List<String> path) {
+        return new ErrorMessage(INVALID_URI_ERROR, path);
     }
 
-    public static ErrorMessage unsupportedVersionError(List<String> path) {
-        return new ErrorMessage(UNSUPPORTED_VERSION, path);
+    public static ErrorMessage noExistingConfigError(List<String> path) {
+        return new ErrorMessage(NO_EXISTING_CONFIG, path);
     }
 }

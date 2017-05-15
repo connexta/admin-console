@@ -21,13 +21,7 @@ public class SourceMessages {
 
     public static final String DUPLICATE_SOURCE_NAME = "DUPLICATE_SOURCE_NAME";
 
-    public static final String UNKNOWN_SOURCE_TYPE = "UNKNOWN_SOURCE_TYPE";
-
     public static ErrorMessage duplicateSourceNameError(List<String> path) {
         return new ErrorMessage(DUPLICATE_SOURCE_NAME, path);
-    }
-
-    public static ErrorMessage unknownSourceTypeError(List<String> path) {
-        return new ErrorMessage(UNKNOWN_SOURCE_TYPE, path);
     }
 }

@@ -34,10 +34,8 @@ public class DiscoverOpenSearchAction extends BaseAction<SourceInfoField> {
     public static final String ID = "discoverOpenSearch";
 
     public static final String DESCRIPTION =
-            "Attempts to discover an OpenSearch source using the given hostname "
-                    + "and port or URL. Either the hostname and port are required, or the URL is required. If both sets "
-                    + "are provided, then the discovery will be attempted with the URL. If no arguments are given, "
-                    + "then a missing required field error on the URL field will be returned.";
+            "Attempts to discover an OpenSearch source using the given hostname and port or URL. If a URL "
+                    + "is provided, it will take precedence over a hostname and port.";
 
     private CredentialsField credentials;
 

@@ -75,10 +75,9 @@ public class OpenSearchSourceUtils {
      * @return a {@link ReportWithResult} containing the {@link SourceConfigUnionField} or containing {@link org.codice.ddf.admin.common.message.ErrorMessage}s on failure.
      */
     public ReportWithResult<SourceConfigUnionField> getOpenSearchConfig(UrlField urlField, CredentialsField creds) {
-        Report errors = verifyOpenSearchCapabilities(urlField, creds);
         ReportWithResult<SourceConfigUnionField> configResult = new ReportWithResult<>();
-        if (errors.containsErrorMsgs()) {
-            configResult.addMessages(errors);
+        configResult.addMessages(verifyOpenSearchCapabilities(urlField, creds));
+        if (configResult.containsErrorMsgs()) {
             return configResult;
         }
 
@@ -151,12 +150,6 @@ public class OpenSearchSourceUtils {
                 .filter(urlField -> !verifyOpenSearchCapabilities(urlField, creds).containsErrorMsgs())
                 .map(ReportWithResult::new)
                 .findFirst()
-                .orElse(createDefaultResult(hostField));
-    }
-
-    private ReportWithResult<UrlField> createDefaultResult(HostField hostField) {
-        ReportWithResult<UrlField> defaultResult = new ReportWithResult<>();
-        defaultResult.argumentMessage(unknownEndpointError(hostField.path()));
-        return defaultResult;
+                .orElse(new ReportWithResult<UrlField>().argumentMessage(unknownEndpointError(hostField.path())));
     }
 }

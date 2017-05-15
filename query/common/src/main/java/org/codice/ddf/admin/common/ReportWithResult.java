@@ -13,7 +13,10 @@
  */
 package org.codice.ddf.admin.common;
 
+import java.util.List;
 import java.util.Optional;
+
+import org.codice.ddf.admin.api.action.Message;
 
 /**
  * A wrapper for an object which also contains argument and result messages.
@@ -38,15 +41,21 @@ public class ReportWithResult<T> extends Report {
         this.result = Optional.ofNullable(value);
     }
 
-    public boolean isPresent() {
+    public boolean isResultPresent() {
         return result.isPresent();
     }
 
-    public boolean isNotPresent() {
-        return !isPresent();
+    public boolean isResultNotPresent() {
+        return !isResultPresent();
     }
 
     public T result() {
         return result.orElseGet(() -> null);
+    }
+
+    @Override
+    public ReportWithResult<T> argumentMessage(Message message) {
+        super.argumentMessage(message);
+        return this;
     }
 }

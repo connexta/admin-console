@@ -29,11 +29,11 @@ public class CswProfile extends BaseEnumField<String> {
             "CSW application profile specifying the capabilities of the CSW server when federating to other systems.";
 
     public static final String CSW_SPEC_PROFILE_FEDERATED_SOURCE =
-            "CswSpecificationProfileFederatedSource";
+            "CswFederatedSource";
 
-    public static final String CSW_FEDERATION_PROFILE_SOURCE = "CswFederationProfileSource";
+    public static final String CSW_FEDERATION_PROFILE_SOURCE = "DDFCswFederatedSource";
 
-    public static final String GMD_CSW_ISO_FEDERATED_SOURCE = "GmdCswIsoFederatedSource";
+    public static final String GMD_CSW_ISO_FEDERATED_SOURCE = "GmdCswFederatedSource";
 
     public CswProfile() {
         this(null);
@@ -43,18 +43,18 @@ public class CswProfile extends BaseEnumField<String> {
         super(DEFAULT_FIELD_NAME,
                 TYPE_NAME,
                 DESCRIPTION,
-                ImmutableList.of(new CswFederationProfileSource(),
-                        new CswSpecificationProfileFederatedSource(),
-                        new GmdCswIsoFederatedSource()),
+                ImmutableList.of(new DDFCswFederatedSource(),
+                        new CswFederatedSource(),
+                        new GmdCswFederatedSource()),
                 cswProfile);
     }
 
-    protected static final class CswSpecificationProfileFederatedSource extends StringField {
+    protected static final class CswFederatedSource extends StringField {
 
         public static final String DESCRIPTION = "CSW Specification Profile Federated Source that should be used when federating to an external CSW service.";
 
-        public CswSpecificationProfileFederatedSource() {
-            super(CSW_SPEC_PROFILE_FEDERATED_SOURCE, TYPE_NAME, DESCRIPTION);
+        public CswFederatedSource() {
+            super(CSW_SPEC_PROFILE_FEDERATED_SOURCE, CSW_SPEC_PROFILE_FEDERATED_SOURCE, DESCRIPTION);
         }
 
         @Override
@@ -63,12 +63,12 @@ public class CswProfile extends BaseEnumField<String> {
         }
     }
 
-    protected static final class CswFederationProfileSource extends StringField {
+    protected static final class DDFCswFederatedSource extends StringField {
 
         public static final String DESCRIPTION = "DDF's full fidelity CSW Federation Profile. Use this when federating to a DDF based system.";
 
-        public CswFederationProfileSource() {
-            super(CSW_FEDERATION_PROFILE_SOURCE, TYPE_NAME, DESCRIPTION);
+        public DDFCswFederatedSource() {
+            super(CSW_FEDERATION_PROFILE_SOURCE, CSW_FEDERATION_PROFILE_SOURCE, DESCRIPTION);
         }
 
         @Override
@@ -77,12 +77,12 @@ public class CswProfile extends BaseEnumField<String> {
         }
     }
 
-    protected static final class GmdCswIsoFederatedSource extends StringField {
+    protected static final class GmdCswFederatedSource extends StringField {
 
         public static final String DESCRIPTION = "CSW Federated Source using the Geographic MetaData (GMD) format (ISO 19115:2003).";
 
-        public GmdCswIsoFederatedSource() {
-            super(GMD_CSW_ISO_FEDERATED_SOURCE, TYPE_NAME, DESCRIPTION);
+        public GmdCswFederatedSource() {
+            super(GMD_CSW_ISO_FEDERATED_SOURCE, GMD_CSW_ISO_FEDERATED_SOURCE, DESCRIPTION);
         }
 
         @Override

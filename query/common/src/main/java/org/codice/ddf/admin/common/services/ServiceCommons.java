@@ -19,11 +19,13 @@ import static org.codice.ddf.admin.common.message.DefaultMessages.failedUpdateEr
 import static org.codice.ddf.admin.common.message.DefaultMessages.noExistingConfigError;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.text.StrSubstitutor;
+import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.common.Report;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 import org.codice.ddf.admin.common.fields.common.PidField;
@@ -60,23 +62,23 @@ public class ServiceCommons {
         return report;
     }
 
-    public static Report updateService(PidField servicePidField, Map<String, Object> newConfig,
+    public static Report updateService(PidField servicePid, Map<String, Object> newConfig,
             ConfiguratorFactory configuratorFactory) {
         Report report = new Report();
-        String servicePid = servicePidField.getValue();
-        if (!serviceConfigurationExists(servicePid, configuratorFactory)) {
-            report.argumentMessage(noExistingConfigError(servicePidField.path()));
+        report.addMessages(serviceConfigurationExists(servicePid, configuratorFactory));
+        if (report.containsErrorMsgs()) {
             return report;
         }
 
+        String pid = servicePid.getValue();
         Configurator configurator = configuratorFactory.getConfigurator();
-        configurator.updateConfigFile(servicePid, newConfig, true);
+        configurator.updateConfigFile(pid, newConfig, true);
         OperationReport operationReport = configurator.commit(
                 "Updated config with pid [{}] and new service properties [{}]",
-                servicePid,
+                pid,
                 newConfig.toString());
         if (operationReport.containsFailedResults()) {
-            return report.argumentMessage(failedUpdateError(servicePidField.path()));
+            return report.argumentMessage(failedUpdateError(servicePid.path()));
         }
 
         return report;
@@ -93,9 +95,55 @@ public class ServiceCommons {
         return report;
     }
 
+    public static Report serviceConfigurationExists(PidField servicePid, ConfiguratorFactory configuratorFactory) {
+        Report report = new Report();
+        if(configuratorFactory.getConfigReader()
+                .getConfig(servicePid.getValue())
+                .isEmpty()) {
+            report.argumentMessage(noExistingConfigError(servicePid.path()));
+        }
+        return report;
+    }
+
     public static boolean serviceConfigurationExists(String servicePid, ConfiguratorFactory configuratorFactory) {
         return !configuratorFactory.getConfigReader()
                 .getConfig(servicePid)
                 .isEmpty();
+    }
+
+    public static <T> T mapValue(Map<String, Object> props, String key) {
+        return props.get(key) == null ? null : (T) props.get(key);
+    }
+
+    public static void putPropertyIfNotNull(Map<String, Object> serviceProperties, String key, Field field) {
+        if(field.getValue() == null) {
+            return;
+        }
+        serviceProperties.put(key, field.getValue());
+    }
+
+    public static class ServicePropertyBuilder {
+
+        private Map<String, Object> serviceProperties;
+
+        public ServicePropertyBuilder() {
+            serviceProperties = new HashMap<>();
+        }
+
+        public ServicePropertyBuilder put(String key, Field field) {
+            serviceProperties.put(key, field.getValue());
+            return this;
+        }
+
+        public ServicePropertyBuilder putPropertyIfNotNull(String key, Field field) {
+            if(field.getValue() != null) {
+                put(key, field);
+            }
+            return this;
+        }
+
+        public Map<String, Object> build() {
+            return serviceProperties;
+        }
     }
 }

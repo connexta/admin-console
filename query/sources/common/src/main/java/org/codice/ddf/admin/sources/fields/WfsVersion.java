@@ -34,9 +34,9 @@ public class WfsVersion extends BaseEnumField<String> {
 
     public static final String WFS_VERSION_2 = "2.0.0";
 
-    public static final String WFS_10_FIELD_NAME = "WFS_10";
+    public static final String WFS_1_FIELD_NAME = "WFS_1";
 
-    public static final String WFS_20_FIELD_NAME = "WFS_20";
+    public static final String WFS_2_FIELD_NAME = "WFS_2";
 
     public WfsVersion() {
         this(null);
@@ -46,7 +46,7 @@ public class WfsVersion extends BaseEnumField<String> {
         this(DEFAULT_FIELD_NAME,
                 TYPE_NAME,
                 DESCRIPTION,
-                ImmutableList.of(new Wfs10(), new Wfs20()),
+                ImmutableList.of(new Wfs1(), new Wfs2()),
                 wfsVersion);
     }
 
@@ -55,13 +55,13 @@ public class WfsVersion extends BaseEnumField<String> {
         super(fieldName, fieldTypeName, description, enumValues, enumValue);
     }
 
-    protected static final class Wfs10 extends StringField {
+    protected static final class Wfs1 extends StringField {
 
         public static final String DESCRIPTION =
                 "Indicates a server implements version 1.0.0 of the WFS specification.";
 
-        public Wfs10() {
-            super(WFS_10_FIELD_NAME, TYPE_NAME, DESCRIPTION);
+        public Wfs1() {
+            super(WFS_1_FIELD_NAME, TYPE_NAME, DESCRIPTION);
         }
 
         @Override
@@ -70,13 +70,13 @@ public class WfsVersion extends BaseEnumField<String> {
         }
     }
 
-    protected static final class Wfs20 extends StringField {
+    protected static final class Wfs2 extends StringField {
 
         public static final String DESCRIPTION =
                 "Indicates a server implements version 2.0.0 of the WFS specification.";
 
-        public Wfs20() {
-            super(WFS_20_FIELD_NAME, TYPE_NAME, DESCRIPTION);
+        public Wfs2() {
+            super(WFS_2_FIELD_NAME, TYPE_NAME, DESCRIPTION);
         }
 
         @Override

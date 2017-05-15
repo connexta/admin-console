@@ -18,32 +18,31 @@ import java.util.List;
 import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.common.actions.TestAction;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
-import org.codice.ddf.admin.common.fields.common.UrlField;
+import org.codice.ddf.admin.common.fields.common.AddressField;
+import org.codice.ddf.admin.common.fields.common.HostField;
 
 import com.google.common.collect.ImmutableList;
 
-public class PingByUrl extends TestAction {
+public class PingByAddress extends TestAction {
+    public static final String NAME = "pingByAddress";
 
-    public static final String NAME = "pingByUrl";
+    public static final String DESCRIPTION = "Attempts to reach the given URL or hostname and port.";
 
-    public static final String DESCRIPTION = "Attempts to reach the given url.";
+    private AddressField address;
 
-    private UrlField url;
-
-    public PingByUrl() {
+    public PingByAddress() {
         super(NAME, DESCRIPTION);
-        url = new UrlField();
+        address = new AddressField();
+        address.isRequired(true);
     }
 
     @Override
     public List<Field> getArguments() {
-        return ImmutableList.of(url);
+        return ImmutableList.of(address);
     }
 
     @Override
     public BooleanField performAction() {
-        BooleanField testPassed = new BooleanField();
-        testPassed.setValue(true);
-        return testPassed;
+        return new BooleanField(true);
     }
 }

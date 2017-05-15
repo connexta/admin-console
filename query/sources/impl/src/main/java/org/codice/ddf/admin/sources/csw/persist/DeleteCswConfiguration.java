@@ -13,7 +13,6 @@
  */
 package org.codice.ddf.admin.sources.csw.persist;
 
-import static org.codice.ddf.admin.common.message.DefaultMessages.noExistingConfigError;
 import static org.codice.ddf.admin.common.services.ServiceCommons.deleteService;
 import static org.codice.ddf.admin.common.services.ServiceCommons.serviceConfigurationExists;
 
@@ -57,10 +56,7 @@ public class DeleteCswConfiguration extends BaseAction<BooleanField> {
         if (containsErrorMsgs()) {
             return;
         }
-
-        if (!serviceConfigurationExists(pid.getValue(), configuratorFactory)) {
-            addArgumentMessage(noExistingConfigError(pid.path()));
-        }
+        addMessages(serviceConfigurationExists(pid, configuratorFactory));
     }
 
     @Override

@@ -39,6 +39,10 @@ public class ServiceCommons {
 
     public static final String FACTORY_PID_KEY = "service.factoryPid";
 
+    // A flag to indicate if a service being updated has a password of "password" then the
+    // password will not be updated.
+    public static final String FLAG_PASSWORD = "password";
+
     public String resolveProperty(String str) {
         return StrSubstitutor.replaceSystemProperties(str);
     }
@@ -130,14 +134,14 @@ public class ServiceCommons {
             serviceProperties = new HashMap<>();
         }
 
-        public ServicePropertyBuilder put(String key, Field field) {
-            serviceProperties.put(key, field.getValue());
+        public ServicePropertyBuilder put(String key, Object object) {
+            serviceProperties.put(key, object);
             return this;
         }
 
         public ServicePropertyBuilder putPropertyIfNotNull(String key, Field field) {
             if(field.getValue() != null) {
-                put(key, field);
+                put(key, field.getValue());
             }
             return this;
         }

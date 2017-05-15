@@ -14,6 +14,7 @@
 package org.codice.ddf.admin.sources.services;
 
 import static org.codice.ddf.admin.common.services.ServiceCommons.FACTORY_PID_KEY;
+import static org.codice.ddf.admin.common.services.ServiceCommons.FLAG_PASSWORD;
 import static org.codice.ddf.admin.common.services.ServiceCommons.SERVICE_PID_KEY;
 import static org.codice.ddf.admin.common.services.ServiceCommons.mapValue;
 
@@ -67,19 +68,23 @@ public class WfsServiceProperties {
         wfsConfig.sourceName(mapValue(props, ID));
         wfsConfig.endpointUrl(mapValue(props, WFS_URL));
         wfsConfig.credentials().username(mapValue(props, USERNAME));
-        wfsConfig.credentials().password(mapValue(props, PASSWORD));
+        wfsConfig.credentials().password(FLAG_PASSWORD);
         wfsConfig.wfsVersion(wfsFactoryPidToVersion(mapValue(props, FACTORY_PID_KEY)));
         return wfsConfig;
     }
 
     public static Map<String, Object> wfsConfigToServiceProps(
-            WfsSourceConfigurationField configuration) {
-        return new ServiceCommons.ServicePropertyBuilder()
-                .putPropertyIfNotNull(ID, configuration.sourceNameField())
-                .putPropertyIfNotNull(WFS_URL, configuration.endpointUrlField())
-                .putPropertyIfNotNull(USERNAME, configuration.credentials().usernameField())
-                .putPropertyIfNotNull(PASSWORD, configuration.credentials().passwordField())
-                .build();
+            WfsSourceConfigurationField config) {
+        ServiceCommons.ServicePropertyBuilder builder = new ServiceCommons.ServicePropertyBuilder()
+                .putPropertyIfNotNull(ID, config.sourceNameField())
+                .putPropertyIfNotNull(WFS_URL, config.endpointUrlField())
+                .putPropertyIfNotNull(USERNAME, config.credentials().usernameField());
+
+        String password = config.credentials().password();
+        if(password != null && !password.equals(FLAG_PASSWORD)) {
+            builder.put(PASSWORD, config.credentials().password());
+        }
+        return builder.build();
     }
 
     public static String wfsVersionToFactoryPid(String wfsVersion) throws IllegalArgumentException {

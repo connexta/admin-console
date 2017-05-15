@@ -13,11 +13,11 @@
  */
 package org.codice.ddf.admin.sources.services;
 
+import static org.codice.ddf.admin.common.services.ServiceCommons.FLAG_PASSWORD;
 import static org.codice.ddf.admin.common.services.ServiceCommons.SERVICE_PID_KEY;
 import static org.codice.ddf.admin.common.services.ServiceCommons.mapValue;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -54,17 +54,21 @@ public class OpenSearchServiceProperties {
         config.sourceName(mapValue(props, SHORTNAME));
         config.endpointUrl(mapValue(props, ENDPOINT_URL));
         config.credentials().username(mapValue(props, USERNAME));
-        config.credentials().password(mapValue(props, PASSWORD));
+        config.credentials().password(FLAG_PASSWORD);
         return config;
     }
 
     public static final Map<String, Object> openSearchConfigToServiceProps(
             OpenSearchSourceConfigurationField config) {
-        return new ServiceCommons.ServicePropertyBuilder()
+        ServiceCommons.ServicePropertyBuilder builder = new ServiceCommons.ServicePropertyBuilder()
             .putPropertyIfNotNull(SHORTNAME, config.sourceNameField())
             .putPropertyIfNotNull(ENDPOINT_URL, config.endpointUrlField())
-            .putPropertyIfNotNull(USERNAME, config.credentials().usernameField())
-            .putPropertyIfNotNull(PASSWORD, config.credentials().passwordField())
-            .build();
+            .putPropertyIfNotNull(USERNAME, config.credentials().usernameField());
+
+        String password = config.credentials().password();
+        if(password != null && !password.equals(FLAG_PASSWORD)) {
+            builder.put(PASSWORD, config.credentials().password());
+        }
+        return builder.build();
     }
 }

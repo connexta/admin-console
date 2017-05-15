@@ -13,6 +13,8 @@
  */
 package org.codice.ddf.admin.sources.commons;
 
+import static org.codice.ddf.admin.common.services.ServiceCommons.FLAG_PASSWORD;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +37,7 @@ import ddf.catalog.source.Source;
 public class SourceActionCommons {
 
     public static SourceInfoField createSourceInfoField(boolean isAvailable, SourceConfigUnionField config) {
-        config.credentials().password("*****");
+        config.credentials().password(FLAG_PASSWORD);
         SourceInfoField sourceInfoField = new SourceInfoField();
         sourceInfoField.isAvaliable(isAvailable);
         sourceInfoField.configuration(config);

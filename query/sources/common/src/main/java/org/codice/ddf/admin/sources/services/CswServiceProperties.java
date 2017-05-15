@@ -15,6 +15,7 @@
 package org.codice.ddf.admin.sources.services;
 
 import static org.codice.ddf.admin.common.services.ServiceCommons.FACTORY_PID_KEY;
+import static org.codice.ddf.admin.common.services.ServiceCommons.FLAG_PASSWORD;
 import static org.codice.ddf.admin.common.services.ServiceCommons.SERVICE_PID_KEY;
 import static org.codice.ddf.admin.common.services.ServiceCommons.mapValue;
 import static org.codice.ddf.admin.sources.fields.CswProfile.CSW_FEDERATION_PROFILE_SOURCE;
@@ -28,8 +29,6 @@ import java.util.function.Function;
 import org.codice.ddf.admin.common.services.ServiceCommons;
 import org.codice.ddf.admin.sources.fields.type.CswSourceConfigurationField;
 import org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
@@ -78,7 +77,7 @@ public class CswServiceProperties {
         cswConfig.sourceName(mapValue(props, ID));
         cswConfig.endpointUrl(mapValue(props, CSW_URL));
         cswConfig.credentials().username(mapValue(props, USERNAME));
-        cswConfig.credentials().password(mapValue(props, PASSWORD));
+        cswConfig.credentials().password(FLAG_PASSWORD);
         cswConfig.outputSchema(mapValue(props, OUTPUT_SCHEMA));
         cswConfig.spatialOperator(mapValue(props, FORCE_SPATIAL_FILTER));
         cswConfig.cswProfile(factoryPidToCswProfile(mapValue(props, FACTORY_PID_KEY)));
@@ -87,15 +86,19 @@ public class CswServiceProperties {
 
     public static final Map<String, Object> cswConfigToServiceProps(
             CswSourceConfigurationField config) {
-        return new ServiceCommons.ServicePropertyBuilder()
+        ServiceCommons.ServicePropertyBuilder builder = new ServiceCommons.ServicePropertyBuilder()
             .putPropertyIfNotNull(ID, config.sourceNameField())
             .putPropertyIfNotNull(CSW_URL, config.endpointUrlField())
             .putPropertyIfNotNull(EVENT_SERVICE_ADDRESS, config.eventServiceAddressField())
             .putPropertyIfNotNull(USERNAME, config.credentials().usernameField())
-            .putPropertyIfNotNull(PASSWORD, config.credentials().passwordField())
             .putPropertyIfNotNull(OUTPUT_SCHEMA, config.outputSchemaField())
-            .putPropertyIfNotNull(FORCE_SPATIAL_FILTER, config.spatialOperatorField())
-            .build();
+            .putPropertyIfNotNull(FORCE_SPATIAL_FILTER, config.spatialOperatorField());
+
+        String password = config.credentials().password();
+        if(password != null && !password.equals(FLAG_PASSWORD)) {
+            builder.put(PASSWORD, config.credentials().password());
+        }
+        return builder.build();
     }
 
     public static String cswProfileToFactoryPid(String cswProfile) {

@@ -13,6 +13,8 @@
  **/
 package org.codice.ddf.admin.sources.fields.type;
 
+import static org.codice.ddf.admin.common.services.ServiceCommons.FLAG_PASSWORD;
+
 import java.util.List;
 
 import org.codice.ddf.admin.api.fields.Field;
@@ -131,7 +133,7 @@ public class SourceConfigUnionField extends BaseUnionField {
                 .add(SOURCE_NAME_FIELD_NAME, sourceName())
                 .add(ENDPOINT_URL_FIELD_NAME, endpointUrl())
                 .add(CredentialsField.USERNAME_FIELD_NAME, credentials().username())
-                .add(CredentialsField.PASSWORD_FIELD_NAME, "*****")
+                .add(CredentialsField.PASSWORD_FIELD_NAME, FLAG_PASSWORD)
                 .toString();
     }
 }

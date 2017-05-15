@@ -14,11 +14,16 @@
 package org.codice.ddf.admin.sources.commons.utils;
 
 import static java.net.HttpURLConnection.HTTP_OK;
+import static java.net.HttpURLConnection.HTTP_UNAUTHORIZED;
 import static org.codice.ddf.admin.common.message.DefaultMessages.cannotConnectError;
+import static org.codice.ddf.admin.common.message.DefaultMessages.unauthorizedError;
+import static org.codice.ddf.admin.common.message.DefaultMessages.unknownEndpointError;
 
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.ProcessingException;
@@ -28,6 +33,7 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import org.codice.ddf.admin.common.Report;
 import org.codice.ddf.admin.common.ReportWithResult;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
+import org.codice.ddf.admin.common.fields.common.HostField;
 import org.codice.ddf.admin.common.fields.common.UrlField;
 import org.codice.ddf.cxf.SecureCxfClientFactory;
 import org.slf4j.Logger;
@@ -38,43 +44,75 @@ public class RequestUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger(RequestUtils.class);
 
     /**
-     * Sends a get request to the specified URL and returns the content of the response.
+     * Takes a list of url formats, for example "https://%s:%d/wfs", formats them together with the
+     * hostField name and port, then sends GET requests to those URLs. If an HTTP 200 and response body is returned on one the the formatted
+     * URLs, then a {@link UrlField} whose value is the formatted URL is returned. The {@code UrlField} returned
+     * will have the same path and field name as the hostField passed in. On failure, the {@link ReportWithResult}
+     * will contain {@link org.codice.ddf.admin.common.message.ErrorMessage}s.
      *
-     * @param urlField contains the URL to send the get request to
-     * @param creds    option credentials consisting of a username and password
-     * @return a {@link ReportWithResult} containing the GET request response body or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
+     * @param hostField host field containing the host name and port
+     * @param urlFormats list of url formats to format with the hostField
+     * @param creds credentials for basic authentication
+     * @param queryParams additional query params
+     * @return a {@code ReportWithResult} containing a UrlField on success, or {@code ErrorMessage}s on failure
      */
-    public ReportWithResult<String> sendGetRequest(UrlField urlField, CredentialsField creds,
+    public ReportWithResult<UrlField> discoverUrlFromHost(HostField hostField, List<String> urlFormats, CredentialsField creds,
             Map<String, String> queryParams) {
-        WebClient client = generateClient(urlField, creds);
-        queryParams.entrySet()
-                .forEach(entry -> client.query(entry.getKey(), entry.getValue()));
+        ReportWithResult<UrlField> responseBody = new ReportWithResult<>();
+        for(String formatUrl : urlFormats) {
+            UrlField clientUrl = new UrlField();
+            clientUrl.fieldName(hostField.fieldName());
+            clientUrl.updatePath(hostField.path().subList(0, hostField.path().size() - 1));
+            clientUrl.setValue(String.format(formatUrl, hostField.name(), hostField.port()));
 
-        Response response;
-        ReportWithResult<String> responseBody = new ReportWithResult<>();
-        try {
-            response = client.get();
-        } catch (ProcessingException e) {
-            LOGGER.debug("Processing exception while sending GET request to [{}].",
-                    urlField.getValue(),
-                    e);
-            responseBody.argumentMessage(cannotConnectError(urlField.path()));
-            return responseBody;
+            ReportWithResult<String> body = sendGetRequest(clientUrl, creds, queryParams);
+            if(!body.containsErrorMsgs()) {
+                responseBody.result(clientUrl);
+                return responseBody;
+            } else {
+                responseBody.addMessages(body);
+            }
         }
-
-        String responseString = response.readEntity(String.class);
-        if (response.getStatus() != HTTP_OK || responseString.equals("")) {
-            LOGGER.debug("Bad or empty response received from sending GET to {}.",
-                    urlField.getValue());
-            responseBody.argumentMessage(cannotConnectError(urlField.path()));
-            return responseBody;
-        }
-        responseBody.result(responseString);
-        return responseBody;
+        return new ReportWithResult<UrlField>().argumentMessage(responseBody.messages().get(0));
     }
 
     /**
-     * Sends a post request to the specified url. Does not check response code or body.
+     * Creates a secure CXF {@code WebClient} and sends a request to the URL given by the clientUrl and
+     * optional queryParams. Returns a {@link ReportWithResult} containing the body of the response returned,
+     * or containing an {@link org.codice.ddf.admin.common.message.ErrorMessage} if the response was empty
+     * or not a HTTP 200.
+     *
+     * @param clientUrl url to send GET request to
+     * @param creds optional credentials for basic authentication
+     * @param queryParams optional query parameters
+     * @return {@link ReportWithResult} containing the body of the response on success, or containing an {@link org.codice.ddf.admin.common.message.ErrorMessage}
+     */
+    public ReportWithResult<String> sendGetRequest(UrlField clientUrl, CredentialsField creds, Map<String, String> queryParams) {
+        WebClient client = generateClient(clientUrl.getValue(), creds, queryParams);
+        ReportWithResult<String> body = new ReportWithResult<>();
+        Response response;
+        try {
+            response = client.get();
+        } catch (ProcessingException e) {
+            body.argumentMessage(cannotConnectError(clientUrl.path()));
+            return body;
+        }
+
+        if (response != null) {
+            String responseString = response.readEntity(String.class);
+            if (response.getStatus() == HTTP_OK && !responseString.equals("")) {
+                body.result(responseString);
+            } else if(response.getStatus() == HTTP_UNAUTHORIZED) {
+                body.argumentMessage(unauthorizedError(creds.path()));
+            } else {
+                body.argumentMessage(unknownEndpointError(clientUrl.path()));
+            }
+        }
+        return body;
+    }
+
+    /**
+     * Sends a post request to the specified url.
      *
      * @param urlField    URL to send Post request to
      * @param creds       optional credentials consisting of a username and password
@@ -84,7 +122,7 @@ public class RequestUtils {
      */
     public ReportWithResult<String> sendPostRequest(UrlField urlField, CredentialsField creds,
             String contentType, String content) {
-        WebClient client = generateClient(urlField, creds);
+        WebClient client = generateClient(urlField.getValue(), creds, Collections.emptyMap());
         Response response = client.type(contentType)
                 .post(content);
 
@@ -121,16 +159,21 @@ public class RequestUtils {
         return report;
     }
 
-    private WebClient generateClient(UrlField url, CredentialsField creds) {
+    public WebClient generateClient(String url, CredentialsField creds, Map<String, String> queryParams) {
         String username = creds == null ? null : creds.username();
         String password = creds == null ? null : creds.password();
-
         SecureCxfClientFactory<WebClient> clientFactory =
-                username == null && password == null ? new SecureCxfClientFactory<>(url.getValue(),
-                        WebClient.class) : new SecureCxfClientFactory<>(url.getValue(),
+                username == null && password == null ? new SecureCxfClientFactory<>(url,
+                        WebClient.class) : new SecureCxfClientFactory<>(url,
                         WebClient.class,
                         username,
                         password);
-        return clientFactory.getClient();
+
+        WebClient client = clientFactory.getClient();
+        if(queryParams != null) {
+            queryParams.entrySet()
+                    .forEach(entry -> client.query(entry.getKey(), entry.getValue()));
+        }
+        return client;
     }
 }

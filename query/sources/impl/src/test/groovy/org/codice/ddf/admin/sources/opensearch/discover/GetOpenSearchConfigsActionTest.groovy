@@ -35,7 +35,7 @@ class GetOpenSearchConfigsActionTest extends Specification {
 
     static BASE_PATH = [GetOpenSearchConfigsAction.ID, BaseAction.ARGUMENT]
 
-    static SERVICE_PID_PATH = [BASE_PATH, PID].flatten()
+    static PID_PATH = [BASE_PATH, PID].flatten()
 
     Action getOpenSearchConfigsAction
 
@@ -84,10 +84,26 @@ class GetOpenSearchConfigsActionTest extends Specification {
         then:
         1 * configReader.getServices(_, _) >> [new TestSource(S_PID_2, false)]
         1 * configReader.getServices(_, _) >> []
-        1 * configReader.getConfig(S_PID_2) >> baseManagedServiceConfigs.get(S_PID_2)
+        configReader.getConfig(S_PID_2) >> baseManagedServiceConfigs.get(S_PID_2)
         report.result() != null
         list.getList().size() == 1
         assertConfig(list.getList().get(0), 0, TEST_SHORT_NAME, S_PID_2, false)
+    }
+
+    def 'test failure due to config with id of pid does not exist'() {
+        setup:
+        actionArgs.put(PID, S_PID)
+        getOpenSearchConfigsAction.setArguments(actionArgs)
+        configReader.getConfig(S_PID) >> [:]
+
+        when:
+        def report = getOpenSearchConfigsAction.process()
+
+        then:
+        report.result() == null
+        report.messages().size() == 1
+        report.messages().get(0).code == DefaultMessages.NO_EXISTING_CONFIG
+        report.messages().get(0).path == PID_PATH
     }
 
     def 'test failure due to provided but empty pid field'() {
@@ -99,7 +115,7 @@ class GetOpenSearchConfigsActionTest extends Specification {
         report.result() == null
         report.messages().size() == 1
         report.messages().get(0).code == DefaultMessages.EMPTY_FIELD
-        report.messages().get(0).path == SERVICE_PID_PATH
+        report.messages().get(0).path == PID_PATH
     }
 
     def createOpenSearchManagedServiceConfigs() {
@@ -113,7 +129,7 @@ class GetOpenSearchConfigsActionTest extends Specification {
         def sourceInfo = (SourceInfoField) field
         assert sourceInfo.fieldName() == ListFieldImpl.INDEX_DELIMETER + index
         assert sourceInfo.isAvailable() == availability
-        assert sourceInfo.config().credentials().password() == "*****"
+        assert sourceInfo.config().credentials().password() == FLAG_PASSWORD
         assert sourceInfo.config().credentials().username() == TEST_USERNAME
         assert sourceInfo.config().sourceName() == sourceName
         assert sourceInfo.config().pid() == pid

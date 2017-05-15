@@ -56,6 +56,8 @@ class SourceTestCommons {
 
     static final ID = 'id'
 
+    static final FLAG_PASSWORD = ServiceCommons.FLAG_PASSWORD
+
     static F_PID = "testFactoryPid"
 
     static S_PID = "testServicePid"

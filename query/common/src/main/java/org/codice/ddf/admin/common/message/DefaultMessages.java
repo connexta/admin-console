@@ -37,8 +37,6 @@ public class DefaultMessages {
 
     public static final String CANNOT_CONNECT = "CANNOT_CONNECT";
 
-    public static final String INTERNAL_ERROR = "INTERNAL_ERROR";
-
     public static final String FAILED_UPDATE_ERROR = "FAILED_UPDATE";
 
     public static final String FAILED_DELETE_ERROR = "FAILED_DELETE";
@@ -49,7 +47,7 @@ public class DefaultMessages {
 
     public static final String INVALID_URI_ERROR = "INVALID_URI";
 
-    public static final ErrorMessage INTERNAL_ERROR_MESSAGE = new ErrorMessage(INTERNAL_ERROR);
+    public static final String UNAUTHORIZED = "UNAUTHORIZED";
 
     public static ErrorMessage failedPersistError() {
         return new ErrorMessage(FAILED_PERSIST);
@@ -114,5 +112,9 @@ public class DefaultMessages {
 
     public static ErrorMessage noExistingConfigError(List<String> path) {
         return new ErrorMessage(NO_EXISTING_CONFIG, path);
+    }
+
+    public static ErrorMessage unauthorizedError(List<String> path) {
+        return new ErrorMessage(UNAUTHORIZED, path);
     }
 }

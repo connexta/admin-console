@@ -27,7 +27,6 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 
-import org.codice.ddf.admin.common.Report;
 import org.codice.ddf.admin.common.ReportWithResult;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
 import org.codice.ddf.admin.common.fields.common.HostField;
@@ -79,18 +78,6 @@ public class CswSourceUtils {
     }
 
     /**
-     * Confirms whether or not an endpoint has CSW capabilities and returns the URL if it does.
-     *
-     * @param urlField the url endpoint
-     * @param creds    optional credentials for basic authentication
-     * @return an empty {@link Report} on success, or containing {@link org.codice.ddf.admin.common.message.ErrorMessage}s on failure.
-     */
-    public Report sendCswCapabilitiesRequest(UrlField urlField, CredentialsField creds) {
-        return requestUtils.sendGetRequest(urlField, creds,
-                GET_CAPABILITIES_PARAMS);
-    }
-
-    /**
      * Attempts to discover the source from the given hostname and port with optional basic authentication.
      *
      * @param hostField address to probe for CSW capabilities
@@ -98,18 +85,8 @@ public class CswSourceUtils {
      * @return a {@link ReportWithResult} containing the {@link UrlField} or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
      */
     public ReportWithResult<UrlField> discoverCswUrl(HostField hostField, CredentialsField creds) {
-        return URL_FORMATS.stream()
-                .map(format -> String.format(format, hostField.name(), hostField.port()))
-                .map(url -> {
-                    UrlField urlField = new UrlField(hostField.fieldName());
-                    urlField.setValue(url);
-                    urlField.updatePath(hostField.path());
-                    return urlField;
-                })
-                .filter(urlField -> !sendCswCapabilitiesRequest(urlField, creds).containsErrorMsgs())
-                .map(ReportWithResult::new)
-                .findFirst()
-                .orElse(new ReportWithResult<UrlField>().argumentMessage(unknownEndpointError(hostField.path())));
+        return requestUtils.discoverUrlFromHost(hostField, URL_FORMATS, creds,
+                GET_CAPABILITIES_PARAMS);
     }
 
     /**
@@ -120,7 +97,8 @@ public class CswSourceUtils {
      * @return a {@link ReportWithResult} containing the {@link SourceConfigUnionField} or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
      */
     public ReportWithResult<SourceConfigUnionField> getPreferredCswConfig(UrlField urlField, CredentialsField creds) {
-        ReportWithResult<String> responseBodyResult = requestUtils.sendGetRequest(urlField, creds,
+        ReportWithResult<String> responseBodyResult = requestUtils.sendGetRequest(urlField,
+                creds,
                 GET_CAPABILITIES_PARAMS);
 
         ReportWithResult<SourceConfigUnionField> configResult = new ReportWithResult<>();

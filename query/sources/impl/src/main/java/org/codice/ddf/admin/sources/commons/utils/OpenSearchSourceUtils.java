@@ -139,17 +139,7 @@ public class OpenSearchSourceUtils {
      * @return a {@link ReportWithResult} containing the discovered {@link UrlField} on success, or containing {@link org.codice.ddf.admin.common.message.ErrorMessage}s on failure.
      */
     public ReportWithResult<UrlField> discoverOpenSearchUrl(HostField hostField, CredentialsField creds) {
-        return URL_FORMATS.stream()
-                .map(format -> String.format(format, hostField.name(), hostField.port()))
-                .map(url -> {
-                    UrlField urlField = new UrlField(hostField.fieldName());
-                    urlField.updatePath(hostField.path());
-                    urlField.setValue(url);
-                    return urlField;
-                })
-                .filter(urlField -> !verifyOpenSearchCapabilities(urlField, creds).containsErrorMsgs())
-                .map(ReportWithResult::new)
-                .findFirst()
-                .orElse(new ReportWithResult<UrlField>().argumentMessage(unknownEndpointError(hostField.path())));
+        return requestUtils.discoverUrlFromHost(hostField, URL_FORMATS, creds,
+                GET_CAPABILITIES_PARAMS);
     }
 }

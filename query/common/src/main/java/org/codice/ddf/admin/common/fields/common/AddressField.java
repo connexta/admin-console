@@ -13,9 +13,6 @@
  */
 package org.codice.ddf.admin.common.fields.common;
 
-import static org.codice.ddf.admin.common.message.DefaultMessages.missingRequiredFieldError;
-
-import java.util.Collections;
 import java.util.List;
 
 import org.codice.ddf.admin.api.action.Message;
@@ -71,9 +68,11 @@ public class AddressField extends BaseObjectField {
 
     @Override
     public List<Message> validate() {
-        if(isRequired() && url == null) {
+        url.isRequired(true);
+        if(isRequired() && url.getValue() == null && (host.hostnameField().getValue() != null || host.portField().getValue() != null)) {
             host.isRequired(true);
             host.useDefaultRequired();
+            url.isRequired(false);
         }
         return super.validate();
     }

@@ -17,8 +17,8 @@ import java.util.List;
 
 import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
-import org.codice.ddf.admin.sources.fields.CswOutputSchemaField;
 import org.codice.ddf.admin.common.fields.common.UrlField;
+import org.codice.ddf.admin.sources.fields.CswOutputSchemaField;
 import org.codice.ddf.admin.sources.fields.CswProfile;
 import org.codice.ddf.admin.sources.fields.CswSpatialOperator;
 

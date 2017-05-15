@@ -13,7 +13,6 @@
  */
 package org.codice.ddf.admin.sources.opensearch.persist;
 
-import static org.codice.ddf.admin.common.message.DefaultMessages.noExistingConfigError;
 import static org.codice.ddf.admin.common.services.ServiceCommons.deleteService;
 import static org.codice.ddf.admin.common.services.ServiceCommons.serviceConfigurationExists;
 

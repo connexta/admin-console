@@ -94,10 +94,26 @@ class GetWfsConfigsActionTest extends Specification {
         then:
         1 * configReader.getServices(_, _) >> [new TestSource(S_PID_2, false)]
         1 * configReader.getServices(_, _) >> []
-        1 * configReader.getConfig(S_PID_2) >> managedServiceConfigs.get(S_PID_2)
+        configReader.getConfig(S_PID_2) >> managedServiceConfigs.get(S_PID_2)
         report.result() != null
         list.getList().size() == 1
         assertConfig(list.getList().get(0), 0, SOURCE_ID_2, S_PID_2, false, TEST_WFS_VERSION_2)
+    }
+
+    def 'test failure due to config with id of pid does not exist'() {
+        setup:
+        actionArgs.put(PID, S_PID)
+        getWfsConfigsAction.setArguments(actionArgs)
+        configReader.getConfig(S_PID) >> [:]
+
+        when:
+        def report = getWfsConfigsAction.process()
+
+        then:
+        report.result() == null
+        report.messages().size() == 1
+        report.messages().get(0).code == DefaultMessages.NO_EXISTING_CONFIG
+        report.messages().get(0).path == PID_PATH
     }
 
     def 'test failure due to provided but empty pid field'() {
@@ -116,7 +132,7 @@ class GetWfsConfigsActionTest extends Specification {
         def sourceInfo = (SourceInfoField) field
         assert sourceInfo.fieldName() == ListFieldImpl.INDEX_DELIMETER + index
         assert sourceInfo.isAvailable() == availability
-        assert sourceInfo.config().credentials().password() == "*****"
+        assert sourceInfo.config().credentials().password() == FLAG_PASSWORD
         assert sourceInfo.config().credentials().username() == TEST_USERNAME
         assert sourceInfo.config().sourceName() == sourceName
         assert sourceInfo.config().pid() == pid

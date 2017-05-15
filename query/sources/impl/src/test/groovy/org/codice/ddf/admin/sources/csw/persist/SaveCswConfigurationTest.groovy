@@ -53,6 +53,8 @@ class SaveCswConfigurationTest extends Specification {
 
     static SPATIAL_OPERATOR_PATH = [CONFIG_PATH, SPATIAL_OPERATOR].flatten()
 
+    static EVENT_SERVICE_ADDR_PATH = [CONFIG_PATH, CswSourceConfigurationField.EVENT_SERVICE_ADDRESS_FIELD_NAME].flatten()
+
     Action saveCswConfiguration
 
     ConfiguratorFactory configuratorFactory
@@ -198,6 +200,21 @@ class SaveCswConfigurationTest extends Specification {
         report.result() == null
         report.messages().size() == 1
         report.messages().get(0).path == SERVICE_PID_PATH
+        report.messages().get(0).code == DefaultMessages.EMPTY_FIELD
+    }
+
+    def 'test fail to save due to empty event service address provided'() {
+        setup:
+        actionArgs.get(SOURCE_CONFIG).put(CswSourceConfigurationField.EVENT_SERVICE_ADDRESS_FIELD_NAME, '')
+        saveCswConfiguration.setArguments(actionArgs)
+
+        when:
+        def report = saveCswConfiguration.process()
+
+        then:
+        report.result() == null
+        report.messages().size() == 1
+        report.messages().get(0).path == EVENT_SERVICE_ADDR_PATH
         report.messages().get(0).code == DefaultMessages.EMPTY_FIELD
     }
 

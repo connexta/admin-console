@@ -19,7 +19,6 @@ import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.common.actions.TestAction;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.common.fields.common.AddressField;
-import org.codice.ddf.admin.common.fields.common.HostField;
 
 import com.google.common.collect.ImmutableList;
 

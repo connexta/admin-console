@@ -39,7 +39,7 @@ public class ServiceCommons {
 
     public static final String FACTORY_PID_KEY = "service.factoryPid";
 
-    // A flag to indicate if a service being updated has a password of "password" then the
+    // A flag to indicate if a service being updated has a password of "password". If so, the
     // password will not be updated.
     public static final String FLAG_PASSWORD = "password";
 
@@ -117,13 +117,6 @@ public class ServiceCommons {
 
     public static <T> T mapValue(Map<String, Object> props, String key) {
         return props.get(key) == null ? null : (T) props.get(key);
-    }
-
-    public static void putPropertyIfNotNull(Map<String, Object> serviceProperties, String key, Field field) {
-        if(field.getValue() == null) {
-            return;
-        }
-        serviceProperties.put(key, field.getValue());
     }
 
     public static class ServicePropertyBuilder {

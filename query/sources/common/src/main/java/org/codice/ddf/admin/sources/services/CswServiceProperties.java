@@ -86,13 +86,16 @@ public class CswServiceProperties {
 
     public static final Map<String, Object> cswConfigToServiceProps(
             CswSourceConfigurationField config) {
-        ServiceCommons.ServicePropertyBuilder builder = new ServiceCommons.ServicePropertyBuilder()
-            .putPropertyIfNotNull(ID, config.sourceNameField())
-            .putPropertyIfNotNull(CSW_URL, config.endpointUrlField())
-            .putPropertyIfNotNull(EVENT_SERVICE_ADDRESS, config.eventServiceAddressField())
-            .putPropertyIfNotNull(USERNAME, config.credentials().usernameField())
-            .putPropertyIfNotNull(OUTPUT_SCHEMA, config.outputSchemaField())
-            .putPropertyIfNotNull(FORCE_SPATIAL_FILTER, config.spatialOperatorField());
+        ServiceCommons.ServicePropertyBuilder builder =
+                new ServiceCommons.ServicePropertyBuilder().putPropertyIfNotNull(ID,
+                        config.sourceNameField())
+                        .putPropertyIfNotNull(CSW_URL, config.endpointUrlField())
+                        .putPropertyIfNotNull(EVENT_SERVICE_ADDRESS,
+                                config.eventServiceAddressField())
+                        .putPropertyIfNotNull(USERNAME,
+                                config.credentials().usernameField())
+                        .putPropertyIfNotNull(OUTPUT_SCHEMA, config.outputSchemaField())
+                        .putPropertyIfNotNull(FORCE_SPATIAL_FILTER, config.spatialOperatorField());
 
         String password = config.credentials().password();
         if(password != null && !password.equals(FLAG_PASSWORD)) {

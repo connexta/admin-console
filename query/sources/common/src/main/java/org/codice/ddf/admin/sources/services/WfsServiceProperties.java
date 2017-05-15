@@ -75,10 +75,12 @@ public class WfsServiceProperties {
 
     public static Map<String, Object> wfsConfigToServiceProps(
             WfsSourceConfigurationField config) {
-        ServiceCommons.ServicePropertyBuilder builder = new ServiceCommons.ServicePropertyBuilder()
-                .putPropertyIfNotNull(ID, config.sourceNameField())
-                .putPropertyIfNotNull(WFS_URL, config.endpointUrlField())
-                .putPropertyIfNotNull(USERNAME, config.credentials().usernameField());
+        ServiceCommons.ServicePropertyBuilder builder =
+                new ServiceCommons.ServicePropertyBuilder().putPropertyIfNotNull(ID,
+                        config.sourceNameField())
+                        .putPropertyIfNotNull(WFS_URL, config.endpointUrlField())
+                        .putPropertyIfNotNull(USERNAME,
+                                config.credentials().usernameField());
 
         String password = config.credentials().password();
         if(password != null && !password.equals(FLAG_PASSWORD)) {

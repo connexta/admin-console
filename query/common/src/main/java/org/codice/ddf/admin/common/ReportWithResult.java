@@ -13,7 +13,6 @@
  */
 package org.codice.ddf.admin.common;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.codice.ddf.admin.api.action.Message;

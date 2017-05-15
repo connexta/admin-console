@@ -79,9 +79,12 @@ public class SaveCswConfiguration extends BaseAction<BooleanField> {
 
         if(pid.getValue() != null) {
             addMessages(serviceConfigurationExists(pid, configuratorFactory));
-        } else {
-            addMessages(validateSourceName(config.sourceNameField(), configuratorFactory));
         }
+
+        if(containsErrorMsgs()) {
+            return;
+        }
+        addMessages(validateSourceName(config.sourceNameField(), configuratorFactory));
     }
 
     @Override

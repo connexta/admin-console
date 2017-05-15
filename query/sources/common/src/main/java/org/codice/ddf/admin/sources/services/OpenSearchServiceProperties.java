@@ -60,10 +60,11 @@ public class OpenSearchServiceProperties {
 
     public static final Map<String, Object> openSearchConfigToServiceProps(
             OpenSearchSourceConfigurationField config) {
-        ServiceCommons.ServicePropertyBuilder builder = new ServiceCommons.ServicePropertyBuilder()
-            .putPropertyIfNotNull(SHORTNAME, config.sourceNameField())
-            .putPropertyIfNotNull(ENDPOINT_URL, config.endpointUrlField())
-            .putPropertyIfNotNull(USERNAME, config.credentials().usernameField());
+        ServiceCommons.ServicePropertyBuilder builder =
+                new ServiceCommons.ServicePropertyBuilder().putPropertyIfNotNull(SHORTNAME,
+                        config.sourceNameField())
+                        .putPropertyIfNotNull(ENDPOINT_URL, config.endpointUrlField())
+                        .putPropertyIfNotNull(USERNAME, config.credentials().usernameField());
 
         String password = config.credentials().password();
         if(password != null && !password.equals(FLAG_PASSWORD)) {

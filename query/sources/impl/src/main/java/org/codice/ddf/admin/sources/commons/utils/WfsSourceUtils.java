@@ -24,7 +24,6 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.codice.ddf.admin.common.Report;
 import org.codice.ddf.admin.common.ReportWithResult;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
 import org.codice.ddf.admin.common.fields.common.HostField;
@@ -67,17 +66,6 @@ public class WfsSourceUtils {
     }
 
     /**
-     * Attempts to verify the given URL as a functional WFS endpoint
-     *
-     * @param urlField URL to probe for WFS capabilities
-     * @param creds    optional username and password to add to Basic Auth header
-     * @return a {@link ReportWithResult} containing the {@link UrlField}, or containing {@link org.codice.ddf.admin.common.message.ErrorMessage}s on failure.
-     */
-    public Report sendWfsCapabilitiesRequest(UrlField urlField, CredentialsField creds) {
-        return requestUtils.sendGetRequest(urlField, creds, GET_CAPABILITIES_PARAMS);
-    }
-
-    /**
      * Attempts to discover a WFS endpoint at a given hostname and port
      *
      * @param hostField address to probe for WFS capabilities
@@ -85,18 +73,7 @@ public class WfsSourceUtils {
      * @return a {@link ReportWithResult} containing the {@link UrlField} or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
      */
     public ReportWithResult<UrlField> discoverWfsUrl(HostField hostField, CredentialsField creds) {
-        return URL_FORMATS.stream()
-                .map(format -> String.format(format, hostField.name(), hostField.port()))
-                .map(url -> {
-                    UrlField urlField = new UrlField(hostField.fieldName());
-                    urlField.updatePath(hostField.path());
-                    urlField.setValue(url);
-                    return urlField;
-                })
-                .filter(urlField -> !sendWfsCapabilitiesRequest(urlField, creds).containsErrorMsgs())
-                .map(ReportWithResult::new)
-                .findFirst()
-                .orElse(new ReportWithResult<UrlField>().argumentMessage(unknownEndpointError(hostField.path())));
+        return requestUtils.discoverUrlFromHost(hostField, URL_FORMATS, creds, GET_CAPABILITIES_PARAMS);
     }
 
     /**
@@ -112,7 +89,6 @@ public class WfsSourceUtils {
         if (responseBodyResult.containsErrorMsgs()) {
             configResult.addMessages(responseBodyResult);
             return configResult;
-
         }
 
         String requestBody = responseBodyResult.result();

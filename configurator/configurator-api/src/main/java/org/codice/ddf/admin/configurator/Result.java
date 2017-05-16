@@ -16,15 +16,37 @@ package org.codice.ddf.admin.configurator;
 import java.util.Optional;
 
 /**
+ * Provides result information for a specific {@link Configurator} operation.
+ * <p>
  * <b> This code is experimental. While this class is functional and tested, it may change or be
  * removed in a future version of the library. </b>
  */
 public interface Result {
-    boolean isTxactSucceeded();
+    /**
+     * Returns the success or failure of a particular operation.
+     *
+     * @return true if the operation committed successfully; else, false.
+     */
+    boolean isOperationSucceeded();
 
+    /**
+     * The final disposition of the operation.
+     *
+     * @return status indicating if the operation committed, rolled back, was skipped, or failed to process correctly
+     */
     Status getStatus();
 
+    /**
+     * If an exception occurred during processing, this {@code Optional} will contain the exception thrown.
+     *
+     * @return Optional failure exception
+     */
     Optional<Throwable> getBadOutcome();
 
+    /**
+     * For operations against Managed Services, this field will be populated with the associated {@code configId}.
+     *
+     * @return the configId of a specific managed service instance or null for other operations
+     */
     String getConfigId();
 }

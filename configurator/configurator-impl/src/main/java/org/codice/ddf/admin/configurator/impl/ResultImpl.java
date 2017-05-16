@@ -61,7 +61,7 @@ public class ResultImpl implements Result {
     }
 
     @Override
-    public boolean isTxactSucceeded() {
+    public boolean isOperationSucceeded() {
         return status == Status.COMMIT_PASSED;
     }
 

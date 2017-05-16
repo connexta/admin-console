@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -24,22 +25,22 @@ import org.codice.ddf.admin.configurator.OperationReport;
 import org.codice.ddf.admin.configurator.Result;
 
 public class OperationReportImpl implements OperationReport {
-    private final Map<String, Result> results = new LinkedHashMap<>();
+    private final Map<UUID, Result> results = new LinkedHashMap<>();
 
-    public boolean isTransactionSucceeded() {
+    public boolean hasTransactionSucceeded() {
         return results.values()
                 .stream()
-                .allMatch(Result::isTxactSucceeded);
+                .allMatch(Result::isOperationSucceeded);
     }
 
-    public Result getResult(String key) {
+    public Result getResult(UUID key) {
         return results.get(key);
     }
 
     public List<Result> getFailedResults() {
         return Collections.unmodifiableList(results.values()
                 .stream()
-                .filter(((Predicate<Result>) Result::isTxactSucceeded).negate())
+                .filter(((Predicate<Result>) Result::isOperationSucceeded).negate())
                 .collect(Collectors.toList()));
     }
 
@@ -48,7 +49,7 @@ public class OperationReportImpl implements OperationReport {
     }
 
     @Override
-    public void putResult(String key, Result result) {
+    public void putResult(UUID key, Result result) {
         results.put(key, result);
     }
 }

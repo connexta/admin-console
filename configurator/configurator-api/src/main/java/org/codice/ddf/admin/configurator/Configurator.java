@@ -15,6 +15,7 @@ package org.codice.ddf.admin.configurator;
 
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Provides pseudo-transactional semantics to system configuration tasks.
@@ -32,11 +33,14 @@ public interface Configurator {
      * occurs during the processing, a rollback is attempted of those handlers that had already been
      * committed.
      * <p>
-     * In the case of a successful commit, changes should be logged.
+     * After commit is called, this {@code Configurator} should not be used again.
+     * <p>
+     * In the case of a successful commit, changes should be logged. {@code auditParams} are
+     * interpolated into the {@code auditMessage} using the Log4J interpolation style.
      *
      * @param auditMessage In the case of a successful commit, the message to pass to be audited
      * @param auditParams  In the case of a successful commit, optional parameters to pass to be
-     *                     interpolated into the message
+     *                     interpolated into the message.
      * @return report of the commit status, whether successful, successfully rolled back, or partially
      * rolled back with errors
      */
@@ -46,6 +50,8 @@ public interface Configurator {
      * Sequentially invokes all the transaction's operations, committing their changes. If a failure
      * occurs during the processing, a rollback is attempted of those handlers that had already been
      * committed.
+     * <p>
+     * After commit is called, this {@code Configurator} should not be used again.
      *
      * @return report of the commit status, whether successful, successfully rolled back, or partially
      * rolled back with errors
@@ -59,7 +65,7 @@ public interface Configurator {
      * @return a lookup key that can be used to correlate this operation in the
      * final {@link OperationReport}
      */
-    String startBundle(String bundleSymName);
+    UUID startBundle(String bundleSymName);
 
     /**
      * Stops the bundle with the given name.
@@ -68,7 +74,7 @@ public interface Configurator {
      * @return a lookup key that can be used to correlate this operation in the
      * final {@link OperationReport}
      */
-    String stopBundle(String bundleSymName);
+    UUID stopBundle(String bundleSymName);
 
     /**
      * Installs and starts the feature with the given name.
@@ -77,7 +83,7 @@ public interface Configurator {
      * @return a lookup key that can be used to correlate this operation in the
      * final {@link OperationReport}
      */
-    String startFeature(String featureName);
+    UUID startFeature(String featureName);
 
     /**
      * Stops the feature with the given name.
@@ -86,17 +92,18 @@ public interface Configurator {
      * @return a lookup key that can be used to correlate this operation in the
      * final {@link OperationReport}
      */
-    String stopFeature(String featureName);
+    UUID stopFeature(String featureName);
 
     /**
      * Creates a property file in the system with the given set of new key:value pairs.
      *
      * @param propFile   the property file to create
-     * @param properties the set of key:value pairs to save to the property file
+     * @param properties the set of key:value pairs to save to the property file; a null map or
+     *                   null values in the map will result in a runtime exception
      * @return a lookup key that can be used to correlate this operation in the
      * final {@link OperationReport}
      */
-    String createPropertyFile(Path propFile, Map<String, String> properties);
+    UUID createPropertyFile(Path propFile, Map<String, String> properties);
 
     /**
      * Deletes a property file in the system.
@@ -105,13 +112,14 @@ public interface Configurator {
      * @return a lookup key that can be used to correlate this operation in the
      * final {@link OperationReport}
      */
-    String deletePropertyFile(Path propFile);
+    UUID deletePropertyFile(Path propFile);
 
     /**
      * Updates a property file in the system with the given set of new key:value pairs.
      *
      * @param propFile    the property file to update
-     * @param properties  the set of key:value pairs to save to the property file
+     * @param properties  the set of key:value pairs to save to the property file; a null map or
+     *                    null values in the map will result in a runtime exception
      * @param keepIgnored if true, then any keys already in the property file will retain their
      *                    initial values if they are excluded from the {@code properties} param; if
      *                    false, then the only properties that will be in the updated file are those
@@ -119,12 +127,12 @@ public interface Configurator {
      * @return a lookup key that can be used to correlate this operation in the
      * final {@link OperationReport}
      */
-    String updatePropertyFile(Path propFile, Map<String, String> properties, boolean keepIgnored);
+    UUID updatePropertyFile(Path propFile, Map<String, String> properties, boolean keepIgnored);
 
     /**
      * Updates a bundle configuration file in the system with the given set of new key:value pairs.
      *
-     * @param configPid   the configId of the bundle configuration file to update
+     * @param configPid   the configPid of the bundle configuration file to update
      * @param configs     the set of key:value pairs to save in the configuration
      * @param keepIgnored if true, then any keys already in the config file will retain their
      *                    initial values if they are excluded from the {@code properties} param; if
@@ -133,7 +141,7 @@ public interface Configurator {
      * @return a lookup key that can be used to correlate this operation in the
      * final {@link OperationReport}
      */
-    String updateConfigFile(String configPid, Map<String, Object> configs, boolean keepIgnored);
+    UUID updateConfigFile(String configPid, Map<String, Object> configs, boolean keepIgnored);
 
     /**
      * Creates a new managed service for the given factory.
@@ -143,7 +151,7 @@ public interface Configurator {
      * @return a lookup key that can be used to correlate this operation in the
      * final {@link OperationReport}
      */
-    String createManagedService(String factoryPid, Map<String, Object> configs);
+    UUID createManagedService(String factoryPid, Map<String, Object> configs);
 
     /**
      * Deletes a managed service.
@@ -152,5 +160,5 @@ public interface Configurator {
      * @return a lookup key that can be used to correlate this operation in the
      * final {@link OperationReport}
      */
-    String deleteManagedService(String configPid);
+    UUID deleteManagedService(String configPid);
 }

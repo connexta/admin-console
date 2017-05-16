@@ -34,7 +34,7 @@ class DefaultEmbeddedLdapPersistMethodTest extends Specification {
 
     def setup() {
         def configurator = Mock(Configurator)
-        configurator.startFeature(_ as String) >> ""
+        configurator.startFeature(_ as String) >> UUID.randomUUID()
         configuratorFactory = Mock(ConfiguratorFactory)
         configuratorFactory.getConfigurator() >> configurator
 

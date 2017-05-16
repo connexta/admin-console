@@ -29,32 +29,36 @@ public interface ConfigReader {
      *
      * @param bundleSymName the symbolic name of the bundle
      * @return true if started; else, false
+     * @throws ConfiguratorException if any errors occur
      */
-    boolean isBundleStarted(String bundleSymName);
+    boolean isBundleStarted(String bundleSymName) throws ConfiguratorException;
 
     /**
      * Determines if the feature with the given name is started.
      *
      * @param featureName the name of the feature
      * @return true if started; else, false
+     * @throws ConfiguratorException if any errors occur
      */
-    boolean isFeatureStarted(String featureName);
+    boolean isFeatureStarted(String featureName) throws ConfiguratorException;
 
     /**
      * Gets the current key:value pairs set in the given property file.
      *
      * @param propFile the property file to query
      * @return the current set of key:value pairs
+     * @throws ConfiguratorException if any errors occur
      */
-    Map<String, String> getProperties(Path propFile);
+    Map<String, String> getProperties(Path propFile) throws ConfiguratorException;
 
     /**
      * Gets the current key:value pairs set in the given configuration file.
      *
      * @param configPid the configId of the bundle configuration file to query
      * @return the current set of key:value pairs
+     * @throws ConfiguratorException if any errors occur
      */
-    Map<String, Object> getConfig(String configPid);
+    Map<String, Object> getConfig(String configPid) throws ConfiguratorException;
 
     /**
      * For the given managed service factory, retrieves the full complement of configuration properties.
@@ -63,8 +67,10 @@ public interface ConfigReader {
      *
      * @param factoryPid the factoryPid of the service to query
      * @return the the current sets of key:value pairs, in a map keyed on {@code configId}
+     * @throws ConfiguratorException if any errors occur
      */
-    Map<String, Map<String, Object>> getManagedServiceConfigs(String factoryPid);
+    Map<String, Map<String, Object>> getManagedServiceConfigs(String factoryPid)
+            throws ConfiguratorException;
 
     /**
      * Retrieves the service reference. The reference should only be used for reading purposes,
@@ -81,9 +87,9 @@ public interface ConfigReader {
      * Retrieves the services. The services should only be used for reading purposes,
      * any changes should be done through a commit
      *
-     * @param <S> service interface
+     * @param <S>          service interface
      * @param serviceClass Class of service to retrieve
-     * @param filter the filter expression or {@code null} for all services, null returns all services
+     * @param filter       the filter expression or {@code null} for all services, null returns all services
      * @return a set of services of the serviceClass
      * @throws ConfiguratorException if any errors occur
      */

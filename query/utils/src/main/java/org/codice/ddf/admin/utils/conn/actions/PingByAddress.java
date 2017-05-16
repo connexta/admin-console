@@ -25,13 +25,14 @@ import com.google.common.collect.ImmutableList;
 public class PingByAddress extends TestAction {
     public static final String NAME = "pingByAddress";
 
-    public static final String DESCRIPTION = "Attempts to reach the given address";
+    public static final String DESCRIPTION = "Attempts to reach the given URL or hostname and port.";
 
     private AddressField address;
 
     public PingByAddress() {
         super(NAME, DESCRIPTION);
         address = new AddressField();
+        address.isRequired(true);
     }
 
     @Override
@@ -41,8 +42,6 @@ public class PingByAddress extends TestAction {
 
     @Override
     public BooleanField performAction() {
-        BooleanField testPassed = new BooleanField();
-        testPassed.setValue(true);
-        return testPassed;
+        return new BooleanField(true);
     }
 }

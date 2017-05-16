@@ -13,44 +13,9 @@
  **/
 package org.codice.ddf.admin.common.actions;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.codice.ddf.admin.api.action.ActionReport;
-import org.codice.ddf.admin.api.action.Message;
 import org.codice.ddf.admin.api.fields.Field;
+import org.codice.ddf.admin.common.ReportWithResult;
 
-public class ActionReportImpl<T extends Field> implements ActionReport<T> {
-
-    private List<Message> messages;
-
-    private T result;
-
-    public ActionReportImpl() {
-        this.messages = new ArrayList<>();
-    }
-
-    @Override
-    public List<Message> messages() {
-        return messages;
-    }
-
-    @Override
-    public T result() {
-        return result;
-    }
-
-    @Override
-    public void result(T result) {
-        this.result = result;
-    }
-
-    public void addMessage(Message message) {
-        messages.add(message);
-    }
-
-    public boolean containsErrorMsgs() {
-        return messages().stream()
-                .anyMatch(msg -> msg.getType() == Message.MessageType.ERROR);
-    }
+public class ActionReportImpl<T extends Field> extends ReportWithResult<T> implements ActionReport<T> {
 }

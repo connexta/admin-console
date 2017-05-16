@@ -13,6 +13,8 @@
  **/
 package org.codice.ddf.admin.sources.fields.type;
 
+import static org.codice.ddf.admin.common.services.ServiceCommons.FLAG_PASSWORD;
+
 import java.util.List;
 
 import org.codice.ddf.admin.api.fields.Field;
@@ -23,6 +25,7 @@ import org.codice.ddf.admin.common.fields.common.CredentialsField;
 import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.common.fields.common.UrlField;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
 
 public class SourceConfigUnionField extends BaseUnionField {
@@ -31,14 +34,18 @@ public class SourceConfigUnionField extends BaseUnionField {
 
     public static final String FIELD_TYPE_NAME = "SourceConfiguration";
 
-    public static final String DESCRIPTION = "All supported source configuration types";
+    public static final String DESCRIPTION = "All supported source configuration types.";
+
+    public static final String SOURCE_NAME_FIELD_NAME = "sourceName";
+
+    public static final String ENDPOINT_URL_FIELD_NAME = "endpointUrl";
 
     private static final List<ObjectField> UNION_TYPES =
             ImmutableList.of(new CswSourceConfigurationField(),
                     new WfsSourceConfigurationField(),
-                    new OpensearchSourceConfigurationField());
+                    new OpenSearchSourceConfigurationField());
 
-    protected PidField pid;
+    protected PidField pidField;
 
     protected StringField sourceName;
 
@@ -54,16 +61,10 @@ public class SourceConfigUnionField extends BaseUnionField {
         super(FIELD_NAME, fieldTypeName, description, UNION_TYPES, true);
     }
 
-    public PidField pidField() {
-        return pid;
-    }
+    // Setters
 
-    public CredentialsField credentials() {
-        return creds;
-    }
-
-    public SourceConfigUnionField pid(String pid) {
-        this.pid.setValue(pid);
+    public SourceConfigUnionField pid(String servicePid) {
+        this.pidField.setValue(servicePid);
         return this;
     }
 
@@ -83,16 +84,56 @@ public class SourceConfigUnionField extends BaseUnionField {
         return this;
     }
 
+    // Getters
+    public String sourceName() {
+        return sourceName.getValue();
+    }
+
+    public StringField sourceNameField() {
+        return sourceName;
+    }
+
+    public CredentialsField credentials() {
+        return this.creds;
+    }
+
+    public String pid() {
+        return pidField.getValue();
+    }
+
+    public PidField pidField() {
+        return pidField;
+    }
+
+    public String endpointUrl() {
+        return endpointUrl.getValue();
+    }
+
+    public UrlField endpointUrlField() {
+        return endpointUrl;
+    }
+
     @Override
     public List<Field> getFields() {
-        return ImmutableList.of(pid, sourceName, endpointUrl, creds);
+        return ImmutableList.of(pidField, sourceName, endpointUrl, creds);
     }
 
     @Override
     public void initializeFields() {
-        pid = new PidField();
-        sourceName = new StringField("sourceName");
-        endpointUrl = new UrlField("endpointUrl");
+        pidField = new PidField();
+        sourceName = new StringField(SOURCE_NAME_FIELD_NAME);
+        endpointUrl = new UrlField(ENDPOINT_URL_FIELD_NAME);
         creds = new CredentialsField();
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add(PidField.DEFAULT_FIELD_NAME, pid())
+                .add(SOURCE_NAME_FIELD_NAME, sourceName())
+                .add(ENDPOINT_URL_FIELD_NAME, endpointUrl())
+                .add(CredentialsField.USERNAME_FIELD_NAME, credentials().username())
+                .add(CredentialsField.PASSWORD_FIELD_NAME, FLAG_PASSWORD)
+                .toString();
     }
 }

@@ -18,14 +18,15 @@ import java.util.List;
 import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
-import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 import org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField;
 
 import com.google.common.collect.ImmutableList;
 
 public class SourceInfoField extends BaseObjectField {
 
-    private static final String DEFAULT_FIELD_NAME = "sourceInfo";
+    public static final String DEFAULT_FIELD_NAME = "sourceInfo";
+
+    public static final String IS_AVAILABLE_FIELD_NAME = "isAvailable";
 
     private static final String FIELD_TYPE_NAME = "SourceInfo";
 
@@ -34,21 +35,14 @@ public class SourceInfoField extends BaseObjectField {
 
     private BooleanField isAvailable;
 
-    private StringField sourceHandlerName;
-
     private SourceConfigUnionField config;
 
     public SourceInfoField() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
     }
 
-    public SourceInfoField isAvaliable(boolean avaliable) {
-        isAvailable.setValue(avaliable);
-        return this;
-    }
-
-    public SourceInfoField sourceHandlerName(String name) {
-        sourceHandlerName.setValue(name);
+    public SourceInfoField isAvaliable(boolean available) {
+        isAvailable.setValue(available);
         return this;
     }
 
@@ -57,21 +51,22 @@ public class SourceInfoField extends BaseObjectField {
         return this;
     }
 
-    @Override
-    public List<Field> getFields() {
-        return ImmutableList.of(isAvailable, sourceHandlerName, config);
+    public Boolean isAvailable() {
+        return isAvailable.getValue();
+    }
+
+    public SourceConfigUnionField config() {
+        return config;
     }
 
     @Override
-    public SourceInfoField allFieldsRequired(boolean required) {
-        super.allFieldsRequired(required);
-        return this;
+    public List<Field> getFields() {
+        return ImmutableList.of(isAvailable, config);
     }
 
     @Override
     public void initializeFields() {
-        isAvailable = new BooleanField("isAvailable");
-        sourceHandlerName = new StringField("sourceHandlerName");
         config = new SourceConfigUnionField();
+        isAvailable = new BooleanField(IS_AVAILABLE_FIELD_NAME);
     }
 }

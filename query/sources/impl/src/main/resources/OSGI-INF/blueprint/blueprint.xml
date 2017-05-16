@@ -12,7 +12,25 @@
  **/
 -->
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
-    <service id="sourcesActionCreator" interface="org.codice.ddf.admin.api.action.ActionCreator">
-        <bean class="org.codice.ddf.admin.sources.SourceActionCreator" />
-    </service>
+    <bean id="cswActionCreator" class="org.codice.ddf.admin.sources.csw.CswActionCreator">
+        <property name="configuratorFactory" ref="configuratorFactory"/>
+    </bean>
+
+    <bean id="openSearchActionCreator"
+          class="org.codice.ddf.admin.sources.opensearch.OpenSearchActionCreator">
+        <property name="configuratorFactory" ref="configuratorFactory"/>
+    </bean>
+
+    <bean id="wfsActionCreator" class="org.codice.ddf.admin.sources.wfs.WfsActionCreator">
+        <property name="configuratorFactory" ref="configuratorFactory"/>
+    </bean>
+
+    <service ref="cswActionCreator" interface="org.codice.ddf.admin.api.action.ActionCreator"/>
+    <service ref="openSearchActionCreator"
+             interface="org.codice.ddf.admin.api.action.ActionCreator"/>
+    <service ref="wfsActionCreator" interface="org.codice.ddf.admin.api.action.ActionCreator"/>
+
+    <reference id="configuratorFactory"
+               interface="org.codice.ddf.admin.configurator.ConfiguratorFactory"
+               availability="mandatory" filter="(type=txact)"/>
 </blueprint>

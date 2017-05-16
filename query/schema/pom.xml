@@ -105,11 +105,6 @@
             <artifactId>graphql-dependencies</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.codice.ddf.admin.beta</groupId>
-            <artifactId>admin-graphql</artifactId>
-            <version>${project.version}</version>
-        </dependency>
         <!--TODO: Clean the dependencies above up-->
 
         <dependency>

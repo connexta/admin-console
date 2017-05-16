@@ -27,18 +27,54 @@ public class DefaultMessages {
 
     public static final String INVALID_HOSTNAME = "INVALID_HOSTNAME";
 
+    public static final String INVALID_CONTEXT_PATH = "INVALID_CONTEXT_PATH";
+
     public static final String FAILED_PERSIST = "FAILED_PERSIST";
 
     public static final String UNSUPPORTED_ENUM = "UNSUPPORTED_ENUM";
 
-    public static final String INVALID_CONTEXT_PATH = "INVALID_CONTEXT_PATH";
+    public static final String UNKNOWN_ENDPOINT = "UNKNOWN_ENDPOINT";
 
-    public static ErrorMessage unsupportedEnum(List<String> path) {
-        return new ErrorMessage(UNSUPPORTED_ENUM, path);
-    }
+    public static final String CANNOT_CONNECT = "CANNOT_CONNECT";
+
+    public static final String FAILED_UPDATE_ERROR = "FAILED_UPDATE";
+
+    public static final String FAILED_DELETE_ERROR = "FAILED_DELETE";
+
+    public static final String INVALID_URL_ERROR = "INVALID_URL";
+
+    public static final String NO_EXISTING_CONFIG = "NO_EXISTING_CONFIG";
+
+    public static final String INVALID_URI_ERROR = "INVALID_URI";
+
+    public static final String UNAUTHORIZED = "UNAUTHORIZED";
 
     public static ErrorMessage failedPersistError() {
         return new ErrorMessage(FAILED_PERSIST);
+    }
+
+    public static ErrorMessage failedDeleteError() {
+        return new ErrorMessage(FAILED_DELETE_ERROR);
+    }
+
+    public static ErrorMessage failedUpdateError() {
+        return new ErrorMessage(FAILED_UPDATE_ERROR);
+    }
+
+    public static ErrorMessage cannotConnectError() {
+        return new ErrorMessage(CANNOT_CONNECT);
+    }
+
+    public static ErrorMessage noExistingConfigError() {
+        return new ErrorMessage(NO_EXISTING_CONFIG);
+    }
+
+    public static ErrorMessage failedPersistError(List<String> path) {
+        return new ErrorMessage(FAILED_PERSIST, path);
+    }
+
+    public static ErrorMessage unsupportedEnum(List<String> path) {
+        return new ErrorMessage(UNSUPPORTED_ENUM, path);
     }
 
     public static ErrorMessage missingKeyValue(List<String> path) {
@@ -63,5 +99,37 @@ public class DefaultMessages {
 
     public static ErrorMessage invalidContextPathError(List<String> path) {
         return new ErrorMessage(INVALID_CONTEXT_PATH, path);
+    }
+
+    public static ErrorMessage unknownEndpointError(List<String> path) {
+        return new ErrorMessage(UNKNOWN_ENDPOINT, path);
+    }
+
+    public static ErrorMessage cannotConnectError(List<String> path) {
+        return new ErrorMessage(CANNOT_CONNECT, path);
+    }
+
+    public static ErrorMessage failedUpdateError(List<String> path) {
+        return new ErrorMessage(FAILED_UPDATE_ERROR, path);
+    }
+
+    public static ErrorMessage failedDeleteError(List<String> path) {
+        return new ErrorMessage(FAILED_DELETE_ERROR, path);
+    }
+
+    public static ErrorMessage invalidUrlError(List<String> path) {
+        return new ErrorMessage(INVALID_URL_ERROR, path);
+    }
+
+    public static ErrorMessage invalidUriError(List<String> path) {
+        return new ErrorMessage(INVALID_URI_ERROR, path);
+    }
+
+    public static ErrorMessage noExistingConfigError(List<String> path) {
+        return new ErrorMessage(NO_EXISTING_CONFIG, path);
+    }
+
+    public static ErrorMessage unauthorizedError(List<String> path) {
+        return new ErrorMessage(UNAUTHORIZED, path);
     }
 }

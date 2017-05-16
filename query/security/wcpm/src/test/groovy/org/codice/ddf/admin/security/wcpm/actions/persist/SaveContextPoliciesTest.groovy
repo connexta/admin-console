@@ -165,7 +165,7 @@ class SaveContextPoliciesTest extends Specification {
 
         then:
         report.messages().size() == 1
-        report.messages()[0].code == DefaultMessages.MISSING_REQUIRED_FIELD
+        report.messages()[0].code == DefaultMessages.UNSUPPORTED_ENUM
         report.messages()[0].path == [SaveContextPolices.ACTION_ID, BaseAction.ARGUMENT, 'policies', Field.INDEX_DELIMETER + 0, 'authTypes', ListFieldImpl.INDEX_DELIMETER + 1]
         report.result() == null
     }
@@ -198,7 +198,7 @@ class SaveContextPoliciesTest extends Specification {
 
         then:
         report.messages().size() == 1
-        report.messages()[0].code == DefaultMessages.MISSING_REQUIRED_FIELD
+        report.messages()[0].code == DefaultMessages.UNSUPPORTED_ENUM
         report.messages()[0].path == [SaveContextPolices.ACTION_ID, BaseAction.ARGUMENT, 'policies', Field.INDEX_DELIMETER + 0, Realm.DEFAULT_FIELD_NAME]
         report.result() == null
     }

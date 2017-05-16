@@ -48,6 +48,10 @@ public abstract class BaseObjectField extends BaseField<Map<String, Object>>
 
     @Override
     public void setValue(Map<String, Object> values) {
+        if(values == null || values.isEmpty()) {
+            return;
+        }
+
         getFields().stream()
                 .filter(field -> values.containsKey(field.fieldName()))
                 .forEach(field -> field.setValue(values.get(field.fieldName())));
@@ -65,7 +69,6 @@ public abstract class BaseObjectField extends BaseField<Map<String, Object>>
                 .map(field -> (List<Message>) field.validate())
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList()));
-
         return validationErrors;
     }
 

@@ -10,11 +10,12 @@
  * Lesser General Public License for more details. A copy of the GNU Lesser General Public License
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
- **/
+ */
 package org.codice.ddf.admin.common.fields.common;
 
 import java.util.List;
 
+import org.codice.ddf.admin.api.action.Message;
 import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
 
@@ -26,24 +27,63 @@ public class AddressField extends BaseObjectField {
 
     public static final String FIELD_TYPE_NAME = "Address";
 
-    public static final String DESCRIPTION = "Represents a url base address.";
+    public static final String DESCRIPTION =
+            "Represents an address given by either a hostname and port or a URL. When this field is required,"
+                    + " a URL or hostname and port must be provided.";
 
-    private HostnameField hostname;
+    private HostField host;
 
-    private PortField port;
+    private UrlField url;
 
     public AddressField() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
     }
 
+    public AddressField hostname(String hostname) {
+        host.name(hostname);
+        return this;
+    }
+
+    public AddressField port(int port) {
+        host.port(port);
+        return this;
+    }
+
+    public AddressField url(String url) {
+        this.url.setValue(url);
+        return this;
+    }
+
+    public HostField host() {
+        return host;
+    }
+
+    public String url() {
+        return url.getValue();
+    }
+
+    public UrlField urlField() {
+        return url;
+    }
+
+    @Override
+    public List<Message> validate() {
+        if(isRequired() && url.getValue() == null && (host.hostnameField().getValue() != null || host.portField().getValue() != null)) {
+            host.isRequired(true);
+        } else if(isRequired()) {
+            url.isRequired(true);
+        }
+        return super.validate();
+    }
+
     @Override
     public List<Field> getFields() {
-        return ImmutableList.of(hostname, port);
+        return ImmutableList.of(host, url);
     }
 
     @Override
     public void initializeFields() {
-        this.hostname = new HostnameField();
-        this.port = new PortField();
+        host = new HostField();
+        url = new UrlField();
     }
 }

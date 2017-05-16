@@ -21,6 +21,7 @@ import org.codice.ddf.admin.api.action.Action;
 import org.codice.ddf.admin.api.action.ActionReport;
 import org.codice.ddf.admin.api.action.Message;
 import org.codice.ddf.admin.api.fields.Field;
+import org.codice.ddf.admin.common.Report;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,7 +93,7 @@ public abstract class BaseAction<T extends Field> implements Action<T> {
         Message copy = msg.copy();
         copy.addSubpath(ARGUMENT);
         copy.addSubpath(actionId);
-        report.addMessage(copy);
+        report.argumentMessage(copy);
         return this;
     }
 
@@ -104,16 +105,21 @@ public abstract class BaseAction<T extends Field> implements Action<T> {
     protected BaseAction addMessage(Message msg) {
         Message copy = msg.copy();
         copy.addSubpath(actionId);
-        report.addMessage(copy);
+        report.resultMessage(copy);
         return this;
     }
 
+    protected BaseAction addMessages(Report report) {
+        addMessages(report.resultMessages());
+        addArgumentMessages(report.argumentMessages());
+        return this;
+    }
 
     public void validate() {
         getArguments().stream()
                 .map(Field::validate)
                 .flatMap(Collection<Message>::stream)
-                .forEach(msg -> addArgumentMessage(msg));
+                .forEach(this::addArgumentMessage);
     }
 
     public abstract T performAction();

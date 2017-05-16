@@ -28,30 +28,6 @@ public class CswSpatialOperator extends BaseEnumField<String> {
     public static final String DESCRIPTION =
             "A spatial operator determines whether its geometric arguments satisfy the stated spatial relationship.";
 
-    public static final String NO_FILTER_FIELD_NAME = "None";
-
-    public static final String BBOX_FIELD_NAME = "BBOX";
-
-    public static final String BEYOND_FIELD_NAME = "Beyond";
-
-    public static final String CONTAINS_FIELD_NAME = "Contains";
-
-    public static final String CROSSES_FIELD_NAME = "Crosses";
-
-    public static final String DISJOINT_FIELD_NAME = "Disjoint";
-
-    public static final String DWITHIN_FIELD_NAME = "DWithin";
-
-    public static final String EQUALS_FIELD_NAME = "Equals";
-
-    public static final String INTERSECTS_FIELD_NAME = "Intersects";
-
-    public static final String OVERLAPS_FIELD_NAME = "Overlaps";
-
-    public static final String TOUCHES_FIELD_NAME = "Touches";
-
-    public static final String WITHIN_FIELD_NAME = "Within";
-
     public CswSpatialOperator() {
         this(new NoFilter());
     }
@@ -77,7 +53,9 @@ public class CswSpatialOperator extends BaseEnumField<String> {
 
     protected static final class NoFilter extends StringField {
 
-        public static final String NO_FILTER = "NO_FILTER";
+        public static final String OPERATOR = "NO_FILTER";
+
+        public static final String NO_FILTER_FIELD_NAME = "None";
 
         public static final String DESCRIPTION =
                 "Indicates that no spatial operators should be applied.";
@@ -88,13 +66,13 @@ public class CswSpatialOperator extends BaseEnumField<String> {
 
         @Override
         public String getValue() {
-            return NO_FILTER;
+            return OPERATOR;
         }
     }
 
     protected static final class Bbox extends StringField {
 
-        public static final String BBOX = "BBOX";
+        public static final String BBOX_FIELD_NAME = "BBOX";
 
         public static final String DESCRIPTION =
                 "Identifies all geometries that spatially interact with a bounding box.";
@@ -105,13 +83,13 @@ public class CswSpatialOperator extends BaseEnumField<String> {
 
         @Override
         public String getValue() {
-            return BBOX;
+            return BBOX_FIELD_NAME;
         }
     }
 
     protected static final class Beyond extends StringField {
 
-        public static final String BEYOND = "Beyond";
+        public static final String BEYOND_FIELD_NAME = "Beyond";
 
         public static final String DESCRIPTION =
                 "Tests whether the value of a geometric property A is beyond a specified distance d of the specified literal geometric value B.";
@@ -122,13 +100,13 @@ public class CswSpatialOperator extends BaseEnumField<String> {
 
         @Override
         public String getValue() {
-            return BEYOND;
+            return BEYOND_FIELD_NAME;
         }
     }
 
     protected static final class Contains extends StringField {
 
-        public static final String CONTAINS = "Contains";
+        public static final String CONTAINS_FIELD_NAME = "Contains";
 
         public static final String DESCRIPTION =
                 "Determines whether the second geometry is completely within the first geometry. Contain tests the exact opposite result of within.";
@@ -139,13 +117,13 @@ public class CswSpatialOperator extends BaseEnumField<String> {
 
         @Override
         public String getValue() {
-            return CONTAINS;
+            return CONTAINS_FIELD_NAME;
         }
     }
 
     protected static final class Crosses extends StringField {
 
-        public static final String CROSSES = "Crosses";
+        public static final String CROSSES_FIELD_NAME = "Crosses";
 
         public static final String DESCRIPTION =
                 "Determines whether two geometric properties cross each other.";
@@ -156,13 +134,13 @@ public class CswSpatialOperator extends BaseEnumField<String> {
 
         @Override
         public String getValue() {
-            return CROSSES;
+            return CROSSES_FIELD_NAME;
         }
     }
 
     protected static final class Disjoint extends StringField {
 
-        public static final String DISJOINT = "Disjoint";
+        public static final String DISJOINT_FIELD_NAME = "Disjoint";
 
         public static final String DESCRIPTION =
                 "Determines whether two geometric properties do not intersect.";
@@ -173,13 +151,13 @@ public class CswSpatialOperator extends BaseEnumField<String> {
 
         @Override
         public String getValue() {
-            return DISJOINT;
+            return DISJOINT_FIELD_NAME;
         }
     }
 
     protected static final class DWithin extends StringField {
 
-        public static final String DWITHIN = "DWithin";
+        public static final String DWITHIN_FIELD_NAME = "DWithin";
 
         public static final String DESCRIPTION =
                 "Determines whether the value of a geometric property A is within a specified distance d of the specified literal geometric value B.";
@@ -190,13 +168,13 @@ public class CswSpatialOperator extends BaseEnumField<String> {
 
         @Override
         public String getValue() {
-            return DWITHIN;
+            return DWITHIN_FIELD_NAME;
         }
     }
 
     protected static final class Equals extends StringField {
 
-        public static final String EQUALS = "Equals";
+        public static final String EQUALS_FIELD_NAME = "Equals";
 
         public static final String DESCRIPTION =
                 "Determines whether two geometric properties are identical.";
@@ -207,13 +185,13 @@ public class CswSpatialOperator extends BaseEnumField<String> {
 
         @Override
         public String getValue() {
-            return EQUALS;
+            return EQUALS_FIELD_NAME;
         }
     }
 
     protected static final class Intersects extends StringField {
 
-        public static final String INTERSECTS = "Intersects";
+        public static final String INTERSECTS_FIELD_NAME = "Intersects";
 
         public static final String DESCRIPTION =
                 "Determines whether two geometric properties intersect with each other.";
@@ -224,13 +202,13 @@ public class CswSpatialOperator extends BaseEnumField<String> {
 
         @Override
         public String getValue() {
-            return INTERSECTS;
+            return INTERSECTS_FIELD_NAME;
         }
     }
 
     protected static final class Overlaps extends StringField {
 
-        public static final String OVERLAPS = "Overlaps";
+        public static final String OVERLAPS_FIELD_NAME = "Overlaps";
 
         public static final String DESCRIPTION =
                 "Determines whether two geometries of the same dimensions overlap. If their intersection produces a geometry different from both and of the same dimension, they overlap.";
@@ -241,13 +219,13 @@ public class CswSpatialOperator extends BaseEnumField<String> {
 
         @Override
         public String getValue() {
-            return OVERLAPS;
+            return OVERLAPS_FIELD_NAME;
         }
     }
 
     protected static final class Touches extends StringField {
 
-        public static final String TOUCHES = "Touches";
+        public static final String TOUCHES_FIELD_NAME = "Touches";
 
         public static final String DESCRIPTION =
                 "Determines if the points of two geometric properties touch, but do not intersect the interiors of each geometry.";
@@ -258,13 +236,13 @@ public class CswSpatialOperator extends BaseEnumField<String> {
 
         @Override
         public String getValue() {
-            return TOUCHES;
+            return TOUCHES_FIELD_NAME;
         }
     }
 
     protected static final class Within extends StringField {
 
-        public static final String WITHIN = "Within";
+        public static final String WITHIN_FIELD_NAME = "Within";
 
         public static final String DESCRIPTION =
                 "Determines whether the first geometry is completely within the second geometry. Within tests the exact opposite result of contains.";
@@ -275,7 +253,7 @@ public class CswSpatialOperator extends BaseEnumField<String> {
 
         @Override
         public String getValue() {
-            return WITHIN;
+            return WITHIN_FIELD_NAME;
         }
     }
 }

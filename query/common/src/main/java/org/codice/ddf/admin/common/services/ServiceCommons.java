@@ -27,7 +27,6 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang.text.StrSubstitutor;
 import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.common.Report;
-import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.configurator.Configurator;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
@@ -61,7 +60,7 @@ public class ServiceCommons {
         configurator.createManagedService(factoryPid, serviceProps);
         if(configurator.commit("Service saved with details [{}]", serviceProps.toString())
                 .containsFailedResults()) {
-            report.argumentMessage(failedPersistError());
+            report.resultMessage(failedPersistError());
         }
         return report;
     }
@@ -82,19 +81,19 @@ public class ServiceCommons {
                 pid,
                 newConfig.toString());
         if (operationReport.containsFailedResults()) {
-            return report.argumentMessage(failedUpdateError(servicePid.path()));
+            return report.resultMessage(failedUpdateError());
         }
 
         return report;
     }
 
-    public static Report deleteService(StringField servicePid, ConfiguratorFactory configuratorFactory) {
+    public static Report deleteService(PidField servicePid, ConfiguratorFactory configuratorFactory) {
         Report report = new Report();
         Configurator configurator = configuratorFactory.getConfigurator();
         configurator.deleteManagedService(servicePid.getValue());
         if(configurator.commit("Deleted source with pid [{}].", servicePid.getValue())
                 .containsFailedResults()) {
-            report.argumentMessage(failedDeleteError(servicePid.path()));
+            report.resultMessage(failedDeleteError());
         }
         return report;
     }
@@ -104,7 +103,7 @@ public class ServiceCommons {
         if(configuratorFactory.getConfigReader()
                 .getConfig(servicePid.getValue())
                 .isEmpty()) {
-            report.argumentMessage(noExistingConfigError(servicePid.path()));
+            report.resultMessage(noExistingConfigError());
         }
         return report;
     }

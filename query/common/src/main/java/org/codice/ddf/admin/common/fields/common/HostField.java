@@ -15,6 +15,7 @@ package org.codice.ddf.admin.common.fields.common;
 
 import java.util.List;
 
+import org.codice.ddf.admin.api.action.Message;
 import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
 
@@ -26,7 +27,8 @@ public class HostField extends BaseObjectField {
 
     public static final String FIELD_TYPE_NAME = "Host";
 
-    public static final String DESCRIPTION = "Represents a host identified by the hostname and the port.";
+    public static final String DESCRIPTION = "Represents a host identified by the hostname and the port. If this field is required, then"
+            + " a host name and port must be provided.";
 
     private HostnameField name;
 
@@ -65,6 +67,15 @@ public class HostField extends BaseObjectField {
     public void useDefaultRequired() {
         name.isRequired(true);
         port.isRequired(true);
+    }
+
+    @Override
+    public List<Message> validate() {
+        if(isRequired()) {
+            name.isRequired(true);
+            port.isRequired(true);
+        }
+        return super.validate();
     }
 
     @Override

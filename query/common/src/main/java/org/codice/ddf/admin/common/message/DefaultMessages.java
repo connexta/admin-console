@@ -53,6 +53,18 @@ public class DefaultMessages {
         return new ErrorMessage(FAILED_PERSIST);
     }
 
+    public static ErrorMessage failedDeleteError() {
+        return new ErrorMessage(FAILED_DELETE_ERROR);
+    }
+
+    public static ErrorMessage failedUpdateError() {
+        return new ErrorMessage(FAILED_UPDATE_ERROR);
+    }
+
+    public static ErrorMessage noExistingConfigError() {
+        return new ErrorMessage(NO_EXISTING_CONFIG);
+    }
+
     public static ErrorMessage failedPersistError(List<String> path) {
         return new ErrorMessage(FAILED_PERSIST, path);
     }
@@ -60,7 +72,6 @@ public class DefaultMessages {
     public static ErrorMessage unsupportedEnum(List<String> path) {
         return new ErrorMessage(UNSUPPORTED_ENUM, path);
     }
-
 
     public static ErrorMessage missingKeyValue(List<String> path) {
         return new ErrorMessage(MISSING_KEY_VALUE, path);

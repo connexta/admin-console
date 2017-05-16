@@ -14,6 +14,7 @@
 package org.codice.ddf.admin.sources.commons.utils;
 
 import static org.codice.ddf.admin.common.message.DefaultMessages.unknownEndpointError;
+import static org.codice.ddf.admin.common.services.ServiceCommons.FLAG_PASSWORD;
 import static org.codice.ddf.admin.sources.commons.SourceUtilCommons.SOURCES_NAMESPACE_CONTEXT;
 import static org.codice.ddf.admin.sources.commons.SourceUtilCommons.createDocument;
 import static org.codice.ddf.admin.sources.fields.CswProfile.CSW_FEDERATION_PROFILE_SOURCE;
@@ -54,7 +55,7 @@ public class CswSourceUtils {
 
     protected static final String GMD_OUTPUT_SCHEMA = "http://www.isotc211.org/2005/gmd";
 
-    protected static final String CSW_202_OUTPUT_SCHEMA = "http://www.opengis.net/cat/csw/2.0.2";
+    protected static final String CSW_2_0_2_OUTPUT_SCHEMA = "http://www.opengis.net/cat/csw/2.0.2";
 
     protected static final String METACARD_OUTPUT_SCHEMA = "urn:catalog:metacard";
 
@@ -80,6 +81,11 @@ public class CswSourceUtils {
     /**
      * Attempts to discover the source from the given hostname and port with optional basic authentication.
      *
+     * Possible Error Codes to be returned
+     * - {@link org.codice.ddf.admin.common.message.DefaultMessages#CANNOT_CONNECT}
+     * - {@link org.codice.ddf.admin.common.message.DefaultMessages#UNAUTHORIZED}
+     * - {@link org.codice.ddf.admin.common.message.DefaultMessages#UNKNOWN_ENDPOINT}
+     *
      * @param hostField address to probe for CSW capabilities
      * @param creds        optional credentials for basic authentication
      * @return a {@link ReportWithResult} containing the {@link UrlField} or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
@@ -91,6 +97,11 @@ public class CswSourceUtils {
 
     /**
      * Attempts to create a CSW configuration from the given url.
+     *
+     * Possible Error Codes to be returned
+     * - {@link org.codice.ddf.admin.common.message.DefaultMessages#CANNOT_CONNECT}
+     * - {@link org.codice.ddf.admin.common.message.DefaultMessages#UNAUTHORIZED}
+     * - {@link org.codice.ddf.admin.common.message.DefaultMessages#UNKNOWN_ENDPOINT}
      *
      * @param urlField A URL of an endpoint with CSW capabilities
      * @param creds    optional credentials for basic authentication
@@ -121,7 +132,7 @@ public class CswSourceUtils {
         preferred.endpointUrl(urlField.getValue())
                 .credentials()
                 .username(creds.username())
-                .password(creds.password());
+                .password(FLAG_PASSWORD);
 
         XPath xpath = XPathFactory.newInstance()
                 .newXPath();
@@ -153,7 +164,7 @@ public class CswSourceUtils {
         try {
             xpath.compile(GET_FIRST_OUTPUT_SCHEMA)
                     .evaluate(capabilitiesXml);
-            configResult.result(preferred.outputSchema(CSW_202_OUTPUT_SCHEMA)
+            configResult.result(preferred.outputSchema(CSW_2_0_2_OUTPUT_SCHEMA)
                     .cswProfile(CSW_SPEC_PROFILE_FEDERATED_SOURCE));
             return configResult;
         } catch (Exception e) {

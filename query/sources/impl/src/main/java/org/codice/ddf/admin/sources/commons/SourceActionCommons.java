@@ -74,15 +74,6 @@ public class SourceActionCommons {
 
         populateSourceAvailability(sourceInfoListField.getList(), configuratorFactory);
         return sourceInfoListField;
-
-    }
-
-    public static List<Source> getAllSourceReferences(ConfiguratorFactory configuratorFactory) {
-        List<Source> sources = new ArrayList<>();
-        ConfigReader configReader = configuratorFactory.getConfigReader();
-        sources.addAll(configReader.getServices(FederatedSource.class, null));
-        sources.addAll(configReader.getServices(ConnectedSource.class, null));
-        return sources;
     }
 
     private static void populateSourceAvailability(List<SourceInfoField> sourceInfoList,
@@ -99,5 +90,13 @@ public class SourceActionCommons {
                 }
             }
         }
+    }
+
+    public static List<Source> getAllSourceReferences(ConfiguratorFactory configuratorFactory) {
+        List<Source> sources = new ArrayList<>();
+        ConfigReader configReader = configuratorFactory.getConfigReader();
+        sources.addAll(configReader.getServices(FederatedSource.class, null));
+        sources.addAll(configReader.getServices(ConnectedSource.class, null));
+        return sources;
     }
 }

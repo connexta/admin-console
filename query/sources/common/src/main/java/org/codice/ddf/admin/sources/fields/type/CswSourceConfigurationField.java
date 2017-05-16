@@ -30,7 +30,9 @@ public class CswSourceConfigurationField extends SourceConfigUnionField {
     public static final String FIELD_TYPE_NAME = "CswSourceConfiguration";
 
     public static final String DESCRIPTION =
-            "Represents a CSW configuration containing properties to be saved.";
+            "Represents a CSW configuration containing properties to be saved. The spatial operator applies "
+                    + "the specific operator to all queries. The output schema defines the schema of the records returned "
+                    + "by a CSW GetRecords request. The event service address is for DDF CSW sources to listen to CUD pub/sub events.";
 
     public static final String OUTPUT_SCHEMA_FIELD_NAME = CswOutputSchemaField.DEFAULT_FIELD_NAME;
 

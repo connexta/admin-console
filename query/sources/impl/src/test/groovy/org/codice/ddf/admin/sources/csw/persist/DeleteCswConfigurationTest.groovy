@@ -41,6 +41,8 @@ class DeleteCswConfigurationTest extends Specification {
 
     static TEST_EVENT_SERVICE_ADDRESS = "testEventServiceAddress"
 
+    static RESULT_ARGUMENT_PATH = [DeleteCswConfiguration.ID]
+
     static BASE_PATH = [DeleteCswConfiguration.ID, BaseAction.ARGUMENT]
 
     static SERVICE_PID_PATH = [BASE_PATH, PID].flatten()
@@ -61,7 +63,7 @@ class DeleteCswConfigurationTest extends Specification {
         deleteCswConfiguration = new DeleteCswConfiguration(configuratorFactory)
     }
 
-    def 'test success delete config returns true'() {
+    def 'successful delete config returns true'() {
         when:
         configReader.getConfig(S_PID) >> configToDelete
         configurator.commit(_, _) >> mockReport(false)
@@ -73,7 +75,7 @@ class DeleteCswConfigurationTest extends Specification {
         report.result().getValue() == true
     }
 
-    def 'test no config found with provided servicePid'() {
+    def 'fail with no existing config found with provided servicePid'() {
         when:
         configReader.getConfig(_ as String) >> [:]
         deleteCswConfiguration.setArguments(actionArgs)
@@ -82,11 +84,11 @@ class DeleteCswConfigurationTest extends Specification {
         then:
         report.result() == null
         report.messages().size() == 1
-        report.messages().get(0).path == SERVICE_PID_PATH
+        report.messages().get(0).path == RESULT_ARGUMENT_PATH
         report.messages().get(0).code == DefaultMessages.NO_EXISTING_CONFIG
     }
 
-    def 'test error while committing deleted configuration with the given servicePid'() {
+    def 'error while committing deleted configuration with the given servicePid'() {
         when:
         configReader.getConfig(S_PID) >> configToDelete
         configurator.commit(_, _) >> mockReport(true)
@@ -96,31 +98,21 @@ class DeleteCswConfigurationTest extends Specification {
         then:
         report.result().getValue() == false
         report.messages().size() == 1
-        report.messages().get(0).path == SERVICE_PID_PATH
+        report.messages().get(0).path == RESULT_ARGUMENT_PATH
         report.messages().get(0).code == DefaultMessages.FAILED_DELETE_ERROR
     }
 
-    def 'test failure due to required servicePid argument not provided'() {
+    def 'fail when missing required fields'() {
         when:
         def report = deleteCswConfiguration.process()
 
         then:
         report.result() == null
         report.messages().size() == 1
-        report.messages().get(0).path == SERVICE_PID_PATH
-        report.messages().get(0).code == DefaultMessages.MISSING_REQUIRED_FIELD
-    }
-
-    def 'test failure due to service pid argument provided but empty'() {
-        when:
-        deleteCswConfiguration.setArguments([(PID): ""])
-        def report = deleteCswConfiguration.process()
-
-        then:
-        report.result() == null
-        report.messages().size() == 1
-        report.messages().get(0).path == SERVICE_PID_PATH
-        report.messages().get(0).code == DefaultMessages.EMPTY_FIELD
+        report.messages().count {
+            it.getCode() == DefaultMessages.MISSING_REQUIRED_FIELD
+        } == 1
+        report.messages()*.getPath() == [SERVICE_PID_PATH]
     }
 
     def mockReport(boolean hasError) {

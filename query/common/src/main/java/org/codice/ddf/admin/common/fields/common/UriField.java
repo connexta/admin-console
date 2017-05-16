@@ -13,38 +13,37 @@
  **/
 package org.codice.ddf.admin.common.fields.common;
 
-import static org.codice.ddf.admin.common.message.DefaultMessages.invalidUrlError;
+import static org.codice.ddf.admin.common.message.DefaultMessages.invalidUriError;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 
 import org.codice.ddf.admin.api.action.Message;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-public class UrlField extends StringField {
+public class UriField extends StringField {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(UrlField.class);
+    public static final String DEFAULT_FIELD_NAME = "uri";
 
-    public static final String DEFAULT_FIELD_NAME = "url";
+    public static final String FIELD_TYPE_NAME = "URI";
 
-    public static final String FIELD_TYPE_NAME = "URL";
+    public static final String DESCRIPTION = "A Universal Resource Indicator used to identify a name or resource on the internet. Formatted according to RFC 3986.";
 
-    public static final String DESCRIPTION =
-            "An address that identifies a particular file on the Internet, usually consisting of the protocol, such as HTTP, followed by the domain name.";
-
-    public UrlField() {
+    public UriField() {
         this(DEFAULT_FIELD_NAME);
     }
 
-    public UrlField(String fieldName) {
+    public UriField(String fieldName) {
         super(fieldName, FIELD_TYPE_NAME, DESCRIPTION);
     }
 
-    public UrlField url(String url) {
-        setValue(url);
+    protected UriField(String fieldName, String fieldTypeName, String description) {
+        super(fieldName, fieldTypeName, description);
+    }
+
+    public UriField uri(String uri) {
+        setValue(uri);
         return this;
     }
 
@@ -57,13 +56,11 @@ public class UrlField extends StringField {
 
         if(getValue() != null) {
             try {
-                new URL(getValue());
-            } catch (MalformedURLException e) {
-                LOGGER.debug("Failed to validate URL [{}].", getValue());
-                validationMsgs.add(invalidUrlError(path()));
+                new URI(getValue());
+            } catch (URISyntaxException e) {
+                validationMsgs.add(invalidUriError(path()));
             }
         }
-
         return validationMsgs;
     }
 }

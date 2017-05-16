@@ -13,7 +13,7 @@
  */
 package org.codice.ddf.admin.sources.csw.persist
 
-import ddf.catalog.source.FederatedSource
+import ddf.catalog.source.Source
 import org.codice.ddf.admin.api.action.Action
 import org.codice.ddf.admin.common.actions.BaseAction
 import org.codice.ddf.admin.common.message.DefaultMessages
@@ -23,7 +23,6 @@ import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.configurator.OperationReport
 import org.codice.ddf.admin.sources.commons.SourceMessages
 import org.codice.ddf.admin.sources.fields.CswProfile
-import org.codice.ddf.admin.sources.fields.CswSpatialOperator
 import org.codice.ddf.admin.sources.fields.type.CswSourceConfigurationField
 import spock.lang.Specification
 
@@ -37,23 +36,19 @@ class SaveCswConfigurationTest extends Specification {
 
     static CSW_PROFILE = CswProfile.DEFAULT_FIELD_NAME
 
-    static SPATIAL_OPERATOR = CswSpatialOperator.DEFAULT_FIELD_NAME
+    static OUTPUT_SCHEMA = CswSourceConfigurationField.OUTPUT_SCHEMA_FIELD_NAME
 
-    static BASE_PATH = [SaveCswConfiguration.ID, BaseAction.ARGUMENT]
+    static RESULT_ARGUMENT_PATH = [SaveCswConfiguration.ID]
+
+    static BASE_PATH = [RESULT_ARGUMENT_PATH, BaseAction.ARGUMENT].flatten()
 
     static CONFIG_PATH = [BASE_PATH, SOURCE_CONFIG].flatten()
 
     static ENDPOINT_URL_PATH = [CONFIG_PATH, ENDPOINT_URL].flatten()
 
-    static SERVICE_PID_PATH = [BASE_PATH, PID].flatten()
-
     static SOURCE_NAME_PATH = [CONFIG_PATH, SOURCE_NAME].flatten()
 
     static CSW_PROFILE_PATH = [CONFIG_PATH, CSW_PROFILE].flatten()
-
-    static SPATIAL_OPERATOR_PATH = [CONFIG_PATH, SPATIAL_OPERATOR].flatten()
-
-    static EVENT_SERVICE_ADDR_PATH = [CONFIG_PATH, CswSourceConfigurationField.EVENT_SERVICE_ADDRESS_FIELD_NAME].flatten()
 
     Action saveCswConfiguration
 
@@ -63,7 +58,7 @@ class SaveCswConfigurationTest extends Specification {
 
     ConfigReader configReader
 
-    FederatedSource federatedSource
+    Source federatedSource
 
     def actionArgs
 
@@ -73,16 +68,15 @@ class SaveCswConfigurationTest extends Specification {
         actionArgs = createCswSaveArgs()
         configurator = Mock(Configurator)
         configReader = Mock(ConfigReader)
-        federatedSource = Mock(FederatedSource)
         configuratorFactory = Mock(ConfiguratorFactory)
-        federatedSource.getId() >> TEST_SOURCENAME
+        federatedSource = new TestSource(S_PID, TEST_SOURCENAME, false)
         federatedSources.add(federatedSource)
         configuratorFactory.getConfigurator() >> configurator
         configuratorFactory.getConfigReader() >> configReader
         saveCswConfiguration = new SaveCswConfiguration(configuratorFactory)
     }
 
-    def 'test new configuration save successful'() {
+    def 'new configuration save successful'() {
         when:
         saveCswConfiguration.setArguments(actionArgs)
         configReader.getServices(_, _) >> []
@@ -94,7 +88,7 @@ class SaveCswConfigurationTest extends Specification {
         report.result().getValue() == true
     }
 
-    def 'test fail to save new config due to duplicate source name'() {
+    def 'fail to save new config due to duplicate source name'() {
         when:
         saveCswConfiguration.setArguments(actionArgs)
         configReader.getServices(_, _) >> federatedSources
@@ -107,7 +101,7 @@ class SaveCswConfigurationTest extends Specification {
         report.messages().get(0).code == SourceMessages.DUPLICATE_SOURCE_NAME
     }
 
-    def 'test fail to save new config due to failure to commit'() {
+    def 'fail to save new config due to failure to commit'() {
         when:
         saveCswConfiguration.setArguments(actionArgs)
         configReader.getServices(_, _) >> []
@@ -121,7 +115,7 @@ class SaveCswConfigurationTest extends Specification {
         report.messages().get(0).code == DefaultMessages.FAILED_PERSIST
     }
 
-    def 'test update configuration successful'() {
+    def 'update configuration successful'() {
         setup:
         actionArgs.put(PID, S_PID)
         saveCswConfiguration.setArguments(actionArgs)
@@ -137,12 +131,12 @@ class SaveCswConfigurationTest extends Specification {
         report.result().getValue() == true
     }
 
-    def 'test fail update config due to existing source name'() {
+    def 'fail update config due to existing source name'() {
         setup:
         actionArgs.put(PID, S_PID)
         saveCswConfiguration.setArguments(actionArgs)
-        configReader.getConfig(_) >> [(ID):'someOtherSourceName']
-        configReader.getServices(_, _) >> federatedSources
+        configReader.getConfig(_) >> [(ID):'updatedName']
+        configReader.getServices(_, _) >> [new TestSource(S_PID, 'updatedName', false), new TestSource("existingSource", TEST_SOURCENAME, false)]
 
         when:
         def report = saveCswConfiguration.process()
@@ -154,7 +148,7 @@ class SaveCswConfigurationTest extends Specification {
         report.messages().get(0).code == SourceMessages.DUPLICATE_SOURCE_NAME
     }
 
-    def 'test fail to update config due to failure to commit'() {
+    def 'fail to update config due to failure to commit'() {
         setup:
         actionArgs.put(PID, S_PID)
         saveCswConfiguration.setArguments(actionArgs)
@@ -168,11 +162,11 @@ class SaveCswConfigurationTest extends Specification {
         then:
         report.result().getValue() == false
         report.messages().size() == 1
-        report.messages().get(0).path == SERVICE_PID_PATH
+        report.messages().get(0).path == RESULT_ARGUMENT_PATH
         report.messages().get(0).code == DefaultMessages.FAILED_UPDATE_ERROR
     }
 
-    def 'test fail to update config due to no existing source'() {
+    def 'fail to update config due to no existing source'() {
         setup:
         actionArgs.put(PID, S_PID)
         saveCswConfiguration.setArguments(actionArgs)
@@ -184,113 +178,21 @@ class SaveCswConfigurationTest extends Specification {
         then:
         report.result() == null
         report.messages().size() == 1
-        report.messages().get(0).path == SERVICE_PID_PATH
+        report.messages().get(0).path == RESULT_ARGUMENT_PATH
         report.messages().get(0).code == DefaultMessages.NO_EXISTING_CONFIG
     }
 
-    def 'test fail update due to empty servicePid'() {
-        setup:
-        actionArgs.put(PID, '')
-        saveCswConfiguration.setArguments(actionArgs)
-
+    def 'fail when missing required fields'() {
         when:
         def report = saveCswConfiguration.process()
 
         then:
         report.result() == null
-        report.messages().size() == 1
-        report.messages().get(0).path == SERVICE_PID_PATH
-        report.messages().get(0).code == DefaultMessages.EMPTY_FIELD
-    }
-
-    def 'test fail to save due to empty event service address provided'() {
-        setup:
-        actionArgs.get(SOURCE_CONFIG).put(CswSourceConfigurationField.EVENT_SERVICE_ADDRESS_FIELD_NAME, '')
-        saveCswConfiguration.setArguments(actionArgs)
-
-        when:
-        def report = saveCswConfiguration.process()
-
-        then:
-        report.result() == null
-        report.messages().size() == 1
-        report.messages().get(0).path == EVENT_SERVICE_ADDR_PATH
-        report.messages().get(0).code == DefaultMessages.EMPTY_FIELD
-    }
-
-    def 'test fail save due to missing required source name field'() {
-        setup:
-        actionArgs.get(SOURCE_CONFIG).put(SOURCE_NAME, null)
-        saveCswConfiguration.setArguments(actionArgs)
-
-        when:
-        def report = saveCswConfiguration.process()
-
-        then:
-        report.result() == null
-        report.messages().size() == 1
-        report.messages().get(0).path == SOURCE_NAME_PATH
-        report.messages().get(0).code == DefaultMessages.MISSING_REQUIRED_FIELD
-    }
-
-    def 'test fail save due to missing required endpoint url field'() {
-        setup:
-        actionArgs.get(SOURCE_CONFIG).put(ENDPOINT_URL, null)
-        saveCswConfiguration.setArguments(actionArgs)
-
-        when:
-        def report = saveCswConfiguration.process()
-
-        then:
-        report.result() == null
-        report.messages().size() == 1
-        report.messages().get(0).path == ENDPOINT_URL_PATH
-        report.messages().get(0).code == DefaultMessages.MISSING_REQUIRED_FIELD
-    }
-
-    def 'test fail save due to missing required csw profile field'() {
-        setup:
-        actionArgs.get(SOURCE_CONFIG).put(CSW_PROFILE, null)
-        saveCswConfiguration.setArguments(actionArgs)
-
-        when:
-        def report = saveCswConfiguration.process()
-
-        then:
-        report.result() == null
-        report.messages().size() == 1
-        report.messages().get(0).path == CSW_PROFILE_PATH
-        report.messages().get(0).code == DefaultMessages.MISSING_REQUIRED_FIELD
-    }
-
-    def 'test fail save due to invalid required csw profile field'() {
-        setup:
-        actionArgs.get(SOURCE_CONFIG).put(CSW_PROFILE, 'notAValidProfile')
-        saveCswConfiguration.setArguments(actionArgs)
-
-        when:
-        def report = saveCswConfiguration.process()
-
-        then:
-        report.result() == null
-        report.messages().size() == 1
-        report.messages().get(0).path == CSW_PROFILE_PATH
-        report.messages().get(0).code == DefaultMessages.UNSUPPORTED_ENUM
-    }
-
-    def 'test fail to save due to invalid csw spatial operator'() {
-        setup:
-        actionArgs.get(SOURCE_CONFIG).put(SPATIAL_OPERATOR, 'notAValidOperator')
-        saveCswConfiguration.setArguments(actionArgs)
-
-        when:
-        def report = saveCswConfiguration.process()
-
-        then:
-        report.result() == null
-        report.messages().size() == 1
-        report.messages().get(0).path == SPATIAL_OPERATOR_PATH
-        report.messages().get(0).code == DefaultMessages.UNSUPPORTED_ENUM
+        report.messages().size() == 3
+        report.messages().count {
+            it.getCode() == DefaultMessages.MISSING_REQUIRED_FIELD
+        } == 3
+        report.messages()*.getPath() == [SOURCE_NAME_PATH, ENDPOINT_URL_PATH, CSW_PROFILE_PATH]
     }
 
     def mockReport(boolean hasError) {
@@ -302,7 +204,7 @@ class SaveCswConfigurationTest extends Specification {
     def createCswSaveArgs() {
         refreshSaveConfigActionArgs()
         actionArgs = saveConfigActionArgs
-        actionArgs.get(SOURCE_CONFIG).put(CswSourceConfigurationField.OUTPUT_SCHEMA_FIELD_NAME, TEST_OUTPUT_SCHEMA)
+        actionArgs.get(SOURCE_CONFIG).put(OUTPUT_SCHEMA, TEST_OUTPUT_SCHEMA)
         actionArgs.get(SOURCE_CONFIG).put(CSW_PROFILE, TEST_CSW_PROFILE)
         return actionArgs
     }

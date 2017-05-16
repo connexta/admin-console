@@ -14,6 +14,7 @@
 package org.codice.ddf.admin.sources.commons.utils;
 
 import static org.codice.ddf.admin.common.message.DefaultMessages.unknownEndpointError;
+import static org.codice.ddf.admin.common.services.ServiceCommons.FLAG_PASSWORD;
 import static org.codice.ddf.admin.sources.commons.SourceUtilCommons.SOURCES_NAMESPACE_CONTEXT;
 import static org.codice.ddf.admin.sources.commons.SourceUtilCommons.createDocument;
 
@@ -85,13 +86,18 @@ public class OpenSearchSourceUtils {
         config.endpointUrl(urlField.getValue())
                 .credentials()
                 .username(creds.username())
-                .password(creds.password());
+                .password(FLAG_PASSWORD);
         configResult.result(config);
         return configResult;
     }
 
     /**
      * Verifies that an endpoint given by the URL (and credentials) has OpenSearch capabilities.
+     *
+     * Possible Error Codes to be returned
+     * - {@link org.codice.ddf.admin.common.message.DefaultMessages#CANNOT_CONNECT}
+     * - {@link org.codice.ddf.admin.common.message.DefaultMessages#UNAUTHORIZED}
+     * - {@link org.codice.ddf.admin.common.message.DefaultMessages#UNKNOWN_ENDPOINT}
      *
      * @param urlField endpoint url to verify
      * @param creds optional credentials for authentication
@@ -133,6 +139,11 @@ public class OpenSearchSourceUtils {
 
     /**
      * Attempts to discover an OpenSearch endpoint from the given hostname and port
+     *
+     * Possible Error Codes to be returned
+     * - {@link org.codice.ddf.admin.common.message.DefaultMessages#CANNOT_CONNECT}
+     * - {@link org.codice.ddf.admin.common.message.DefaultMessages#UNAUTHORIZED}
+     * - {@link org.codice.ddf.admin.common.message.DefaultMessages#UNKNOWN_ENDPOINT}
      *
      * @param hostField hostname and port to probe for OpenSearch capabilities
      * @param creds        optional credentials for authentication

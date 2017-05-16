@@ -22,9 +22,31 @@ import org.codice.ddf.admin.common.Report;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 
+import ddf.catalog.service.ConfiguredService;
 import ddf.catalog.source.Source;
 
 public class SourceValidationUtils {
+
+    /**
+     * Determines whether the service configuration identified by the service pid has the same name as sourceName.
+     * If the service configuration's id equals the sourceName return {@code true}, otherwise {@code false}.
+     *
+     * @param servicePid service pid of the service configuration
+     * @param sourceName source name to check against existing source name
+     * @param configuratorFactory configurator factory to get services
+     * @return {@code true} if the sourceName matches the existing configuration's id, {@code false} otherwise
+     */
+    public static boolean hasSourceName(String servicePid, String sourceName, ConfiguratorFactory configuratorFactory) {
+        Source source = getAllSourceReferences(configuratorFactory).stream()
+                .map(ConfiguredService.class::cast)
+                .filter(configuredService -> configuredService.getConfigurationPid()
+                        .equals(servicePid))
+                .findFirst()
+                .map(Source.class::cast)
+                .orElseGet(() -> null);
+
+        return source == null || source.getId().equals(sourceName);
+    }
 
     /**
      * Validates the {@code sourceName} against the existing source names in the system. An empty {@link Report} will be returned

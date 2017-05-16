@@ -28,15 +28,15 @@ import static org.codice.ddf.admin.sources.SourceTestCommons.*
 
 class SaveOpenSearchConfigurationTest extends Specification {
 
-    static BASE_PATH = [SaveOpenSearchConfiguration.ID, BaseAction.ARGUMENT]
+    static RESULT_ARGUMENT_PATH = [SaveOpenSearchConfiguration.ID]
+
+    static BASE_PATH = [RESULT_ARGUMENT_PATH, BaseAction.ARGUMENT].flatten()
 
     static CONFIG_PATH = [BASE_PATH, SOURCE_CONFIG].flatten()
 
     static SOURCE_NAME_PATH = [CONFIG_PATH, SOURCE_NAME].flatten()
 
     static ENDPOINT_URL_PATH = [CONFIG_PATH, ENDPOINT_URL].flatten()
-
-    static PID_PATH = [BASE_PATH, PID].flatten()
 
     Action saveOpenSearchConfiguration
 
@@ -64,7 +64,7 @@ class SaveOpenSearchConfigurationTest extends Specification {
         saveOpenSearchConfiguration = new SaveOpenSearchConfiguration(configuratorFactory)
     }
 
-    def 'test new configuration save successful'() {
+    def 'new configuration save successful'() {
         setup:
         saveOpenSearchConfiguration.setArguments(saveConfigActionArgs)
         configReader.getServices(_, _) >> []
@@ -77,7 +77,7 @@ class SaveOpenSearchConfigurationTest extends Specification {
         report.result().getValue() == true
     }
 
-    def 'test fail to save new config due to duplicate source name'() {
+    def 'fail to save new config due to duplicate source name'() {
         setup:
         saveOpenSearchConfiguration.setArguments(saveConfigActionArgs)
         configReader.getServices(_, _) >> federatedSources
@@ -92,7 +92,7 @@ class SaveOpenSearchConfigurationTest extends Specification {
         report.messages().get(0).path == SOURCE_NAME_PATH
     }
 
-    def 'test fail to save new config due to failure to commit'() {
+    def 'fail to save new config due to failure to commit'() {
         setup:
         saveOpenSearchConfiguration.setArguments(saveConfigActionArgs)
         configReader.getServices(_, _) >> []
@@ -108,7 +108,7 @@ class SaveOpenSearchConfigurationTest extends Specification {
         report.messages().get(0).code == DefaultMessages.FAILED_PERSIST
     }
 
-    def 'test update configuration successful'() {
+    def 'update configuration successful'() {
         setup:
         saveConfigActionArgs.put(PID, S_PID)
         saveOpenSearchConfiguration.setArguments(saveConfigActionArgs)
@@ -123,12 +123,12 @@ class SaveOpenSearchConfigurationTest extends Specification {
         report.result().getValue() == true
     }
 
-    def 'test fail update config due to existing source name'() {
+    def 'fail update config due to existing source name'() {
         setup:
         saveConfigActionArgs.put(PID, S_PID)
         saveOpenSearchConfiguration.setArguments(saveConfigActionArgs)
-        configReader.getConfig(_) >> [(ID):'someOtherSourceName']
-        configReader.getServices(_, _) >> federatedSources
+        configReader.getConfig(_) >> [(ID):'updatedName']
+        configReader.getServices(_, _) >> [new TestSource(S_PID, 'updatedName', false), new TestSource("existingSource", TEST_SOURCENAME, false)]
 
         when:
         def report = saveOpenSearchConfiguration.process()
@@ -140,7 +140,7 @@ class SaveOpenSearchConfigurationTest extends Specification {
         report.messages().get(0).code == SourceMessages.DUPLICATE_SOURCE_NAME
     }
 
-    def 'test fail to update config due to failure to commit'() {
+    def 'fail to update config due to failure to commit'() {
         setup:
         saveConfigActionArgs.put(PID, S_PID)
         saveOpenSearchConfiguration.setArguments(saveConfigActionArgs)
@@ -154,11 +154,11 @@ class SaveOpenSearchConfigurationTest extends Specification {
         then:
         report.result().getValue() == false
         report.messages().size() == 1
-        report.messages().get(0).path == PID_PATH
+        report.messages().get(0).path == RESULT_ARGUMENT_PATH
         report.messages().get(0).code == DefaultMessages.FAILED_UPDATE_ERROR
     }
 
-    def 'test fail update config due to no existing source'() {
+    def 'fail update config due to no existing source'() {
         setup:
         saveConfigActionArgs.put(PID, S_PID)
         saveOpenSearchConfiguration.setArguments(saveConfigActionArgs)
@@ -171,52 +171,20 @@ class SaveOpenSearchConfigurationTest extends Specification {
         report.result() == null
         report.messages().size() == 1
         report.messages().get(0).code == DefaultMessages.NO_EXISTING_CONFIG
-        report.messages().get(0).path == PID_PATH
+        report.messages().get(0).path == RESULT_ARGUMENT_PATH
     }
 
-    def 'test fail update due to empty pid'() {
-        setup:
-        saveConfigActionArgs.put(PID, '')
-        saveOpenSearchConfiguration.setArguments(saveConfigActionArgs)
-
+    def 'fail when missing required fields'() {
         when:
         def report = saveOpenSearchConfiguration.process()
 
         then:
         report.result() == null
-        report.messages().size() == 1
-        report.messages().get(0).path == PID_PATH
-        report.messages().get(0).code == DefaultMessages.EMPTY_FIELD
-    }
-
-    def 'test fail save due to missing required source name field'() {
-        setup:
-        saveConfigActionArgs.get(SOURCE_CONFIG).put(SOURCE_NAME, null)
-        saveOpenSearchConfiguration.setArguments(saveConfigActionArgs)
-
-        when:
-        def report = saveOpenSearchConfiguration.process()
-
-        then:
-        report.result() == null
-        report.messages().size() == 1
-        report.messages().get(0).path == SOURCE_NAME_PATH
-        report.messages().get(0).code == DefaultMessages.MISSING_REQUIRED_FIELD
-    }
-
-    def 'test fail save due to missing required endpoint url field'() {
-        setup:
-        saveConfigActionArgs.get(SOURCE_CONFIG).put(ENDPOINT_URL, null)
-        saveOpenSearchConfiguration.setArguments(saveConfigActionArgs)
-
-        when:
-        def report = saveOpenSearchConfiguration.process()
-
-        then:
-        report.result() == null
-        report.messages().size() == 1
-        report.messages().get(0).path == ENDPOINT_URL_PATH
-        report.messages().get(0).code == DefaultMessages.MISSING_REQUIRED_FIELD
+        report.messages().size() == 2
+        report.messages().count {
+            it.getCode() == DefaultMessages.MISSING_REQUIRED_FIELD
+        } == 2
+        report.messages()*.getPath() == [SOURCE_NAME_PATH, ENDPOINT_URL_PATH]
     }
 
     def mockReport(boolean hasError) {

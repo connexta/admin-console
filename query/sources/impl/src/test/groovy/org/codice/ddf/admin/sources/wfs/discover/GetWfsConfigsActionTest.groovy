@@ -45,9 +45,9 @@ class GetWfsConfigsActionTest extends Specification {
 
     static TEST_FACTORY_PID_2 = WfsServiceProperties.WFS2_FACTORY_PID
 
-    static BASE_PATH = [GetWfsConfigsAction.ID, BaseAction.ARGUMENT]
+    static RESULT_ARGUMENT_PATH = [GetWfsConfigsAction.ID]
 
-    static PID_PATH = [BASE_PATH, PID].flatten()
+    static BASE_PATH = [RESULT_ARGUMENT_PATH, BaseAction.ARGUMENT].flatten()
 
     def managedServiceConfigs
 
@@ -64,7 +64,7 @@ class GetWfsConfigsActionTest extends Specification {
         getWfsConfigsAction = new GetWfsConfigsAction(configuratorFactory)
     }
 
-    def 'test no pid argument returns all configs'() {
+    def 'no pid argument returns all configs'() {
         setup:
         configReader.getServices(_, _) >> []
 
@@ -83,7 +83,7 @@ class GetWfsConfigsActionTest extends Specification {
         assertConfig(list.getList().get(1), 1, SOURCE_ID_2, S_PID_2, false, TEST_WFS_VERSION_2)
     }
 
-    def 'test pid filter returns 1 result'() {
+    def 'pid filter returns 1 result'() {
         setup:
         getWfsConfigsAction.setArguments(actionArgs)
 
@@ -100,7 +100,7 @@ class GetWfsConfigsActionTest extends Specification {
         assertConfig(list.getList().get(0), 0, SOURCE_ID_2, S_PID_2, false, TEST_WFS_VERSION_2)
     }
 
-    def 'test failure due to config with id of pid does not exist'() {
+    def 'failure due to no existing config when pid specified'() {
         setup:
         actionArgs.put(PID, S_PID)
         getWfsConfigsAction.setArguments(actionArgs)
@@ -113,19 +113,7 @@ class GetWfsConfigsActionTest extends Specification {
         report.result() == null
         report.messages().size() == 1
         report.messages().get(0).code == DefaultMessages.NO_EXISTING_CONFIG
-        report.messages().get(0).path == PID_PATH
-    }
-
-    def 'test failure due to provided but empty pid field'() {
-        when:
-        getWfsConfigsAction.setArguments([(PID): ''])
-        def report = getWfsConfigsAction.process()
-
-        then:
-        report.result() == null
-        report.messages().size() == 1
-        report.messages().get(0).code == DefaultMessages.EMPTY_FIELD
-        report.messages().get(0).path == PID_PATH
+        report.messages().get(0).path == RESULT_ARGUMENT_PATH
     }
 
     def assertConfig(Field field, int index, String sourceName, String pid, boolean availability, String wfsVersion) {

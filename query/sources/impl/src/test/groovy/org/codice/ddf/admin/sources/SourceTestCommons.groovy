@@ -77,27 +77,38 @@ class SourceTestCommons {
     static TEST_SOURCENAME = "testSourceName"
 
     static discoverByAddressActionArgs = [
-        (ADDRESS): [
-            (HOST)       : [
-                (PORT)    : 8993,
-                (HOSTNAME): "localhost"
-            ]
-        ],
-        (CREDENTIALS): [
-                (USERNAME): TEST_USERNAME,
-                (PASSWORD): TEST_PASSWORD
-        ]
+        (ADDRESS) : new AddressField().hostname('localhost').port(8993).getValue(),
+        (CREDENTIALS) : new CredentialsField().username(TEST_USERNAME).password(TEST_PASSWORD).getValue()
     ]
 
     static discoverByUrlActionArgs = [
-        (ADDRESS) : [
-            (URL_NAME)   : "http://localhost:8993/sevices/csw",
-        ],
-        (CREDENTIALS): [
-                (USERNAME): TEST_USERNAME,
-                (PASSWORD): TEST_PASSWORD
-        ]
+        (ADDRESS) : new AddressField().url("http://localhost:8993/sevices/csw").getValue(),
+        (CREDENTIALS) : new CredentialsField().username(TEST_USERNAME).password(TEST_PASSWORD).getValue()
     ]
+
+    static saveConfigActionArgs = [
+        (SOURCE_CONFIG) : createSourceConfigUnionField().getValue()
+    ]
+
+    static refreshSaveConfigActionArgs() {
+        saveConfigActionArgs = [
+            (SOURCE_CONFIG) : createSourceConfigUnionField().getValue()
+        ]
+    }
+
+    static refreshDiscoverByAddressActionArgs() {
+        discoverByAddressActionArgs = [
+            (ADDRESS) : new AddressField().hostname('localhost').port(8993).getValue(),
+            (CREDENTIALS) : new CredentialsField().username(TEST_USERNAME).password(TEST_PASSWORD).getValue()
+        ]
+    }
+
+    static refreshDiscoverByUrlActionArgs() {
+        discoverByUrlActionArgs = [
+            (ADDRESS) : new AddressField().url("http://localhost:8993/sevices/csw").getValue(),
+            (CREDENTIALS) : new CredentialsField().username(TEST_USERNAME).password(TEST_PASSWORD).getValue()
+        ]
+    }
 
     static baseManagedServiceConfigs = [
         (S_PID_1): [
@@ -117,62 +128,18 @@ class SourceTestCommons {
     ]
 
     static configToBeDeleted = [
-            (PASSWORD)                    : TEST_PASSWORD,
-            (ID)                          : SOURCE_ID_1,
-            (FACTORY_PID_KEY)             : F_PID,
-            (SERVICE_PID_KEY)             : S_PID,
-            (USERNAME)                    : TEST_USERNAME
+        (PASSWORD)                    : TEST_PASSWORD,
+        (ID)                          : SOURCE_ID_1,
+        (FACTORY_PID_KEY)             : F_PID,
+        (SERVICE_PID_KEY)             : S_PID,
+        (USERNAME)                    : TEST_USERNAME
     ]
 
-    static saveConfigActionArgs = [
-        (SOURCE_CONFIG): [
-            (ENDPOINT_URL): "https://localhost:8993",
-            (SOURCE_NAME) : TEST_SOURCENAME,
-            (CREDENTIALS) : [
-                (USERNAME): TEST_USERNAME,
-                (PASSWORD): TEST_PASSWORD
-            ]
-        ]
-    ]
-
-    static refreshSaveConfigActionArgs() {
-        saveConfigActionArgs = [
-            (SOURCE_CONFIG): [
-                (ENDPOINT_URL): "https://localhost:8993",
-                (SOURCE_NAME) : TEST_SOURCENAME,
-                (CREDENTIALS) : [
-                    (USERNAME): TEST_USERNAME,
-                    (PASSWORD): TEST_PASSWORD
-                ]
-            ]
-        ]
-    }
-
-    static refreshDiscoverByAddressActionArgs() {
-        discoverByAddressActionArgs = [
-            (ADDRESS): [
-                (HOST)       : [
-                    (PORT)    : 8993,
-                    (HOSTNAME): "localhost"
-                ]
-            ],
-            (CREDENTIALS): [
-                    (USERNAME): TEST_USERNAME,
-                    (PASSWORD): TEST_PASSWORD
-            ]
-        ]
-    }
-
-    static refreshDiscoverByUrlActionArgs() {
-        discoverByUrlActionArgs = [
-            (ADDRESS) : [
-                (URL_NAME)   : "http://localhost:8993/sevices/csw"
-            ],
-            (CREDENTIALS): [
-                    (USERNAME): TEST_USERNAME,
-                    (PASSWORD): TEST_PASSWORD
-            ]
-        ]
+    static createSourceConfigUnionField() {
+        def source = new SourceConfigUnionField()
+        source.endpointUrl('https://localhost:8993').sourceName(TEST_SOURCENAME)
+                .credentials().username(TEST_USERNAME).password(TEST_PASSWORD)
+        return source
     }
 
     /**
@@ -183,9 +150,17 @@ class SourceTestCommons {
 
         boolean availability
         String pid
+        String sourceName
 
         TestSource(String pid, boolean availability) {
             this.pid = pid
+            this.sourceName = TEST_SOURCENAME
+            this.availability = availability
+        }
+
+        TestSource(String pid, String sourceName, boolean availability) {
+            this.pid = pid
+            this.sourceName = sourceName
             this.availability = availability
         }
 
@@ -226,7 +201,7 @@ class SourceTestCommons {
 
         @Override
         String getId() {
-            return null
+            return sourceName
         }
 
         @Override

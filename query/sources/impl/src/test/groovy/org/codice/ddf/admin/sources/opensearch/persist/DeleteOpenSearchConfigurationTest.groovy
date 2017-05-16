@@ -21,7 +21,9 @@ class DeleteOpenSearchConfigurationTest extends Specification {
 
     Configurator configurator
 
-    static BASE_PATH = [DeleteOpenSearchConfiguration.ID, BaseAction.ARGUMENT]
+    static RESULT_ARGUMENT_PATH = [DeleteOpenSearchConfiguration.ID]
+
+    static BASE_PATH = [RESULT_ARGUMENT_PATH, BaseAction.ARGUMENT].flatten()
 
     static PID_PATH = [BASE_PATH, PID].flatten()
 
@@ -39,7 +41,7 @@ class DeleteOpenSearchConfigurationTest extends Specification {
         deleteOpenSearchConfigurationAction = new DeleteOpenSearchConfiguration(configuratorFactory)
     }
 
-    def 'test success delete config returns true'() {
+    def 'successfully delete config returns true'() {
         when:
         configReader.getConfig(S_PID) >> configToBeDeleted
         configurator.commit(_, _) >> mockReport(false)
@@ -51,7 +53,7 @@ class DeleteOpenSearchConfigurationTest extends Specification {
         report.result().getValue() == true
     }
 
-    def 'test no config found with provided pid'() {
+    def 'no config found with provided pid'() {
         when:
         configReader.getConfig(S_PID) >> [:]
         deleteOpenSearchConfigurationAction.setArguments(actionArgs)
@@ -61,10 +63,10 @@ class DeleteOpenSearchConfigurationTest extends Specification {
         report.result() == null
         report.messages().size() == 1
         report.messages().get(0).code == DefaultMessages.NO_EXISTING_CONFIG
-        report.messages().get(0).path == PID_PATH
+        report.messages().get(0).path == RESULT_ARGUMENT_PATH
     }
 
-    def 'test error while committing delete configuration with given pid'() {
+    def 'error while committing delete configuration with given pid'() {
         when:
         configReader.getConfig(S_PID) >> configToBeDeleted
         configurator.commit(_, _) >> mockReport(true)
@@ -75,30 +77,20 @@ class DeleteOpenSearchConfigurationTest extends Specification {
         report.result().getValue() == false
         report.messages().size() == 1
         report.messages().get(0).code == DefaultMessages.FAILED_DELETE_ERROR
-        report.messages().get(0).path == PID_PATH
+        report.messages().get(0).path == RESULT_ARGUMENT_PATH
     }
 
-    def 'test failure due to required pid argument not provided'() {
+    def 'fail when missing required fields'() {
         when:
         def report = deleteOpenSearchConfigurationAction.process()
 
         then:
         report.result() == null
         report.messages().size() == 1
-        report.messages().get(0).code == DefaultMessages.MISSING_REQUIRED_FIELD
-        report.messages().get(0).path == PID_PATH
-    }
-
-    def 'test failure due to pid argument provided but empty'() {
-        when:
-        deleteOpenSearchConfigurationAction.setArguments([(PID):''])
-        def report = deleteOpenSearchConfigurationAction.process()
-
-        then:
-        report.result() == null
-        report.messages().size() == 1
-        report.messages().get(0).code == DefaultMessages.EMPTY_FIELD
-        report.messages().get(0).path == PID_PATH
+        report.messages().count {
+            it.getCode() == DefaultMessages.MISSING_REQUIRED_FIELD
+        } == 1
+        report.messages()*.getPath() == [PID_PATH]
     }
 
     def mockReport(boolean hasError) {

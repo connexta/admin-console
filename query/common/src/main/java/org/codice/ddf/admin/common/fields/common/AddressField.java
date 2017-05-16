@@ -28,7 +28,7 @@ public class AddressField extends BaseObjectField {
     public static final String FIELD_TYPE_NAME = "Address";
 
     public static final String DESCRIPTION =
-            "Represents an address given by either a hostname and port or a URL. When this field is a required,"
+            "Represents an address given by either a hostname and port or a URL. When this field is required,"
                     + " a URL or hostname and port must be provided.";
 
     private HostField host;
@@ -68,11 +68,10 @@ public class AddressField extends BaseObjectField {
 
     @Override
     public List<Message> validate() {
-        url.isRequired(true);
         if(isRequired() && url.getValue() == null && (host.hostnameField().getValue() != null || host.portField().getValue() != null)) {
             host.isRequired(true);
-            host.useDefaultRequired();
-            url.isRequired(false);
+        } else if(isRequired()) {
+            url.isRequired(true);
         }
         return super.validate();
     }

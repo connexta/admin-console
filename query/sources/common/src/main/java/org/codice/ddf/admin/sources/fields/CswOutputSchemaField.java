@@ -13,16 +13,9 @@
  **/
 package org.codice.ddf.admin.sources.fields;
 
-import static org.codice.ddf.admin.common.message.DefaultMessages.invalidUriError;
+import org.codice.ddf.admin.common.fields.common.UriField;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.List;
-
-import org.codice.ddf.admin.api.action.Message;
-import org.codice.ddf.admin.common.fields.base.scalar.StringField;
-
-public class CswOutputSchemaField extends StringField {
+public class CswOutputSchemaField extends UriField {
 
     public static final String DEFAULT_FIELD_NAME = "cswOutputSchema";
 
@@ -31,27 +24,10 @@ public class CswOutputSchemaField extends StringField {
     public static final String DESCRIPTION = "A URI identifying the schema of the CSW records returned from a CSW GetRecords response.";
 
     public CswOutputSchemaField() {
-        super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
+        this(DEFAULT_FIELD_NAME);
     }
 
     public CswOutputSchemaField(String fieldName) {
         super(fieldName, FIELD_TYPE_NAME, DESCRIPTION);
-    }
-
-    @Override
-    public List<Message> validate() {
-        List<Message> validationMsgs = super.validate();
-        if(!validationMsgs.isEmpty()) {
-            return validationMsgs;
-        }
-
-        if(getValue() != null) {
-            try {
-                new URI(getValue());
-            } catch (URISyntaxException e) {
-                validationMsgs.add(invalidUriError(path()));
-            }
-        }
-        return validationMsgs;
     }
 }

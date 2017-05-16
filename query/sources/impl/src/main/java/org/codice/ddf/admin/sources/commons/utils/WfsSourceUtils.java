@@ -14,6 +14,7 @@
 package org.codice.ddf.admin.sources.commons.utils;
 
 import static org.codice.ddf.admin.common.message.DefaultMessages.unknownEndpointError;
+import static org.codice.ddf.admin.common.services.ServiceCommons.FLAG_PASSWORD;
 import static org.codice.ddf.admin.sources.commons.SourceUtilCommons.SOURCES_NAMESPACE_CONTEXT;
 import static org.codice.ddf.admin.sources.commons.SourceUtilCommons.createDocument;
 
@@ -68,6 +69,11 @@ public class WfsSourceUtils {
     /**
      * Attempts to discover a WFS endpoint at a given hostname and port
      *
+     * Possible Error Codes to be returned
+     * - {@link org.codice.ddf.admin.common.message.DefaultMessages#CANNOT_CONNECT}
+     * - {@link org.codice.ddf.admin.common.message.DefaultMessages#UNAUTHORIZED}
+     * - {@link org.codice.ddf.admin.common.message.DefaultMessages#UNKNOWN_ENDPOINT}
+     *
      * @param hostField address to probe for WFS capabilities
      * @param creds        optional username to add to Basic Auth header
      * @return a {@link ReportWithResult} containing the {@link UrlField} or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
@@ -78,6 +84,11 @@ public class WfsSourceUtils {
 
     /**
      * Attempts to create a WFS configuration from the given url.
+     *
+     * Possible Error Codes to be returned
+     * - {@link org.codice.ddf.admin.common.message.DefaultMessages#CANNOT_CONNECT}
+     * - {@link org.codice.ddf.admin.common.message.DefaultMessages#UNAUTHORIZED}
+     * - {@link org.codice.ddf.admin.common.message.DefaultMessages#UNKNOWN_ENDPOINT}
      *
      * @param urlField WFS URL to probe for a configuration
      * @param creds    optional username to add to Basic Auth header
@@ -105,7 +116,7 @@ public class WfsSourceUtils {
         preferredConfig.endpointUrl(urlField.getValue())
                 .credentials()
                 .username(creds.username())
-                .password(creds.password());
+                .password(FLAG_PASSWORD);
 
         XPath xpath = XPathFactory.newInstance()
                 .newXPath();

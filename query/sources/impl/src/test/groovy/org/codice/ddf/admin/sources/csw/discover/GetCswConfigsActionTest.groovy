@@ -64,7 +64,7 @@ class GetCswConfigsActionTest extends Specification {
         getCswConfigsAction = new GetCswConfigsAction(configuratorFactory)
     }
 
-    def 'test no pid argument returns all configs'() {
+    def 'no pid argument returns all configs'() {
         when:
         def report = getCswConfigsAction.process()
         def list = ((ListField)report.result())
@@ -79,7 +79,7 @@ class GetCswConfigsActionTest extends Specification {
         assertConfig(list.getList().get(0), 0, managedServiceConfigs.get(S_PID_1), SOURCE_ID_1, S_PID_1, true)
         assertConfig(list.getList().get(1), 1, managedServiceConfigs.get(S_PID_2), SOURCE_ID_2, S_PID_2, false)
     }
-    def 'test pid filter returns 1 result'() {
+    def 'pid filter returns 1 result'() {
         when:
         getCswConfigsAction.setArguments(actionArgs)
         def report = getCswConfigsAction.process()
@@ -94,7 +94,7 @@ class GetCswConfigsActionTest extends Specification {
         assertConfig(list.getList().get(0), 0, managedServiceConfigs.get(S_PID_2), SOURCE_ID_2, S_PID_2, false)
     }
 
-    def 'test failure due to config with id of pid does not exist'() {
+    def 'failure due to config with id of pid does not exist'() {
         setup:
         actionArgs.put(PID, S_PID)
         getCswConfigsAction.setArguments(actionArgs)
@@ -107,10 +107,10 @@ class GetCswConfigsActionTest extends Specification {
         report.result() == null
         report.messages().size() == 1
         report.messages().get(0).code == DefaultMessages.NO_EXISTING_CONFIG
-        report.messages().get(0).path == PID_PATH
+        report.messages().get(0).path == [GetCswConfigsAction.ID]
     }
 
-    def 'test failure due to provided but empty pid field'() {
+    def 'failure due to provided but empty pid field'() {
         when:
         getCswConfigsAction.setArguments([(PID): ''])
         def report = getCswConfigsAction.process()

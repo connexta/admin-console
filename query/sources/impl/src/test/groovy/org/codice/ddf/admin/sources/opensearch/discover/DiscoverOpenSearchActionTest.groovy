@@ -25,18 +25,7 @@ import org.codice.ddf.admin.sources.fields.SourceInfoField
 import org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField
 import spock.lang.Specification
 
-import static org.codice.ddf.admin.sources.SourceTestCommons.discoverByAddressActionArgs
-import static org.codice.ddf.admin.sources.SourceTestCommons.discoverByUrlActionArgs
-import static org.codice.ddf.admin.sources.SourceTestCommons.ADDRESS
-import static org.codice.ddf.admin.sources.SourceTestCommons.CREDENTIALS
-import static org.codice.ddf.admin.sources.SourceTestCommons.HOST
-import static org.codice.ddf.admin.sources.SourceTestCommons.HOSTNAME
-import static org.codice.ddf.admin.sources.SourceTestCommons.PASSWORD
-import static org.codice.ddf.admin.sources.SourceTestCommons.PORT
-import static org.codice.ddf.admin.sources.SourceTestCommons.URL_NAME
-import static org.codice.ddf.admin.sources.SourceTestCommons.USERNAME
-import static org.codice.ddf.admin.sources.SourceTestCommons.refreshDiscoverByAddressActionArgs
-import static org.codice.ddf.admin.sources.SourceTestCommons.refreshDiscoverByUrlActionArgs
+import static org.codice.ddf.admin.sources.SourceTestCommons.*
 
 class DiscoverOpenSearchActionTest extends Specification {
 
@@ -56,12 +45,6 @@ class DiscoverOpenSearchActionTest extends Specification {
 
     static URL_FIELD_PATH = [ADDRESS_FIELD_PATH, URL_NAME].flatten()
 
-    static CREDENTIALS_FIELD_PATH = [BASE_PATH, CREDENTIALS].flatten()
-
-    static USERNAME_FIELD_PATH = [CREDENTIALS_FIELD_PATH, USERNAME].flatten()
-
-    static PASSWORD_FIELD_PATH = [CREDENTIALS_FIELD_PATH, PASSWORD].flatten()
-
     def setup() {
         refreshDiscoverByAddressActionArgs()
         refreshDiscoverByUrlActionArgs()
@@ -69,7 +52,7 @@ class DiscoverOpenSearchActionTest extends Specification {
         discoverOpenSearch = new DiscoverOpenSearchAction(openSearchSourceUtils)
     }
 
-    def 'test successful discover using URL'() {
+    def 'successful discover using URL'() {
         setup:
         discoverOpenSearch.setArguments(discoverByUrlActionArgs)
 
@@ -83,7 +66,7 @@ class DiscoverOpenSearchActionTest extends Specification {
         ((SourceInfoField) report.result()).config() != null
     }
 
-    def 'test successful discover using hostname and port'() {
+    def 'successful discover using hostname and port'() {
         setup:
         discoverOpenSearch.setArguments(discoverByAddressActionArgs)
 
@@ -98,7 +81,7 @@ class DiscoverOpenSearchActionTest extends Specification {
         ((SourceInfoField) report.result()).config() != null
     }
 
-    def 'test failure discovery using URL while getting preferred config'() {
+    def 'failure discovery using URL while getting preferred config'() {
         setup:
         discoverOpenSearch.setArguments(discoverByUrlActionArgs)
 
@@ -111,7 +94,7 @@ class DiscoverOpenSearchActionTest extends Specification {
         report.messages().size() == 1
     }
 
-    def 'test failure when using hostname and port when discovering the URL'() {
+    def 'failure when using hostname and port when discovering the URL'() {
         setup:
         discoverOpenSearch.setArguments(discoverByAddressActionArgs)
 
@@ -124,7 +107,7 @@ class DiscoverOpenSearchActionTest extends Specification {
         report.messages().size() == 1
     }
 
-    def 'test failure when using hostname and port when getting preferred config'() {
+    def 'failure when using hostname and port when getting preferred config'() {
         setup:
         discoverOpenSearch.setArguments(discoverByAddressActionArgs)
 
@@ -138,107 +121,17 @@ class DiscoverOpenSearchActionTest extends Specification {
         report.messages().size() == 1
     }
 
-    def 'test missing required URL field when no arguments provided'() {
+    def 'fail when missing required fields'() {
         when:
         def report = discoverOpenSearch.process()
 
         then:
         report.result() == null
         report.messages().size() == 1
-        report.messages().get(0).code == DefaultMessages.MISSING_REQUIRED_FIELD
-        report.messages().get(0).path == URL_FIELD_PATH
-    }
-
-    def 'test missing required port field when hostname provided and url is not'() {
-        setup:
-        discoverByAddressActionArgs.get(ADDRESS).get(HOST).put(PORT, null)
-        discoverOpenSearch.setArguments(discoverByAddressActionArgs)
-
-        when:
-        def report = discoverOpenSearch.process()
-
-        then:
-        report.result() == null
-        report.messages().size() == 1
-        report.messages().get(0).code == DefaultMessages.MISSING_REQUIRED_FIELD
-        report.messages().get(0).path == PORT_FIELD_PATH
-    }
-
-    def 'test missing required hostname field when port is provided and url is not'() {
-        setup:
-        discoverByAddressActionArgs.get(ADDRESS).get(HOST).put(HOSTNAME, null)
-        discoverOpenSearch.setArguments(discoverByAddressActionArgs)
-
-        when:
-        def report = discoverOpenSearch.process()
-
-        then:
-        report.result() == null
-        report.messages().size() == 1
-        report.messages().get(0).code == DefaultMessages.MISSING_REQUIRED_FIELD
-        report.messages().get(0).path == HOSTNAME_FIELD_PATH
-    }
-
-    def 'test failure due to invalid url'() {
-        setup:
-        discoverByUrlActionArgs.get(ADDRESS).put(URL_NAME, 'n19($')
-        discoverOpenSearch.setArguments(discoverByUrlActionArgs)
-
-        when:
-        def report = discoverOpenSearch.process()
-
-        then:
-        report.result() == null
-        report.messages().size() == 1
-        report.messages().get(0).code == DefaultMessages.INVALID_URL_ERROR
-        report.messages().get(0).path == URL_FIELD_PATH
-    }
-
-    def 'test failure due to invalid hostname'() {
-        setup:
-        discoverByAddressActionArgs.get(ADDRESS).get(HOST).put(HOSTNAME, 'f089d**40')
-        discoverOpenSearch.setArguments(discoverByAddressActionArgs)
-
-        when:
-        def report = discoverOpenSearch.process()
-
-        then:
-        report.result() == null
-        report.messages().size() == 1
-        report.messages().get(0).code == DefaultMessages.INVALID_HOSTNAME
-        report.messages().get(0).path == HOSTNAME_FIELD_PATH
-    }
-
-    def 'test failure due to invalid port'() {
-        setup:
-        discoverByAddressActionArgs.get(ADDRESS).get(HOST).put(PORT, -1)
-        discoverOpenSearch.setArguments(discoverByAddressActionArgs)
-
-        when:
-        def report = discoverOpenSearch.process()
-
-        then:
-        report.result() == null
-        report.messages().size() == 1
-        report.messages().get(0).code == DefaultMessages.INVALID_PORT_RANGE
-        report.messages().get(0).path == PORT_FIELD_PATH
-    }
-
-    def 'test failure due to credentials provided but empty'() {
-        setup:
-        discoverByAddressActionArgs.put(CREDENTIALS, [(PASSWORD):'',(USERNAME): ''])
-        discoverOpenSearch.setArguments(discoverByAddressActionArgs)
-
-        when:
-        def report = discoverOpenSearch.process()
-
-        then:
-        report.result() == null
-        report.messages().size() == 2
-        report.messages().get(0).code == DefaultMessages.EMPTY_FIELD
-        report.messages().get(0).path == USERNAME_FIELD_PATH
-        report.messages().get(1).code == DefaultMessages.EMPTY_FIELD
-        report.messages().get(1).path == PASSWORD_FIELD_PATH
+        report.messages().count {
+            it.getCode() == DefaultMessages.MISSING_REQUIRED_FIELD
+        } == 1
+        report.messages()*.getPath() == [URL_FIELD_PATH]
     }
 
     def createResult(boolean hasError, Class clazz) {

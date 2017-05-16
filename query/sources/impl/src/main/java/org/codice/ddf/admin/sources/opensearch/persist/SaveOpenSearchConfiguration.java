@@ -17,6 +17,7 @@ import static org.codice.ddf.admin.common.message.DefaultMessages.failedPersistE
 import static org.codice.ddf.admin.common.services.ServiceCommons.createManagedService;
 import static org.codice.ddf.admin.common.services.ServiceCommons.serviceConfigurationExists;
 import static org.codice.ddf.admin.common.services.ServiceCommons.updateService;
+import static org.codice.ddf.admin.sources.commons.utils.SourceValidationUtils.hasSourceName;
 import static org.codice.ddf.admin.sources.commons.utils.SourceValidationUtils.validateSourceName;
 import static org.codice.ddf.admin.sources.services.OpenSearchServiceProperties.OPENSEARCH_FACTORY_PID;
 import static org.codice.ddf.admin.sources.services.OpenSearchServiceProperties.openSearchConfigToServiceProps;
@@ -78,11 +79,12 @@ public class SaveOpenSearchConfiguration extends BaseAction<BooleanField> {
 
         if(pid.getValue() != null) {
             addMessages(serviceConfigurationExists(pid, configuratorFactory));
+            if(!containsErrorMsgs() && !hasSourceName(pid.getValue(), config.sourceName(), configuratorFactory)) {
+                addMessages(validateSourceName(config.sourceNameField(), configuratorFactory));
+            }
+        } else {
+            addMessages(validateSourceName(config.sourceNameField(), configuratorFactory));
         }
-        if(containsErrorMsgs()) {
-            return;
-        }
-        addMessages(validateSourceName(config.sourceNameField(), configuratorFactory));
     }
 
     @Override

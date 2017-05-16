@@ -33,9 +33,9 @@ class GetOpenSearchConfigsActionTest extends Specification {
 
     static TEST_SHORT_NAME = "openSearchSource"
 
-    static BASE_PATH = [GetOpenSearchConfigsAction.ID, BaseAction.ARGUMENT]
+    static RESULT_ARGUMENT_PATH = [GetOpenSearchConfigsAction.ID]
 
-    static PID_PATH = [BASE_PATH, PID].flatten()
+    static BASE_PATH = [RESULT_ARGUMENT_PATH, BaseAction.ARGUMENT].flatten()
 
     Action getOpenSearchConfigsAction
 
@@ -58,7 +58,7 @@ class GetOpenSearchConfigsActionTest extends Specification {
         getOpenSearchConfigsAction = new GetOpenSearchConfigsAction(configuratorFactory)
     }
 
-    def 'test no pid argument returns all configs'() {
+    def 'no pid argument returns all configs'() {
         when:
         def report = getOpenSearchConfigsAction.process()
         def list = ((ListField)report.result())
@@ -73,7 +73,7 @@ class GetOpenSearchConfigsActionTest extends Specification {
         assertConfig(list.getList().get(1), 1, TEST_SHORT_NAME, S_PID_2, false)
     }
 
-    def 'test pid filter returns 1 result'() {
+    def 'pid filter returns 1 result'() {
         setup:
         getOpenSearchConfigsAction.setArguments(actionArgs)
 
@@ -90,7 +90,7 @@ class GetOpenSearchConfigsActionTest extends Specification {
         assertConfig(list.getList().get(0), 0, TEST_SHORT_NAME, S_PID_2, false)
     }
 
-    def 'test failure due to config with id of pid does not exist'() {
+    def 'failure due to no existing config with specified pid'() {
         setup:
         actionArgs.put(PID, S_PID)
         getOpenSearchConfigsAction.setArguments(actionArgs)
@@ -103,19 +103,7 @@ class GetOpenSearchConfigsActionTest extends Specification {
         report.result() == null
         report.messages().size() == 1
         report.messages().get(0).code == DefaultMessages.NO_EXISTING_CONFIG
-        report.messages().get(0).path == PID_PATH
-    }
-
-    def 'test failure due to provided but empty pid field'() {
-        when:
-        getOpenSearchConfigsAction.setArguments([(PID): ''])
-        def report = getOpenSearchConfigsAction.process()
-
-        then:
-        report.result() == null
-        report.messages().size() == 1
-        report.messages().get(0).code == DefaultMessages.EMPTY_FIELD
-        report.messages().get(0).path == PID_PATH
+        report.messages().get(0).path == RESULT_ARGUMENT_PATH
     }
 
     def createOpenSearchManagedServiceConfigs() {

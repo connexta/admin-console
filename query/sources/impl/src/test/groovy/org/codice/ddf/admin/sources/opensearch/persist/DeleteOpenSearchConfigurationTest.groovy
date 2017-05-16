@@ -41,7 +41,7 @@ class DeleteOpenSearchConfigurationTest extends Specification {
         deleteOpenSearchConfigurationAction = new DeleteOpenSearchConfiguration(configuratorFactory)
     }
 
-    def 'successfully delete config returns true'() {
+    def 'Successfully deleting WFS config returns true'() {
         when:
         configReader.getConfig(S_PID) >> configToBeDeleted
         configurator.commit(_, _) >> mockReport(false)
@@ -53,7 +53,7 @@ class DeleteOpenSearchConfigurationTest extends Specification {
         report.result().getValue() == true
     }
 
-    def 'no config found with provided pid'() {
+    def 'Fail delete when no existing configuration with the provided pid'() {
         when:
         configReader.getConfig(S_PID) >> [:]
         deleteOpenSearchConfigurationAction.setArguments(actionArgs)
@@ -66,7 +66,7 @@ class DeleteOpenSearchConfigurationTest extends Specification {
         report.messages().get(0).path == RESULT_ARGUMENT_PATH
     }
 
-    def 'error while committing delete configuration with given pid'() {
+    def 'Error while committing delete configuration with given pid'() {
         when:
         configReader.getConfig(S_PID) >> configToBeDeleted
         configurator.commit(_, _) >> mockReport(true)
@@ -80,7 +80,7 @@ class DeleteOpenSearchConfigurationTest extends Specification {
         report.messages().get(0).path == RESULT_ARGUMENT_PATH
     }
 
-    def 'fail when missing required fields'() {
+    def 'Fail when missing required fields'() {
         when:
         def report = deleteOpenSearchConfigurationAction.process()
 

@@ -83,8 +83,6 @@ public class CswSourceUtils {
      *
      * Possible Error Codes to be returned
      * - {@link org.codice.ddf.admin.common.message.DefaultMessages#CANNOT_CONNECT}
-     * - {@link org.codice.ddf.admin.common.message.DefaultMessages#UNAUTHORIZED}
-     * - {@link org.codice.ddf.admin.common.message.DefaultMessages#UNKNOWN_ENDPOINT}
      *
      * @param hostField address to probe for CSW capabilities
      * @param creds        optional credentials for basic authentication
@@ -153,8 +151,7 @@ public class CswSourceUtils {
             if ((Boolean) xpath.compile(HAS_GMD_ISO_EXP)
                     .evaluate(capabilitiesXml, XPathConstants.BOOLEAN)) {
                 configResult.result(preferred.outputSchema(GMD_OUTPUT_SCHEMA)
-                        .cswProfile(GMD_CSW_ISO_FEDERATED_SOURCE)
-                        .eventServiceAddress(urlField.getValue() + "/subscription"));
+                        .cswProfile(GMD_CSW_ISO_FEDERATED_SOURCE));
                 return configResult;
             }
         } catch (Exception e) {

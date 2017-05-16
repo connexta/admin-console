@@ -61,6 +61,10 @@ public class DefaultMessages {
         return new ErrorMessage(FAILED_UPDATE_ERROR);
     }
 
+    public static ErrorMessage cannotConnectError() {
+        return new ErrorMessage(CANNOT_CONNECT);
+    }
+
     public static ErrorMessage noExistingConfigError() {
         return new ErrorMessage(NO_EXISTING_CONFIG);
     }

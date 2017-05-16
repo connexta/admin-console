@@ -64,7 +64,7 @@ class GetCswConfigsActionTest extends Specification {
         getCswConfigsAction = new GetCswConfigsAction(configuratorFactory)
     }
 
-    def 'no pid argument returns all configs'() {
+    def 'No pid argument returns all configs'() {
         when:
         def report = getCswConfigsAction.process()
         def list = ((ListField)report.result())
@@ -79,7 +79,7 @@ class GetCswConfigsActionTest extends Specification {
         assertConfig(list.getList().get(0), 0, managedServiceConfigs.get(S_PID_1), SOURCE_ID_1, S_PID_1, true)
         assertConfig(list.getList().get(1), 1, managedServiceConfigs.get(S_PID_2), SOURCE_ID_2, S_PID_2, false)
     }
-    def 'pid filter returns 1 result'() {
+    def 'Sending pid filter returns 1 result'() {
         when:
         getCswConfigsAction.setArguments(actionArgs)
         def report = getCswConfigsAction.process()
@@ -88,13 +88,13 @@ class GetCswConfigsActionTest extends Specification {
         then:
         1 * configReader.getServices(_, _) >> [new TestSource(S_PID_2, false)]
         1 * configReader.getServices(_, _) >> []
-        configReader.getConfig(S_PID_2) >>  managedServiceConfigs.get(S_PID_2)
+        configReader.getConfig(S_PID_2) >> managedServiceConfigs.get(S_PID_2)
         report.result() != null
         list.getList().size() == 1
         assertConfig(list.getList().get(0), 0, managedServiceConfigs.get(S_PID_2), SOURCE_ID_2, S_PID_2, false)
     }
 
-    def 'failure due to config with id of pid does not exist'() {
+    def 'Fail when there is no existing configuration for the service specified by the pid'() {
         setup:
         actionArgs.put(PID, S_PID)
         getCswConfigsAction.setArguments(actionArgs)
@@ -108,18 +108,6 @@ class GetCswConfigsActionTest extends Specification {
         report.messages().size() == 1
         report.messages().get(0).code == DefaultMessages.NO_EXISTING_CONFIG
         report.messages().get(0).path == [GetCswConfigsAction.ID]
-    }
-
-    def 'failure due to provided but empty pid field'() {
-        when:
-        getCswConfigsAction.setArguments([(PID): ''])
-        def report = getCswConfigsAction.process()
-
-        then:
-        report.result() == null
-        report.messages().size() == 1
-        report.messages().get(0).code == DefaultMessages.EMPTY_FIELD
-        report.messages().get(0).path == PID_PATH
     }
 
     def assertConfig(Field field, int index, Map<String, Object> properties, String sourceName, String pid, boolean availability) {

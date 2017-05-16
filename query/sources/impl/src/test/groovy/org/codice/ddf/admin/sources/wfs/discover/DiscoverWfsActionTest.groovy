@@ -16,7 +16,6 @@ package org.codice.ddf.admin.sources.wfs.discover
 import org.codice.ddf.admin.api.action.Action
 import org.codice.ddf.admin.common.ReportWithResult
 import org.codice.ddf.admin.common.actions.BaseAction
-import org.codice.ddf.admin.common.fields.common.AddressField
 import org.codice.ddf.admin.common.fields.common.CredentialsField
 import org.codice.ddf.admin.common.fields.common.UrlField
 import org.codice.ddf.admin.common.message.DefaultMessages
@@ -38,25 +37,16 @@ class DiscoverWfsActionTest extends Specification {
 
     static ADDRESS_FIELD_PATH = [BASE_PATH, ADDRESS].flatten()
 
-    static HOST_FIELD_PATH = [ADDRESS_FIELD_PATH, HOST].flatten()
-
-    static PORT_FIELD_PATH = [HOST_FIELD_PATH, PORT].flatten()
-
-    static HOSTNAME_FIELD_PATH = [HOST_FIELD_PATH, HOSTNAME].flatten()
-
     static URL_FIELD_PATH = [ADDRESS_FIELD_PATH, URL_NAME].flatten()
 
     def setup() {
-        refreshDiscoverByAddressActionArgs()
-        refreshDiscoverByUrlActionArgs()
         wfsSourceUtils = Mock(WfsSourceUtils)
         discoverWfs = new DiscoverWfsAction(wfsSourceUtils)
     }
 
-    def 'successfully discover using URL'() {
+    def 'Successfully discover WFS configuration using URL'() {
         setup:
-        def addr = new AddressField().url('https://localhost:8993').getValue()
-        discoverWfs.setArguments(discoverByUrlActionArgs)
+        discoverWfs.setArguments(getBaseDiscoverByUrlActionArgs())
 
         when:
         def report = discoverWfs.process()
@@ -68,9 +58,9 @@ class DiscoverWfsActionTest extends Specification {
         ((SourceInfoField) report.result()).config() != null
     }
 
-    def 'successfully discover using hostname and port'() {
+    def 'Successfully discover WFS configuration using hostname and port'() {
         setup:
-        discoverWfs.setArguments(discoverByAddressActionArgs)
+        discoverWfs.setArguments(getBaseDiscoverByAddressActionArgs())
 
         when:
         def report = discoverWfs.process()
@@ -83,9 +73,9 @@ class DiscoverWfsActionTest extends Specification {
         ((SourceInfoField) report.result()).config() != null
     }
 
-    def 'failure discovery using URL while getting preferred config'() {
+    def 'Fail to discover WFS config using URL while getting preferred config'() {
         setup:
-        discoverWfs.setArguments(discoverByUrlActionArgs)
+        discoverWfs.setArguments(getBaseDiscoverByUrlActionArgs())
 
         when:
         def report = discoverWfs.process()
@@ -96,9 +86,9 @@ class DiscoverWfsActionTest extends Specification {
         report.messages().size() == 1
     }
 
-    def 'failure when using hostname and port when discovering the URL'() {
+    def 'Fail to discover WFS config when using hostname and port when discovering the URL'() {
         setup:
-        discoverWfs.setArguments(discoverByAddressActionArgs)
+        discoverWfs.setArguments(getBaseDiscoverByAddressActionArgs())
 
         when:
         def report = discoverWfs.process()
@@ -109,9 +99,9 @@ class DiscoverWfsActionTest extends Specification {
         report.messages().size() == 1
     }
 
-    def 'failure discovery using hostname and port while getting preferred config'() {
+    def 'Fail to discover WFS config when using hostname and port while getting preferred config'() {
         setup:
-        discoverWfs.setArguments(discoverByAddressActionArgs)
+        discoverWfs.setArguments(getBaseDiscoverByAddressActionArgs())
 
         when:
         def report = discoverWfs.process()
@@ -123,7 +113,7 @@ class DiscoverWfsActionTest extends Specification {
         report.messages().size() == 1
     }
 
-    def 'fail when missing required fields'() {
+    def 'Fail when missing required fields'() {
         when:
         def report = discoverWfs.process()
 

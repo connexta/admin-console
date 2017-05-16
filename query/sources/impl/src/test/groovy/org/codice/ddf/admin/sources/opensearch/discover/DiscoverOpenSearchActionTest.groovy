@@ -37,24 +37,16 @@ class DiscoverOpenSearchActionTest extends Specification {
 
     static ADDRESS_FIELD_PATH = [BASE_PATH, ADDRESS].flatten()
 
-    static HOST_FIELD_PATH = [ADDRESS_FIELD_PATH, HOST].flatten()
-
-    static PORT_FIELD_PATH = [HOST_FIELD_PATH, PORT].flatten()
-
-    static HOSTNAME_FIELD_PATH = [HOST_FIELD_PATH, HOSTNAME].flatten()
-
     static URL_FIELD_PATH = [ADDRESS_FIELD_PATH, URL_NAME].flatten()
 
     def setup() {
-        refreshDiscoverByAddressActionArgs()
-        refreshDiscoverByUrlActionArgs()
         openSearchSourceUtils = Mock(OpenSearchSourceUtils)
         discoverOpenSearch = new DiscoverOpenSearchAction(openSearchSourceUtils)
     }
 
-    def 'successful discover using URL'() {
+    def 'Successfully discover CSW configuration using URL'() {
         setup:
-        discoverOpenSearch.setArguments(discoverByUrlActionArgs)
+        discoverOpenSearch.setArguments(getBaseDiscoverByUrlActionArgs())
 
         when:
         def report = discoverOpenSearch.process()
@@ -66,9 +58,9 @@ class DiscoverOpenSearchActionTest extends Specification {
         ((SourceInfoField) report.result()).config() != null
     }
 
-    def 'successful discover using hostname and port'() {
+    def 'Successfully discover CSW Configuration using hostname and port'() {
         setup:
-        discoverOpenSearch.setArguments(discoverByAddressActionArgs)
+        discoverOpenSearch.setArguments(getBaseDiscoverByAddressActionArgs())
 
         when:
         def report = discoverOpenSearch.process()
@@ -81,9 +73,9 @@ class DiscoverOpenSearchActionTest extends Specification {
         ((SourceInfoField) report.result()).config() != null
     }
 
-    def 'failure discovery using URL while getting preferred config'() {
+    def 'Failure to discover using URL while getting preferred config'() {
         setup:
-        discoverOpenSearch.setArguments(discoverByUrlActionArgs)
+        discoverOpenSearch.setArguments(getBaseDiscoverByUrlActionArgs())
 
         when:
         def report = discoverOpenSearch.process()
@@ -94,9 +86,9 @@ class DiscoverOpenSearchActionTest extends Specification {
         report.messages().size() == 1
     }
 
-    def 'failure when using hostname and port when discovering the URL'() {
+    def 'Fail when using hostname and port to discover the URL'() {
         setup:
-        discoverOpenSearch.setArguments(discoverByAddressActionArgs)
+        discoverOpenSearch.setArguments(getBaseDiscoverByAddressActionArgs())
 
         when:
         def report = discoverOpenSearch.process()
@@ -107,9 +99,9 @@ class DiscoverOpenSearchActionTest extends Specification {
         report.messages().size() == 1
     }
 
-    def 'failure when using hostname and port when getting preferred config'() {
+    def 'Fail when using hostname and port when getting preferred CSW config'() {
         setup:
-        discoverOpenSearch.setArguments(discoverByAddressActionArgs)
+        discoverOpenSearch.setArguments(getBaseDiscoverByAddressActionArgs())
 
         when:
         def report = discoverOpenSearch.process()
@@ -121,7 +113,7 @@ class DiscoverOpenSearchActionTest extends Specification {
         report.messages().size() == 1
     }
 
-    def 'fail when missing required fields'() {
+    def 'Fail when missing required fields'() {
         when:
         def report = discoverOpenSearch.process()
 

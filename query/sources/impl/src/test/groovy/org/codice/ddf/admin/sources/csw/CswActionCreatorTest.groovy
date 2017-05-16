@@ -24,7 +24,7 @@ class CswActionCreatorTest extends Specification {
         cswActionCreator = new CswActionCreator()
     }
 
-    def 'test discovery actions immutability'() {
+    def 'Verify discovery actions immutability'() {
         when:
         cswActionCreator.getDiscoveryActions().add(Mock(Action))
 
@@ -32,7 +32,7 @@ class CswActionCreatorTest extends Specification {
         thrown(UnsupportedOperationException)
     }
 
-    def 'test persist actions immutability'() {
+    def 'Verify persist actions immutability'() {
         when:
         cswActionCreator.getPersistActions().add(Mock(Action))
 

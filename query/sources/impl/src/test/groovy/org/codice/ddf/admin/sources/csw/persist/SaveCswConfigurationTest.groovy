@@ -76,7 +76,7 @@ class SaveCswConfigurationTest extends Specification {
         saveCswConfiguration = new SaveCswConfiguration(configuratorFactory)
     }
 
-    def 'new configuration save successful'() {
+    def 'Successfully save new CSW configuration'() {
         when:
         saveCswConfiguration.setArguments(actionArgs)
         configReader.getServices(_, _) >> []
@@ -88,7 +88,7 @@ class SaveCswConfigurationTest extends Specification {
         report.result().getValue() == true
     }
 
-    def 'fail to save new config due to duplicate source name'() {
+    def 'Fail to save new CSW config due to duplicate source name'() {
         when:
         saveCswConfiguration.setArguments(actionArgs)
         configReader.getServices(_, _) >> federatedSources
@@ -101,7 +101,7 @@ class SaveCswConfigurationTest extends Specification {
         report.messages().get(0).code == SourceMessages.DUPLICATE_SOURCE_NAME
     }
 
-    def 'fail to save new config due to failure to commit'() {
+    def 'Fail to save new CSW config due to failure to commit'() {
         when:
         saveCswConfiguration.setArguments(actionArgs)
         configReader.getServices(_, _) >> []
@@ -115,7 +115,7 @@ class SaveCswConfigurationTest extends Specification {
         report.messages().get(0).code == DefaultMessages.FAILED_PERSIST
     }
 
-    def 'update configuration successful'() {
+    def 'Successfully update CSW configuration'() {
         setup:
         actionArgs.put(PID, S_PID)
         saveCswConfiguration.setArguments(actionArgs)
@@ -131,7 +131,7 @@ class SaveCswConfigurationTest extends Specification {
         report.result().getValue() == true
     }
 
-    def 'fail update config due to existing source name'() {
+    def 'Fail CSW configuration update due to existing source name'() {
         setup:
         actionArgs.put(PID, S_PID)
         saveCswConfiguration.setArguments(actionArgs)
@@ -148,7 +148,7 @@ class SaveCswConfigurationTest extends Specification {
         report.messages().get(0).code == SourceMessages.DUPLICATE_SOURCE_NAME
     }
 
-    def 'fail to update config due to failure to commit'() {
+    def 'Fail to update CSW config due to failure to commit'() {
         setup:
         actionArgs.put(PID, S_PID)
         saveCswConfiguration.setArguments(actionArgs)
@@ -166,7 +166,7 @@ class SaveCswConfigurationTest extends Specification {
         report.messages().get(0).code == DefaultMessages.FAILED_UPDATE_ERROR
     }
 
-    def 'fail to update config due to no existing source'() {
+    def 'Fail to update CSW Configuration due to no existing source config'() {
         setup:
         actionArgs.put(PID, S_PID)
         saveCswConfiguration.setArguments(actionArgs)
@@ -182,7 +182,7 @@ class SaveCswConfigurationTest extends Specification {
         report.messages().get(0).code == DefaultMessages.NO_EXISTING_CONFIG
     }
 
-    def 'fail when missing required fields'() {
+    def 'Fail when missing required fields'() {
         when:
         def report = saveCswConfiguration.process()
 
@@ -202,8 +202,7 @@ class SaveCswConfigurationTest extends Specification {
     }
 
     def createCswSaveArgs() {
-        refreshSaveConfigActionArgs()
-        actionArgs = saveConfigActionArgs
+        actionArgs = getBaseSaveConfigActionArgs()
         actionArgs.get(SOURCE_CONFIG).put(OUTPUT_SCHEMA, TEST_OUTPUT_SCHEMA)
         actionArgs.get(SOURCE_CONFIG).put(CSW_PROFILE, TEST_CSW_PROFILE)
         return actionArgs

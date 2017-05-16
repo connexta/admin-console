@@ -57,4 +57,10 @@ public class ReportWithResult<T> extends Report {
         super.argumentMessage(message);
         return this;
     }
+
+    @Override
+    public ReportWithResult<T> resultMessage(Message message) {
+        super.resultMessage(message);
+        return this;
+    }
 }

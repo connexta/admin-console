@@ -73,7 +73,7 @@ class SaveWfsConfigurationTest extends Specification {
         saveWfsConfiguration = new SaveWfsConfiguration(configuratorFactory)
     }
 
-    def 'successfully save new WFS configuration'() {
+    def 'Successfully save new WFS configuration'() {
         setup:
         saveWfsConfiguration.setArguments(actionArgs)
         configReader.getServices(_, _) >> []
@@ -86,7 +86,7 @@ class SaveWfsConfigurationTest extends Specification {
         report.result().getValue() == true
     }
 
-    def 'fail to save new config due to duplicate source name'() {
+    def 'Fail to save new WFS config due to duplicate source name'() {
         setup:
         saveWfsConfiguration.setArguments(actionArgs)
         configReader.getServices(_, _) >> federatedSources
@@ -101,7 +101,7 @@ class SaveWfsConfigurationTest extends Specification {
         report.messages().get(0).path == SOURCE_NAME_PATH
     }
 
-    def 'fail to save new config due to failure to commit'() {
+    def 'Fail to save new WFS config due to failure to commit'() {
         setup:
         saveWfsConfiguration.setArguments(actionArgs)
         configReader.getServices(_, _) >> []
@@ -117,7 +117,7 @@ class SaveWfsConfigurationTest extends Specification {
         report.messages().get(0).path == CONFIG_PATH
     }
 
-    def 'successfully update csw configuration'() {
+    def 'Successfully update WFS configuration'() {
         setup:
         actionArgs.put(PID, S_PID)
         saveWfsConfiguration.setArguments(actionArgs)
@@ -132,7 +132,7 @@ class SaveWfsConfigurationTest extends Specification {
         report.result().getValue() == true
     }
 
-    def 'fail update due to existing source name'() {
+    def 'Fail to update due to existing source name specified by pid'() {
         setup:
         actionArgs.put(PID, S_PID)
         saveWfsConfiguration.setArguments(actionArgs)
@@ -149,7 +149,7 @@ class SaveWfsConfigurationTest extends Specification {
         report.messages().get(0).path == SOURCE_NAME_PATH
     }
 
-    def 'fail update due to failure to commit'() {
+    def 'Fail configuration update due to failure to commit'() {
         setup:
         actionArgs.put(PID, S_PID)
         saveWfsConfiguration.setArguments(actionArgs)
@@ -167,7 +167,7 @@ class SaveWfsConfigurationTest extends Specification {
         report.messages().get(0).code == DefaultMessages.FAILED_UPDATE_ERROR
     }
 
-    def 'fail update config due to no existing config specified by pid'() {
+    def 'Fail to update WFS config due to no existing config specified by pid'() {
         setup:
         actionArgs.put(PID, S_PID)
         saveWfsConfiguration.setArguments(actionArgs)
@@ -183,7 +183,7 @@ class SaveWfsConfigurationTest extends Specification {
         report.messages().get(0).path == RESULT_ARGUMENT_PATH
     }
 
-    def 'fail due to missing required fields'() {
+    def 'Fail due to missing required fields'() {
         when:
         def report = saveWfsConfiguration.process()
 
@@ -197,8 +197,7 @@ class SaveWfsConfigurationTest extends Specification {
     }
 
     def createWfsSaveArgs() {
-        refreshSaveConfigActionArgs()
-        actionArgs = saveConfigActionArgs
+        actionArgs = getBaseSaveConfigActionArgs()
         actionArgs.get(SOURCE_CONFIG).put(WFS_VERSION, TEST_WFS_VERSION)
         return actionArgs
     }

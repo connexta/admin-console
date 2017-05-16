@@ -74,7 +74,7 @@ public class RequestUtils {
                 return responseBody;
             }
         }
-        return responseBody.argumentMessage(cannotConnectError(hostField.path()));
+        return responseBody.resultMessage(cannotConnectError());
     }
 
     /**
@@ -124,17 +124,17 @@ public class RequestUtils {
      */
     public ReportWithResult<Response> executeGetRequest(UrlField clientUrl, CredentialsField creds, Map<String, String> queryParams) {
         WebClient client = generateClient(clientUrl.getValue(), creds, queryParams);
-        ReportWithResult<Response> body = new ReportWithResult<>();
+        ReportWithResult<Response> report = new ReportWithResult<>();
         Response response;
         try {
             response = client.get();
         } catch (ProcessingException e) {
-            body.argumentMessage(cannotConnectError(clientUrl.path()));
-            return body;
+            report.resultMessage(cannotConnectError());
+            return report;
         }
 
-        body.result(response);
-        return body;
+        report.result(response);
+        return report;
     }
 
     /**

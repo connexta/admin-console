@@ -64,7 +64,7 @@ class GetWfsConfigsActionTest extends Specification {
         getWfsConfigsAction = new GetWfsConfigsAction(configuratorFactory)
     }
 
-    def 'no pid argument returns all configs'() {
+    def 'No pid argument returns all configs'() {
         setup:
         configReader.getServices(_, _) >> []
 
@@ -83,7 +83,7 @@ class GetWfsConfigsActionTest extends Specification {
         assertConfig(list.getList().get(1), 1, SOURCE_ID_2, S_PID_2, false, TEST_WFS_VERSION_2)
     }
 
-    def 'pid filter returns 1 result'() {
+    def 'Pid filter returns 1 result'() {
         setup:
         getWfsConfigsAction.setArguments(actionArgs)
 
@@ -100,7 +100,7 @@ class GetWfsConfigsActionTest extends Specification {
         assertConfig(list.getList().get(0), 0, SOURCE_ID_2, S_PID_2, false, TEST_WFS_VERSION_2)
     }
 
-    def 'failure due to no existing config when pid specified'() {
+    def 'Fail due to no existing config with specified pid'() {
         setup:
         actionArgs.put(PID, S_PID)
         getWfsConfigsAction.setArguments(actionArgs)

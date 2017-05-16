@@ -56,7 +56,7 @@ class DeleteWfsConfigurationTest extends Specification {
         deleteWfsConfiguration = new DeleteWfsConfiguration(configuratorFactory)
     }
 
-    def 'successfully delete configuration'() {
+    def 'Successfully delete WFS configuration'() {
         setup:
         configReader.getConfig(S_PID) >> configToBeDeleted
         configurator.commit(_, _) >> mockReport(false)
@@ -70,7 +70,7 @@ class DeleteWfsConfigurationTest extends Specification {
         report.result().getValue() == true
     }
 
-    def 'fail when no existing config found with provided pid'() {
+    def 'Fail to discover WFS config when no existing config found with provided pid'() {
         setup:
         configReader.getConfig(S_PID) >> [:]
         deleteWfsConfiguration.setArguments(actionArgs)
@@ -85,7 +85,7 @@ class DeleteWfsConfigurationTest extends Specification {
         report.messages().get(0).path == RESULT_ARGUMENT_PATH
     }
 
-    def 'error while committing delete configuration with given pid'() {
+    def 'Error while committing delete configuration with given pid'() {
         when:
         configReader.getConfig(S_PID) >> configToBeDeleted
         configurator.commit(_, _) >> mockReport(true)
@@ -99,7 +99,7 @@ class DeleteWfsConfigurationTest extends Specification {
         report.messages().get(0).path == RESULT_ARGUMENT_PATH
     }
 
-    def 'fail when missing required fields'() {
+    def 'Fail when missing required fields'() {
         when:
         def report = deleteWfsConfiguration.process()
 

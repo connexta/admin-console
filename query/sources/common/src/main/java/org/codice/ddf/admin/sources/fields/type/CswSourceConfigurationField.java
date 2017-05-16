@@ -17,7 +17,6 @@ import java.util.List;
 
 import org.codice.ddf.admin.api.fields.Field;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
-import org.codice.ddf.admin.common.fields.common.UrlField;
 import org.codice.ddf.admin.sources.fields.CswOutputSchemaField;
 import org.codice.ddf.admin.sources.fields.CswProfile;
 import org.codice.ddf.admin.sources.fields.CswSpatialOperator;
@@ -30,13 +29,11 @@ public class CswSourceConfigurationField extends SourceConfigUnionField {
     public static final String FIELD_TYPE_NAME = "CswSourceConfiguration";
 
     public static final String DESCRIPTION =
-            "Represents a CSW configuration containing properties to be saved. The spatial operator applies "
-                    + "the specific operator to all queries. The output schema defines the schema of the records returned "
-                    + "by a CSW GetRecords request. The event service address is for DDF CSW sources to listen to CUD pub/sub events.";
+            "Represents a CSW configuration containing properties to be saved. If specified, the spatial operator applies "
+                    + "the specific operator to the records returned by a GetRecords request, and the output schema defines the schema of the records returned "
+                    + "by the request.";
 
     public static final String OUTPUT_SCHEMA_FIELD_NAME = CswOutputSchemaField.DEFAULT_FIELD_NAME;
-
-    public static final String EVENT_SERVICE_ADDRESS_FIELD_NAME = "eventServiceAddress";
 
     public static final String CSW_PROFILE_FIELD_NAME = CswProfile.DEFAULT_FIELD_NAME;
 
@@ -45,8 +42,6 @@ public class CswSourceConfigurationField extends SourceConfigUnionField {
     private CswOutputSchemaField outputSchema;
 
     private CswSpatialOperator spatialOperator;
-
-    private UrlField eventServiceAddress;
 
     private CswProfile cswProfile;
 
@@ -61,11 +56,6 @@ public class CswSourceConfigurationField extends SourceConfigUnionField {
 
     public CswSourceConfigurationField spatialOperator(String spatialOperator) {
         this.spatialOperator.setValue(spatialOperator);
-        return this;
-    }
-
-    public CswSourceConfigurationField eventServiceAddress(String url) {
-        this.eventServiceAddress.setValue(url);
         return this;
     }
 
@@ -94,16 +84,8 @@ public class CswSourceConfigurationField extends SourceConfigUnionField {
         return spatialOperator;
     }
 
-    public String eventServiceAddress() {
-        return eventServiceAddress.getValue();
-    }
-
     public String cswProfile() {
         return cswProfile.getValue();
-    }
-
-    public UrlField eventServiceAddressField() {
-        return eventServiceAddress;
     }
 
     @Override
@@ -116,7 +98,6 @@ public class CswSourceConfigurationField extends SourceConfigUnionField {
     public void initializeFields() {
         super.initializeFields();
         outputSchema = new CswOutputSchemaField(OUTPUT_SCHEMA_FIELD_NAME);
-        eventServiceAddress = new UrlField(EVENT_SERVICE_ADDRESS_FIELD_NAME);
         cswProfile = new CswProfile();
         spatialOperator = new CswSpatialOperator();
     }
@@ -125,7 +106,6 @@ public class CswSourceConfigurationField extends SourceConfigUnionField {
     public List<Field> getFields() {
         return new ImmutableList.Builder<Field>().addAll(super.getFields())
                 .add(outputSchema)
-                .add(eventServiceAddress)
                 .add(cswProfile)
                 .add(spatialOperator)
                 .build();
@@ -135,7 +115,6 @@ public class CswSourceConfigurationField extends SourceConfigUnionField {
     public String toString() {
         return MoreObjects.toStringHelper(this)
                 .add(OUTPUT_SCHEMA_FIELD_NAME, outputSchema())
-                .add(EVENT_SERVICE_ADDRESS_FIELD_NAME, eventServiceAddress())
                 .add(CSW_PROFILE_FIELD_NAME, cswProfile())
                 .add(SPATIAL_OPERATOR_FIELD_NAME, spatialOperator())
                 .addValue(super.toString())

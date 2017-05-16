@@ -90,8 +90,6 @@ public class CswServiceProperties {
                 new ServiceCommons.ServicePropertyBuilder().putPropertyIfNotNull(ID,
                         config.sourceNameField())
                         .putPropertyIfNotNull(CSW_URL, config.endpointUrlField())
-                        .putPropertyIfNotNull(EVENT_SERVICE_ADDRESS,
-                                config.eventServiceAddressField())
                         .putPropertyIfNotNull(USERNAME,
                                 config.credentials().usernameField())
                         .putPropertyIfNotNull(OUTPUT_SCHEMA, config.outputSchemaField())
@@ -100,6 +98,10 @@ public class CswServiceProperties {
         String password = config.credentials().password();
         if(password != null && !password.equals(FLAG_PASSWORD)) {
             builder.put(PASSWORD, config.credentials().password());
+        }
+
+        if(config.endpointUrl() != null && config.cswProfile().equals(CSW_FEDERATION_PROFILE_SOURCE)) {
+            builder.put(EVENT_SERVICE_ADDRESS, config.endpointUrl() + "/subscription");
         }
         return builder.build();
     }

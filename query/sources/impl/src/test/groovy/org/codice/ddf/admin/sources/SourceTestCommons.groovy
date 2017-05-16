@@ -34,13 +34,7 @@ class SourceTestCommons {
 
     static final PASSWORD = CredentialsField.PASSWORD_FIELD_NAME
 
-    static final HOST = HostField.DEFAULT_FIELD_NAME
-
     static final ADDRESS = AddressField.DEFAULT_FIELD_NAME
-
-    static final PORT = PortField.DEFAULT_FIELD_NAME
-
-    static final HOSTNAME = HostnameField.DEFAULT_FIELD_NAME
 
     static final URL_NAME = UrlField.DEFAULT_FIELD_NAME
 
@@ -76,35 +70,21 @@ class SourceTestCommons {
 
     static TEST_SOURCENAME = "testSourceName"
 
-    static discoverByAddressActionArgs = [
-        (ADDRESS) : new AddressField().hostname('localhost').port(8993).getValue(),
-        (CREDENTIALS) : new CredentialsField().username(TEST_USERNAME).password(TEST_PASSWORD).getValue()
-    ]
-
-    static discoverByUrlActionArgs = [
-        (ADDRESS) : new AddressField().url("http://localhost:8993/sevices/csw").getValue(),
-        (CREDENTIALS) : new CredentialsField().username(TEST_USERNAME).password(TEST_PASSWORD).getValue()
-    ]
-
-    static saveConfigActionArgs = [
-        (SOURCE_CONFIG) : createSourceConfigUnionField().getValue()
-    ]
-
-    static refreshSaveConfigActionArgs() {
-        saveConfigActionArgs = [
+    static getBaseSaveConfigActionArgs() {
+        return [
             (SOURCE_CONFIG) : createSourceConfigUnionField().getValue()
         ]
     }
 
-    static refreshDiscoverByAddressActionArgs() {
-        discoverByAddressActionArgs = [
+    static getBaseDiscoverByAddressActionArgs() {
+        return [
             (ADDRESS) : new AddressField().hostname('localhost').port(8993).getValue(),
             (CREDENTIALS) : new CredentialsField().username(TEST_USERNAME).password(TEST_PASSWORD).getValue()
         ]
     }
 
-    static refreshDiscoverByUrlActionArgs() {
-        discoverByUrlActionArgs = [
+    static getBaseDiscoverByUrlActionArgs() {
+        return [
             (ADDRESS) : new AddressField().url("http://localhost:8993/sevices/csw").getValue(),
             (CREDENTIALS) : new CredentialsField().username(TEST_USERNAME).password(TEST_PASSWORD).getValue()
         ]

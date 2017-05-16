@@ -40,15 +40,13 @@ class DiscoverCswActionTest extends Specification {
     static URL_FIELD_PATH = [ADDRESS_FIELD_PATH, URL_NAME].flatten()
 
     def setup() {
-        refreshDiscoverByAddressActionArgs()
-        refreshDiscoverByUrlActionArgs()
         cswSourceUtils = Mock(CswSourceUtils)
         discoverCsw = new DiscoverCswAction(cswSourceUtils)
     }
 
-    def 'successfully discover using URL'() {
+    def 'Successfully discover CSW configuration using URL'() {
         setup:
-        discoverCsw.setArguments(discoverByUrlActionArgs)
+        discoverCsw.setArguments(getBaseDiscoverByUrlActionArgs())
 
         when:
         def report = discoverCsw.process()
@@ -60,9 +58,9 @@ class DiscoverCswActionTest extends Specification {
         ((SourceInfoField) report.result()).config() != null
     }
 
-    def 'successfully discover using hostname and port'() {
+    def 'Successfully discover CSW configuration using hostname and port'() {
         setup:
-        discoverCsw.setArguments(discoverByAddressActionArgs)
+        discoverCsw.setArguments(getBaseDiscoverByAddressActionArgs())
 
         when:
         def report = discoverCsw.process()
@@ -75,9 +73,9 @@ class DiscoverCswActionTest extends Specification {
         ((SourceInfoField) report.result()).config() != null
     }
 
-    def 'fail discovery using URL while getting preferred config'() {
+    def 'Fail discovery using URL while getting preferred config'() {
         setup:
-        discoverCsw.setArguments(discoverByUrlActionArgs)
+        discoverCsw.setArguments(getBaseDiscoverByUrlActionArgs())
 
         when:
         def report = discoverCsw.process()
@@ -88,9 +86,9 @@ class DiscoverCswActionTest extends Specification {
         report.messages().size() == 1
     }
 
-    def 'fail when using hostname+port when getting discovering the URL'() {
+    def 'Fail when using hostname+port when discovering the URL'() {
         setup:
-        discoverCsw.setArguments(discoverByAddressActionArgs)
+        discoverCsw.setArguments(getBaseDiscoverByAddressActionArgs())
 
         when:
         def report = discoverCsw.process()
@@ -101,9 +99,9 @@ class DiscoverCswActionTest extends Specification {
         report.messages().size() == 1
     }
 
-    def 'fail discovery using hostname+port while getting preferred config'() {
+    def 'Fail discovery using hostname+port while getting preferred config'() {
         setup:
-        discoverCsw.setArguments(discoverByAddressActionArgs)
+        discoverCsw.setArguments(getBaseDiscoverByAddressActionArgs())
 
         when:
         def report = discoverCsw.process()
@@ -115,7 +113,7 @@ class DiscoverCswActionTest extends Specification {
         report.messages().size() == 1
     }
 
-    def 'fail when missing required fields'() {
+    def 'Fail when missing required fields'() {
         when:
         def report = discoverCsw.process()
 

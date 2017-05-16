@@ -63,7 +63,7 @@ class DeleteCswConfigurationTest extends Specification {
         deleteCswConfiguration = new DeleteCswConfiguration(configuratorFactory)
     }
 
-    def 'successful delete config returns true'() {
+    def 'Successfully deleting CSW configuration returns true'() {
         when:
         configReader.getConfig(S_PID) >> configToDelete
         configurator.commit(_, _) >> mockReport(false)
@@ -75,7 +75,7 @@ class DeleteCswConfigurationTest extends Specification {
         report.result().getValue() == true
     }
 
-    def 'fail with no existing config found with provided servicePid'() {
+    def 'Fail with no existing config found with provided pid'() {
         when:
         configReader.getConfig(_ as String) >> [:]
         deleteCswConfiguration.setArguments(actionArgs)
@@ -88,7 +88,7 @@ class DeleteCswConfigurationTest extends Specification {
         report.messages().get(0).code == DefaultMessages.NO_EXISTING_CONFIG
     }
 
-    def 'error while committing deleted configuration with the given servicePid'() {
+    def 'Error while committing deleted configuration with the given servicePid'() {
         when:
         configReader.getConfig(S_PID) >> configToDelete
         configurator.commit(_, _) >> mockReport(true)
@@ -102,7 +102,7 @@ class DeleteCswConfigurationTest extends Specification {
         report.messages().get(0).code == DefaultMessages.FAILED_DELETE_ERROR
     }
 
-    def 'fail when missing required fields'() {
+    def 'Fail when missing required fields'() {
         when:
         def report = deleteCswConfiguration.process()
 

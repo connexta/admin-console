@@ -71,8 +71,6 @@ public class WfsSourceUtils {
      *
      * Possible Error Codes to be returned
      * - {@link org.codice.ddf.admin.common.message.DefaultMessages#CANNOT_CONNECT}
-     * - {@link org.codice.ddf.admin.common.message.DefaultMessages#UNAUTHORIZED}
-     * - {@link org.codice.ddf.admin.common.message.DefaultMessages#UNKNOWN_ENDPOINT}
      *
      * @param hostField address to probe for WFS capabilities
      * @param creds        optional username to add to Basic Auth header

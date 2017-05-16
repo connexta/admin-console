@@ -11,22 +11,22 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.sources.opensearch
+package org.codice.ddf.admin.sources.wfs
 
 import org.codice.ddf.admin.api.action.Action
 import spock.lang.Specification
 
-class OpenSearchActionCreatorTest extends Specification {
+class WfsActionCreatorTest extends Specification {
 
-    OpenSearchActionCreator openSearchActionCreator
+    WfsActionCreator wfsActionCreator
 
     def setup() {
-        openSearchActionCreator = new OpenSearchActionCreator()
+        wfsActionCreator = new WfsActionCreator()
     }
 
     def 'Verify discovery actions immutability'() {
         when:
-        openSearchActionCreator.getDiscoveryActions().add(Mock(Action))
+        wfsActionCreator.getDiscoveryActions().add(Mock(Action))
 
         then:
         thrown(UnsupportedOperationException)
@@ -34,7 +34,7 @@ class OpenSearchActionCreatorTest extends Specification {
 
     def 'Verify persist actions immutability'() {
         when:
-        openSearchActionCreator.getPersistActions().add(Mock(Action))
+        wfsActionCreator.getPersistActions().add(Mock(Action))
 
         then:
         thrown(UnsupportedOperationException)

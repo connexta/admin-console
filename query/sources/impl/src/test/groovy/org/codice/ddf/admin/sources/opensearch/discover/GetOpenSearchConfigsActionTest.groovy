@@ -58,7 +58,7 @@ class GetOpenSearchConfigsActionTest extends Specification {
         getOpenSearchConfigsAction = new GetOpenSearchConfigsAction(configuratorFactory)
     }
 
-    def 'no pid argument returns all configs'() {
+    def 'No pid argument returns all configs'() {
         when:
         def report = getOpenSearchConfigsAction.process()
         def list = ((ListField)report.result())
@@ -73,7 +73,7 @@ class GetOpenSearchConfigsActionTest extends Specification {
         assertConfig(list.getList().get(1), 1, TEST_SHORT_NAME, S_PID_2, false)
     }
 
-    def 'pid filter returns 1 result'() {
+    def 'Pid filter returns 1 result'() {
         setup:
         getOpenSearchConfigsAction.setArguments(actionArgs)
 
@@ -90,7 +90,7 @@ class GetOpenSearchConfigsActionTest extends Specification {
         assertConfig(list.getList().get(0), 0, TEST_SHORT_NAME, S_PID_2, false)
     }
 
-    def 'failure due to no existing config with specified pid'() {
+    def 'Fail due to no existing config with specified pid'() {
         setup:
         actionArgs.put(PID, S_PID)
         getOpenSearchConfigsAction.setArguments(actionArgs)

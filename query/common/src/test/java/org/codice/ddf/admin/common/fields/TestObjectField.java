@@ -13,11 +13,14 @@
  **/
 package org.codice.ddf.admin.common.fields;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.codice.ddf.admin.api.Field;
+import org.codice.ddf.admin.api.report.Message;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
+import org.codice.ddf.admin.common.report.message.ErrorMessage;
 
 import com.google.common.collect.ImmutableList;
 
@@ -28,6 +31,8 @@ public class TestObjectField extends BaseObjectField {
     public static final String FIELD_TYPE_NAME = "TestObjectField";
 
     public static final String DESCRIPTION = "TestObjectField Description";
+
+    public static final String TEST_ERROR_CODE = "TEST_ERROR_CODE";
 
     private InnerTestObjectField testField;
 
@@ -59,7 +64,11 @@ public class TestObjectField extends BaseObjectField {
 
         public static final String DESCRIPTION = "InnerTestObjectField Description";
 
-        StringField subFieldOfInnerField;
+        public static final String TEST_VALUE = "testValue";
+
+        public static final String SUB_FIELD_FIELD_NAME = "testSubFieldName";
+
+        public StringField subFieldOfInnerField;
 
         InnerTestObjectField() {
             this(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
@@ -67,8 +76,14 @@ public class TestObjectField extends BaseObjectField {
 
         InnerTestObjectField(String fieldName, String fieldTypeName, String description) {
             super(fieldName, fieldTypeName, description);
-            subFieldOfInnerField = new StringField();
+            subFieldOfInnerField = new StringField(SUB_FIELD_FIELD_NAME);
+            subFieldOfInnerField.setValue(TEST_VALUE);
             updateInnerFieldPaths();
+        }
+
+        @Override
+        public List<Message> validate() {
+            return Collections.singletonList(new ErrorMessage(TEST_ERROR_CODE, path()));
         }
 
         @Override

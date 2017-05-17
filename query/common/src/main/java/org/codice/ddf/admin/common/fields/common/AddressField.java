@@ -43,7 +43,7 @@ public class AddressField extends BaseObjectField {
     }
 
     public AddressField hostname(String hostname) {
-        host.name(hostname);
+        host.hostname(hostname);
         return this;
     }
 

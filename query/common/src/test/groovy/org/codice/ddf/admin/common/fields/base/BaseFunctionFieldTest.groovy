@@ -1,0 +1,134 @@
+/**
+ * Copyright (c) Codice Foundation
+ * <p>
+ * This is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser
+ * General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or any later version.
+ * <p>
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details. A copy of the GNU Lesser General Public License
+ * is distributed along with this program and can be found at
+ * <http://www.gnu.org/licenses/lgpl.html>.
+ **/
+package org.codice.ddf.admin.common.fields.base
+
+import org.codice.ddf.admin.api.DataType
+import org.codice.ddf.admin.api.fields.FunctionField
+import org.codice.ddf.admin.common.fields.base.scalar.StringField
+import org.codice.ddf.admin.common.report.message.DefaultMessages
+import org.codice.ddf.admin.common.report.message.ErrorMessage
+import spock.lang.Specification
+
+class BaseFunctionFieldTest extends Specification {
+
+    BaseFunctionField functionField
+
+    def 'Argument paths are updated when function field name is updated'() {
+        setup:
+        functionField = new TestBaseFunctionField(true)
+
+        expect:
+        functionField.path() == [TestBaseFunctionField.DEFAULT_NAME]
+        functionField.getArguments()[0].path() == [TestBaseFunctionField.DEFAULT_NAME, BaseFunctionField.ARGUMENT, StringField.DEFAULT_FIELD_NAME]
+
+        when:
+        functionField.fieldName('newName')
+
+        then:
+        functionField.path() == ['newName']
+        functionField.getArguments()[0].path() == ['newName', BaseFunctionField.ARGUMENT, StringField.DEFAULT_FIELD_NAME]
+    }
+
+    def 'Function field validates arguments'() {
+        setup:
+        functionField = new TestBaseFunctionField(true)
+
+        when:
+        def report = functionField.getValue()
+
+        then:
+        report.messages().size() == 1
+        report.messages()[0].getCode() == DefaultMessages.EMPTY_FIELD
+        report.messages()[0].getPath() == [TestBaseFunctionField.DEFAULT_NAME, BaseFunctionField.ARGUMENT, StringField.DEFAULT_FIELD_NAME]
+    }
+
+    def 'Adding result message has correct path on added message'() {
+        setup:
+        functionField = new TestBaseFunctionField(false)
+        functionField.addResultMessage(new ErrorMessage('test'))
+
+        when:
+        def report = functionField.getValue()
+
+        then:
+        report.messages().size() == 1
+        report.messages()[0].getPath() == [TestBaseFunctionField.DEFAULT_NAME]
+    }
+
+    def 'Setting function arguments'() {
+        setup:
+        functionField = new TestBaseFunctionField(false)
+
+        expect:
+        functionField.getArguments()[0].getValue() == TestBaseFunctionField.ARG_VALUE
+
+        when:
+        def value = [(StringField.DEFAULT_FIELD_NAME): 'test' ]
+        functionField.setValue(value)
+
+        then:
+        functionField.getArguments()[0].getValue() == 'test'
+    }
+
+    def 'Updating path updates arguments paths'() {
+        setup:
+        functionField = new TestBaseFunctionField(false)
+
+        when:
+        functionField.updatePath(['test'])
+
+        then:
+        functionField.path() == ['test', TestBaseFunctionField.DEFAULT_NAME]
+        functionField.getArguments()[0].path() == ['test', TestBaseFunctionField.DEFAULT_NAME, FunctionField.ARGUMENT, StringField.DEFAULT_FIELD_NAME]
+    }
+
+    class TestBaseFunctionField extends BaseFunctionField<StringField> {
+
+        static String DEFAULT_NAME = 'testBaseFunctionField'
+
+        static String ARG_VALUE = 'valid'
+
+        StringField stringArg
+
+        TestBaseFunctionField(boolean failValidation) {
+            this(DEFAULT_NAME, failValidation)
+        }
+
+        TestBaseFunctionField(String functionName, boolean failValidation) {
+            super(functionName, 'description', new StringField())
+            stringArg = new StringField()
+            if(failValidation) {
+                stringArg.setValue('')
+            } else {
+                stringArg.setValue(ARG_VALUE)
+            }
+            updateArgumentPaths()
+        }
+
+        @Override
+        List<DataType> getArguments() {
+            return Collections.singletonList(stringArg)
+        }
+
+        @Override
+        FunctionField<StringField> newInstance() {
+            return new TestBaseFunctionField(DEFAULT_NAME)
+        }
+
+        @Override
+        StringField performFunction() {
+            return new StringField('result')
+        }
+    }
+}

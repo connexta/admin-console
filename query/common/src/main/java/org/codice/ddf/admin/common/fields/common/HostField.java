@@ -30,19 +30,19 @@ public class HostField extends BaseObjectField {
     public static final String DESCRIPTION = "Represents a host identified by the hostname and the port. If this field is required, then"
             + " a host name and port must be provided.";
 
-    private HostnameField name;
+    private HostnameField hostname;
 
     private PortField port;
 
     public HostField() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
-        name = new HostnameField();
+        hostname = new HostnameField();
         port = new PortField();
         updateInnerFieldPaths();
     }
 
-    public HostField name(String hostname) {
-        this.name.setValue(hostname);
+    public HostField hostname(String hostname) {
+        this.hostname.setValue(hostname);
         return this;
     }
 
@@ -55,12 +55,12 @@ public class HostField extends BaseObjectField {
         return this.port.getValue();
     }
 
-    public String name() {
-        return this.name.getValue();
+    public String hostname() {
+        return this.hostname.getValue();
     }
 
     public HostnameField hostnameField() {
-        return name;
+        return hostname;
     }
 
     public PortField portField() {
@@ -68,14 +68,14 @@ public class HostField extends BaseObjectField {
     }
 
     public void useDefaultRequired() {
-        name.isRequired(true);
+        hostname.isRequired(true);
         port.isRequired(true);
     }
 
     @Override
     public List<Message> validate() {
         if(isRequired()) {
-            name.isRequired(true);
+            hostname.isRequired(true);
             port.isRequired(true);
         }
         return super.validate();
@@ -83,6 +83,6 @@ public class HostField extends BaseObjectField {
 
     @Override
     public List<Field> getFields() {
-        return ImmutableList.of(name, port);
+        return ImmutableList.of(hostname, port);
     }
 }

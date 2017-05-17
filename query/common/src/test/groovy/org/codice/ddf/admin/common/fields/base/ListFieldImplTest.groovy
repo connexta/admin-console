@@ -17,25 +17,28 @@ import org.codice.ddf.admin.api.fields.ListField
 import org.codice.ddf.admin.api.fields.ObjectField
 import org.codice.ddf.admin.common.fields.TestObjectField
 import org.codice.ddf.admin.common.fields.base.scalar.StringField
+import org.codice.ddf.admin.common.report.message.DefaultMessages
 import spock.lang.Specification
 
 class ListFieldImplTest extends Specification {
 
-    static final String LIST_FIELD_NAME = "listFieldName"
+    static final String TEST_LIST_FIELD_NAME = "testListFieldName"
 
-    def 'test the path of fields in listfields are the listfields path + their own'() {
+    def 'The path of fields in ListFields are the ListFields path + their own'() {
         when:
-        ListFieldImpl<StringField> listField = new ListFieldImpl<>(LIST_FIELD_NAME, StringField.class)
+        ListFieldImpl<StringField> listField = new ListFieldImpl<>(TEST_LIST_FIELD_NAME, StringField.class)
+        listField.add(new StringField())
         listField.add(new StringField())
 
         then:
-        listField.path() == [LIST_FIELD_NAME]
-        listField.getList().get(0).path() == [LIST_FIELD_NAME, ListField.INDEX_DELIMETER + 0]
+        listField.path() == [TEST_LIST_FIELD_NAME]
+        listField.getList().get(0).path() == [TEST_LIST_FIELD_NAME, ListField.INDEX_DELIMETER + 0]
+        listField.getList().get(1).path() == [TEST_LIST_FIELD_NAME, ListField.INDEX_DELIMETER+ 1]
     }
 
-    def 'test the path of ObjectFields and their inner fields in listfields'() {
+    def 'The path of ObjectFields and their inner fields in ListFields are correct'() {
         when:
-        ListFieldImpl<ObjectField> listField = new ListFieldImpl<>(LIST_FIELD_NAME, TestObjectField.class)
+        ListFieldImpl<ObjectField> listField = new ListFieldImpl<>(TEST_LIST_FIELD_NAME, TestObjectField.class)
         listField.add(new TestObjectField())
 
         List<String> parentPath = listField.path()
@@ -44,9 +47,128 @@ class ListFieldImplTest extends Specification {
         List<String> subFieldOfInnerObjectFieldPath = ((ObjectField) listField.getList().get(0).getFields().get(0)).getFields().get(0).path()
 
         then:
-        parentPath == [LIST_FIELD_NAME]
+        parentPath == [TEST_LIST_FIELD_NAME]
         objectFieldPath == [parentPath, ListField.INDEX_DELIMETER + 0].flatten()
         innerObjectFieldPath == [objectFieldPath, TestObjectField.InnerTestObjectField.DEFAULT_FIELD_NAME].flatten()
-        subFieldOfInnerObjectFieldPath == [innerObjectFieldPath, StringField.DEFAULT_FIELD_NAME].flatten()
+        subFieldOfInnerObjectFieldPath == [innerObjectFieldPath, TestObjectField.InnerTestObjectField.SUB_FIELD_FIELD_NAME].flatten()
+    }
+
+    def 'Newly added required elements match the requirement of the ListFields field type'() {
+        setup:
+        ListFieldImpl<StringField> listField = new ListFieldImpl<>(TEST_LIST_FIELD_NAME, new StringField().isRequired(true))
+
+        when:
+        listField.add(new StringField())
+
+        then:
+        listField.getList().get(0).isRequired()
+    }
+
+    def 'Validation fails when list elements fail to validate'() {
+        setup:
+        ListFieldImpl<StringField> listField = new ListFieldImpl<>(TEST_LIST_FIELD_NAME, new StringField().isRequired(true))
+        def element1 = new StringField('element1')
+        element1.setValue('')
+        def element2 = new StringField('element2')
+        element2.setValue('valid')
+        def element3 = new StringField('element3')
+
+        listField.addAll([element1, element2, element3])
+
+        when:
+        def validationMsgs = listField.validate()
+
+        then:
+        validationMsgs.size() == 2
+        listField.path() == [TEST_LIST_FIELD_NAME]
+        validationMsgs[0].getCode() == DefaultMessages.EMPTY_FIELD
+        validationMsgs[0].getPath() == [TEST_LIST_FIELD_NAME, ListFieldImpl.INDEX_DELIMETER + 0]
+        validationMsgs[1].getCode() == DefaultMessages.MISSING_REQUIRED_FIELD
+        validationMsgs[1].getPath() == [TEST_LIST_FIELD_NAME, ListFieldImpl.INDEX_DELIMETER + 2]
+    }
+
+    def 'Setting null or empty list value clears the list'() {
+        setup:
+        ListFieldImpl<StringField> listField = new ListFieldImpl<>(TEST_LIST_FIELD_NAME, new StringField())
+
+        when:
+        listField.add(new StringField())
+
+        then:
+        listField.getList().size() == 1
+
+        when:
+        listField.setValue(value)
+
+        then:
+        listField.getList().size() == 0
+
+        where:
+        value << [null, []]
+    }
+
+    def 'matchRequired updates list and its elements requirements'() {
+        setup:
+        ListFieldImpl<StringField> listField = new ListFieldImpl<>(TEST_LIST_FIELD_NAME, new StringField().isRequired(false))
+        listField.add(new StringField())
+
+        expect:
+        !listField.isRequired()
+        !listField.getListFieldType().isRequired()
+        !listField.getList()[0].isRequired()
+
+        when:
+        def fieldToMatch = new ListFieldImpl<StringField>(TEST_LIST_FIELD_NAME, new StringField().isRequired(true))
+        fieldToMatch.isRequired(true)
+        listField.matchRequired(fieldToMatch)
+
+        then:
+        listField.isRequired()
+        listField.getListFieldType().isRequired()
+        listField.getList()[0].isRequired()
+    }
+
+    def 'Updating list field name updates list elements paths'() {
+        setup:
+        ListFieldImpl<StringField> listField = new ListFieldImpl<>(TEST_LIST_FIELD_NAME, new StringField().isRequired(false))
+        listField.add(new StringField())
+
+        expect:
+        listField.path() == [TEST_LIST_FIELD_NAME]
+        listField.getList()[0].path() == [TEST_LIST_FIELD_NAME, ListField.INDEX_DELIMETER + 0]
+
+        when:
+        listField.fieldName('newName')
+
+        then:
+        listField.path() == ['newName']
+        listField.getList()[0].path() == ['newName', ListField.INDEX_DELIMETER + 0]
+    }
+
+    def 'Set list values'() {
+        setup:
+        ListFieldImpl<StringField> listField = new ListFieldImpl<>(TEST_LIST_FIELD_NAME, new StringField())
+
+        when:
+        listField.setValue(['string1', 'string2'])
+
+        then:
+        listField.getList()[0].getValue() == 'string1'
+        listField.getList()[0].path() == [TEST_LIST_FIELD_NAME, ListField.INDEX_DELIMETER + 0]
+        listField.getList()[1].getValue() == 'string2'
+        listField.getList()[1].path() == [TEST_LIST_FIELD_NAME, ListField.INDEX_DELIMETER + 1]
+    }
+
+    def 'RuntimeException when list field class type has no default constructor'() {
+        when:
+        new ListFieldImpl<>(TEST_LIST_FIELD_NAME, ClassWithNoDefaultConstructor.class)
+
+        then:
+        thrown(RuntimeException)
+    }
+
+    class ClassWithNoDefaultConstructor extends StringField {
+        ClassWithNoDefaultConstructor(String test) {
+        }
     }
 }

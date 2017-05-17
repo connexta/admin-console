@@ -22,7 +22,7 @@
         <version>0.1.3-SNAPSHOT</version>
     </parent>
     <artifactId>admin-query-sources</artifactId>
-    <name>DDF Admin (Beta) :: Sources</name>
+    <name>DDF Admin Console (Beta) :: Query :: Sources</name>
     <packaging>pom</packaging>
 
     <modules>

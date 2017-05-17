@@ -22,7 +22,7 @@
         <version>0.1.3-SNAPSHOT</version>
     </parent>
     <artifactId>admin-query</artifactId>
-    <name>DDF Admin Query (Beta)</name>
+    <name>DDF Admin Console (Beta) :: Query</name>
     <packaging>pom</packaging>
 
     <modules>
@@ -36,53 +36,4 @@
         <module>schema</module>
         <module>graphql-dependencies</module>
     </modules>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>1.7.24</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>${guava.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
-            <version>2.6</version>
-        </dependency>
-    </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-enforcer-plugin</artifactId>
-                <version>1.4.1</version>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.codice.ddf.admin.beta</groupId>
-                        <artifactId>artifact-size-enforcer</artifactId>
-                        <version>${project.version}</version>
-                    </dependency>
-                </dependencies>
-                <executions>
-                    <execution>
-                        <id>check-artifact-size</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>enforce</goal>
-                        </goals>
-                        <configuration>
-                            <rules>
-                                <ArtifactSizeEnforcerRule implementation="org.codice.ddf.admin.beta.enforcer.ArtifactSizeEnforcerRule" />
-                            </rules>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
 </project>

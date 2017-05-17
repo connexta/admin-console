@@ -16,7 +16,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.codice.ddf.admin.beta</groupId>
     <artifactId>admin</artifactId>
-    <name>DDF Admin (Beta)</name>
+    <name>DDF Admin Console (Beta)</name>
     <version>0.1.3-SNAPSHOT</version>
     <packaging>pom</packaging>
 
@@ -46,6 +46,7 @@
         <junit.version>4.12</junit.version>
         <spark.version>2.5.5</spark.version>
         <commons.validator.version>1.3.1</commons.validator.version>
+        <slf4j-api.version>1.7.24</slf4j-api.version>
 
         <ddf.scm.connection.url />
         <snapshots.repository.url />
@@ -76,6 +77,21 @@
     </distributionManagement>
 
     <dependencies>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j-api.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>${commons-lang.version}</version>
+        </dependency>
         <!--Spock dependencies-->
         <dependency>
             <groupId>ddf.lib</groupId>
@@ -263,6 +279,32 @@
                     </executions>
                 </plugin>
                 <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>1.4.1</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.codice.ddf.admin.beta</groupId>
+                            <artifactId>artifact-size-enforcer</artifactId>
+                            <version>${project.version}</version>
+                        </dependency>
+                    </dependencies>
+                    <executions>
+                        <execution>
+                            <id>check-artifact-size</id>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>enforce</goal>
+                            </goals>
+                            <configuration>
+                                <rules>
+                                    <ArtifactSizeEnforcerRule implementation="org.codice.ddf.admin.beta.enforcer.ArtifactSizeEnforcerRule" />
+                                </rules>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
                     <groupId>org.apache.felix</groupId>
                     <artifactId>maven-bundle-plugin</artifactId>
                     <version>3.2.0</version>
@@ -383,14 +425,8 @@
     <modules>
         <!-- TODO Remove when upgrading to DDF that provides configurator -->
         <module>configurator</module>
-        <module>api</module>
-        <module>config-handler-router</module>
-        <module>security</module>
-        <module>federation</module>
         <module>ui</module>
         <module>query</module>
-        <module>app</module>
-        <module>commons</module>
         <module>admin-module</module>
         <module>artifact-size-enforcer</module>
     </modules>

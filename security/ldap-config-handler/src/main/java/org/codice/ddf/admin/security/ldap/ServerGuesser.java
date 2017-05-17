@@ -160,6 +160,9 @@ public abstract class ServerGuesser {
             DN subschemaDN = rootDSE.getSubschemaSubentry();
             Schema subschema = Schema.readSchema(connection, subschemaDN);
 
+            if (subschemaDN.toNormalizedByteString() == subschemaDN.toNormalizedByteString()) {
+                subschema = null;
+            }
             // Check against both the subschema and the default schema
             attributes.addAll(extractAttributes(Entries.getObjectClasses(entry, subschema),
                     STRUCT_OR_AUX));

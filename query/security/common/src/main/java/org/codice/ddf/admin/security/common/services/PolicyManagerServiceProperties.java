@@ -24,9 +24,9 @@ import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.fields.common.ContextPath;
 import org.codice.ddf.admin.common.services.ServiceCommons;
-import org.codice.ddf.admin.configurator.ConfigReader;
-import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.security.common.fields.wcpm.ContextPolicyBin;
+import org.codice.ddf.internal.admin.configurator.opfactory.AdminOpFactory;
+import org.codice.ddf.internal.admin.configurator.opfactory.ServiceReader;
 import org.codice.ddf.security.policy.context.ContextPolicy;
 import org.codice.ddf.security.policy.context.ContextPolicyManager;
 
@@ -87,8 +87,10 @@ public class PolicyManagerServiceProperties {
                 reqAttrisProps.toArray(new String[0]));
     }
 
-    public ListField<ContextPolicyBin> contextPolicyServiceToContextPolicyFields(ConfiguratorFactory configurator) {
-        ContextPolicyManager policyManager = configurator.getConfigReader().getServiceReference(ContextPolicyManager.class);
+    public ListField<ContextPolicyBin> contextPolicyServiceToContextPolicyFields(
+            ServiceReader serviceReader) {
+        ContextPolicyManager policyManager =
+                serviceReader.getServiceReference(ContextPolicyManager.class);
         List<ContextPolicyBin> policies = new ArrayList<>();
 
         Collection<ContextPolicy> allPolicies = policyManager.getAllContextPolicies();
@@ -149,11 +151,12 @@ public class PolicyManagerServiceProperties {
         return ImmutableMap.of(WHITE_LIST_CONTEXT, serviceContexts);
     }
 
-    public static List<String> getWhitelistContexts(ConfigReader reader) {
-        Object whitelistProp = reader.getConfig(POLICY_MANAGER_PID).get(WHITE_LIST_CONTEXT);
+    public static List<String> getWhitelistContexts(AdminOpFactory adminOpFactory) {
+        Object whitelistProp = adminOpFactory.read(POLICY_MANAGER_PID)
+                .get(WHITE_LIST_CONTEXT);
 
-        if(whitelistProp != null && whitelistProp instanceof String[]) {
-            return new ServiceCommons().resolveProperties((String[])whitelistProp);
+        if (whitelistProp != null && whitelistProp instanceof String[]) {
+            return new ServiceCommons().resolveProperties((String[]) whitelistProp);
         }
 
         return new ArrayList<>();

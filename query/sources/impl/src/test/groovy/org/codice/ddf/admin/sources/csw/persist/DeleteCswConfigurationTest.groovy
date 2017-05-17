@@ -16,11 +16,13 @@ package org.codice.ddf.admin.sources.csw.persist
 import org.codice.ddf.admin.api.action.Action
 import org.codice.ddf.admin.common.actions.BaseAction
 import org.codice.ddf.admin.common.message.DefaultMessages
-import org.codice.ddf.admin.configurator.ConfigReader
 import org.codice.ddf.admin.configurator.Configurator
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.configurator.OperationReport
 import org.codice.ddf.admin.sources.services.CswServiceProperties
+import org.codice.ddf.internal.admin.configurator.opfactory.AdminOpFactory
+import org.codice.ddf.internal.admin.configurator.opfactory.ManagedServiceOpFactory
+import org.codice.ddf.internal.admin.configurator.opfactory.ServiceReader
 import spock.lang.Specification
 
 import static org.codice.ddf.admin.sources.SourceTestCommons.*
@@ -31,7 +33,11 @@ class DeleteCswConfigurationTest extends Specification {
 
     ConfiguratorFactory configuratorFactory
 
-    ConfigReader configReader
+    ServiceReader serviceReader
+
+    ManagedServiceOpFactory managedServiceOpFactory
+
+    AdminOpFactory adminOpFactory
 
     Configurator configurator
 
@@ -54,18 +60,20 @@ class DeleteCswConfigurationTest extends Specification {
     def configToDelete = createCswConfigToDelete()
 
     def setup() {
-        configReader = Mock(ConfigReader)
+        serviceReader = Mock(ServiceReader)
+        managedServiceOpFactory = Mock(ManagedServiceOpFactory)
+        adminOpFactory = Mock(AdminOpFactory)
+
         configurator = Mock(Configurator)
         configuratorFactory = Mock(ConfiguratorFactory) {
-            getConfigReader() >> configReader
             getConfigurator() >> configurator
         }
-        deleteCswConfiguration = new DeleteCswConfiguration(configuratorFactory)
+        deleteCswConfiguration = new DeleteCswConfiguration(configuratorFactory, managedServiceOpFactory, adminOpFactory)
     }
 
     def 'Successfully deleting CSW configuration returns true'() {
         when:
-        configReader.getConfig(S_PID) >> configToDelete
+        adminOpFactory.read(S_PID) >> configToDelete
         configurator.commit(_, _) >> mockReport(false)
         deleteCswConfiguration.setArguments(actionArgs)
         def report = deleteCswConfiguration.process()
@@ -77,7 +85,7 @@ class DeleteCswConfigurationTest extends Specification {
 
     def 'Fail with no existing config found with provided pid'() {
         when:
-        configReader.getConfig(_ as String) >> [:]
+        adminOpFactory.read(_ as String) >> [:]
         deleteCswConfiguration.setArguments(actionArgs)
         def report = deleteCswConfiguration.process()
 
@@ -90,7 +98,7 @@ class DeleteCswConfigurationTest extends Specification {
 
     def 'Error while committing deleted configuration with the given servicePid'() {
         when:
-        configReader.getConfig(S_PID) >> configToDelete
+        adminOpFactory.read(S_PID) >> configToDelete
         configurator.commit(_, _) >> mockReport(true)
         deleteCswConfiguration.setArguments(actionArgs)
         def report = deleteCswConfiguration.process()

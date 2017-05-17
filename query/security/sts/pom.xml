@@ -37,6 +37,11 @@
             <artifactId>admin-query-security-common</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.codice.ddf.admin.beta</groupId>
+            <artifactId>configurator-opfactory-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

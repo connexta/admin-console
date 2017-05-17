@@ -40,6 +40,11 @@
         </dependency>
         <dependency>
             <groupId>org.codice.ddf.admin.beta</groupId>
+            <artifactId>configurator-opfactory-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codice.ddf.admin.beta</groupId>
             <artifactId>configurator-impl</artifactId>
             <version>${project.version}</version>
         </dependency>

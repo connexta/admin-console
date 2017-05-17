@@ -24,6 +24,10 @@ import org.codice.ddf.admin.security.wcpm.actions.discover.GetRealms;
 import org.codice.ddf.admin.security.wcpm.actions.discover.GetWhiteListContexts;
 import org.codice.ddf.admin.security.wcpm.actions.persist.SaveContextPolices;
 import org.codice.ddf.admin.security.wcpm.actions.persist.SaveWhitelistContexts;
+import org.codice.ddf.internal.admin.configurator.opfactory.AdminOpFactory;
+import org.codice.ddf.internal.admin.configurator.opfactory.BundleOpFactory;
+import org.codice.ddf.internal.admin.configurator.opfactory.ManagedServiceOpFactory;
+import org.codice.ddf.internal.admin.configurator.opfactory.ServiceReader;
 
 import com.google.common.collect.ImmutableList;
 
@@ -36,22 +40,36 @@ public class WcpmActionCreator extends BaseActionCreator {
 
     private ConfiguratorFactory configuratorFactory;
 
-    public WcpmActionCreator(ConfiguratorFactory configuratorFactory) {
+    private BundleOpFactory bundleOpFactory;
+
+    private AdminOpFactory adminOpFactory;
+
+    private ManagedServiceOpFactory managedServiceOpFactory;
+
+    private ServiceReader serviceReader;
+
+    public WcpmActionCreator(ConfiguratorFactory configuratorFactory,
+            BundleOpFactory bundleOpFactory, AdminOpFactory adminOpFactory,
+            ManagedServiceOpFactory managedServiceOpFactory, ServiceReader serviceReader) {
         super(NAME, TYPE_NAME, DESCRIPTION);
         this.configuratorFactory = configuratorFactory;
+        this.bundleOpFactory = bundleOpFactory;
+        this.adminOpFactory = adminOpFactory;
+        this.managedServiceOpFactory = managedServiceOpFactory;
+        this.serviceReader = serviceReader;
     }
 
     @Override
     public List<Action> getDiscoveryActions() {
         return ImmutableList.of(new GetAuthTypes(configuratorFactory),
-                new GetRealms(configuratorFactory),
-                new GetWhiteListContexts(configuratorFactory),
-                new GetContextPolicies(configuratorFactory));
+                new GetRealms(bundleOpFactory, managedServiceOpFactory),
+                new GetWhiteListContexts(adminOpFactory),
+                new GetContextPolicies(serviceReader));
     }
 
     @Override
     public List<Action> getPersistActions() {
-        return ImmutableList.of(new SaveContextPolices(configuratorFactory),
-                new SaveWhitelistContexts(configuratorFactory));
+        return ImmutableList.of(new SaveContextPolices(configuratorFactory, adminOpFactory),
+                new SaveWhitelistContexts(configuratorFactory, adminOpFactory));
     }
 }

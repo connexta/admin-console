@@ -20,7 +20,13 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import org.codice.ddf.admin.api.action.ActionCreator;
+import org.codice.ddf.admin.configurator.impl.AdminOperation;
+import org.codice.ddf.admin.configurator.impl.BundleOperation;
 import org.codice.ddf.admin.configurator.impl.ConfiguratorFactoryImpl;
+import org.codice.ddf.admin.configurator.impl.FeatureOperation;
+import org.codice.ddf.admin.configurator.impl.ManagedServiceOperation;
+import org.codice.ddf.admin.configurator.impl.PropertyOperation;
+import org.codice.ddf.admin.configurator.impl.ServiceReaderImpl;
 import org.codice.ddf.admin.ldap.actions.LdapActionCreator;
 import org.codice.ddf.admin.security.sts.StsActionCreator;
 import org.codice.ddf.admin.security.wcpm.actions.WcpmActionCreator;
@@ -33,18 +39,25 @@ import com.google.common.collect.ImmutableList;
 
 import graphql.introspection.IntrospectionQuery;
 
-
 public class SchemaGenerator {
 
     public static void main(String[] args) throws IOException, URISyntaxException {
         GraphQLServletImpl servlet = new GraphQLServletImpl();
-        final List<ActionCreator> GRAPHQL_PROVIDERS = ImmutableList.of(new StsActionCreator(new ConfiguratorFactoryImpl()),
-                new ConnectionActionCreator(),
-                new LdapActionCreator(new ConfiguratorFactoryImpl()),
-                new WcpmActionCreator(new ConfiguratorFactoryImpl()),
-                new CswActionCreator(),
-                new WfsActionCreator(),
-                new OpenSearchActionCreator());
+        final List<ActionCreator> GRAPHQL_PROVIDERS =
+                ImmutableList.of(new StsActionCreator(new AdminOperation.OpFactory()),
+                        new ConnectionActionCreator(),
+                        new LdapActionCreator(new ConfiguratorFactoryImpl(),
+                                new FeatureOperation.OpFactory(),
+                                new ManagedServiceOperation.OpFactory(),
+                                new PropertyOperation.OpFactory()),
+                        new WcpmActionCreator(new ConfiguratorFactoryImpl(),
+                                new BundleOperation.OpFactory(),
+                                new AdminOperation.OpFactory(),
+                                new ManagedServiceOperation.OpFactory(),
+                                new ServiceReaderImpl()),
+                        new CswActionCreator(),
+                        new WfsActionCreator(),
+                        new OpenSearchActionCreator());
 
         servlet.setActionCreators(GRAPHQL_PROVIDERS);
         String schemaResult = servlet.executeQuery(IntrospectionQuery.INTROSPECTION_QUERY);

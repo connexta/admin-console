@@ -17,9 +17,9 @@ import java.util.List;
 
 import org.codice.ddf.admin.common.actions.GetAction;
 import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
-import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.security.common.fields.sts.StsClaimField;
 import org.codice.ddf.admin.security.common.services.StsServiceProperties;
+import org.codice.ddf.internal.admin.configurator.opfactory.AdminOpFactory;
 
 public class GetStsClaimsAction extends GetAction<ListFieldImpl<StsClaimField>> {
 
@@ -27,17 +27,17 @@ public class GetStsClaimsAction extends GetAction<ListFieldImpl<StsClaimField>> 
 
     public static final String DESCRIPTION = "All currently configured claims the STS supports.";
 
-    ConfiguratorFactory configuratorFactory;
+    AdminOpFactory adminOpFactory;
 
-    public GetStsClaimsAction(ConfiguratorFactory configurator) {
+    public GetStsClaimsAction(AdminOpFactory adminOpFactory) {
         super(NAME, DESCRIPTION, new ListFieldImpl<>(StsClaimField.class));
-        this.configuratorFactory = configurator;
+        this.adminOpFactory = adminOpFactory;
     }
 
     @Override
     public ListFieldImpl<StsClaimField> performAction() {
         List<String> supportedClaims = new StsServiceProperties().getConfiguredStsClaims(
-                configuratorFactory);
+                adminOpFactory);
 
         ListFieldImpl<StsClaimField> claims = new ListFieldImpl<>(StsClaimField.class);
 

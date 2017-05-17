@@ -37,6 +37,7 @@
         <bundle>mvn:com.google.guava/guava/${guava.version}</bundle>
         <feature>security-core-api</feature>
         <bundle>mvn:org.codice.ddf.admin.beta/configurator-api/${project.version}</bundle>
+        <bundle>mvn:org.codice.ddf.admin.beta/configurator-opfactory-api/${project.version}</bundle>
         <bundle>mvn:org.codice.ddf.admin.beta/configurator-impl/${project.version}</bundle>
     </feature>
 

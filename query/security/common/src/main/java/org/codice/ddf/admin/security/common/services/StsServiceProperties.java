@@ -18,7 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.codice.ddf.admin.configurator.ConfiguratorFactory;
+import org.codice.ddf.internal.admin.configurator.opfactory.AdminOpFactory;
 
 public class StsServiceProperties {
 
@@ -29,12 +29,10 @@ public class StsServiceProperties {
     public static final String STS_CLAIMS_PROPS_KEY_CLAIMS = "claims";
     //
 
-    public List<String> getConfiguredStsClaims(ConfiguratorFactory configuratorFactory){
-        Map<String, Object> stsConfig = configuratorFactory.getConfigReader()
-                .getConfig(STS_CLAIMS_CONFIGURATION_CONFIG_ID);
+    public List<String> getConfiguredStsClaims(AdminOpFactory adminOpFactory) {
+        Map<String, Object> stsConfig = adminOpFactory.read(STS_CLAIMS_CONFIGURATION_CONFIG_ID);
 
-        return stsConfig != null ?
-                Arrays.asList((String[]) stsConfig.get(STS_CLAIMS_PROPS_KEY_CLAIMS)) :
-                new ArrayList<>();
+        return stsConfig != null ? Arrays.asList((String[]) stsConfig.get(
+                STS_CLAIMS_PROPS_KEY_CLAIMS)) : new ArrayList<>();
     }
 }

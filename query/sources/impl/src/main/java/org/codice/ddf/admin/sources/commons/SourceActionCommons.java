@@ -23,10 +23,11 @@ import java.util.function.Function;
 import org.apache.commons.lang.StringUtils;
 import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
-import org.codice.ddf.admin.configurator.ConfigReader;
-import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.sources.fields.SourceInfoField;
 import org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField;
+import org.codice.ddf.internal.admin.configurator.opfactory.AdminOpFactory;
+import org.codice.ddf.internal.admin.configurator.opfactory.ManagedServiceOpFactory;
+import org.codice.ddf.internal.admin.configurator.opfactory.ServiceReader;
 
 import ddf.catalog.service.ConfiguredService;
 import ddf.catalog.source.ConnectedSource;
@@ -35,8 +36,10 @@ import ddf.catalog.source.Source;
 
 public class SourceActionCommons {
 
-    public static SourceInfoField createSourceInfoField(boolean isAvailable, SourceConfigUnionField config) {
-        config.credentials().password(FLAG_PASSWORD);
+    public static SourceInfoField createSourceInfoField(boolean isAvailable,
+            SourceConfigUnionField config) {
+        config.credentials()
+                .password(FLAG_PASSWORD);
         SourceInfoField sourceInfoField = new SourceInfoField();
         sourceInfoField.isAvaliable(isAvailable);
         sourceInfoField.configuration(config);
@@ -44,46 +47,54 @@ public class SourceActionCommons {
     }
 
     /**
-     * Gets the configurations for the given factoryPids using the {@link ConfiguratorFactory}. A mapper is used
-     * to transform the service properties to a {@link SourceConfigUnionField}. Providing the pid parameter
-     * will return only the configuration with that pid.
+     * Gets the configurations for the given factoryPids using the provided services.
+     * A mapper is used to transform the service properties to a
+     * {@link SourceConfigUnionField}. Providing the pid parameter will return only
+     * the configuration with that pid.
      *
-     * @param factoryPids factory pids to lookup configurations for
-     * @param mapper a {@link Function} taking a map of string to objects and returning a {@code SourceConfigUnionField}
-     * @param pid a servicePid to select a single configuration, returns all configs when null or empty
+     * @param factoryPids             factory pids to lookup configurations for
+     * @param mapper                  a {@link Function} taking a map of string to objects and returning a {@code SourceConfigUnionField}
+     * @param pid                     a servicePid to select a single configuration, returns all configs when null or empty
+     * @param adminOpFactory          service to interact with admin configurations
+     * @param managedServiceOpFactory service to interact with managed services
+     * @param serviceReader           service to query about services
      * @return a list of {@code SourceInfoField}s configured in the system
      */
-    public static ListField<SourceInfoField> getSourceConfigurations(List<String> factoryPids, Function<Map<String, Object>, SourceConfigUnionField> mapper,
-            String pid, ConfiguratorFactory configuratorFactory) {
-        ListFieldImpl<SourceInfoField> sourceInfoListField = new ListFieldImpl<>(SourceInfoField.class);
-        ConfigReader configReader = configuratorFactory.getConfigReader();
+    public static ListField<SourceInfoField> getSourceConfigurations(List<String> factoryPids,
+            Function<Map<String, Object>, SourceConfigUnionField> mapper, String pid,
+            AdminOpFactory adminOpFactory, ManagedServiceOpFactory managedServiceOpFactory,
+            ServiceReader serviceReader) {
+        ListFieldImpl<SourceInfoField> sourceInfoListField =
+                new ListFieldImpl<>(SourceInfoField.class);
 
         if (StringUtils.isNotEmpty(pid)) {
-            SourceConfigUnionField config = mapper.apply(configReader.getConfig(pid));
+            SourceConfigUnionField config = mapper.apply(adminOpFactory.read(pid));
             sourceInfoListField.add(createSourceInfoField(true, config));
-            populateSourceAvailability(sourceInfoListField.getList(), configuratorFactory);
+            populateSourceAvailability(sourceInfoListField.getList(), serviceReader);
             return sourceInfoListField;
         }
 
         factoryPids.stream()
-                .flatMap(factoryPid -> configReader.getManagedServiceConfigs(factoryPid)
+                .flatMap(factoryPid -> managedServiceOpFactory.read(factoryPid)
                         .values()
                         .stream())
                 .map(mapper)
                 .forEach(config -> sourceInfoListField.add(createSourceInfoField(false, config)));
 
-        populateSourceAvailability(sourceInfoListField.getList(), configuratorFactory);
+        populateSourceAvailability(sourceInfoListField.getList(), serviceReader);
         return sourceInfoListField;
     }
 
     private static void populateSourceAvailability(List<SourceInfoField> sourceInfoList,
-            ConfiguratorFactory configuratorFactory) {
-        List<Source> sources = getAllSourceReferences(configuratorFactory);
+            ServiceReader serviceReader) {
+        List<Source> sources = getAllSourceReferences(serviceReader);
         for (SourceInfoField sourceInfoField : sourceInfoList) {
             for (Source source : sources) {
-                if(source instanceof ConfiguredService) {
+                if (source instanceof ConfiguredService) {
                     ConfiguredService service = (ConfiguredService) source;
-                    if (service.getConfigurationPid().equals(sourceInfoField.config().pid())) {
+                    if (service.getConfigurationPid()
+                            .equals(sourceInfoField.config()
+                                    .pid())) {
                         sourceInfoField.isAvaliable(source.isAvailable());
                         break;
                     }
@@ -92,11 +103,10 @@ public class SourceActionCommons {
         }
     }
 
-    public static List<Source> getAllSourceReferences(ConfiguratorFactory configuratorFactory) {
+    public static List<Source> getAllSourceReferences(ServiceReader serviceReader) {
         List<Source> sources = new ArrayList<>();
-        ConfigReader configReader = configuratorFactory.getConfigReader();
-        sources.addAll(configReader.getServices(FederatedSource.class, null));
-        sources.addAll(configReader.getServices(ConnectedSource.class, null));
+        sources.addAll(serviceReader.getServices(FederatedSource.class, null));
+        sources.addAll(serviceReader.getServices(ConnectedSource.class, null));
         return sources;
     }
 }

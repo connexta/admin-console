@@ -16,10 +16,12 @@ package org.codice.ddf.admin.sources.wfs.persist
 import org.codice.ddf.admin.api.action.Action
 import org.codice.ddf.admin.common.actions.BaseAction
 import org.codice.ddf.admin.common.message.DefaultMessages
-import org.codice.ddf.admin.configurator.ConfigReader
 import org.codice.ddf.admin.configurator.Configurator
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.configurator.OperationReport
+import org.codice.ddf.internal.admin.configurator.opfactory.AdminOpFactory
+import org.codice.ddf.internal.admin.configurator.opfactory.ManagedServiceOpFactory
+import org.codice.ddf.internal.admin.configurator.opfactory.ServiceReader
 import spock.lang.Specification
 
 import static org.codice.ddf.admin.sources.SourceTestCommons.PID
@@ -32,7 +34,11 @@ class DeleteWfsConfigurationTest extends Specification {
 
     ConfiguratorFactory configuratorFactory
 
-    ConfigReader configReader
+    ServiceReader serviceReader
+
+    AdminOpFactory adminOpFactory
+
+    ManagedServiceOpFactory managedServiceOpFactory
 
     Configurator configurator
 
@@ -47,18 +53,19 @@ class DeleteWfsConfigurationTest extends Specification {
     ]
 
     def setup() {
-        configReader = Mock(ConfigReader)
+        serviceReader = Mock(ServiceReader)
+        adminOpFactory = Mock(AdminOpFactory)
+        managedServiceOpFactory = Mock(ManagedServiceOpFactory)
         configurator = Mock(Configurator)
         configuratorFactory = Mock(ConfiguratorFactory) {
-            getConfigReader() >> configReader
             getConfigurator() >> getConfigurator()
         }
-        deleteWfsConfiguration = new DeleteWfsConfiguration(configuratorFactory)
+        deleteWfsConfiguration = new DeleteWfsConfiguration(configuratorFactory, managedServiceOpFactory, adminOpFactory)
     }
 
     def 'Successfully delete WFS configuration'() {
         setup:
-        configReader.getConfig(S_PID) >> configToBeDeleted
+        adminOpFactory.read(S_PID) >> configToBeDeleted
         configurator.commit(_, _) >> mockReport(false)
         deleteWfsConfiguration.setArguments(actionArgs)
 
@@ -72,7 +79,7 @@ class DeleteWfsConfigurationTest extends Specification {
 
     def 'Fail to discover WFS config when no existing config found with provided pid'() {
         setup:
-        configReader.getConfig(S_PID) >> [:]
+        adminOpFactory.read(S_PID) >> [:]
         deleteWfsConfiguration.setArguments(actionArgs)
 
         when:
@@ -87,7 +94,7 @@ class DeleteWfsConfigurationTest extends Specification {
 
     def 'Error while committing delete configuration with given pid'() {
         when:
-        configReader.getConfig(S_PID) >> configToBeDeleted
+        adminOpFactory.read(S_PID) >> configToBeDeleted
         configurator.commit(_, _) >> mockReport(true)
         deleteWfsConfiguration.setArguments(actionArgs)
         def report = deleteWfsConfiguration.process()

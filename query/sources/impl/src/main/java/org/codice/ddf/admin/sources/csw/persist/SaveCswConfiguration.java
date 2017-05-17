@@ -31,6 +31,9 @@ import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.sources.fields.type.CswSourceConfigurationField;
+import org.codice.ddf.internal.admin.configurator.opfactory.AdminOpFactory;
+import org.codice.ddf.internal.admin.configurator.opfactory.ManagedServiceOpFactory;
+import org.codice.ddf.internal.admin.configurator.opfactory.ServiceReader;
 
 import com.google.common.collect.ImmutableList;
 
@@ -47,24 +50,44 @@ public class SaveCswConfiguration extends BaseAction<BooleanField> {
 
     private ConfiguratorFactory configuratorFactory;
 
-    public SaveCswConfiguration(ConfiguratorFactory configuratorFactory) {
+    private final AdminOpFactory adminOpFactory;
+
+    private final ManagedServiceOpFactory managedServiceOpFactory;
+
+    private final ServiceReader serviceReader;
+
+    public SaveCswConfiguration(ConfiguratorFactory configuratorFactory,
+            AdminOpFactory adminOpFactory, ManagedServiceOpFactory managedServiceOpFactory,
+            ServiceReader serviceReader) {
         super(ID, DESCRIPTION, new BooleanField());
+        this.adminOpFactory = adminOpFactory;
+        this.managedServiceOpFactory = managedServiceOpFactory;
+        this.serviceReader = serviceReader;
         config = new CswSourceConfigurationField();
         pid = new PidField();
         config.isRequired(true);
-        config.cswProfileField().isRequired(true);
-        config.sourceNameField().isRequired(true);
-        config.endpointUrlField().isRequired(true);
+        config.cswProfileField()
+                .isRequired(true);
+        config.sourceNameField()
+                .isRequired(true);
+        config.endpointUrlField()
+                .isRequired(true);
         this.configuratorFactory = configuratorFactory;
     }
 
     @Override
     public BooleanField performAction() {
         if (StringUtils.isNotEmpty(pid.getValue())) {
-            addMessages(updateService(pid, cswConfigToServiceProps(config), configuratorFactory));
+            addMessages(updateService(pid,
+                    cswConfigToServiceProps(config),
+                    configuratorFactory,
+                    adminOpFactory));
         } else {
             String factoryPid = cswProfileToFactoryPid(config.cswProfile());
-            if (createManagedService(cswConfigToServiceProps(config), factoryPid, configuratorFactory).containsErrorMsgs()) {
+            if (createManagedService(cswConfigToServiceProps(config),
+                    factoryPid,
+                    configuratorFactory,
+                    managedServiceOpFactory).containsErrorMsgs()) {
                 addArgumentMessage(failedPersistError(config.path()));
             }
         }
@@ -74,17 +97,19 @@ public class SaveCswConfiguration extends BaseAction<BooleanField> {
     @Override
     public void validate() {
         super.validate();
-        if(containsErrorMsgs()) {
+        if (containsErrorMsgs()) {
             return;
         }
 
-        if(pid.getValue() != null) {
-            addMessages(serviceConfigurationExists(pid, configuratorFactory));
-            if(!containsErrorMsgs() && !hasSourceName(pid.getValue(), config.sourceName(), configuratorFactory)) {
-                addMessages(validateSourceName(config.sourceNameField(), configuratorFactory));
+        if (pid.getValue() != null) {
+            addMessages(serviceConfigurationExists(pid, adminOpFactory));
+            if (!containsErrorMsgs() && !hasSourceName(pid.getValue(),
+                    config.sourceName(),
+                    serviceReader)) {
+                addMessages(validateSourceName(config.sourceNameField(), serviceReader));
             }
         } else {
-            addMessages(validateSourceName(config.sourceNameField(), configuratorFactory));
+            addMessages(validateSourceName(config.sourceNameField(), serviceReader));
         }
 
     }

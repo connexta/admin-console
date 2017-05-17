@@ -42,6 +42,11 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.codice.ddf.admin.beta</groupId>
+            <artifactId>configurator-opfactory-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>ddf.security.policy</groupId>
             <artifactId>security-policy-api</artifactId>
             <version>${ddf.version}</version>

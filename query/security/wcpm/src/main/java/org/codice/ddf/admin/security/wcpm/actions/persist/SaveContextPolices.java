@@ -32,9 +32,11 @@ import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 import org.codice.ddf.admin.configurator.Configurator;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.configurator.OperationReport;
+import org.codice.ddf.admin.security.common.fields.wcpm.ClaimsMapEntry;
 import org.codice.ddf.admin.security.common.fields.wcpm.ContextPolicyBin;
 import org.codice.ddf.admin.security.common.services.PolicyManagerServiceProperties;
 import org.codice.ddf.admin.security.common.services.StsServiceProperties;
+import org.codice.ddf.internal.admin.configurator.opfactory.AdminOpFactory;
 
 import com.google.common.collect.ImmutableList;
 
@@ -47,19 +49,24 @@ public class SaveContextPolices extends BaseAction<ListField<ContextPolicyBin>> 
 
     private ConfiguratorFactory configuratorFactory;
 
+    private AdminOpFactory adminOpFactory;
+
     private ListField<ContextPolicyBin> contextPolicies;
 
     private PolicyManagerServiceProperties wcpmServiceProps;
 
     private StsServiceProperties stsServiceProps;
 
-    public SaveContextPolices(ConfiguratorFactory configuratorFactory) {
+    public SaveContextPolices(ConfiguratorFactory configuratorFactory,
+            AdminOpFactory adminOpFactory) {
         super(ACTION_ID, DESCRIPTION, new ListFieldImpl<>(ContextPolicyBin.class));
         contextPolicies = new ListFieldImpl<>("policies",
                 new ContextPolicyBin().useDefaultRequiredFields())
                 .isRequired(true);
 
         this.configuratorFactory = configuratorFactory;
+        this.adminOpFactory = adminOpFactory;
+
         wcpmServiceProps = new PolicyManagerServiceProperties();
         stsServiceProps = new StsServiceProperties();
     }
@@ -72,9 +79,9 @@ public class SaveContextPolices extends BaseAction<ListField<ContextPolicyBin>> 
     @Override
     public ListField<ContextPolicyBin> performAction() {
         Configurator configurator = configuratorFactory.getConfigurator();
-        configurator.updateConfigFile(POLICY_MANAGER_PID,
+        configurator.add(adminOpFactory.build(POLICY_MANAGER_PID,
                 new PolicyManagerServiceProperties().contextPoliciesToPolicyManagerProps(contextPolicies.getList()),
-                true);
+                true));
 
         // TODO: tbatie - 4/25/17 - Should we have to provide a auditMessage to the configurator? We're going to continually forget to do this. It should audit the pid changed, the diff and the user that did it instead in my opinion
         OperationReport configReport = configurator.commit(
@@ -96,14 +103,14 @@ public class SaveContextPolices extends BaseAction<ListField<ContextPolicyBin>> 
     }
 
     private void checkClaimsValidity() {
-        List<String> supportedClaims = stsServiceProps.getConfiguredStsClaims(configuratorFactory);
+        List<String> supportedClaims = stsServiceProps.getConfiguredStsClaims(adminOpFactory);
 
         List<StringField> claimArgs = new ArrayList<>();
         for (ContextPolicyBin bin : contextPolicies.getList()) {
             claimArgs.addAll(bin.claimsMappingField()
                     .getList()
                     .stream()
-                    .map(entry -> entry.claimField())
+                    .map(ClaimsMapEntry::claimField)
                     .collect(Collectors.toList()));
         }
 

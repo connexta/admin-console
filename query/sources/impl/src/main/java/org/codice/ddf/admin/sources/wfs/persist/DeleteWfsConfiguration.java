@@ -23,6 +23,8 @@ import org.codice.ddf.admin.common.actions.BaseAction;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
+import org.codice.ddf.internal.admin.configurator.opfactory.AdminOpFactory;
+import org.codice.ddf.internal.admin.configurator.opfactory.ManagedServiceOpFactory;
 
 import com.google.common.collect.ImmutableList;
 
@@ -37,26 +39,34 @@ public class DeleteWfsConfiguration extends BaseAction<BooleanField> {
 
     private ConfiguratorFactory configuratorFactory;
 
-    public DeleteWfsConfiguration(ConfiguratorFactory configuratorFactory) {
+    private final ManagedServiceOpFactory managedServiceOpFactory;
+
+    private final AdminOpFactory adminOpFactory;
+
+    public DeleteWfsConfiguration(ConfiguratorFactory configuratorFactory,
+            ManagedServiceOpFactory managedServiceOpFactory, AdminOpFactory adminOpFactory) {
         super(ID, DESCRIPTION, new BooleanField());
+
         this.configuratorFactory = configuratorFactory;
+        this.managedServiceOpFactory = managedServiceOpFactory;
+        this.adminOpFactory = adminOpFactory;
         pid = new PidField();
         pid.isRequired(true);
     }
 
     @Override
     public BooleanField performAction() {
-        addMessages(deleteService(pid, configuratorFactory));
+        addMessages(deleteService(pid, configuratorFactory, managedServiceOpFactory));
         return new BooleanField(!containsErrorMsgs());
     }
 
     @Override
     public void validate() {
         super.validate();
-        if(containsErrorMsgs()) {
+        if (containsErrorMsgs()) {
             return;
         }
-        addMessages(serviceConfigurationExists(pid, configuratorFactory));
+        addMessages(serviceConfigurationExists(pid, adminOpFactory));
     }
 
     @Override

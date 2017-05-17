@@ -22,6 +22,9 @@ import org.codice.ddf.admin.sources.opensearch.discover.DiscoverOpenSearchAction
 import org.codice.ddf.admin.sources.opensearch.discover.GetOpenSearchConfigsAction;
 import org.codice.ddf.admin.sources.opensearch.persist.DeleteOpenSearchConfiguration;
 import org.codice.ddf.admin.sources.opensearch.persist.SaveOpenSearchConfiguration;
+import org.codice.ddf.internal.admin.configurator.opfactory.AdminOpFactory;
+import org.codice.ddf.internal.admin.configurator.opfactory.ManagedServiceOpFactory;
+import org.codice.ddf.internal.admin.configurator.opfactory.ServiceReader;
 
 import com.google.common.collect.ImmutableList;
 
@@ -36,6 +39,12 @@ public class OpenSearchActionCreator extends BaseActionCreator {
 
     private ConfiguratorFactory configuratorFactory;
 
+    private AdminOpFactory adminOpFactory;
+
+    private ManagedServiceOpFactory managedServiceOpFactory;
+
+    private ServiceReader serviceReader;
+
     public OpenSearchActionCreator() {
         super(ID, TYPE_NAME, DESCRIPTION);
     }
@@ -43,16 +52,34 @@ public class OpenSearchActionCreator extends BaseActionCreator {
     @Override
     public List<Action> getDiscoveryActions() {
         return ImmutableList.of(new DiscoverOpenSearchAction(),
-                new GetOpenSearchConfigsAction(configuratorFactory));
+                new GetOpenSearchConfigsAction(adminOpFactory,
+                        managedServiceOpFactory,
+                        serviceReader));
     }
 
     @Override
     public List<Action> getPersistActions() {
-        return ImmutableList.of(new SaveOpenSearchConfiguration(configuratorFactory),
-                new DeleteOpenSearchConfiguration(configuratorFactory));
+        return ImmutableList.of(new SaveOpenSearchConfiguration(configuratorFactory,
+                        adminOpFactory,
+                        managedServiceOpFactory, serviceReader),
+                new DeleteOpenSearchConfiguration(configuratorFactory,
+                        managedServiceOpFactory,
+                        adminOpFactory));
     }
 
     public void setConfiguratorFactory(ConfiguratorFactory configuratorFactory) {
         this.configuratorFactory = configuratorFactory;
+    }
+
+    public void setAdminOpFactory(AdminOpFactory adminOpFactory) {
+        this.adminOpFactory = adminOpFactory;
+    }
+
+    public void setManagedServiceOpFactory(ManagedServiceOpFactory managedServiceOpFactory) {
+        this.managedServiceOpFactory = managedServiceOpFactory;
+    }
+
+    public void setServiceReader(ServiceReader serviceReader) {
+        this.serviceReader = serviceReader;
     }
 }

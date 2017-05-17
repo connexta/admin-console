@@ -19,10 +19,12 @@ import org.codice.ddf.admin.api.fields.ListField
 import org.codice.ddf.admin.common.actions.BaseAction
 import org.codice.ddf.admin.common.fields.base.ListFieldImpl
 import org.codice.ddf.admin.common.message.DefaultMessages
-import org.codice.ddf.admin.configurator.ConfigReader
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.sources.fields.SourceInfoField
 import org.codice.ddf.admin.sources.services.OpenSearchServiceProperties
+import org.codice.ddf.internal.admin.configurator.opfactory.AdminOpFactory
+import org.codice.ddf.internal.admin.configurator.opfactory.ManagedServiceOpFactory
+import org.codice.ddf.internal.admin.configurator.opfactory.ServiceReader
 import spock.lang.Specification
 
 import static org.codice.ddf.admin.sources.SourceTestCommons.*
@@ -41,7 +43,11 @@ class GetOpenSearchConfigsActionTest extends Specification {
 
     ConfiguratorFactory configuratorFactory
 
-    ConfigReader configReader
+    ServiceReader serviceReader
+
+    AdminOpFactory adminOpFactory
+
+    ManagedServiceOpFactory managedServiceOpFactory
 
     def managedServiceConfigs
 
@@ -51,11 +57,11 @@ class GetOpenSearchConfigsActionTest extends Specification {
 
     def setup() {
         managedServiceConfigs = createOpenSearchManagedServiceConfigs()
-        configReader = Mock(ConfigReader)
-        configuratorFactory = Mock(ConfiguratorFactory) {
-            getConfigReader() >> configReader
-        }
-        getOpenSearchConfigsAction = new GetOpenSearchConfigsAction(configuratorFactory)
+        serviceReader = Mock(ServiceReader)
+        adminOpFactory = Mock(AdminOpFactory)
+        managedServiceOpFactory = Mock(ManagedServiceOpFactory)
+        configuratorFactory = Mock(ConfiguratorFactory)
+        getOpenSearchConfigsAction = new GetOpenSearchConfigsAction(adminOpFactory, managedServiceOpFactory, serviceReader)
     }
 
     def 'No pid argument returns all configs'() {
@@ -64,9 +70,9 @@ class GetOpenSearchConfigsActionTest extends Specification {
         def list = ((ListField)report.result())
 
         then:
-        1 * configReader.getServices(_, _) >> [new TestSource(S_PID_1, true)]
-        1 * configReader.getServices(_, _) >> [new TestSource(S_PID_2, false)]
-        1 * configReader.getManagedServiceConfigs(_ as String) >> baseManagedServiceConfigs
+        1 * serviceReader.getServices(_, _) >> [new TestSource(S_PID_1, true)]
+        1 * serviceReader.getServices(_, _) >> [new TestSource(S_PID_2, false)]
+        1 * managedServiceOpFactory.read(_ as String) >> baseManagedServiceConfigs
         report.result() != null
         list.getList().size() == 2
         assertConfig(list.getList().get(0), 0, TEST_SHORT_NAME, S_PID_1, true)
@@ -82,9 +88,9 @@ class GetOpenSearchConfigsActionTest extends Specification {
         def list = ((ListField)report.result())
 
         then:
-        1 * configReader.getServices(_, _) >> [new TestSource(S_PID_2, false)]
-        1 * configReader.getServices(_, _) >> []
-        configReader.getConfig(S_PID_2) >> baseManagedServiceConfigs.get(S_PID_2)
+        1 * serviceReader.getServices(_, _) >> [new TestSource(S_PID_2, false)]
+        1 * serviceReader.getServices(_, _) >> []
+        adminOpFactory.read(S_PID_2) >> baseManagedServiceConfigs.get(S_PID_2)
         report.result() != null
         list.getList().size() == 1
         assertConfig(list.getList().get(0), 0, TEST_SHORT_NAME, S_PID_2, false)
@@ -94,7 +100,7 @@ class GetOpenSearchConfigsActionTest extends Specification {
         setup:
         actionArgs.put(PID, S_PID)
         getOpenSearchConfigsAction.setArguments(actionArgs)
-        configReader.getConfig(S_PID) >> [:]
+        adminOpFactory.read(S_PID) >> [:]
 
         when:
         def report = getOpenSearchConfigsAction.process()

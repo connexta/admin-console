@@ -25,8 +25,10 @@ import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.actions.BaseAction;
 import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.fields.common.PidField;
-import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.sources.fields.SourceInfoField;
+import org.codice.ddf.internal.admin.configurator.opfactory.AdminOpFactory;
+import org.codice.ddf.internal.admin.configurator.opfactory.ManagedServiceOpFactory;
+import org.codice.ddf.internal.admin.configurator.opfactory.ServiceReader;
 
 import com.google.common.collect.ImmutableList;
 
@@ -39,29 +41,40 @@ public class GetOpenSearchConfigsAction extends BaseAction<ListField<SourceInfoF
 
     private PidField pid;
 
-    private ConfiguratorFactory configuratorFactory;
+    private final AdminOpFactory adminOpFactory;
 
-    public GetOpenSearchConfigsAction(ConfiguratorFactory configuratorFactory) {
+    private final ManagedServiceOpFactory managedServiceOpFactory;
+
+    private final ServiceReader serviceReader;
+
+    public GetOpenSearchConfigsAction(AdminOpFactory adminOpFactory,
+            ManagedServiceOpFactory managedServiceOpFactory, ServiceReader serviceReader) {
         super(ID, DESCRIPTION, new ListFieldImpl<>(SourceInfoField.class));
-        this.configuratorFactory = configuratorFactory;
+        this.adminOpFactory = adminOpFactory;
+        this.managedServiceOpFactory = managedServiceOpFactory;
+        this.serviceReader = serviceReader;
         pid = new PidField();
     }
 
     @Override
     public ListField<SourceInfoField> performAction() {
         return getSourceConfigurations(OPENSEARCH_FACTORY_PIDS,
-                SERVICE_PROPS_TO_OPENSEARCH_CONFIG, pid.getValue(), configuratorFactory);
+                SERVICE_PROPS_TO_OPENSEARCH_CONFIG,
+                pid.getValue(),
+                adminOpFactory,
+                managedServiceOpFactory,
+                serviceReader);
     }
 
     @Override
     public void validate() {
         super.validate();
-        if(containsErrorMsgs()) {
+        if (containsErrorMsgs()) {
             return;
         }
 
-        if(pid.getValue() != null) {
-            addMessages(serviceConfigurationExists(pid, configuratorFactory));
+        if (pid.getValue() != null) {
+            addMessages(serviceConfigurationExists(pid, adminOpFactory));
         }
     }
 

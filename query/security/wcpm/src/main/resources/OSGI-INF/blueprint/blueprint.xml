@@ -15,10 +15,31 @@
     <service id="wcpmActionCreator" interface="org.codice.ddf.admin.api.action.ActionCreator">
         <bean class="org.codice.ddf.admin.security.wcpm.actions.WcpmActionCreator">
             <argument ref="configuratorFactory" />
+            <argument ref="bundleOpFactory" />
+            <argument ref="adminOpFactory" />
+            <argument ref="managedServiceOpFactory" />
+            <argument ref="serviceReader" />
         </bean>
     </service>
 
     <reference id="configuratorFactory"
                interface="org.codice.ddf.admin.configurator.ConfiguratorFactory"
                availability="mandatory" filter="(type=txact)"/>
+
+    <reference id="bundleOpFactory"
+               interface="org.codice.ddf.internal.admin.configurator.opfactory.BundleOpFactory"
+               availability="mandatory"/>
+
+    <reference id="adminOpFactory"
+               interface="org.codice.ddf.internal.admin.configurator.opfactory.AdminOpFactory"
+               availability="mandatory"/>
+
+    <reference id="managedServiceOpFactory"
+               interface="org.codice.ddf.internal.admin.configurator.opfactory.ManagedServiceOpFactory"
+               availability="mandatory"/>
+
+    <reference id="serviceReader"
+               interface="org.codice.ddf.internal.admin.configurator.opfactory.ServiceReader"
+               availability="mandatory"/>
+
 </blueprint>

@@ -20,9 +20,10 @@ import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.actions.BaseAction;
 import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.fields.common.PidField;
-import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.ldap.actions.commons.services.LdapServiceCommons;
 import org.codice.ddf.admin.ldap.fields.config.LdapConfigurationField;
+import org.codice.ddf.internal.admin.configurator.opfactory.ManagedServiceOpFactory;
+import org.codice.ddf.internal.admin.configurator.opfactory.PropertyOpFactory;
 
 import com.google.common.collect.ImmutableList;
 
@@ -36,15 +37,16 @@ public class LdapConfigurations extends BaseAction<ListField<LdapConfigurationFi
 
     private PidField pid = new PidField();
 
-    private ConfiguratorFactory configuratorFactory;
     private LdapServiceCommons serviceCommons;
 
     private List<Field> arguments = ImmutableList.of(pid);
 
-    public LdapConfigurations(ConfiguratorFactory configuratorFactory) {
-        super(NAME, DESCRIPTION, new ListFieldImpl<>(CONFIGS_ARG_NAME, LdapConfigurationField.class));
-        this.configuratorFactory = configuratorFactory;
-        serviceCommons = new LdapServiceCommons(configuratorFactory);
+    public LdapConfigurations(ManagedServiceOpFactory managedServiceOpFactory,
+            PropertyOpFactory propertyOpFactory) {
+        super(NAME,
+                DESCRIPTION,
+                new ListFieldImpl<>(CONFIGS_ARG_NAME, LdapConfigurationField.class));
+        serviceCommons = new LdapServiceCommons(managedServiceOpFactory, propertyOpFactory);
     }
 
     @Override
@@ -54,6 +56,6 @@ public class LdapConfigurations extends BaseAction<ListField<LdapConfigurationFi
 
     @Override
     public ListField<LdapConfigurationField> performAction() {
-        return serviceCommons.getLdapConfigurations(configuratorFactory);
+        return serviceCommons.getLdapConfigurations();
     }
 }

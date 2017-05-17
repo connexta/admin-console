@@ -19,12 +19,15 @@ import org.codice.ddf.admin.api.action.ActionReport
 import org.codice.ddf.admin.common.actions.BaseAction
 import org.codice.ddf.admin.common.fields.base.ListFieldImpl
 import org.codice.ddf.admin.common.message.DefaultMessages
-import org.codice.ddf.admin.configurator.ConfigReader
 import org.codice.ddf.admin.configurator.Configurator
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.configurator.OperationReport
 import org.codice.ddf.admin.security.common.services.PolicyManagerServiceProperties
 import org.codice.ddf.admin.security.wcpm.actions.WcpmActionCreator
+import org.codice.ddf.internal.admin.configurator.opfactory.AdminOpFactory
+import org.codice.ddf.internal.admin.configurator.opfactory.BundleOpFactory
+import org.codice.ddf.internal.admin.configurator.opfactory.ManagedServiceOpFactory
+import org.codice.ddf.internal.admin.configurator.opfactory.ServiceReader
 import org.codice.ddf.security.policy.context.impl.PolicyManager
 import spock.lang.Specification
 
@@ -32,7 +35,10 @@ class SaveWhitelistContextsTest extends Specification {
     ActionCreator actionCreator
     ConfiguratorFactory configuratorFactory
     Configurator configurator
-    ConfigReader configReader
+    AdminOpFactory adminOpFactory
+    BundleOpFactory bundleOpFactory
+    ManagedServiceOpFactory managedServiceOpFactory
+    ServiceReader serviceReader
     OperationReport operationReport
     PolicyManager policyManager
     Action action
@@ -42,14 +48,16 @@ class SaveWhitelistContextsTest extends Specification {
         configuratorFactory = Mock(ConfiguratorFactory)
         configurator = Mock(Configurator)
         policyManager = new PolicyManager()
-        configReader = Mock(ConfigReader)
+        adminOpFactory = Mock(AdminOpFactory)
+        bundleOpFactory = Mock(BundleOpFactory)
+        managedServiceOpFactory = Mock(ManagedServiceOpFactory)
+        serviceReader = Mock(ServiceReader)
 
         policyManager.setWhiteListContexts([ '/', '/default', '/paths' ])
         configurator.commit(_,_) >> operationReport
         configuratorFactory.getConfigurator() >> configurator
-        configuratorFactory.getConfigReader() >>  configReader
-        configReader.getConfig(_) >> { [ (PolicyManagerServiceProperties.WHITE_LIST_CONTEXT) : policyManager.getWhiteListContexts() ] }
-        actionCreator = new WcpmActionCreator(configuratorFactory)
+        adminOpFactory.read(_) >> { [ (PolicyManagerServiceProperties.WHITE_LIST_CONTEXT) : policyManager.getWhiteListContexts() ] }
+        actionCreator = new WcpmActionCreator(configuratorFactory, bundleOpFactory, adminOpFactory, managedServiceOpFactory, serviceReader)
         action = actionCreator.createAction(SaveWhitelistContexts.ACTION_ID)
     }
 

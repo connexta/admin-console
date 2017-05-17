@@ -17,12 +17,14 @@ import ddf.catalog.source.FederatedSource
 import org.codice.ddf.admin.api.action.Action
 import org.codice.ddf.admin.common.actions.BaseAction
 import org.codice.ddf.admin.common.message.DefaultMessages
-import org.codice.ddf.admin.configurator.ConfigReader
 import org.codice.ddf.admin.configurator.Configurator
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.configurator.OperationReport
 import org.codice.ddf.admin.sources.commons.SourceMessages
 import org.codice.ddf.admin.sources.fields.WfsVersion
+import org.codice.ddf.internal.admin.configurator.opfactory.AdminOpFactory
+import org.codice.ddf.internal.admin.configurator.opfactory.ManagedServiceOpFactory
+import org.codice.ddf.internal.admin.configurator.opfactory.ServiceReader
 import spock.lang.Specification
 
 import static org.codice.ddf.admin.sources.SourceTestCommons.*
@@ -51,7 +53,11 @@ class SaveWfsConfigurationTest extends Specification {
 
     Configurator configurator
 
-    ConfigReader configReader
+    ServiceReader serviceReader
+
+    AdminOpFactory adminOpFactory
+
+    ManagedServiceOpFactory managedServiceOpFactory
 
     FederatedSource federatedSource
 
@@ -61,22 +67,24 @@ class SaveWfsConfigurationTest extends Specification {
 
     def setup() {
         actionArgs = createWfsSaveArgs()
-        configReader = Mock(ConfigReader)
+        serviceReader = Mock(ServiceReader)
+        adminOpFactory = Mock(AdminOpFactory)
+        managedServiceOpFactory = Mock(ManagedServiceOpFactory)
         configurator = Mock(Configurator)
         federatedSource = Mock(FederatedSource)
         federatedSource.getId() >> TEST_SOURCENAME
         federatedSources.add(federatedSource)
         configuratorFactory = Mock(ConfiguratorFactory) {
-            getConfigReader() >> configReader
+            getServiceReader() >> serviceReader
             getConfigurator() >> configurator
         }
-        saveWfsConfiguration = new SaveWfsConfiguration(configuratorFactory)
+        saveWfsConfiguration = new SaveWfsConfiguration(configuratorFactory, adminOpFactory, managedServiceOpFactory, serviceReader)
     }
 
     def 'Successfully save new WFS configuration'() {
         setup:
         saveWfsConfiguration.setArguments(actionArgs)
-        configReader.getServices(_, _) >> []
+        serviceReader.getServices(_, _) >> []
         configurator.commit(_, _) >> mockReport(false)
 
         when:
@@ -89,7 +97,7 @@ class SaveWfsConfigurationTest extends Specification {
     def 'Fail to save new WFS config due to duplicate source name'() {
         setup:
         saveWfsConfiguration.setArguments(actionArgs)
-        configReader.getServices(_, _) >> federatedSources
+        serviceReader.getServices(_, _) >> federatedSources
 
         when:
         def report = saveWfsConfiguration.process()
@@ -104,7 +112,7 @@ class SaveWfsConfigurationTest extends Specification {
     def 'Fail to save new WFS config due to failure to commit'() {
         setup:
         saveWfsConfiguration.setArguments(actionArgs)
-        configReader.getServices(_, _) >> []
+        serviceReader.getServices(_, _) >> []
         configurator.commit(_, _) >> mockReport(true)
 
         when:
@@ -121,8 +129,8 @@ class SaveWfsConfigurationTest extends Specification {
         setup:
         actionArgs.put(PID, S_PID)
         saveWfsConfiguration.setArguments(actionArgs)
-        configReader.getConfig(_ as String) >> [(ID):TEST_SOURCENAME]
-        configReader.getServices(_, _) >> []
+        adminOpFactory.read(_ as String) >> [(ID):TEST_SOURCENAME]
+        serviceReader.getServices(_, _) >> []
         configurator.commit(_, _) >> mockReport(false)
 
         when:
@@ -136,8 +144,8 @@ class SaveWfsConfigurationTest extends Specification {
         setup:
         actionArgs.put(PID, S_PID)
         saveWfsConfiguration.setArguments(actionArgs)
-        configReader.getConfig(_) >> [(ID):'updatedName']
-        configReader.getServices(_, _) >> [new TestSource(S_PID, 'updatedName', false), new TestSource("existingSource", TEST_SOURCENAME, false)]
+        adminOpFactory.read(_) >> [(ID):'updatedName']
+        serviceReader.getServices(_, _) >> [new TestSource(S_PID, 'updatedName', false), new TestSource("existingSource", TEST_SOURCENAME, false)]
 
         when:
         def report = saveWfsConfiguration.process()
@@ -153,8 +161,8 @@ class SaveWfsConfigurationTest extends Specification {
         setup:
         actionArgs.put(PID, S_PID)
         saveWfsConfiguration.setArguments(actionArgs)
-        configReader.getConfig(_) >> [(ID):TEST_SOURCENAME]
-        configReader.getServices(_, _) >> []
+        adminOpFactory.read(_) >> [(ID):TEST_SOURCENAME]
+        serviceReader.getServices(_, _) >> []
         configurator.commit(_, _) >> mockReport(true)
 
         when:
@@ -171,7 +179,7 @@ class SaveWfsConfigurationTest extends Specification {
         setup:
         actionArgs.put(PID, S_PID)
         saveWfsConfiguration.setArguments(actionArgs)
-        configReader.getConfig(S_PID) >> [:]
+        adminOpFactory.read(S_PID) >> [:]
 
         when:
         def report = saveWfsConfiguration.process()

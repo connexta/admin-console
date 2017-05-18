@@ -98,7 +98,7 @@ public class LdapTestSettings extends TestAction {
             addArgumentMessages(checkGroup(settings, ldapConnection));
         }
 
-        return new BooleanField(containsErrorMsgs());
+        return new BooleanField(!containsErrorMsgs());
     }
 
     /**

@@ -44,8 +44,6 @@ public class LdapSettingsField extends BaseObjectField {
 
     private StringField groupObjectClass;
 
-    private StringField groupMembershipAttribute;
-
     private StringField groupAttributeHoldingMember;
 
     private StringField memberAttributeReferencedInGroup;
@@ -62,7 +60,6 @@ public class LdapSettingsField extends BaseObjectField {
     public List<Field> getFields() {
         return ImmutableList.of(usernameAttribute, baseUserDn, baseGroupDn,
                 groupObjectClass,
-                groupMembershipAttribute,
                 groupAttributeHoldingMember,
                 memberAttributeReferencedInGroup,
                 attributeMap,
@@ -80,10 +77,6 @@ public class LdapSettingsField extends BaseObjectField {
 
     public String groupObjectClass() {
         return groupObjectClass.getValue();
-    }
-
-    public String groupMembershipAttribute() {
-        return groupMembershipAttribute.getValue();
     }
 
     public String usernameAttribute() {
@@ -127,10 +120,6 @@ public class LdapSettingsField extends BaseObjectField {
         return groupObjectClass;
     }
 
-    public StringField groupMembershipAttributeField() {
-        return groupMembershipAttribute;
-    }
-
     public StringField groupAttributeHoldingMemberField() {
         return groupAttributeHoldingMember;
     }
@@ -156,11 +145,6 @@ public class LdapSettingsField extends BaseObjectField {
 
     public LdapSettingsField groupObjectClass(String groupObjectCLass) {
         this.groupObjectClass.setValue(groupObjectCLass);
-        return this;
-    }
-
-    public LdapSettingsField groupMembershipAttribute(String groupMembershipAttribute) {
-        this.groupMembershipAttribute.setValue(groupMembershipAttribute);
         return this;
     }
 
@@ -204,7 +188,6 @@ public class LdapSettingsField extends BaseObjectField {
         this.baseUserDn = new LdapDistinguishedName("baseUserDn");
         this.baseGroupDn = new LdapDistinguishedName("baseGroupDn");
         this.groupObjectClass = new StringField("groupObjectClass");
-        this.groupMembershipAttribute = new StringField("groupMembershipAttribute");
         this.groupAttributeHoldingMember = new StringField("groupAttributeHoldingMember");
         this.memberAttributeReferencedInGroup = new StringField("memberAttributeReferencedInGroup");
         this.attributeMap = new ListFieldImpl<>("attributeMapping", ClaimsMapEntry.class);

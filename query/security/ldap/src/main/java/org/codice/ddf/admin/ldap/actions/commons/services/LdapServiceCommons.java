@@ -31,7 +31,6 @@ import org.apache.commons.lang.StringUtils;
 import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.services.ServiceCommons;
-import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.ldap.fields.config.LdapConfigurationField;
 import org.codice.ddf.admin.ldap.fields.config.LdapSettingsField;
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindUserInfo;
@@ -39,31 +38,40 @@ import org.codice.ddf.admin.ldap.fields.connection.LdapConnectionField;
 import org.codice.ddf.admin.security.common.services.LdapClaimsHandlerServiceProperties;
 import org.codice.ddf.admin.security.common.services.LdapLoginServiceProperties;
 import org.codice.ddf.configuration.PropertyResolver;
+import org.codice.ddf.internal.admin.configurator.opfactory.ManagedServiceOpFactory;
+import org.codice.ddf.internal.admin.configurator.opfactory.PropertyOpFactory;
 
 public class LdapServiceCommons {
 
     public static final Pattern URI_MATCHER = Pattern.compile("\\w*://.*");
 
-    private ConfiguratorFactory configuratorFactory;
+    private ManagedServiceOpFactory managedServiceOpFactory;
 
-    public LdapServiceCommons(ConfiguratorFactory configuratorFactory) {
-        this.configuratorFactory = configuratorFactory;
+    private PropertyOpFactory propertyOpFactory;
+
+    public LdapServiceCommons(ManagedServiceOpFactory managedServiceOpFactory,
+            PropertyOpFactory propertyOpFactory) {
+        this.managedServiceOpFactory = managedServiceOpFactory;
+        this.propertyOpFactory = propertyOpFactory;
     }
 
-    public ListField<LdapConfigurationField> getLdapConfigurations(ConfiguratorFactory configuratorFactory) {
-        List<LdapConfigurationField> ldapLoginConfigs = new LdapClaimsHandlerServiceProperties(configuratorFactory).getLdapClaimsHandlerManagedServices()
+    public ListField<LdapConfigurationField> getLdapConfigurations() {
+        List<LdapConfigurationField> ldapLoginConfigs = new LdapClaimsHandlerServiceProperties(
+                managedServiceOpFactory).getLdapClaimsHandlerManagedServices()
                 .values()
                 .stream()
                 .map(this::ldapLoginServiceToLdapConfiguration)
                 .collect(Collectors.toList());
 
-        List<LdapConfigurationField> ldapClaimsHandlerConfigs = new LdapClaimsHandlerServiceProperties(configuratorFactory).getLdapClaimsHandlerManagedServices()
-                .values()
-                .stream()
-                .map(this::ldapClaimsHandlerServiceToLdapConfig)
-                .collect(Collectors.toList());
+        List<LdapConfigurationField> ldapClaimsHandlerConfigs =
+                new LdapClaimsHandlerServiceProperties(managedServiceOpFactory).getLdapClaimsHandlerManagedServices()
+                        .values()
+                        .stream()
+                        .map(this::ldapClaimsHandlerServiceToLdapConfig)
+                        .collect(Collectors.toList());
 
-        List<LdapConfigurationField> configs = Stream.concat(ldapLoginConfigs.stream(), ldapClaimsHandlerConfigs.stream())
+        List<LdapConfigurationField> configs = Stream.concat(ldapLoginConfigs.stream(),
+                ldapClaimsHandlerConfigs.stream())
                 .collect(Collectors.toList());
 
         configs.stream()
@@ -77,7 +85,8 @@ public class LdapServiceCommons {
 
         LdapConnectionField connection = new LdapConnectionField();
 
-        URI ldapUri = getUriFromProperty((String) props.get(LdapClaimsHandlerServiceProperties.URL));
+        URI ldapUri =
+                getUriFromProperty((String) props.get(LdapClaimsHandlerServiceProperties.URL));
         if (ldapUri != null) {
             connection.encryptionMethod(ldapUri.getScheme())
                     .hostname(ldapUri.getHost())
@@ -88,50 +97,83 @@ public class LdapServiceCommons {
             connection.encryptionMethod(LdapClaimsHandlerServiceProperties.START_TLS);
         }
 
-        LdapBindUserInfo bindUserInfo =
-                new LdapBindUserInfo().username(mapStringValue(LdapClaimsHandlerServiceProperties.LDAP_BIND_USER_DN, props))
-                        .password(mapStringValue(LdapClaimsHandlerServiceProperties.PASSWORD, props))
-                        .bindMethod(mapStringValue(LdapClaimsHandlerServiceProperties.BIND_METHOD, props));
+        LdapBindUserInfo bindUserInfo = new LdapBindUserInfo().username(mapStringValue(
+                LdapClaimsHandlerServiceProperties.LDAP_BIND_USER_DN,
+                props))
+                .password(mapStringValue(LdapClaimsHandlerServiceProperties.PASSWORD, props))
+                .bindMethod(mapStringValue(LdapClaimsHandlerServiceProperties.BIND_METHOD, props));
 
-        LdapSettingsField settings = new LdapSettingsField().usernameAttribute(
-                mapStringValue(LdapClaimsHandlerServiceProperties.LOGIN_USER_ATTRIBUTE, props))
+        LdapSettingsField settings = new LdapSettingsField().usernameAttribute(mapStringValue(
+                LdapClaimsHandlerServiceProperties.LOGIN_USER_ATTRIBUTE,
+                props))
                 .baseUserDn(mapStringValue(LdapClaimsHandlerServiceProperties.USER_BASE_DN, props))
-                .baseGroupDn(mapStringValue(LdapClaimsHandlerServiceProperties.GROUP_BASE_DN, props))
-                .groupObjectClass(mapStringValue(LdapClaimsHandlerServiceProperties.OBJECT_CLASS, props))
-                .groupAttributeHoldingMember(mapStringValue(LdapClaimsHandlerServiceProperties.MEMBERSHIP_USER_ATTRIBUTE, props))
-                .memberAttributeReferencedInGroup(mapStringValue(LdapClaimsHandlerServiceProperties.MEMBER_NAME_ATTRIBUTE, props))
+                .baseGroupDn(mapStringValue(LdapClaimsHandlerServiceProperties.GROUP_BASE_DN,
+                        props))
+                .groupObjectClass(mapStringValue(LdapClaimsHandlerServiceProperties.OBJECT_CLASS,
+                        props))
+                .groupAttributeHoldingMember(mapStringValue(LdapClaimsHandlerServiceProperties.MEMBERSHIP_USER_ATTRIBUTE,
+                        props))
+                .memberAttributeReferencedInGroup(mapStringValue(LdapClaimsHandlerServiceProperties.MEMBER_NAME_ATTRIBUTE,
+                        props))
                 .useCase(ATTRIBUTE_STORE);
 
-        String attributeMappingsPath = mapStringValue(LdapClaimsHandlerServiceProperties.PROPERTY_FILE_LOCATION, props);
+        String attributeMappingsPath =
+                mapStringValue(LdapClaimsHandlerServiceProperties.PROPERTY_FILE_LOCATION, props);
         if (StringUtils.isNotEmpty(attributeMappingsPath)) {
-            Map<String, String> attributeMappings =
-                    new HashMap<>(configuratorFactory.getConfigReader().getProperties(Paths.get(attributeMappingsPath)));
+            Map<String, String> attributeMappings = new HashMap<>(propertyOpFactory.getProperties(
+                    Paths.get(attributeMappingsPath)));
             settings.attributeMapField(attributeMappings);
         }
 
         return new LdapConfigurationField().connection(connection)
                 .bindUserInfo(bindUserInfo)
                 .settings(settings)
-                .pid(props.get(ServiceCommons.SERVICE_PID_KEY) == null ? null : (String) props.get(ServiceCommons.SERVICE_PID_KEY));
+                .pid(props.get(ServiceCommons.SERVICE_PID_KEY) == null ?
+                        null :
+                        (String) props.get(ServiceCommons.SERVICE_PID_KEY));
     }
 
-    public static Map<String, Object> ldapConfigToLdapClaimsHandlerService(LdapConfigurationField config) {
+    public static Map<String, Object> ldapConfigToLdapClaimsHandlerService(
+            LdapConfigurationField config) {
         Map<String, Object> props = new HashMap<>();
 
         if (config != null) {
             String ldapUrl = getLdapUrl(config.connectionField());
             boolean startTls = isStartTls(config.connectionField());
-            props.put(LdapClaimsHandlerServiceProperties.URL, ldapUrl + config.connectionField().hostname() + ":" + config.connectionField().port());
+            props.put(LdapClaimsHandlerServiceProperties.URL,
+                    ldapUrl + config.connectionField()
+                            .hostname() + ":" + config.connectionField()
+                            .port());
             props.put(LdapClaimsHandlerServiceProperties.START_TLS, startTls);
-            props.put(LdapClaimsHandlerServiceProperties.LDAP_BIND_USER_DN, config.bindUserInfoField().credentials().username());
-            props.put(LdapClaimsHandlerServiceProperties.PASSWORD, config.bindUserInfoField().credentials().password());
-            props.put(LdapClaimsHandlerServiceProperties.BIND_METHOD, config.bindUserInfoField().bindMethod());
-            props.put(LdapClaimsHandlerServiceProperties.LOGIN_USER_ATTRIBUTE, config.settingsField().usernameAttribute());
-            props.put(LdapClaimsHandlerServiceProperties.USER_BASE_DN, config.settingsField().baseUserDn());
-            props.put(LdapClaimsHandlerServiceProperties.GROUP_BASE_DN, config.settingsField().baseGroupDn());
-            props.put(LdapClaimsHandlerServiceProperties.OBJECT_CLASS, config.settingsField().groupObjectClass());
-            props.put(LdapClaimsHandlerServiceProperties.MEMBERSHIP_USER_ATTRIBUTE, config.settingsField().memberAttributeReferencedInGroup());
-            props.put(LdapClaimsHandlerServiceProperties.MEMBER_NAME_ATTRIBUTE, config.settingsField().groupAttributeHoldingMember());
+            props.put(LdapClaimsHandlerServiceProperties.LDAP_BIND_USER_DN,
+                    config.bindUserInfoField()
+                            .credentials()
+                            .username());
+            props.put(LdapClaimsHandlerServiceProperties.PASSWORD,
+                    config.bindUserInfoField()
+                            .credentials()
+                            .password());
+            props.put(LdapClaimsHandlerServiceProperties.BIND_METHOD,
+                    config.bindUserInfoField()
+                            .bindMethod());
+            props.put(LdapClaimsHandlerServiceProperties.LOGIN_USER_ATTRIBUTE,
+                    config.settingsField()
+                            .usernameAttribute());
+            props.put(LdapClaimsHandlerServiceProperties.USER_BASE_DN,
+                    config.settingsField()
+                            .baseUserDn());
+            props.put(LdapClaimsHandlerServiceProperties.GROUP_BASE_DN,
+                    config.settingsField()
+                            .baseGroupDn());
+            props.put(LdapClaimsHandlerServiceProperties.OBJECT_CLASS,
+                    config.settingsField()
+                            .groupObjectClass());
+            props.put(LdapClaimsHandlerServiceProperties.MEMBERSHIP_USER_ATTRIBUTE,
+                    config.settingsField()
+                            .memberAttributeReferencedInGroup());
+            props.put(LdapClaimsHandlerServiceProperties.MEMBER_NAME_ATTRIBUTE,
+                    config.settingsField()
+                            .groupAttributeHoldingMember());
             // TODO: tbatie - 4/11/17 - Look up the pid, if it doesn't exist then create a new attribute mapping, else use the existing one
             //            props.put(PROPERTY_FILE_LOCATION, config.settings().attributeMappingPath());
         }
@@ -140,7 +182,8 @@ public class LdapServiceCommons {
 
     public LdapConfigurationField ldapLoginServiceToLdapConfiguration(Map<String, Object> props) {
         LdapConnectionField connection = new LdapConnectionField();
-        URI ldapUri = getUriFromProperty(mapStringValue(LdapLoginServiceProperties.LDAP_URL, props));
+        URI ldapUri = getUriFromProperty(mapStringValue(LdapLoginServiceProperties.LDAP_URL,
+                props));
         if (ldapUri != null) {
             connection.encryptionMethod(ldapUri.getScheme())
                     .hostname(ldapUri.getHost())
@@ -151,21 +194,22 @@ public class LdapServiceCommons {
             connection.encryptionMethod(LdapLoginServiceProperties.START_TLS);
         }
 
-        LdapBindUserInfo bindUserInfo = new LdapBindUserInfo()
-                .username(mapStringValue(LdapLoginServiceProperties.LDAP_BIND_USER_DN, props))
+        LdapBindUserInfo bindUserInfo = new LdapBindUserInfo().username(mapStringValue(
+                LdapLoginServiceProperties.LDAP_BIND_USER_DN,
+                props))
                 .password(mapStringValue(LdapLoginServiceProperties.LDAP_BIND_USER_PASS, props))
                 .bindMethod(mapStringValue(LdapLoginServiceProperties.BIND_METHOD, props))
                 .realm(mapStringValue(LdapLoginServiceProperties.REALM, props));
         //        ldapConfiguration.bindKdcAddress((String) props.get(KDC_ADDRESS));
 
-        LdapSettingsField settings = new LdapSettingsField()
-                .usernameAttribute(mapStringValue(LdapLoginServiceProperties.USER_NAME_ATTRIBUTE, props))
+        LdapSettingsField settings = new LdapSettingsField().usernameAttribute(mapStringValue(
+                LdapLoginServiceProperties.USER_NAME_ATTRIBUTE,
+                props))
                 .baseUserDn(mapStringValue(LdapLoginServiceProperties.USER_BASE_DN, props))
                 .baseGroupDn(mapStringValue(LdapLoginServiceProperties.GROUP_BASE_DN, props))
                 .useCase(LOGIN);
 
-        return new LdapConfigurationField()
-                .connection(connection)
+        return new LdapConfigurationField().connection(connection)
                 .bindUserInfo(bindUserInfo)
                 .settings(settings)
                 .pid(mapStringValue(SERVICE_PID_KEY, props));
@@ -178,17 +222,36 @@ public class LdapServiceCommons {
             String ldapUrl = getLdapUrl(config.connectionField());
             boolean startTls = isStartTls(config.connectionField());
 
-            ldapStsConfig.put(LdapLoginServiceProperties.LDAP_URL, ldapUrl + config.connectionField().hostname() + ":" + config.connectionField().port());
+            ldapStsConfig.put(LdapLoginServiceProperties.LDAP_URL,
+                    ldapUrl + config.connectionField()
+                            .hostname() + ":" + config.connectionField()
+                            .port());
             ldapStsConfig.put(LdapLoginServiceProperties.START_TLS, Boolean.toString(startTls));
-            ldapStsConfig.put(LdapLoginServiceProperties.LDAP_BIND_USER_DN, config.bindUserInfoField().credentials().username());
-            ldapStsConfig.put(LdapLoginServiceProperties.LDAP_BIND_USER_PASS, config.bindUserInfoField().credentials().password());
-            ldapStsConfig.put(LdapLoginServiceProperties.BIND_METHOD, config.bindUserInfoField().bindMethod());
+            ldapStsConfig.put(LdapLoginServiceProperties.LDAP_BIND_USER_DN,
+                    config.bindUserInfoField()
+                            .credentials()
+                            .username());
+            ldapStsConfig.put(LdapLoginServiceProperties.LDAP_BIND_USER_PASS,
+                    config.bindUserInfoField()
+                            .credentials()
+                            .password());
+            ldapStsConfig.put(LdapLoginServiceProperties.BIND_METHOD,
+                    config.bindUserInfoField()
+                            .bindMethod());
             //        ldapStsConfig.put(KDC_ADDRESS, config.bindKdcAddress());
-            ldapStsConfig.put(LdapLoginServiceProperties.REALM, config.bindUserInfoField().realm());
+            ldapStsConfig.put(LdapLoginServiceProperties.REALM,
+                    config.bindUserInfoField()
+                            .realm());
 
-            ldapStsConfig.put(LdapLoginServiceProperties.USER_NAME_ATTRIBUTE, config.settingsField().usernameAttribute());
-            ldapStsConfig.put(LdapLoginServiceProperties.USER_BASE_DN, config.settingsField().baseUserDn());
-            ldapStsConfig.put(LdapLoginServiceProperties.GROUP_BASE_DN, config.settingsField().baseGroupDn());
+            ldapStsConfig.put(LdapLoginServiceProperties.USER_NAME_ATTRIBUTE,
+                    config.settingsField()
+                            .usernameAttribute());
+            ldapStsConfig.put(LdapLoginServiceProperties.USER_BASE_DN,
+                    config.settingsField()
+                            .baseUserDn());
+            ldapStsConfig.put(LdapLoginServiceProperties.GROUP_BASE_DN,
+                    config.settingsField()
+                            .baseGroupDn());
         }
         return ldapStsConfig;
     }

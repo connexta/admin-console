@@ -60,13 +60,13 @@ class OperationReportTest extends Specification {
         report.getFailedResults() == [fail1]
         report.getResult(a1) == pass1
         report.getResult(b2) == fail1
-        report.getResult(b2).badOutcome.get() == throwable
+        report.getResult(b2).error.get() == throwable
     }
 
     def 'pass with a managed service'() {
         setup:
         def pass1 = ResultImpl.pass()
-        def pass2 = ResultImpl.passManagedService('serviceId1')
+        def pass2 = ResultImpl.passWithData('serviceId1')
         def a1 = UUID.randomUUID()
         def b2 = UUID.randomUUID()
 
@@ -80,7 +80,8 @@ class OperationReportTest extends Specification {
         report.getFailedResults() == []
         report.getResult(a1) == pass1
         report.getResult(b2) == pass2
-        report.getResult(b2).configId == 'serviceId1'
+        report.getResult(b2).operationData.isPresent()
+        report.getResult(b2).operationData.get() == 'serviceId1'
     }
 
     def 'rollback success'() {
@@ -120,14 +121,14 @@ class OperationReportTest extends Specification {
         report.getFailedResults() == [roll1]
         report.getResult(a1) == pass1
         report.getResult(b2) == roll1
-        report.getResult(b2).badOutcome.get() == throwable
+        report.getResult(b2).error.get() == throwable
     }
 
     def 'rollback failed on a managed service'() {
         setup:
         def pass1 = ResultImpl.pass()
         def throwable = Mock(Throwable)
-        def roll1 = ResultImpl.rollbackFailManagedService(throwable, 'serviceId1')
+        def roll1 = ResultImpl.rollbackFailWithData(throwable, 'serviceId1')
         def a1 = UUID.randomUUID()
         def b2 = UUID.randomUUID()
 
@@ -141,8 +142,9 @@ class OperationReportTest extends Specification {
         report.getFailedResults() == [roll1]
         report.getResult(a1) == pass1
         report.getResult(b2) == roll1
-        report.getResult(b2).badOutcome.get() == throwable
-        report.getResult(b2).configId == 'serviceId1'
+        report.getResult(b2).error.get() == throwable
+        report.getResult(b2).operationData.isPresent()
+        report.getResult(b2).operationData.get() == 'serviceId1'
     }
 
     def 'test skipped rollback step'() {

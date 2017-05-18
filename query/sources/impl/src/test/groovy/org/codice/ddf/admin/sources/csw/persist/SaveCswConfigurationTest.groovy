@@ -17,13 +17,15 @@ import ddf.catalog.source.Source
 import org.codice.ddf.admin.api.action.Action
 import org.codice.ddf.admin.common.actions.BaseAction
 import org.codice.ddf.admin.common.message.DefaultMessages
-import org.codice.ddf.admin.configurator.ConfigReader
 import org.codice.ddf.admin.configurator.Configurator
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.configurator.OperationReport
 import org.codice.ddf.admin.sources.commons.SourceMessages
 import org.codice.ddf.admin.sources.fields.CswProfile
 import org.codice.ddf.admin.sources.fields.type.CswSourceConfigurationField
+import org.codice.ddf.internal.admin.configurator.opfactory.AdminOpFactory
+import org.codice.ddf.internal.admin.configurator.opfactory.ManagedServiceOpFactory
+import org.codice.ddf.internal.admin.configurator.opfactory.ServiceReader
 import spock.lang.Specification
 
 import static org.codice.ddf.admin.sources.SourceTestCommons.*
@@ -56,7 +58,11 @@ class SaveCswConfigurationTest extends Specification {
 
     Configurator configurator
 
-    ConfigReader configReader
+    ServiceReader serviceReader
+
+    AdminOpFactory adminOpFactory
+
+    ManagedServiceOpFactory managedServiceOpFactory
 
     Source federatedSource
 
@@ -67,19 +73,20 @@ class SaveCswConfigurationTest extends Specification {
     def setup() {
         actionArgs = createCswSaveArgs()
         configurator = Mock(Configurator)
-        configReader = Mock(ConfigReader)
+        serviceReader = Mock(ServiceReader)
+        adminOpFactory = Mock(AdminOpFactory)
+        managedServiceOpFactory = Mock(ManagedServiceOpFactory)
         configuratorFactory = Mock(ConfiguratorFactory)
         federatedSource = new TestSource(S_PID, TEST_SOURCENAME, false)
         federatedSources.add(federatedSource)
         configuratorFactory.getConfigurator() >> configurator
-        configuratorFactory.getConfigReader() >> configReader
-        saveCswConfiguration = new SaveCswConfiguration(configuratorFactory)
+        saveCswConfiguration = new SaveCswConfiguration(configuratorFactory, adminOpFactory, managedServiceOpFactory, serviceReader)
     }
 
     def 'Successfully save new CSW configuration'() {
         when:
         saveCswConfiguration.setArguments(actionArgs)
-        configReader.getServices(_, _) >> []
+        serviceReader.getServices(_, _) >> []
         configurator.commit(_, _) >> mockReport(false)
         def report = saveCswConfiguration.process()
 
@@ -91,7 +98,7 @@ class SaveCswConfigurationTest extends Specification {
     def 'Fail to save new CSW config due to duplicate source name'() {
         when:
         saveCswConfiguration.setArguments(actionArgs)
-        configReader.getServices(_, _) >> federatedSources
+        serviceReader.getServices(_, _) >> federatedSources
         def report = saveCswConfiguration.process()
 
         then:
@@ -104,7 +111,7 @@ class SaveCswConfigurationTest extends Specification {
     def 'Fail to save new CSW config due to failure to commit'() {
         when:
         saveCswConfiguration.setArguments(actionArgs)
-        configReader.getServices(_, _) >> []
+        serviceReader.getServices(_, _) >> []
         configurator.commit(_, _) >> mockReport(true)
         def report = saveCswConfiguration.process()
 
@@ -119,8 +126,8 @@ class SaveCswConfigurationTest extends Specification {
         setup:
         actionArgs.put(PID, S_PID)
         saveCswConfiguration.setArguments(actionArgs)
-        configReader.getConfig(_) >> [(ID):TEST_SOURCENAME]
-        configReader.getServices(_, _) >> []
+        adminOpFactory.read(_) >> [(ID):TEST_SOURCENAME]
+        serviceReader.getServices(_, _) >> []
         configurator.commit(_, _) >> mockReport(false)
 
         when:
@@ -135,8 +142,8 @@ class SaveCswConfigurationTest extends Specification {
         setup:
         actionArgs.put(PID, S_PID)
         saveCswConfiguration.setArguments(actionArgs)
-        configReader.getConfig(_) >> [(ID):'updatedName']
-        configReader.getServices(_, _) >> [new TestSource(S_PID, 'updatedName', false), new TestSource("existingSource", TEST_SOURCENAME, false)]
+        adminOpFactory.read(_) >> [(ID):'updatedName']
+        serviceReader.getServices(_, _) >> [new TestSource(S_PID, 'updatedName', false), new TestSource("existingSource", TEST_SOURCENAME, false)]
 
         when:
         def report = saveCswConfiguration.process()
@@ -152,8 +159,8 @@ class SaveCswConfigurationTest extends Specification {
         setup:
         actionArgs.put(PID, S_PID)
         saveCswConfiguration.setArguments(actionArgs)
-        configReader.getConfig(_) >> [(ID):TEST_SOURCENAME]
-        configReader.getServices(_, _) >> []
+        adminOpFactory.read(_) >> [(ID):TEST_SOURCENAME]
+        serviceReader.getServices(_, _) >> []
         configurator.commit(_, _) >> mockReport(true)
 
         when:
@@ -170,7 +177,7 @@ class SaveCswConfigurationTest extends Specification {
         setup:
         actionArgs.put(PID, S_PID)
         saveCswConfiguration.setArguments(actionArgs)
-        configReader.getConfig(S_PID) >> [:]
+        adminOpFactory.read(S_PID) >> [:]
 
         when:
         def report = saveCswConfiguration.process()

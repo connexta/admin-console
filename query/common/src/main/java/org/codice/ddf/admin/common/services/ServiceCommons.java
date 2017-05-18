@@ -31,6 +31,8 @@ import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.configurator.Configurator;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.configurator.OperationReport;
+import org.codice.ddf.internal.admin.configurator.opfactory.AdminOpFactory;
+import org.codice.ddf.internal.admin.configurator.opfactory.ManagedServiceOpFactory;
 
 public class ServiceCommons {
 
@@ -53,12 +55,13 @@ public class ServiceCommons {
     }
 
     public static Report createManagedService(Map<String, Object> serviceProps, String factoryPid,
-            ConfiguratorFactory configuratorFactory) {
+            ConfiguratorFactory configuratorFactory,
+            ManagedServiceOpFactory managedServiceOpFactory) {
         Report report = new Report();
         Configurator configurator = configuratorFactory.getConfigurator();
 
-        configurator.createManagedService(factoryPid, serviceProps);
-        if(configurator.commit("Service saved with details [{}]", serviceProps.toString())
+        configurator.add(managedServiceOpFactory.create(factoryPid, serviceProps));
+        if (configurator.commit("Service saved with details [{}]", serviceProps.toString())
                 .containsFailedResults()) {
             report.resultMessage(failedPersistError());
         }
@@ -66,16 +69,16 @@ public class ServiceCommons {
     }
 
     public static Report updateService(PidField servicePid, Map<String, Object> newConfig,
-            ConfiguratorFactory configuratorFactory) {
+            ConfiguratorFactory configuratorFactory, AdminOpFactory adminOpFactory) {
         Report report = new Report();
-        report.addMessages(serviceConfigurationExists(servicePid, configuratorFactory));
+        report.addMessages(serviceConfigurationExists(servicePid, adminOpFactory));
         if (report.containsErrorMsgs()) {
             return report;
         }
 
         String pid = servicePid.getValue();
         Configurator configurator = configuratorFactory.getConfigurator();
-        configurator.updateConfigFile(pid, newConfig, true);
+        configurator.add(adminOpFactory.build(pid, newConfig, true));
         OperationReport operationReport = configurator.commit(
                 "Updated config with pid [{}] and new service properties [{}]",
                 pid,
@@ -87,30 +90,31 @@ public class ServiceCommons {
         return report;
     }
 
-    public static Report deleteService(PidField servicePid, ConfiguratorFactory configuratorFactory) {
+    public static Report deleteService(PidField servicePid, ConfiguratorFactory configuratorFactory,
+            ManagedServiceOpFactory managedServiceOpFactory) {
         Report report = new Report();
         Configurator configurator = configuratorFactory.getConfigurator();
-        configurator.deleteManagedService(servicePid.getValue());
-        if(configurator.commit("Deleted source with pid [{}].", servicePid.getValue())
+        configurator.add(managedServiceOpFactory.delete(servicePid.getValue()));
+        if (configurator.commit("Deleted source with pid [{}].", servicePid.getValue())
                 .containsFailedResults()) {
             report.resultMessage(failedDeleteError());
         }
         return report;
     }
 
-    public static Report serviceConfigurationExists(PidField servicePid, ConfiguratorFactory configuratorFactory) {
+    public static Report serviceConfigurationExists(PidField servicePid,
+            AdminOpFactory adminOpFactory) {
         Report report = new Report();
-        if(configuratorFactory.getConfigReader()
-                .getConfig(servicePid.getValue())
+        if (adminOpFactory.read(servicePid.getValue())
                 .isEmpty()) {
             report.resultMessage(noExistingConfigError());
         }
         return report;
     }
 
-    public static boolean serviceConfigurationExists(String servicePid, ConfiguratorFactory configuratorFactory) {
-        return !configuratorFactory.getConfigReader()
-                .getConfig(servicePid)
+    public static boolean serviceConfigurationExists(String servicePid,
+            AdminOpFactory adminOpFactory) {
+        return !adminOpFactory.read(servicePid)
                 .isEmpty();
     }
 
@@ -132,7 +136,7 @@ public class ServiceCommons {
         }
 
         public ServicePropertyBuilder putPropertyIfNotNull(String key, Field field) {
-            if(field.getValue() != null) {
+            if (field.getValue() != null) {
                 put(key, field.getValue());
             }
             return this;

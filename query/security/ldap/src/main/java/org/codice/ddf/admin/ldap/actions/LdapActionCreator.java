@@ -29,6 +29,9 @@ import org.codice.ddf.admin.ldap.actions.discover.LdapUserAttributes;
 import org.codice.ddf.admin.ldap.actions.embedded.InstallEmbeddedLdap;
 import org.codice.ddf.admin.ldap.actions.persist.DeleteLdapConfiguration;
 import org.codice.ddf.admin.ldap.actions.persist.SaveLdapConfiguration;
+import org.codice.ddf.internal.admin.configurator.opfactory.FeatureOpFactory;
+import org.codice.ddf.internal.admin.configurator.opfactory.ManagedServiceOpFactory;
+import org.codice.ddf.internal.admin.configurator.opfactory.PropertyOpFactory;
 
 public class LdapActionCreator extends BaseActionCreator {
 
@@ -40,9 +43,20 @@ public class LdapActionCreator extends BaseActionCreator {
 
     private ConfiguratorFactory configuratorFactory;
 
-    public LdapActionCreator(ConfiguratorFactory configuratorFactory) {
+    private FeatureOpFactory featureOpFactory;
+
+    private ManagedServiceOpFactory managedServiceOpFactory;
+
+    private PropertyOpFactory propertyOpFactory;
+
+    public LdapActionCreator(ConfiguratorFactory configuratorFactory,
+            FeatureOpFactory featureOpFactory, ManagedServiceOpFactory managedServiceOpFactory,
+            PropertyOpFactory propertyOpFactory) {
         super(NAME, TYPE_NAME, DESCRIPTION);
         this.configuratorFactory = configuratorFactory;
+        this.featureOpFactory = featureOpFactory;
+        this.managedServiceOpFactory = managedServiceOpFactory;
+        this.propertyOpFactory = propertyOpFactory;
     }
 
     @Override
@@ -53,11 +67,17 @@ public class LdapActionCreator extends BaseActionCreator {
                 new LdapTestSettings(),
                 new LdapQuery(),
                 new LdapUserAttributes(),
-                new LdapConfigurations(configuratorFactory));
+                new LdapConfigurations(managedServiceOpFactory, propertyOpFactory));
     }
 
     @Override
     public List<Action> getPersistActions() {
-        return Arrays.asList(new SaveLdapConfiguration(configuratorFactory), new DeleteLdapConfiguration(configuratorFactory), new InstallEmbeddedLdap(configuratorFactory.getConfigurator()));
+        return Arrays.asList(new SaveLdapConfiguration(configuratorFactory,
+                        featureOpFactory,
+                        managedServiceOpFactory,
+                        propertyOpFactory),
+                new DeleteLdapConfiguration(configuratorFactory, managedServiceOpFactory,
+                        propertyOpFactory),
+                new InstallEmbeddedLdap(configuratorFactory.getConfigurator(), featureOpFactory));
     }
 }

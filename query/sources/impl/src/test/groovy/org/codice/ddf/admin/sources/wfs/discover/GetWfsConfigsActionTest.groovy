@@ -19,12 +19,14 @@ import org.codice.ddf.admin.api.fields.ListField
 import org.codice.ddf.admin.common.actions.BaseAction
 import org.codice.ddf.admin.common.fields.base.ListFieldImpl
 import org.codice.ddf.admin.common.message.DefaultMessages
-import org.codice.ddf.admin.configurator.ConfigReader
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.sources.fields.SourceInfoField
 import org.codice.ddf.admin.sources.fields.WfsVersion
 import org.codice.ddf.admin.sources.fields.type.WfsSourceConfigurationField
 import org.codice.ddf.admin.sources.services.WfsServiceProperties
+import org.codice.ddf.internal.admin.configurator.opfactory.AdminOpFactory
+import org.codice.ddf.internal.admin.configurator.opfactory.ManagedServiceOpFactory
+import org.codice.ddf.internal.admin.configurator.opfactory.ServiceReader
 import spock.lang.Specification
 
 import static org.codice.ddf.admin.sources.SourceTestCommons.*
@@ -35,7 +37,11 @@ class GetWfsConfigsActionTest extends Specification {
 
     ConfiguratorFactory configuratorFactory
 
-    ConfigReader configReader
+    ServiceReader serviceReader
+
+    AdminOpFactory adminOpFactory
+
+    ManagedServiceOpFactory managedServiceOpFactory
 
     static TEST_WFS_VERSION_1 = WfsVersion.WFS_VERSION_1
 
@@ -57,26 +63,26 @@ class GetWfsConfigsActionTest extends Specification {
 
     def setup() {
         managedServiceConfigs = createWfsManagedServiceConfigs()
-        configReader = Mock(ConfigReader)
-        configuratorFactory = Mock(ConfiguratorFactory) {
-            getConfigReader() >> configReader
-        }
-        getWfsConfigsAction = new GetWfsConfigsAction(configuratorFactory)
+        serviceReader = Mock(ServiceReader)
+        adminOpFactory = Mock(AdminOpFactory)
+        managedServiceOpFactory = Mock(ManagedServiceOpFactory)
+        configuratorFactory = Mock(ConfiguratorFactory)
+        getWfsConfigsAction = new GetWfsConfigsAction(adminOpFactory, managedServiceOpFactory, serviceReader)
     }
 
     def 'No pid argument returns all configs'() {
         setup:
-        configReader.getServices(_, _) >> []
+        serviceReader.getServices(_, _) >> []
 
         when:
         def report = getWfsConfigsAction.process()
         def list = ((ListField)report.result())
 
         then:
-        1 * configReader.getServices(_, _) >> [new TestSource(S_PID_1, true)]
-        1 * configReader.getServices(_, _) >> [new TestSource(S_PID_2, false)]
-        1 * configReader.getManagedServiceConfigs(_ as String) >> managedServiceConfigs
-        1 * configReader.getManagedServiceConfigs(_ as String) >> [:]
+        1 * serviceReader.getServices(_, _) >> [new TestSource(S_PID_1, true)]
+        1 * serviceReader.getServices(_, _) >> [new TestSource(S_PID_2, false)]
+        1 * managedServiceOpFactory.read(_ as String) >> managedServiceConfigs
+        1 * managedServiceOpFactory.read(_ as String) >> [:]
         report.result() != null
         list.getList().size() == 2
         assertConfig(list.getList().get(0), 0, SOURCE_ID_1, S_PID_1, true, TEST_WFS_VERSION_1)
@@ -92,9 +98,9 @@ class GetWfsConfigsActionTest extends Specification {
         def list = ((ListField)report.result())
 
         then:
-        1 * configReader.getServices(_, _) >> [new TestSource(S_PID_2, false)]
-        1 * configReader.getServices(_, _) >> []
-        configReader.getConfig(S_PID_2) >> managedServiceConfigs.get(S_PID_2)
+        1 * serviceReader.getServices(_, _) >> [new TestSource(S_PID_2, false)]
+        1 * serviceReader.getServices(_, _) >> []
+        adminOpFactory.read(S_PID_2) >> managedServiceConfigs.get(S_PID_2)
         report.result() != null
         list.getList().size() == 1
         assertConfig(list.getList().get(0), 0, SOURCE_ID_2, S_PID_2, false, TEST_WFS_VERSION_2)
@@ -104,7 +110,7 @@ class GetWfsConfigsActionTest extends Specification {
         setup:
         actionArgs.put(PID, S_PID)
         getWfsConfigsAction.setArguments(actionArgs)
-        configReader.getConfig(S_PID) >> [:]
+        adminOpFactory.read(S_PID) >> [:]
 
         when:
         def report = getWfsConfigsAction.process()

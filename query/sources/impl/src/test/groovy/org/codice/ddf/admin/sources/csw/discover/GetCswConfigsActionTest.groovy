@@ -19,12 +19,14 @@ import org.codice.ddf.admin.api.fields.ListField
 import org.codice.ddf.admin.common.actions.BaseAction
 import org.codice.ddf.admin.common.fields.base.ListFieldImpl
 import org.codice.ddf.admin.common.message.DefaultMessages
-import org.codice.ddf.admin.configurator.ConfigReader
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.sources.fields.CswProfile
 import org.codice.ddf.admin.sources.fields.SourceInfoField
 import org.codice.ddf.admin.sources.fields.type.CswSourceConfigurationField
 import org.codice.ddf.admin.sources.services.CswServiceProperties
+import org.codice.ddf.internal.admin.configurator.opfactory.AdminOpFactory
+import org.codice.ddf.internal.admin.configurator.opfactory.ManagedServiceOpFactory
+import org.codice.ddf.internal.admin.configurator.opfactory.ServiceReader
 import spock.lang.Specification
 
 import static org.codice.ddf.admin.sources.SourceTestCommons.*
@@ -41,13 +43,13 @@ class GetCswConfigsActionTest extends Specification {
 
     static BASE_PATH = [GetCswConfigsAction.ID, BaseAction.ARGUMENT]
 
-    static PID_PATH = [BASE_PATH, PID].flatten()
-
     Action getCswConfigsAction
 
-    ConfiguratorFactory configuratorFactory
+    ServiceReader serviceReader
 
-    ConfigReader configReader
+    AdminOpFactory adminOpFactory
+
+    ManagedServiceOpFactory managedServiceOpFactory
 
     def actionArgs = [
         (PID): S_PID_2
@@ -56,12 +58,11 @@ class GetCswConfigsActionTest extends Specification {
     Map<String, Map<String, Object>> managedServiceConfigs = createCswManagedServiceConfigs()
 
     def setup() {
-        configReader = Mock(ConfigReader)
-        configuratorFactory = Mock(ConfiguratorFactory) {
-            getConfigReader() >> configReader
-        }
+        serviceReader = Mock(ServiceReader)
+        adminOpFactory = Mock(AdminOpFactory)
+        managedServiceOpFactory = Mock(ManagedServiceOpFactory)
 
-        getCswConfigsAction = new GetCswConfigsAction(configuratorFactory)
+        getCswConfigsAction = new GetCswConfigsAction(adminOpFactory, managedServiceOpFactory, serviceReader)
     }
 
     def 'No pid argument returns all configs'() {
@@ -70,10 +71,10 @@ class GetCswConfigsActionTest extends Specification {
         def list = ((ListField)report.result())
 
         then:
-        1 * configReader.getServices(_, _) >> [new TestSource(S_PID_1, true)]
-        1 * configReader.getServices(_, _) >> [new TestSource(S_PID_2, false)]
-        1 * configReader.getManagedServiceConfigs(TEST_FACTORY_PID) >> managedServiceConfigs
-        2 * configReader.getManagedServiceConfigs(_ as String) >> [:]
+        1 * serviceReader.getServices(_, _) >> [new TestSource(S_PID_1, true)]
+        1 * serviceReader.getServices(_, _) >> [new TestSource(S_PID_2, false)]
+        1 * managedServiceOpFactory.read(TEST_FACTORY_PID) >> managedServiceConfigs
+        2 * managedServiceOpFactory.read(_ as String) >> [:]
         report.result() != null
         list.getList().size() == 2
         assertConfig(list.getList().get(0), 0, managedServiceConfigs.get(S_PID_1), SOURCE_ID_1, S_PID_1, true)
@@ -86,9 +87,9 @@ class GetCswConfigsActionTest extends Specification {
         def list = ((ListField)report.result())
 
         then:
-        1 * configReader.getServices(_, _) >> [new TestSource(S_PID_2, false)]
-        1 * configReader.getServices(_, _) >> []
-        configReader.getConfig(S_PID_2) >> managedServiceConfigs.get(S_PID_2)
+        1 * serviceReader.getServices(_, _) >> [new TestSource(S_PID_2, false)]
+        1 * serviceReader.getServices(_, _) >> []
+        adminOpFactory.read(S_PID_2) >> managedServiceConfigs.get(S_PID_2)
         report.result() != null
         list.getList().size() == 1
         assertConfig(list.getList().get(0), 0, managedServiceConfigs.get(S_PID_2), SOURCE_ID_2, S_PID_2, false)
@@ -98,7 +99,7 @@ class GetCswConfigsActionTest extends Specification {
         setup:
         actionArgs.put(PID, S_PID)
         getCswConfigsAction.setArguments(actionArgs)
-        configReader.getConfig(S_PID) >> [:]
+        adminOpFactory.read(S_PID) >> [:]
 
         when:
         def report = getCswConfigsAction.process()

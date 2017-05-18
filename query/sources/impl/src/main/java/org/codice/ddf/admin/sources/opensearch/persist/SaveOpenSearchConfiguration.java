@@ -31,6 +31,9 @@ import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.sources.fields.type.OpenSearchSourceConfigurationField;
+import org.codice.ddf.internal.admin.configurator.opfactory.AdminOpFactory;
+import org.codice.ddf.internal.admin.configurator.opfactory.ManagedServiceOpFactory;
+import org.codice.ddf.internal.admin.configurator.opfactory.ServiceReader;
 
 import com.google.common.collect.ImmutableList;
 
@@ -47,23 +50,42 @@ public class SaveOpenSearchConfiguration extends BaseAction<BooleanField> {
 
     private ConfiguratorFactory configuratorFactory;
 
+    private final AdminOpFactory adminOpFactory;
 
-    public SaveOpenSearchConfiguration(ConfiguratorFactory configuratorFactory) {
+    private final ManagedServiceOpFactory managedServiceOpFactory;
+
+    private final ServiceReader serviceReader;
+
+    public SaveOpenSearchConfiguration(ConfiguratorFactory configuratorFactory,
+            AdminOpFactory adminOpFactory, ManagedServiceOpFactory managedServiceOpFactory,
+            ServiceReader serviceReader) {
         super(ID, DESCRIPTION, new BooleanField());
+        this.serviceReader = serviceReader;
         config = new OpenSearchSourceConfigurationField();
         pid = new PidField();
         config.isRequired(true);
-        config.sourceNameField().isRequired(true);
-        config.endpointUrlField().isRequired(true);
+        config.sourceNameField()
+                .isRequired(true);
+        config.endpointUrlField()
+                .isRequired(true);
+
         this.configuratorFactory = configuratorFactory;
+        this.adminOpFactory = adminOpFactory;
+        this.managedServiceOpFactory = managedServiceOpFactory;
     }
 
     @Override
     public BooleanField performAction() {
         if (StringUtils.isNotEmpty(pid.getValue())) {
-            addMessages(updateService(pid, openSearchConfigToServiceProps(config), configuratorFactory));
+            addMessages(updateService(pid,
+                    openSearchConfigToServiceProps(config),
+                    configuratorFactory,
+                    adminOpFactory));
         } else {
-            if(createManagedService(openSearchConfigToServiceProps(config), OPENSEARCH_FACTORY_PID, configuratorFactory).containsErrorMsgs()) {
+            if (createManagedService(openSearchConfigToServiceProps(config),
+                    OPENSEARCH_FACTORY_PID,
+                    configuratorFactory,
+                    managedServiceOpFactory).containsErrorMsgs()) {
                 addArgumentMessage(failedPersistError(config.path()));
             }
         }
@@ -73,17 +95,19 @@ public class SaveOpenSearchConfiguration extends BaseAction<BooleanField> {
     @Override
     public void validate() {
         super.validate();
-        if(containsErrorMsgs()) {
+        if (containsErrorMsgs()) {
             return;
         }
 
-        if(pid.getValue() != null) {
-            addMessages(serviceConfigurationExists(pid, configuratorFactory));
-            if(!containsErrorMsgs() && !hasSourceName(pid.getValue(), config.sourceName(), configuratorFactory)) {
-                addMessages(validateSourceName(config.sourceNameField(), configuratorFactory));
+        if (pid.getValue() != null) {
+            addMessages(serviceConfigurationExists(pid, adminOpFactory));
+            if (!containsErrorMsgs() && !hasSourceName(pid.getValue(),
+                    config.sourceName(),
+                    serviceReader)) {
+                addMessages(validateSourceName(config.sourceNameField(), serviceReader));
             }
         } else {
-            addMessages(validateSourceName(config.sourceNameField(), configuratorFactory));
+            addMessages(validateSourceName(config.sourceNameField(), serviceReader));
         }
     }
 

@@ -14,13 +14,13 @@
 package org.codice.ddf.admin.security.sts;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.codice.ddf.admin.api.action.Action;
 import org.codice.ddf.admin.common.actions.BaseActionCreator;
-import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.security.sts.actions.GetStsClaimsAction;
+import org.codice.ddf.internal.admin.configurator.opfactory.AdminOpFactory;
 
 public class StsActionCreator extends BaseActionCreator {
 
@@ -31,16 +31,16 @@ public class StsActionCreator extends BaseActionCreator {
     public static final String DESCRIPTION =
             "The STS (Security Token Service) is responsible for generating assertions that allow clients to be authenticated.";
 
-    private ConfiguratorFactory configuratorFactory;
+    AdminOpFactory adminOpFactory;
 
-    public StsActionCreator(ConfiguratorFactory configuratorFactory) {
+    public StsActionCreator(AdminOpFactory adminOpFactory) {
         super(NAME, TYPE_NAME, DESCRIPTION);
-        this.configuratorFactory = configuratorFactory;
+        this.adminOpFactory = adminOpFactory;
     }
 
     @Override
     public List<Action> getDiscoveryActions() {
-        return Arrays.asList(new GetStsClaimsAction(configuratorFactory));
+        return Collections.singletonList(new GetStsClaimsAction(adminOpFactory));
     }
 
     @Override

@@ -22,4 +22,29 @@
         <bean class="org.codice.ddf.admin.configurator.impl.ConfiguratorFactoryImpl"/>
     </service>
 
+    <!-- OperationFactories -->
+    <service interface="org.codice.ddf.internal.admin.configurator.opfactory.AdminOpFactory">
+        <bean class="org.codice.ddf.admin.configurator.impl.AdminOperation.OpFactory"/>
+    </service>
+
+    <service interface="org.codice.ddf.internal.admin.configurator.opfactory.BundleOpFactory">
+        <bean class="org.codice.ddf.admin.configurator.impl.BundleOperation.OpFactory"/>
+    </service>
+
+    <service interface="org.codice.ddf.internal.admin.configurator.opfactory.FeatureOpFactory">
+        <bean class="org.codice.ddf.admin.configurator.impl.FeatureOperation.OpFactory"/>
+    </service>
+
+    <service interface="org.codice.ddf.internal.admin.configurator.opfactory.ManagedServiceOpFactory">
+        <bean class="org.codice.ddf.admin.configurator.impl.ManagedServiceOperation.OpFactory"/>
+    </service>
+
+    <service interface="org.codice.ddf.internal.admin.configurator.opfactory.PropertyOpFactory">
+        <bean class="org.codice.ddf.admin.configurator.impl.PropertyOperation.OpFactory"/>
+    </service>
+
+    <service interface="org.codice.ddf.internal.admin.configurator.opfactory.ServiceReader">
+        <bean class="org.codice.ddf.admin.configurator.impl.ServiceReaderImpl"/>
+    </service>
+
 </blueprint>

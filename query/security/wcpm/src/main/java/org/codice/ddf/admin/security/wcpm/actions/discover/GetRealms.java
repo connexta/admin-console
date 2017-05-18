@@ -18,9 +18,10 @@ import static org.codice.ddf.admin.security.common.services.PolicyManagerService
 import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.actions.GetAction;
 import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
-import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.security.common.fields.wcpm.Realm;
 import org.codice.ddf.admin.security.common.services.LdapLoginServiceProperties;
+import org.codice.ddf.internal.admin.configurator.opfactory.BundleOpFactory;
+import org.codice.ddf.internal.admin.configurator.opfactory.ManagedServiceOpFactory;
 
 public class GetRealms extends GetAction<ListField<Realm>> {
 
@@ -28,14 +29,15 @@ public class GetRealms extends GetAction<ListField<Realm>> {
 
     public static final String DESCRIPTION = "Retrieves all currently configured realms.";
 
-    ConfiguratorFactory configuratorFactory;
+    BundleOpFactory bundleOpFactory;
 
     LdapLoginServiceProperties serviceCommons;
 
-    public GetRealms(ConfiguratorFactory configuratorFactory) {
+    public GetRealms(BundleOpFactory bundleOpFactory,
+            ManagedServiceOpFactory managedServiceOpFactory) {
         super(FIELD_NAME, DESCRIPTION, new ListFieldImpl<>(Realm.class));
-        this.configuratorFactory = configuratorFactory;
-        serviceCommons = new LdapLoginServiceProperties(configuratorFactory);
+        this.bundleOpFactory = bundleOpFactory;
+        serviceCommons = new LdapLoginServiceProperties(managedServiceOpFactory);
     }
 
     @Override
@@ -43,13 +45,13 @@ public class GetRealms extends GetAction<ListField<Realm>> {
         ListField<Realm> realms = new ListFieldImpl<>(Realm.class);
         realms.add(Realm.KARAF_REALM);
 
-
-        if (configuratorFactory.getConfigReader()
-                .isBundleStarted(IDP_SERVER_BUNDLE_NAME)) {
+        if (bundleOpFactory.isStarted(IDP_SERVER_BUNDLE_NAME)) {
             // TODO: 4/19/17 How are we going to treat/display IdP as an auth type
         }
 
-        if(!serviceCommons.getLdapLoginManagedServices().keySet().isEmpty()) {
+        if (!serviceCommons.getLdapLoginManagedServices()
+                .keySet()
+                .isEmpty()) {
             realms.add(Realm.LDAP_REALM);
         }
 

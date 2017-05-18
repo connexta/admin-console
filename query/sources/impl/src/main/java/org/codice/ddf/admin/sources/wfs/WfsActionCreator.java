@@ -22,6 +22,9 @@ import org.codice.ddf.admin.sources.wfs.discover.DiscoverWfsAction;
 import org.codice.ddf.admin.sources.wfs.discover.GetWfsConfigsAction;
 import org.codice.ddf.admin.sources.wfs.persist.DeleteWfsConfiguration;
 import org.codice.ddf.admin.sources.wfs.persist.SaveWfsConfiguration;
+import org.codice.ddf.internal.admin.configurator.opfactory.AdminOpFactory;
+import org.codice.ddf.internal.admin.configurator.opfactory.ManagedServiceOpFactory;
+import org.codice.ddf.internal.admin.configurator.opfactory.ServiceReader;
 
 import com.google.common.collect.ImmutableList;
 
@@ -37,6 +40,12 @@ public class WfsActionCreator extends BaseActionCreator {
 
     private ConfiguratorFactory configuratorFactory;
 
+    private AdminOpFactory adminOpFactory;
+
+    private ManagedServiceOpFactory managedServiceOpFactory;
+
+    private ServiceReader serviceReader;
+
     public WfsActionCreator() {
         super(NAME, TYPE_NAME, DESCRIPTION);
     }
@@ -44,16 +53,32 @@ public class WfsActionCreator extends BaseActionCreator {
     @Override
     public List<Action> getDiscoveryActions() {
         return ImmutableList.of(new DiscoverWfsAction(),
-                new GetWfsConfigsAction(configuratorFactory));
+                new GetWfsConfigsAction(adminOpFactory, managedServiceOpFactory, serviceReader));
     }
 
     @Override
     public List<Action> getPersistActions() {
-        return ImmutableList.of(new SaveWfsConfiguration(configuratorFactory),
-                new DeleteWfsConfiguration(configuratorFactory));
+        return ImmutableList.of(new SaveWfsConfiguration(configuratorFactory,
+                        adminOpFactory,
+                        managedServiceOpFactory, serviceReader),
+                new DeleteWfsConfiguration(configuratorFactory,
+                        managedServiceOpFactory,
+                        adminOpFactory));
     }
 
     public void setConfiguratorFactory(ConfiguratorFactory configuratorFactory) {
         this.configuratorFactory = configuratorFactory;
+    }
+
+    public void setAdminOpFactory(AdminOpFactory adminOpFactory) {
+        this.adminOpFactory = adminOpFactory;
+    }
+
+    public void setManagedServiceOpFactory(ManagedServiceOpFactory managedServiceOpFactory) {
+        this.managedServiceOpFactory = managedServiceOpFactory;
+    }
+
+    public void setServiceReader(ServiceReader serviceReader) {
+        this.serviceReader = serviceReader;
     }
 }

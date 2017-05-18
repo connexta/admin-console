@@ -27,6 +27,7 @@
 
     <modules>
         <module>configurator-api</module>
+        <module>configurator-opfactory-api</module>
         <module>configurator-impl</module>
     </modules>
 

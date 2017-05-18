@@ -12,25 +12,49 @@
  **/
 -->
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
-    <bean id="cswActionCreator" class="org.codice.ddf.admin.sources.csw.CswActionCreator">
-        <property name="configuratorFactory" ref="configuratorFactory"/>
-    </bean>
 
-    <bean id="openSearchActionCreator"
-          class="org.codice.ddf.admin.sources.opensearch.OpenSearchActionCreator">
-        <property name="configuratorFactory" ref="configuratorFactory"/>
-    </bean>
+    <service id="cswActionCreator" interface="org.codice.ddf.admin.api.action.ActionCreator">
+        <bean class="org.codice.ddf.admin.sources.csw.CswActionCreator">
+            <property name="configuratorFactory" ref="configuratorFactory"/>
+            <property name="adminOpFactory" ref="adminOpFactory"/>
+            <property name="managedServiceOpFactory" ref="managedServiceOpFactory"/>
+            <property name="serviceReader" ref="serviceReader"/>
+        </bean>
+    </service>
 
-    <bean id="wfsActionCreator" class="org.codice.ddf.admin.sources.wfs.WfsActionCreator">
-        <property name="configuratorFactory" ref="configuratorFactory"/>
-    </bean>
+    <service id="openSearchActionCreator"
+             interface="org.codice.ddf.admin.api.action.ActionCreator">
+        <bean class="org.codice.ddf.admin.sources.opensearch.OpenSearchActionCreator">
+            <property name="configuratorFactory" ref="configuratorFactory"/>
+            <property name="adminOpFactory" ref="adminOpFactory"/>
+            <property name="managedServiceOpFactory" ref="managedServiceOpFactory"/>
+            <property name="serviceReader" ref="serviceReader"/>
+        </bean>
+    </service>
 
-    <service ref="cswActionCreator" interface="org.codice.ddf.admin.api.action.ActionCreator"/>
-    <service ref="openSearchActionCreator"
-             interface="org.codice.ddf.admin.api.action.ActionCreator"/>
-    <service ref="wfsActionCreator" interface="org.codice.ddf.admin.api.action.ActionCreator"/>
+    <service id="wfsActionCreator" interface="org.codice.ddf.admin.api.action.ActionCreator">
+        <bean class="org.codice.ddf.admin.sources.wfs.WfsActionCreator">
+            <property name="configuratorFactory" ref="configuratorFactory"/>
+            <property name="adminOpFactory" ref="adminOpFactory"/>
+            <property name="managedServiceOpFactory" ref="managedServiceOpFactory"/>
+            <property name="serviceReader" ref="serviceReader"/>
+        </bean>
+    </service>
 
     <reference id="configuratorFactory"
                interface="org.codice.ddf.admin.configurator.ConfiguratorFactory"
                availability="mandatory" filter="(type=txact)"/>
+
+    <reference id="adminOpFactory"
+               interface="org.codice.ddf.internal.admin.configurator.opfactory.AdminOpFactory"
+               availability="mandatory"/>
+
+    <reference id="managedServiceOpFactory"
+               interface="org.codice.ddf.internal.admin.configurator.opfactory.ManagedServiceOpFactory"
+               availability="mandatory"/>
+
+    <reference id="serviceReader"
+               interface="org.codice.ddf.internal.admin.configurator.opfactory.ServiceReader"
+               availability="mandatory"/>
+
 </blueprint>

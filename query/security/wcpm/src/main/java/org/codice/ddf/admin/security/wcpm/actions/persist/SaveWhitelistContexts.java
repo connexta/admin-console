@@ -26,6 +26,7 @@ import org.codice.ddf.admin.configurator.Configurator;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.configurator.OperationReport;
 import org.codice.ddf.admin.security.common.services.PolicyManagerServiceProperties;
+import org.codice.ddf.internal.admin.configurator.opfactory.AdminOpFactory;
 
 import com.google.common.collect.ImmutableList;
 
@@ -40,10 +41,15 @@ public class SaveWhitelistContexts extends BaseAction<ListField<ContextPath>> {
 
     private ConfiguratorFactory configuratorFactory;
 
-    public SaveWhitelistContexts(ConfiguratorFactory configuratorFactory) {
+    private AdminOpFactory adminOpFactory;
+
+    public SaveWhitelistContexts(ConfiguratorFactory configuratorFactory,
+            AdminOpFactory adminOpFactory) {
         super(ACTION_ID, DESCRIPTION, new ListFieldImpl<>(ContextPath.class));
         contexts = new ListFieldImpl<>("paths", new ContextPath());
+
         this.configuratorFactory = configuratorFactory;
+        this.adminOpFactory = adminOpFactory;
     }
 
     @Override
@@ -54,9 +60,9 @@ public class SaveWhitelistContexts extends BaseAction<ListField<ContextPath>> {
     @Override
     public ListField<ContextPath> performAction() {
         Configurator configurator = configuratorFactory.getConfigurator();
-        configurator.updateConfigFile(PolicyManagerServiceProperties.POLICY_MANAGER_PID,
+        configurator.add(adminOpFactory.build(PolicyManagerServiceProperties.POLICY_MANAGER_PID,
                 new PolicyManagerServiceProperties().whiteListToPolicyManagerProps(contexts),
-                true);
+                true));
 
         OperationReport configReport = configurator.commit(
                 "Whitelist Contexts saved with details: {}",

@@ -13,29 +13,30 @@
  */
 package org.codice.ddf.admin.security.wcpm.actions.persist
 
-import org.codice.ddf.admin.api.action.Action
-import org.codice.ddf.admin.api.action.ActionCreator
-import org.codice.ddf.admin.api.action.ActionReport
-import org.codice.ddf.admin.common.actions.BaseAction
-import org.codice.ddf.admin.common.fields.base.ListFieldImpl
-import org.codice.ddf.admin.common.message.DefaultMessages
+import org.codice.ddf.admin.api.fields.FunctionField
+import org.codice.ddf.admin.api.FieldProvider
+import org.codice.ddf.admin.api.report.ReportWithResult
+import org.codice.ddf.admin.api.fields.ListField
+import org.codice.ddf.admin.common.fields.base.BaseFunctionField
+import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.configurator.ConfigReader
 import org.codice.ddf.admin.configurator.Configurator
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.configurator.OperationReport
 import org.codice.ddf.admin.security.common.services.PolicyManagerServiceProperties
-import org.codice.ddf.admin.security.wcpm.actions.WcpmActionCreator
+import org.codice.ddf.admin.security.wcpm.WcpmFieldProvider
+import org.codice.ddf.admin.security.wcpm.persist.SaveWhitelistContexts
 import org.codice.ddf.security.policy.context.impl.PolicyManager
 import spock.lang.Specification
 
 class SaveWhitelistContextsTest extends Specification {
-    ActionCreator actionCreator
+    FieldProvider actionCreator
     ConfiguratorFactory configuratorFactory
     Configurator configurator
     ConfigReader configReader
     OperationReport operationReport
     PolicyManager policyManager
-    Action action
+    FunctionField action
 
     def setup() {
         operationReport = Mock(OperationReport)
@@ -49,8 +50,8 @@ class SaveWhitelistContextsTest extends Specification {
         configuratorFactory.getConfigurator() >> configurator
         configuratorFactory.getConfigReader() >>  configReader
         configReader.getConfig(_) >> { [ (PolicyManagerServiceProperties.WHITE_LIST_CONTEXT) : policyManager.getWhiteListContexts() ] }
-        actionCreator = new WcpmActionCreator(configuratorFactory)
-        action = actionCreator.createAction(SaveWhitelistContexts.ACTION_ID)
+        actionCreator = new WcpmFieldProvider(configuratorFactory)
+        action = actionCreator.getMutationFunction(SaveWhitelistContexts.FIELD_NAME)
     }
 
     def 'Pass with valid context list' () {
@@ -59,8 +60,8 @@ class SaveWhitelistContextsTest extends Specification {
         operationReport.containsFailedResults() >> false
 
         when:
-        action.setArguments(testMap)
-        ActionReport report = action.process()
+        action.setValue(testMap)
+        ReportWithResult report = action.getValue()
 
         then:
         report.messages().size() == 0
@@ -73,12 +74,12 @@ class SaveWhitelistContextsTest extends Specification {
         operationReport.containsFailedResults() >> false
 
         when:
-        action.setArguments(testMap)
-        ActionReport report = action.process()
+        action.setValue(testMap)
+        ReportWithResult report = action.getValue()
 
         then:
         report.messages()[0].code == DefaultMessages.INVALID_CONTEXT_PATH
-        report.messages()[0].path == [SaveWhitelistContexts.ACTION_ID, BaseAction.ARGUMENT, 'paths', ListFieldImpl.INDEX_DELIMETER + 2]
+        report.messages()[0].path == [WcpmFieldProvider.NAME, SaveWhitelistContexts.FIELD_NAME, BaseFunctionField.ARGUMENT, 'paths', ListField.INDEX_DELIMETER + 2]
         report.result() == null
     }
 
@@ -88,12 +89,12 @@ class SaveWhitelistContextsTest extends Specification {
         operationReport.containsFailedResults() >> false
 
         when:
-        action.setArguments(testMap)
-        ActionReport report = action.process()
+        action.setValue(testMap)
+        ReportWithResult report = action.getValue()
 
         then:
         report.messages()[0].code == DefaultMessages.EMPTY_FIELD
-        report.messages()[0].path == [SaveWhitelistContexts.ACTION_ID, BaseAction.ARGUMENT, 'paths', ListFieldImpl.INDEX_DELIMETER + 2]
+        report.messages()[0].path == [WcpmFieldProvider.NAME, SaveWhitelistContexts.FIELD_NAME, BaseFunctionField.ARGUMENT, 'paths', ListField.INDEX_DELIMETER + 2]
         report.result() == null
     }
 
@@ -104,8 +105,8 @@ class SaveWhitelistContextsTest extends Specification {
         operationReport.containsFailedResults() >> false
 
         when:
-        action.setArguments(testMap)
-        ActionReport report = action.process()
+        action.setValue(testMap)
+        ReportWithResult report = action.getValue()
 
         then:
         report.messages().size() == 0
@@ -118,12 +119,12 @@ class SaveWhitelistContextsTest extends Specification {
         operationReport.containsFailedResults() >> true
 
         when:
-        action.setArguments(testMap)
-        ActionReport report = action.process()
+        action.setValue(testMap)
+        ReportWithResult report = action.getValue()
 
         then:
         report.messages()[0].code == DefaultMessages.FAILED_PERSIST
-        report.messages()[0].path == [SaveWhitelistContexts.ACTION_ID]
+        report.messages()[0].path == [WcpmFieldProvider.NAME, SaveWhitelistContexts.FIELD_NAME]
         report.result() == null
     }
 }

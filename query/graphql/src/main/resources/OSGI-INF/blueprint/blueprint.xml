@@ -13,10 +13,10 @@
 -->
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" >
 
-    <reference-list id="actionCreators"
-                    interface="org.codice.ddf.admin.api.action.ActionCreator"
+    <reference-list id="fieldProviders"
+                    interface="org.codice.ddf.admin.api.FieldProvider"
                     availability="optional">
-        <reference-listener bind-method="bindCreator" unbind-method="unbindCreator" ref="graphQLServlet"/>
+        <reference-listener bind-method="bindFieldProvider" unbind-method="unbindFieldProvider" ref="graphQLServlet"/>
     </reference-list>
 
     <reference id="configuratorFactory"
@@ -24,7 +24,7 @@
                availability="mandatory" filter="(type=txact)"/>
 
     <bean id="graphQLServlet" class="org.codice.ddf.admin.graphql.GraphQLServletImpl" >
-        <property name="actionCreators" ref="actionCreators" />
+        <property name="fieldProviders" ref="fieldProviders" />
     </bean>
 
     <service ref="graphQLServlet" interface="javax.servlet.Servlet" >

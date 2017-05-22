@@ -13,12 +13,12 @@
  **/
 package org.codice.ddf.admin.sources.opensearch.discover
 
-import org.codice.ddf.admin.api.action.Action
-import org.codice.ddf.admin.api.fields.Field
+import org.codice.ddf.admin.api.Field
+import org.codice.ddf.admin.api.FieldProvider
+import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.api.fields.ListField
-import org.codice.ddf.admin.common.actions.BaseAction
 import org.codice.ddf.admin.common.fields.base.ListFieldImpl
-import org.codice.ddf.admin.common.message.DefaultMessages
+import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.configurator.ConfigReader
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.sources.fields.SourceInfoField
@@ -33,11 +33,11 @@ class GetOpenSearchConfigsActionTest extends Specification {
 
     static TEST_SHORT_NAME = "openSearchSource"
 
-    static RESULT_ARGUMENT_PATH = [GetOpenSearchConfigsAction.ID]
+    static RESULT_ARGUMENT_PATH = [GetOpenSearchConfigurations.ID]
 
-    static BASE_PATH = [RESULT_ARGUMENT_PATH, BaseAction.ARGUMENT].flatten()
+    static BASE_PATH = [RESULT_ARGUMENT_PATH, FunctionField.ARGUMENT].flatten()
 
-    Action getOpenSearchConfigsAction
+    FieldProvider getOpenSearchConfigsAction
 
     ConfiguratorFactory configuratorFactory
 
@@ -55,7 +55,7 @@ class GetOpenSearchConfigsActionTest extends Specification {
         configuratorFactory = Mock(ConfiguratorFactory) {
             getConfigReader() >> configReader
         }
-        getOpenSearchConfigsAction = new GetOpenSearchConfigsAction(configuratorFactory)
+        getOpenSearchConfigsAction = new GetOpenSearchConfigurations(configuratorFactory)
     }
 
     def 'No pid argument returns all configs'() {

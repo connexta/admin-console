@@ -13,12 +13,12 @@
  **/
 package org.codice.ddf.admin.common.fields.common;
 
-import static org.codice.ddf.admin.common.message.DefaultMessages.invalidContextPathError;
+import static org.codice.ddf.admin.common.report.message.DefaultMessages.invalidContextPathError;
 
 import java.util.List;
 
 import org.apache.commons.validator.UrlValidator;
-import org.codice.ddf.admin.api.action.Message;
+import org.codice.ddf.admin.api.report.Message;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 
 public class ContextPath extends StringField {

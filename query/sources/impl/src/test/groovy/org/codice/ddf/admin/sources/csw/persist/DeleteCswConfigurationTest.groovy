@@ -13,9 +13,9 @@
  */
 package org.codice.ddf.admin.sources.csw.persist
 
-import org.codice.ddf.admin.api.action.Action
-import org.codice.ddf.admin.common.actions.BaseAction
-import org.codice.ddf.admin.common.message.DefaultMessages
+import org.codice.ddf.admin.api.FieldProvider
+import org.codice.ddf.admin.api.fields.FunctionField
+import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.configurator.ConfigReader
 import org.codice.ddf.admin.configurator.Configurator
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
@@ -27,7 +27,7 @@ import static org.codice.ddf.admin.sources.SourceTestCommons.*
 
 class DeleteCswConfigurationTest extends Specification {
 
-    Action deleteCswConfiguration
+    FieldProvider deleteCswConfiguration
 
     ConfiguratorFactory configuratorFactory
 
@@ -43,7 +43,7 @@ class DeleteCswConfigurationTest extends Specification {
 
     static RESULT_ARGUMENT_PATH = [DeleteCswConfiguration.ID]
 
-    static BASE_PATH = [DeleteCswConfiguration.ID, BaseAction.ARGUMENT]
+    static BASE_PATH = [DeleteCswConfiguration.ID, FunctionField.ARGUMENT]
 
     static SERVICE_PID_PATH = [BASE_PATH, PID].flatten()
 

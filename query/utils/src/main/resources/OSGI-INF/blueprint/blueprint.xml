@@ -12,7 +12,7 @@
  **/
 -->
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
-    <service id="connActionCreator" interface="org.codice.ddf.admin.api.action.ActionCreator">
-        <bean class="org.codice.ddf.admin.utils.conn.ConnectionActionCreator" />
+    <service id="connFieldProvider" interface="org.codice.ddf.admin.api.FieldProvider">
+        <bean class="org.codice.ddf.admin.utils.conn.ConnectionFieldProvider" />
     </service>
 </blueprint>

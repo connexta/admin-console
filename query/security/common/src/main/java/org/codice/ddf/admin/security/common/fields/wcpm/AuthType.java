@@ -13,7 +13,7 @@
  **/
 package org.codice.ddf.admin.security.common.fields.wcpm;
 
-import org.codice.ddf.admin.api.fields.Field;
+import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.common.fields.base.BaseEnumField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 
@@ -42,8 +42,7 @@ public class AuthType extends BaseEnumField<String> {
         this(null);
     }
 
-    // TODO: tbatie - 3/27/17 - Add constructor for supporting additional authtypes. Do this for all enum fields
-    protected AuthType(Field<String> authType) {
+    protected AuthType(DataType<String> authType) {
         super(DEFAULT_FIELD_NAME,
                 FIELD_TYPE_NAME,
                 DESCRIPTION,

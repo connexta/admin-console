@@ -15,8 +15,8 @@ package org.codice.ddf.admin.common.fields.common;
 
 import java.util.List;
 
-import org.codice.ddf.admin.api.action.Message;
-import org.codice.ddf.admin.api.fields.Field;
+import org.codice.ddf.admin.api.Field;
+import org.codice.ddf.admin.api.report.Message;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
 
 import com.google.common.collect.ImmutableList;
@@ -36,6 +36,9 @@ public class HostField extends BaseObjectField {
 
     public HostField() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
+        name = new HostnameField();
+        port = new PortField();
+        updateInnerFieldPaths();
     }
 
     public HostField name(String hostname) {
@@ -81,11 +84,5 @@ public class HostField extends BaseObjectField {
     @Override
     public List<Field> getFields() {
         return ImmutableList.of(name, port);
-    }
-
-    @Override
-    public void initializeFields() {
-        name = new HostnameField();
-        port = new PortField();
     }
 }

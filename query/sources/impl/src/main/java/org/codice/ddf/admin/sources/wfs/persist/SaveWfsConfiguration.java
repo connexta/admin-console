@@ -13,7 +13,7 @@
  */
 package org.codice.ddf.admin.sources.wfs.persist;
 
-import static org.codice.ddf.admin.common.message.DefaultMessages.failedPersistError;
+import static org.codice.ddf.admin.common.report.message.DefaultMessages.failedPersistError;
 import static org.codice.ddf.admin.common.services.ServiceCommons.createManagedService;
 import static org.codice.ddf.admin.common.services.ServiceCommons.serviceConfigurationExists;
 import static org.codice.ddf.admin.common.services.ServiceCommons.updateService;
@@ -25,8 +25,9 @@ import static org.codice.ddf.admin.sources.services.WfsServiceProperties.wfsVers
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.codice.ddf.admin.api.fields.Field;
-import org.codice.ddf.admin.common.actions.BaseAction;
+import org.codice.ddf.admin.api.DataType;
+import org.codice.ddf.admin.api.fields.FunctionField;
+import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
@@ -34,7 +35,7 @@ import org.codice.ddf.admin.sources.fields.type.WfsSourceConfigurationField;
 
 import com.google.common.collect.ImmutableList;
 
-public class SaveWfsConfiguration extends BaseAction<BooleanField> {
+public class SaveWfsConfiguration extends BaseFunctionField<BooleanField> {
 
     public static final String ID = "saveWfsSource";
 
@@ -59,7 +60,7 @@ public class SaveWfsConfiguration extends BaseAction<BooleanField> {
     }
 
     @Override
-    public BooleanField performAction() {
+    public BooleanField performFunction() {
         if (StringUtils.isNotEmpty(pid.getValue())) {
             addMessages(updateService(pid, wfsConfigToServiceProps(config), configuratorFactory));
         } else {
@@ -78,6 +79,7 @@ public class SaveWfsConfiguration extends BaseAction<BooleanField> {
             return;
         }
 
+        // TODO: tbatie - 5/16/17 - Duplicate code, move to source validator
         if(pid.getValue() != null) {
             addMessages(serviceConfigurationExists(pid, configuratorFactory));
             if(!containsErrorMsgs() && !hasSourceName(pid.getValue(), config.sourceName(), configuratorFactory)) {
@@ -89,7 +91,12 @@ public class SaveWfsConfiguration extends BaseAction<BooleanField> {
     }
 
     @Override
-    public List<Field> getArguments() {
+    public List<DataType> getArguments() {
         return ImmutableList.of(config, pid);
+    }
+
+    @Override
+    public FunctionField<BooleanField> newInstance() {
+        return new SaveWfsConfiguration(configuratorFactory);
     }
 }

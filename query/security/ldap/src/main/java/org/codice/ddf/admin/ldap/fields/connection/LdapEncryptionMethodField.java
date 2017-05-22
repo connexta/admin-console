@@ -13,7 +13,7 @@
  **/
 package org.codice.ddf.admin.ldap.fields.connection;
 
-import org.codice.ddf.admin.api.fields.Field;
+import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.common.fields.base.BaseEnumField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 
@@ -47,7 +47,7 @@ public class LdapEncryptionMethodField extends BaseEnumField<String> {
         this(null);
     }
 
-    protected LdapEncryptionMethodField(Field<String> encryptionMethod) {
+    protected LdapEncryptionMethodField(DataType<String> encryptionMethod) {
         super(FIELD_NAME,
                 FIELD_TYPE_NAME,
                 DESCRIPTION,

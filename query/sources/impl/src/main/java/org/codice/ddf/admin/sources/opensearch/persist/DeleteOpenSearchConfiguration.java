@@ -18,15 +18,16 @@ import static org.codice.ddf.admin.common.services.ServiceCommons.serviceConfigu
 
 import java.util.List;
 
-import org.codice.ddf.admin.api.fields.Field;
-import org.codice.ddf.admin.common.actions.BaseAction;
+import org.codice.ddf.admin.api.DataType;
+import org.codice.ddf.admin.api.fields.FunctionField;
+import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 
 import com.google.common.collect.ImmutableList;
 
-public class DeleteOpenSearchConfiguration extends BaseAction<BooleanField> {
+public class DeleteOpenSearchConfiguration extends BaseFunctionField<BooleanField> {
     public static final String ID = "deleteOpenSearchSource";
 
     public static final String DESCRIPTION =
@@ -41,10 +42,11 @@ public class DeleteOpenSearchConfiguration extends BaseAction<BooleanField> {
         this.configuratorFactory = configuratorFactory;
         pid = new PidField();
         pid.isRequired(true);
+        updateArgumentPaths();
     }
 
     @Override
-    public BooleanField performAction() {
+    public BooleanField performFunction() {
         addMessages(deleteService(pid, configuratorFactory));
         return new BooleanField(!containsErrorMsgs());
     }
@@ -59,7 +61,12 @@ public class DeleteOpenSearchConfiguration extends BaseAction<BooleanField> {
     }
 
     @Override
-    public List<Field> getArguments() {
+    public List<DataType> getArguments() {
         return ImmutableList.of(pid);
+    }
+
+    @Override
+    public FunctionField<BooleanField> newInstance() {
+        return new DeleteOpenSearchConfiguration(configuratorFactory);
     }
 }

@@ -14,9 +14,9 @@
 package org.codice.ddf.admin.sources.csw.persist
 
 import ddf.catalog.source.Source
-import org.codice.ddf.admin.api.action.Action
-import org.codice.ddf.admin.common.actions.BaseAction
-import org.codice.ddf.admin.common.message.DefaultMessages
+import org.codice.ddf.admin.api.FieldProvider
+import org.codice.ddf.admin.api.fields.FunctionField
+import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.configurator.ConfigReader
 import org.codice.ddf.admin.configurator.Configurator
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
@@ -40,7 +40,7 @@ class SaveCswConfigurationTest extends Specification {
 
     static RESULT_ARGUMENT_PATH = [SaveCswConfiguration.ID]
 
-    static BASE_PATH = [RESULT_ARGUMENT_PATH, BaseAction.ARGUMENT].flatten()
+    static BASE_PATH = [RESULT_ARGUMENT_PATH, FunctionField.ARGUMENT].flatten()
 
     static CONFIG_PATH = [BASE_PATH, SOURCE_CONFIG].flatten()
 
@@ -50,7 +50,7 @@ class SaveCswConfigurationTest extends Specification {
 
     static CSW_PROFILE_PATH = [CONFIG_PATH, CSW_PROFILE].flatten()
 
-    Action saveCswConfiguration
+    FieldProvider saveCswConfiguration
 
     ConfiguratorFactory configuratorFactory
 

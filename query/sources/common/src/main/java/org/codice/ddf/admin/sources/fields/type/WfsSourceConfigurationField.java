@@ -15,7 +15,7 @@ package org.codice.ddf.admin.sources.fields.type;
 
 import java.util.List;
 
-import org.codice.ddf.admin.api.fields.Field;
+import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.sources.fields.WfsVersion;
 
 import com.google.common.collect.ImmutableList;
@@ -31,6 +31,8 @@ public class WfsSourceConfigurationField extends SourceConfigUnionField {
 
     public WfsSourceConfigurationField() {
         super(FIELD_TYPE_NAME, DESCRIPTION);
+        wfsVersion = new WfsVersion();
+        updateInnerFieldPaths();
     }
 
     public WfsSourceConfigurationField wfsVersion(String wfsVersion) {
@@ -53,9 +55,4 @@ public class WfsSourceConfigurationField extends SourceConfigUnionField {
                 .build();
     }
 
-    @Override
-    public void initializeFields() {
-        super.initializeFields();
-        wfsVersion = new WfsVersion();
-    }
 }

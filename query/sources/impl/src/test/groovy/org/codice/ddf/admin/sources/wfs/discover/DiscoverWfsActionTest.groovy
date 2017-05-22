@@ -13,13 +13,13 @@
  **/
 package org.codice.ddf.admin.sources.wfs.discover
 
-import org.codice.ddf.admin.api.action.Action
-import org.codice.ddf.admin.common.ReportWithResult
-import org.codice.ddf.admin.common.actions.BaseAction
+import org.codice.ddf.admin.api.FieldProvider
+import org.codice.ddf.admin.api.fields.FunctionField
+import org.codice.ddf.admin.common.report.ReportWithResultImpl
 import org.codice.ddf.admin.common.fields.common.CredentialsField
 import org.codice.ddf.admin.common.fields.common.UrlField
-import org.codice.ddf.admin.common.message.DefaultMessages
-import org.codice.ddf.admin.common.message.ErrorMessage
+import org.codice.ddf.admin.common.report.message.DefaultMessages
+import org.codice.ddf.admin.common.report.message.ErrorMessage
 import org.codice.ddf.admin.sources.commons.utils.WfsSourceUtils
 import org.codice.ddf.admin.sources.fields.SourceInfoField
 import org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField
@@ -29,11 +29,11 @@ import static org.codice.ddf.admin.sources.SourceTestCommons.*
 
 class DiscoverWfsActionTest extends Specification {
 
-    Action discoverWfs
+    FieldProvider discoverWfs
 
     WfsSourceUtils wfsSourceUtils
 
-    static BASE_PATH = [DiscoverWfsAction.ID, BaseAction.ARGUMENT]
+    static BASE_PATH = [DiscoverWfsSource.ID, FunctionField.ARGUMENT]
 
     static ADDRESS_FIELD_PATH = [BASE_PATH, ADDRESS].flatten()
 
@@ -41,7 +41,7 @@ class DiscoverWfsActionTest extends Specification {
 
     def setup() {
         wfsSourceUtils = Mock(WfsSourceUtils)
-        discoverWfs = new DiscoverWfsAction(wfsSourceUtils)
+        discoverWfs = new DiscoverWfsSource(wfsSourceUtils)
     }
 
     def 'Successfully discover WFS configuration using URL'() {
@@ -128,12 +128,12 @@ class DiscoverWfsActionTest extends Specification {
 
     def createResult(boolean hasError, Class clazz) {
         if(hasError) {
-            return Mock(ReportWithResult) {
+            return Mock(ReportWithResultImpl) {
                 argumentMessages() >> [new ErrorMessage("code", [])]
                 resultMessages() >> []
             }
         }
-        return Mock(ReportWithResult) {
+        return Mock(ReportWithResultImpl) {
             argumentMessages() >> []
             resultMessages() >> []
             result() >> Mock(clazz) {

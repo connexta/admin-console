@@ -13,20 +13,20 @@
  **/
 package org.codice.ddf.admin.sources.csw
 
-import org.codice.ddf.admin.api.action.Action
+import org.codice.ddf.admin.api.FieldProvider
 import spock.lang.Specification
 
 class CswActionCreatorTest extends Specification {
 
-    CswActionCreator cswActionCreator
+    CswFieldProvider cswActionCreator
 
     def setup() {
-        cswActionCreator = new CswActionCreator()
+        cswActionCreator = new CswFieldProvider()
     }
 
     def 'Verify discovery actions immutability'() {
         when:
-        cswActionCreator.getDiscoveryActions().add(Mock(Action))
+        cswActionCreator.getDiscoveryActions().add(Mock(FieldProvider))
 
         then:
         thrown(UnsupportedOperationException)
@@ -34,7 +34,7 @@ class CswActionCreatorTest extends Specification {
 
     def 'Verify persist actions immutability'() {
         when:
-        cswActionCreator.getPersistActions().add(Mock(Action))
+        cswActionCreator.getPersistActions().add(Mock(FieldProvider))
 
         then:
         thrown(UnsupportedOperationException)

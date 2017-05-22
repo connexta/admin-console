@@ -13,12 +13,12 @@
  **/
 package org.codice.ddf.admin.sources.wfs.discover
 
-import org.codice.ddf.admin.api.action.Action
-import org.codice.ddf.admin.api.fields.Field
+import org.codice.ddf.admin.api.Field
+import org.codice.ddf.admin.api.FieldProvider
+import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.api.fields.ListField
-import org.codice.ddf.admin.common.actions.BaseAction
 import org.codice.ddf.admin.common.fields.base.ListFieldImpl
-import org.codice.ddf.admin.common.message.DefaultMessages
+import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.configurator.ConfigReader
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.sources.fields.SourceInfoField
@@ -31,7 +31,7 @@ import static org.codice.ddf.admin.sources.SourceTestCommons.*
 
 class GetWfsConfigsActionTest extends Specification {
 
-    Action getWfsConfigsAction
+    FieldProvider getWfsConfigsAction
 
     ConfiguratorFactory configuratorFactory
 
@@ -45,9 +45,9 @@ class GetWfsConfigsActionTest extends Specification {
 
     static TEST_FACTORY_PID_2 = WfsServiceProperties.WFS2_FACTORY_PID
 
-    static RESULT_ARGUMENT_PATH = [GetWfsConfigsAction.ID]
+    static RESULT_ARGUMENT_PATH = [GetWfsConfigurations.ID]
 
-    static BASE_PATH = [RESULT_ARGUMENT_PATH, BaseAction.ARGUMENT].flatten()
+    static BASE_PATH = [RESULT_ARGUMENT_PATH, FunctionField.ARGUMENT].flatten()
 
     def managedServiceConfigs
 
@@ -61,7 +61,7 @@ class GetWfsConfigsActionTest extends Specification {
         configuratorFactory = Mock(ConfiguratorFactory) {
             getConfigReader() >> configReader
         }
-        getWfsConfigsAction = new GetWfsConfigsAction(configuratorFactory)
+        getWfsConfigsAction = new GetWfsConfigurations(configuratorFactory)
     }
 
     def 'No pid argument returns all configs'() {

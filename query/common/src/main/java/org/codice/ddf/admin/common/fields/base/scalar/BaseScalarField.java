@@ -13,9 +13,9 @@
  **/
 package org.codice.ddf.admin.common.fields.base.scalar;
 
-import org.codice.ddf.admin.common.fields.base.BaseField;
+import org.codice.ddf.admin.common.fields.base.BaseDataType;
 
-public abstract class BaseScalarField<T> extends BaseField<T> {
+public abstract class BaseScalarField<T> extends BaseDataType<T> {
 
     private T value;
 

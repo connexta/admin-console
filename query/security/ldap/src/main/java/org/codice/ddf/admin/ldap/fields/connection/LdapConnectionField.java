@@ -15,7 +15,7 @@ package org.codice.ddf.admin.ldap.fields.connection;
 
 import java.util.List;
 
-import org.codice.ddf.admin.api.fields.Field;
+import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
 import org.codice.ddf.admin.common.fields.common.HostnameField;
 import org.codice.ddf.admin.common.fields.common.PortField;
@@ -38,6 +38,10 @@ public class LdapConnectionField extends BaseObjectField {
 
     public LdapConnectionField() {
         super(FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
+        hostname = new HostnameField();
+        port = new PortField();
+        encryptionMethod = new LdapEncryptionMethodField();
+        updateInnerFieldPaths();
     }
 
     public LdapConnectionField hostname(String hostname) {
@@ -71,12 +75,5 @@ public class LdapConnectionField extends BaseObjectField {
     @Override
     public List<Field> getFields() {
         return ImmutableList.of(hostname, port, encryptionMethod);
-    }
-
-    @Override
-    public void initializeFields() {
-        hostname = new HostnameField();
-        port = new PortField();
-        encryptionMethod = new LdapEncryptionMethodField();
     }
 }

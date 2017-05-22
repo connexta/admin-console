@@ -13,11 +13,11 @@
  **/
 package org.codice.ddf.admin.common.fields.common;
 
-import static org.codice.ddf.admin.common.message.DefaultMessages.invalidPortRangeError;
+import static org.codice.ddf.admin.common.report.message.DefaultMessages.invalidPortRangeError;
 
 import java.util.List;
 
-import org.codice.ddf.admin.api.action.Message;
+import org.codice.ddf.admin.api.report.Message;
 import org.codice.ddf.admin.common.fields.base.scalar.IntegerField;
 
 public class PortField extends IntegerField {

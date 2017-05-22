@@ -13,14 +13,13 @@
  */
 package org.codice.ddf.admin.security.wcpm.actions.persist
 
-import org.codice.ddf.admin.api.action.Action
-import org.codice.ddf.admin.api.action.ActionCreator
-import org.codice.ddf.admin.api.action.ActionReport
-import org.codice.ddf.admin.api.fields.Field
+import org.codice.ddf.admin.api.fields.FunctionField
+import org.codice.ddf.admin.api.FieldProvider
+import org.codice.ddf.admin.api.report.ReportWithResult
 import org.codice.ddf.admin.api.fields.ListField
-import org.codice.ddf.admin.common.actions.BaseAction
+import org.codice.ddf.admin.common.fields.base.BaseFunctionField
 import org.codice.ddf.admin.common.fields.base.ListFieldImpl
-import org.codice.ddf.admin.common.message.DefaultMessages
+import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.configurator.ConfigReader
 import org.codice.ddf.admin.configurator.Configurator
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
@@ -31,18 +30,19 @@ import org.codice.ddf.admin.security.common.fields.wcpm.ContextPolicyBin
 import org.codice.ddf.admin.security.common.fields.wcpm.Realm
 import org.codice.ddf.admin.security.common.services.PolicyManagerServiceProperties
 import org.codice.ddf.admin.security.common.services.StsServiceProperties
-import org.codice.ddf.admin.security.wcpm.actions.WcpmActionCreator
+import org.codice.ddf.admin.security.wcpm.WcpmFieldProvider
+import org.codice.ddf.admin.security.wcpm.persist.SaveContextPolices
 import org.codice.ddf.security.policy.context.impl.PolicyManager
 import spock.lang.Specification
 
 class SaveContextPoliciesTest extends Specification {
-    ActionCreator actionCreator
+    FieldProvider queryProvider
     ConfiguratorFactory configuratorFactory
     Configurator configurator
     ConfigReader configReader
     OperationReport operationReport
     PolicyManager policyManager
-    Action action
+    FunctionField action
     Map<String, Object> stsConfig
 
     String[] testClaims
@@ -106,8 +106,8 @@ class SaveContextPoliciesTest extends Specification {
         configReader.getServiceReference(_) >> policyManager
         configuratorFactory.getConfigurator() >> configurator
         configuratorFactory.getConfigReader() >> configReader
-        actionCreator = new WcpmActionCreator(configuratorFactory)
-        action = actionCreator.createAction(SaveContextPolices.ACTION_ID)
+        queryProvider = new WcpmFieldProvider(configuratorFactory)
+        action = queryProvider.getMutationFunction(SaveContextPolices.FUNCTION_FIELD_NAME)
     }
 
     def 'Pass with valid update'() {
@@ -115,8 +115,8 @@ class SaveContextPoliciesTest extends Specification {
         operationReport.containsFailedResults() >> false
 
         when:
-        action.setArguments(testData)
-        ActionReport report = action.process()
+        action.setValue(testData)
+        ReportWithResult report = action.getValue()
 
         then:
         report.messages().isEmpty()
@@ -128,13 +128,13 @@ class SaveContextPoliciesTest extends Specification {
         operationReport.containsFailedResults() >> true
 
         when:
-        action.setArguments(testData)
-        ActionReport report = action.process()
+        action.setValue(testData)
+        ReportWithResult report = action.getValue()
 
         then:
         report.messages().size() == 1
         report.messages()[0].code == DefaultMessages.FAILED_PERSIST
-        report.messages()[0].path == [SaveContextPolices.ACTION_ID]
+        report.messages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME]
         report.result() == null
     }
 
@@ -144,13 +144,13 @@ class SaveContextPoliciesTest extends Specification {
         testData.policies[0].paths = ['/test']
 
         when:
-        action.setArguments(testData)
-        ActionReport report = action.process()
+        action.setValue(testData)
+        ReportWithResult report = action.getValue()
 
         then:
         report.messages().size() == 1
         report.messages()[0].code == SecurityMessages.NO_ROOT_CONTEXT
-        report.messages()[0].path == [SaveContextPolices.ACTION_ID, BaseAction.ARGUMENT, 'policies']
+        report.messages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, BaseFunctionField.ARGUMENT, 'policies']
         report.result() == null
     }
 
@@ -160,13 +160,13 @@ class SaveContextPoliciesTest extends Specification {
         testData.policies[0].authTypes = ['PKI', 'COFFEE']
 
         when:
-        action.setArguments(testData)
-        ActionReport report = action.process()
+        action.setValue(testData)
+        ReportWithResult report = action.getValue()
 
         then:
         report.messages().size() == 1
         report.messages()[0].code == DefaultMessages.UNSUPPORTED_ENUM
-        report.messages()[0].path == [SaveContextPolices.ACTION_ID, BaseAction.ARGUMENT, 'policies', Field.INDEX_DELIMETER + 0, 'authTypes', ListFieldImpl.INDEX_DELIMETER + 1]
+        report.messages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, BaseFunctionField.ARGUMENT, 'policies', ListField.INDEX_DELIMETER + 0, 'authTypes', ListField.INDEX_DELIMETER + 1]
         report.result() == null
     }
 
@@ -176,13 +176,13 @@ class SaveContextPoliciesTest extends Specification {
         testData.policies[0].authTypes = []
 
         when:
-        action.setArguments(testData)
-        ActionReport report = action.process()
+        action.setValue(testData)
+        ReportWithResult report = action.getValue()
 
         then:
         report.messages().size() == 1
         report.messages()[0].code == DefaultMessages.MISSING_REQUIRED_FIELD
-        report.messages()[0].path == [SaveContextPolices.ACTION_ID, BaseAction.ARGUMENT, 'policies', Field.INDEX_DELIMETER + 0, 'authTypes']
+        report.messages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, BaseFunctionField.ARGUMENT, 'policies', ListField.INDEX_DELIMETER + 0, 'authTypes']
         report.result() == null
 
     }
@@ -193,13 +193,13 @@ class SaveContextPoliciesTest extends Specification {
         testData.policies[0].realm = 'COFFEE'
 
         when:
-        action.setArguments(testData)
-        ActionReport report = action.process()
+        action.setValue(testData)
+        ReportWithResult report = action.getValue()
 
         then:
         report.messages().size() == 1
         report.messages()[0].code == DefaultMessages.UNSUPPORTED_ENUM
-        report.messages()[0].path == [SaveContextPolices.ACTION_ID, BaseAction.ARGUMENT, 'policies', Field.INDEX_DELIMETER + 0, Realm.DEFAULT_FIELD_NAME]
+        report.messages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, BaseFunctionField.ARGUMENT, 'policies', ListField.INDEX_DELIMETER + 0, Realm.DEFAULT_FIELD_NAME]
         report.result() == null
     }
 
@@ -209,13 +209,13 @@ class SaveContextPoliciesTest extends Specification {
         testData.policies[0].realm = null
 
         when:
-        action.setArguments(testData)
-        ActionReport report = action.process()
+        action.setValue(testData)
+        ReportWithResult report = action.getValue()
 
         then:
         report.messages().size() == 1
         report.messages()[0].code == DefaultMessages.MISSING_REQUIRED_FIELD
-        report.messages()[0].path == [SaveContextPolices.ACTION_ID, BaseAction.ARGUMENT, 'policies', Field.INDEX_DELIMETER + 0, Realm.DEFAULT_FIELD_NAME]
+        report.messages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, BaseFunctionField.ARGUMENT, 'policies', ListField.INDEX_DELIMETER + 0, Realm.DEFAULT_FIELD_NAME]
         report.result() == null
     }
 
@@ -225,8 +225,8 @@ class SaveContextPoliciesTest extends Specification {
         testData.policies[0].claimsMapping = []
 
         when:
-        action.setArguments(testData)
-        ActionReport report = action.process()
+        action.setValue(testData)
+        ReportWithResult report = action.getValue()
 
         then:
         report.messages().isEmpty()
@@ -239,13 +239,13 @@ class SaveContextPoliciesTest extends Specification {
         testData.policies[0].claimsMapping[0][ClaimsMapEntry.VALUE_FIELD_NAME] = null
 
         when:
-        action.setArguments(testData)
-        ActionReport report = action.process()
+        action.setValue(testData)
+        ReportWithResult report = action.getValue()
 
         then:
         report.messages().size() == 1
         report.messages()[0].code == DefaultMessages.MISSING_REQUIRED_FIELD
-        report.messages()[0].path == [SaveContextPolices.ACTION_ID, BaseAction.ARGUMENT, 'policies', Field.INDEX_DELIMETER + 0, 'claimsMapping', Field.INDEX_DELIMETER + 0, ClaimsMapEntry.VALUE_FIELD_NAME]
+        report.messages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, BaseFunctionField.ARGUMENT, 'policies', ListField.INDEX_DELIMETER + 0, 'claimsMapping', ListField.INDEX_DELIMETER + 0,  ClaimsMapEntry.VALUE_FIELD_NAME]
         report.result() == null
     }
 
@@ -255,13 +255,13 @@ class SaveContextPoliciesTest extends Specification {
         testData.policies[0].claimsMapping[0][ClaimsMapEntry.KEY_FIELD_NAME] = 'unsupportedClaim'
 
         when:
-        action.setArguments(testData)
-        ActionReport report = action.process()
+        action.setValue(testData)
+        ReportWithResult report = action.getValue()
 
         then:
         report.messages().size() == 1
         report.messages()[0].code == SecurityMessages.INVALID_CLAIM_TYPE
-        report.messages()[0].path == [SaveContextPolices.ACTION_ID, BaseAction.ARGUMENT, 'policies', Field.INDEX_DELIMETER + 0, 'claimsMapping', Field.INDEX_DELIMETER + 0, ClaimsMapEntry.KEY_FIELD_NAME]
+        report.messages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, BaseFunctionField.ARGUMENT, 'policies', ListField.INDEX_DELIMETER + 0, 'claimsMapping', ListField.INDEX_DELIMETER + 0, ClaimsMapEntry.KEY_FIELD_NAME]
         report.result() == null
     }
 }

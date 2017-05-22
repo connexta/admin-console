@@ -15,7 +15,7 @@ package org.codice.ddf.admin.security.common;
 
 import java.util.List;
 
-import org.codice.ddf.admin.common.message.ErrorMessage;
+import org.codice.ddf.admin.common.report.message.ErrorMessage;
 
 public class SecurityMessages {
 

@@ -13,12 +13,12 @@
  **/
 package org.codice.ddf.admin.common.fields.base.scalar;
 
-import static org.codice.ddf.admin.api.fields.Field.FieldBaseType.STRING;
-import static org.codice.ddf.admin.common.message.DefaultMessages.emptyFieldError;
+import static org.codice.ddf.admin.api.DataType.FieldBaseType.STRING;
+import static org.codice.ddf.admin.common.report.message.DefaultMessages.emptyFieldError;
 
 import java.util.List;
 
-import org.codice.ddf.admin.api.action.Message;
+import org.codice.ddf.admin.api.report.Message;
 
 public class StringField extends BaseScalarField<String> {
 

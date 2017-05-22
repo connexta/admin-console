@@ -13,7 +13,7 @@
  **/
 package org.codice.ddf.admin.sources.fields;
 
-import org.codice.ddf.admin.api.fields.Field;
+import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.common.fields.base.BaseEnumField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 
@@ -39,7 +39,7 @@ public class CswProfile extends BaseEnumField<String> {
         this(null);
     }
 
-    public CswProfile(Field<String> cswProfile) {
+    public CswProfile(DataType<String> cswProfile) {
         super(DEFAULT_FIELD_NAME,
                 TYPE_NAME,
                 DESCRIPTION,

@@ -19,8 +19,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.EnumField;
-import org.codice.ddf.admin.api.fields.Field;
+import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.api.fields.ObjectField;
 
@@ -34,9 +35,9 @@ import graphql.schema.GraphQLScalarType;
 
 public class GraphQLTransformInput {
 
-    public static GraphQLInputType fieldTypeToGraphQLInputType(Field field) {
+    public GraphQLInputType fieldTypeToGraphQLInputType(DataType field) {
         GraphQLInputType type = null;
-        switch (field.fieldBaseType()) {
+        switch (field.baseDataType()) {
         case OBJECT:
             type = objectFieldToGraphQLInputType((ObjectField) field);
             break;
@@ -44,7 +45,7 @@ public class GraphQLTransformInput {
             type = enumFieldToGraphQLEnumType((EnumField) field);
             break;
         case LIST:
-            type = listFieldToGraphQLInputType((ListField) field);
+            type = new GraphQLList(fieldTypeToGraphQLInputType(((ListField) field).getListFieldType()));
             break;
         case INTEGER:
             if (field.fieldTypeName() == null) {
@@ -78,23 +79,20 @@ public class GraphQLTransformInput {
         if (type == null) {
             throw new RuntimeException(
                     "Error transforming input field to GraphQLInputType. Unknown field type: "
-                            + field.fieldBaseType());
+                            + field.baseDataType());
         }
 
         return field.isRequired() ? new GraphQLNonNull(type) : type;
     }
 
-    public static GraphQLInputType listFieldToGraphQLInputType(ListField listField) {
-        return new GraphQLList(fieldTypeToGraphQLInputType(listField.getListFieldType()));
-    }
-
-    public static GraphQLInputType objectFieldToGraphQLInputType(ObjectField field) {
+    public GraphQLInputType objectFieldToGraphQLInputType(ObjectField field) {
         List<GraphQLInputObjectField> fieldDefinitions = new ArrayList<>();
 
         if (field.getFields() != null) {
             fieldDefinitions = field.getFields()
                     .stream()
-                    .map(input -> fieldToGraphQLInputObjectFieldDefinition(input))
+                    .filter(input -> !(input instanceof FunctionField))
+                    .map(input -> fieldToGraphQLInputObjectFieldDefinition((DataType) input))
                     .collect(Collectors.toList());
         }
 
@@ -105,15 +103,11 @@ public class GraphQLTransformInput {
                 .build();
     }
 
-    public static GraphQLInputObjectField fieldToGraphQLInputObjectFieldDefinition(Field field) {
+    public GraphQLInputObjectField fieldToGraphQLInputObjectFieldDefinition(DataType field) {
         return GraphQLInputObjectField.newInputObjectField()
                 .name(field.fieldName())
                 .description(field.description())
                 .type(fieldTypeToGraphQLInputType(field))
                 .build();
-    }
-
-    public static GraphQLInputType isRequired(boolean required, GraphQLInputType inputType) {
-        return required ? new GraphQLNonNull(inputType) : inputType;
     }
 }

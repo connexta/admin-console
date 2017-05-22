@@ -16,7 +16,12 @@ package org.codice.ddf.admin.api.fields;
 import java.util.Collection;
 import java.util.List;
 
-public interface ListField<T extends Field> extends Field<List> {
+import org.codice.ddf.admin.api.DataType;
+
+public interface ListField<T extends DataType> extends DataType<List> {
+
+    String INDEX_DELIMETER = "__index:";
+
     T getListFieldType();
 
     List<T> getList();

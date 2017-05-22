@@ -13,11 +13,11 @@
  **/
 package org.codice.ddf.admin.ldap.fields.query;
 
-import static org.codice.ddf.admin.ldap.actions.commons.LdapMessages.invalidQueryError;
+import static org.codice.ddf.admin.ldap.commons.LdapMessages.invalidQueryError;
 
 import java.util.List;
 
-import org.codice.ddf.admin.api.action.Message;
+import org.codice.ddf.admin.api.report.Message;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 import org.forgerock.opendj.ldap.Filter;
 

@@ -13,20 +13,20 @@
  **/
 package org.codice.ddf.admin.sources.opensearch
 
-import org.codice.ddf.admin.api.action.Action
+import org.codice.ddf.admin.api.FieldProvider
 import spock.lang.Specification
 
 class OpenSearchActionCreatorTest extends Specification {
 
-    OpenSearchActionCreator openSearchActionCreator
+    OpenSearchFieldProvider openSearchActionCreator
 
     def setup() {
-        openSearchActionCreator = new OpenSearchActionCreator()
+        openSearchActionCreator = new OpenSearchFieldProvider()
     }
 
     def 'Verify discovery actions immutability'() {
         when:
-        openSearchActionCreator.getDiscoveryActions().add(Mock(Action))
+        openSearchActionCreator.getDiscoveryActions().add(Mock(FieldProvider))
 
         then:
         thrown(UnsupportedOperationException)
@@ -34,7 +34,7 @@ class OpenSearchActionCreatorTest extends Specification {
 
     def 'Verify persist actions immutability'() {
         when:
-        openSearchActionCreator.getPersistActions().add(Mock(Action))
+        openSearchActionCreator.getPersistActions().add(Mock(FieldProvider))
 
         then:
         thrown(UnsupportedOperationException)

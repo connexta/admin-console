@@ -15,7 +15,7 @@ package org.codice.ddf.admin.sources.fields;
 
 import java.util.List;
 
-import org.codice.ddf.admin.api.fields.Field;
+import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField;
@@ -39,6 +39,9 @@ public class SourceInfoField extends BaseObjectField {
 
     public SourceInfoField() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
+        config = new SourceConfigUnionField();
+        isAvailable = new BooleanField(IS_AVAILABLE_FIELD_NAME);
+        updateInnerFieldPaths();
     }
 
     public SourceInfoField isAvaliable(boolean available) {
@@ -62,11 +65,5 @@ public class SourceInfoField extends BaseObjectField {
     @Override
     public List<Field> getFields() {
         return ImmutableList.of(isAvailable, config);
-    }
-
-    @Override
-    public void initializeFields() {
-        config = new SourceConfigUnionField();
-        isAvailable = new BooleanField(IS_AVAILABLE_FIELD_NAME);
     }
 }

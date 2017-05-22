@@ -13,20 +13,20 @@
  **/
 package org.codice.ddf.admin.sources.wfs
 
-import org.codice.ddf.admin.api.action.Action
+import org.codice.ddf.admin.api.FieldProvider
 import spock.lang.Specification
 
 class WfsActionCreatorTest extends Specification {
 
-    WfsActionCreator wfsActionCreator
+    WfsFieldProvider wfsActionCreator
 
     def setup() {
-        wfsActionCreator = new WfsActionCreator()
+        wfsActionCreator = new WfsFieldProvider()
     }
 
     def 'Verify discovery actions immutability'() {
         when:
-        wfsActionCreator.getDiscoveryActions().add(Mock(Action))
+        wfsActionCreator.getDiscoveryActions().add(Mock(FieldProvider))
 
         then:
         thrown(UnsupportedOperationException)
@@ -34,7 +34,7 @@ class WfsActionCreatorTest extends Specification {
 
     def 'Verify persist actions immutability'() {
         when:
-        wfsActionCreator.getPersistActions().add(Mock(Action))
+        wfsActionCreator.getPersistActions().add(Mock(FieldProvider))
 
         then:
         thrown(UnsupportedOperationException)

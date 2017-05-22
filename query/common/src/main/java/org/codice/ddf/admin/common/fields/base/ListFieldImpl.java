@@ -13,20 +13,20 @@
  **/
 package org.codice.ddf.admin.common.fields.base;
 
-import static org.codice.ddf.admin.api.fields.Field.FieldBaseType.LIST;
+import static org.codice.ddf.admin.api.DataType.FieldBaseType.LIST;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.codice.ddf.admin.api.action.Message;
-import org.codice.ddf.admin.api.fields.Field;
+import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.ListField;
+import org.codice.ddf.admin.api.report.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ListFieldImpl<T extends Field> extends BaseField<List>
+public class ListFieldImpl<T extends DataType> extends BaseDataType<List>
         implements ListField<T> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ListFieldImpl.class);
@@ -130,7 +130,7 @@ public class ListFieldImpl<T extends Field> extends BaseField<List>
     }
 
     @Override
-    public ListField<T> matchRequired(Field fieldToMatch) {
+    public ListField<T> matchRequired(DataType fieldToMatch) {
         super.matchRequired(fieldToMatch);
         listFieldType.matchRequired(((ListField) fieldToMatch).getListFieldType());
         getList().forEach(field -> field.matchRequired(listFieldType));
@@ -144,8 +144,8 @@ public class ListFieldImpl<T extends Field> extends BaseField<List>
     }
 
     @Override
-    public void updatePath(List<String> path) {
-        super.updatePath(path);
+    public void updatePath(List<String> subPath) {
+        super.updatePath(subPath);
         getList().forEach(field -> field.updatePath(path()));
     }
 

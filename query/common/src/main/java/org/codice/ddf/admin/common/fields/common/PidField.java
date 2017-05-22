@@ -20,7 +20,7 @@ public class PidField extends StringField {
 
     public static final String FIELD_TYPE_NAME = "Pid";
 
-    public static final String DESCRIPTION = "A unique id used for persisting.";
+    public static final String DESCRIPTION = "A unique fieldName used for persisting.";
 
     public PidField() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);

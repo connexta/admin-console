@@ -15,7 +15,7 @@ package org.codice.ddf.admin.ldap.fields.config;
 
 import java.util.List;
 
-import org.codice.ddf.admin.api.fields.Field;
+import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
 import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindUserInfo;
@@ -42,6 +42,11 @@ public class LdapConfigurationField extends BaseObjectField {
 
     public LdapConfigurationField() {
         super(FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
+        pid = new PidField();
+        connection = new LdapConnectionField();
+        bindUserInfo = new LdapBindUserInfo();
+        settings = new LdapSettingsField();
+        updateInnerFieldPaths();
     }
 
     public LdapConfigurationField connection(LdapConnectionField connection) {
@@ -93,13 +98,5 @@ public class LdapConfigurationField extends BaseObjectField {
     public LdapConfigurationField allFieldsRequired(boolean required) {
         super.allFieldsRequired(required);
         return this;
-    }
-
-    @Override
-    public void initializeFields() {
-        this.pid = new PidField();
-        this.connection = new LdapConnectionField();
-        this.bindUserInfo = new LdapBindUserInfo();
-        this.settings = new LdapSettingsField();
     }
 }

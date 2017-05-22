@@ -13,12 +13,12 @@
  */
 package org.codice.ddf.admin.sources.commons.utils;
 
-import static org.codice.ddf.admin.sources.commons.SourceActionCommons.getAllSourceReferences;
+import static org.codice.ddf.admin.sources.commons.utils.SourceUtilCommons.getAllSourceReferences;
 import static org.codice.ddf.admin.sources.commons.SourceMessages.duplicateSourceNameError;
 
 import java.util.List;
 
-import org.codice.ddf.admin.common.Report;
+import org.codice.ddf.admin.common.report.ReportImpl;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 
@@ -49,25 +49,25 @@ public class SourceValidationUtils {
     }
 
     /**
-     * Validates the {@code sourceName} against the existing source names in the system. An empty {@link Report} will be returned
-     * if there are no existing source names with with name {@code sourceName}, or a {@link Report} with error messages.
+     * Validates the {@code sourceName} against the existing source names in the system. An empty {@link ReportImpl} will be returned
+     * if there are no existing source names with with name {@code sourceName}, or a {@link ReportImpl} with error messages.
      *
      * @param sourceName          source name to validate
      * @param configuratorFactory configurator factory for reading FederatedSource service references
-     * @return a {@link Report} containing a {@link org.codice.ddf.admin.sources.commons.SourceMessages#DUPLICATE_SOURCE_NAME} error, or a Report with
+     * @return a {@link ReportImpl} containing a {@link org.codice.ddf.admin.sources.commons.SourceMessages#DUPLICATE_SOURCE_NAME} error, or a Report with
      * no messages on success.
      */
     // TODO: 4/24/17 phuffer -  adding a duplicate name should be valid as long as the Active Binding is different
-    public static Report validateSourceName(StringField sourceName,
+    public static ReportImpl validateSourceName(StringField sourceName,
             ConfiguratorFactory configuratorFactory) {
         List<Source> sources = getAllSourceReferences(configuratorFactory);
         boolean matchFound = sources.stream()
                 .map(source -> source.getId())
                 .anyMatch(id -> id.equals(sourceName.getValue()));
 
-        Report report = new Report();
+        ReportImpl report = new ReportImpl();
         if (matchFound) {
-            report.argumentMessage(duplicateSourceNameError(sourceName.path()));
+            report.addArgumentMessage(duplicateSourceNameError(sourceName.path()));
         }
         return report;
     }

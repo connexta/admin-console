@@ -17,8 +17,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.codice.ddf.admin.api.action.ActionReport;
-import org.codice.ddf.admin.api.action.Message;
+import org.codice.ddf.admin.api.DataType;
+import org.codice.ddf.admin.api.report.FunctionReport;
+import org.codice.ddf.admin.api.report.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,17 +77,15 @@ public class ExecutionStrategyImpl extends EnhancedExecutionStrategy {
         try {
             resolvedValue = fieldDef.getDataFetcher()
                     .get(environment);
-            if (resolvedValue instanceof ActionReport) {
-                ActionReport report = ((ActionReport) resolvedValue);
-                resolvedValue = report.result() == null ?
-                        null :
-                        report.result()
-                                .getValue();
-
+            if (resolvedValue instanceof FunctionReport) {
+                FunctionReport<DataType> report = ((FunctionReport) resolvedValue);
+                resolvedValue = report.isResultPresent() ? report.result().getValue() : null;
                 List<Message> msgs = report.messages();
                 msgs.stream()
-                        .map(ActionGraphQLError::new)
+                        .map(GraphQLErrorMessageWrapper::new)
                         .forEach(executionContext::addError);
+            } else if(resolvedValue instanceof DataType){
+                resolvedValue = ((DataType) resolvedValue).getValue();
             }
         } catch (Exception e) {
             LOGGER.info("Exception while fetching data", e);

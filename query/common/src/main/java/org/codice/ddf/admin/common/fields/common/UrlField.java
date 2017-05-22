@@ -13,13 +13,13 @@
  **/
 package org.codice.ddf.admin.common.fields.common;
 
-import static org.codice.ddf.admin.common.message.DefaultMessages.invalidUrlError;
+import static org.codice.ddf.admin.common.report.message.DefaultMessages.invalidUrlError;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
-import org.codice.ddf.admin.api.action.Message;
+import org.codice.ddf.admin.api.report.Message;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

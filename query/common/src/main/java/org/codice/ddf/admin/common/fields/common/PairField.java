@@ -15,7 +15,7 @@ package org.codice.ddf.admin.common.fields.common;
 
 import java.util.List;
 
-import org.codice.ddf.admin.api.fields.Field;
+import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 
@@ -29,12 +29,19 @@ public class PairField extends BaseObjectField {
 
     public static final String DESCRIPTION = "Represents a generic key value pair.";
 
+    public static final String KEY_FIELD_NAME = "key";
+
+    public static final String VALUE_FIELD_NAME = "value";
+
     private StringField key;
 
     private StringField value;
 
     public PairField() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
+        key = new StringField(KEY_FIELD_NAME);
+        value = new StringField(VALUE_FIELD_NAME);
+        updateInnerFieldPaths();
     }
 
     @Override
@@ -58,11 +65,5 @@ public class PairField extends BaseObjectField {
 
     public String value() {
         return value.getValue();
-    }
-
-    @Override
-    public void initializeFields() {
-        key = new StringField("key");
-        value = new StringField("value");
     }
 }

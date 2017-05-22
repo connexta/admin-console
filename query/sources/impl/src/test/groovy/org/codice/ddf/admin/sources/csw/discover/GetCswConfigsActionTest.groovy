@@ -13,12 +13,12 @@
  */
 package org.codice.ddf.admin.sources.csw.discover
 
-import org.codice.ddf.admin.api.action.Action
-import org.codice.ddf.admin.api.fields.Field
+import org.codice.ddf.admin.api.Field
+import org.codice.ddf.admin.api.FieldProvider
+import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.api.fields.ListField
-import org.codice.ddf.admin.common.actions.BaseAction
 import org.codice.ddf.admin.common.fields.base.ListFieldImpl
-import org.codice.ddf.admin.common.message.DefaultMessages
+import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.configurator.ConfigReader
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.sources.fields.CswProfile
@@ -39,11 +39,11 @@ class GetCswConfigsActionTest extends Specification {
 
     static TEST_FACTORY_PID = CswServiceProperties.CSW_PROFILE_FACTORY_PID
 
-    static BASE_PATH = [GetCswConfigsAction.ID, BaseAction.ARGUMENT]
+    static BASE_PATH = [GetCswConfigurations.ID, FunctionField.ARGUMENT]
 
     static PID_PATH = [BASE_PATH, PID].flatten()
 
-    Action getCswConfigsAction
+    FieldProvider getCswConfigsAction
 
     ConfiguratorFactory configuratorFactory
 
@@ -61,7 +61,7 @@ class GetCswConfigsActionTest extends Specification {
             getConfigReader() >> configReader
         }
 
-        getCswConfigsAction = new GetCswConfigsAction(configuratorFactory)
+        getCswConfigsAction = new GetCswConfigurations(configuratorFactory)
     }
 
     def 'No pid argument returns all configs'() {
@@ -107,7 +107,7 @@ class GetCswConfigsActionTest extends Specification {
         report.result() == null
         report.messages().size() == 1
         report.messages().get(0).code == DefaultMessages.NO_EXISTING_CONFIG
-        report.messages().get(0).path == [GetCswConfigsAction.ID]
+        report.messages().get(0).path == [GetCswConfigurations.ID]
     }
 
     def assertConfig(Field field, int index, Map<String, Object> properties, String sourceName, String pid, boolean availability) {

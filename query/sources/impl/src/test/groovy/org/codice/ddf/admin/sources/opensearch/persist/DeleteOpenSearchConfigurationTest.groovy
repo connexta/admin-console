@@ -1,8 +1,8 @@
 package org.codice.ddf.admin.sources.opensearch.persist
 
-import org.codice.ddf.admin.api.action.Action
-import org.codice.ddf.admin.common.actions.BaseAction
-import org.codice.ddf.admin.common.message.DefaultMessages
+import org.codice.ddf.admin.api.FieldProvider
+import org.codice.ddf.admin.api.fields.FunctionField
+import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.configurator.ConfigReader
 import org.codice.ddf.admin.configurator.Configurator
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
@@ -13,7 +13,7 @@ import static org.codice.ddf.admin.sources.SourceTestCommons.*
 
 class DeleteOpenSearchConfigurationTest extends Specification {
 
-    Action deleteOpenSearchConfigurationAction
+    FieldProvider deleteOpenSearchConfigurationAction
 
     ConfiguratorFactory configuratorFactory
 
@@ -23,7 +23,7 @@ class DeleteOpenSearchConfigurationTest extends Specification {
 
     static RESULT_ARGUMENT_PATH = [DeleteOpenSearchConfiguration.ID]
 
-    static BASE_PATH = [RESULT_ARGUMENT_PATH, BaseAction.ARGUMENT].flatten()
+    static BASE_PATH = [RESULT_ARGUMENT_PATH, FunctionField.ARGUMENT].flatten()
 
     static PID_PATH = [BASE_PATH, PID].flatten()
 

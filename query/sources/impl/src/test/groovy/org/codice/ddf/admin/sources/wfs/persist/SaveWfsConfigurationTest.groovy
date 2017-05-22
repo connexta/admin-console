@@ -14,9 +14,9 @@
 package org.codice.ddf.admin.sources.wfs.persist
 
 import ddf.catalog.source.FederatedSource
-import org.codice.ddf.admin.api.action.Action
-import org.codice.ddf.admin.common.actions.BaseAction
-import org.codice.ddf.admin.common.message.DefaultMessages
+import org.codice.ddf.admin.api.FieldProvider
+import org.codice.ddf.admin.api.fields.FunctionField
+import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.configurator.ConfigReader
 import org.codice.ddf.admin.configurator.Configurator
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
@@ -31,7 +31,7 @@ class SaveWfsConfigurationTest extends Specification {
 
     static RESULT_ARGUMENT_PATH = [SaveWfsConfiguration.ID]
 
-    static BASE_PATH = [RESULT_ARGUMENT_PATH, BaseAction.ARGUMENT].flatten()
+    static BASE_PATH = [RESULT_ARGUMENT_PATH, FunctionField.ARGUMENT].flatten()
 
     static CONFIG_PATH = [BASE_PATH, SOURCE_CONFIG].flatten()
 
@@ -45,7 +45,7 @@ class SaveWfsConfigurationTest extends Specification {
 
     static TEST_WFS_VERSION = WfsVersion.WFS_VERSION_1
 
-    Action saveWfsConfiguration
+    FieldProvider saveWfsConfiguration
 
     ConfiguratorFactory configuratorFactory
 

@@ -11,7 +11,7 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  */
-package org.codice.ddf.admin.security.wcpm.actions.persist
+package groovy.org.codice.ddf.admin.security.wcpm.persist
 
 import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.api.FieldProvider
@@ -30,13 +30,13 @@ import org.codice.ddf.security.policy.context.impl.PolicyManager
 import spock.lang.Specification
 
 class SaveWhitelistContextsTest extends Specification {
-    FieldProvider actionCreator
+    FieldProvider WcpmFieldProvider
     ConfiguratorFactory configuratorFactory
     Configurator configurator
     ConfigReader configReader
     OperationReport operationReport
     PolicyManager policyManager
-    FunctionField action
+    FunctionField saveWhitelistContextsFunction
 
     def setup() {
         operationReport = Mock(OperationReport)
@@ -50,8 +50,8 @@ class SaveWhitelistContextsTest extends Specification {
         configuratorFactory.getConfigurator() >> configurator
         configuratorFactory.getConfigReader() >>  configReader
         configReader.getConfig(_) >> { [ (PolicyManagerServiceProperties.WHITE_LIST_CONTEXT) : policyManager.getWhiteListContexts() ] }
-        actionCreator = new WcpmFieldProvider(configuratorFactory)
-        action = actionCreator.getMutationFunction(SaveWhitelistContexts.FIELD_NAME)
+        WcpmFieldProvider = new WcpmFieldProvider(configuratorFactory)
+        saveWhitelistContextsFunction = WcpmFieldProvider.getMutationFunction(SaveWhitelistContexts.FIELD_NAME)
     }
 
     def 'Pass with valid context list' () {
@@ -60,8 +60,8 @@ class SaveWhitelistContextsTest extends Specification {
         operationReport.containsFailedResults() >> false
 
         when:
-        action.setValue(testMap)
-        ReportWithResult report = action.getValue()
+        saveWhitelistContextsFunction.setValue(testMap)
+        ReportWithResult report = saveWhitelistContextsFunction.getValue()
 
         then:
         report.messages().size() == 0
@@ -74,8 +74,8 @@ class SaveWhitelistContextsTest extends Specification {
         operationReport.containsFailedResults() >> false
 
         when:
-        action.setValue(testMap)
-        ReportWithResult report = action.getValue()
+        saveWhitelistContextsFunction.setValue(testMap)
+        ReportWithResult report = saveWhitelistContextsFunction.getValue()
 
         then:
         report.messages()[0].code == DefaultMessages.INVALID_CONTEXT_PATH
@@ -89,8 +89,8 @@ class SaveWhitelistContextsTest extends Specification {
         operationReport.containsFailedResults() >> false
 
         when:
-        action.setValue(testMap)
-        ReportWithResult report = action.getValue()
+        saveWhitelistContextsFunction.setValue(testMap)
+        ReportWithResult report = saveWhitelistContextsFunction.getValue()
 
         then:
         report.messages()[0].code == DefaultMessages.EMPTY_FIELD
@@ -105,8 +105,8 @@ class SaveWhitelistContextsTest extends Specification {
         operationReport.containsFailedResults() >> false
 
         when:
-        action.setValue(testMap)
-        ReportWithResult report = action.getValue()
+        saveWhitelistContextsFunction.setValue(testMap)
+        ReportWithResult report = saveWhitelistContextsFunction.getValue()
 
         then:
         report.messages().size() == 0
@@ -119,8 +119,8 @@ class SaveWhitelistContextsTest extends Specification {
         operationReport.containsFailedResults() >> true
 
         when:
-        action.setValue(testMap)
-        ReportWithResult report = action.getValue()
+        saveWhitelistContextsFunction.setValue(testMap)
+        ReportWithResult report = saveWhitelistContextsFunction.getValue()
 
         then:
         report.messages()[0].code == DefaultMessages.FAILED_PERSIST

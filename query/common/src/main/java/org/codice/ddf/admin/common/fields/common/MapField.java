@@ -30,11 +30,13 @@ public class MapField extends BaseObjectField {
 
     public static final String DESCRIPTION = "A map containing a list of key value pairs.";
 
+    public static final String ENTRIES_FIELD_NAME = "entries";
+
     private ListField<PairField> entries;
 
     public MapField() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
-        entries = new ListFieldImpl<>("entries", PairField.class);
+        entries = new ListFieldImpl<>(ENTRIES_FIELD_NAME, PairField.class);
         updateInnerFieldPaths();
     }
 

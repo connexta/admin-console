@@ -53,12 +53,11 @@ public class ListFieldImpl<T extends DataType> extends BaseDataType<List>
         this.listFieldType = listFieldType;
     }
 
-    public ListFieldImpl(Class<T> listFieldType, List<T> values) {
+    public ListFieldImpl(Class<T> listFieldType) {
         this(DEFAULT_FIELD_NAME, listFieldType);
-        addAll(values);
     }
 
-    public ListFieldImpl(Class<T> listFieldType) {
+    public ListFieldImpl(T listFieldType) {
         this(DEFAULT_FIELD_NAME, listFieldType);
     }
 

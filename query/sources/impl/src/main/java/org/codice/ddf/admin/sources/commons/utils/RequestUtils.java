@@ -30,11 +30,11 @@ import javax.ws.rs.ProcessingException;
 import javax.ws.rs.core.Response;
 
 import org.apache.cxf.jaxrs.client.WebClient;
-import org.codice.ddf.admin.common.report.ReportImpl;
-import org.codice.ddf.admin.common.report.ReportWithResultImpl;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
 import org.codice.ddf.admin.common.fields.common.HostField;
 import org.codice.ddf.admin.common.fields.common.UrlField;
+import org.codice.ddf.admin.common.report.ReportImpl;
+import org.codice.ddf.admin.common.report.ReportWithResultImpl;
 import org.codice.ddf.cxf.SecureCxfClientFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

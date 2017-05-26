@@ -11,111 +11,110 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.sources.csw.discover
+package org.codice.ddf.admin.sources.wfs.discover
 
-import org.codice.ddf.admin.api.FieldProvider
 import org.codice.ddf.admin.api.fields.FunctionField
-import org.codice.ddf.admin.common.report.ReportWithResultImpl
 import org.codice.ddf.admin.common.fields.common.CredentialsField
 import org.codice.ddf.admin.common.fields.common.UrlField
+import org.codice.ddf.admin.common.report.ReportWithResultImpl
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.common.report.message.ErrorMessage
-import org.codice.ddf.admin.sources.commons.utils.CswSourceUtils
+import org.codice.ddf.admin.sources.commons.utils.WfsSourceUtils
 import org.codice.ddf.admin.sources.fields.SourceInfoField
 import org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField
 import spock.lang.Specification
 
 import static org.codice.ddf.admin.sources.SourceTestCommons.*
 
-class DiscoverCswActionTest extends Specification {
+class DiscoverWfsSourcesTest extends Specification {
 
-    FieldProvider discoverCsw
+    DiscoverWfsSource discoverWfs
 
-    CswSourceUtils cswSourceUtils
+    WfsSourceUtils wfsSourceUtils
 
-    static BASE_PATH = [DiscoverCswSource.ID, FunctionField.ARGUMENT]
+    static BASE_PATH = [DiscoverWfsSource.ID, FunctionField.ARGUMENT]
 
     static ADDRESS_FIELD_PATH = [BASE_PATH, ADDRESS].flatten()
 
     static URL_FIELD_PATH = [ADDRESS_FIELD_PATH, URL_NAME].flatten()
 
     def setup() {
-        cswSourceUtils = Mock(CswSourceUtils)
-        discoverCsw = new DiscoverCswSource(cswSourceUtils)
+        wfsSourceUtils = Mock(WfsSourceUtils)
+        discoverWfs = new DiscoverWfsSource(wfsSourceUtils)
     }
 
-    def 'Successfully discover CSW configuration using URL'() {
+    def 'Successfully discover WFS configuration using URL'() {
         setup:
-        discoverCsw.setArguments(getBaseDiscoverByUrlActionArgs())
+        discoverWfs.setValue(getBaseDiscoverByUrlArgs())
 
         when:
-        def report = discoverCsw.process()
+        def report = discoverWfs.getValue()
 
         then:
-        1 * cswSourceUtils.getPreferredCswConfig(_ , _) >> createResult(false, SourceConfigUnionField.class)
+        1 * wfsSourceUtils.getPreferredWfsConfig(_ , _) >> createResult(false, SourceConfigUnionField.class)
         report.result() instanceof SourceInfoField
         ((SourceInfoField) report.result()).isAvailable()
         ((SourceInfoField) report.result()).config() != null
     }
 
-    def 'Successfully discover CSW configuration using hostname and port'() {
+    def 'Successfully discover WFS configuration using hostname and port'() {
         setup:
-        discoverCsw.setArguments(getBaseDiscoverByAddressActionArgs())
+        discoverWfs.setValue(getBaseDiscoverByAddressArgs())
 
         when:
-        def report = discoverCsw.process()
+        def report = discoverWfs.getValue()
 
         then:
-        1 * cswSourceUtils.discoverCswUrl(_, _) >> createResult(false, UrlField.class)
-        1 * cswSourceUtils.getPreferredCswConfig(_, _) >> createResult(false, SourceConfigUnionField.class)
+        1 * wfsSourceUtils.discoverWfsUrl(_, _) >> createResult(false, UrlField.class)
+        1 * wfsSourceUtils.getPreferredWfsConfig(_, _) >> createResult(false, SourceConfigUnionField.class)
         report.result() instanceof SourceInfoField
         ((SourceInfoField) report.result()).isAvailable()
         ((SourceInfoField) report.result()).config() != null
     }
 
-    def 'Fail discovery using URL while getting preferred config'() {
+    def 'Fail to discover WFS config using URL while getting preferred config'() {
         setup:
-        discoverCsw.setArguments(getBaseDiscoverByUrlActionArgs())
+        discoverWfs.setValue(getBaseDiscoverByUrlArgs())
 
         when:
-        def report = discoverCsw.process()
+        def report = discoverWfs.getValue()
 
         then:
-        1 * cswSourceUtils.getPreferredCswConfig(_, _) >> createResult(true, null)
+        1 * wfsSourceUtils.getPreferredWfsConfig(_, _) >> createResult(true, null)
         report.result() == null
         report.messages().size() == 1
     }
 
-    def 'Fail when using hostname+port when discovering the URL'() {
+    def 'Fail to discover WFS config when using hostname and port when discovering the URL'() {
         setup:
-        discoverCsw.setArguments(getBaseDiscoverByAddressActionArgs())
+        discoverWfs.setValue(getBaseDiscoverByAddressArgs())
 
         when:
-        def report = discoverCsw.process()
+        def report = discoverWfs.getValue()
 
         then:
-        1 * cswSourceUtils.discoverCswUrl(_, _) >> createResult(true, null)
+        1 * wfsSourceUtils.discoverWfsUrl(_, _) >> createResult(true, null)
         report.result() == null
         report.messages().size() == 1
     }
 
-    def 'Fail discovery using hostname+port while getting preferred config'() {
+    def 'Fail to discover WFS config when using hostname and port while getting preferred config'() {
         setup:
-        discoverCsw.setArguments(getBaseDiscoverByAddressActionArgs())
+        discoverWfs.setValue(getBaseDiscoverByAddressArgs())
 
         when:
-        def report = discoverCsw.process()
+        def report = discoverWfs.getValue()
 
         then:
-        1 * cswSourceUtils.discoverCswUrl(_, _) >> createResult(false, UrlField.class)
-        1 * cswSourceUtils.getPreferredCswConfig(_, _) >> createResult(true, null)
+        1 * wfsSourceUtils.discoverWfsUrl(_, _) >> createResult(false, UrlField.class)
+        1 * wfsSourceUtils.getPreferredWfsConfig(_, _) >> createResult(true, null)
         report.result() == null
         report.messages().size() == 1
     }
 
     def 'Fail when missing required fields'() {
         when:
-        def report = discoverCsw.process()
+        def report = discoverWfs.getValue()
 
         then:
         report.result() == null

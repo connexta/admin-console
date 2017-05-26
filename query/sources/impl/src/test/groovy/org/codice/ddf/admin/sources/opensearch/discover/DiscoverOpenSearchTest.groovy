@@ -11,111 +11,110 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.sources.wfs.discover
+package org.codice.ddf.admin.sources.opensearch.discover
 
-import org.codice.ddf.admin.api.FieldProvider
 import org.codice.ddf.admin.api.fields.FunctionField
-import org.codice.ddf.admin.common.report.ReportWithResultImpl
 import org.codice.ddf.admin.common.fields.common.CredentialsField
 import org.codice.ddf.admin.common.fields.common.UrlField
+import org.codice.ddf.admin.common.report.ReportWithResultImpl
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.common.report.message.ErrorMessage
-import org.codice.ddf.admin.sources.commons.utils.WfsSourceUtils
+import org.codice.ddf.admin.sources.commons.utils.OpenSearchSourceUtils
 import org.codice.ddf.admin.sources.fields.SourceInfoField
 import org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField
 import spock.lang.Specification
 
 import static org.codice.ddf.admin.sources.SourceTestCommons.*
 
-class DiscoverWfsActionTest extends Specification {
+class DiscoverOpenSearchTest extends Specification {
 
-    FieldProvider discoverWfs
+    DiscoverOpenSearchSource discoverOpenSearch
 
-    WfsSourceUtils wfsSourceUtils
+    OpenSearchSourceUtils openSearchSourceUtils
 
-    static BASE_PATH = [DiscoverWfsSource.ID, FunctionField.ARGUMENT]
+    static BASE_PATH = [DiscoverOpenSearchSource.ID, FunctionField.ARGUMENT]
 
     static ADDRESS_FIELD_PATH = [BASE_PATH, ADDRESS].flatten()
 
     static URL_FIELD_PATH = [ADDRESS_FIELD_PATH, URL_NAME].flatten()
 
     def setup() {
-        wfsSourceUtils = Mock(WfsSourceUtils)
-        discoverWfs = new DiscoverWfsSource(wfsSourceUtils)
+        openSearchSourceUtils = Mock(OpenSearchSourceUtils)
+        discoverOpenSearch = new DiscoverOpenSearchSource(openSearchSourceUtils)
     }
 
-    def 'Successfully discover WFS configuration using URL'() {
+    def 'Successfully discover CSW configuration using URL'() {
         setup:
-        discoverWfs.setArguments(getBaseDiscoverByUrlActionArgs())
+        discoverOpenSearch.setValue(getBaseDiscoverByUrlArgs())
 
         when:
-        def report = discoverWfs.process()
+        def report = discoverOpenSearch.getValue()
 
         then:
-        1 * wfsSourceUtils.getPreferredWfsConfig(_ , _) >> createResult(false, SourceConfigUnionField.class)
+        1 * openSearchSourceUtils.getOpenSearchConfig(_ , _) >> createResult(false, SourceConfigUnionField.class)
         report.result() instanceof SourceInfoField
         ((SourceInfoField) report.result()).isAvailable()
         ((SourceInfoField) report.result()).config() != null
     }
 
-    def 'Successfully discover WFS configuration using hostname and port'() {
+    def 'Successfully discover CSW Configuration using hostname and port'() {
         setup:
-        discoverWfs.setArguments(getBaseDiscoverByAddressActionArgs())
+        discoverOpenSearch.setValue(getBaseDiscoverByAddressArgs())
 
         when:
-        def report = discoverWfs.process()
+        def report = discoverOpenSearch.getValue()
 
         then:
-        1 * wfsSourceUtils.discoverWfsUrl(_, _) >> createResult(false, UrlField.class)
-        1 * wfsSourceUtils.getPreferredWfsConfig(_, _) >> createResult(false, SourceConfigUnionField.class)
+        1 * openSearchSourceUtils.discoverOpenSearchUrl(_, _) >> createResult(false, UrlField.class)
+        1 * openSearchSourceUtils.getOpenSearchConfig(_, _) >> createResult(false, SourceConfigUnionField.class)
         report.result() instanceof SourceInfoField
         ((SourceInfoField) report.result()).isAvailable()
         ((SourceInfoField) report.result()).config() != null
     }
 
-    def 'Fail to discover WFS config using URL while getting preferred config'() {
+    def 'Failure to discover using URL while getting preferred config'() {
         setup:
-        discoverWfs.setArguments(getBaseDiscoverByUrlActionArgs())
+        discoverOpenSearch.setValue(getBaseDiscoverByUrlArgs())
 
         when:
-        def report = discoverWfs.process()
+        def report = discoverOpenSearch.getValue()
 
         then:
-        1 * wfsSourceUtils.getPreferredWfsConfig(_, _) >> createResult(true, null)
+        1 * openSearchSourceUtils.getOpenSearchConfig(_, _) >> createResult(true, null)
         report.result() == null
         report.messages().size() == 1
     }
 
-    def 'Fail to discover WFS config when using hostname and port when discovering the URL'() {
+    def 'Fail when using hostname and port to discover the URL'() {
         setup:
-        discoverWfs.setArguments(getBaseDiscoverByAddressActionArgs())
+        discoverOpenSearch.setValue(getBaseDiscoverByAddressArgs())
 
         when:
-        def report = discoverWfs.process()
+        def report = discoverOpenSearch.getValue()
 
         then:
-        1 * wfsSourceUtils.discoverWfsUrl(_, _) >> createResult(true, null)
+        1 * openSearchSourceUtils.discoverOpenSearchUrl(_, _) >> createResult(true, null)
         report.result() == null
         report.messages().size() == 1
     }
 
-    def 'Fail to discover WFS config when using hostname and port while getting preferred config'() {
+    def 'Fail when using hostname and port when getting preferred CSW config'() {
         setup:
-        discoverWfs.setArguments(getBaseDiscoverByAddressActionArgs())
+        discoverOpenSearch.setValue(getBaseDiscoverByAddressArgs())
 
         when:
-        def report = discoverWfs.process()
+        def report = discoverOpenSearch.getValue()
 
         then:
-        1 * wfsSourceUtils.discoverWfsUrl(_, _) >> createResult(false, UrlField.class)
-        1 * wfsSourceUtils.getPreferredWfsConfig(_, _) >> createResult(true, null)
+        1 * openSearchSourceUtils.discoverOpenSearchUrl(_, _) >> createResult(false, UrlField.class)
+        1 * openSearchSourceUtils.getOpenSearchConfig(_, _) >> createResult(true, null)
         report.result() == null
         report.messages().size() == 1
     }
 
     def 'Fail when missing required fields'() {
         when:
-        def report = discoverWfs.process()
+        def report = discoverOpenSearch.getValue()
 
         then:
         report.result() == null

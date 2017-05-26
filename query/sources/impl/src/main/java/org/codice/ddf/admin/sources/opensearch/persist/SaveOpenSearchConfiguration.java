@@ -56,6 +56,8 @@ public class SaveOpenSearchConfiguration extends BaseFunctionField<BooleanField>
         config.isRequired(true);
         config.sourceNameField().isRequired(true);
         config.endpointUrlField().isRequired(true);
+        updateArgumentPaths();
+
         this.configuratorFactory = configuratorFactory;
     }
 

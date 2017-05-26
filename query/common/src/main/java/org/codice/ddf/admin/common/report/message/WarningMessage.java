@@ -26,7 +26,7 @@ public class WarningMessage extends BaseMessage {
     }
 
     public WarningMessage(String code, List<String> path) {
-        super(MessageType.ERROR, code, path);
+        super(MessageType.WARNING, code, path);
     }
 
     @Override

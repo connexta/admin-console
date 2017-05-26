@@ -38,6 +38,15 @@ public abstract class BaseFunctionField<T extends DataType> extends BaseField<Ma
         report = new FunctionReportImpl<>();
     }
 
+    public BaseFunctionField(String functionName, String description, Class<T> returnType) {
+        super(functionName, description);
+        try {
+            this.returnType = returnType.newInstance();
+        } catch (InstantiationException | IllegalAccessException e) {
+            throw new RuntimeException(String.format("Unable to create new instance of class [%s]. Ensure there is a default constructor for the BaseFunctionField to initialize.", returnType.getClass()));
+        }
+        report = new FunctionReportImpl<>();
+    }
     public abstract T performFunction();
 
     @Override
@@ -102,7 +111,12 @@ public abstract class BaseFunctionField<T extends DataType> extends BaseField<Ma
     }
 
     protected BaseFunctionField addArgumentMessage(Message msg) {
-        report.addArgumentMessage(msg);
+        Message copy = msg.copy();
+        if(copy.getPath().isEmpty()) {
+            copy.setPath(path());
+        }
+
+        report.addArgumentMessage(copy);
         return this;
     }
 
@@ -111,19 +125,26 @@ public abstract class BaseFunctionField<T extends DataType> extends BaseField<Ma
         return this;
     }
 
-    protected BaseFunctionField addMessages(Report report) {
-        this.report.addMessages(report);
-        return this;
-    }
-
     protected BaseFunctionField addResultMessage(Message msg) {
         Message copy = msg.copy();
+        List<String> copyMsgPath = copy.getPath();
+
+        //Remove first element of path because the return object's name will be included in the path
+        if(!copyMsgPath.isEmpty()) {
+            copyMsgPath.remove(0);
+        }
+
         List<String> fullPath = new ImmutableList.Builder<String>().addAll(path())
-                .addAll(msg.getPath())
+                .addAll(copyMsgPath)
                 .build();
         copy.setPath(fullPath);
         report.addResultMessage(copy);
         return this;
     }
 
+    protected BaseFunctionField addMessages(Report report) {
+        addArgumentMessages(report.argumentMessages());
+        addResultMessages(report.resultMessages());
+        return this;
+    }
 }

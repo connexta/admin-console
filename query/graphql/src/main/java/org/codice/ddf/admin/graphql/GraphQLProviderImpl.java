@@ -26,28 +26,28 @@ import graphql.servlet.GraphQLQueryProvider;
 
 public class GraphQLProviderImpl implements GraphQLMutationProvider, GraphQLQueryProvider {
 
-    private FieldProvider creator;
+    private FieldProvider provider;
 
     private GraphQLTransformOutput transformOutput;
 
-    public GraphQLProviderImpl(FieldProvider creator, GraphQLTransformOutput transformOutput) {
-        this.creator = creator;
+    public GraphQLProviderImpl(FieldProvider provider, GraphQLTransformOutput transformOutput) {
+        this.provider = provider;
         this.transformOutput = transformOutput;
     }
 
     @Override
     public Collection<GraphQLFieldDefinition> getMutations() {
-        return transformOutput.fieldsToGraphQLFieldDefinition(creator.getMutationFunctions());
+        return transformOutput.fieldsToGraphQLFieldDefinition(provider.getMutationFunctions());
     }
 
     @Override
     public GraphQLObjectType getQuery() {
-        return transformOutput.queryProviderToGraphQLObjectType(creator);
+        return transformOutput.queryProviderToGraphQLObjectType(provider);
     }
 
     @Override
     public String getName() {
-        return creator.fieldName();
+        return provider.fieldName();
     }
 
     @Override

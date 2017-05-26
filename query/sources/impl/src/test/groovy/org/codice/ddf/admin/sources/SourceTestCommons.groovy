@@ -20,7 +20,10 @@ import ddf.catalog.service.ConfiguredService
 import ddf.catalog.source.Source
 import ddf.catalog.source.SourceMonitor
 import ddf.catalog.source.UnsupportedQueryException
-import org.codice.ddf.admin.common.fields.common.*
+import org.codice.ddf.admin.common.fields.common.AddressField
+import org.codice.ddf.admin.common.fields.common.CredentialsField
+import org.codice.ddf.admin.common.fields.common.PidField
+import org.codice.ddf.admin.common.fields.common.UrlField
 import org.codice.ddf.admin.common.services.ServiceCommons
 import org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField
 
@@ -70,20 +73,20 @@ class SourceTestCommons {
 
     static TEST_SOURCENAME = "testSourceName"
 
-    static getBaseSaveConfigActionArgs() {
+    static getBaseSaveConfigArgs() {
         return [
             (SOURCE_CONFIG) : createSourceConfigUnionField().getValue()
         ]
     }
 
-    static getBaseDiscoverByAddressActionArgs() {
+    static getBaseDiscoverByAddressArgs() {
         return [
             (ADDRESS) : new AddressField().hostname('localhost').port(8993).getValue(),
             (CREDENTIALS) : new CredentialsField().username(TEST_USERNAME).password(TEST_PASSWORD).getValue()
         ]
     }
 
-    static getBaseDiscoverByUrlActionArgs() {
+    static getBaseDiscoverByUrlArgs() {
         return [
             (ADDRESS) : new AddressField().url("http://localhost:8993/sevices/csw").getValue(),
             (CREDENTIALS) : new CredentialsField().username(TEST_USERNAME).password(TEST_PASSWORD).getValue()

@@ -20,12 +20,12 @@ import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 import com.google.common.collect.ImmutableList;
 
 public class TestEnum extends BaseEnumField<String> {
-    public static final String DEFAULT_FIELD_NAME = "authType";
+    public static final String DEFAULT_FIELD_NAME = "enumeration";
 
-    public static final String FIELD_TYPE_NAME = "AuthenticationType";
+    public static final String FIELD_TYPE_NAME = "Enumeration";
 
     public static final String DESCRIPTION =
-            "Defines a specific type of authentication that should be performed.";
+            "Sample enum for testing purposes.";
 
     public TestEnum() {
         this(null);
@@ -39,7 +39,7 @@ public class TestEnum extends BaseEnumField<String> {
                 enumType);
     }
 
-    protected static final class EnumA extends StringField {
+    public static final class EnumA extends StringField {
         public static final String ENUM_A = "ENUM_A";
 
         public EnumA() {
@@ -52,7 +52,7 @@ public class TestEnum extends BaseEnumField<String> {
         }
     }
 
-    protected static final class EnumB extends StringField {
+    public static final class EnumB extends StringField {
         public static final String ENUM_B = "ENUM_B";
 
         public EnumB() {

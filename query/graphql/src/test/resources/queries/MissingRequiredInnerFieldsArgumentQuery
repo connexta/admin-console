@@ -1,0 +1,10 @@
+query MissingInnerRequiredFields {
+  testing {
+    requiredArg(testObj: {}) {
+      string
+      integer
+      list
+      enumeration
+    }
+  }
+}

@@ -116,22 +116,29 @@ public class GraphQLServletImpl extends GraphQLServlet {
             List<GraphQLError> graphQLJavaErrors = msgs.stream().filter(msg -> !GraphQLErrorMessageWrapper.class.isInstance(msg)).collect(
                     Collectors.toList());
 
-            List<Message> internalMsgs = msgs.stream()
+            List<Message> providerMsgs = msgs.stream()
                     .filter(GraphQLErrorMessageWrapper.class::isInstance)
                     .map(GraphQLErrorMessageWrapper.class::cast)
                     .map(GraphQLErrorMessageWrapper::getQueryProviderError)
                     .collect(Collectors.toList());
 
-            List<Message> internalWarningMsgs = internalMsgs.stream()
+            List<Message> warningMsgs = providerMsgs.stream()
                     .filter(error -> error.getType() == Message.MessageType.WARNING)
                     .collect(Collectors.toList());
 
-            List<Message> internalErrorMsgs = internalMsgs.stream()
+            List<Message> internalErrorMsgs = providerMsgs.stream()
                     .filter(error -> error.getType() == Message.MessageType.ERROR)
                     .collect(Collectors.toList());
 
-            result.put("errors", Stream.concat(graphQLJavaErrors.stream(), internalErrorMsgs.stream()).collect(Collectors.toList()));
-            result.put("warnings", internalWarningMsgs);
+            List<Object> allErrorMsgs = Stream.concat(graphQLJavaErrors.stream(), internalErrorMsgs.stream()).collect(Collectors.toList());
+
+            if(!allErrorMsgs.isEmpty()) {
+                result.put("errors", allErrorMsgs);
+            }
+
+            if(!warningMsgs.isEmpty()) {
+                result.put("warnings", warningMsgs);
+            }
         }
 
         return result;
@@ -169,11 +176,11 @@ public class GraphQLServletImpl extends GraphQLServlet {
         return schema;
     }
 
-    public void bindFieldProvider(FieldProvider creator) {
+    public void bindFieldProvider(FieldProvider provider) {
         updateSchema();
     }
 
-    public void unbindFieldProvider(FieldProvider creator) {
+    public void unbindFieldProvider(FieldProvider provider) {
         updateSchema();
     }
 

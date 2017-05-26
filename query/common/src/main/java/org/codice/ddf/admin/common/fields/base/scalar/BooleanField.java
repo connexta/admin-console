@@ -25,14 +25,16 @@ public class BooleanField extends BaseScalarField<Boolean> {
     }
 
     public BooleanField() {
-        super(DEFAULT_FIELD_NAME, null, null, BOOLEAN);
+        this(DEFAULT_FIELD_NAME);
     }
 
     public BooleanField(String fieldName) {
-        super(fieldName, null, null, BOOLEAN);
+        this(fieldName, null, null);
     }
+
 
     protected BooleanField(String fieldName, String fieldTypeName, String description) {
         super(fieldName, fieldTypeName, description, BOOLEAN);
     }
+
 }

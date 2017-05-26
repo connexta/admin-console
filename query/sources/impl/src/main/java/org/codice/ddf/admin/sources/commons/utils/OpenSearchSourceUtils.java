@@ -26,11 +26,11 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.codice.ddf.admin.common.report.ReportImpl;
-import org.codice.ddf.admin.common.report.ReportWithResultImpl;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
 import org.codice.ddf.admin.common.fields.common.HostField;
 import org.codice.ddf.admin.common.fields.common.UrlField;
+import org.codice.ddf.admin.common.report.ReportImpl;
+import org.codice.ddf.admin.common.report.ReportWithResultImpl;
 import org.codice.ddf.admin.sources.fields.type.OpenSearchSourceConfigurationField;
 import org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField;
 import org.slf4j.Logger;

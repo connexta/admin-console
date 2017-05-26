@@ -11,13 +11,32 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.api.fields;
+package org.codice.ddf.admin.sources.wfs
 
-public interface SourceField extends InterfaceField {
+import org.codice.ddf.admin.api.FieldProvider
+import spock.lang.Specification
 
-    @Override
-    String interfaceTypeName();
+class WfsFieldProviderTest extends Specification {
 
-    @Override
-    String interfaceDescription();
+    WfsFieldProvider wfsFieldProvider
+
+    def setup() {
+        wfsFieldProvider = new WfsFieldProvider()
+    }
+
+    def 'Verify discovery fields immutability'() {
+        when:
+        wfsFieldProvider.getDiscoveryFields().add(Mock(FieldProvider))
+
+        then:
+        thrown(UnsupportedOperationException)
+    }
+
+    def 'Verify persist functions immutability'() {
+        when:
+        wfsFieldProvider.getMutationFunctions().add(Mock(FieldProvider))
+
+        then:
+        thrown(UnsupportedOperationException)
+    }
 }

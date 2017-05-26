@@ -47,7 +47,7 @@ public abstract class BaseFieldProvider extends BaseObjectField implements Field
                 .filter(field -> field.fieldName()
                         .equals(fieldName))
                 .findFirst()
-                .get();
+                .orElse(null);
     }
 
     public Field getMutationFunction(String fieldName) {
@@ -55,6 +55,6 @@ public abstract class BaseFieldProvider extends BaseObjectField implements Field
                 .filter(field -> field.fieldName()
                         .equals(fieldName))
                 .findFirst()
-                .get();
+                .orElse(null);
     }
 }

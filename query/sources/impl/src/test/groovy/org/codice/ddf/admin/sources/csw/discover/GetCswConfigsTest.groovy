@@ -14,7 +14,6 @@
 package org.codice.ddf.admin.sources.csw.discover
 
 import org.codice.ddf.admin.api.Field
-import org.codice.ddf.admin.api.FieldProvider
 import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.api.fields.ListField
 import org.codice.ddf.admin.common.fields.base.ListFieldImpl
@@ -29,7 +28,7 @@ import spock.lang.Specification
 
 import static org.codice.ddf.admin.sources.SourceTestCommons.*
 
-class GetCswConfigsActionTest extends Specification {
+class GetCswConfigsTest extends Specification {
 
     static EVENT_SERVICE_ADDRESS = 'eventServiceAddress'
 
@@ -43,13 +42,13 @@ class GetCswConfigsActionTest extends Specification {
 
     static PID_PATH = [BASE_PATH, PID].flatten()
 
-    FieldProvider getCswConfigsAction
+    GetCswConfigurations getCswConfigsFunction
 
     ConfiguratorFactory configuratorFactory
 
     ConfigReader configReader
 
-    def actionArgs = [
+    def functionArgs = [
         (PID): S_PID_2
     ]
 
@@ -61,12 +60,12 @@ class GetCswConfigsActionTest extends Specification {
             getConfigReader() >> configReader
         }
 
-        getCswConfigsAction = new GetCswConfigurations(configuratorFactory)
+        getCswConfigsFunction = new GetCswConfigurations(configuratorFactory)
     }
 
     def 'No pid argument returns all configs'() {
         when:
-        def report = getCswConfigsAction.process()
+        def report = getCswConfigsFunction.getValue()
         def list = ((ListField)report.result())
 
         then:
@@ -81,8 +80,8 @@ class GetCswConfigsActionTest extends Specification {
     }
     def 'Sending pid filter returns 1 result'() {
         when:
-        getCswConfigsAction.setArguments(actionArgs)
-        def report = getCswConfigsAction.process()
+        getCswConfigsFunction.setValue(functionArgs)
+        def report = getCswConfigsFunction.getValue()
         def list = ((ListField)report.result())
 
         then:
@@ -96,12 +95,12 @@ class GetCswConfigsActionTest extends Specification {
 
     def 'Fail when there is no existing configuration for the service specified by the pid'() {
         setup:
-        actionArgs.put(PID, S_PID)
-        getCswConfigsAction.setArguments(actionArgs)
+        functionArgs.put(PID, S_PID)
+        getCswConfigsFunction.setValue(functionArgs)
         configReader.getConfig(S_PID) >> [:]
 
         when:
-        def report = getCswConfigsAction.process()
+        def report = getCswConfigsFunction.getValue()
 
         then:
         report.result() == null

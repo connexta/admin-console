@@ -30,7 +30,6 @@ import graphql.schema.GraphQLInputObjectField;
 import graphql.schema.GraphQLInputObjectType;
 import graphql.schema.GraphQLInputType;
 import graphql.schema.GraphQLList;
-import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLScalarType;
 
 public class GraphQLTransformInput {
@@ -82,7 +81,7 @@ public class GraphQLTransformInput {
                             + field.baseDataType());
         }
 
-        return field.isRequired() ? new GraphQLNonNull(type) : type;
+        return type;
     }
 
     public GraphQLInputType objectFieldToGraphQLInputType(ObjectField field) {

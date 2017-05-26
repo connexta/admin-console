@@ -14,7 +14,6 @@
 package org.codice.ddf.admin.sources.csw.persist
 
 import ddf.catalog.source.Source
-import org.codice.ddf.admin.api.FieldProvider
 import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.configurator.ConfigReader
@@ -50,7 +49,7 @@ class SaveCswConfigurationTest extends Specification {
 
     static CSW_PROFILE_PATH = [CONFIG_PATH, CSW_PROFILE].flatten()
 
-    FieldProvider saveCswConfiguration
+    SaveCswConfiguration saveCswConfiguration
 
     ConfiguratorFactory configuratorFactory
 
@@ -78,10 +77,10 @@ class SaveCswConfigurationTest extends Specification {
 
     def 'Successfully save new CSW configuration'() {
         when:
-        saveCswConfiguration.setArguments(actionArgs)
+        saveCswConfiguration.setValue(actionArgs)
         configReader.getServices(_, _) >> []
         configurator.commit(_, _) >> mockReport(false)
-        def report = saveCswConfiguration.process()
+        def report = saveCswConfiguration.getValue()
 
         then:
         report.result() != null
@@ -90,9 +89,9 @@ class SaveCswConfigurationTest extends Specification {
 
     def 'Fail to save new CSW config due to duplicate source name'() {
         when:
-        saveCswConfiguration.setArguments(actionArgs)
+        saveCswConfiguration.setValue(actionArgs)
         configReader.getServices(_, _) >> federatedSources
-        def report = saveCswConfiguration.process()
+        def report = saveCswConfiguration.getValue()
 
         then:
         report.result() == null
@@ -103,10 +102,10 @@ class SaveCswConfigurationTest extends Specification {
 
     def 'Fail to save new CSW config due to failure to commit'() {
         when:
-        saveCswConfiguration.setArguments(actionArgs)
+        saveCswConfiguration.setValue(actionArgs)
         configReader.getServices(_, _) >> []
         configurator.commit(_, _) >> mockReport(true)
-        def report = saveCswConfiguration.process()
+        def report = saveCswConfiguration.getValue()
 
         then:
         report.result().getValue() == false
@@ -118,13 +117,13 @@ class SaveCswConfigurationTest extends Specification {
     def 'Successfully update CSW configuration'() {
         setup:
         actionArgs.put(PID, S_PID)
-        saveCswConfiguration.setArguments(actionArgs)
+        saveCswConfiguration.setValue(actionArgs)
         configReader.getConfig(_) >> [(ID):TEST_SOURCENAME]
         configReader.getServices(_, _) >> []
         configurator.commit(_, _) >> mockReport(false)
 
         when:
-        def report = saveCswConfiguration.process()
+        def report = saveCswConfiguration.getValue()
 
         then:
         report.result() != null
@@ -134,12 +133,12 @@ class SaveCswConfigurationTest extends Specification {
     def 'Fail CSW configuration update due to existing source name'() {
         setup:
         actionArgs.put(PID, S_PID)
-        saveCswConfiguration.setArguments(actionArgs)
+        saveCswConfiguration.setValue(actionArgs)
         configReader.getConfig(_) >> [(ID):'updatedName']
         configReader.getServices(_, _) >> [new TestSource(S_PID, 'updatedName', false), new TestSource("existingSource", TEST_SOURCENAME, false)]
 
         when:
-        def report = saveCswConfiguration.process()
+        def report = saveCswConfiguration.getValue()
 
         then:
         report.result() == null
@@ -151,13 +150,13 @@ class SaveCswConfigurationTest extends Specification {
     def 'Fail to update CSW config due to failure to commit'() {
         setup:
         actionArgs.put(PID, S_PID)
-        saveCswConfiguration.setArguments(actionArgs)
+        saveCswConfiguration.setValue(actionArgs)
         configReader.getConfig(_) >> [(ID):TEST_SOURCENAME]
         configReader.getServices(_, _) >> []
         configurator.commit(_, _) >> mockReport(true)
 
         when:
-        def report = saveCswConfiguration.process()
+        def report = saveCswConfiguration.getValue()
 
         then:
         report.result().getValue() == false
@@ -169,11 +168,11 @@ class SaveCswConfigurationTest extends Specification {
     def 'Fail to update CSW Configuration due to no existing source config'() {
         setup:
         actionArgs.put(PID, S_PID)
-        saveCswConfiguration.setArguments(actionArgs)
+        saveCswConfiguration.setValue(actionArgs)
         configReader.getConfig(S_PID) >> [:]
 
         when:
-        def report = saveCswConfiguration.process()
+        def report = saveCswConfiguration.getValue()
 
         then:
         report.result() == null
@@ -184,7 +183,7 @@ class SaveCswConfigurationTest extends Specification {
 
     def 'Fail when missing required fields'() {
         when:
-        def report = saveCswConfiguration.process()
+        def report = saveCswConfiguration.getValue()
 
         then:
         report.result() == null
@@ -202,7 +201,7 @@ class SaveCswConfigurationTest extends Specification {
     }
 
     def createCswSaveArgs() {
-        actionArgs = getBaseSaveConfigActionArgs()
+        actionArgs = getBaseSaveConfigArgs()
         actionArgs.get(SOURCE_CONFIG).put(OUTPUT_SCHEMA, TEST_OUTPUT_SCHEMA)
         actionArgs.get(SOURCE_CONFIG).put(CSW_PROFILE, TEST_CSW_PROFILE)
         return actionArgs

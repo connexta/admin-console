@@ -44,8 +44,10 @@ public class GetOpenSearchConfigurations extends BaseFunctionField<ListField<Sou
 
     public GetOpenSearchConfigurations(ConfiguratorFactory configuratorFactory) {
         super(ID, DESCRIPTION, new ListFieldImpl<>(SourceInfoField.class));
-        this.configuratorFactory = configuratorFactory;
         pid = new PidField();
+        updateArgumentPaths();
+
+        this.configuratorFactory = configuratorFactory;
     }
 
     @Override

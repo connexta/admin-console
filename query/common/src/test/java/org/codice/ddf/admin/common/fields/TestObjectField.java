@@ -43,7 +43,6 @@ public class TestObjectField extends BaseObjectField {
             FieldBaseType baseType) {
         super(fieldName, fieldTypeName, description, baseType);
         testField = new InnerTestObjectField();
-
         updateInnerFieldPaths();
     }
 

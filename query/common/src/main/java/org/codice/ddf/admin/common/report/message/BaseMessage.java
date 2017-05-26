@@ -58,12 +58,6 @@ public abstract class BaseMessage implements Message {
     }
 
     @Override
-    public BaseMessage addSubpath(String subPath) {
-        path.add(0, subPath);
-        return this;
-    }
-
-    @Override
     public Message setPath(List<String> path) {
         this.path = path;
         return this;

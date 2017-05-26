@@ -25,6 +25,9 @@ public abstract class GetFunctionField<T extends DataType> extends BaseFunctionF
         super(fieldName, description, returnType);
     }
 
+    public GetFunctionField(String fieldName, String description, Class<T> returnType) {
+        super(fieldName, description, returnType);
+    }
 
     @Override
     public List<DataType> getArguments() {

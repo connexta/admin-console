@@ -33,7 +33,7 @@ public class AddressField extends BaseObjectField {
 
     private HostField host;
 
-    private UrlField url;;
+    private UrlField url;
 
     public AddressField() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);

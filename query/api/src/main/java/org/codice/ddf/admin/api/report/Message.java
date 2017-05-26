@@ -22,8 +22,6 @@ public interface Message {
 
     List<String> getPath();
 
-    Message addSubpath(String subPath);
-
     Message setPath(List<String> path);
 
     Message copy();

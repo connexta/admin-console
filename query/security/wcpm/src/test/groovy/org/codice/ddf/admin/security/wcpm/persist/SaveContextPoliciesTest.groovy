@@ -11,7 +11,7 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  */
-package org.codice.ddf.admin.security.wcpm.actions.persist
+package groovy.org.codice.ddf.admin.security.wcpm.persist
 
 import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.api.FieldProvider
@@ -42,7 +42,7 @@ class SaveContextPoliciesTest extends Specification {
     ConfigReader configReader
     OperationReport operationReport
     PolicyManager policyManager
-    FunctionField action
+    FunctionField saveContextPoliciesFunction
     Map<String, Object> stsConfig
 
     String[] testClaims
@@ -84,6 +84,7 @@ class SaveContextPoliciesTest extends Specification {
                 ]
         ]
 
+
         operationReport = Mock(OperationReport)
         configuratorFactory = Mock(ConfiguratorFactory)
         configurator = Mock(Configurator)
@@ -107,7 +108,7 @@ class SaveContextPoliciesTest extends Specification {
         configuratorFactory.getConfigurator() >> configurator
         configuratorFactory.getConfigReader() >> configReader
         queryProvider = new WcpmFieldProvider(configuratorFactory)
-        action = queryProvider.getMutationFunction(SaveContextPolices.FUNCTION_FIELD_NAME)
+        saveContextPoliciesFunction = queryProvider.getMutationFunction(SaveContextPolices.FUNCTION_FIELD_NAME)
     }
 
     def 'Pass with valid update'() {
@@ -115,8 +116,8 @@ class SaveContextPoliciesTest extends Specification {
         operationReport.containsFailedResults() >> false
 
         when:
-        action.setValue(testData)
-        ReportWithResult report = action.getValue()
+        saveContextPoliciesFunction.setValue(testData)
+        ReportWithResult report = saveContextPoliciesFunction.getValue()
 
         then:
         report.messages().isEmpty()
@@ -128,8 +129,8 @@ class SaveContextPoliciesTest extends Specification {
         operationReport.containsFailedResults() >> true
 
         when:
-        action.setValue(testData)
-        ReportWithResult report = action.getValue()
+        saveContextPoliciesFunction.setValue(testData)
+        ReportWithResult report = saveContextPoliciesFunction.getValue()
 
         then:
         report.messages().size() == 1
@@ -144,8 +145,8 @@ class SaveContextPoliciesTest extends Specification {
         testData.policies[0].paths = ['/test']
 
         when:
-        action.setValue(testData)
-        ReportWithResult report = action.getValue()
+        saveContextPoliciesFunction.setValue(testData)
+        ReportWithResult report = saveContextPoliciesFunction.getValue()
 
         then:
         report.messages().size() == 1
@@ -160,8 +161,8 @@ class SaveContextPoliciesTest extends Specification {
         testData.policies[0].authTypes = ['PKI', 'COFFEE']
 
         when:
-        action.setValue(testData)
-        ReportWithResult report = action.getValue()
+        saveContextPoliciesFunction.setValue(testData)
+        ReportWithResult report = saveContextPoliciesFunction.getValue()
 
         then:
         report.messages().size() == 1
@@ -176,8 +177,8 @@ class SaveContextPoliciesTest extends Specification {
         testData.policies[0].authTypes = []
 
         when:
-        action.setValue(testData)
-        ReportWithResult report = action.getValue()
+        saveContextPoliciesFunction.setValue(testData)
+        ReportWithResult report = saveContextPoliciesFunction.getValue()
 
         then:
         report.messages().size() == 1
@@ -193,8 +194,8 @@ class SaveContextPoliciesTest extends Specification {
         testData.policies[0].realm = 'COFFEE'
 
         when:
-        action.setValue(testData)
-        ReportWithResult report = action.getValue()
+        saveContextPoliciesFunction.setValue(testData)
+        ReportWithResult report = saveContextPoliciesFunction.getValue()
 
         then:
         report.messages().size() == 1
@@ -209,8 +210,8 @@ class SaveContextPoliciesTest extends Specification {
         testData.policies[0].realm = null
 
         when:
-        action.setValue(testData)
-        ReportWithResult report = action.getValue()
+        saveContextPoliciesFunction.setValue(testData)
+        ReportWithResult report = saveContextPoliciesFunction.getValue()
 
         then:
         report.messages().size() == 1
@@ -225,8 +226,8 @@ class SaveContextPoliciesTest extends Specification {
         testData.policies[0].claimsMapping = []
 
         when:
-        action.setValue(testData)
-        ReportWithResult report = action.getValue()
+        saveContextPoliciesFunction.setValue(testData)
+        ReportWithResult report = saveContextPoliciesFunction.getValue()
 
         then:
         report.messages().isEmpty()
@@ -239,8 +240,8 @@ class SaveContextPoliciesTest extends Specification {
         testData.policies[0].claimsMapping[0][ClaimsMapEntry.VALUE_FIELD_NAME] = null
 
         when:
-        action.setValue(testData)
-        ReportWithResult report = action.getValue()
+        saveContextPoliciesFunction.setValue(testData)
+        ReportWithResult report = saveContextPoliciesFunction.getValue()
 
         then:
         report.messages().size() == 1
@@ -255,8 +256,8 @@ class SaveContextPoliciesTest extends Specification {
         testData.policies[0].claimsMapping[0][ClaimsMapEntry.KEY_FIELD_NAME] = 'unsupportedClaim'
 
         when:
-        action.setValue(testData)
-        ReportWithResult report = action.getValue()
+        saveContextPoliciesFunction.setValue(testData)
+        ReportWithResult report = saveContextPoliciesFunction.getValue()
 
         then:
         report.messages().size() == 1

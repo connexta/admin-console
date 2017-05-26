@@ -46,6 +46,7 @@ public class GetWfsConfigurations extends BaseFunctionField<ListField<SourceInfo
         super(ID, DESCRIPTION, new ListFieldImpl<>(SourceInfoField.class));
         this.configuratorFactory = configuratorFactory;
         pid = new PidField();
+        updateArgumentPaths();
     }
 
     @Override

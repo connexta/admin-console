@@ -38,11 +38,15 @@ import org.codice.ddf.admin.api.report.FunctionReport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Lists;
+
 import graphql.Scalars;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLArgument;
 import graphql.schema.GraphQLFieldDefinition;
+import graphql.schema.GraphQLInputType;
 import graphql.schema.GraphQLList;
+import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLScalarType;
@@ -136,27 +140,46 @@ public class GraphQLTransformOutput {
                     .description(field.description())
                     .type(fieldToGraphQLOutputType(returnType))
                     .argument(graphQLArgs)
-                    .dataFetcher(field instanceof FunctionField ? (env -> functionDataFetcher(env, field)) : null)
+                    .dataFetcher(field instanceof FunctionField ? (env -> functionDataFetcher(env, (FunctionField)field)) : (env -> dataTypeDataFetcher(env, (DataType)field)))
                     .build();
     }
 
-    public Object functionDataFetcher(DataFetchingEnvironment env, Field field) {
+    public FunctionReport functionDataFetcher(DataFetchingEnvironment env, FunctionField field) {
         Map<String, Object> args = new HashMap<>();
         if (env.getArguments() != null) {
             args.putAll(env.getArguments());
         }
 
-        FunctionField<DataType> funcField = ((FunctionField)field).newInstance();
+        FunctionField<DataType> funcField = field.newInstance();
+
+        //Remove the field name of the function from that path since the update is using a subpath
+        List<String> fixedPath = Lists.newArrayList(field.path());
+        fixedPath.remove(fixedPath.size() - 1);
+        funcField.updatePath(fixedPath);
         funcField.setValue(env.getArguments());
         FunctionReport result = funcField.getValue();
         return result;
     }
 
+    public Object dataTypeDataFetcher(DataFetchingEnvironment env, DataType field) {
+        Object source = env.getSource();
+        //If no values are passed for the source, return a field definition to continue the execution strategy instead of returning null. This is an expansion of the PropertyDataFetcher
+        if (source instanceof Map) {
+            if(!((Map) source).isEmpty()) {
+                return ((Map<?, ?>) source).get(field.fieldName());
+            }
+        }
+
+        return field.getValue();
+    }
+
     public GraphQLArgument fieldToGraphQLArgument(DataType field) {
+        GraphQLInputType graphqlInputType = transformInput.fieldTypeToGraphQLInputType(field);
+
         return GraphQLArgument.newArgument()
                 .name(field.fieldName())
                 .description(field.description())
-                .type(transformInput.fieldTypeToGraphQLInputType(field))
+                .type(field.isRequired() ? new GraphQLNonNull(graphqlInputType) : graphqlInputType)
                 .build();
     }
 

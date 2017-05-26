@@ -13,13 +13,13 @@
  */
 package org.codice.ddf.admin.sources.commons.utils;
 
-import static org.codice.ddf.admin.sources.commons.utils.SourceUtilCommons.getAllSourceReferences;
 import static org.codice.ddf.admin.sources.commons.SourceMessages.duplicateSourceNameError;
+import static org.codice.ddf.admin.sources.commons.utils.SourceUtilCommons.getAllSourceReferences;
 
 import java.util.List;
 
-import org.codice.ddf.admin.common.report.ReportImpl;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
+import org.codice.ddf.admin.common.report.ReportImpl;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 
 import ddf.catalog.service.ConfiguredService;

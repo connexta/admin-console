@@ -19,11 +19,12 @@ import java.util.List;
 
 import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
+import org.codice.ddf.admin.api.report.ReportWithResult;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
-import org.codice.ddf.admin.common.report.ReportWithResultImpl;
 import org.codice.ddf.admin.common.fields.common.AddressField;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
 import org.codice.ddf.admin.common.fields.common.UrlField;
+import org.codice.ddf.admin.common.report.ReportWithResultImpl;
 import org.codice.ddf.admin.sources.commons.utils.OpenSearchSourceUtils;
 import org.codice.ddf.admin.sources.fields.SourceInfoField;
 import org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField;
@@ -49,6 +50,8 @@ public class DiscoverOpenSearchSource extends BaseFunctionField<SourceInfoField>
         credentials = new CredentialsField();
         address = new AddressField();
         address.isRequired(true);
+        updateArgumentPaths();
+
         openSearchSourceUtils = new OpenSearchSourceUtils();
     }
 
@@ -59,7 +62,7 @@ public class DiscoverOpenSearchSource extends BaseFunctionField<SourceInfoField>
 
     @Override
     public SourceInfoField performFunction() {
-        ReportWithResultImpl<SourceConfigUnionField> configResult;
+        ReportWithResult<SourceConfigUnionField> configResult;
         if (address.url() != null) {
             configResult = openSearchSourceUtils.getOpenSearchConfig(address.urlField(), credentials);
             addMessages(configResult);

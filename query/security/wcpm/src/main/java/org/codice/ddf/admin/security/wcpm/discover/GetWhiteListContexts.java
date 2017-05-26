@@ -19,8 +19,8 @@ import java.util.List;
 
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.api.fields.ListField;
-import org.codice.ddf.admin.common.fields.base.function.GetFunctionField;
 import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
+import org.codice.ddf.admin.common.fields.base.function.GetFunctionField;
 import org.codice.ddf.admin.common.fields.common.ContextPath;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 

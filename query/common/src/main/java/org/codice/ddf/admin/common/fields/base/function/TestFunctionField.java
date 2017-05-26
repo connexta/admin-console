@@ -18,7 +18,6 @@ import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 
 public abstract class TestFunctionField extends BaseFunctionField<BooleanField> {
 
-    // TODO: tbatie - 3/29/17 - Consider changing return type to be PASSED, WARNING, ERRORS, ERRORS_AND_WARNINGS
     public TestFunctionField(String fieldName, String description) {
         super(fieldName, description, new BooleanField(null));
     }

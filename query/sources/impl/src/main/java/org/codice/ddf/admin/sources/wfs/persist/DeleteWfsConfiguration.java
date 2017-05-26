@@ -43,6 +43,7 @@ public class DeleteWfsConfiguration extends BaseFunctionField<BooleanField> {
         this.configuratorFactory = configuratorFactory;
         pid = new PidField();
         pid.isRequired(true);
+        updateArgumentPaths();
     }
 
     @Override

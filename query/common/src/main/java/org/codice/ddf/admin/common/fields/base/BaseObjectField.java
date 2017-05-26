@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.Field;
+import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.api.fields.ObjectField;
 import org.codice.ddf.admin.api.report.Message;
 
@@ -42,9 +43,14 @@ public abstract class BaseObjectField extends BaseDataType<Map<String, Object>>
 
     @Override
     public Map<String, Object> getValue() {
-        Map<String, Object> value = new HashMap<>();
-        getFields().forEach(field -> value.put(field.fieldName(), field.getValue()));
-        return value;
+
+        Map<String, Object> values = new HashMap<>();
+        for(Field field : getFields()) {
+            if(!(field instanceof FunctionField)) {
+                values.put(field.fieldName(), field.getValue());
+            }
+        }
+        return values;
     }
 
     @Override
@@ -54,7 +60,7 @@ public abstract class BaseObjectField extends BaseDataType<Map<String, Object>>
         }
 
         getFields().stream()
-                .filter(field -> values.containsKey(field.fieldName()))
+                .filter(field -> !(field instanceof FunctionField) && values.containsKey(field.fieldName()))
                 .forEach(field -> field.setValue(values.get(field.fieldName())));
     }
 
@@ -67,6 +73,7 @@ public abstract class BaseObjectField extends BaseDataType<Map<String, Object>>
         }
 
         validationErrors.addAll(getFields().stream()
+                .filter(field -> !(field instanceof FunctionField))
                 .filter(field -> field instanceof DataType)
                 .map(field -> (List<Message>) ((DataType)field).validate())
                 .flatMap(Collection::stream)
@@ -81,6 +88,7 @@ public abstract class BaseObjectField extends BaseDataType<Map<String, Object>>
         }
 
         getFields().stream()
+                .filter(field -> !(field instanceof FunctionField))
                 .filter(field -> field instanceof DataType)
                 .map(field -> ((DataType) field).isRequired(required))
                 .filter(field -> field instanceof ObjectField)

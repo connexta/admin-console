@@ -11,30 +11,30 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.sources.wfs
+package org.codice.ddf.admin.sources.opensearch
 
 import org.codice.ddf.admin.api.FieldProvider
 import spock.lang.Specification
 
-class WfsActionCreatorTest extends Specification {
+class OpenSearchFieldProviderTest extends Specification {
 
-    WfsFieldProvider wfsActionCreator
+    OpenSearchFieldProvider openSearchFieldProvider
 
     def setup() {
-        wfsActionCreator = new WfsFieldProvider()
+        openSearchFieldProvider = new OpenSearchFieldProvider()
     }
 
-    def 'Verify discovery actions immutability'() {
+    def 'Verify discovery fields immutability'() {
         when:
-        wfsActionCreator.getDiscoveryActions().add(Mock(FieldProvider))
+        openSearchFieldProvider.getDiscoveryFields().add(Mock(FieldProvider))
 
         then:
         thrown(UnsupportedOperationException)
     }
 
-    def 'Verify persist actions immutability'() {
+    def 'Verify persist functions immutability'() {
         when:
-        wfsActionCreator.getPersistActions().add(Mock(FieldProvider))
+        openSearchFieldProvider.getMutationFunctions().add(Mock(FieldProvider))
 
         then:
         thrown(UnsupportedOperationException)

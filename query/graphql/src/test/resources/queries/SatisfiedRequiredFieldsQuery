@@ -1,0 +1,11 @@
+query TestRequiredArgs($stringArg: String, $integerArg: Int, $booleanArg: Boolean, $listArg: [String], $enumArg: Enumeration) {
+  testing {
+    requiredArg(testObj: {string: $stringArg, integer: $integerArg, boolean: $booleanArg, list: $listArg, enumeration: $enumArg}) {
+      string
+      integer
+      boolean
+      list
+      enumeration
+    }
+  }
+}

@@ -1,0 +1,11 @@
+query TestMultipleArgs($stringArg: String, $integerArg: Int, $booleanArg: Boolean, $listArg: [String], $enumArg: Enumeration) {
+  testing {
+    multipleArgs(string: $stringArg, integer: $integerArg, boolean:$booleanArg, list: $listArg, enumeration: $enumArg) {
+      string
+      boolean
+      integer
+      list
+      enumeration
+    }
+  }
+}

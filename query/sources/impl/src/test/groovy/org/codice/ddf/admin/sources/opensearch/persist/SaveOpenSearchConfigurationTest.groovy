@@ -14,7 +14,6 @@
 package org.codice.ddf.admin.sources.opensearch.persist
 
 import ddf.catalog.source.FederatedSource
-import org.codice.ddf.admin.api.FieldProvider
 import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.configurator.ConfigReader
@@ -38,7 +37,7 @@ class SaveOpenSearchConfigurationTest extends Specification {
 
     static ENDPOINT_URL_PATH = [CONFIG_PATH, ENDPOINT_URL].flatten()
 
-    FieldProvider saveOpenSearchConfiguration
+    SaveOpenSearchConfiguration saveOpenSearchConfiguration
 
     ConfiguratorFactory configuratorFactory
 
@@ -65,12 +64,12 @@ class SaveOpenSearchConfigurationTest extends Specification {
 
     def 'Successfully save new OpenSearch configuration'() {
         setup:
-        saveOpenSearchConfiguration.setArguments(getBaseSaveConfigActionArgs())
+        saveOpenSearchConfiguration.setValue(getBaseSaveConfigArgs())
         configReader.getServices(_, _) >> []
         configurator.commit(_, _) >> mockReport(false)
 
         when:
-        def report = saveOpenSearchConfiguration.process()
+        def report = saveOpenSearchConfiguration.getValue()
 
         then:
         report.result().getValue() == true
@@ -78,11 +77,11 @@ class SaveOpenSearchConfigurationTest extends Specification {
 
     def 'Fail to save new OpenSearch config due to duplicate source name'() {
         setup:
-        saveOpenSearchConfiguration.setArguments(getBaseSaveConfigActionArgs())
+        saveOpenSearchConfiguration.setValue(getBaseSaveConfigArgs())
         configReader.getServices(_, _) >> federatedSources
 
         when:
-        def report = saveOpenSearchConfiguration.process()
+        def report = saveOpenSearchConfiguration.getValue()
 
         then:
         report.result() == null
@@ -93,12 +92,12 @@ class SaveOpenSearchConfigurationTest extends Specification {
 
     def 'Fail to save new OpenSearch config due to failure to commit'() {
         setup:
-        saveOpenSearchConfiguration.setArguments(getBaseSaveConfigActionArgs())
+        saveOpenSearchConfiguration.setValue(getBaseSaveConfigArgs())
         configReader.getServices(_, _) >> []
         configurator.commit(_, _) >> mockReport(true)
 
         when:
-        def report = saveOpenSearchConfiguration.process()
+        def report = saveOpenSearchConfiguration.getValue()
 
         then:
         report.result().getValue() == false
@@ -109,13 +108,13 @@ class SaveOpenSearchConfigurationTest extends Specification {
 
     def 'Successfully update existing OpenSearch configuration'() {
         setup:
-        saveOpenSearchConfiguration.setArguments(createUpdateActionArgs())
+        saveOpenSearchConfiguration.setValue(createUpdateFunctionArgs())
         configReader.getConfig(_) >> [(ID):TEST_SOURCENAME]
         configReader.getServices(_, _) >> []
         configurator.commit(_, _) >> mockReport(false)
 
         when:
-        def report = saveOpenSearchConfiguration.process()
+        def report = saveOpenSearchConfiguration.getValue()
 
         then:
         report.result().getValue() == true
@@ -123,12 +122,12 @@ class SaveOpenSearchConfigurationTest extends Specification {
 
     def 'Fail to update config due to existing source name'() {
         setup:
-        saveOpenSearchConfiguration.setArguments(createUpdateActionArgs())
+        saveOpenSearchConfiguration.setValue(createUpdateFunctionArgs())
         configReader.getConfig(_) >> [(ID):'updatedName']
         configReader.getServices(_, _) >> [new TestSource(S_PID, 'updatedName', false), new TestSource("existingSource", TEST_SOURCENAME, false)]
 
         when:
-        def report = saveOpenSearchConfiguration.process()
+        def report = saveOpenSearchConfiguration.getValue()
 
         then:
         report.result() == null
@@ -139,13 +138,13 @@ class SaveOpenSearchConfigurationTest extends Specification {
 
     def 'Fail to update config due to failure to commit'() {
         setup:
-        saveOpenSearchConfiguration.setArguments(createUpdateActionArgs())
+        saveOpenSearchConfiguration.setValue(createUpdateFunctionArgs())
         configReader.getConfig(_) >> [(ID):TEST_SOURCENAME]
         configReader.getServices(_, _) >> []
         configurator.commit(_, _) >> mockReport(true)
 
         when:
-        def report = saveOpenSearchConfiguration.process()
+        def report = saveOpenSearchConfiguration.getValue()
 
         then:
         report.result().getValue() == false
@@ -156,11 +155,11 @@ class SaveOpenSearchConfigurationTest extends Specification {
 
     def 'Fail to update config due to no existing source specified by the pid'() {
         setup:
-        saveOpenSearchConfiguration.setArguments(createUpdateActionArgs())
+        saveOpenSearchConfiguration.setValue(createUpdateFunctionArgs())
         configReader.getConfig(S_PID) >> [:]
 
         when:
-        def report = saveOpenSearchConfiguration.process()
+        def report = saveOpenSearchConfiguration.getValue()
 
         then:
         report.result() == null
@@ -171,7 +170,7 @@ class SaveOpenSearchConfigurationTest extends Specification {
 
     def 'Fail when missing required fields'() {
         when:
-        def report = saveOpenSearchConfiguration.process()
+        def report = saveOpenSearchConfiguration.getValue()
 
         then:
         report.result() == null
@@ -188,8 +187,8 @@ class SaveOpenSearchConfigurationTest extends Specification {
         return report
     }
 
-    def createUpdateActionArgs() {
-        def args = getBaseSaveConfigActionArgs()
+    def createUpdateFunctionArgs() {
+        def args = getBaseSaveConfigArgs()
         args.put(PID, S_PID)
         return args
     }

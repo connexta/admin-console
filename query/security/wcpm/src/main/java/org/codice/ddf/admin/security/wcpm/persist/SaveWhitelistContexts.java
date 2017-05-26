@@ -18,7 +18,6 @@ import static org.codice.ddf.admin.common.report.message.DefaultMessages.failedP
 import java.util.List;
 
 import org.codice.ddf.admin.api.DataType;
-import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.base.ListFieldImpl;

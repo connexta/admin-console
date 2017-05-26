@@ -56,6 +56,8 @@ public class SaveWfsConfiguration extends BaseFunctionField<BooleanField> {
         config.wfsVersionField().isRequired(true);
         config.sourceNameField().isRequired(true);
         config.endpointUrlField().isRequired(true);
+        updateArgumentPaths();
+
         this.configuratorFactory = configuratorFactory;
     }
 
@@ -79,7 +81,6 @@ public class SaveWfsConfiguration extends BaseFunctionField<BooleanField> {
             return;
         }
 
-        // TODO: tbatie - 5/16/17 - Duplicate code, move to source validator
         if(pid.getValue() != null) {
             addMessages(serviceConfigurationExists(pid, configuratorFactory));
             if(!containsErrorMsgs() && !hasSourceName(pid.getValue(), config.sourceName(), configuratorFactory)) {

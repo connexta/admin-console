@@ -11,18 +11,32 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.api.fields;
+package org.codice.ddf.admin.sources.csw
 
-import java.util.List;
+import org.codice.ddf.admin.api.FieldProvider
+import spock.lang.Specification
 
-import org.codice.ddf.admin.api.DataType;
-import org.codice.ddf.admin.api.Field;
+class CswFieldProviderTest extends Specification {
 
-public interface InterfaceField<T> extends DataType<T> {
+    CswFieldProvider cswFieldProvider
 
-    String interfaceTypeName();
+    def setup() {
+        cswFieldProvider = new CswFieldProvider()
+    }
 
-    String interfaceDescription();
+    def 'Verify discovery fields immutability'() {
+        when:
+        cswFieldProvider.getDiscoveryFields().add(Mock(FieldProvider))
 
-    List<Field> getFields();
+        then:
+        thrown(UnsupportedOperationException)
+    }
+
+    def 'Verify persist functions immutability'() {
+        when:
+        cswFieldProvider.getMutationFunctions().add(Mock(FieldProvider))
+
+        then:
+        thrown(UnsupportedOperationException)
+    }
 }

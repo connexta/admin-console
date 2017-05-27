@@ -17,8 +17,8 @@ import static org.codice.ddf.admin.ldap.fields.connection.LdapBindMethod.DIGEST_
 
 import java.util.List;
 
-import org.codice.ddf.admin.api.action.Message;
-import org.codice.ddf.admin.api.fields.Field;
+import org.codice.ddf.admin.api.Field;
+import org.codice.ddf.admin.api.report.Message;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
 
@@ -40,6 +40,10 @@ public class LdapBindUserInfo extends BaseObjectField {
 
     public LdapBindUserInfo() {
         super(FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
+        creds = new CredentialsField();
+        bindMethod = new LdapBindMethod();
+        realm = new LdapRealm();
+        updateInnerFieldPaths();
     }
 
     public LdapBindUserInfo username(String username) {
@@ -80,13 +84,6 @@ public class LdapBindUserInfo extends BaseObjectField {
             realm.isRequired(true);
         }
         return super.validate();
-    }
-
-    @Override
-    public void initializeFields() {
-        this.creds = new CredentialsField();
-        this.bindMethod = new LdapBindMethod();
-        this.realm = new LdapRealm();
     }
 
     @Override

@@ -15,7 +15,7 @@ package org.codice.ddf.admin.common.fields.common;
 
 import java.util.List;
 
-import org.codice.ddf.admin.api.fields.Field;
+import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
 import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
@@ -30,10 +30,14 @@ public class MapField extends BaseObjectField {
 
     public static final String DESCRIPTION = "A map containing a list of key value pairs.";
 
+    public static final String ENTRIES_FIELD_NAME = "entries";
+
     private ListField<PairField> entries;
 
     public MapField() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
+        entries = new ListFieldImpl<>(ENTRIES_FIELD_NAME, PairField.class);
+        updateInnerFieldPaths();
     }
 
     @Override
@@ -44,11 +48,5 @@ public class MapField extends BaseObjectField {
     public MapField put(String key, String value) {
         entries.add(new PairField().key(key).value(value));
         return this;
-    }
-
-    @Override
-    public void initializeFields() {
-        // TODO: 4/18/17 phuffer - replace with a MapField
-        entries = new ListFieldImpl<>("entries", PairField.class);
     }
 }

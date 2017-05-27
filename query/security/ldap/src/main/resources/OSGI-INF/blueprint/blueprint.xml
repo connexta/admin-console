@@ -13,8 +13,8 @@
 -->
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-    <service id="ldapProvider" interface="org.codice.ddf.admin.api.action.ActionCreator">
-        <bean class="org.codice.ddf.admin.ldap.actions.LdapActionCreator">
+    <service id="ldapProvider" interface="org.codice.ddf.admin.api.FieldProvider">
+        <bean class="org.codice.ddf.admin.ldap.LdapFieldProvider">
             <argument ref="configuratorFactory" />
         </bean>
     </service>

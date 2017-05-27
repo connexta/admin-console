@@ -16,10 +16,13 @@ package org.codice.ddf.admin.api.fields;
 import java.util.List;
 import java.util.Map;
 
+import org.codice.ddf.admin.api.DataType;
+import org.codice.ddf.admin.api.Field;
+
 /**
  * Encapsulates a {@code List} of {@link Field}s.
  */
-public interface ObjectField extends Field<Map<String, Object>> {
+public interface ObjectField extends DataType<Map<String, Object>> {
 
     /**
      * Returns all the internal {@link Field}s held by this {@code ObjectField}.

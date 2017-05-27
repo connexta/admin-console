@@ -13,9 +13,15 @@
  **/
 package org.codice.ddf.admin.common.fields.base.scalar;
 
-import static org.codice.ddf.admin.api.fields.Field.FieldBaseType.INTEGER;
+import static org.codice.ddf.admin.api.DataType.FieldBaseType.INTEGER;
 
 public class IntegerField extends BaseScalarField<Integer> {
+
+    public static final String DEFAULT_FIELD_NAME  = "integer";
+
+    public IntegerField() {
+        this(DEFAULT_FIELD_NAME);
+    }
 
     public IntegerField(String fieldName) {
         super(fieldName, null, null, INTEGER);

@@ -13,7 +13,7 @@
  **/
 package org.codice.ddf.admin.common.fields.base.scalar;
 
-import static org.codice.ddf.admin.api.fields.Field.FieldBaseType.FLOAT;
+import static org.codice.ddf.admin.api.DataType.FieldBaseType.FLOAT;
 
 public class FloatField extends BaseScalarField<Float> {
     public FloatField(String fieldName) {

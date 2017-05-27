@@ -13,24 +13,28 @@
  **/
 package org.codice.ddf.admin.common.fields.base.scalar;
 
-import static org.codice.ddf.admin.api.fields.Field.FieldBaseType.BOOLEAN;
+import static org.codice.ddf.admin.api.DataType.FieldBaseType.BOOLEAN;
 
 public class BooleanField extends BaseScalarField<Boolean> {
 
-    public BooleanField() {
-        super(null, null, null, BOOLEAN);
-    }
+    public static final String DEFAULT_FIELD_NAME = "boolean";
 
     public BooleanField(boolean value) {
         this();
         setValue(value);
     }
 
-    public BooleanField(String fieldName) {
-        super(fieldName, null, null, BOOLEAN);
+    public BooleanField() {
+        this(DEFAULT_FIELD_NAME);
     }
+
+    public BooleanField(String fieldName) {
+        this(fieldName, null, null);
+    }
+
 
     protected BooleanField(String fieldName, String fieldTypeName, String description) {
         super(fieldName, fieldTypeName, description, BOOLEAN);
     }
+
 }

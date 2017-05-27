@@ -13,7 +13,7 @@
  **/
 package org.codice.ddf.admin.ldap.fields.query;
 
-import org.codice.ddf.admin.api.fields.Field;
+import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.common.fields.base.BaseEnumField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 
@@ -42,7 +42,7 @@ public class LdapTypeField extends BaseEnumField<String> {
     }
 
     // TODO: tbatie - 3/27/17 - Add constructor for supporting additional authtypes. Do this for all enum fields
-    protected LdapTypeField(Field<String> ldapType) {
+    protected LdapTypeField(DataType<String> ldapType) {
         super(DEFAULT_FIELD_NAME,
                 FIELD_TYPE_NAME,
                 DESCRIPTION,

@@ -13,26 +13,28 @@
  **/
 package org.codice.ddf.admin.common.fields.base;
 
-import static org.codice.ddf.admin.api.fields.Field.FieldBaseType.OBJECT;
+import static org.codice.ddf.admin.api.DataType.FieldBaseType.OBJECT;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
-import org.codice.ddf.admin.api.action.Message;
-import org.codice.ddf.admin.api.fields.Field;
+import org.codice.ddf.admin.api.DataType;
+import org.codice.ddf.admin.api.Field;
+import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.api.fields.ObjectField;
+import org.codice.ddf.admin.api.report.Message;
 
-public abstract class BaseObjectField extends BaseField<Map<String, Object>>
+public abstract class BaseObjectField extends BaseDataType<Map<String, Object>>
         implements ObjectField {
 
+    // TODO: tbatie - 5/21/17 - Remove the baseType field once unions are moved to interfaces
     protected BaseObjectField(String fieldName, String fieldTypeName, String description,
             FieldBaseType baseType) {
         super(fieldName, fieldTypeName, description, baseType);
-        initializeFields();
-        getFields().forEach(field -> field.updatePath(path()));
     }
 
     public BaseObjectField(String fieldName, String fieldTypeName, String description) {
@@ -41,9 +43,15 @@ public abstract class BaseObjectField extends BaseField<Map<String, Object>>
 
     @Override
     public Map<String, Object> getValue() {
-        Map<String, Object> value = new HashMap<>();
-        getFields().forEach(field -> value.put(field.fieldName(), field.getValue()));
-        return value;
+        Map<String, Object> values = new HashMap<>();
+
+        for(Field field : getFields()) {
+            if(!(field instanceof FunctionField)) {
+                values.put(field.fieldName(), field.getValue());
+            }
+        }
+
+        return values;
     }
 
     @Override
@@ -53,7 +61,7 @@ public abstract class BaseObjectField extends BaseField<Map<String, Object>>
         }
 
         getFields().stream()
-                .filter(field -> values.containsKey(field.fieldName()))
+                .filter(field -> !(field instanceof FunctionField) && values.containsKey(field.fieldName()))
                 .forEach(field -> field.setValue(values.get(field.fieldName())));
     }
 
@@ -66,7 +74,8 @@ public abstract class BaseObjectField extends BaseField<Map<String, Object>>
         }
 
         validationErrors.addAll(getFields().stream()
-                .map(field -> (List<Message>) field.validate())
+                .filter(field -> field instanceof DataType)
+                .map(field -> (List<Message>) ((DataType)field).validate())
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList()));
         return validationErrors;
@@ -79,7 +88,8 @@ public abstract class BaseObjectField extends BaseField<Map<String, Object>>
         }
 
         getFields().stream()
-                .map(field -> field.isRequired(required))
+                .filter(field -> field instanceof DataType)
+                .map(field -> ((DataType) field).isRequired(required))
                 .filter(field -> field instanceof ObjectField)
                 .map(ObjectField.class::cast)
                 .forEach(objField -> objField.allFieldsRequired(required));
@@ -87,19 +97,19 @@ public abstract class BaseObjectField extends BaseField<Map<String, Object>>
     }
 
     @Override
-    public void updatePath(List<String> path) {
-        super.updatePath(path);
-        getFields().forEach(child -> child.updatePath(path()));
+    public void updatePath(List<String> subPath) {
+        super.updatePath(subPath);
+        updateInnerFieldPaths();
     }
 
     @Override
     public void fieldName(String fieldName) {
         super.fieldName(fieldName);
-        getFields().forEach(child -> child.updatePath(path()));
+        updateInnerFieldPaths();
     }
 
     @Override
-    public Field matchRequired(Field field) {
+    public DataType matchRequired(DataType field) {
         super.matchRequired(field);
 
         if(!(field instanceof ObjectField)) {
@@ -108,8 +118,8 @@ public abstract class BaseObjectField extends BaseField<Map<String, Object>>
 
         for(Field subField : ((ObjectField)field).getFields()) {
             for(Field toSetSubField : getFields()) {
-                if(toSetSubField.fieldName().equals(subField.fieldName())) {
-                    toSetSubField.matchRequired(subField);
+                if(toSetSubField instanceof DataType && toSetSubField.fieldName().equals(subField.fieldName())) {
+                    ((DataType)toSetSubField).matchRequired((DataType) subField);
                     break;
                 }
             }
@@ -118,9 +128,9 @@ public abstract class BaseObjectField extends BaseField<Map<String, Object>>
         return this;
     }
 
-    /**
-     * Initializes all the {@link org.codice.ddf.admin.api.fields.Field} of an {@code ObjectField}. Any {@link org.codice.ddf.admin.api.fields.Field} that gets initialized
-     * in this method, and is also returned by the {@link ObjectField#getFields()}, will have the {@code ObjectField} added to its path.
-     */
-    public abstract void initializeFields();
+    public void updateInnerFieldPaths() {
+        getFields().stream()
+                .filter(Objects::nonNull)
+                .forEach(child -> child.updatePath(path()));
+    }
 }

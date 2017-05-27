@@ -12,23 +12,22 @@
  **/
 -->
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
-    <bean id="cswActionCreator" class="org.codice.ddf.admin.sources.csw.CswActionCreator">
-        <property name="configuratorFactory" ref="configuratorFactory"/>
+    <bean id="cswFieldProvider" class="org.codice.ddf.admin.sources.csw.CswFieldProvider">
+        <argument ref="configuratorFactory"/>
     </bean>
 
-    <bean id="openSearchActionCreator"
-          class="org.codice.ddf.admin.sources.opensearch.OpenSearchActionCreator">
-        <property name="configuratorFactory" ref="configuratorFactory"/>
+    <bean id="openSearchFieldProvider"
+          class="org.codice.ddf.admin.sources.opensearch.OpenSearchFieldProvider">
+        <argument ref="configuratorFactory"/>
     </bean>
 
-    <bean id="wfsActionCreator" class="org.codice.ddf.admin.sources.wfs.WfsActionCreator">
-        <property name="configuratorFactory" ref="configuratorFactory"/>
+    <bean id="wfsFieldProvider" class="org.codice.ddf.admin.sources.wfs.WfsFieldProvider">
+        <argument ref="configuratorFactory"/>
     </bean>
 
-    <service ref="cswActionCreator" interface="org.codice.ddf.admin.api.action.ActionCreator"/>
-    <service ref="openSearchActionCreator"
-             interface="org.codice.ddf.admin.api.action.ActionCreator"/>
-    <service ref="wfsActionCreator" interface="org.codice.ddf.admin.api.action.ActionCreator"/>
+    <service ref="cswFieldProvider" interface="org.codice.ddf.admin.api.FieldProvider"/>
+    <service ref="openSearchFieldProvider" interface="org.codice.ddf.admin.api.FieldProvider"/>
+    <service ref="wfsFieldProvider" interface="org.codice.ddf.admin.api.FieldProvider"/>
 
     <reference id="configuratorFactory"
                interface="org.codice.ddf.admin.configurator.ConfiguratorFactory"

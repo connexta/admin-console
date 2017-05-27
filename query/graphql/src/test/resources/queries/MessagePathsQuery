@@ -1,0 +1,17 @@
+query TestMessagePaths {
+  testing {
+    path {
+      path2 {
+        path3 {
+          returnErrorsAndWarnings(testObj: {list: ["str"]}) {
+            integer
+            boolean
+            string
+            list
+            enumeration
+          }
+        }
+      }
+    }
+  }
+}

@@ -13,7 +13,7 @@
  */
 package org.codice.ddf.admin.sources.fields;
 
-import org.codice.ddf.admin.api.fields.Field;
+import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.common.fields.base.BaseEnumField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 
@@ -32,7 +32,7 @@ public class CswSpatialOperator extends BaseEnumField<String> {
         this(new NoFilter());
     }
 
-    public CswSpatialOperator(Field<String> spatialOperator) {
+    public CswSpatialOperator(DataType<String> spatialOperator) {
         super(DEFAULT_FIELD_NAME,
                 TYPE_NAME,
                 DESCRIPTION,

@@ -13,10 +13,10 @@
  **/
 package org.codice.ddf.admin.common.services;
 
-import static org.codice.ddf.admin.common.message.DefaultMessages.failedDeleteError;
-import static org.codice.ddf.admin.common.message.DefaultMessages.failedPersistError;
-import static org.codice.ddf.admin.common.message.DefaultMessages.failedUpdateError;
-import static org.codice.ddf.admin.common.message.DefaultMessages.noExistingConfigError;
+import static org.codice.ddf.admin.common.report.message.DefaultMessages.failedDeleteError;
+import static org.codice.ddf.admin.common.report.message.DefaultMessages.failedPersistError;
+import static org.codice.ddf.admin.common.report.message.DefaultMessages.failedUpdateError;
+import static org.codice.ddf.admin.common.report.message.DefaultMessages.noExistingConfigError;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -25,9 +25,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.text.StrSubstitutor;
-import org.codice.ddf.admin.api.fields.Field;
-import org.codice.ddf.admin.common.Report;
+import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.common.fields.common.PidField;
+import org.codice.ddf.admin.common.report.ReportImpl;
 import org.codice.ddf.admin.configurator.Configurator;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.configurator.OperationReport;
@@ -52,22 +52,22 @@ public class ServiceCommons {
                 .collect(Collectors.toList());
     }
 
-    public static Report createManagedService(Map<String, Object> serviceProps, String factoryPid,
+    public static ReportImpl createManagedService(Map<String, Object> serviceProps, String factoryPid,
             ConfiguratorFactory configuratorFactory) {
-        Report report = new Report();
+        ReportImpl report = new ReportImpl();
         Configurator configurator = configuratorFactory.getConfigurator();
 
         configurator.createManagedService(factoryPid, serviceProps);
         if(configurator.commit("Service saved with details [{}]", serviceProps.toString())
                 .containsFailedResults()) {
-            report.resultMessage(failedPersistError());
+            report.addResultMessage(failedPersistError());
         }
         return report;
     }
 
-    public static Report updateService(PidField servicePid, Map<String, Object> newConfig,
+    public static ReportImpl updateService(PidField servicePid, Map<String, Object> newConfig,
             ConfiguratorFactory configuratorFactory) {
-        Report report = new Report();
+        ReportImpl report = new ReportImpl();
         report.addMessages(serviceConfigurationExists(servicePid, configuratorFactory));
         if (report.containsErrorMsgs()) {
             return report;
@@ -81,29 +81,29 @@ public class ServiceCommons {
                 pid,
                 newConfig.toString());
         if (operationReport.containsFailedResults()) {
-            return report.resultMessage(failedUpdateError());
+            return report.addResultMessage(failedUpdateError());
         }
 
         return report;
     }
 
-    public static Report deleteService(PidField servicePid, ConfiguratorFactory configuratorFactory) {
-        Report report = new Report();
+    public static ReportImpl deleteService(PidField servicePid, ConfiguratorFactory configuratorFactory) {
+        ReportImpl report = new ReportImpl();
         Configurator configurator = configuratorFactory.getConfigurator();
         configurator.deleteManagedService(servicePid.getValue());
         if(configurator.commit("Deleted source with pid [{}].", servicePid.getValue())
                 .containsFailedResults()) {
-            report.resultMessage(failedDeleteError());
+            report.addResultMessage(failedDeleteError());
         }
         return report;
     }
 
-    public static Report serviceConfigurationExists(PidField servicePid, ConfiguratorFactory configuratorFactory) {
-        Report report = new Report();
+    public static ReportImpl serviceConfigurationExists(PidField servicePid, ConfiguratorFactory configuratorFactory) {
+        ReportImpl report = new ReportImpl();
         if(configuratorFactory.getConfigReader()
                 .getConfig(servicePid.getValue())
                 .isEmpty()) {
-            report.resultMessage(noExistingConfigError());
+            report.addResultMessage(noExistingConfigError());
         }
         return report;
     }

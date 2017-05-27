@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.codice.ddf.admin.api.fields.Field;
+import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
 import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
@@ -36,6 +36,12 @@ public class ContextPolicyBin extends BaseObjectField {
     public static final String DESCRIPTION =
             "Represents a policy being applied to a set of context paths.";
 
+    public static final String PATHS_FIELD_NAME = "paths";
+
+    public static final String AUTH_TYPES_FIELD_NAME = "authTypes";
+
+    public static final String CLAIMS_MAPPING_FIELD_NAME = "claimsMapping";
+
     private ListField<ContextPath> contexts;
 
     private ListField<AuthType> authTypes;
@@ -46,6 +52,11 @@ public class ContextPolicyBin extends BaseObjectField {
 
     public ContextPolicyBin() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
+        contexts = new ListFieldImpl<>(PATHS_FIELD_NAME, ContextPath.class);
+        authTypes = new ListFieldImpl<>(AUTH_TYPES_FIELD_NAME, AuthType.class);
+        realm = new Realm();
+        claimsMapping = new ListFieldImpl<>(CLAIMS_MAPPING_FIELD_NAME, ClaimsMapEntry.class);
+        updateInnerFieldPaths();
     }
 
     public ContextPolicyBin realm(String realm) {
@@ -132,15 +143,6 @@ public class ContextPolicyBin extends BaseObjectField {
     public ContextPolicyBin allFieldsRequired(boolean required) {
         super.allFieldsRequired(required);
         return this;
-    }
-
-    @Override
-    public void initializeFields() {
-        contexts = new ListFieldImpl<>("paths", ContextPath.class);
-        authTypes = new ListFieldImpl<>("authTypes", AuthType.class);
-        realm = new Realm();
-        // TODO: 4/18/17 phuffer -  Replace with a MapField
-        claimsMapping = new ListFieldImpl<>("claimsMapping", ClaimsMapEntry.class);
     }
 
     public ContextPolicyBin useDefaultRequiredFields() {

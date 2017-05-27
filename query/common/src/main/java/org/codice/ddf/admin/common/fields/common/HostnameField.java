@@ -13,12 +13,12 @@
  **/
 package org.codice.ddf.admin.common.fields.common;
 
-import static org.codice.ddf.admin.common.message.DefaultMessages.invalidHostnameError;
+import static org.codice.ddf.admin.common.report.message.DefaultMessages.invalidHostnameError;
 
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.codice.ddf.admin.api.action.Message;
+import org.codice.ddf.admin.api.report.Message;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 
 public class HostnameField extends StringField {

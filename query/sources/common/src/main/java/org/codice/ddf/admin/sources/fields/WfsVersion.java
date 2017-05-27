@@ -13,7 +13,7 @@
  */
 package org.codice.ddf.admin.sources.fields;
 
-import org.codice.ddf.admin.api.fields.Field;
+import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.common.fields.base.BaseEnumField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 
@@ -38,7 +38,7 @@ public class WfsVersion extends BaseEnumField<String> {
         this(null);
     }
 
-    protected WfsVersion(Field<String> wfsVersion) {
+    protected WfsVersion(DataType<String> wfsVersion) {
         super(DEFAULT_FIELD_NAME,
                 TYPE_NAME,
                 DESCRIPTION,

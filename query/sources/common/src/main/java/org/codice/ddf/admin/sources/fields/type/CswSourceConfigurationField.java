@@ -15,7 +15,7 @@ package org.codice.ddf.admin.sources.fields.type;
 
 import java.util.List;
 
-import org.codice.ddf.admin.api.fields.Field;
+import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 import org.codice.ddf.admin.sources.fields.CswOutputSchemaField;
 import org.codice.ddf.admin.sources.fields.CswProfile;
@@ -47,6 +47,10 @@ public class CswSourceConfigurationField extends SourceConfigUnionField {
 
     public CswSourceConfigurationField() {
         super(FIELD_TYPE_NAME, DESCRIPTION);
+        outputSchema = new CswOutputSchemaField(OUTPUT_SCHEMA_FIELD_NAME);
+        cswProfile = new CswProfile();
+        spatialOperator = new CswSpatialOperator();
+        updateInnerFieldPaths();
     }
 
     public CswSourceConfigurationField outputSchema(String outputSchema) {
@@ -92,14 +96,6 @@ public class CswSourceConfigurationField extends SourceConfigUnionField {
     public CswSourceConfigurationField allFieldsRequired(boolean required) {
         super.allFieldsRequired(required);
         return this;
-    }
-
-    @Override
-    public void initializeFields() {
-        super.initializeFields();
-        outputSchema = new CswOutputSchemaField(OUTPUT_SCHEMA_FIELD_NAME);
-        cswProfile = new CswProfile();
-        spatialOperator = new CswSpatialOperator();
     }
 
     @Override

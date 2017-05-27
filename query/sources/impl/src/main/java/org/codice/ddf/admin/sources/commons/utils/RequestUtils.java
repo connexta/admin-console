@@ -15,9 +15,9 @@ package org.codice.ddf.admin.sources.commons.utils;
 
 import static java.net.HttpURLConnection.HTTP_OK;
 import static java.net.HttpURLConnection.HTTP_UNAUTHORIZED;
-import static org.codice.ddf.admin.common.message.DefaultMessages.cannotConnectError;
-import static org.codice.ddf.admin.common.message.DefaultMessages.unauthorizedError;
-import static org.codice.ddf.admin.common.message.DefaultMessages.unknownEndpointError;
+import static org.codice.ddf.admin.common.report.message.DefaultMessages.cannotConnectError;
+import static org.codice.ddf.admin.common.report.message.DefaultMessages.unauthorizedError;
+import static org.codice.ddf.admin.common.report.message.DefaultMessages.unknownEndpointError;
 
 import java.io.IOException;
 import java.net.URL;
@@ -30,11 +30,11 @@ import javax.ws.rs.ProcessingException;
 import javax.ws.rs.core.Response;
 
 import org.apache.cxf.jaxrs.client.WebClient;
-import org.codice.ddf.admin.common.Report;
-import org.codice.ddf.admin.common.ReportWithResult;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
 import org.codice.ddf.admin.common.fields.common.HostField;
 import org.codice.ddf.admin.common.fields.common.UrlField;
+import org.codice.ddf.admin.common.report.ReportImpl;
+import org.codice.ddf.admin.common.report.ReportWithResultImpl;
 import org.codice.ddf.cxf.SecureCxfClientFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,17 +50,17 @@ public class RequestUtils {
      * will have the same path and field name as the hostField passed in.
      *
      * Possible Error Codes to be returned
-     * - {@link org.codice.ddf.admin.common.message.DefaultMessages#CANNOT_CONNECT}
+     * - {@link org.codice.ddf.admin.common.report.message.DefaultMessages#CANNOT_CONNECT}
      *
      * @param hostField host field containing the host name and port
      * @param urlFormats list of url formats to format with the hostField
      * @param creds credentials for basic authentication
      * @param queryParams additional query params
-     * @return a {@code ReportWithResult} containing a {@code UrlField} on success, or {@link org.codice.ddf.admin.common.message.ErrorMessage}s on failure
+     * @return a {@code ReportWithResult} containing a {@code UrlField} on success, or {@link org.codice.ddf.admin.common.report.message.ErrorMessage}s on failure
      */
-    public ReportWithResult<UrlField> discoverUrlFromHost(HostField hostField, List<String> urlFormats, CredentialsField creds,
+    public ReportWithResultImpl<UrlField> discoverUrlFromHost(HostField hostField, List<String> urlFormats, CredentialsField creds,
             Map<String, String> queryParams) {
-        ReportWithResult<UrlField> responseBody = new ReportWithResult<>();
+        ReportWithResultImpl<UrlField> responseBody = new ReportWithResultImpl<>();
         for(String formatUrl : urlFormats) {
             UrlField clientUrl = new UrlField();
             clientUrl.fieldName(hostField.fieldName());
@@ -68,13 +68,13 @@ public class RequestUtils {
             clientUrl.updatePath(hostField.path().subList(0, hostField.path().size() - 1));
             clientUrl.setValue(String.format(formatUrl, hostField.name(), hostField.port()));
 
-            ReportWithResult<String> body = sendGetRequest(clientUrl, creds, queryParams);
+            ReportWithResultImpl<String> body = sendGetRequest(clientUrl, creds, queryParams);
             if(!body.containsErrorMsgs()) {
                 responseBody.result(clientUrl);
                 return responseBody;
             }
         }
-        return responseBody.resultMessage(cannotConnectError());
+        return responseBody.addResultMessage(cannotConnectError());
     }
 
     /**
@@ -82,18 +82,18 @@ public class RequestUtils {
      * optional queryParams.
      *
      * Possible Error Codes to be returned
-     * - {@link org.codice.ddf.admin.common.message.DefaultMessages#CANNOT_CONNECT}
-     * - {@link org.codice.ddf.admin.common.message.DefaultMessages#UNAUTHORIZED}
-     * - {@link org.codice.ddf.admin.common.message.DefaultMessages#UNKNOWN_ENDPOINT}
+     * - {@link org.codice.ddf.admin.common.report.message.DefaultMessages#CANNOT_CONNECT}
+     * - {@link org.codice.ddf.admin.common.report.message.DefaultMessages#UNAUTHORIZED}
+     * - {@link org.codice.ddf.admin.common.report.message.DefaultMessages#UNKNOWN_ENDPOINT}
      *
      * @param clientUrl url to send GET request to
      * @param creds optional credentials for basic authentication
      * @param queryParams optional query parameters
-     * @return {@link ReportWithResult} containing the body of the response on success, or containing an {@link org.codice.ddf.admin.common.message.ErrorMessage}
+     * @return {@link ReportWithResultImpl} containing the body of the response on success, or containing an {@link org.codice.ddf.admin.common.report.message.ErrorMessage}
      */
-    public ReportWithResult<String> sendGetRequest(UrlField clientUrl, CredentialsField creds, Map<String, String> queryParams) {
-        ReportWithResult<String> body = new ReportWithResult<>();
-        ReportWithResult<Response> responseResult = executeGetRequest(clientUrl, creds, queryParams);
+    public ReportWithResultImpl<String> sendGetRequest(UrlField clientUrl, CredentialsField creds, Map<String, String> queryParams) {
+        ReportWithResultImpl<String> body = new ReportWithResultImpl<>();
+        ReportWithResultImpl<Response> responseResult = executeGetRequest(clientUrl, creds, queryParams);
         if(responseResult.containsErrorMsgs()) {
             body.addMessages(responseResult);
             return body;
@@ -104,9 +104,9 @@ public class RequestUtils {
         if (response.getStatus() == HTTP_OK && !responseString.equals("")) {
             body.result(responseString);
         } else if(response.getStatus() == HTTP_UNAUTHORIZED) {
-            body.argumentMessage(unauthorizedError(creds.path()));
+            body.addArgumentMessage(unauthorizedError(creds.path()));
         } else {
-            body.argumentMessage(unknownEndpointError(clientUrl.path()));
+            body.addArgumentMessage(unknownEndpointError(clientUrl.path()));
         }
         return body;
     }
@@ -115,21 +115,21 @@ public class RequestUtils {
      * Executes a request by creating a Secure CXF Client from the provided url, credentials, and query params.
      *
      * Possible Error Codes to return
-     * - {@link org.codice.ddf.admin.common.message.DefaultMessages#CANNOT_CONNECT}
+     * - {@link org.codice.ddf.admin.common.report.message.DefaultMessages#CANNOT_CONNECT}
      *
      * @param clientUrl url to send GET request to
      * @param creds optional basic authentication
      * @param queryParams additional query parameters
      * @return {@link Response} of the request
      */
-    public ReportWithResult<Response> executeGetRequest(UrlField clientUrl, CredentialsField creds, Map<String, String> queryParams) {
+    public ReportWithResultImpl<Response> executeGetRequest(UrlField clientUrl, CredentialsField creds, Map<String, String> queryParams) {
         WebClient client = generateClient(clientUrl.getValue(), creds, queryParams);
-        ReportWithResult<Response> report = new ReportWithResult<>();
+        ReportWithResultImpl<Response> report = new ReportWithResultImpl<>();
         Response response;
         try {
             response = client.get();
         } catch (ProcessingException e) {
-            report.resultMessage(cannotConnectError());
+            report.addResultMessage(cannotConnectError());
             return report;
         }
 
@@ -141,26 +141,26 @@ public class RequestUtils {
      * Sends a POST request to the specified url.
      *
      * Possible Error Codes to be returned
-     * - {@link org.codice.ddf.admin.common.message.DefaultMessages#CANNOT_CONNECT}
+     * - {@link org.codice.ddf.admin.common.report.message.DefaultMessages#CANNOT_CONNECT}
      *
      * @param urlField    URL to send Post request to
      * @param creds       optional credentials consisting of a username and password
      * @param contentType Mime type of the post body
      * @param content     Body of the post request
-     * @return a {@link ReportWithResult} containing the POST request response body or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
+     * @return a {@link ReportWithResultImpl} containing the POST request response body or an {@link org.codice.ddf.admin.common.report.message.ErrorMessage} on failure.
      */
-    public ReportWithResult<String> sendPostRequest(UrlField urlField, CredentialsField creds,
+    public ReportWithResultImpl<String> sendPostRequest(UrlField urlField, CredentialsField creds,
             String contentType, String content) {
         WebClient client = generateClient(urlField.getValue(), creds, Collections.emptyMap());
         Response response = client.type(contentType)
                 .post(content);
 
-        ReportWithResult<String> responseBodyResult = new ReportWithResult<>();
+        ReportWithResultImpl<String> responseBodyResult = new ReportWithResultImpl<>();
         if (response.getStatus() != HTTP_OK || response.readEntity(String.class)
                 .equals("")) {
             LOGGER.debug("Bad or empty response received from sending POST to {}.",
                     urlField.getValue());
-            responseBodyResult.argumentMessage(cannotConnectError(urlField.path()));
+            responseBodyResult.addArgumentMessage(cannotConnectError(urlField.path()));
             return responseBodyResult;
         }
 
@@ -172,13 +172,13 @@ public class RequestUtils {
      * Attempts to open a connection to a URL.
      *
      * Possible Error Codes to be returned
-     * - {@link org.codice.ddf.admin.common.message.DefaultMessages#CANNOT_CONNECT}
+     * - {@link org.codice.ddf.admin.common.report.message.DefaultMessages#CANNOT_CONNECT}
      *
      * @param urlField {@link UrlField} containing the URL to connect to
-     * @return a {@link Report} containing no messages on success, or containing {@link org.codice.ddf.admin.common.message.ErrorMessage}s on failure.
+     * @return a {@link ReportImpl} containing no messages on success, or containing {@link org.codice.ddf.admin.common.report.message.ErrorMessage}s on failure.
      */
-    public Report endpointIsReachable(UrlField urlField) {
-        Report report = new Report();
+    public ReportImpl endpointIsReachable(UrlField urlField) {
+        ReportImpl report = new ReportImpl();
         try {
             URLConnection urlConnection = (new URL(urlField.getValue()).openConnection());
             urlConnection.setConnectTimeout(500);
@@ -186,7 +186,7 @@ public class RequestUtils {
             LOGGER.debug("Successfully reached {}.", urlField);
         } catch (IOException e) {
             LOGGER.debug("Failed to reach {}, returning an error.", urlField, e);
-            report.argumentMessage(cannotConnectError(urlField.path()));
+            report.addArgumentMessage(cannotConnectError(urlField.path()));
         }
         return report;
     }

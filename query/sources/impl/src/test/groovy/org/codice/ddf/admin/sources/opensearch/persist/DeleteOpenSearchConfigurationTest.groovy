@@ -1,8 +1,7 @@
 package org.codice.ddf.admin.sources.opensearch.persist
 
-import org.codice.ddf.admin.api.action.Action
-import org.codice.ddf.admin.common.actions.BaseAction
-import org.codice.ddf.admin.common.message.DefaultMessages
+import org.codice.ddf.admin.api.fields.FunctionField
+import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.configurator.ConfigReader
 import org.codice.ddf.admin.configurator.Configurator
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
@@ -13,7 +12,7 @@ import static org.codice.ddf.admin.sources.SourceTestCommons.*
 
 class DeleteOpenSearchConfigurationTest extends Specification {
 
-    Action deleteOpenSearchConfigurationAction
+    DeleteOpenSearchConfiguration deleteOpenSearchConfigurationFunction
 
     ConfiguratorFactory configuratorFactory
 
@@ -23,11 +22,11 @@ class DeleteOpenSearchConfigurationTest extends Specification {
 
     static RESULT_ARGUMENT_PATH = [DeleteOpenSearchConfiguration.ID]
 
-    static BASE_PATH = [RESULT_ARGUMENT_PATH, BaseAction.ARGUMENT].flatten()
+    static BASE_PATH = [RESULT_ARGUMENT_PATH, FunctionField.ARGUMENT].flatten()
 
     static PID_PATH = [BASE_PATH, PID].flatten()
 
-    def actionArgs = [
+    def functionArgs = [
         (PID): S_PID
     ]
 
@@ -38,15 +37,15 @@ class DeleteOpenSearchConfigurationTest extends Specification {
             getConfigurator() >> configurator
             getConfigReader() >> configReader
         }
-        deleteOpenSearchConfigurationAction = new DeleteOpenSearchConfiguration(configuratorFactory)
+        deleteOpenSearchConfigurationFunction = new DeleteOpenSearchConfiguration(configuratorFactory)
     }
 
     def 'Successfully deleting WFS config returns true'() {
         when:
         configReader.getConfig(S_PID) >> configToBeDeleted
         configurator.commit(_, _) >> mockReport(false)
-        deleteOpenSearchConfigurationAction.setArguments(actionArgs)
-        def report = deleteOpenSearchConfigurationAction.process()
+        deleteOpenSearchConfigurationFunction.setValue(functionArgs)
+        def report = deleteOpenSearchConfigurationFunction.getValue()
 
         then:
         report.result() != null
@@ -56,8 +55,8 @@ class DeleteOpenSearchConfigurationTest extends Specification {
     def 'Fail delete when no existing configuration with the provided pid'() {
         when:
         configReader.getConfig(S_PID) >> [:]
-        deleteOpenSearchConfigurationAction.setArguments(actionArgs)
-        def report = deleteOpenSearchConfigurationAction.process()
+        deleteOpenSearchConfigurationFunction.setValue(functionArgs)
+        def report = deleteOpenSearchConfigurationFunction.getValue()
 
         then:
         report.result() == null
@@ -70,8 +69,8 @@ class DeleteOpenSearchConfigurationTest extends Specification {
         when:
         configReader.getConfig(S_PID) >> configToBeDeleted
         configurator.commit(_, _) >> mockReport(true)
-        deleteOpenSearchConfigurationAction.setArguments(actionArgs)
-        def report = deleteOpenSearchConfigurationAction.process()
+        deleteOpenSearchConfigurationFunction.setValue(functionArgs)
+        def report = deleteOpenSearchConfigurationFunction.getValue()
 
         then:
         report.result().getValue() == false
@@ -82,7 +81,7 @@ class DeleteOpenSearchConfigurationTest extends Specification {
 
     def 'Fail when missing required fields'() {
         when:
-        def report = deleteOpenSearchConfigurationAction.process()
+        def report = deleteOpenSearchConfigurationFunction.getValue()
 
         then:
         report.result() == null

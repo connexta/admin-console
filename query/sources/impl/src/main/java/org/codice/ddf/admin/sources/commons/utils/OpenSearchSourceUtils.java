@@ -13,10 +13,10 @@
  */
 package org.codice.ddf.admin.sources.commons.utils;
 
-import static org.codice.ddf.admin.common.message.DefaultMessages.unknownEndpointError;
+import static org.codice.ddf.admin.common.report.message.DefaultMessages.unknownEndpointError;
 import static org.codice.ddf.admin.common.services.ServiceCommons.FLAG_PASSWORD;
-import static org.codice.ddf.admin.sources.commons.SourceUtilCommons.SOURCES_NAMESPACE_CONTEXT;
-import static org.codice.ddf.admin.sources.commons.SourceUtilCommons.createDocument;
+import static org.codice.ddf.admin.sources.commons.utils.SourceUtilCommons.SOURCES_NAMESPACE_CONTEXT;
+import static org.codice.ddf.admin.sources.commons.utils.SourceUtilCommons.createDocument;
 
 import java.util.List;
 import java.util.Map;
@@ -26,11 +26,11 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.codice.ddf.admin.common.Report;
-import org.codice.ddf.admin.common.ReportWithResult;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
 import org.codice.ddf.admin.common.fields.common.HostField;
 import org.codice.ddf.admin.common.fields.common.UrlField;
+import org.codice.ddf.admin.common.report.ReportImpl;
+import org.codice.ddf.admin.common.report.ReportWithResultImpl;
 import org.codice.ddf.admin.sources.fields.type.OpenSearchSourceConfigurationField;
 import org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField;
 import org.slf4j.Logger;
@@ -69,14 +69,14 @@ public class OpenSearchSourceUtils {
 
     /**
      * Attempts to create an OpenSearch configuration with the provided URL and credentials. If a configuration
-     * is not found or created, the {@link ReportWithResult}'s will have errors.
+     * is not found or created, the {@link ReportWithResultImpl}'s will have errors.
      *
      * @param urlField The URL to probe for OpenSearch capabilities
      * @param creds    optional credentials to send with Basic Auth header
-     * @return a {@link ReportWithResult} containing the {@link SourceConfigUnionField} or containing {@link org.codice.ddf.admin.common.message.ErrorMessage}s on failure.
+     * @return a {@link ReportWithResultImpl} containing the {@link SourceConfigUnionField} or containing {@link org.codice.ddf.admin.common.report.message.ErrorMessage}s on failure.
      */
-    public ReportWithResult<SourceConfigUnionField> getOpenSearchConfig(UrlField urlField, CredentialsField creds) {
-        ReportWithResult<SourceConfigUnionField> configResult = new ReportWithResult<>();
+    public ReportWithResultImpl<SourceConfigUnionField> getOpenSearchConfig(UrlField urlField, CredentialsField creds) {
+        ReportWithResultImpl<SourceConfigUnionField> configResult = new ReportWithResultImpl<>();
         configResult.addMessages(verifyOpenSearchCapabilities(urlField, creds));
         if (configResult.containsErrorMsgs()) {
             return configResult;
@@ -95,16 +95,16 @@ public class OpenSearchSourceUtils {
      * Verifies that an endpoint given by the URL (and credentials) has OpenSearch capabilities.
      *
      * Possible Error Codes to be returned
-     * - {@link org.codice.ddf.admin.common.message.DefaultMessages#CANNOT_CONNECT}
-     * - {@link org.codice.ddf.admin.common.message.DefaultMessages#UNAUTHORIZED}
-     * - {@link org.codice.ddf.admin.common.message.DefaultMessages#UNKNOWN_ENDPOINT}
+     * - {@link org.codice.ddf.admin.common.report.message.DefaultMessages#CANNOT_CONNECT}
+     * - {@link org.codice.ddf.admin.common.report.message.DefaultMessages#UNAUTHORIZED}
+     * - {@link org.codice.ddf.admin.common.report.message.DefaultMessages#UNKNOWN_ENDPOINT}
      *
      * @param urlField endpoint url to verify
      * @param creds optional credentials for authentication
-     * @return an empty {@code Report} on success, otherwise a {@code Report} containing {@link org.codice.ddf.admin.common.message.ErrorMessage}s
+     * @return an empty {@code Report} on success, otherwise a {@code Report} containing {@link org.codice.ddf.admin.common.report.message.ErrorMessage}s
      */
-    protected Report verifyOpenSearchCapabilities(UrlField urlField, CredentialsField creds) {
-        ReportWithResult<String> responseBodyResult = requestUtils.sendGetRequest(urlField, creds,
+    protected ReportImpl verifyOpenSearchCapabilities(UrlField urlField, CredentialsField creds) {
+        ReportWithResultImpl<String> responseBodyResult = requestUtils.sendGetRequest(urlField, creds,
                 GET_CAPABILITIES_PARAMS);
         if (responseBodyResult.containsErrorMsgs()) {
             return responseBodyResult;
@@ -115,7 +115,7 @@ public class OpenSearchSourceUtils {
             capabilitiesXml = createDocument(responseBodyResult.result());
         } catch (Exception e) {
             LOGGER.debug("Failed to read response from OpenSearch endpoint.");
-            responseBodyResult.argumentMessage(unknownEndpointError(urlField.path()));
+            responseBodyResult.addArgumentMessage(unknownEndpointError(urlField.path()));
             return responseBodyResult;
         }
 
@@ -129,11 +129,11 @@ public class OpenSearchSourceUtils {
             }
         } catch (XPathExpressionException e) {
             LOGGER.debug("Failed to compile OpenSearch totalResults XPath.");
-            responseBodyResult.argumentMessage(unknownEndpointError(urlField.path()));
+            responseBodyResult.addArgumentMessage(unknownEndpointError(urlField.path()));
             return responseBodyResult;
 
         }
-        responseBodyResult.argumentMessage(unknownEndpointError(urlField.path()));
+        responseBodyResult.addArgumentMessage(unknownEndpointError(urlField.path()));
         return responseBodyResult;
     }
 
@@ -141,13 +141,13 @@ public class OpenSearchSourceUtils {
      * Attempts to discover an OpenSearch endpoint from the given hostname and port
      *
      * Possible Error Codes to be returned
-     * - {@link org.codice.ddf.admin.common.message.DefaultMessages#CANNOT_CONNECT}
+     * - {@link org.codice.ddf.admin.common.report.message.DefaultMessages#CANNOT_CONNECT}
      *
      * @param hostField hostname and port to probe for OpenSearch capabilities
      * @param creds        optional credentials for authentication
-     * @return a {@link ReportWithResult} containing the discovered {@link UrlField} on success, or containing {@link org.codice.ddf.admin.common.message.ErrorMessage}s on failure.
+     * @return a {@link ReportWithResultImpl} containing the discovered {@link UrlField} on success, or containing {@link org.codice.ddf.admin.common.report.message.ErrorMessage}s on failure.
      */
-    public ReportWithResult<UrlField> discoverOpenSearchUrl(HostField hostField, CredentialsField creds) {
+    public ReportWithResultImpl<UrlField> discoverOpenSearchUrl(HostField hostField, CredentialsField creds) {
         return requestUtils.discoverUrlFromHost(hostField, URL_FORMATS, creds,
                 GET_CAPABILITIES_PARAMS);
     }

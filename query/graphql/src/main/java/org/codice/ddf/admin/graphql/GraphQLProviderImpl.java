@@ -13,13 +13,11 @@
  **/
 package org.codice.ddf.admin.graphql;
 
-import static org.codice.ddf.admin.graphql.common.GraphQLTransformCommons.actionCreatorToGraphQLObjectType;
-import static org.codice.ddf.admin.graphql.common.GraphQLTransformCommons.actionsToGraphQLFieldDef;
-
 import java.util.Collection;
 import java.util.HashMap;
 
-import org.codice.ddf.admin.api.action.ActionCreator;
+import org.codice.ddf.admin.api.FieldProvider;
+import org.codice.ddf.admin.graphql.common.GraphQLTransformOutput;
 
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLObjectType;
@@ -28,25 +26,28 @@ import graphql.servlet.GraphQLQueryProvider;
 
 public class GraphQLProviderImpl implements GraphQLMutationProvider, GraphQLQueryProvider {
 
-    private ActionCreator creator;
+    private FieldProvider provider;
 
-    public GraphQLProviderImpl(ActionCreator creator) {
-        this.creator = creator;
+    private GraphQLTransformOutput transformOutput;
+
+    public GraphQLProviderImpl(FieldProvider provider, GraphQLTransformOutput transformOutput) {
+        this.provider = provider;
+        this.transformOutput = transformOutput;
     }
 
     @Override
     public Collection<GraphQLFieldDefinition> getMutations() {
-        return actionsToGraphQLFieldDef(creator, creator.getPersistActions());
+        return transformOutput.fieldsToGraphQLFieldDefinition(provider.getMutationFunctions());
     }
 
     @Override
     public GraphQLObjectType getQuery() {
-        return actionCreatorToGraphQLObjectType(creator, creator.getDiscoveryActions());
+        return transformOutput.queryProviderToGraphQLObjectType(provider);
     }
 
     @Override
     public String getName() {
-        return creator.name();
+        return provider.fieldName();
     }
 
     @Override

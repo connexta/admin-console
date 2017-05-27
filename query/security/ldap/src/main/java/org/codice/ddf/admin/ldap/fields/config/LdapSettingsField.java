@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.codice.ddf.admin.api.fields.Field;
+import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
 import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
@@ -54,6 +54,17 @@ public class LdapSettingsField extends BaseObjectField {
 
     public LdapSettingsField() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
+
+        this.usernameAttribute = new StringField("userNameAttribute");
+        this.baseUserDn = new LdapDistinguishedName("baseUserDn");
+        this.baseGroupDn = new LdapDistinguishedName("baseGroupDn");
+        this.groupObjectClass = new StringField("groupObjectClass");
+        this.groupAttributeHoldingMember = new StringField("groupAttributeHoldingMember");
+        this.memberAttributeReferencedInGroup = new StringField("memberAttributeReferencedInGroup");
+        this.attributeMap = new ListFieldImpl<>("attributeMapping", ClaimsMapEntry.class);
+        this.useCase = new LdapUseCase();
+
+        updateInnerFieldPaths();
     }
 
     @Override
@@ -180,17 +191,5 @@ public class LdapSettingsField extends BaseObjectField {
     public LdapSettingsField useCase(String useCase) {
         this.useCase.setValue(useCase);
         return this;
-    }
-
-    @Override
-    public void initializeFields() {
-        this.usernameAttribute = new StringField("userNameAttribute");
-        this.baseUserDn = new LdapDistinguishedName("baseUserDn");
-        this.baseGroupDn = new LdapDistinguishedName("baseGroupDn");
-        this.groupObjectClass = new StringField("groupObjectClass");
-        this.groupAttributeHoldingMember = new StringField("groupAttributeHoldingMember");
-        this.memberAttributeReferencedInGroup = new StringField("memberAttributeReferencedInGroup");
-        this.attributeMap = new ListFieldImpl<>("attributeMapping", ClaimsMapEntry.class);
-        this.useCase = new LdapUseCase();
     }
 }

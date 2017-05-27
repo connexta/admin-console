@@ -15,7 +15,7 @@ package org.codice.ddf.admin.common.fields.common;
 
 import java.util.List;
 
-import org.codice.ddf.admin.api.fields.Field;
+import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 
@@ -39,6 +39,9 @@ public class CredentialsField extends BaseObjectField {
 
     public CredentialsField() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
+        this.username = new StringField(USERNAME_FIELD_NAME);
+        this.password = new StringField(PASSWORD_FIELD_NAME);
+        updateInnerFieldPaths();
     }
 
     public CredentialsField username(String username) {
@@ -70,12 +73,6 @@ public class CredentialsField extends BaseObjectField {
     public void useDefaultRequired() {
         username.isRequired(true);
         password.isRequired(true);
-    }
-
-    @Override
-    public void initializeFields() {
-        this.username = new StringField(USERNAME_FIELD_NAME);
-        this.password = new StringField(PASSWORD_FIELD_NAME);
     }
 
     @Override

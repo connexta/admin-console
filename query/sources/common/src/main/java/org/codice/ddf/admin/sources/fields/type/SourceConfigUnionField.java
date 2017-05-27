@@ -17,7 +17,7 @@ import static org.codice.ddf.admin.common.services.ServiceCommons.FLAG_PASSWORD;
 
 import java.util.List;
 
-import org.codice.ddf.admin.api.fields.Field;
+import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.api.fields.ObjectField;
 import org.codice.ddf.admin.common.fields.base.BaseUnionField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
@@ -55,10 +55,20 @@ public class SourceConfigUnionField extends BaseUnionField {
 
     public SourceConfigUnionField() {
         super(FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION, UNION_TYPES, false);
+
+        pidField = new PidField();
+        sourceName = new StringField(SOURCE_NAME_FIELD_NAME);
+        endpointUrl = new UrlField(ENDPOINT_URL_FIELD_NAME);
+        creds = new CredentialsField();
     }
 
     protected SourceConfigUnionField(String fieldTypeName, String description) {
         super(FIELD_NAME, fieldTypeName, description, UNION_TYPES, true);
+
+        pidField = new PidField();
+        sourceName = new StringField(SOURCE_NAME_FIELD_NAME);
+        endpointUrl = new UrlField(ENDPOINT_URL_FIELD_NAME);
+        creds = new CredentialsField();
     }
 
     // Setters
@@ -116,14 +126,6 @@ public class SourceConfigUnionField extends BaseUnionField {
     @Override
     public List<Field> getFields() {
         return ImmutableList.of(pidField, sourceName, endpointUrl, creds);
-    }
-
-    @Override
-    public void initializeFields() {
-        pidField = new PidField();
-        sourceName = new StringField(SOURCE_NAME_FIELD_NAME);
-        endpointUrl = new UrlField(ENDPOINT_URL_FIELD_NAME);
-        creds = new CredentialsField();
     }
 
     @Override

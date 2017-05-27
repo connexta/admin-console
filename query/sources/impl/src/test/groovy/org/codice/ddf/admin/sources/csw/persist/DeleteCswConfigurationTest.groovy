@@ -13,9 +13,8 @@
  */
 package org.codice.ddf.admin.sources.csw.persist
 
-import org.codice.ddf.admin.api.action.Action
-import org.codice.ddf.admin.common.actions.BaseAction
-import org.codice.ddf.admin.common.message.DefaultMessages
+import org.codice.ddf.admin.api.fields.FunctionField
+import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.configurator.ConfigReader
 import org.codice.ddf.admin.configurator.Configurator
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
@@ -27,7 +26,7 @@ import static org.codice.ddf.admin.sources.SourceTestCommons.*
 
 class DeleteCswConfigurationTest extends Specification {
 
-    Action deleteCswConfiguration
+    DeleteCswConfiguration deleteCswConfiguration
 
     ConfiguratorFactory configuratorFactory
 
@@ -43,11 +42,11 @@ class DeleteCswConfigurationTest extends Specification {
 
     static RESULT_ARGUMENT_PATH = [DeleteCswConfiguration.ID]
 
-    static BASE_PATH = [DeleteCswConfiguration.ID, BaseAction.ARGUMENT]
+    static BASE_PATH = [DeleteCswConfiguration.ID, FunctionField.ARGUMENT]
 
     static SERVICE_PID_PATH = [BASE_PATH, PID].flatten()
 
-    def actionArgs = [
+    def functionArgs = [
         (PID): S_PID
     ]
 
@@ -67,8 +66,8 @@ class DeleteCswConfigurationTest extends Specification {
         when:
         configReader.getConfig(S_PID) >> configToDelete
         configurator.commit(_, _) >> mockReport(false)
-        deleteCswConfiguration.setArguments(actionArgs)
-        def report = deleteCswConfiguration.process()
+        deleteCswConfiguration.setValue(functionArgs)
+        def report = deleteCswConfiguration.getValue()
 
         then:
         report.result() != null
@@ -78,8 +77,8 @@ class DeleteCswConfigurationTest extends Specification {
     def 'Fail with no existing config found with provided pid'() {
         when:
         configReader.getConfig(_ as String) >> [:]
-        deleteCswConfiguration.setArguments(actionArgs)
-        def report = deleteCswConfiguration.process()
+        deleteCswConfiguration.setValue(functionArgs)
+        def report = deleteCswConfiguration.getValue()
 
         then:
         report.result() == null
@@ -92,8 +91,8 @@ class DeleteCswConfigurationTest extends Specification {
         when:
         configReader.getConfig(S_PID) >> configToDelete
         configurator.commit(_, _) >> mockReport(true)
-        deleteCswConfiguration.setArguments(actionArgs)
-        def report = deleteCswConfiguration.process()
+        deleteCswConfiguration.setValue(functionArgs)
+        def report = deleteCswConfiguration.getValue()
 
         then:
         report.result().getValue() == false
@@ -104,7 +103,7 @@ class DeleteCswConfigurationTest extends Specification {
 
     def 'Fail when missing required fields'() {
         when:
-        def report = deleteCswConfiguration.process()
+        def report = deleteCswConfiguration.getValue()
 
         then:
         report.result() == null

@@ -13,10 +13,10 @@
  */
 package org.codice.ddf.admin.sources.commons.utils;
 
-import static org.codice.ddf.admin.common.message.DefaultMessages.unknownEndpointError;
+import static org.codice.ddf.admin.common.report.message.DefaultMessages.unknownEndpointError;
 import static org.codice.ddf.admin.common.services.ServiceCommons.FLAG_PASSWORD;
-import static org.codice.ddf.admin.sources.commons.SourceUtilCommons.SOURCES_NAMESPACE_CONTEXT;
-import static org.codice.ddf.admin.sources.commons.SourceUtilCommons.createDocument;
+import static org.codice.ddf.admin.sources.commons.utils.SourceUtilCommons.SOURCES_NAMESPACE_CONTEXT;
+import static org.codice.ddf.admin.sources.commons.utils.SourceUtilCommons.createDocument;
 
 import java.util.List;
 import java.util.Map;
@@ -25,10 +25,10 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.codice.ddf.admin.common.ReportWithResult;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
 import org.codice.ddf.admin.common.fields.common.HostField;
 import org.codice.ddf.admin.common.fields.common.UrlField;
+import org.codice.ddf.admin.common.report.ReportWithResultImpl;
 import org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField;
 import org.codice.ddf.admin.sources.fields.type.WfsSourceConfigurationField;
 import org.slf4j.Logger;
@@ -70,13 +70,13 @@ public class WfsSourceUtils {
      * Attempts to discover a WFS endpoint at a given hostname and port
      *
      * Possible Error Codes to be returned
-     * - {@link org.codice.ddf.admin.common.message.DefaultMessages#CANNOT_CONNECT}
+     * - {@link org.codice.ddf.admin.common.report.message.DefaultMessages#CANNOT_CONNECT}
      *
      * @param hostField address to probe for WFS capabilities
      * @param creds        optional username to add to Basic Auth header
-     * @return a {@link ReportWithResult} containing the {@link UrlField} or an {@link org.codice.ddf.admin.common.message.ErrorMessage} on failure.
+     * @return a {@link ReportWithResultImpl} containing the {@link UrlField} or an {@link org.codice.ddf.admin.common.report.message.ErrorMessage} on failure.
      */
-    public ReportWithResult<UrlField> discoverWfsUrl(HostField hostField, CredentialsField creds) {
+    public ReportWithResultImpl<UrlField> discoverWfsUrl(HostField hostField, CredentialsField creds) {
         return requestUtils.discoverUrlFromHost(hostField, URL_FORMATS, creds, GET_CAPABILITIES_PARAMS);
     }
 
@@ -84,17 +84,17 @@ public class WfsSourceUtils {
      * Attempts to create a WFS configuration from the given url.
      *
      * Possible Error Codes to be returned
-     * - {@link org.codice.ddf.admin.common.message.DefaultMessages#CANNOT_CONNECT}
-     * - {@link org.codice.ddf.admin.common.message.DefaultMessages#UNAUTHORIZED}
-     * - {@link org.codice.ddf.admin.common.message.DefaultMessages#UNKNOWN_ENDPOINT}
+     * - {@link org.codice.ddf.admin.common.report.message.DefaultMessages#CANNOT_CONNECT}
+     * - {@link org.codice.ddf.admin.common.report.message.DefaultMessages#UNAUTHORIZED}
+     * - {@link org.codice.ddf.admin.common.report.message.DefaultMessages#UNKNOWN_ENDPOINT}
      *
      * @param urlField WFS URL to probe for a configuration
      * @param creds    optional username to add to Basic Auth header
-     * @return a {@link ReportWithResult} containing the preferred {@link SourceConfigUnionField}, or containing {@link org.codice.ddf.admin.common.message.ErrorMessage}s on failure.
+     * @return a {@link ReportWithResultImpl} containing the preferred {@link SourceConfigUnionField}, or containing {@link org.codice.ddf.admin.common.report.message.ErrorMessage}s on failure.
      */
-    public ReportWithResult<SourceConfigUnionField> getPreferredWfsConfig(UrlField urlField, CredentialsField creds) {
-        ReportWithResult<String> responseBodyResult = requestUtils.sendGetRequest(urlField, creds, GET_CAPABILITIES_PARAMS);
-        ReportWithResult<SourceConfigUnionField> configResult = new ReportWithResult<>();
+    public ReportWithResultImpl<SourceConfigUnionField> getPreferredWfsConfig(UrlField urlField, CredentialsField creds) {
+        ReportWithResultImpl<String> responseBodyResult = requestUtils.sendGetRequest(urlField, creds, GET_CAPABILITIES_PARAMS);
+        ReportWithResultImpl<SourceConfigUnionField> configResult = new ReportWithResultImpl<>();
         if (responseBodyResult.containsErrorMsgs()) {
             configResult.addMessages(responseBodyResult);
             return configResult;
@@ -106,7 +106,7 @@ public class WfsSourceUtils {
             capabilitiesXml = createDocument(requestBody);
         } catch (Exception e) {
             LOGGER.debug("Failed to read response from WFS endpoint.");
-            configResult.argumentMessage(unknownEndpointError(urlField.path()));
+            configResult.addArgumentMessage(unknownEndpointError(urlField.path()));
             return configResult;
         }
 
@@ -125,14 +125,14 @@ public class WfsSourceUtils {
                     .evaluate(capabilitiesXml);
         } catch (XPathExpressionException e) {
             LOGGER.debug("Failed to parse XML response.");
-            configResult.argumentMessage(unknownEndpointError(urlField.path()));
+            configResult.addArgumentMessage(unknownEndpointError(urlField.path()));
             return configResult;
         }
 
         try {
             configResult.result(preferredConfig.wfsVersion(wfsVersion));
         } catch (IllegalArgumentException e) {
-            configResult.argumentMessage(unknownEndpointError(urlField.path()));
+            configResult.addArgumentMessage(unknownEndpointError(urlField.path()));
         }
         return configResult;
     }

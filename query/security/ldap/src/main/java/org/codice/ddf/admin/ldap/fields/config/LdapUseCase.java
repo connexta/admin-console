@@ -13,7 +13,7 @@
  **/
 package org.codice.ddf.admin.ldap.fields.config;
 
-import org.codice.ddf.admin.api.fields.Field;
+import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.common.fields.base.BaseEnumField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 
@@ -44,7 +44,7 @@ public class LdapUseCase extends BaseEnumField<String> {
     }
 
     // TODO: tbatie - 3/27/17 - Add constructor for supporting additional authtypes. Do this for all enum fields
-    protected LdapUseCase(Field<String> bindMethod) {
+    protected LdapUseCase(DataType<String> bindMethod) {
         super(DEFAULT_FIELD_NAME,
                 FIELD_TYPE_NAME,
                 DESCRIPTION,

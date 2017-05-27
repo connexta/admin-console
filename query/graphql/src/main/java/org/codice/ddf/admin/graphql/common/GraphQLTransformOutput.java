@@ -18,34 +18,64 @@ import static org.codice.ddf.admin.graphql.common.GraphQLTransformCommons.capita
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.codice.ddf.admin.api.DataType;
+import org.codice.ddf.admin.api.Field;
+import org.codice.ddf.admin.api.FieldProvider;
 import org.codice.ddf.admin.api.fields.EnumField;
-import org.codice.ddf.admin.api.fields.Field;
+import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.api.fields.ObjectField;
 import org.codice.ddf.admin.api.fields.UnionField;
+import org.codice.ddf.admin.api.report.FunctionReport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Lists;
+
 import graphql.Scalars;
+import graphql.schema.DataFetchingEnvironment;
+import graphql.schema.GraphQLArgument;
 import graphql.schema.GraphQLFieldDefinition;
+import graphql.schema.GraphQLInputType;
 import graphql.schema.GraphQLList;
+import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLScalarType;
+import graphql.schema.GraphQLTypeReference;
 import graphql.schema.GraphQLUnionType;
 import graphql.schema.TypeResolver;
 
 public class GraphQLTransformOutput {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GraphQLTransformOutput.class);
+    private GraphQLTransformInput transformInput;
+    private Set<String> createdObjectFieldTypeNames;
 
-    public static GraphQLOutputType fieldToGraphQLOutputType(Field field) {
-        switch (field.fieldBaseType()) {
+    public GraphQLTransformOutput() {
+        transformInput = new GraphQLTransformInput();
+        createdObjectFieldTypeNames = new HashSet<>();
+    }
+
+    public GraphQLObjectType queryProviderToGraphQLObjectType(FieldProvider provider) {
+        createdObjectFieldTypeNames.add(provider.fieldTypeName());
+        return GraphQLObjectType.newObject()
+                .name(provider.fieldTypeName())
+                .description(provider.description())
+                .fields(fieldsToGraphQLFieldDefinition(provider.getDiscoveryFields()))
+                .build();
+    }
+
+    public GraphQLOutputType fieldToGraphQLOutputType(DataType field) {
+        switch (field.baseDataType()) {
         case OBJECT:
             return fieldToGraphQLObjectType(field);
         case ENUM:
@@ -80,25 +110,8 @@ public class GraphQLTransformOutput {
         return Scalars.GraphQLString;
     }
 
-    public static GraphQLFieldDefinition fieldToGraphQLFieldDefinition(Field field) {
-        switch (field.fieldBaseType()) {
-        case UNION:
-            return GraphQLFieldDefinition.newFieldDefinition()
-                    .name(field.fieldName())
-                    .description(field.description())
-                    .type(GraphQLTransformOutput.fieldToGraphQLOutputType(field))
-                    //                    .dataFetcher(fetcher -> unionTypeDataFetch(field))
-                    .build();
-        default:
-            return GraphQLFieldDefinition.newFieldDefinition()
-                    .name(field.fieldName())
-                    .description(field.description())
-                    .type(GraphQLTransformOutput.fieldToGraphQLOutputType(field))
-                    .build();
-        }
-    }
 
-    public static List<GraphQLFieldDefinition> fieldsToGraphQLFieldDefinition(
+    public List<GraphQLFieldDefinition> fieldsToGraphQLFieldDefinition(
             List<? extends Field> fields) {
         if (fields == null) {
             return new ArrayList<>();
@@ -107,25 +120,98 @@ public class GraphQLTransformOutput {
                 .map(field -> fieldToGraphQLFieldDefinition(field))
                 .collect(Collectors.toList());
     }
+    public GraphQLFieldDefinition fieldToGraphQLFieldDefinition(Field field) {
+        List<GraphQLArgument> graphQLArgs = new ArrayList<>();
+        DataType returnType;
 
-    public static GraphQLObjectType fieldToGraphQLObjectType(Field field) {
-        switch (field.fieldBaseType()) {
-        case OBJECT:
-            //Add on Payload to avoid collision between an input and output field type name;
+        if(field instanceof FunctionField) {
+            FunctionField function = (FunctionField) field;
+            if (function.getArguments() != null) {
+                function.getArguments()
+                        .forEach(f -> graphQLArgs.add(fieldToGraphQLArgument((DataType) f)));
+            }
+            returnType = function.getReturnType();
+        } else {
+            returnType = (DataType) field;
+        }
+
+        return GraphQLFieldDefinition.newFieldDefinition()
+                    .name(field.fieldName())
+                    .description(field.description())
+                    .type(fieldToGraphQLOutputType(returnType))
+                    .argument(graphQLArgs)
+                    .dataFetcher(field instanceof FunctionField ? (env -> functionDataFetcher(env, (FunctionField)field)) : (env -> dataTypeDataFetcher(env, (DataType)field)))
+                    .build();
+    }
+
+    public FunctionReport functionDataFetcher(DataFetchingEnvironment env, FunctionField field) {
+        Map<String, Object> args = new HashMap<>();
+        if (env.getArguments() != null) {
+            args.putAll(env.getArguments());
+        }
+
+        FunctionField<DataType> funcField = field.newInstance();
+
+        //Remove the field name of the function from that path since the update is using a subpath
+        List<String> fixedPath = Lists.newArrayList(field.path());
+        fixedPath.remove(fixedPath.size() - 1);
+        funcField.updatePath(fixedPath);
+        funcField.setValue(env.getArguments());
+        FunctionReport result = funcField.getValue();
+        return result;
+    }
+
+    public Object dataTypeDataFetcher(DataFetchingEnvironment env, DataType field) {
+        Object source = env.getSource();
+        //If no values are passed for the source, return a field definition to continue the execution strategy instead of returning null. This is an expansion of the PropertyDataFetcher
+        if (source instanceof Map) {
+            if(!((Map) source).isEmpty()) {
+                return ((Map<?, ?>) source).get(field.fieldName());
+            }
+        }
+
+        return field.getValue();
+    }
+
+    public GraphQLArgument fieldToGraphQLArgument(DataType field) {
+        GraphQLInputType graphqlInputType = transformInput.fieldTypeToGraphQLInputType(field);
+
+        return GraphQLArgument.newArgument()
+                .name(field.fieldName())
+                .description(field.description())
+                .type(field.isRequired() ? new GraphQLNonNull(graphqlInputType) : graphqlInputType)
+                .build();
+    }
+
+    public GraphQLOutputType fieldToGraphQLObjectType(DataType field) {
+        //Checks if it's a recursive reference to the queryProvider
+        if(createdObjectFieldTypeNames.contains(field.fieldTypeName())) {
+            return new GraphQLTypeReference(field.fieldTypeName());
+        }
+
+        String typeName = createOutputObjectFieldTypeName(field.fieldTypeName());
+        if (createdObjectFieldTypeNames.contains(typeName)) {
+            return new GraphQLTypeReference(typeName);
+        } else {
+            createdObjectFieldTypeNames.add(typeName);
             return GraphQLObjectType.newObject()
-                    .name(capitalize(field.fieldTypeName()) + "Payload")
+                    .name(typeName)
                     .description(field.description())
                     .fields(fieldsToGraphQLFieldDefinition(((ObjectField) field).getFields()))
                     .build();
-        default:
-            throw new RuntimeException("Unknown ObjectType: " + field.fieldBaseType());
         }
     }
 
-    public static GraphQLOutputType unionToGraphQLOutputType(UnionField field) {
+    //Add on Payload to avoid collision between an input and output field type name;
+    public String createOutputObjectFieldTypeName(String fieldTypeName) {
+        return capitalize(fieldTypeName) + "Payload";
+    }
+
+    // TODO: tbatie - 5/15/17 - Replace unions with interface
+    public GraphQLOutputType unionToGraphQLOutputType(UnionField field) {
         GraphQLObjectType[] unionValues = field.getUnionTypes()
                 .stream()
-                .map(GraphQLTransformOutput::fieldToGraphQLObjectType)
+                .map(fi -> fieldToGraphQLObjectType(fi))
                 .toArray(GraphQLObjectType[]::new);
 
         return GraphQLUnionType.newUnionType()
@@ -141,7 +227,7 @@ public class GraphQLTransformOutput {
         List<GraphQLObjectType> supportedTypes;
 
         //The graphql library requires the same object reference it was given to build the schema
-        //So we have to keep track of the objects and match them after being processed by the action datafetcher
+        //So we have to keep track of the objects and match them after being processed by the datafetcher
         public UnionTypeResolver(GraphQLObjectType... supportedTypes) {
             this.supportedTypes = Arrays.asList(supportedTypes);
         }

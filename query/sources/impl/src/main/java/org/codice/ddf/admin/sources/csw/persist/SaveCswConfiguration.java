@@ -13,7 +13,7 @@
  **/
 package org.codice.ddf.admin.sources.csw.persist;
 
-import static org.codice.ddf.admin.common.message.DefaultMessages.failedPersistError;
+import static org.codice.ddf.admin.common.report.message.DefaultMessages.failedPersistError;
 import static org.codice.ddf.admin.common.services.ServiceCommons.createManagedService;
 import static org.codice.ddf.admin.common.services.ServiceCommons.serviceConfigurationExists;
 import static org.codice.ddf.admin.common.services.ServiceCommons.updateService;
@@ -25,8 +25,9 @@ import static org.codice.ddf.admin.sources.services.CswServiceProperties.cswProf
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.codice.ddf.admin.api.fields.Field;
-import org.codice.ddf.admin.common.actions.BaseAction;
+import org.codice.ddf.admin.api.DataType;
+import org.codice.ddf.admin.api.fields.FunctionField;
+import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
@@ -34,7 +35,7 @@ import org.codice.ddf.admin.sources.fields.type.CswSourceConfigurationField;
 
 import com.google.common.collect.ImmutableList;
 
-public class SaveCswConfiguration extends BaseAction<BooleanField> {
+public class SaveCswConfiguration extends BaseFunctionField<BooleanField> {
 
     public static final String ID = "saveCswSource";
 
@@ -55,11 +56,13 @@ public class SaveCswConfiguration extends BaseAction<BooleanField> {
         config.cswProfileField().isRequired(true);
         config.sourceNameField().isRequired(true);
         config.endpointUrlField().isRequired(true);
+        updateArgumentPaths();
+
         this.configuratorFactory = configuratorFactory;
     }
 
     @Override
-    public BooleanField performAction() {
+    public BooleanField performFunction() {
         if (StringUtils.isNotEmpty(pid.getValue())) {
             addMessages(updateService(pid, cswConfigToServiceProps(config), configuratorFactory));
         } else {
@@ -90,7 +93,12 @@ public class SaveCswConfiguration extends BaseAction<BooleanField> {
     }
 
     @Override
-    public List<Field> getArguments() {
+    public List<DataType> getArguments() {
         return ImmutableList.of(config, pid);
+    }
+
+    @Override
+    public FunctionField<BooleanField> newInstance() {
+        return new SaveCswConfiguration(configuratorFactory);
     }
 }

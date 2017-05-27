@@ -15,7 +15,7 @@ package org.codice.ddf.admin.common.fields;
 
 import java.util.List;
 
-import org.codice.ddf.admin.api.fields.Field;
+import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 
@@ -42,18 +42,14 @@ public class TestObjectField extends BaseObjectField {
     public TestObjectField(String fieldName, String fieldTypeName, String description,
             FieldBaseType baseType) {
         super(fieldName, fieldTypeName, description, baseType);
+        testField = new InnerTestObjectField();
+        updateInnerFieldPaths();
     }
 
     @Override
     public List<Field> getFields() {
         return ImmutableList.of(testField);
     }
-
-    @Override
-    public void initializeFields() {
-        testField = new InnerTestObjectField();
-    }
-
 
     public class InnerTestObjectField extends BaseObjectField {
 
@@ -71,16 +67,13 @@ public class TestObjectField extends BaseObjectField {
 
         InnerTestObjectField(String fieldName, String fieldTypeName, String description) {
             super(fieldName, fieldTypeName, description);
+            subFieldOfInnerField = new StringField();
+            updateInnerFieldPaths();
         }
 
         @Override
         public List<Field> getFields() {
             return ImmutableList.of(subFieldOfInnerField);
-        }
-
-        @Override
-        public void initializeFields() {
-            subFieldOfInnerField = new StringField();
         }
     }
 }

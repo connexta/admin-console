@@ -12,8 +12,8 @@
  **/
 -->
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
-    <service id="wcpmActionCreator" interface="org.codice.ddf.admin.api.action.ActionCreator">
-        <bean class="org.codice.ddf.admin.security.wcpm.actions.WcpmActionCreator">
+    <service id="wcpmFieldProvider" interface="org.codice.ddf.admin.api.FieldProvider">
+        <bean class="org.codice.ddf.admin.security.wcpm.WcpmFieldProvider">
             <argument ref="configuratorFactory" />
         </bean>
     </service>

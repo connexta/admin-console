@@ -13,12 +13,12 @@
  **/
 package org.codice.ddf.admin.security.common.fields.wcpm;
 
-import static org.codice.ddf.admin.common.message.DefaultMessages.missingKeyValue;
+import static org.codice.ddf.admin.common.report.message.DefaultMessages.missingKeyValue;
 
 import java.util.List;
 
-import org.codice.ddf.admin.api.action.Message;
-import org.codice.ddf.admin.api.fields.Field;
+import org.codice.ddf.admin.api.Field;
+import org.codice.ddf.admin.api.report.Message;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 
@@ -43,6 +43,9 @@ public class ClaimsMapEntry extends BaseObjectField {
 
     public ClaimsMapEntry() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
+        key = new StringField(KEY_FIELD_NAME);
+        value = new StringField(VALUE_FIELD_NAME);
+        updateInnerFieldPaths();
     }
 
     public ClaimsMapEntry key(String key) {
@@ -97,11 +100,5 @@ public class ClaimsMapEntry extends BaseObjectField {
     @Override
     public List<Field> getFields() {
         return ImmutableList.of(key, value);
-    }
-
-    @Override
-    public void initializeFields() {
-        key = new StringField(KEY_FIELD_NAME);
-        value = new StringField(VALUE_FIELD_NAME);
     }
 }

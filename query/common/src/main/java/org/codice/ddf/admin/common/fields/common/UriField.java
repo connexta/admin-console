@@ -13,13 +13,13 @@
  **/
 package org.codice.ddf.admin.common.fields.common;
 
-import static org.codice.ddf.admin.common.message.DefaultMessages.invalidUriError;
+import static org.codice.ddf.admin.common.report.message.DefaultMessages.invalidUriError;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 
-import org.codice.ddf.admin.api.action.Message;
+import org.codice.ddf.admin.api.report.Message;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 
 public class UriField extends StringField {

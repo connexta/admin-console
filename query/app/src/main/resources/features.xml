@@ -27,7 +27,7 @@
 
     <feature name="admin-beta-core" install="manual" version="${project.version}"
              description="DDF Admin Core (Beta)">
-        <feature prerequisite="true">admin-beta-temp-configurator</feature>
+        <feature>admin-beta-temp-configurator</feature>
         <bundle>mvn:org.codice.ddf.admin.beta/admin-query-api/${project.version}</bundle>
     </feature>
 
@@ -42,14 +42,14 @@
 
     <feature name="admin-beta-federation" install="manual" version="${project.version}"
              description="DDF Admin Federation (Beta)">
-        <feature prerequisite="true">admin-beta-core</feature>
+        <feature>admin-beta-core</feature>
         <bundle>mvn:ddf.catalog.core/catalog-core-api/${ddf.version}</bundle>
         <bundle>mvn:org.codice.ddf.admin.beta/admin-query-sources-impl/${project.version}</bundle>
     </feature>
 
     <feature name="admin-beta-security" install="manual" version="${project.version}"
              description="DDF Admin Security (Beta)">
-        <feature prerequisite="true">admin-beta-core</feature>
+        <feature>admin-beta-core</feature>
         <feature>admin-beta-ldap</feature>
         <feature>admin-beta-wcpm</feature>
         <bundle>mvn:org.codice.ddf.admin.beta/admin-query-sts/${project.version}</bundle>
@@ -57,40 +57,40 @@
 
     <feature name="admin-beta-wcpm" install="manual" version="${project.version}"
              description="DDF Admin Web Context Policy Manager (Beta)">
-        <feature prerequisite="true">admin-beta-core</feature>
+        <feature >admin-beta-core</feature>
         <bundle>mvn:org.codice.ddf.admin.beta/admin-query-wcpm/${project.version}</bundle>
     </feature>
 
     <feature name="admin-beta-ldap" install="manual" version="${project.version}"
              description="DDF Admin Security (Beta) :: LDAP Handler">
-        <feature prerequisite="true">admin-beta-core</feature>
-        <feature prerequisite="true">admin-beta-temp-configurator</feature>
+        <feature>admin-beta-core</feature>
+        <feature>admin-beta-temp-configurator</feature>
         <bundle>mvn:org.codice.ddf.admin.beta/admin-query-ldap/${project.version}</bundle>
     </feature>
 
     <feature name="admin-beta-utils" install="manual" version="${project.version}"
              description="DDF Admin Security (Beta) :: LDAP Handler">
-        <feature prerequisite="true">admin-beta-core</feature>
+        <feature>admin-beta-core</feature>
         <bundle>mvn:org.codice.ddf.admin.beta/admin-query-utils/${project.version}</bundle>
     </feature>
     <!--<feature name="admin-beta-embedded-ldap" install="auto" version="${project.version}"-->
              <!--description="DDF Admin Security (Beta) :: Embedded LDAP Handler ">-->
-        <!--<feature prerequisite="true">admin-beta-core</feature>-->
+        <!--<feature >admin-beta-core</feature>-->
         <!--<bundle>mvn:org.codice.ddf.admin.beta/embedded-ldap-config-handler/${project.version}-->
         <!--</bundle>-->
     <!--</feature>-->
 
     <feature name="admin-beta-ui" install="auto" version="${project.version}"
              description="DDF Admin UI (Beta)">
-        <feature prerequisite="true">admin-beta-core</feature>
+        <feature>admin-beta-core</feature>
         <feature>admin-beta-graphql</feature>
         <bundle>mvn:org.codice.ddf.admin.beta/admin-ui/${project.version}</bundle>
     </feature>
 
     <feature name="admin-beta-graphql" install="manual" version="${project.version}"
              description="DDF Admin (Beta) GraphQL">
-        <feature prerequisite="true">admin-beta-core</feature>
-        <feature prerequisite="true">graphql-dependencies</feature>
+        <feature>admin-beta-core</feature>
+        <feature>graphql-dependencies</feature>
         <bundle>mvn:org.codice.ddf.admin.beta/admin-graphql/${project.version}</bundle>
     </feature>
 

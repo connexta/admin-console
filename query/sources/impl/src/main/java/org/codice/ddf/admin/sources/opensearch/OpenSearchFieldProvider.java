@@ -35,25 +35,29 @@ public class OpenSearchFieldProvider extends BaseFieldProvider {
     private static final String DESCRIPTION =
             "A specification for querying geospatial data using standard data formats. This is a source that implements the OpenSearch specification.";
 
-    private ConfiguratorFactory configuratorFactory;
+    private DiscoverOpenSearchSource discoverOpenSearchSource;
+    private GetOpenSearchConfigurations getOpenSearchConfigs;
 
-    public OpenSearchFieldProvider() {
+    private SaveOpenSearchConfiguration saveOpenSearchConfigs;
+    private DeleteOpenSearchConfiguration deleteOpenSearchConfig;
+
+    public OpenSearchFieldProvider(ConfiguratorFactory configuratorFactory) {
         super(ID, TYPE_NAME, DESCRIPTION);
+        discoverOpenSearchSource = new DiscoverOpenSearchSource();
+        getOpenSearchConfigs = new GetOpenSearchConfigurations(configuratorFactory);
+
+        saveOpenSearchConfigs = new SaveOpenSearchConfiguration(configuratorFactory);
+        deleteOpenSearchConfig = new DeleteOpenSearchConfiguration(configuratorFactory);
+        updateInnerFieldPaths();
     }
 
     @Override
     public List<Field> getDiscoveryFields() {
-        return ImmutableList.of(new DiscoverOpenSearchSource(),
-                new GetOpenSearchConfigurations(configuratorFactory));
+        return ImmutableList.of(discoverOpenSearchSource, getOpenSearchConfigs);
     }
 
     @Override
     public List<FunctionField> getMutationFunctions() {
-        return ImmutableList.of(new SaveOpenSearchConfiguration(configuratorFactory),
-                new DeleteOpenSearchConfiguration(configuratorFactory));
-    }
-
-    public void setConfiguratorFactory(ConfiguratorFactory configuratorFactory) {
-        this.configuratorFactory = configuratorFactory;
+        return ImmutableList.of(saveOpenSearchConfigs, deleteOpenSearchConfig);
     }
 }

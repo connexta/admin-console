@@ -42,6 +42,7 @@ public abstract class BaseFieldProvider extends BaseObjectField implements Field
                 .collect(Collectors.toList());
     }
 
+
     public Field getDiscoveryField(String fieldName) {
         return getDiscoveryFields().stream()
                 .filter(field -> field.fieldName()

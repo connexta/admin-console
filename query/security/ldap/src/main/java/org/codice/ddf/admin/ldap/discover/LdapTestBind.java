@@ -50,16 +50,16 @@ public class LdapTestBind extends TestFunctionField {
         return ImmutableList.of(conn, creds);
     }
 
-    @Override
-    public FunctionField<BooleanField> newInstance() {
-        return new LdapTestBind();
-    }
-
     // Possible message types: CANNOT_CONFIGURE, CANNOT_CONNECT, CANNOT_BIND
     @Override
     public BooleanField performFunction() {
         LdapConnectionAttempt connectionAttempt = utils.bindUserToLdapConnection(conn, creds);
         addResultMessages(connectionAttempt.messages());
         return new BooleanField(connectionAttempt.connection().isPresent());
+    }
+
+    @Override
+    public FunctionField<BooleanField> newInstance() {
+        return new LdapTestBind();
     }
 }

@@ -84,8 +84,6 @@ public class ExecutionStrategyImpl extends EnhancedExecutionStrategy {
                 msgs.stream()
                         .map(GraphQLErrorMessageWrapper::new)
                         .forEach(executionContext::addError);
-            } else if(resolvedValue instanceof DataType){
-                resolvedValue = ((DataType) resolvedValue).getValue();
             }
         } catch (Exception e) {
             LOGGER.info("Exception while fetching data", e);

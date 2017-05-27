@@ -36,25 +36,29 @@ public class WfsFieldProvider extends BaseFieldProvider {
             "Web Feature Service - an Open Geospatial Consortium (OGC) standard to requesting geographical features across the web. This is a source "
                     + "that implements the WFS specification and provides methods for discovering and persisting WFS sources.";
 
-    private ConfiguratorFactory configuratorFactory;
+    private DiscoverWfsSource discoverWfsSource;
+    private GetWfsConfigurations getWfsConfigs;
 
-    public WfsFieldProvider() {
+    private SaveWfsConfiguration saveWfsConfig;
+    private DeleteWfsConfiguration deleteWfsConfig;
+
+    public WfsFieldProvider(ConfiguratorFactory configuratorFactory) {
         super(NAME, TYPE_NAME, DESCRIPTION);
+        discoverWfsSource = new DiscoverWfsSource();
+        getWfsConfigs = new GetWfsConfigurations(configuratorFactory);
+
+        saveWfsConfig = new SaveWfsConfiguration(configuratorFactory);
+        deleteWfsConfig = new DeleteWfsConfiguration(configuratorFactory);
+        updateInnerFieldPaths();
     }
 
     @Override
     public List<Field> getDiscoveryFields() {
-        return ImmutableList.of(new DiscoverWfsSource(),
-                new GetWfsConfigurations(configuratorFactory));
+        return ImmutableList.of(discoverWfsSource, getWfsConfigs);
     }
 
     @Override
     public List<FunctionField> getMutationFunctions() {
-        return ImmutableList.of(new SaveWfsConfiguration(configuratorFactory),
-                new DeleteWfsConfiguration(configuratorFactory));
-    }
-
-    public void setConfiguratorFactory(ConfiguratorFactory configuratorFactory) {
-        this.configuratorFactory = configuratorFactory;
+        return ImmutableList.of(saveWfsConfig, deleteWfsConfig);
     }
 }

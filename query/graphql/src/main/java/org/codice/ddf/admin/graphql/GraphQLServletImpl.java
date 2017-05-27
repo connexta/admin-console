@@ -18,7 +18,6 @@ import static graphql.schema.GraphQLObjectType.newObject;
 import static graphql.schema.GraphQLSchema.newSchema;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -33,7 +32,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.codice.ddf.admin.api.FieldProvider;
 import org.codice.ddf.admin.api.report.Message;
 import org.codice.ddf.admin.graphql.common.GraphQLTransformCommons;
-import org.codice.ddf.admin.graphql.test.TestFieldProvider;
 
 import graphql.GraphQLError;
 import graphql.execution.ExecutionStrategy;
@@ -66,8 +64,7 @@ public class GraphQLServletImpl extends GraphQLServlet {
     private void updateSchema() {
         GraphQLObjectType.Builder object = newObject().name("Query");
         GraphQLTransformCommons transformCommons = new GraphQLTransformCommons();
-//        List<GraphQLProviderImpl> graphqlProviders = transformCommons.fieldProviderToGraphQLProvider(fieldProviders);
-        List<GraphQLProviderImpl> graphqlProviders = transformCommons.fieldProviderToGraphQLProvider(Arrays.asList(new TestFieldProvider()));
+        List<GraphQLProviderImpl> graphqlProviders = transformCommons.fieldProvidersToGraphQLProviders(fieldProviders);
 
         for (GraphQLQueryProvider provider : graphqlProviders) {
             GraphQLObjectType query = provider.getQuery();

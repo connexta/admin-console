@@ -10,6 +10,8 @@ import org.codice.ddf.admin.api.fields.ListField
 import org.codice.ddf.admin.api.report.Message.MessageType
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.graphql.GraphQLServletImpl
+import org.codice.ddf.admin.graphql.test.provider.TestFieldProvider
+import org.codice.ddf.admin.graphql.test.provider.TestObject
 import org.springframework.mock.web.MockHttpServletRequest
 import org.springframework.mock.web.MockHttpServletResponse
 import spock.lang.Shared
@@ -61,7 +63,7 @@ class TestGraphQLTransformation extends Specification {
         servlet.doGet(request, response)
 
         then:
-        response.getStatus() == 200
+        response.getStatus() == STATUS_OK
         getResponseContent().errors == null
         getResponseContent().warnings == null
         getResponseContent().data.__schema != null
@@ -76,7 +78,7 @@ class TestGraphQLTransformation extends Specification {
         servlet.doGet(request, response)
 
         then:
-        response.getStatus() == 200
+        response.getStatus() == STATUS_OK
         getResponseContent().errors == null
         getResponseContent().warnings == null
         getResponseContent().data ==
@@ -93,7 +95,6 @@ class TestGraphQLTransformation extends Specification {
                                 getEnum   : TestFieldProvider.GetEnum.GET_ENUM_VALUE
                         ]
                 ]
-
     }
 
     def "successfully pass all supported base field types as args"() {
@@ -105,7 +106,7 @@ class TestGraphQLTransformation extends Specification {
         servlet.doGet(request, response)
 
         then:
-        response.getStatus() == 200
+        response.getStatus() == STATUS_OK
         getResponseContent().errors == null
         getResponseContent().warnings == null
         getResponseContent().data ==
@@ -120,7 +121,6 @@ class TestGraphQLTransformation extends Specification {
                                 ]
                         ]
                 ]
-
     }
 
     def "test errors/warning paths and that data can still be returned"() {
@@ -132,7 +132,7 @@ class TestGraphQLTransformation extends Specification {
         servlet.doGet(request, response)
 
         then:
-        response.getStatus() == 200
+        response.getStatus() == STATUS_OK
         getResponseContent().errors.size() == 14
         getResponseContent().errors as Set == [
                 createArgumentError(["testObj"]),
@@ -177,7 +177,7 @@ class TestGraphQLTransformation extends Specification {
         servlet.doGet(request, response)
 
         then:
-        response.getStatus() == 200
+        response.getStatus() == STATUS_OK
         getResponseContent().data == null
         getResponseContent().warnings == null
         getResponseContent().errors.get(0).validationErrorType == ValidationErrorType.MissingFieldArgument.name()
@@ -192,7 +192,7 @@ class TestGraphQLTransformation extends Specification {
         servlet.doGet(request, response)
 
         then:
-        response.getStatus() == 200
+        response.getStatus() == STATUS_OK
         getResponseContent().data == [
                 testing: [
                         requiredArg: null
@@ -217,7 +217,7 @@ class TestGraphQLTransformation extends Specification {
         servlet.doGet(request, response)
 
         then:
-        response.getStatus() == 200
+        response.getStatus() == STATUS_OK
         getResponseContent().warnings == null
         getResponseContent().errors == null
         getResponseContent().data ==

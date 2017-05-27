@@ -36,26 +36,30 @@ public class CswFieldProvider extends BaseFieldProvider {
             "Catalog Service for the Web - a standard used to expose geospatial data over the web. This is a source "
                     + "that implements the CSW specification and provides methods for discovering and persisting CSW sources.";
 
-    private ConfiguratorFactory configuratorFactory;
+    private GetCswConfigurations getCswConfigurations;
+    private DiscoverCswSource discoverCswSource;
 
+    private SaveCswConfiguration saveCswConfiguration;
+    private DeleteCswConfiguration deleteCswConfiguration;
 
-    public CswFieldProvider() {
+    public CswFieldProvider(ConfiguratorFactory configuratorFactory) {
         super(ID, TYPE_NAME, DESCRIPTION);
+        getCswConfigurations = new GetCswConfigurations(configuratorFactory);
+        discoverCswSource = new DiscoverCswSource();
+
+        saveCswConfiguration = new SaveCswConfiguration(configuratorFactory);
+        deleteCswConfiguration = new DeleteCswConfiguration(configuratorFactory);
+        updateInnerFieldPaths();
     }
 
     @Override
     public List<Field> getDiscoveryFields() {
-        return ImmutableList.of(new GetCswConfigurations(configuratorFactory),
-                new DiscoverCswSource());
+        return ImmutableList.of(getCswConfigurations,
+                discoverCswSource);
     }
 
     @Override
     public List<FunctionField> getMutationFunctions() {
-        return ImmutableList.of(new SaveCswConfiguration(configuratorFactory),
-                new DeleteCswConfiguration(configuratorFactory));
-    }
-
-    public void setConfiguratorFactory(ConfiguratorFactory configuratorFactory) {
-        this.configuratorFactory = configuratorFactory;
+        return ImmutableList.of(saveCswConfiguration, deleteCswConfiguration);
     }
 }

@@ -43,13 +43,14 @@ public abstract class BaseObjectField extends BaseDataType<Map<String, Object>>
 
     @Override
     public Map<String, Object> getValue() {
-
         Map<String, Object> values = new HashMap<>();
+
         for(Field field : getFields()) {
             if(!(field instanceof FunctionField)) {
                 values.put(field.fieldName(), field.getValue());
             }
         }
+
         return values;
     }
 
@@ -73,7 +74,6 @@ public abstract class BaseObjectField extends BaseDataType<Map<String, Object>>
         }
 
         validationErrors.addAll(getFields().stream()
-                .filter(field -> !(field instanceof FunctionField))
                 .filter(field -> field instanceof DataType)
                 .map(field -> (List<Message>) ((DataType)field).validate())
                 .flatMap(Collection::stream)
@@ -88,7 +88,6 @@ public abstract class BaseObjectField extends BaseDataType<Map<String, Object>>
         }
 
         getFields().stream()
-                .filter(field -> !(field instanceof FunctionField))
                 .filter(field -> field instanceof DataType)
                 .map(field -> ((DataType) field).isRequired(required))
                 .filter(field -> field instanceof ObjectField)

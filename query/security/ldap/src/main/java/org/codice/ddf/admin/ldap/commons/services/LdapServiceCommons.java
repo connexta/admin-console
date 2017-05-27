@@ -104,6 +104,7 @@ public class LdapServiceCommons {
 
         String attributeMappingsPath = mapStringValue(LdapClaimsHandlerServiceProperties.PROPERTY_FILE_LOCATION, props);
         if (StringUtils.isNotEmpty(attributeMappingsPath)) {
+            // TODO: tbatie - 5/26/17 - Need to check if this path exists before trying to read. If it doesn't don't populate the attributeMappings field
             Map<String, String> attributeMappings =
                     new HashMap<>(configuratorFactory.getConfigReader().getProperties(Paths.get(attributeMappingsPath)));
             settings.attributeMapField(attributeMappings);

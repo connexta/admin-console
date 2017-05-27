@@ -39,8 +39,6 @@ public class LdapFieldProvider extends BaseFieldProvider {
 
     public static final String DESCRIPTION = "Facilities for interacting with LDAP servers.";
 
-    private ConfiguratorFactory configuratorFactory;
-
     //Discovery functions
     private LdapRecommendedSettings getRecommendedSettings;
     private LdapTestConnection testConnection;
@@ -57,8 +55,6 @@ public class LdapFieldProvider extends BaseFieldProvider {
 
     public LdapFieldProvider(ConfiguratorFactory configuratorFactory) {
         super(NAME, TYPE_NAME, DESCRIPTION);
-        this.configuratorFactory = configuratorFactory;
-
         getRecommendedSettings = new LdapRecommendedSettings();
         testConnection = new LdapTestConnection();
         testBind = new LdapTestBind();
@@ -75,9 +71,9 @@ public class LdapFieldProvider extends BaseFieldProvider {
 
     @Override
     public List<Field> getDiscoveryFields() {
-        return Arrays.asList(getRecommendedSettings,
-                testConnection,
+        return Arrays.asList(testConnection,
                 testBind,
+                getRecommendedSettings,
                 testSettings,
                 runLdapQuery,
                 getLdapUserAttributes,

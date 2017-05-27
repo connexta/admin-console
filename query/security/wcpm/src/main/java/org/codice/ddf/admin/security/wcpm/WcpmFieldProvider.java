@@ -36,8 +36,6 @@ public class WcpmFieldProvider extends BaseFieldProvider {
 
     public static final String DESCRIPTION = "Manages policies for the system's endpoints";
 
-    private ConfiguratorFactory configuratorFactory;
-
     //Discovery functions
     private GetAuthTypes getAuthTypes;
     private GetRealms getRealms;
@@ -50,8 +48,6 @@ public class WcpmFieldProvider extends BaseFieldProvider {
 
     public WcpmFieldProvider(ConfiguratorFactory configuratorFactory) {
         super(NAME, TYPE_NAME, DESCRIPTION);
-        this.configuratorFactory = configuratorFactory;
-
         getAuthTypes = new GetAuthTypes(configuratorFactory);
         getRealms = new GetRealms(configuratorFactory);
         getWhiteListContexts = new GetWhiteListContexts(configuratorFactory);

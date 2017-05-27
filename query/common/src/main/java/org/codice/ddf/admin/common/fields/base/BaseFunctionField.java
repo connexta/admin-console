@@ -47,6 +47,7 @@ public abstract class BaseFunctionField<T extends DataType> extends BaseField<Ma
         }
         report = new FunctionReportImpl<>();
     }
+
     public abstract T performFunction();
 
     @Override

@@ -57,7 +57,6 @@ public class SourceValidationUtils {
      * @return a {@link ReportImpl} containing a {@link org.codice.ddf.admin.sources.commons.SourceMessages#DUPLICATE_SOURCE_NAME} error, or a Report with
      * no messages on success.
      */
-    // TODO: 4/24/17 phuffer -  adding a duplicate name should be valid as long as the Active Binding is different
     public static ReportImpl validateSourceName(StringField sourceName,
             ConfiguratorFactory configuratorFactory) {
         List<Source> sources = getAllSourceReferences(configuratorFactory);

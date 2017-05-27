@@ -52,7 +52,7 @@ public class GraphQLTransformCommons {
         return new GraphQLProviderImpl(provider, transformOutput);
     }
 
-    public List<GraphQLProviderImpl> fieldProviderToGraphQLProvider(List<FieldProvider> providers) {
+    public List<GraphQLProviderImpl> fieldProvidersToGraphQLProviders(List<FieldProvider> providers) {
         return providers.stream()
                 .map(this::fieldProviderToGraphQLProvider)
                 .collect(Collectors.toList());

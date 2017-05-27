@@ -14,7 +14,6 @@
 package org.codice.ddf.admin.security.sts;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.codice.ddf.admin.api.Field;
@@ -22,6 +21,8 @@ import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.function.BaseFieldProvider;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.security.sts.discover.GetStsClaimsFunctionField;
+
+import com.google.common.collect.ImmutableList;
 
 public class StsFieldProvider extends BaseFieldProvider {
 
@@ -32,20 +33,17 @@ public class StsFieldProvider extends BaseFieldProvider {
     public static final String DESCRIPTION =
             "The STS (Security Token Service) is responsible for generating assertions that allow clients to be authenticated.";
 
-    private ConfiguratorFactory configuratorFactory;
-
     private GetStsClaimsFunctionField getStsClaims;
 
     public StsFieldProvider(ConfiguratorFactory configuratorFactory) {
         super(NAME, TYPE_NAME, DESCRIPTION);
-        this.configuratorFactory = configuratorFactory;
         getStsClaims = new GetStsClaimsFunctionField(configuratorFactory);
         updateInnerFieldPaths();
     }
 
     @Override
     public List<Field> getDiscoveryFields() {
-        return Arrays.asList(getStsClaims);
+        return ImmutableList.of(getStsClaims);
     }
 
     @Override

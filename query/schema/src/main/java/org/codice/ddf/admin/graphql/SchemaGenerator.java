@@ -20,7 +20,14 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import org.codice.ddf.admin.api.FieldProvider;
-import org.codice.ddf.admin.graphql.test.TestFieldProvider;
+import org.codice.ddf.admin.configurator.impl.ConfiguratorFactoryImpl;
+import org.codice.ddf.admin.ldap.LdapFieldProvider;
+import org.codice.ddf.admin.security.sts.StsFieldProvider;
+import org.codice.ddf.admin.security.wcpm.WcpmFieldProvider;
+import org.codice.ddf.admin.sources.csw.CswFieldProvider;
+import org.codice.ddf.admin.sources.opensearch.OpenSearchFieldProvider;
+import org.codice.ddf.admin.sources.wfs.WfsFieldProvider;
+import org.codice.ddf.admin.utils.conn.ConnectionFieldProvider;
 
 import com.google.common.collect.ImmutableList;
 
@@ -30,18 +37,14 @@ public class SchemaGenerator {
 
     public static void main(String[] args) throws IOException, URISyntaxException {
         GraphQLServletImpl servlet = new GraphQLServletImpl();
-//        final List<FieldProvider> GRAPHQL_PROVIDERS = ImmutableList.of(
-//                new StsFieldProvider(new ConfiguratorFactoryImpl()),
-//                new ConnectionFieldProvider(),
-//                new LdapFieldProvider(new ConfiguratorFactoryImpl()),
-//                new WcpmFieldProvider(new ConfiguratorFactoryImpl()),
-//                new CswFieldProvider(),
-//                new WfsFieldProvider(),
-//                new OpenSearchFieldProvider()
-//        );
-
         final List<FieldProvider> GRAPHQL_PROVIDERS = ImmutableList.of(
-                new TestFieldProvider()
+                new StsFieldProvider(new ConfiguratorFactoryImpl()),
+                new ConnectionFieldProvider(),
+                new LdapFieldProvider(new ConfiguratorFactoryImpl()),
+                new WcpmFieldProvider(new ConfiguratorFactoryImpl()),
+                new CswFieldProvider(new ConfiguratorFactoryImpl()),
+                new WfsFieldProvider(new ConfiguratorFactoryImpl()),
+                new OpenSearchFieldProvider(new ConfiguratorFactoryImpl())
         );
 
         servlet.setFieldProviders(GRAPHQL_PROVIDERS);

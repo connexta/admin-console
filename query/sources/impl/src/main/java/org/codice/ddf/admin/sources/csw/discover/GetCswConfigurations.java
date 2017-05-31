@@ -28,6 +28,9 @@ import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.sources.fields.SourceInfoField;
+import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
+import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
+import org.codice.ddf.internal.admin.configurator.actions.ServiceReader;
 
 import com.google.common.collect.ImmutableList;
 
@@ -42,30 +45,44 @@ public class GetCswConfigurations extends BaseFunctionField<ListField<SourceInfo
 
     private ConfiguratorFactory configuratorFactory;
 
-    public GetCswConfigurations(ConfiguratorFactory configuratorFactory) {
+    private final ServiceActions serviceActions;
+
+    private final ManagedServiceActions managedServiceActions;
+
+    private final ServiceReader serviceReader;
+
+    public GetCswConfigurations(ConfiguratorFactory configuratorFactory,
+            ServiceActions serviceActions, ManagedServiceActions managedServiceActions,
+            ServiceReader serviceReader) {
         super(ID, DESCRIPTION, new ListFieldImpl<>(SourceInfoField.class));
+        this.configuratorFactory = configuratorFactory;
+        this.serviceActions = serviceActions;
+        this.managedServiceActions = managedServiceActions;
+        this.serviceReader = serviceReader;
+
         pid = new PidField();
         updateArgumentPaths();
-
-        this.configuratorFactory = configuratorFactory;
     }
 
     @Override
     public ListField<SourceInfoField> performFunction() {
         return getSourceConfigurations(CSW_FACTORY_PIDS,
-                SERVICE_PROPS_TO_CSW_CONFIG, pid.getValue(),
-                configuratorFactory);
+                SERVICE_PROPS_TO_CSW_CONFIG,
+                pid.getValue(),
+                serviceActions,
+                managedServiceActions,
+                serviceReader);
     }
 
     @Override
     public void validate() {
         super.validate();
-        if(containsErrorMsgs()) {
+        if (containsErrorMsgs()) {
             return;
         }
 
-        if(pid.getValue() != null) {
-            addMessages(serviceConfigurationExists(pid, configuratorFactory));
+        if (pid.getValue() != null) {
+            addMessages(serviceConfigurationExists(pid, serviceActions));
         }
     }
 
@@ -76,6 +93,9 @@ public class GetCswConfigurations extends BaseFunctionField<ListField<SourceInfo
 
     @Override
     public FunctionField<ListField<SourceInfoField>> newInstance() {
-        return new GetCswConfigurations(configuratorFactory);
+        return new GetCswConfigurations(configuratorFactory,
+                serviceActions,
+                managedServiceActions,
+                serviceReader);
     }
 }

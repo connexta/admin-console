@@ -19,8 +19,8 @@ import java.util.List;
 import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.function.BaseFieldProvider;
-import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.security.sts.discover.GetStsClaimsFunctionField;
+import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
 
 import com.google.common.collect.ImmutableList;
 
@@ -35,9 +35,9 @@ public class StsFieldProvider extends BaseFieldProvider {
 
     private GetStsClaimsFunctionField getStsClaims;
 
-    public StsFieldProvider(ConfiguratorFactory configuratorFactory) {
+    public StsFieldProvider(ServiceActions serviceActions) {
         super(NAME, TYPE_NAME, DESCRIPTION);
-        getStsClaims = new GetStsClaimsFunctionField(configuratorFactory);
+        getStsClaims = new GetStsClaimsFunctionField(serviceActions);
         updateInnerFieldPaths();
     }
 

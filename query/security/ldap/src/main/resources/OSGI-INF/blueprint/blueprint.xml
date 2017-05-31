@@ -16,10 +16,26 @@
     <service id="ldapProvider" interface="org.codice.ddf.admin.api.FieldProvider">
         <bean class="org.codice.ddf.admin.ldap.LdapFieldProvider">
             <argument ref="configuratorFactory" />
+            <argument ref="featureActions"/>
+            <argument ref="managedServiceActions"/>
+            <argument ref="propertyActions"/>
         </bean>
     </service>
 
     <reference id="configuratorFactory"
                interface="org.codice.ddf.admin.configurator.ConfiguratorFactory"
                availability="mandatory" filter="(type=txact)"/>
+
+    <reference id="featureActions"
+               interface="org.codice.ddf.internal.admin.configurator.actions.FeatureActions"
+               availability="mandatory"/>
+
+    <reference id="managedServiceActions"
+               interface="org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions"
+               availability="mandatory"/>
+
+    <reference id="propertyActions"
+               interface="org.codice.ddf.internal.admin.configurator.actions.PropertyActions"
+               availability="mandatory"/>
+
 </blueprint>

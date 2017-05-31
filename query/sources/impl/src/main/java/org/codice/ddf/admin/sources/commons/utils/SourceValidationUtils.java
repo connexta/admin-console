@@ -20,48 +20,52 @@ import java.util.List;
 
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 import org.codice.ddf.admin.common.report.ReportImpl;
-import org.codice.ddf.admin.configurator.ConfiguratorFactory;
+import org.codice.ddf.internal.admin.configurator.actions.ServiceReader;
 
 import ddf.catalog.service.ConfiguredService;
 import ddf.catalog.source.Source;
+import ddf.catalog.util.Describable;
 
 public class SourceValidationUtils {
-
+    // TODO RAP 31 May 17: Remove static methods and pass services to the ctor instead
     /**
      * Determines whether the service configuration identified by the service pid has the same name as sourceName.
      * If the service configuration's id equals the sourceName return {@code true}, otherwise {@code false}.
      *
-     * @param servicePid service pid of the service configuration
-     * @param sourceName source name to check against existing source name
-     * @param configuratorFactory configurator factory to get services
+     * @param servicePid    service pid of the service configuration
+     * @param sourceName    source name to check against existing source name
+     * @param serviceReader service to read service state
      * @return {@code true} if the sourceName matches the existing configuration's id, {@code false} otherwise
      */
-    public static boolean hasSourceName(String servicePid, String sourceName, ConfiguratorFactory configuratorFactory) {
-        Source source = getAllSourceReferences(configuratorFactory).stream()
+    public static boolean hasSourceName(String servicePid, String sourceName,
+            ServiceReader serviceReader) {
+        Source source = getAllSourceReferences(serviceReader).stream()
                 .map(ConfiguredService.class::cast)
                 .filter(configuredService -> configuredService.getConfigurationPid()
                         .equals(servicePid))
                 .findFirst()
                 .map(Source.class::cast)
-                .orElseGet(() -> null);
+                .orElse(null);
 
-        return source == null || source.getId().equals(sourceName);
+        return source == null || source.getId()
+                .equals(sourceName);
     }
 
     /**
      * Validates the {@code sourceName} against the existing source names in the system. An empty {@link ReportImpl} will be returned
      * if there are no existing source names with with name {@code sourceName}, or a {@link ReportImpl} with error messages.
      *
-     * @param sourceName          source name to validate
-     * @param configuratorFactory configurator factory for reading FederatedSource service references
-     * @return a {@link ReportImpl} containing a {@link org.codice.ddf.admin.sources.commons.SourceMessages#DUPLICATE_SOURCE_NAME} error, or a Report with
+     * @param sourceName    source name to validate
+     * @param serviceReader service to read service state
+     * @return a {@link ReportImpl} containing a {@link org.codice.ddf.admin.sources.commons.SourceMessages#DUPLICATE_SOURCE_NAME}
+     * error, or a Report with
      * no messages on success.
      */
     public static ReportImpl validateSourceName(StringField sourceName,
-            ConfiguratorFactory configuratorFactory) {
-        List<Source> sources = getAllSourceReferences(configuratorFactory);
+            ServiceReader serviceReader) {
+        List<Source> sources = getAllSourceReferences(serviceReader);
         boolean matchFound = sources.stream()
-                .map(source -> source.getId())
+                .map(Describable::getId)
                 .anyMatch(id -> id.equals(sourceName.getValue()));
 
         ReportImpl report = new ReportImpl();

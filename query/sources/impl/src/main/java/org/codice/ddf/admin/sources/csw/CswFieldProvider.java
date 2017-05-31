@@ -23,6 +23,9 @@ import org.codice.ddf.admin.sources.csw.discover.DiscoverCswSource;
 import org.codice.ddf.admin.sources.csw.discover.GetCswConfigurations;
 import org.codice.ddf.admin.sources.csw.persist.DeleteCswConfiguration;
 import org.codice.ddf.admin.sources.csw.persist.SaveCswConfiguration;
+import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
+import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
+import org.codice.ddf.internal.admin.configurator.actions.ServiceReader;
 
 import com.google.common.collect.ImmutableList;
 
@@ -37,25 +40,35 @@ public class CswFieldProvider extends BaseFieldProvider {
                     + "that implements the CSW specification and provides methods for discovering and persisting CSW sources.";
 
     private GetCswConfigurations getCswConfigurations;
+
     private DiscoverCswSource discoverCswSource;
 
     private SaveCswConfiguration saveCswConfiguration;
+
     private DeleteCswConfiguration deleteCswConfiguration;
 
-    public CswFieldProvider(ConfiguratorFactory configuratorFactory) {
+    public CswFieldProvider(ConfiguratorFactory configuratorFactory, ServiceActions serviceActions,
+            ManagedServiceActions managedServiceActions, ServiceReader serviceReader) {
         super(ID, TYPE_NAME, DESCRIPTION);
-        getCswConfigurations = new GetCswConfigurations(configuratorFactory);
+        getCswConfigurations = new GetCswConfigurations(configuratorFactory,
+                serviceActions,
+                managedServiceActions,
+                serviceReader);
         discoverCswSource = new DiscoverCswSource();
 
-        saveCswConfiguration = new SaveCswConfiguration(configuratorFactory);
-        deleteCswConfiguration = new DeleteCswConfiguration(configuratorFactory);
+        saveCswConfiguration = new SaveCswConfiguration(configuratorFactory,
+                serviceActions,
+                managedServiceActions,
+                serviceReader);
+        deleteCswConfiguration = new DeleteCswConfiguration(configuratorFactory,
+                serviceActions,
+                managedServiceActions);
         updateInnerFieldPaths();
     }
 
     @Override
     public List<Field> getDiscoveryFields() {
-        return ImmutableList.of(getCswConfigurations,
-                discoverCswSource);
+        return ImmutableList.of(getCswConfigurations, discoverCswSource);
     }
 
     @Override

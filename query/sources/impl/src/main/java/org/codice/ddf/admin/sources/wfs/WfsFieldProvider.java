@@ -23,6 +23,9 @@ import org.codice.ddf.admin.sources.wfs.discover.DiscoverWfsSource;
 import org.codice.ddf.admin.sources.wfs.discover.GetWfsConfigurations;
 import org.codice.ddf.admin.sources.wfs.persist.DeleteWfsConfiguration;
 import org.codice.ddf.admin.sources.wfs.persist.SaveWfsConfiguration;
+import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
+import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
+import org.codice.ddf.internal.admin.configurator.actions.ServiceReader;
 
 import com.google.common.collect.ImmutableList;
 
@@ -37,18 +40,29 @@ public class WfsFieldProvider extends BaseFieldProvider {
                     + "that implements the WFS specification and provides methods for discovering and persisting WFS sources.";
 
     private DiscoverWfsSource discoverWfsSource;
+
     private GetWfsConfigurations getWfsConfigs;
 
     private SaveWfsConfiguration saveWfsConfig;
+
     private DeleteWfsConfiguration deleteWfsConfig;
 
-    public WfsFieldProvider(ConfiguratorFactory configuratorFactory) {
+    public WfsFieldProvider(ConfiguratorFactory configuratorFactory, ServiceActions serviceActions,
+            ManagedServiceActions managedServiceActions, ServiceReader serviceReader) {
         super(NAME, TYPE_NAME, DESCRIPTION);
         discoverWfsSource = new DiscoverWfsSource();
-        getWfsConfigs = new GetWfsConfigurations(configuratorFactory);
+        getWfsConfigs = new GetWfsConfigurations(configuratorFactory,
+                serviceActions,
+                managedServiceActions,
+                serviceReader);
 
-        saveWfsConfig = new SaveWfsConfiguration(configuratorFactory);
-        deleteWfsConfig = new DeleteWfsConfiguration(configuratorFactory);
+        saveWfsConfig = new SaveWfsConfiguration(configuratorFactory,
+                serviceActions,
+                managedServiceActions,
+                serviceReader);
+        deleteWfsConfig = new DeleteWfsConfiguration(configuratorFactory,
+                serviceActions,
+                managedServiceActions);
         updateInnerFieldPaths();
     }
 

@@ -30,6 +30,9 @@ import org.codice.ddf.admin.ldap.discover.LdapUserAttributes;
 import org.codice.ddf.admin.ldap.embedded.InstallEmbeddedLdap;
 import org.codice.ddf.admin.ldap.persist.DeleteLdapConfiguration;
 import org.codice.ddf.admin.ldap.persist.SaveLdapConfiguration;
+import org.codice.ddf.internal.admin.configurator.actions.FeatureActions;
+import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
+import org.codice.ddf.internal.admin.configurator.actions.PropertyActions;
 
 public class LdapFieldProvider extends BaseFieldProvider {
 
@@ -41,19 +44,28 @@ public class LdapFieldProvider extends BaseFieldProvider {
 
     //Discovery functions
     private LdapRecommendedSettings getRecommendedSettings;
+
     private LdapTestConnection testConnection;
+
     private LdapTestBind testBind;
+
     private LdapTestSettings testSettings;
+
     private LdapQuery runLdapQuery;
+
     private LdapUserAttributes getLdapUserAttributes;
+
     private LdapConfigurations getLdapConfigs;
 
     //Mutation functions
     private SaveLdapConfiguration saveConfig;
+
     private DeleteLdapConfiguration deleteConfig;
+
     private InstallEmbeddedLdap installEmbeddedLdap;
 
-    public LdapFieldProvider(ConfiguratorFactory configuratorFactory) {
+    public LdapFieldProvider(ConfiguratorFactory configuratorFactory, FeatureActions featureActions,
+            ManagedServiceActions managedServiceActions, PropertyActions propertyActions) {
         super(NAME, TYPE_NAME, DESCRIPTION);
         getRecommendedSettings = new LdapRecommendedSettings();
         testConnection = new LdapTestConnection();
@@ -61,11 +73,18 @@ public class LdapFieldProvider extends BaseFieldProvider {
         testSettings = new LdapTestSettings();
         runLdapQuery = new LdapQuery();
         getLdapUserAttributes = new LdapUserAttributes();
-        getLdapConfigs = new LdapConfigurations(configuratorFactory);
+        getLdapConfigs = new LdapConfigurations(configuratorFactory,
+                managedServiceActions,
+                propertyActions);
 
-        saveConfig = new SaveLdapConfiguration(configuratorFactory);
-        deleteConfig = new DeleteLdapConfiguration(configuratorFactory);
-        installEmbeddedLdap = new InstallEmbeddedLdap(configuratorFactory);
+        saveConfig = new SaveLdapConfiguration(configuratorFactory,
+                propertyActions,
+                featureActions,
+                managedServiceActions);
+        deleteConfig = new DeleteLdapConfiguration(configuratorFactory,
+                propertyActions,
+                managedServiceActions);
+        installEmbeddedLdap = new InstallEmbeddedLdap(configuratorFactory, featureActions);
         updateInnerFieldPaths();
     }
 
@@ -82,8 +101,6 @@ public class LdapFieldProvider extends BaseFieldProvider {
 
     @Override
     public List<FunctionField> getMutationFunctions() {
-        return Arrays.asList(saveConfig,
-                deleteConfig,
-                installEmbeddedLdap);
+        return Arrays.asList(saveConfig, deleteConfig, installEmbeddedLdap);
     }
 }

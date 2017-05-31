@@ -23,6 +23,9 @@ import org.codice.ddf.admin.sources.opensearch.discover.DiscoverOpenSearchSource
 import org.codice.ddf.admin.sources.opensearch.discover.GetOpenSearchConfigurations;
 import org.codice.ddf.admin.sources.opensearch.persist.DeleteOpenSearchConfiguration;
 import org.codice.ddf.admin.sources.opensearch.persist.SaveOpenSearchConfiguration;
+import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
+import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
+import org.codice.ddf.internal.admin.configurator.actions.ServiceReader;
 
 import com.google.common.collect.ImmutableList;
 
@@ -36,18 +39,30 @@ public class OpenSearchFieldProvider extends BaseFieldProvider {
             "A specification for querying geospatial data using standard data formats. This is a source that implements the OpenSearch specification.";
 
     private DiscoverOpenSearchSource discoverOpenSearchSource;
+
     private GetOpenSearchConfigurations getOpenSearchConfigs;
 
     private SaveOpenSearchConfiguration saveOpenSearchConfigs;
+
     private DeleteOpenSearchConfiguration deleteOpenSearchConfig;
 
-    public OpenSearchFieldProvider(ConfiguratorFactory configuratorFactory) {
+    public OpenSearchFieldProvider(ConfiguratorFactory configuratorFactory,
+            ServiceActions serviceActions, ManagedServiceActions managedServiceActions,
+            ServiceReader serviceReader) {
         super(ID, TYPE_NAME, DESCRIPTION);
         discoverOpenSearchSource = new DiscoverOpenSearchSource();
-        getOpenSearchConfigs = new GetOpenSearchConfigurations(configuratorFactory);
+        getOpenSearchConfigs = new GetOpenSearchConfigurations(configuratorFactory,
+                serviceActions,
+                managedServiceActions,
+                serviceReader);
 
-        saveOpenSearchConfigs = new SaveOpenSearchConfiguration(configuratorFactory);
-        deleteOpenSearchConfig = new DeleteOpenSearchConfiguration(configuratorFactory);
+        saveOpenSearchConfigs = new SaveOpenSearchConfiguration(configuratorFactory,
+                serviceActions,
+                managedServiceActions,
+                serviceReader);
+        deleteOpenSearchConfig = new DeleteOpenSearchConfiguration(configuratorFactory,
+                serviceActions,
+                managedServiceActions);
         updateInnerFieldPaths();
     }
 

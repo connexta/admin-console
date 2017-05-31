@@ -24,6 +24,8 @@ import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
+import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
+import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
 
 import com.google.common.collect.ImmutableList;
 
@@ -37,9 +39,17 @@ public class DeleteOpenSearchConfiguration extends BaseFunctionField<BooleanFiel
 
     private ConfiguratorFactory configuratorFactory;
 
-    public DeleteOpenSearchConfiguration(ConfiguratorFactory configuratorFactory) {
+    private final ServiceActions serviceActions;
+
+    private final ManagedServiceActions managedServiceActions;
+
+    public DeleteOpenSearchConfiguration(ConfiguratorFactory configuratorFactory,
+            ServiceActions serviceActions, ManagedServiceActions managedServiceActions) {
         super(ID, DESCRIPTION, new BooleanField());
         this.configuratorFactory = configuratorFactory;
+        this.serviceActions = serviceActions;
+        this.managedServiceActions = managedServiceActions;
+
         pid = new PidField();
         pid.isRequired(true);
         updateArgumentPaths();
@@ -47,17 +57,17 @@ public class DeleteOpenSearchConfiguration extends BaseFunctionField<BooleanFiel
 
     @Override
     public BooleanField performFunction() {
-        addMessages(deleteService(pid, configuratorFactory));
+        addMessages(deleteService(pid, configuratorFactory, managedServiceActions));
         return new BooleanField(!containsErrorMsgs());
     }
 
     @Override
     public void validate() {
         super.validate();
-        if(containsErrorMsgs()) {
+        if (containsErrorMsgs()) {
             return;
         }
-        addMessages(serviceConfigurationExists(pid, configuratorFactory));
+        addMessages(serviceConfigurationExists(pid, serviceActions));
     }
 
     @Override
@@ -67,6 +77,8 @@ public class DeleteOpenSearchConfiguration extends BaseFunctionField<BooleanFiel
 
     @Override
     public FunctionField<BooleanField> newInstance() {
-        return new DeleteOpenSearchConfiguration(configuratorFactory);
+        return new DeleteOpenSearchConfiguration(configuratorFactory,
+                serviceActions,
+                managedServiceActions);
     }
 }

@@ -32,6 +32,9 @@ import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.sources.fields.type.CswSourceConfigurationField;
+import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
+import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
+import org.codice.ddf.internal.admin.configurator.actions.ServiceReader;
 
 import com.google.common.collect.ImmutableList;
 
@@ -48,26 +51,46 @@ public class SaveCswConfiguration extends BaseFunctionField<BooleanField> {
 
     private ConfiguratorFactory configuratorFactory;
 
-    public SaveCswConfiguration(ConfiguratorFactory configuratorFactory) {
+    private final ServiceActions serviceActions;
+
+    private final ManagedServiceActions managedServiceActions;
+
+    private final ServiceReader serviceReader;
+
+    public SaveCswConfiguration(ConfiguratorFactory configuratorFactory,
+            ServiceActions serviceActions, ManagedServiceActions managedServiceActions,
+            ServiceReader serviceReader) {
         super(ID, DESCRIPTION, new BooleanField());
+        this.configuratorFactory = configuratorFactory;
+        this.serviceActions = serviceActions;
+        this.managedServiceActions = managedServiceActions;
+        this.serviceReader = serviceReader;
+
         config = new CswSourceConfigurationField();
         pid = new PidField();
         config.isRequired(true);
-        config.cswProfileField().isRequired(true);
-        config.sourceNameField().isRequired(true);
-        config.endpointUrlField().isRequired(true);
+        config.cswProfileField()
+                .isRequired(true);
+        config.sourceNameField()
+                .isRequired(true);
+        config.endpointUrlField()
+                .isRequired(true);
         updateArgumentPaths();
-
-        this.configuratorFactory = configuratorFactory;
     }
 
     @Override
     public BooleanField performFunction() {
         if (StringUtils.isNotEmpty(pid.getValue())) {
-            addMessages(updateService(pid, cswConfigToServiceProps(config), configuratorFactory));
+            addMessages(updateService(pid,
+                    cswConfigToServiceProps(config),
+                    configuratorFactory,
+                    serviceActions));
         } else {
             String factoryPid = cswProfileToFactoryPid(config.cswProfile());
-            if (createManagedService(cswConfigToServiceProps(config), factoryPid, configuratorFactory).containsErrorMsgs()) {
+            if (createManagedService(cswConfigToServiceProps(config),
+                    factoryPid,
+                    configuratorFactory,
+                    managedServiceActions).containsErrorMsgs()) {
                 addArgumentMessage(failedPersistError(config.path()));
             }
         }
@@ -77,17 +100,19 @@ public class SaveCswConfiguration extends BaseFunctionField<BooleanField> {
     @Override
     public void validate() {
         super.validate();
-        if(containsErrorMsgs()) {
+        if (containsErrorMsgs()) {
             return;
         }
 
-        if(pid.getValue() != null) {
-            addMessages(serviceConfigurationExists(pid, configuratorFactory));
-            if(!containsErrorMsgs() && !hasSourceName(pid.getValue(), config.sourceName(), configuratorFactory)) {
-                addMessages(validateSourceName(config.sourceNameField(), configuratorFactory));
+        if (pid.getValue() != null) {
+            addMessages(serviceConfigurationExists(pid, serviceActions));
+            if (!containsErrorMsgs() && !hasSourceName(pid.getValue(),
+                    config.sourceName(),
+                    serviceReader)) {
+                addMessages(validateSourceName(config.sourceNameField(), serviceReader));
             }
         } else {
-            addMessages(validateSourceName(config.sourceNameField(), configuratorFactory));
+            addMessages(validateSourceName(config.sourceNameField(), serviceReader));
         }
 
     }
@@ -99,6 +124,9 @@ public class SaveCswConfiguration extends BaseFunctionField<BooleanField> {
 
     @Override
     public FunctionField<BooleanField> newInstance() {
-        return new SaveCswConfiguration(configuratorFactory);
+        return new SaveCswConfiguration(configuratorFactory,
+                serviceActions,
+                managedServiceActions,
+                serviceReader);
     }
 }

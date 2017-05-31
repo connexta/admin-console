@@ -33,9 +33,11 @@ import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 import org.codice.ddf.admin.configurator.Configurator;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.configurator.OperationReport;
+import org.codice.ddf.admin.security.common.fields.wcpm.ClaimsMapEntry;
 import org.codice.ddf.admin.security.common.fields.wcpm.ContextPolicyBin;
 import org.codice.ddf.admin.security.common.services.PolicyManagerServiceProperties;
 import org.codice.ddf.admin.security.common.services.StsServiceProperties;
+import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
 
 import com.google.common.collect.ImmutableList;
 
@@ -48,30 +50,32 @@ public class SaveContextPolices extends BaseFunctionField<ListField<ContextPolic
 
     private ConfiguratorFactory configuratorFactory;
 
-    private ListField<ContextPolicyBin> contextPolicies;
+    private final ServiceActions serviceActions;
 
-    private PolicyManagerServiceProperties wcpmServiceProps;
+    private ListField<ContextPolicyBin> contextPolicies;
 
     private StsServiceProperties stsServiceProps;
 
-    public SaveContextPolices(ConfiguratorFactory configuratorFactory) {
+    public SaveContextPolices(ConfiguratorFactory configuratorFactory,
+            ServiceActions serviceActions) {
         super(FUNCTION_FIELD_NAME, DESCRIPTION, new ListFieldImpl<>(ContextPolicyBin.class));
+        this.configuratorFactory = configuratorFactory;
+        this.serviceActions = serviceActions;
+
         contextPolicies = new ListFieldImpl<>("policies",
-                new ContextPolicyBin().useDefaultRequiredFields())
-                .isRequired(true);
+                new ContextPolicyBin().useDefaultRequiredFields()).isRequired(true);
         updateArgumentPaths();
 
-        this.configuratorFactory = configuratorFactory;
-        wcpmServiceProps = new PolicyManagerServiceProperties();
         stsServiceProps = new StsServiceProperties();
     }
 
     @Override
     public ListField<ContextPolicyBin> performFunction() {
         Configurator configurator = configuratorFactory.getConfigurator();
-        configurator.updateConfigFile(POLICY_MANAGER_PID,
-                new PolicyManagerServiceProperties().contextPoliciesToPolicyManagerProps(contextPolicies.getList()),
-                true);
+        configurator.add(serviceActions.build(POLICY_MANAGER_PID,
+                new PolicyManagerServiceProperties().contextPoliciesToPolicyManagerProps(
+                        contextPolicies.getList()),
+                true));
 
         OperationReport configReport = configurator.commit(
                 "Web Context Policy saved with details: {}",
@@ -92,14 +96,14 @@ public class SaveContextPolices extends BaseFunctionField<ListField<ContextPolic
     }
 
     private void checkClaimsValidity() {
-        List<String> supportedClaims = stsServiceProps.getConfiguredStsClaims(configuratorFactory);
+        List<String> supportedClaims = stsServiceProps.getConfiguredStsClaims(serviceActions);
 
         List<StringField> claimArgs = new ArrayList<>();
         for (ContextPolicyBin bin : contextPolicies.getList()) {
             claimArgs.addAll(bin.claimsMappingField()
                     .getList()
                     .stream()
-                    .map(entry -> entry.claimField())
+                    .map(ClaimsMapEntry::claimField)
                     .collect(Collectors.toList()));
         }
 
@@ -125,6 +129,6 @@ public class SaveContextPolices extends BaseFunctionField<ListField<ContextPolic
 
     @Override
     public FunctionField<ListField<ContextPolicyBin>> newInstance() {
-        return new SaveContextPolices(configuratorFactory);
+        return new SaveContextPolices(configuratorFactory, serviceActions);
     }
 }

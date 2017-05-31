@@ -27,6 +27,7 @@
 
     <modules>
         <module>configurator-api</module>
+        <module>configurator-actions-api</module>
         <module>configurator-impl</module>
     </modules>
 

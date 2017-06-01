@@ -34,6 +34,7 @@ public abstract class BaseFunctionField<T extends DataType> extends BaseField<Ma
 
     public BaseFunctionField(String functionName, String description) {
         super(functionName, description);
+        report = new FunctionReportImpl<>();
     }
 
     public BaseFunctionField(String functionName, String description, T returnType) {

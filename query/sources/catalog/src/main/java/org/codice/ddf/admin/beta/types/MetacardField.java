@@ -14,6 +14,7 @@
 package org.codice.ddf.admin.beta.types;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +41,7 @@ public class MetacardField extends BaseObjectField {
 
     public static final String DESCRIPTION = "A Metacard containing a list of attributes.";
 
-    private List<Field> fields;
+    private List<Field> fields = Collections.emptyList();
 
     private Map<String, String> descriptorNameToFieldMapping;
 
@@ -48,7 +49,7 @@ public class MetacardField extends BaseObjectField {
         this(FIELD_NAME);
     }
 
-    public MetacardField(String fieldName) {
+    private MetacardField(String fieldName) {
         super(fieldName, FIELD_TYPE_NAME, DESCRIPTION);
         descriptorNameToFieldMapping = new HashMap<>();
     }
@@ -77,8 +78,8 @@ public class MetacardField extends BaseObjectField {
         return fields;
     }
 
-    private Field typeMapping(String fieldName, AttributeType.AttributeFormat format) {
-        switch(format) {
+    private Field mapType(String fieldName, AttributeType.AttributeFormat format) {
+        switch (format) {
         case BOOLEAN:
             return new BooleanField(fieldName);
         case STRING:
@@ -103,10 +104,13 @@ public class MetacardField extends BaseObjectField {
     }
 
     private Field createField(AttributeDescriptor descriptor) {
-        String fieldName = descriptor.getName().replace("-", "").replace(".", "");
+        String fieldName = descriptor.getName()
+                .replace("-", "")
+                .replace(".", ""); // graphql doesn't like these characters
         descriptorNameToFieldMapping.put(descriptor.getName(), fieldName);
-        Field field = typeMapping(fieldName,
-                descriptor.getType().getAttributeFormat());
+        Field field = mapType(fieldName,
+                descriptor.getType()
+                        .getAttributeFormat());
         if (field != null && descriptor.isMultiValued()) {
             return new ListFieldImpl(fieldName, field.getClass());
         }

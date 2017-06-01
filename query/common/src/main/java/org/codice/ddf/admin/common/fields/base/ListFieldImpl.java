@@ -43,7 +43,7 @@ public class ListFieldImpl<T extends DataType> extends BaseDataType<List>
         try {
             this.listFieldType = listFieldType.newInstance();
         } catch (InstantiationException | IllegalAccessException e) {
-            throw new RuntimeException(String.format("Unable to create new instance of class [%s]. Ensure there is a default constructor for the ListFieldImpl to initialize.", listFieldType.getClass()));
+            throw new RuntimeException(String.format("Unable to create new instance of class [%s]. Ensure there is a default constructor for the ListFieldImpl to initialize.", listFieldType.getClass().getCanonicalName()));
         }
     }
 

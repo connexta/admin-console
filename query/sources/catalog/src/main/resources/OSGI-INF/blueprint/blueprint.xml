@@ -13,6 +13,9 @@
 -->
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
     <bean id="catalogFieldProvider" class="org.codice.ddf.admin.beta.CatalogFieldProvider">
+        <argument>
+            <reference-list interface="ddf.catalog.data.MetacardType"/>
+        </argument>
         <argument ref="catalogFramework" />
         <argument ref="filterBuilder" />
     </bean>

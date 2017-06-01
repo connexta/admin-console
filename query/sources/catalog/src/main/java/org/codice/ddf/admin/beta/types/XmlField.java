@@ -11,24 +11,24 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.common.fields.base.scalar;
+package org.codice.ddf.admin.beta.types;
 
-import static org.codice.ddf.admin.api.DataType.FieldBaseType.FLOAT;
+import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 
-public class FloatField extends BaseScalarField<Float> {
+public class XmlField extends StringField {
 
-    public static final String DEFAULT_FIELD_NAME = "float";
+    public static final String FIELD_NAME = "xml";
 
-    public FloatField() {
-        this(DEFAULT_FIELD_NAME);
+    public static final String FIELD_TYPE_NAME = "Xml";
+
+    public static final String DESCRIPTION = "An XML encoded string.";
+
+    public XmlField() {
+        this(FIELD_NAME);
     }
 
-    public FloatField(String fieldName) {
-        super(fieldName, null, null, FLOAT);
+    public XmlField(String fieldName) {
+        super(fieldName, FIELD_TYPE_NAME, DESCRIPTION);
     }
 
-    protected FloatField(String fieldName, String fieldTypeName, String description) {
-        super(fieldName, fieldTypeName, description, FLOAT);
-    }
 }
-

@@ -11,6 +11,7 @@ import org.codice.ddf.admin.common.fields.base.function.BaseFieldProvider;
 import com.google.common.collect.ImmutableList;
 
 import ddf.catalog.CatalogFramework;
+import ddf.catalog.data.MetacardType;
 import ddf.catalog.filter.FilterBuilder;
 
 public class CatalogFieldProvider extends BaseFieldProvider {
@@ -22,11 +23,14 @@ public class CatalogFieldProvider extends BaseFieldProvider {
     public static final String DESCRIPTION =
             "Dat catalog doe.";
 
+    private List<MetacardType> metacardTypes;
+
     private PerformQuery performQuery;
 
-    public CatalogFieldProvider(CatalogFramework framework, FilterBuilder filterBuilder) {
+    public CatalogFieldProvider(CatalogFramework framework, FilterBuilder filterBuilder, List<MetacardType> metacardTypes) {
         super(NAME, TYPE_NAME, DESCRIPTION);
-        performQuery = new PerformQuery(framework, filterBuilder);
+        performQuery = new PerformQuery(framework, filterBuilder, metacardTypes);
+        this.metacardTypes = metacardTypes;
         updateInnerFieldPaths();
     }
 

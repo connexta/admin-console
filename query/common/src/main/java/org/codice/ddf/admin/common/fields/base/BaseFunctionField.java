@@ -32,6 +32,10 @@ public abstract class BaseFunctionField<T extends DataType> extends BaseField<Ma
 
     private T returnType;
 
+    public BaseFunctionField(String functionName, String description) {
+        super(functionName, description);
+    }
+
     public BaseFunctionField(String functionName, String description, T returnType) {
         super(functionName, description);
         this.returnType = returnType;
@@ -86,6 +90,10 @@ public abstract class BaseFunctionField<T extends DataType> extends BaseField<Ma
     public void fieldName(String fieldName) {
         super.fieldName(fieldName);
         updateArgumentPaths();
+    }
+
+    public void setReturnType(T returnType) {
+        this.returnType = returnType;
     }
 
     public void updateArgumentPaths() {

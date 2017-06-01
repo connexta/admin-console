@@ -13,10 +13,18 @@
  **/
 package org.codice.ddf.admin.beta.types;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.common.fields.base.BaseEnumField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 
-import com.google.common.collect.ImmutableList;
+import ddf.catalog.data.MetacardType;
 
 public class MetacardAttributeField extends BaseEnumField<String> {
 
@@ -24,19 +32,37 @@ public class MetacardAttributeField extends BaseEnumField<String> {
 
     public static final String TYPE_NAME = "MetacardAttribute";
 
-    public static final String DESCRIPTION = "Metacard attribute.";
+    public static final String DESCRIPTION = "Name of a metacard attribute.";
 
     public MetacardAttributeField() {
-        this(null);
+        this(Collections.emptyList());
     }
 
-    public MetacardAttributeField(StringField attribute) {
-        super(DEFAULT_FIELD_NAME,
-                TYPE_NAME,
-                DESCRIPTION,
-                ImmutableList.of(),
-                attribute);
+    public MetacardAttributeField(List<MetacardType> metacardTypes) {
+        super(DEFAULT_FIELD_NAME, TYPE_NAME, DESCRIPTION, createEnumerations(metacardTypes));
     }
 
-    
+    private static List<DataType<String>> createEnumerations(List<MetacardType> metacardTypes) {
+        Map<String, Object> found = new HashMap<>();
+
+        return metacardTypes.stream()
+                .map(MetacardType::getAttributeDescriptors)
+                .flatMap(Collection::stream)
+                .filter((descriptor) -> {
+                    if (found.get(descriptor.getName()) != null) {
+                        return false;
+                    }
+                    found.put(descriptor.getName(), true);
+                    return true;
+                })
+                .map(descriptor -> {
+                    String fieldName = descriptor.getName()
+                            .replace("-", "")
+                            .replace(".", "");
+                    StringField enumValue = new StringField(fieldName);
+                    enumValue.setValue(descriptor.getName());
+                    return enumValue;
+                })
+                .collect(Collectors.toList());
+    }
 }

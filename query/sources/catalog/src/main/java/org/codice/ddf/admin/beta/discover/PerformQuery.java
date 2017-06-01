@@ -9,6 +9,7 @@ import java.util.Objects;
 import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.api.fields.ListField;
+import org.codice.ddf.admin.beta.types.MetacardAttributeField;
 import org.codice.ddf.admin.beta.types.MetacardField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
@@ -41,7 +42,7 @@ public class PerformQuery extends BaseFunctionField<ListField<MetacardField>> {
     public PerformQuery(CatalogFramework framework, FilterBuilder filterBuilder,
             List<MetacardType> metacardTypes) {
         super(NAME, DESCRIPTION);
-        queryArg = new QueryField();
+        queryArg = new QueryField(metacardTypes);
 
         this.framework = framework;
         this.filterBuilder = filterBuilder;
@@ -57,7 +58,6 @@ public class PerformQuery extends BaseFunctionField<ListField<MetacardField>> {
 
     @Override
     public ListField<MetacardField>  performFunction() {
-
         List<Result> results = Collections.emptyList();
 
         try {
@@ -91,7 +91,9 @@ public class PerformQuery extends BaseFunctionField<ListField<MetacardField>> {
         metacard.getMetacardType()
                 .getAttributeDescriptors()
                 .forEach(descriptor -> {
-                    String name = descriptor.getName().replace("-", "").replace(".", "");
+                    String name = descriptor.getName()
+                            .replace("-", "")
+                            .replace(".", "");
                     Attribute attribute = metacard.getAttribute(descriptor.getName());
                     if (attribute != null) {
                         if (descriptor.isMultiValued() && attribute.getValues() != null) {

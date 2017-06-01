@@ -10,9 +10,12 @@ import org.codice.ddf.admin.beta.OperandProvider;
 import org.codice.ddf.admin.beta.fields.BooleanAttributeOperands;
 import org.codice.ddf.admin.beta.fields.IntegerAttributeOperands;
 import org.codice.ddf.admin.beta.fields.StringAttributeOperands;
+import org.codice.ddf.admin.beta.types.MetacardAttributeField;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
 
 import com.google.common.collect.ImmutableList;
+
+import ddf.catalog.data.MetacardType;
 
 public class QueryField extends BaseObjectField implements OperandProvider {
 
@@ -22,18 +25,20 @@ public class QueryField extends BaseObjectField implements OperandProvider {
     private StringAttributeOperands stringOps;
     private IntegerAttributeOperands intOps;
     private BooleanAttributeOperands booleanOps;
+    private MetacardAttributeField metacardAttributes;
 
-    protected QueryField() {
+    protected QueryField(List<MetacardType> metacardTypes) {
         super(DEFAULT_FIELD_NAME, "CatalogQuery", DESCRIPTION);
         stringOps = new StringAttributeOperands();
         intOps = new IntegerAttributeOperands();
         booleanOps = new BooleanAttributeOperands();
+        metacardAttributes = new MetacardAttributeField(metacardTypes);
         updateInnerFieldPaths();
     }
 
     @Override
     public List<Field> getFields() {
-        return ImmutableList.of(stringOps, booleanOps, intOps);
+        return ImmutableList.of(stringOps, booleanOps, intOps, metacardAttributes);
     }
 
     public List<FieldOperand> getFieldOperands() {

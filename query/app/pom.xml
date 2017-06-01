@@ -84,6 +84,11 @@
             <artifactId>catalog-core-api</artifactId>
             <version>${ddf.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.codice.ddf.admin.beta</groupId>
+            <artifactId>catalog-graphql</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

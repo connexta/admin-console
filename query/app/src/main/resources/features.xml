@@ -23,6 +23,7 @@
         <feature>admin-beta-ldap</feature>
         <feature>admin-beta-utils</feature>
         <feature>admin-beta-ui</feature>
+        <bundle>mvn:org.codice.ddf.admin.beta/catalog-graphql/${project.version}</bundle>
     </feature>
 
     <feature name="admin-beta-core" install="manual" version="${project.version}"

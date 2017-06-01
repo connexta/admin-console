@@ -1,6 +1,5 @@
 package org.codice.ddf.admin.beta.discover;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -13,8 +12,8 @@ import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.beta.types.MetacardField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
-import org.codice.ddf.admin.common.fields.base.scalar.StringField;
-import org.opengis.filter.Filter;
+
+import com.google.common.collect.ImmutableList;
 
 import ddf.catalog.CatalogFramework;
 import ddf.catalog.data.Attribute;
@@ -32,15 +31,18 @@ public class PerformQuery extends BaseFunctionField<ListField<MetacardField>> {
 
     public static final String DESCRIPTION = "Executes a query against the Catalog.";
 
+    private QueryField queryArg;
+
     private CatalogFramework framework;
 
     private FilterBuilder filterBuilder;
-
     private List<MetacardType> metacardTypes;
 
     public PerformQuery(CatalogFramework framework, FilterBuilder filterBuilder,
             List<MetacardType> metacardTypes) {
         super(NAME, DESCRIPTION);
+        queryArg = new QueryField();
+
         this.framework = framework;
         this.filterBuilder = filterBuilder;
         this.metacardTypes = metacardTypes;
@@ -50,21 +52,20 @@ public class PerformQuery extends BaseFunctionField<ListField<MetacardField>> {
 
     @Override
     public List<DataType> getArguments() {
-        return new ArrayList<>();
+        return ImmutableList.of(queryArg);
     }
 
     @Override
-    public ListField<MetacardField> performFunction() {
-        Filter testFilter = filterBuilder.attribute("id")
-                .is()
-                .like()
-                .text("*");
+    public ListField<MetacardField>  performFunction() {
 
         List<Result> results = Collections.emptyList();
+
         try {
-            QueryResponse response =
-                    framework.query(new QueryRequestImpl(new QueryImpl(testFilter)));
-            results = response.getResults();
+        QueryResponse response =
+                framework.query(new QueryRequestImpl(new QueryImpl(new GraphQLFilterFactory(
+                        filterBuilder,
+                        queryArg).buildFilter())));
+             results = response.getResults();
         } catch (Exception e) {
             e.printStackTrace();
         }

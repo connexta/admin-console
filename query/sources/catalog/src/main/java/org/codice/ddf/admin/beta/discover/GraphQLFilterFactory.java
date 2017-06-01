@@ -5,7 +5,6 @@ import java.util.stream.Collectors;
 
 import org.opengis.filter.Filter;
 
-import ddf.catalog.filter.EqualityExpressionBuilder;
 import ddf.catalog.filter.FilterBuilder;
 
 public class GraphQLFilterFactory {
@@ -19,10 +18,10 @@ public class GraphQLFilterFactory {
     }
 
     public Filter buildFilter() {
-    return filterBuilder.allOf(query.getOperands()
+        return filterBuilder.allOf(query.getFieldOperands()
                 .stream()
-                .filter(Objects::nonNull)
                 .map(operand -> operand.toFilter(filterBuilder))
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList()));
     }
 }

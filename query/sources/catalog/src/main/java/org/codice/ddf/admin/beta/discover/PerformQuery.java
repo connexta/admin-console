@@ -12,6 +12,7 @@ import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.beta.types.MetacardField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
+import org.opengis.filter.Filter;
 
 import com.google.common.collect.ImmutableList;
 
@@ -21,7 +22,6 @@ import ddf.catalog.data.Metacard;
 import ddf.catalog.data.MetacardType;
 import ddf.catalog.data.Result;
 import ddf.catalog.filter.FilterBuilder;
-import ddf.catalog.operation.QueryResponse;
 import ddf.catalog.operation.impl.QueryImpl;
 import ddf.catalog.operation.impl.QueryRequestImpl;
 
@@ -61,11 +61,11 @@ public class PerformQuery extends BaseFunctionField<ListField<MetacardField>> {
         List<Result> results = Collections.emptyList();
 
         try {
-        QueryResponse response =
-                framework.query(new QueryRequestImpl(new QueryImpl(new GraphQLFilterFactory(
-                        filterBuilder,
-                        queryArg).buildFilter())));
-             results = response.getResults();
+            Filter filter = new GraphQLFilterFactory(
+                    filterBuilder,
+                    queryArg).buildFilter();
+
+             results = framework.query(new QueryRequestImpl(new QueryImpl(filter))).getResults();
         } catch (Exception e) {
             e.printStackTrace();
         }

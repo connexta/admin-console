@@ -10,6 +10,9 @@ import org.codice.ddf.admin.common.fields.base.function.BaseFieldProvider;
 
 import com.google.common.collect.ImmutableList;
 
+import ddf.catalog.CatalogFramework;
+import ddf.catalog.filter.FilterBuilder;
+
 public class CatalogFieldProvider extends BaseFieldProvider {
 
     public static final String NAME = "catalog";
@@ -21,9 +24,9 @@ public class CatalogFieldProvider extends BaseFieldProvider {
 
     private PerformQuery performQuery;
 
-    public CatalogFieldProvider() {
+    public CatalogFieldProvider(CatalogFramework framework, FilterBuilder filterBuilder) {
         super(NAME, TYPE_NAME, DESCRIPTION);
-        performQuery = new PerformQuery();
+        performQuery = new PerformQuery(framework, filterBuilder);
         updateInnerFieldPaths();
     }
 

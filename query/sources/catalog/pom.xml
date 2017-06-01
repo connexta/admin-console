@@ -13,15 +13,27 @@
 
     <dependencies>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>3.8.1</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.codice.ddf.admin.beta</groupId>
             <artifactId>admin-query-common</artifactId>
             <version>${project.version}</version>
+        </dependency>
+
+
+        <!--DDF dependencies-->
+        <dependency>
+            <groupId>ddf.catalog.core</groupId>
+            <artifactId>catalog-core-api</artifactId>
+            <version>${ddf.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>ddf.catalog.core</groupId>
+            <artifactId>catalog-core-api-impl</artifactId>
+            <version>${ddf.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>ddf.platform.util</groupId>
+            <artifactId>platform-util</artifactId>
+            <version>${ddf.version}</version>
         </dependency>
     </dependencies>
     <build>
@@ -33,7 +45,9 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}-beta</Bundle-SymbolicName>
                         <Embed-Dependency>
-                            admin-query-common
+                            admin-query-common,
+                            catalog-core-api-impl,
+                            platform-util
                         </Embed-Dependency>
                     </instructions>
                 </configuration>

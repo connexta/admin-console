@@ -12,6 +12,12 @@
  **/
 -->
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
-    <bean id="catalogFieldProvider" class="org.codice.ddf.admin.beta.CatalogFieldProvider" />
+    <bean id="catalogFieldProvider" class="org.codice.ddf.admin.beta.CatalogFieldProvider">
+        <argument ref="catalogFramework" />
+        <argument ref="filterBuilder" />
+    </bean>
     <service ref="catalogFieldProvider" interface="org.codice.ddf.admin.api.FieldProvider"/>
+
+    <reference id="catalogFramework" interface="ddf.catalog.CatalogFramework"/>
+    <reference id="filterBuilder" interface="ddf.catalog.filter.FilterBuilder"/>
 </blueprint>

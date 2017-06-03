@@ -13,8 +13,11 @@
  **/
 package org.codice.ddf.admin.beta.types;
 
+import static org.codice.ddf.admin.beta.discover.TransformCommons.descriptorToCamelCase;
+
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -71,6 +74,8 @@ public class MetacardField extends BaseObjectField {
                 .map(this::createField)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
+
+        Collections.sort(fields, Comparator.comparing(Field::fieldName));
     }
 
     @Override
@@ -99,14 +104,13 @@ public class MetacardField extends BaseObjectField {
         case SHORT:
             return new IntegerField(fieldName);
         default:
+            System.out.println("UNCAUGHT TYPE: " + format);
             return null;
         }
     }
 
     private Field createField(AttributeDescriptor descriptor) {
-        String fieldName = descriptor.getName()
-                .replace("-", "")
-                .replace(".", ""); // graphql doesn't like these characters
+        String fieldName = descriptorToCamelCase(descriptor.getName());
         descriptorNameToFieldMapping.put(descriptor.getName(), fieldName);
         Field field = mapType(fieldName,
                 descriptor.getType()

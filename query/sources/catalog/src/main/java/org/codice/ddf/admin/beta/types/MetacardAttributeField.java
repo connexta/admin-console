@@ -13,6 +13,8 @@
  **/
 package org.codice.ddf.admin.beta.types;
 
+import static org.codice.ddf.admin.beta.discover.TransformCommons.descriptorToCamelCase;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -55,20 +57,29 @@ public class MetacardAttributeField extends BaseEnumField<String> {
                     found.put(descriptor.getName(), true);
                     return true;
                 })
-                .map(descriptor -> {
-                    String fieldName = descriptor.getName()
-                            .replace("-", "")
-                            .replace(".", "");
-                    StringField enumValue = new StringField(fieldName);
-                    enumValue.setValue(descriptor.getName());
-                    return enumValue;
-                })
+                .map(descriptor -> new DescriptorField(descriptor.getName()))
                 .collect(Collectors.toList());
 
         types.add(new AnyText());
 
         return types;
     }
+
+    public static class DescriptorField extends StringField {
+
+        private String descriptorVal;
+
+        public DescriptorField(String descriptor) {
+            super(descriptorToCamelCase(descriptor));
+            this.descriptorVal = descriptor;
+        }
+
+        @Override
+        public String getValue() {
+            return descriptorVal;
+        }
+    }
+
 
     public static class AnyText extends StringField {
         public static final String ANY_TEXT = "anyText";

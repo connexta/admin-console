@@ -12,6 +12,8 @@ import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.report.message.ErrorMessage;
 import org.opengis.filter.Filter;
 
+import com.google.common.base.CaseFormat;
+
 import ddf.catalog.CatalogFramework;
 import ddf.catalog.data.Attribute;
 import ddf.catalog.data.Metacard;
@@ -57,9 +59,7 @@ public class TransformCommons {
         metacard.getMetacardType()
                 .getAttributeDescriptors()
                 .forEach(descriptor -> {
-                    String name = descriptor.getName()
-                            .replace("-", "")
-                            .replace(".", "");
+                    String name = descriptorToCamelCase(descriptor.getName());
                     Attribute attribute = metacard.getAttribute(descriptor.getName());
                     if (attribute != null) {
                         if (descriptor.isMultiValued() && attribute.getValues() != null) {
@@ -72,5 +72,14 @@ public class TransformCommons {
 
         metacardField.setValue(values);
         return metacardField;
+    }
+
+    public static String descriptorToCamelCase(String str) {
+        // graphql doesn't like these characters
+        String modStr = str.replaceAll("\\-", "_")
+                .replaceAll("\\.", "_")
+                .toUpperCase();
+
+        return CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, modStr);
     }
 }

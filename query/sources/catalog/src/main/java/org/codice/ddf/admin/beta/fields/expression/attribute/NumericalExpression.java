@@ -133,7 +133,7 @@ public class NumericalExpression {
         private FloatField floatField;
 
         public GreaterThanOrEqualTo() {
-            super("GreaterThanOrEqualTo", "GreaterThanOrEqualTo", "todo");
+            super("greaterThanOrEqualTo", "GreaterThanOrEqualTo", "todo");
             integerField = new IntegerField();
             floatField = new FloatField();
             updateInnerFieldPaths();

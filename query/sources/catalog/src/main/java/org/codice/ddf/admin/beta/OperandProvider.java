@@ -4,7 +4,7 @@ import java.util.List;
 
 import ddf.catalog.filter.FilterBuilder;
 
-public interface OperandProvider {
+public interface OperandProvider extends FieldOperand {
 
     List<FieldOperand> getFieldOperands();
 }

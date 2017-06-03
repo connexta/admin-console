@@ -94,6 +94,7 @@ public class ListFieldImpl<T extends DataType> extends BaseDataType<List>
             } catch (IllegalAccessException | InstantiationException e) {
                 LOGGER.debug("Unable to create instance of fieldType {}",
                         getListFieldType().fieldTypeName());
+                throw new RuntimeException("Unable to create instance of fieldType {}" + getListFieldType().fieldTypeName());
             }
         }
     }

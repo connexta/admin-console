@@ -55,6 +55,15 @@ public class GraphQLTransformInput {
                         Scalars.GraphQLInt.getCoercing());
             }
             break;
+        case FLOAT:
+            if (field.fieldTypeName() == null) {
+                type = Scalars.GraphQLFloat;
+            } else {
+                type = new GraphQLScalarType(field.fieldTypeName(),
+                        field.description(),
+                        Scalars.GraphQLFloat.getCoercing());
+            }
+            break;
         case BOOLEAN:
             if (field.fieldTypeName() == null) {
                 type = Scalars.GraphQLBoolean;

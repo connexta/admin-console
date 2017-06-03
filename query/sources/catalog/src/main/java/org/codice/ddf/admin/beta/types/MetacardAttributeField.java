@@ -28,7 +28,7 @@ import ddf.catalog.data.MetacardType;
 
 public class MetacardAttributeField extends BaseEnumField<String> {
 
-    public static final String DEFAULT_FIELD_NAME = "metacardAttribute";
+    public static final String DEFAULT_FIELD_NAME = "attribute";
 
     public static final String TYPE_NAME = "MetacardAttribute";
 
@@ -45,7 +45,7 @@ public class MetacardAttributeField extends BaseEnumField<String> {
     private static List<DataType<String>> createEnumerations(List<MetacardType> metacardTypes) {
         Map<String, Object> found = new HashMap<>();
 
-        return metacardTypes.stream()
+        List<DataType<String>> types = metacardTypes.stream()
                 .map(MetacardType::getAttributeDescriptors)
                 .flatMap(Collection::stream)
                 .filter((descriptor) -> {
@@ -64,5 +64,28 @@ public class MetacardAttributeField extends BaseEnumField<String> {
                     return enumValue;
                 })
                 .collect(Collectors.toList());
+
+        types.add(new AnyText());
+
+        return types;
+    }
+
+    public static class AnyText extends StringField {
+        public static final String ANY_TEXT = "anyText";
+
+        public static final String FIELD_NAME = ANY_TEXT;
+
+        public static final String FIELD_TYPE = ANY_TEXT;
+
+        public static final String DESCRIPTION = "Provides guest access.";
+
+        public AnyText() {
+            super(FIELD_NAME, FIELD_TYPE, DESCRIPTION);
+        }
+
+        @Override
+        public String getValue() {
+            return ANY_TEXT;
+        }
     }
 }

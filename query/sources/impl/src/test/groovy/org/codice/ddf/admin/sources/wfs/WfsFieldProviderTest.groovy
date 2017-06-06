@@ -14,6 +14,7 @@
 package org.codice.ddf.admin.sources.wfs
 
 import org.codice.ddf.admin.api.FieldProvider
+import spock.lang.Ignore
 import spock.lang.Specification
 
 class WfsFieldProviderTest extends Specification {
@@ -24,6 +25,7 @@ class WfsFieldProviderTest extends Specification {
         wfsFieldProvider = new WfsFieldProvider()
     }
 
+    @Ignore
     def 'Verify discovery fields immutability'() {
         when:
         wfsFieldProvider.getDiscoveryFields().add(Mock(FieldProvider))
@@ -32,6 +34,7 @@ class WfsFieldProviderTest extends Specification {
         thrown(UnsupportedOperationException)
     }
 
+    @Ignore
     def 'Verify persist functions immutability'() {
         when:
         wfsFieldProvider.getMutationFunctions().add(Mock(FieldProvider))

@@ -26,6 +26,7 @@ import org.codice.ddf.admin.configurator.Configurator;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.configurator.OperationReport;
 import org.codice.ddf.admin.security.common.services.PolicyManagerServiceProperties;
+import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
 
 import com.google.common.collect.ImmutableList;
 
@@ -40,26 +41,30 @@ public class SaveWhitelistContexts extends BaseFunctionField<ListField<ContextPa
 
     private ConfiguratorFactory configuratorFactory;
 
-    public SaveWhitelistContexts(ConfiguratorFactory configuratorFactory) {
+    private final ServiceActions serviceActions;
+
+    public SaveWhitelistContexts(ConfiguratorFactory configuratorFactory,
+            ServiceActions serviceActions) {
         super(FIELD_NAME, DESCRIPTION, new ListFieldImpl<>(ContextPath.class));
+        this.configuratorFactory = configuratorFactory;
+        this.serviceActions = serviceActions;
+
         contexts = new ListFieldImpl<>("paths", new ContextPath());
         updateArgumentPaths();
-
-        this.configuratorFactory = configuratorFactory;
     }
 
     @Override
     public ListField<ContextPath> performFunction() {
         Configurator configurator = configuratorFactory.getConfigurator();
-        configurator.updateConfigFile(PolicyManagerServiceProperties.POLICY_MANAGER_PID,
+        configurator.add(serviceActions.build(PolicyManagerServiceProperties.POLICY_MANAGER_PID,
                 new PolicyManagerServiceProperties().whiteListToPolicyManagerProps(contexts),
-                true);
+                true));
 
         OperationReport configReport = configurator.commit(
                 "Whitelist Contexts saved with details: {}",
                 contexts.toString());
 
-        if(configReport.containsFailedResults()) {
+        if (configReport.containsFailedResults()) {
             addResultMessage(failedPersistError());
         }
 
@@ -73,6 +78,6 @@ public class SaveWhitelistContexts extends BaseFunctionField<ListField<ContextPa
 
     @Override
     public SaveWhitelistContexts newInstance() {
-        return new SaveWhitelistContexts(configuratorFactory);
+        return new SaveWhitelistContexts(configuratorFactory, serviceActions);
     }
 }

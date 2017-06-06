@@ -22,7 +22,7 @@ import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.fields.base.function.GetFunctionField;
 import org.codice.ddf.admin.common.fields.common.ContextPath;
-import org.codice.ddf.admin.configurator.ConfiguratorFactory;
+import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
 
 public class GetWhiteListContexts extends GetFunctionField<ListField<ContextPath>> {
 
@@ -31,17 +31,17 @@ public class GetWhiteListContexts extends GetFunctionField<ListField<ContextPath
     public static final String DESCRIPTION =
             "Returns all white listed contexts. Any contexts that are white listed have no security policy applied to them.";
 
-    private ConfiguratorFactory configuratorFactory;
+    private final ServiceActions serviceActions;
 
-    public GetWhiteListContexts(ConfiguratorFactory configuratorFactory) {
+    public GetWhiteListContexts(ServiceActions serviceActions) {
         super(DEFAULT_FIELD_NAME, DESCRIPTION, new ListFieldImpl<>(ContextPath.class));
-        this.configuratorFactory = configuratorFactory;
 
+        this.serviceActions = serviceActions;
     }
 
     @Override
     public ListField<ContextPath> performFunction() {
-        List<String> whiteListStrs = getWhitelistContexts(configuratorFactory.getConfigReader());
+        List<String> whiteListStrs = getWhitelistContexts(serviceActions);
         ListField<ContextPath> whiteListedField = new ListFieldImpl<>(ContextPath.class);
         for (String whiteListStr : whiteListStrs) {
             ContextPath newContextPath = new ContextPath();
@@ -53,6 +53,6 @@ public class GetWhiteListContexts extends GetFunctionField<ListField<ContextPath
 
     @Override
     public FunctionField<ListField<ContextPath>> newInstance() {
-        return new GetWhiteListContexts(configuratorFactory);
+        return new GetWhiteListContexts(serviceActions);
     }
 }

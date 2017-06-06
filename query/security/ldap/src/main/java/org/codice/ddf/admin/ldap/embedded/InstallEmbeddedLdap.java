@@ -34,6 +34,7 @@ import org.codice.ddf.admin.configurator.Configurator;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.configurator.OperationReport;
 import org.codice.ddf.admin.ldap.fields.config.LdapUseCase;
+import org.codice.ddf.internal.admin.configurator.actions.FeatureActions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,16 +45,23 @@ public class InstallEmbeddedLdap extends BaseFunctionField<BooleanField> {
     private static final Logger LOGGER = LoggerFactory.getLogger(InstallEmbeddedLdap.class);
 
     public static final String NAME = "installEmbeddedLdap";
-    public static final String DESCRIPTION = "Installs the internal embedded LDAP. Used for testing purposes only. LDAP port: 1389, LDAPS port: 1636, ADMIN port: 4444";
+
+    public static final String DESCRIPTION =
+            "Installs the internal embedded LDAP. Used for testing purposes only. LDAP port: 1389, LDAPS port: 1636, ADMIN port: 4444";
 
     private LdapUseCase useCase;
+
     private ConfiguratorFactory configuratorFactory;
 
-    public InstallEmbeddedLdap(ConfiguratorFactory configuratorFactory) {
+    private final FeatureActions featureActions;
+
+    public InstallEmbeddedLdap(ConfiguratorFactory configuratorFactory,
+            FeatureActions featureActions) {
         super(NAME, DESCRIPTION, new BooleanField());
+        this.configuratorFactory = configuratorFactory;
+        this.featureActions = featureActions;
         useCase = new LdapUseCase();
         updateArgumentPaths();
-        this.configuratorFactory = configuratorFactory;
     }
 
     @Override
@@ -67,20 +75,21 @@ public class InstallEmbeddedLdap extends BaseFunctionField<BooleanField> {
         Configurator configurator = configuratorFactory.getConfigurator();
         switch (useCase.getValue()) {
         case LOGIN:
-            configurator.startFeature(EMBEDDED_LDAP_FEATURE);
-            configurator.startFeature(LDAP_LOGIN_FEATURE);
-            configurator.startFeature(DEFAULT_EMBEDDED_LDAP_LOGIN_CONFIG_FEATURE);
+            configurator.add(featureActions.start(EMBEDDED_LDAP_FEATURE));
+            configurator.add(featureActions.start(LDAP_LOGIN_FEATURE));
+            configurator.add(featureActions.start(DEFAULT_EMBEDDED_LDAP_LOGIN_CONFIG_FEATURE));
             break;
         case ATTRIBUTE_STORE:
-            configurator.startFeature(EMBEDDED_LDAP_FEATURE);
-            configurator.startFeature(LDAP_CLAIMS_HANDLER_FEATURE);
-            configurator.startFeature(DEFAULT_EMBEDDED_LDAP_CLAIMS_HANDLER_CONFIG_FEATURE);
+            configurator.add(featureActions.start(EMBEDDED_LDAP_FEATURE));
+            configurator.add(featureActions.start(LDAP_CLAIMS_HANDLER_FEATURE));
+            configurator.add(featureActions.start(
+                    DEFAULT_EMBEDDED_LDAP_CLAIMS_HANDLER_CONFIG_FEATURE));
             break;
         case LOGIN_AND_ATTRIBUTE_STORE:
-            configurator.startFeature(EMBEDDED_LDAP_FEATURE);
-            configurator.startFeature(LDAP_LOGIN_FEATURE);
-            configurator.startFeature(LDAP_CLAIMS_HANDLER_FEATURE);
-            configurator.startFeature(ALL_DEFAULT_EMBEDDED_LDAP_CONFIG_FEATURE);
+            configurator.add(featureActions.start(EMBEDDED_LDAP_FEATURE));
+            configurator.add(featureActions.start(LDAP_LOGIN_FEATURE));
+            configurator.add(featureActions.start(LDAP_CLAIMS_HANDLER_FEATURE));
+            configurator.add(featureActions.start(ALL_DEFAULT_EMBEDDED_LDAP_CONFIG_FEATURE));
             break;
         default:
             LOGGER.debug("Unrecognized LDAP use case \"{}\". No commits will be made. ",
@@ -90,9 +99,9 @@ public class InstallEmbeddedLdap extends BaseFunctionField<BooleanField> {
             return new BooleanField(false);
         }
 
-        OperationReport report = configurator.commit();
+        OperationReport report = configurator.commit("Installed Embedded LDAP");
 
-        if(report.containsFailedResults()) {
+        if (report.containsFailedResults()) {
             addResultMessage(new ErrorMessage("CANNOT_INSTALL"));
             return new BooleanField(false);
 
@@ -103,6 +112,6 @@ public class InstallEmbeddedLdap extends BaseFunctionField<BooleanField> {
 
     @Override
     public FunctionField<BooleanField> newInstance() {
-        return new InstallEmbeddedLdap(configuratorFactory);
+        return new InstallEmbeddedLdap(configuratorFactory, featureActions);
     }
 }

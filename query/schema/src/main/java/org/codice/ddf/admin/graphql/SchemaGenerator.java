@@ -20,7 +20,13 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import org.codice.ddf.admin.api.FieldProvider;
+import org.codice.ddf.admin.configurator.impl.BundleOperation;
 import org.codice.ddf.admin.configurator.impl.ConfiguratorFactoryImpl;
+import org.codice.ddf.admin.configurator.impl.FeatureOperation;
+import org.codice.ddf.admin.configurator.impl.ManagedServiceOperation;
+import org.codice.ddf.admin.configurator.impl.PropertyOperation;
+import org.codice.ddf.admin.configurator.impl.ServiceOperation;
+import org.codice.ddf.admin.configurator.impl.ServiceReaderImpl;
 import org.codice.ddf.admin.ldap.LdapFieldProvider;
 import org.codice.ddf.admin.security.sts.StsFieldProvider;
 import org.codice.ddf.admin.security.wcpm.WcpmFieldProvider;
@@ -37,15 +43,30 @@ public class SchemaGenerator {
 
     public static void main(String[] args) throws IOException, URISyntaxException {
         GraphQLServletImpl servlet = new GraphQLServletImpl();
-        final List<FieldProvider> GRAPHQL_PROVIDERS = ImmutableList.of(
-                new StsFieldProvider(new ConfiguratorFactoryImpl()),
-                new ConnectionFieldProvider(),
-                new LdapFieldProvider(new ConfiguratorFactoryImpl()),
-                new WcpmFieldProvider(new ConfiguratorFactoryImpl()),
-                new CswFieldProvider(new ConfiguratorFactoryImpl()),
-                new WfsFieldProvider(new ConfiguratorFactoryImpl()),
-                new OpenSearchFieldProvider(new ConfiguratorFactoryImpl())
-        );
+        final List<FieldProvider> GRAPHQL_PROVIDERS =
+                ImmutableList.of(new StsFieldProvider(new ServiceOperation.Actions()),
+                        new ConnectionFieldProvider(),
+                        new LdapFieldProvider(new ConfiguratorFactoryImpl(),
+                                new FeatureOperation.Actions(),
+                                new ManagedServiceOperation.Actions(),
+                                new PropertyOperation.Actions()),
+                        new WcpmFieldProvider(new ConfiguratorFactoryImpl(),
+                                new ServiceOperation.Actions(),
+                                new BundleOperation.Actions(),
+                                new ManagedServiceOperation.Actions(),
+                                new ServiceReaderImpl()),
+                        new CswFieldProvider(new ConfiguratorFactoryImpl(),
+                                new ServiceOperation.Actions(),
+                                new ManagedServiceOperation.Actions(),
+                                new ServiceReaderImpl()),
+                        new WfsFieldProvider(new ConfiguratorFactoryImpl(),
+                                new ServiceOperation.Actions(),
+                                new ManagedServiceOperation.Actions(),
+                                new ServiceReaderImpl()),
+                        new OpenSearchFieldProvider(new ConfiguratorFactoryImpl(),
+                                new ServiceOperation.Actions(),
+                                new ManagedServiceOperation.Actions(),
+                                new ServiceReaderImpl()));
 
         servlet.setFieldProviders(GRAPHQL_PROVIDERS);
         String schemaResult = servlet.executeQuery(IntrospectionQuery.INTROSPECTION_QUERY);

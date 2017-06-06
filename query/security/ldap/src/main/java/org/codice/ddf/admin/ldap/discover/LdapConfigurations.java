@@ -24,6 +24,8 @@ import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.ldap.commons.services.LdapServiceCommons;
 import org.codice.ddf.admin.ldap.fields.config.LdapConfigurationField;
+import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
+import org.codice.ddf.internal.admin.configurator.actions.PropertyActions;
 
 import com.google.common.collect.ImmutableList;
 
@@ -38,15 +40,24 @@ public class LdapConfigurations extends BaseFunctionField<ListField<LdapConfigur
     private PidField pid;
 
     private ConfiguratorFactory configuratorFactory;
+
+    private final ManagedServiceActions managedServiceActions;
+
+    private final PropertyActions propertyActions;
+
     private LdapServiceCommons serviceCommons;
 
-    public LdapConfigurations(ConfiguratorFactory configuratorFactory) {
+    public LdapConfigurations(ConfiguratorFactory configuratorFactory,
+            ManagedServiceActions managedServiceActions, PropertyActions propertyActions) {
         super(NAME, DESCRIPTION, new ListFieldImpl<>(CONFIGS_ARG_NAME, LdapConfigurationField.class));
+        this.configuratorFactory = configuratorFactory;
+        this.managedServiceActions = managedServiceActions;
+        this.propertyActions = propertyActions;
+
         pid = new PidField();
         updateArgumentPaths();
 
-        this.configuratorFactory = configuratorFactory;
-        serviceCommons = new LdapServiceCommons(configuratorFactory);
+        serviceCommons = new LdapServiceCommons(propertyActions, managedServiceActions);
     }
 
     @Override
@@ -56,11 +67,11 @@ public class LdapConfigurations extends BaseFunctionField<ListField<LdapConfigur
 
     @Override
     public ListField<LdapConfigurationField> performFunction() {
-        return serviceCommons.getLdapConfigurations(configuratorFactory);
+        return serviceCommons.getLdapConfigurations();
     }
 
     @Override
     public FunctionField<ListField<LdapConfigurationField>> newInstance() {
-        return new LdapConfigurations(configuratorFactory);
+        return new LdapConfigurations(configuratorFactory, managedServiceActions, propertyActions);
     }
 }

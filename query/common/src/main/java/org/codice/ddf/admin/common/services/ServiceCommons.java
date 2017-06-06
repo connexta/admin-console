@@ -31,6 +31,8 @@ import org.codice.ddf.admin.common.report.ReportImpl;
 import org.codice.ddf.admin.configurator.Configurator;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.configurator.OperationReport;
+import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
+import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
 
 public class ServiceCommons {
 
@@ -52,13 +54,15 @@ public class ServiceCommons {
                 .collect(Collectors.toList());
     }
 
-    public static ReportImpl createManagedService(Map<String, Object> serviceProps, String factoryPid,
-            ConfiguratorFactory configuratorFactory) {
+    // TODO RAP 31 May 17: Remove static methods and pass services to the ctor instead
+    public static ReportImpl createManagedService(Map<String, Object> serviceProps,
+            String factoryPid, ConfiguratorFactory configuratorFactory,
+            ManagedServiceActions managedServiceActions) {
         ReportImpl report = new ReportImpl();
         Configurator configurator = configuratorFactory.getConfigurator();
 
-        configurator.createManagedService(factoryPid, serviceProps);
-        if(configurator.commit("Service saved with details [{}]", serviceProps.toString())
+        configurator.add(managedServiceActions.create(factoryPid, serviceProps));
+        if (configurator.commit("Service saved with details [{}]", serviceProps.toString())
                 .containsFailedResults()) {
             report.addResultMessage(failedPersistError());
         }
@@ -66,16 +70,16 @@ public class ServiceCommons {
     }
 
     public static ReportImpl updateService(PidField servicePid, Map<String, Object> newConfig,
-            ConfiguratorFactory configuratorFactory) {
+            ConfiguratorFactory configuratorFactory, ServiceActions serviceActions) {
         ReportImpl report = new ReportImpl();
-        report.addMessages(serviceConfigurationExists(servicePid, configuratorFactory));
+        report.addMessages(serviceConfigurationExists(servicePid, serviceActions));
         if (report.containsErrorMsgs()) {
             return report;
         }
 
         String pid = servicePid.getValue();
         Configurator configurator = configuratorFactory.getConfigurator();
-        configurator.updateConfigFile(pid, newConfig, true);
+        configurator.add(serviceActions.build(pid, newConfig, true));
         OperationReport operationReport = configurator.commit(
                 "Updated config with pid [{}] and new service properties [{}]",
                 pid,
@@ -87,30 +91,31 @@ public class ServiceCommons {
         return report;
     }
 
-    public static ReportImpl deleteService(PidField servicePid, ConfiguratorFactory configuratorFactory) {
+    public static ReportImpl deleteService(PidField servicePid,
+            ConfiguratorFactory configuratorFactory, ManagedServiceActions managedServiceActions) {
         ReportImpl report = new ReportImpl();
         Configurator configurator = configuratorFactory.getConfigurator();
-        configurator.deleteManagedService(servicePid.getValue());
-        if(configurator.commit("Deleted source with pid [{}].", servicePid.getValue())
+        configurator.add(managedServiceActions.delete(servicePid.getValue()));
+        if (configurator.commit("Deleted source with pid [{}].", servicePid.getValue())
                 .containsFailedResults()) {
             report.addResultMessage(failedDeleteError());
         }
         return report;
     }
 
-    public static ReportImpl serviceConfigurationExists(PidField servicePid, ConfiguratorFactory configuratorFactory) {
+    public static ReportImpl serviceConfigurationExists(PidField servicePid,
+            ServiceActions serviceActions) {
         ReportImpl report = new ReportImpl();
-        if(configuratorFactory.getConfigReader()
-                .getConfig(servicePid.getValue())
+        if (serviceActions.read(servicePid.getValue())
                 .isEmpty()) {
             report.addResultMessage(noExistingConfigError());
         }
         return report;
     }
 
-    public static boolean serviceConfigurationExists(String servicePid, ConfiguratorFactory configuratorFactory) {
-        return !configuratorFactory.getConfigReader()
-                .getConfig(servicePid)
+    public static boolean serviceConfigurationExists(String servicePid,
+            ServiceActions serviceActions) {
+        return !serviceActions.read(servicePid)
                 .isEmpty();
     }
 
@@ -132,7 +137,7 @@ public class ServiceCommons {
         }
 
         public ServicePropertyBuilder putPropertyIfNotNull(String key, Field field) {
-            if(field.getValue() != null) {
+            if (field.getValue() != null) {
                 put(key, field.getValue());
             }
             return this;

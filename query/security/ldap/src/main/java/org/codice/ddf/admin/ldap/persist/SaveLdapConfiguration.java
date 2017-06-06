@@ -35,6 +35,9 @@ import org.codice.ddf.admin.ldap.commons.services.LdapServiceCommons;
 import org.codice.ddf.admin.ldap.fields.config.LdapConfigurationField;
 import org.codice.ddf.admin.security.common.services.LdapClaimsHandlerServiceProperties;
 import org.codice.ddf.admin.security.common.services.LdapLoginServiceProperties;
+import org.codice.ddf.internal.admin.configurator.actions.FeatureActions;
+import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
+import org.codice.ddf.internal.admin.configurator.actions.PropertyActions;
 
 import com.google.common.collect.ImmutableList;
 
@@ -45,16 +48,31 @@ public class SaveLdapConfiguration extends BaseFunctionField<ListField<LdapConfi
     public static final String DESCRIPTION = "Saves the LDAP configuration.";
 
     private LdapConfigurationField config;
+
     private ConfiguratorFactory configuratorFactory;
+
+    private final PropertyActions propertyActions;
+
+    private final FeatureActions featureActions;
+
+    private final ManagedServiceActions managedServiceActions;
+
     private LdapServiceCommons serviceCommons;
 
-    public SaveLdapConfiguration(ConfiguratorFactory configuratorFactory) {
+    public SaveLdapConfiguration(ConfiguratorFactory configuratorFactory,
+            PropertyActions propertyActions, FeatureActions featureActions,
+            ManagedServiceActions managedServiceActions) {
         super(NAME, DESCRIPTION, new ListFieldImpl<>(LdapConfigurationField.class));
+
+        this.propertyActions = propertyActions;
+        this.featureActions = featureActions;
+        this.managedServiceActions = managedServiceActions;
         config = new LdapConfigurationField();
         updateArgumentPaths();
 
         this.configuratorFactory = configuratorFactory;
-        this.serviceCommons = new LdapServiceCommons(configuratorFactory);
+        this.serviceCommons = new LdapServiceCommons(this.propertyActions,
+                this.managedServiceActions);
     }
 
     @Override
@@ -65,18 +83,23 @@ public class SaveLdapConfiguration extends BaseFunctionField<ListField<LdapConfi
     @Override
     public ListField<LdapConfigurationField> performFunction() {
         Configurator configurator = configuratorFactory.getConfigurator();
-        if (config.settingsField().useCase()
-                .equals(LOGIN) || config.settingsField().useCase()
+        if (config.settingsField()
+                .useCase()
+                .equals(LOGIN) || config.settingsField()
+                .useCase()
                 .equals(LOGIN_AND_ATTRIBUTE_STORE)) {
 
-            Map<String, Object> ldapLoginServiceProps = serviceCommons.ldapConfigurationToLdapLoginService(config);
-            configurator.startFeature(LdapLoginServiceProperties.LDAP_LOGIN_FEATURE);
-            configurator.createManagedService(LdapLoginServiceProperties.LDAP_LOGIN_MANAGED_SERVICE_FACTORY_PID,
-                    ldapLoginServiceProps);
+            Map<String, Object> ldapLoginServiceProps =
+                    serviceCommons.ldapConfigurationToLdapLoginService(config);
+            configurator.add(featureActions.start(LdapLoginServiceProperties.LDAP_LOGIN_FEATURE));
+            configurator.add(managedServiceActions.create(LdapLoginServiceProperties.LDAP_LOGIN_MANAGED_SERVICE_FACTORY_PID,
+                    ldapLoginServiceProps));
         }
 
-        if (config.settingsField().useCase()
-                .equals(ATTRIBUTE_STORE) || config.settingsField().useCase()
+        if (config.settingsField()
+                .useCase()
+                .equals(ATTRIBUTE_STORE) || config.settingsField()
+                .useCase()
                 .equals(LOGIN_AND_ATTRIBUTE_STORE)) {
 
             Path newAttributeMappingPath = Paths.get(System.getProperty("ddf.home"),
@@ -84,22 +107,28 @@ public class SaveLdapConfiguration extends BaseFunctionField<ListField<LdapConfi
                     "ws-security",
                     "ldapAttributeMap-" + UUID.randomUUID()
                             .toString() + ".props");
-            Map<String, Object> ldapClaimsServiceProps = serviceCommons.ldapConfigToLdapClaimsHandlerService(config);
-            configurator.createPropertyFile(newAttributeMappingPath, config.settingsField().attributeMap());
-            configurator.startFeature(LdapClaimsHandlerServiceProperties.LDAP_CLAIMS_HANDLER_FEATURE);
-            configurator.createManagedService(LdapClaimsHandlerServiceProperties.LDAP_CLAIMS_HANDLER_MANAGED_SERVICE_FACTORY_PID,
-                    ldapClaimsServiceProps);
+            Map<String, Object> ldapClaimsServiceProps =
+                    LdapServiceCommons.ldapConfigToLdapClaimsHandlerService(config);
+            configurator.add(propertyActions.create(newAttributeMappingPath,
+                    config.settingsField()
+                            .attributeMap()));
+            configurator.add(featureActions.start(LdapClaimsHandlerServiceProperties.LDAP_CLAIMS_HANDLER_FEATURE));
+            configurator.add(managedServiceActions.create(LdapClaimsHandlerServiceProperties.LDAP_CLAIMS_HANDLER_MANAGED_SERVICE_FACTORY_PID,
+                    ldapClaimsServiceProps));
         }
 
         OperationReport report = configurator.commit("LDAP Configuration saved with details: {}",
                 config.toString());
 
         // TODO: tbatie - 4/3/17 - Handle error messages
-        return serviceCommons.getLdapConfigurations(configuratorFactory);
+        return serviceCommons.getLdapConfigurations();
     }
 
     @Override
     public FunctionField<ListField<LdapConfigurationField>> newInstance() {
-        return new SaveLdapConfiguration(configuratorFactory);
+        return new SaveLdapConfiguration(configuratorFactory,
+                propertyActions,
+                featureActions,
+                managedServiceActions);
     }
 }

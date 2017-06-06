@@ -15,11 +15,12 @@
 
     <service id="stsFieldProvider" interface="org.codice.ddf.admin.api.FieldProvider">
         <bean class="org.codice.ddf.admin.security.sts.StsFieldProvider" >
-            <argument ref="configuratorFactory" />
+            <argument ref="serviceActions"/>
         </bean>
     </service>
 
-    <reference id="configuratorFactory"
-               interface="org.codice.ddf.admin.configurator.ConfiguratorFactory"
-               availability="mandatory" filter="(type=txact)"/>
+    <reference id="serviceActions"
+               interface="org.codice.ddf.internal.admin.configurator.actions.ServiceActions"
+               availability="mandatory"/>
+
 </blueprint>

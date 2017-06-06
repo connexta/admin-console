@@ -19,9 +19,10 @@ import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.fields.base.function.GetFunctionField;
-import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.security.common.fields.wcpm.Realm;
 import org.codice.ddf.admin.security.common.services.LdapLoginServiceProperties;
+import org.codice.ddf.internal.admin.configurator.actions.BundleActions;
+import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
 
 public class GetRealms extends GetFunctionField<ListField<Realm>> {
 
@@ -29,14 +30,17 @@ public class GetRealms extends GetFunctionField<ListField<Realm>> {
 
     public static final String DESCRIPTION = "Retrieves all currently configured realms.";
 
-    ConfiguratorFactory configuratorFactory;
+    private final ManagedServiceActions managedServiceActions;
+
+    private final BundleActions bundleActions;
 
     LdapLoginServiceProperties serviceCommons;
 
-    public GetRealms(ConfiguratorFactory configuratorFactory) {
+    public GetRealms(ManagedServiceActions managedServiceActions, BundleActions bundleActions) {
         super(FIELD_NAME, DESCRIPTION, new ListFieldImpl<>(Realm.class));
-        this.configuratorFactory = configuratorFactory;
-        serviceCommons = new LdapLoginServiceProperties(configuratorFactory);
+        this.managedServiceActions = managedServiceActions;
+        serviceCommons = new LdapLoginServiceProperties(managedServiceActions);
+        this.bundleActions = bundleActions;
     }
 
     @Override
@@ -44,13 +48,13 @@ public class GetRealms extends GetFunctionField<ListField<Realm>> {
         ListField<Realm> realms = new ListFieldImpl<>(Realm.class);
         realms.add(Realm.KARAF_REALM);
 
-
-        if (configuratorFactory.getConfigReader()
-                .isBundleStarted(IDP_SERVER_BUNDLE_NAME)) {
+        if (bundleActions.isStarted(IDP_SERVER_BUNDLE_NAME)) {
             // TODO: 4/19/17 How are we going to treat/display IdP as an auth type
         }
 
-        if(!serviceCommons.getLdapLoginManagedServices().keySet().isEmpty()) {
+        if (!serviceCommons.getLdapLoginManagedServices()
+                .keySet()
+                .isEmpty()) {
             realms.add(Realm.LDAP_REALM);
         }
 
@@ -59,6 +63,6 @@ public class GetRealms extends GetFunctionField<ListField<Realm>> {
 
     @Override
     public FunctionField<ListField<Realm>> newInstance() {
-        return new GetRealms(configuratorFactory);
+        return new GetRealms(managedServiceActions, bundleActions);
     }
 }

@@ -18,9 +18,9 @@ import java.util.List;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.fields.base.function.GetFunctionField;
-import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.security.common.fields.sts.StsClaimField;
 import org.codice.ddf.admin.security.common.services.StsServiceProperties;
+import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
 
 public class GetStsClaimsFunctionField extends GetFunctionField<ListFieldImpl<StsClaimField>> {
 
@@ -28,17 +28,17 @@ public class GetStsClaimsFunctionField extends GetFunctionField<ListFieldImpl<St
 
     public static final String DESCRIPTION = "All currently configured claims the STS supports.";
 
-    ConfiguratorFactory configuratorFactory;
+    private final ServiceActions serviceActions;
 
-    public GetStsClaimsFunctionField(ConfiguratorFactory configurator) {
+    public GetStsClaimsFunctionField(ServiceActions serviceActions) {
         super(NAME, DESCRIPTION, new ListFieldImpl<>(StsClaimField.class));
-        this.configuratorFactory = configurator;
+        this.serviceActions = serviceActions;
     }
 
     @Override
     public ListFieldImpl<StsClaimField> performFunction() {
         List<String> supportedClaims = new StsServiceProperties().getConfiguredStsClaims(
-                configuratorFactory);
+                serviceActions);
 
         ListFieldImpl<StsClaimField> claims = new ListFieldImpl<>(StsClaimField.class);
 
@@ -54,6 +54,6 @@ public class GetStsClaimsFunctionField extends GetFunctionField<ListFieldImpl<St
 
     @Override
     public FunctionField<ListFieldImpl<StsClaimField>> newInstance() {
-        return new GetStsClaimsFunctionField(configuratorFactory);
+        return new GetStsClaimsFunctionField(serviceActions);
     }
 }

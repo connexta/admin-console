@@ -32,6 +32,9 @@ import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.sources.fields.type.OpenSearchSourceConfigurationField;
+import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
+import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
+import org.codice.ddf.internal.admin.configurator.actions.ServiceReader;
 
 import com.google.common.collect.ImmutableList;
 
@@ -48,25 +51,43 @@ public class SaveOpenSearchConfiguration extends BaseFunctionField<BooleanField>
 
     private ConfiguratorFactory configuratorFactory;
 
+    private final ServiceActions serviceActions;
 
-    public SaveOpenSearchConfiguration(ConfiguratorFactory configuratorFactory) {
+    private final ManagedServiceActions managedServiceActions;
+
+    private final ServiceReader serviceReader;
+
+    public SaveOpenSearchConfiguration(ConfiguratorFactory configuratorFactory,
+            ServiceActions serviceActions, ManagedServiceActions managedServiceActions,
+            ServiceReader serviceReader) {
         super(ID, DESCRIPTION, new BooleanField());
+        this.configuratorFactory = configuratorFactory;
+        this.serviceActions = serviceActions;
+        this.managedServiceActions = managedServiceActions;
+        this.serviceReader = serviceReader;
+
         config = new OpenSearchSourceConfigurationField();
         pid = new PidField();
         config.isRequired(true);
-        config.sourceNameField().isRequired(true);
-        config.endpointUrlField().isRequired(true);
+        config.sourceNameField()
+                .isRequired(true);
+        config.endpointUrlField()
+                .isRequired(true);
         updateArgumentPaths();
-
-        this.configuratorFactory = configuratorFactory;
     }
 
     @Override
     public BooleanField performFunction() {
         if (StringUtils.isNotEmpty(pid.getValue())) {
-            addMessages(updateService(pid, openSearchConfigToServiceProps(config), configuratorFactory));
+            addMessages(updateService(pid,
+                    openSearchConfigToServiceProps(config),
+                    configuratorFactory,
+                    serviceActions));
         } else {
-            if(createManagedService(openSearchConfigToServiceProps(config), OPENSEARCH_FACTORY_PID, configuratorFactory).containsErrorMsgs()) {
+            if (createManagedService(openSearchConfigToServiceProps(config),
+                    OPENSEARCH_FACTORY_PID,
+                    configuratorFactory,
+                    managedServiceActions).containsErrorMsgs()) {
                 addArgumentMessage(failedPersistError(config.path()));
             }
         }
@@ -76,17 +97,19 @@ public class SaveOpenSearchConfiguration extends BaseFunctionField<BooleanField>
     @Override
     public void validate() {
         super.validate();
-        if(containsErrorMsgs()) {
+        if (containsErrorMsgs()) {
             return;
         }
 
-        if(pid.getValue() != null) {
-            addMessages(serviceConfigurationExists(pid, configuratorFactory));
-            if(!containsErrorMsgs() && !hasSourceName(pid.getValue(), config.sourceName(), configuratorFactory)) {
-                addMessages(validateSourceName(config.sourceNameField(), configuratorFactory));
+        if (pid.getValue() != null) {
+            addMessages(serviceConfigurationExists(pid, serviceActions));
+            if (!containsErrorMsgs() && !hasSourceName(pid.getValue(),
+                    config.sourceName(),
+                    serviceReader)) {
+                addMessages(validateSourceName(config.sourceNameField(), serviceReader));
             }
         } else {
-            addMessages(validateSourceName(config.sourceNameField(), configuratorFactory));
+            addMessages(validateSourceName(config.sourceNameField(), serviceReader));
         }
     }
 
@@ -97,6 +120,9 @@ public class SaveOpenSearchConfiguration extends BaseFunctionField<BooleanField>
 
     @Override
     public FunctionField<BooleanField> newInstance() {
-        return new SaveOpenSearchConfiguration(configuratorFactory);
+        return new SaveOpenSearchConfiguration(configuratorFactory,
+                serviceActions,
+                managedServiceActions,
+                serviceReader);
     }
 }

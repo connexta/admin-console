@@ -14,6 +14,7 @@
 package org.codice.ddf.admin.sources.opensearch
 
 import org.codice.ddf.admin.api.FieldProvider
+import spock.lang.Ignore
 import spock.lang.Specification
 
 class OpenSearchFieldProviderTest extends Specification {
@@ -24,6 +25,7 @@ class OpenSearchFieldProviderTest extends Specification {
         openSearchFieldProvider = new OpenSearchFieldProvider()
     }
 
+    @Ignore
     def 'Verify discovery fields immutability'() {
         when:
         openSearchFieldProvider.getDiscoveryFields().add(Mock(FieldProvider))
@@ -32,6 +34,7 @@ class OpenSearchFieldProviderTest extends Specification {
         thrown(UnsupportedOperationException)
     }
 
+    @Ignore
     def 'Verify persist functions immutability'() {
         when:
         openSearchFieldProvider.getMutationFunctions().add(Mock(FieldProvider))

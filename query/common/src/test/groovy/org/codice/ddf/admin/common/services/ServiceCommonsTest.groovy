@@ -15,26 +15,29 @@ package org.codice.ddf.admin.common.services
 
 import org.codice.ddf.admin.common.fields.common.PidField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
-import org.codice.ddf.admin.configurator.ConfigReader
 import org.codice.ddf.admin.configurator.Configurator
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.configurator.OperationReport
+import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions
+import org.codice.ddf.internal.admin.configurator.actions.ServiceActions
 import spock.lang.Specification
 
 class ServiceCommonsTest extends Specification {
 
     ConfiguratorFactory configuratorFactory
 
-    ConfigReader configReader
-
     Configurator configurator
 
+    ManagedServiceActions managedServiceActions
+
+    ServiceActions serviceActions
+
     def setup() {
+        managedServiceActions = Mock(ManagedServiceActions)
+        serviceActions = Mock(ServiceActions)
         configurator = Mock(Configurator)
         configuratorFactory = Mock(ConfiguratorFactory)
-        configReader = Mock(ConfigReader)
         configuratorFactory.getConfigurator() >> configurator
-        configuratorFactory.getConfigReader() >> configReader
     }
 
     def 'Create managed service success'() {
@@ -42,7 +45,7 @@ class ServiceCommonsTest extends Specification {
         configurator.commit(_, _) >> mockReport(false)
 
         when:
-        def report = ServiceCommons.createManagedService([:], '', configuratorFactory)
+        def report = ServiceCommons.createManagedService([:], '', configuratorFactory, managedServiceActions)
 
         then:
         report.messages().size() == 0
@@ -53,7 +56,7 @@ class ServiceCommonsTest extends Specification {
         configurator.commit(_, _) >> mockReport(true)
 
         when:
-        def report = ServiceCommons.createManagedService([:], '', configuratorFactory)
+        def report = ServiceCommons.createManagedService([:], '', configuratorFactory, managedServiceActions)
 
         then:
         report.messages().size() == 1
@@ -63,11 +66,11 @@ class ServiceCommonsTest extends Specification {
 
     def 'Update service success'() {
         setup:
-        configReader.getConfig(_) >> ['config':'exists']
+        serviceActions.read(_) >> ['config':'exists']
         configurator.commit(_, _) >> mockReport(false)
 
         when:
-        def report = ServiceCommons.updateService(createTestField('testValue'), [:], configuratorFactory)
+        def report = ServiceCommons.updateService(createTestField('testValue'), [:], configuratorFactory, serviceActions)
 
         then:
         report.messages().size() == 0
@@ -75,11 +78,11 @@ class ServiceCommonsTest extends Specification {
 
     def 'Configurator fails to commit when updating service'() {
         setup:
-        configReader.getConfig(_) >> ['config':'exists']
+        serviceActions.read(_) >> ['config':'exists']
         configurator.commit(_, _) >> mockReport(true)
 
         when:
-        def report = ServiceCommons.updateService(createTestField('testValue'), [:], configuratorFactory)
+        def report = ServiceCommons.updateService(createTestField('testValue'), [:], configuratorFactory, serviceActions)
 
         then:
         report.messages().size() == 1
@@ -89,11 +92,10 @@ class ServiceCommonsTest extends Specification {
 
     def 'Delete service success'() {
         setup:
-        configReader.getConfig(_) >> ['config':'exists']
         configurator.commit(_, _) >> mockReport(false)
 
         when:
-        def report = ServiceCommons.deleteService(createTestField('testValue'), configuratorFactory)
+        def report = ServiceCommons.deleteService(createTestField('testValue'), configuratorFactory, managedServiceActions)
 
         then:
         report.messages().size() == 0
@@ -101,11 +103,10 @@ class ServiceCommonsTest extends Specification {
 
     def 'Configurator fails to commit when deleting service'() {
         setup:
-        configReader.getConfig(_) >> ['config':'exists']
         configurator.commit(_, _) >> mockReport(true)
 
         when:
-        def report = ServiceCommons.deleteService(createTestField('testValue'), configuratorFactory)
+        def report = ServiceCommons.deleteService(createTestField('testValue'), configuratorFactory, managedServiceActions)
 
         then:
         report.messages().size() == 1
@@ -115,10 +116,10 @@ class ServiceCommonsTest extends Specification {
 
     def 'Configuration exists'() {
         setup:
-        configReader.getConfig(_) >> ['config':'exists']
+        serviceActions.read(_) >> ['config':'exists']
 
         when:
-        def report = ServiceCommons.serviceConfigurationExists(createTestField('testValue'), configuratorFactory)
+        def report = ServiceCommons.serviceConfigurationExists(createTestField('testValue'), serviceActions)
 
         then:
         report.messages().size() == 0
@@ -126,10 +127,10 @@ class ServiceCommonsTest extends Specification {
 
     def 'Configuration does not exist'() {
         setup:
-        configReader.getConfig(_) >> [:]
+        serviceActions.read(_) >> [:]
 
         when:
-        def report = ServiceCommons.serviceConfigurationExists(createTestField('testValue'), configuratorFactory)
+        def report = ServiceCommons.serviceConfigurationExists(createTestField('testValue'), serviceActions)
 
         then:
         report.messages().size() == 1

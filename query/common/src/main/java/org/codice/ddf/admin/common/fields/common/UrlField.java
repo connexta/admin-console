@@ -46,6 +46,15 @@ public class UrlField extends StringField {
     }
 
     @Override
+    public void setValue(String value) {
+        if(value == null) {
+            super.setValue(value);
+            return;
+        }
+        super.setValue(value.trim());
+    }
+
+    @Override
     public List<Message> validate() {
         List<Message> validationMsgs = super.validate();
         if (!validationMsgs.isEmpty()) {

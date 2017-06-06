@@ -69,7 +69,7 @@ class HostnameFieldTest extends Specification {
         '.localhost'              | HOSTNAME_FIELD_PATH | DefaultMessages.INVALID_HOSTNAME
         'local host.com'          | HOSTNAME_FIELD_PATH | DefaultMessages.INVALID_HOSTNAME
         'http://www.apache.org'   | HOSTNAME_FIELD_PATH | DefaultMessages.INVALID_HOSTNAME
-        '  '                      | HOSTNAME_FIELD_PATH | DefaultMessages.INVALID_HOSTNAME
+        '  '                      | HOSTNAME_FIELD_PATH | DefaultMessages.EMPTY_FIELD
     }
 
     def 'Empty field when hostname provided but empty'() {

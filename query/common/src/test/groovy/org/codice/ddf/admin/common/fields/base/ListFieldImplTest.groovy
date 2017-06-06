@@ -15,7 +15,7 @@ package org.codice.ddf.admin.common.fields.base
 
 import org.codice.ddf.admin.api.fields.ListField
 import org.codice.ddf.admin.api.fields.ObjectField
-import org.codice.ddf.admin.common.fields.TestObjectField
+import org.codice.ddf.admin.common.fields.test.TestObjectField
 import org.codice.ddf.admin.common.fields.base.scalar.StringField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import spock.lang.Specification
@@ -33,7 +33,7 @@ class ListFieldImplTest extends Specification {
         then:
         listField.path() == [TEST_LIST_FIELD_NAME]
         listField.getList().get(0).path() == [TEST_LIST_FIELD_NAME, ListField.INDEX_DELIMETER + 0]
-        listField.getList().get(1).path() == [TEST_LIST_FIELD_NAME, ListField.INDEX_DELIMETER+ 1]
+        listField.getList().get(1).path() == [TEST_LIST_FIELD_NAME, ListField.INDEX_DELIMETER + 1]
     }
 
     def 'The path of ObjectFields and their inner fields in ListFields are correct'() {
@@ -41,16 +41,20 @@ class ListFieldImplTest extends Specification {
         ListFieldImpl<ObjectField> listField = new ListFieldImpl<>(TEST_LIST_FIELD_NAME, TestObjectField.class)
         listField.add(new TestObjectField())
 
+        def innerObjectField = listField.getList()[0].getFields().find {
+            (it.fieldName() == TestObjectField.INNER_OBJECT_FIELD_NAME)
+        }
+
         List<String> parentPath = listField.path()
-        List<String> objectFieldPath = listField.getList().get(0).path()
-        List<String> innerObjectFieldPath = listField.getList().get(0).getFields().get(0).path()
-        List<String> subFieldOfInnerObjectFieldPath = ((ObjectField) listField.getList().get(0).getFields().get(0)).getFields().get(0).path()
+        List<String> objectFieldPath = listField.getList()[0].path()
+        List<String> innerObjectFieldPath = innerObjectField.path()
+        List<String> subFieldOfInnerObjectFieldPath = ((ObjectField) innerObjectField).getFields()[0].path()
 
         then:
         parentPath == [TEST_LIST_FIELD_NAME]
         objectFieldPath == [parentPath, ListField.INDEX_DELIMETER + 0].flatten()
-        innerObjectFieldPath == [objectFieldPath, TestObjectField.InnerTestObjectField.DEFAULT_FIELD_NAME].flatten()
-        subFieldOfInnerObjectFieldPath == [innerObjectFieldPath, TestObjectField.InnerTestObjectField.SUB_FIELD_FIELD_NAME].flatten()
+        innerObjectFieldPath == [objectFieldPath, TestObjectField.INNER_OBJECT_FIELD_NAME].flatten()
+        subFieldOfInnerObjectFieldPath == [innerObjectFieldPath, TestObjectField.SUB_FIELD_OF_INNER_FIELD_NAME].flatten()
     }
 
     def 'Newly added required elements match the requirement of the ListFields field type'() {

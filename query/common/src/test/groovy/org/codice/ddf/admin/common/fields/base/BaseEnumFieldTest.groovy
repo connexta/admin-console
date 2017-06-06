@@ -14,7 +14,7 @@
 package org.codice.ddf.admin.common.fields.base
 
 import org.codice.ddf.admin.api.Field
-import org.codice.ddf.admin.common.fields.TestEnumField
+import org.codice.ddf.admin.common.fields.test.TestEnumField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import spock.lang.Specification
 
@@ -28,7 +28,7 @@ class BaseEnumFieldTest extends Specification {
 
     def 'Validation success'() {
         setup:
-        enumField.setValue(TestEnumField.TEST_TYPE_NAME_1)
+        enumField.setValue(TestEnumField.ENUM_A)
 
         when:
         def validationmsgs = enumField.validate()

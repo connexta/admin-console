@@ -65,10 +65,10 @@ class MapFieldTest extends Specification {
 
     def 'Fail validation due to duplicate keys'() {
         setup:
-        def value = [(ENTRIES) : [
-            ['key' : 'key1', 'value': 'value1'],
-            ['key' : 'key2', 'value': 'value2'],
-            ['key' : 'key1', 'value': 'value3']
+        def value = [(ENTRIES): [
+                createEntry('key1', 'valuef1'),
+                createEntry('key2', 'value2'),
+                createEntry('key1', 'value3')
         ]]
         mapField.setValue(value)
 
@@ -79,5 +79,9 @@ class MapFieldTest extends Specification {
         validationMsgs.size() == 1
         validationMsgs.get(0).getCode() == DefaultMessages.DUPLICATE_MAP_KEY
         validationMsgs.get(0).getPath() == [MapField.DEFAULT_FIELD_NAME, ENTRIES, ListField.INDEX_DELIMETER + 2]
+    }
+
+    def createEntry(String key, String value) {
+        return [(PairField.KEY_FIELD_NAME): key, (PairField.VALUE_FIELD_NAME): value]
     }
 }

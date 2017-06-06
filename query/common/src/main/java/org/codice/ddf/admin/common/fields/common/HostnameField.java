@@ -55,7 +55,16 @@ public class HostnameField extends StringField {
         return validationMsgs;
     }
 
+    @Override
+    public void setValue(String value) {
+        if(value == null) {
+            super.setValue(value);
+            return;
+        }
+        super.setValue(value.trim());
+    }
+
     public boolean validHostname(String hostname) {
-        return HOST_NAME_PATTERN.matcher(hostname.trim()).matches();
+        return HOST_NAME_PATTERN.matcher(hostname).matches();
     }
 }

@@ -16,6 +16,7 @@ package org.codice.ddf.admin.common.fields.base
 import org.codice.ddf.admin.api.DataType
 import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.common.fields.base.scalar.StringField
+import org.codice.ddf.admin.common.fields.test.TestObjectField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.common.report.message.ErrorMessage
 import spock.lang.Specification
@@ -70,15 +71,19 @@ class BaseFunctionFieldTest extends Specification {
         setup:
         functionField = new TestBaseFunctionField(false)
 
-        expect:
-        functionField.getArguments()[0].getValue() == TestBaseFunctionField.ARG_VALUE
-
         when:
-        def value = [(StringField.DEFAULT_FIELD_NAME): 'test' ]
+        def value = [
+                (StringField.DEFAULT_FIELD_NAME): 'test1',
+                (TestObjectField.FIELD_NAME)    : [(StringField.DEFAULT_FIELD_NAME): 'test2', (TestObjectField.INNER_OBJECT_FIELD_NAME): [(TestObjectField.SUB_FIELD_OF_INNER_FIELD_NAME): 'test3']]
+        ]
         functionField.setValue(value)
 
         then:
-        functionField.getArguments()[0].getValue() == 'test'
+        functionField.getStringArg().getValue() == 'test1'
+        ((TestObjectField) functionField.getArguments()[1]).getStringField().getValue() == 'test2'
+        ((TestObjectField) functionField.getArguments()[1]).getFields().find {
+            (it.fieldName() == TestObjectField.INNER_OBJECT_FIELD_NAME)
+        }.getFields()[0].getValue() == 'test3'
     }
 
     def 'Updating path updates arguments paths'() {
@@ -101,6 +106,8 @@ class BaseFunctionFieldTest extends Specification {
 
         StringField stringArg
 
+        TestObjectField testObjectField
+
         TestBaseFunctionField(boolean failValidation) {
             this(DEFAULT_NAME, failValidation)
         }
@@ -108,7 +115,8 @@ class BaseFunctionFieldTest extends Specification {
         TestBaseFunctionField(String functionName, boolean failValidation) {
             super(functionName, 'description', new StringField())
             stringArg = new StringField()
-            if(failValidation) {
+            testObjectField = new TestObjectField()
+            if (failValidation) {
                 stringArg.setValue('')
             } else {
                 stringArg.setValue(ARG_VALUE)
@@ -118,7 +126,7 @@ class BaseFunctionFieldTest extends Specification {
 
         @Override
         List<DataType> getArguments() {
-            return Collections.singletonList(stringArg)
+            return [stringArg, testObjectField]
         }
 
         @Override

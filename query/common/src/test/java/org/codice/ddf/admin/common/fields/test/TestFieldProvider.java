@@ -11,7 +11,7 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.graphql.test.provider;
+package org.codice.ddf.admin.common.fields.test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,18 +36,54 @@ import com.google.common.collect.ImmutableList;
 
 public class TestFieldProvider extends BaseFieldProvider {
 
+    public static final String TEST_FUNCTION_NAME = "testing";
+
+    public static final String REQUIRED_ARG_FUNCTION_NAME = "requiredArg";
+
+    public static final String MULTIPLE_ARGS_FUNCTION_NAME = "multipleArgs";
+
+    public static final String ERRORS_AND_WARNINGS_FUNCTION_NAME = "returnErrorsAndWarnings";
+
+    public static final String GET_INT_FUNCTION_NAME = "getInteger";
+
+    public static final String GET_BOOL_FUNCTION_NAME = "getBoolean";
+
+    public static final String GET_STRING_FUNCTION_NAME = "getString";
+
+    public static final String GET_LIST_FUNCTION_NAME = "getList";
+
+    public static final String GET_ENUM_FUNCTION_NAME = "getEnum";
+
+    public static final String PATH_1 = "path";
+
+    public static final String PATH_2 = "path2";
+
+    public static final String PATH_3 = "path3";
+
+    public static final String ARGUMENT_MSG = "ARGUMENT_MSG";
+
+    public static final String RETURN_VALUE_MSG = "RETURN_VALUE_MSG";
+
     private GetInt getInt;
+
     private GetBoolean getBoolean;
+
     private GetString getString;
+
     private GetList getList;
+
     private GetEnum getEnum;
+
     private PathField errorAndWarningsPath;
+
     private MultiArgFunction multiArgFunc;
+
     private RequiredArgsFunction reqArgFunc;
+
     private SampleMutation sampleMutation;
 
     public TestFieldProvider() {
-        super("testing", "Test", "Testing purposes only.");
+        super(TEST_FUNCTION_NAME, "Test", "Testing purposes only.");
         getInt = new GetInt();
         getBoolean = new GetBoolean();
         getString = new GetString();
@@ -62,7 +98,14 @@ public class TestFieldProvider extends BaseFieldProvider {
 
     @Override
     public List<Field> getDiscoveryFields() {
-        return ImmutableList.of(getInt, getBoolean, getString, getList, getEnum, errorAndWarningsPath, multiArgFunc, reqArgFunc);
+        return ImmutableList.of(getInt,
+                getBoolean,
+                getString,
+                getList,
+                getEnum,
+                errorAndWarningsPath,
+                multiArgFunc,
+                reqArgFunc);
     }
 
     @Override
@@ -75,7 +118,7 @@ public class TestFieldProvider extends BaseFieldProvider {
         public static final int GET_INT_VALUE = 999;
 
         public GetInt() {
-            super("getInteger", "Returns a sample integer.", IntegerField.class);
+            super(GET_INT_FUNCTION_NAME, "Returns a sample integer.", IntegerField.class);
         }
 
         @Override
@@ -96,7 +139,7 @@ public class TestFieldProvider extends BaseFieldProvider {
         public static final boolean GET_BOOLEAN_VALUE = true;
 
         public GetBoolean() {
-            super("getBoolean", "Returns a sample boolean.", BooleanField.class);
+            super(GET_BOOL_FUNCTION_NAME, "Returns a sample boolean.", BooleanField.class);
         }
 
         @Override
@@ -117,7 +160,7 @@ public class TestFieldProvider extends BaseFieldProvider {
         public static final String GET_STRING_VALUE = "SAMPLE_STRING";
 
         public GetString() {
-            super("getString", "Returns a sample string.", StringField.class);
+            super(GET_STRING_FUNCTION_NAME, "Returns a sample string.", StringField.class);
         }
 
         @Override
@@ -133,57 +176,64 @@ public class TestFieldProvider extends BaseFieldProvider {
         }
     }
 
-    public static class GetList extends GetFunctionField<ListField<TestObject>> {
+    public static class GetList extends GetFunctionField<ListField<TestObjectField>> {
 
-        public static final TestObject ENTRY_1_VALUE = TestObject.createSampleTestObject();
-        public static final TestObject ENTRY_2_VALUE = TestObject.createSampleTestObject();
-        public static final TestObject ENTRY_3_VALUE = TestObject.createSampleTestObject();
+        public static final TestObjectField ENTRY_1_VALUE =
+                TestObjectField.createSampleTestObject();
+
+        public static final TestObjectField ENTRY_2_VALUE =
+                TestObjectField.createSampleTestObject();
+
+        public static final TestObjectField ENTRY_3_VALUE =
+                TestObjectField.createSampleTestObject();
 
         public GetList() {
-            super("getList", "Returns a sample list of sample objects.", new ListFieldImpl<>(TestObject.class));
+            super(GET_LIST_FUNCTION_NAME,
+                    "Returns a sample list of sample objects.",
+                    new ListFieldImpl<>(TestObjectField.class));
         }
 
         @Override
         public ListField performFunction() {
-            ListFieldImpl<TestObject> list = new ListFieldImpl<>(TestObject.class);
+            ListFieldImpl<TestObjectField> list = new ListFieldImpl<>(TestObjectField.class);
             list.addAll(Arrays.asList(ENTRY_1_VALUE, ENTRY_2_VALUE, ENTRY_3_VALUE));
             return list;
         }
 
         @Override
-        public FunctionField<ListField<TestObject>> newInstance() {
+        public FunctionField<ListField<TestObjectField>> newInstance() {
             return new GetList();
         }
     }
 
-    public static class GetEnum extends GetFunctionField<TestEnum> {
+    public static class GetEnum extends GetFunctionField<TestEnumField> {
 
-        public static final String GET_ENUM_VALUE = TestEnum.EnumA.ENUM_A;
+        public static final String GET_ENUM_VALUE = TestEnumField.ENUM_A;
 
         public GetEnum() {
-            super("getEnum", "Returns a sample enumerated value.", TestEnum.class);
+            super(GET_ENUM_FUNCTION_NAME, "Returns a sample enumerated value.", TestEnumField.class);
         }
 
         @Override
-        public TestEnum performFunction() {
-            TestEnum enumField = new TestEnum();
+        public TestEnumField performFunction() {
+            TestEnumField enumField = new TestEnumField();
             enumField.setValue(GET_ENUM_VALUE);
             return enumField;
         }
 
         @Override
-        public FunctionField<TestEnum> newInstance() {
+        public FunctionField<TestEnumField> newInstance() {
             return new GetEnum();
         }
     }
 
-    public static class RequiredArgsFunction extends BaseFunctionField<TestObject> {
+    public static class RequiredArgsFunction extends BaseFunctionField<TestObjectField> {
 
-        private TestObject objArg;
+        private TestObjectField objArg;
 
         public RequiredArgsFunction() {
-            super("requiredArg", "Returns the object passed as an argument", new TestObject());
-            objArg = new TestObject();
+            super(REQUIRED_ARG_FUNCTION_NAME, "Returns the object passed as an argument", new TestObjectField());
+            objArg = new TestObjectField();
             objArg.allFieldsRequired(true);
             updateArgumentPaths();
         }
@@ -194,20 +244,20 @@ public class TestFieldProvider extends BaseFieldProvider {
         }
 
         @Override
-        public TestObject performFunction() {
-            TestObject testObject = new TestObject();
+        public TestObjectField performFunction() {
+            TestObjectField testObject = new TestObjectField();
             testObject.setValue(objArg.getValue());
 
             return objArg;
         }
 
         @Override
-        public FunctionField<TestObject> newInstance() {
+        public FunctionField<TestObjectField> newInstance() {
             return new RequiredArgsFunction();
         }
     }
 
-    public static class MultiArgFunction extends BaseFunctionField<TestObject> {
+    public static class MultiArgFunction extends BaseFunctionField<TestObjectField> {
 
         private StringField stringArg;
 
@@ -217,17 +267,17 @@ public class TestFieldProvider extends BaseFieldProvider {
 
         private ListFieldImpl<StringField> listArg;
 
-        private TestEnum enumArg;
+        private TestEnumField enumArg;
 
         public MultiArgFunction() {
-            super("multipleArgs",
-                    "Generates a TestObject using the various args passed.",
-                    new TestObject());
+            super(MULTIPLE_ARGS_FUNCTION_NAME,
+                    "Generates a TestObjectField using the various args passed.",
+                    new TestObjectField());
             stringArg = new StringField();
             integerArg = new IntegerField();
             booleanArg = new BooleanField();
             listArg = new ListFieldImpl<>(StringField.class);
-            enumArg = new TestEnum();
+            enumArg = new TestEnumField();
             updateArgumentPaths();
         }
 
@@ -237,8 +287,8 @@ public class TestFieldProvider extends BaseFieldProvider {
         }
 
         @Override
-        public TestObject performFunction() {
-            return new TestObject().setString(stringArg.getValue())
+        public TestObjectField performFunction() {
+            return new TestObjectField().setString(stringArg.getValue())
                     .setInteger(integerArg.getValue())
                     .setBoolean(booleanArg.getValue())
                     .setList(listArg.getValue())
@@ -246,7 +296,7 @@ public class TestFieldProvider extends BaseFieldProvider {
         }
 
         @Override
-        public FunctionField<TestObject> newInstance() {
+        public FunctionField<TestObjectField> newInstance() {
             return new MultiArgFunction();
         }
     }
@@ -256,7 +306,7 @@ public class TestFieldProvider extends BaseFieldProvider {
         private PathField2 subPath;
 
         public PathField() {
-            super("path", "Path", "Sample path");
+            super(PATH_1, "Path", "Sample path");
             subPath = new PathField2();
             updateInnerFieldPaths();
         }
@@ -272,7 +322,7 @@ public class TestFieldProvider extends BaseFieldProvider {
         private PathField3 subPath;
 
         public PathField2() {
-            super("path2", "Path2", "Sample path");
+            super(PATH_2, "Path2", "Sample path");
             subPath = new PathField3();
             updateInnerFieldPaths();
         }
@@ -288,7 +338,7 @@ public class TestFieldProvider extends BaseFieldProvider {
         private ReturnErrorsAndWarning errorsAndWarningFunction;
 
         public PathField3() {
-            super("path3", "Path3", "Sample path");
+            super(PATH_3, "Path3", "Sample path");
             errorsAndWarningFunction = new ReturnErrorsAndWarning();
             updateInnerFieldPaths();
         }
@@ -299,15 +349,15 @@ public class TestFieldProvider extends BaseFieldProvider {
         }
     }
 
-    public static class ReturnErrorsAndWarning extends BaseFunctionField<TestObject> {
+    public static class ReturnErrorsAndWarning extends BaseFunctionField<TestObjectField> {
 
-        public static final String FUNCTION_NAME = "returnErrorsAndWarnings";
-
-        private TestObject objectFieldArg;
+        private TestObjectField objectFieldArg;
 
         public ReturnErrorsAndWarning() {
-            super(FUNCTION_NAME, "Return a set of errors and warnings about the argument, return value, and general errors.", TestObject.class);
-            objectFieldArg = new TestObject();
+            super(ERRORS_AND_WARNINGS_FUNCTION_NAME,
+                    "Return a set of errors and warnings about the argument, return value, and general errors.",
+                    TestObjectField.class);
+            objectFieldArg = new TestObjectField();
             updateArgumentPaths();
         }
 
@@ -317,35 +367,48 @@ public class TestFieldProvider extends BaseFieldProvider {
         }
 
         @Override
-        public TestObject performFunction() {
+        public TestObjectField performFunction() {
             addArgumentMessage(sampleArgumentError(objectFieldArg.path()));
-            addArgumentMessage(sampleArgumentError(objectFieldArg.getIntegerField().path()));
-            addArgumentMessage(sampleArgumentError(objectFieldArg.getBooleanField().path()));
-            addArgumentMessage(sampleArgumentError(objectFieldArg.getStringField().path()));
-            addArgumentMessage(sampleArgumentError(objectFieldArg.getListField().path()));
-            addArgumentMessage(sampleArgumentError(objectFieldArg.getListField().getList().get(0).path()));
-            addArgumentMessage(sampleArgumentError(objectFieldArg.getEnumField().path()));
+            addArgumentMessage(sampleArgumentError(objectFieldArg.getIntegerField()
+                    .path()));
+            addArgumentMessage(sampleArgumentError(objectFieldArg.getBooleanField()
+                    .path()));
+            addArgumentMessage(sampleArgumentError(objectFieldArg.getStringField()
+                    .path()));
+            addArgumentMessage(sampleArgumentError(objectFieldArg.getListField()
+                    .path()));
+            addArgumentMessage(sampleArgumentError(objectFieldArg.getListField()
+                    .getList()
+                    .get(0)
+                    .path()));
+            addArgumentMessage(sampleArgumentError(objectFieldArg.getEnumField()
+                    .path()));
 
-            TestObject testObject = TestObject.createSampleTestObject();
+            TestObjectField testObject = TestObjectField.createSampleTestObject();
             addResultMessage(sampleReturnValueWarning());
             addResultMessage(sampleReturnValueError(testObject.path()));
-            addResultMessage(sampleReturnValueError(testObject.getIntegerField().path()));
-            addResultMessage(sampleReturnValueError(testObject.getBooleanField().path()));
-            addResultMessage(sampleReturnValueError(testObject.getStringField().path()));
-            addResultMessage(sampleReturnValueError(testObject.getListField().path()));
-            addResultMessage(sampleReturnValueError(testObject.getListField().getList().get(0).path()));
-            addResultMessage(sampleReturnValueError(testObject.getEnumField().path()));
+            addResultMessage(sampleReturnValueError(testObject.getIntegerField()
+                    .path()));
+            addResultMessage(sampleReturnValueError(testObject.getBooleanField()
+                    .path()));
+            addResultMessage(sampleReturnValueError(testObject.getStringField()
+                    .path()));
+            addResultMessage(sampleReturnValueError(testObject.getListField()
+                    .path()));
+            addResultMessage(sampleReturnValueError(testObject.getListField()
+                    .getList()
+                    .get(0)
+                    .path()));
+            addResultMessage(sampleReturnValueError(testObject.getEnumField()
+                    .path()));
             return testObject;
         }
 
         @Override
-        public FunctionField<TestObject> newInstance() {
+        public FunctionField<TestObjectField> newInstance() {
             return new ReturnErrorsAndWarning();
         }
     }
-
-    public static final String ARGUMENT_MSG = "ARGUMENT_MSG";
-    public static final String RETURN_VALUE_MSG = "RETURN_VALUE_MSG";
 
     public static ErrorMessage sampleArgumentError() {
         return sampleArgumentError(new ArrayList<>());
@@ -363,13 +426,15 @@ public class TestFieldProvider extends BaseFieldProvider {
         return new ErrorMessage(RETURN_VALUE_MSG, path);
     }
 
-    public static class SampleMutation extends BaseFunctionField<TestObject> {
+    public static class SampleMutation extends BaseFunctionField<TestObjectField> {
 
-        private TestObject objFieldArg;
+        private TestObjectField objFieldArg;
 
         public SampleMutation() {
-            super("sampleMutation", "Returns the argument. Also returns an error about the argument and an error about the return value.", TestObject.class);
-            objFieldArg = new TestObject();
+            super("sampleMutation",
+                    "Returns the argument. Also returns an error about the argument and an error about the return value.",
+                    TestObjectField.class);
+            objFieldArg = new TestObjectField();
             updateArgumentPaths();
         }
 
@@ -379,15 +444,15 @@ public class TestFieldProvider extends BaseFieldProvider {
         }
 
         @Override
-        public TestObject performFunction() {
+        public TestObjectField performFunction() {
             addArgumentMessage(sampleArgumentError(objFieldArg.path()));
-            TestObject testObject = TestObject.createSampleTestObject();
+            TestObjectField testObject = TestObjectField.createSampleTestObject();
             addResultMessage(sampleReturnValueError(testObject.path()));
             return testObject;
         }
 
         @Override
-        public FunctionField<TestObject> newInstance() {
+        public FunctionField<TestObjectField> newInstance() {
             return new SampleMutation();
         }
     }

@@ -11,7 +11,7 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.common.fields;
+package org.codice.ddf.admin.common.fields.test;
 
 import org.codice.ddf.admin.common.fields.base.BaseEnumField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
@@ -19,15 +19,15 @@ import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 import com.google.common.collect.ImmutableList;
 
 public class TestEnumField extends BaseEnumField<String> {
-    public static final String TEST_FIELD_NAME = "testFieldName";
+    public static final String TEST_FIELD_NAME = "enumeration";
 
-    public static final String TEST_TYPE_NAME = "testTypeName";
+    public static final String TEST_TYPE_NAME = "Enumeration";
 
-    public static final String TEST_DESCRIPTION = "testDescription";
+    public static final String TEST_DESCRIPTION = "Sample enum for testing purposes.";
 
-    public static final String TEST_TYPE_NAME_1 = "enumValue1";
+    public static final String ENUM_A = "ENUM_A";
 
-    public static final String TEST_TYPE_NAME_2 = "enumValue2";
+    public static final String ENUM_B = "ENUM_B";
 
     public TestEnumField() {
         this(null);
@@ -37,31 +37,31 @@ public class TestEnumField extends BaseEnumField<String> {
         super(TEST_FIELD_NAME,
                 TEST_TYPE_NAME,
                 TEST_DESCRIPTION,
-                ImmutableList.of(new TestEnumValue1(), new TestEnumValue2()),
+                ImmutableList.of(new EnumA(), new EnumB()),
                 enumValue);
     }
 
-    protected static final class TestEnumValue1 extends StringField {
+    protected static final class EnumA extends StringField {
 
-        TestEnumValue1() {
-            super(TEST_TYPE_NAME_1, TEST_TYPE_NAME_1, TEST_DESCRIPTION);
+        EnumA() {
+            super(ENUM_A, ENUM_A, TEST_DESCRIPTION);
         }
 
         @Override
         public String getValue() {
-            return TEST_TYPE_NAME_1;
+            return ENUM_A;
         }
     }
 
-    protected static final class TestEnumValue2 extends StringField {
+    protected static final class EnumB extends StringField {
 
-        TestEnumValue2() {
-            super(TEST_TYPE_NAME_2, TEST_TYPE_NAME_2, TEST_DESCRIPTION);
+        EnumB() {
+            super(ENUM_B, ENUM_B, TEST_DESCRIPTION);
         }
 
         @Override
         public String getValue() {
-            return TEST_TYPE_NAME_2;
+            return ENUM_B;
         }
     }
 }

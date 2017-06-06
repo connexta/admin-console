@@ -9,6 +9,9 @@ query TestMessagePaths {
             string
             list
             enumeration
+            innerObjectField {
+                testSubField
+            }
           }
         }
       }

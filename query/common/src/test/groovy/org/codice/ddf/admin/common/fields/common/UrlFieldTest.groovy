@@ -58,15 +58,16 @@ class UrlFieldTest extends Specification {
 
         then:
         validationMsgs.size() == 1
-        validationMsgs[0].getCode() == DefaultMessages.INVALID_URL_ERROR
+        validationMsgs[0].getCode() == code
         validationMsgs[0].getPath() == [UrlField.DEFAULT_FIELD_NAME]
 
         where:
-        url << ['http://',
-                'http://  test.com',
-                'htp://test.com',
-                'htps://test.com',
-                '  ',
-                '://google.com']
+        url                 | code
+        'http://'           | DefaultMessages.INVALID_URL_ERROR
+        'http://  test.com' | DefaultMessages.INVALID_URL_ERROR
+        'htp://test.com'    | DefaultMessages.INVALID_URL_ERROR
+        'htps://test.com'   | DefaultMessages.INVALID_URL_ERROR
+        '://google.com'     | DefaultMessages.INVALID_URL_ERROR
+        '  '                | DefaultMessages.EMPTY_FIELD
     }
 }

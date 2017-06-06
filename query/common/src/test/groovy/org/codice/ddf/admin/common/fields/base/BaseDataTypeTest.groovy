@@ -13,7 +13,7 @@
  **/
 package org.codice.ddf.admin.common.fields.base
 
-import org.codice.ddf.admin.common.fields.TestDataType
+import org.codice.ddf.admin.common.fields.test.TestDataType
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import spock.lang.Specification
 

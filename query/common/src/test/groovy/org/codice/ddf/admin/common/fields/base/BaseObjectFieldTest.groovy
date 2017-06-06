@@ -13,33 +13,40 @@
  **/
 package org.codice.ddf.admin.common.fields.base
 
+import org.codice.ddf.admin.api.DataType
 import org.codice.ddf.admin.api.fields.ObjectField
-import org.codice.ddf.admin.common.fields.TestObjectField
+import org.codice.ddf.admin.common.fields.test.TestObjectField
+import org.codice.ddf.admin.common.report.message.DefaultMessages
 import spock.lang.Specification
 
 class BaseObjectFieldTest extends Specification {
 
-    BaseObjectField topLevelField
+    TestObjectField topLevelField
 
     def setup() {
         topLevelField = new TestObjectField()
     }
 
     def 'ObjectFields inner fields correctly validated'() {
+        setup:
+        ((DataType) topLevelField.getInnerObjectField().getFields()[0]).isRequired(true)
+
         when:
         def validationMsgs = topLevelField.validate()
 
         then:
         validationMsgs.size() == 1
-        validationMsgs.get(0).getCode() == TestObjectField.TEST_ERROR_CODE
-        validationMsgs.get(0).getPath() == [TestObjectField.DEFAULT_FIELD_NAME, TestObjectField.InnerTestObjectField.DEFAULT_FIELD_NAME]
+        validationMsgs.get(0).getCode() == DefaultMessages.MISSING_REQUIRED_FIELD
+        validationMsgs.get(0).getPath() == [TestObjectField.FIELD_NAME, TestObjectField.INNER_OBJECT_FIELD_NAME, TestObjectField.SUB_FIELD_OF_INNER_FIELD_NAME]
     }
 
     def 'All inner fields requirements are true'() {
         when:
         topLevelField.allFieldsRequired(true)
-        def innerField = topLevelField.getFields().get(0)
-        def subFieldOfInnerField = ((ObjectField) innerField).getFields().get(0)
+        def innerField = topLevelField.getFields().find {
+            (it.fieldName() == TestObjectField.INNER_OBJECT_FIELD_NAME)
+        }
+        def subFieldOfInnerField = ((ObjectField) innerField).getFields()[0]
 
         then:
         topLevelField.isRequired()
@@ -51,8 +58,10 @@ class BaseObjectFieldTest extends Specification {
         when:
         topLevelField.isRequired(true)
         topLevelField.allFieldsRequired(false)
-        def innerField = topLevelField.getFields().get(0)
-        def subFieldOfInnerField = ((ObjectField) innerField).getFields().get(0)
+        def innerField = topLevelField.getFields().find {
+            (it.fieldName() == TestObjectField.INNER_OBJECT_FIELD_NAME)
+        }
+        def subFieldOfInnerField = ((ObjectField) innerField).getFields()[0]
 
         then:
         topLevelField.isRequired()
@@ -62,24 +71,26 @@ class BaseObjectFieldTest extends Specification {
 
     def 'Field paths of nested ObjectFields are correct order'() {
         when:
-        def innerField = topLevelField.getFields().get(0)
-        def subFieldOfInnerField = ((ObjectField) innerField).getFields().get(0)
+        def innerField = topLevelField.getFields().find {
+            (it.fieldName() == TestObjectField.INNER_OBJECT_FIELD_NAME)
+        }
+        def subFieldOfInnerField = ((ObjectField) innerField).getFields()[0]
 
         List<String> topLevelFieldPath = topLevelField.path()
         List<String> innerFieldPath = innerField.path()
         List<String> subFieldOfInnerFieldPath = subFieldOfInnerField.path()
 
         then:
-        topLevelFieldPath == [TestObjectField.DEFAULT_FIELD_NAME]
-        innerFieldPath == [topLevelFieldPath, TestObjectField.InnerTestObjectField.DEFAULT_FIELD_NAME].flatten()
-        subFieldOfInnerFieldPath == [innerFieldPath, TestObjectField.InnerTestObjectField.SUB_FIELD_FIELD_NAME].flatten()
+        topLevelFieldPath == [TestObjectField.FIELD_NAME]
+        innerFieldPath == [topLevelFieldPath, TestObjectField.INNER_OBJECT_FIELD_NAME].flatten()
+        subFieldOfInnerFieldPath == [innerFieldPath, TestObjectField.SUB_FIELD_OF_INNER_FIELD_NAME].flatten()
     }
 
     def 'Changing ObjectField name correctly updates inner fields paths'() {
         when:
         topLevelField.fieldName('newFieldName')
-        def innerField = topLevelField.getFields().get(0)
-        def subFieldOfInnerField = ((ObjectField) innerField).getFields().get(0)
+        def innerField = topLevelField.getFields()[5]
+        def subFieldOfInnerField = ((ObjectField) innerField).getFields()[0]
 
         def topLevelFieldPath = topLevelField.path()
         def innerFieldPath = innerField.path()
@@ -87,20 +98,20 @@ class BaseObjectFieldTest extends Specification {
 
         then:
         topLevelFieldPath == ['newFieldName']
-        innerFieldPath == [topLevelFieldPath, TestObjectField.InnerTestObjectField.DEFAULT_FIELD_NAME].flatten()
-        subFieldOfInnerFieldPath == [innerFieldPath, TestObjectField.InnerTestObjectField.SUB_FIELD_FIELD_NAME].flatten()
+        innerFieldPath == [topLevelFieldPath, TestObjectField.INNER_OBJECT_FIELD_NAME].flatten()
+        subFieldOfInnerFieldPath == [innerFieldPath, TestObjectField.SUB_FIELD_OF_INNER_FIELD_NAME].flatten()
     }
 
     def 'Setting values of nested object fields'() {
         setup:
-        def subFieldOfInnerField = ((ObjectField) topLevelField.getFields().get(0)).getFields().get(0)
+        def subFieldOfInnerField = ((ObjectField) topLevelField.getFields()[5]).getFields()[0]
 
         expect:
-        subFieldOfInnerField.getValue() == TestObjectField.InnerTestObjectField.TEST_VALUE
+        subFieldOfInnerField.getValue() == null
 
         when:
         def value = [
-            (TestObjectField.InnerTestObjectField.DEFAULT_FIELD_NAME): [(TestObjectField.InnerTestObjectField.SUB_FIELD_FIELD_NAME): 'valueChange']
+                (TestObjectField.INNER_OBJECT_FIELD_NAME): [(TestObjectField.SUB_FIELD_OF_INNER_FIELD_NAME): 'valueChange']
         ]
         topLevelField.setValue(value)
 

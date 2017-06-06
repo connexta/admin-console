@@ -1,0 +1,88 @@
+{
+  "whitelistContexts": ["/services/SecurityTokenService",
+    "/services/internal/metrics",
+    "/proxy",
+    "/services/saml",
+    "/services/idp",
+    "/idp",
+    "/services/platform/config/ui",
+    "/logout"],
+  "policies": [
+    {
+      "paths": [
+        "/security-config"
+      ],
+      "authTypes": [
+        "IdP",
+        "guest"
+      ],
+      "realm": "karaf",
+      "claimsMapping": [
+        {
+          "key": "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role",
+          "value": "system-admin"
+        }
+      ]
+    },
+    {
+      "paths": [
+        "/admin"
+      ],
+      "authTypes": [
+        "IdP",
+        "guest"
+      ],
+      "realm": "karaf",
+      "claimsMapping": [
+        {
+          "key": "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role",
+          "value": "system-admin"
+        }
+      ]
+    },
+    {
+      "paths": [
+        "/solr"
+      ],
+      "authTypes": [
+        "SAML",
+        "PKI",
+        "basic"
+      ],
+      "realm": "karaf",
+      "claimsMapping": [
+        {
+          "key": "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role",
+          "value": "system-admin"
+        }
+      ]
+    },
+    {
+      "paths": [
+        "/"
+      ],
+      "authTypes": [
+        "IdP",
+        "guest"
+      ],
+      "realm": "karaf",
+      "claimsMapping": []
+    },
+    {
+      "paths": [
+        "/system"
+      ],
+      "authTypes": [
+        "IdP",
+        "guest"
+      ],
+      "realm": "karaf",
+      "claimsMapping": [
+        {
+          "key": "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role",
+          "value": "system-admin"
+        }
+      ]
+    }
+  ]
+}

@@ -5,7 +5,8 @@ import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.configurator.Configurator
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.configurator.OperationReport
-import spock.lang.Ignore
+import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions
+import org.codice.ddf.internal.admin.configurator.actions.ServiceActions
 import spock.lang.Specification
 
 import static org.codice.ddf.admin.sources.SourceTestCommons.*
@@ -25,34 +26,37 @@ class DeleteOpenSearchConfigurationTest extends Specification {
     static PID_PATH = [BASE_PATH, PID].flatten()
 
     def functionArgs = [
-        (PID): S_PID
+            (PID): S_PID
     ]
+    private ServiceActions serviceActions
 
     def setup() {
         configurator = Mock(Configurator)
         configuratorFactory = Mock(ConfiguratorFactory) {
             getConfigurator() >> configurator
         }
-        deleteOpenSearchConfigurationFunction = new DeleteOpenSearchConfiguration(configuratorFactory, adminActions, managedServiceActions)
+        serviceActions = Mock(ServiceActions)
+        def managedServiceActions = Mock(ManagedServiceActions)
+
+        deleteOpenSearchConfigurationFunction = new DeleteOpenSearchConfiguration(configuratorFactory,
+                serviceActions, managedServiceActions)
     }
 
-    @Ignore
     def 'Successfully deleting WFS config returns true'() {
         when:
-        configReader.getConfig(S_PID) >> configToBeDeleted
+        serviceActions.read(S_PID) >> configToBeDeleted
         configurator.commit(_, _) >> mockReport(false)
         deleteOpenSearchConfigurationFunction.setValue(functionArgs)
         def report = deleteOpenSearchConfigurationFunction.getValue()
 
         then:
         report.result() != null
-        report.result().getValue() == true
+        report.result().getValue()
     }
 
-    @Ignore
     def 'Fail delete when no existing configuration with the provided pid'() {
         when:
-        configReader.getConfig(S_PID) >> [:]
+        serviceActions.read(S_PID) >> [:]
         deleteOpenSearchConfigurationFunction.setValue(functionArgs)
         def report = deleteOpenSearchConfigurationFunction.getValue()
 
@@ -63,22 +67,20 @@ class DeleteOpenSearchConfigurationTest extends Specification {
         report.messages().get(0).path == RESULT_ARGUMENT_PATH
     }
 
-    @Ignore
     def 'Error while committing delete configuration with given pid'() {
         when:
-        configReader.getConfig(S_PID) >> configToBeDeleted
+        serviceActions.read(S_PID) >> configToBeDeleted
         configurator.commit(_, _) >> mockReport(true)
         deleteOpenSearchConfigurationFunction.setValue(functionArgs)
         def report = deleteOpenSearchConfigurationFunction.getValue()
 
         then:
-        report.result().getValue() == false
+        !report.result().getValue()
         report.messages().size() == 1
         report.messages().get(0).code == DefaultMessages.FAILED_DELETE_ERROR
         report.messages().get(0).path == RESULT_ARGUMENT_PATH
     }
 
-    @Ignore
     def 'Fail when missing required fields'() {
         when:
         def report = deleteOpenSearchConfigurationFunction.getValue()

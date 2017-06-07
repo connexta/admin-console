@@ -107,7 +107,7 @@ public abstract class BaseFunctionField<T extends DataType> extends BaseField<Ma
     }
 
     protected BaseFunctionField addArgumentMessages(List<Message> msgs) {
-        msgs.forEach(msg -> addArgumentMessage(msg));
+        msgs.forEach(this::addArgumentMessage);
         return this;
     }
 

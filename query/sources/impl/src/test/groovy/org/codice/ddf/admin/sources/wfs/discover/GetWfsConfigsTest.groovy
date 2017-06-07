@@ -23,7 +23,9 @@ import org.codice.ddf.admin.sources.fields.SourceInfoField
 import org.codice.ddf.admin.sources.fields.WfsVersion
 import org.codice.ddf.admin.sources.fields.type.WfsSourceConfigurationField
 import org.codice.ddf.admin.sources.services.WfsServiceProperties
-import spock.lang.Ignore
+import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions
+import org.codice.ddf.internal.admin.configurator.actions.ServiceActions
+import org.codice.ddf.internal.admin.configurator.actions.ServiceReader
 import spock.lang.Specification
 
 import static org.codice.ddf.admin.sources.SourceTestCommons.*
@@ -33,6 +35,12 @@ class GetWfsConfigsTest extends Specification {
     GetWfsConfigurations getWfsConfigsFunction
 
     ConfiguratorFactory configuratorFactory
+
+    private ServiceActions serviceActions
+
+    private ManagedServiceActions managedServiceActions
+
+    private ServiceReader serviceReader
 
     static TEST_WFS_VERSION_1 = WfsVersion.WFS_VERSION_1
 
@@ -49,59 +57,61 @@ class GetWfsConfigsTest extends Specification {
     def managedServiceConfigs
 
     def functionArgs = [
-        (PID): S_PID_2
+            (PID): S_PID_2
     ]
 
     def setup() {
         managedServiceConfigs = createWfsManagedServiceConfigs()
         configuratorFactory = Mock(ConfiguratorFactory)
-        getWfsConfigsFunction = new GetWfsConfigurations(configuratorFactory, adminActions, managedServiceActions, serviceReader)
+        serviceActions = Mock(ServiceActions)
+        managedServiceActions = Mock(ManagedServiceActions)
+        serviceReader = Mock(ServiceReader)
+
+        getWfsConfigsFunction = new GetWfsConfigurations(configuratorFactory, serviceActions,
+                managedServiceActions, serviceReader)
     }
 
-    @Ignore
     def 'No pid argument returns all configs'() {
         setup:
-        configReader.getServices(_, _) >> []
+        serviceReader.getServices(_, _) >> []
 
         when:
         def report = getWfsConfigsFunction.getValue()
-        def list = ((ListField)report.result())
+        def list = ((ListField) report.result())
 
         then:
-        1 * configReader.getServices(_, _) >> [new TestSource(S_PID_1, true)]
-        1 * configReader.getServices(_, _) >> [new TestSource(S_PID_2, false)]
-        1 * configReader.getManagedServiceConfigs(_ as String) >> managedServiceConfigs
-        1 * configReader.getManagedServiceConfigs(_ as String) >> [:]
+        1 * serviceReader.getServices(_, _) >> [new TestSource(S_PID_1, true)]
+        1 * serviceReader.getServices(_, _) >> [new TestSource(S_PID_2, false)]
+        1 * managedServiceActions.read(_ as String) >> managedServiceConfigs
+        1 * managedServiceActions.read(_ as String) >> [:]
         report.result() != null
         list.getList().size() == 2
         assertConfig(list.getList().get(0), 0, SOURCE_ID_1, S_PID_1, true, TEST_WFS_VERSION_1)
         assertConfig(list.getList().get(1), 1, SOURCE_ID_2, S_PID_2, false, TEST_WFS_VERSION_2)
     }
 
-    @Ignore
     def 'Pid filter returns 1 result'() {
         setup:
         getWfsConfigsFunction.setValue(functionArgs)
 
         when:
         def report = getWfsConfigsFunction.getValue()
-        def list = ((ListField)report.result())
+        def list = ((ListField) report.result())
 
         then:
-        1 * configReader.getServices(_, _) >> [new TestSource(S_PID_2, false)]
-        1 * configReader.getServices(_, _) >> []
-        configReader.getConfig(S_PID_2) >> managedServiceConfigs.get(S_PID_2)
+        1 * serviceReader.getServices(_, _) >> [new TestSource(S_PID_2, false)]
+        1 * serviceReader.getServices(_, _) >> []
+        serviceActions.read(S_PID_2) >> managedServiceConfigs.get(S_PID_2)
         report.result() != null
         list.getList().size() == 1
         assertConfig(list.getList().get(0), 0, SOURCE_ID_2, S_PID_2, false, TEST_WFS_VERSION_2)
     }
 
-    @Ignore
     def 'Fail due to no existing config with specified pid'() {
         setup:
         functionArgs.put(PID, S_PID)
         getWfsConfigsFunction.setValue(functionArgs)
-        configReader.getConfig(S_PID) >> [:]
+        serviceActions.read(S_PID) >> [:]
 
         when:
         def report = getWfsConfigsFunction.getValue()
@@ -122,7 +132,7 @@ class GetWfsConfigsTest extends Specification {
         assert sourceInfo.config().credentials().username() == TEST_USERNAME
         assert sourceInfo.config().sourceName() == sourceName
         assert sourceInfo.config().pid() == pid
-        assert ((WfsSourceConfigurationField)sourceInfo.config()).wfsVersion() == wfsVersion
+        assert ((WfsSourceConfigurationField) sourceInfo.config()).wfsVersion() == wfsVersion
         return true
     }
 

@@ -14,7 +14,10 @@
 package org.codice.ddf.admin.sources.csw
 
 import org.codice.ddf.admin.api.FieldProvider
-import spock.lang.Ignore
+import org.codice.ddf.admin.configurator.ConfiguratorFactory
+import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions
+import org.codice.ddf.internal.admin.configurator.actions.ServiceActions
+import org.codice.ddf.internal.admin.configurator.actions.ServiceReader
 import spock.lang.Specification
 
 class CswFieldProviderTest extends Specification {
@@ -22,10 +25,12 @@ class CswFieldProviderTest extends Specification {
     CswFieldProvider cswFieldProvider
 
     def setup() {
-        cswFieldProvider = new CswFieldProvider()
+        cswFieldProvider = new CswFieldProvider(Mock(ConfiguratorFactory),
+                Mock(ServiceActions),
+                Mock(ManagedServiceActions),
+                Mock(ServiceReader))
     }
 
-    @Ignore
     def 'Verify discovery fields immutability'() {
         when:
         cswFieldProvider.getDiscoveryFields().add(Mock(FieldProvider))
@@ -34,7 +39,6 @@ class CswFieldProviderTest extends Specification {
         thrown(UnsupportedOperationException)
     }
 
-    @Ignore
     def 'Verify persist functions immutability'() {
         when:
         cswFieldProvider.getMutationFunctions().add(Mock(FieldProvider))

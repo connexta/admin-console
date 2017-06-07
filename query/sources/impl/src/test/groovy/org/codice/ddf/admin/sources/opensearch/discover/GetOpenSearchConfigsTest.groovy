@@ -21,7 +21,9 @@ import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.sources.fields.SourceInfoField
 import org.codice.ddf.admin.sources.services.OpenSearchServiceProperties
-import spock.lang.Ignore
+import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions
+import org.codice.ddf.internal.admin.configurator.actions.ServiceActions
+import org.codice.ddf.internal.admin.configurator.actions.ServiceReader
 import spock.lang.Specification
 
 import static org.codice.ddf.admin.sources.SourceTestCommons.*
@@ -40,58 +42,65 @@ class GetOpenSearchConfigsTest extends Specification {
 
     ConfiguratorFactory configuratorFactory
 
+    ManagedServiceActions managedServiceActions
+
+    ServiceActions serviceActions
+
+    ServiceReader serviceReader
+
     def managedServiceConfigs
 
     def functionArgs = [
-        (PID): S_PID_2
+            (PID): S_PID_2
     ]
 
     def setup() {
         managedServiceConfigs = createOpenSearchManagedServiceConfigs()
         configuratorFactory = Mock(ConfiguratorFactory)
-        getOpenSearchConfigsFunction = new GetOpenSearchConfigurations(configuratorFactory, adminActions, managedServiceActions, serviceReader)
+        serviceActions = Mock(ServiceActions)
+        serviceReader = Mock(ServiceReader)
+        managedServiceActions = Mock(ManagedServiceActions)
+        getOpenSearchConfigsFunction = new GetOpenSearchConfigurations(configuratorFactory, serviceActions,
+                this.managedServiceActions, serviceReader)
     }
 
-    @Ignore
     def 'No pid argument returns all configs'() {
         when:
         def report = getOpenSearchConfigsFunction.getValue()
-        def list = ((ListField)report.result())
+        def list = ((ListField) report.result())
 
         then:
-        1 * configReader.getServices(_, _) >> [new TestSource(S_PID_1, true)]
-        1 * configReader.getServices(_, _) >> [new TestSource(S_PID_2, false)]
-        1 * configReader.getManagedServiceConfigs(_ as String) >> baseManagedServiceConfigs
+        1 * serviceReader.getServices(_, _) >> [new TestSource(S_PID_1, true)]
+        1 * serviceReader.getServices(_, _) >> [new TestSource(S_PID_2, false)]
+        1 * managedServiceActions.read(_ as String) >> baseManagedServiceConfigs
         report.result() != null
         list.getList().size() == 2
         assertConfig(list.getList().get(0), 0, TEST_SHORT_NAME, S_PID_1, true)
         assertConfig(list.getList().get(1), 1, TEST_SHORT_NAME, S_PID_2, false)
     }
 
-    @Ignore
     def 'Pid filter returns 1 result'() {
         setup:
         getOpenSearchConfigsFunction.setValue(functionArgs)
 
         when:
         def report = getOpenSearchConfigsFunction.getValue()
-        def list = ((ListField)report.result())
+        def list = ((ListField) report.result())
 
         then:
-        1 * configReader.getServices(_, _) >> [new TestSource(S_PID_2, false)]
-        1 * configReader.getServices(_, _) >> []
-        configReader.getConfig(S_PID_2) >> baseManagedServiceConfigs.get(S_PID_2)
+        1 * serviceReader.getServices(_, _) >> [new TestSource(S_PID_2, false)]
+        1 * serviceReader.getServices(_, _) >> []
+        serviceActions.read(S_PID_2) >> baseManagedServiceConfigs.get(S_PID_2)
         report.result() != null
         list.getList().size() == 1
         assertConfig(list.getList().get(0), 0, TEST_SHORT_NAME, S_PID_2, false)
     }
 
-    @Ignore
     def 'Fail due to no existing config with specified pid'() {
         setup:
         functionArgs.put(PID, S_PID)
         getOpenSearchConfigsFunction.setValue(functionArgs)
-        configReader.getConfig(S_PID) >> [:]
+        serviceActions.read(S_PID) >> [:]
 
         when:
         def report = getOpenSearchConfigsFunction.getValue()

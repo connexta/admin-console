@@ -24,13 +24,17 @@ import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.configurator.OperationReport
 import org.codice.ddf.admin.security.common.services.PolicyManagerServiceProperties
 import org.codice.ddf.admin.security.wcpm.WcpmFieldProvider
+import org.codice.ddf.internal.admin.configurator.actions.BundleActions
+import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions
+import org.codice.ddf.internal.admin.configurator.actions.ServiceActions
+import org.codice.ddf.internal.admin.configurator.actions.ServiceReader
 import org.codice.ddf.security.policy.context.impl.PolicyManager
-import spock.lang.Ignore
 import spock.lang.Specification
 
 class SaveWhitelistContextsTest extends Specification {
     FieldProvider WcpmFieldProvider
     ConfiguratorFactory configuratorFactory
+    ServiceActions serviceActions
     Configurator configurator
     OperationReport operationReport
     PolicyManager policyManager
@@ -39,21 +43,29 @@ class SaveWhitelistContextsTest extends Specification {
     def setup() {
         operationReport = Mock(OperationReport)
         configuratorFactory = Mock(ConfiguratorFactory)
+        serviceActions = Mock(ServiceActions)
         configurator = Mock(Configurator)
         policyManager = new PolicyManager()
 
-        policyManager.setWhiteListContexts([ '/', '/default', '/paths' ])
-        configurator.commit(_,_) >> operationReport
+        policyManager.setWhiteListContexts(['/', '/default', '/paths'])
+        configurator.commit(_, _) >> operationReport
         configuratorFactory.getConfigurator() >> configurator
-        configReader.getConfig(_) >> { [ (PolicyManagerServiceProperties.WHITE_LIST_CONTEXT) : policyManager.getWhiteListContexts() ] }
-        WcpmFieldProvider = new WcpmFieldProvider(configuratorFactory, adminActions, bundleActions, managedServiceActions, serviceReader)
+        serviceActions.read(_) >> {
+            [(PolicyManagerServiceProperties.WHITE_LIST_CONTEXT): policyManager.getWhiteListContexts()]
+        }
+
+
+        WcpmFieldProvider = new WcpmFieldProvider(configuratorFactory,
+                serviceActions,
+                Mock(BundleActions),
+                Mock(ManagedServiceActions),
+                Mock(ServiceReader))
         saveWhitelistContextsFunction = WcpmFieldProvider.getMutationFunction(SaveWhitelistContexts.FIELD_NAME)
     }
 
-    @Ignore
-    def 'Pass with valid context list' () {
+    def 'Pass with valid context list'() {
         setup:
-        def testMap = [ 'paths':[  '/test', '/path', '/' ] ]
+        def testMap = ['paths': ['/test', '/path', '/']]
         operationReport.containsFailedResults() >> false
 
         when:
@@ -65,10 +77,9 @@ class SaveWhitelistContextsTest extends Specification {
         report.result().getValue() == testMap.paths
     }
 
-    @Ignore
-    def 'Fail if context path is invalid' () {
+    def 'Fail if context path is invalid'() {
         setup:
-        def testMap = [ 'paths':[  '/test', '/path', '!@#(%^$(&(*' ] ]
+        def testMap = ['paths': ['/test', '/path', '!@#(%^$(&(*']]
         operationReport.containsFailedResults() >> false
 
         when:
@@ -81,10 +92,9 @@ class SaveWhitelistContextsTest extends Specification {
         report.result() == null
     }
 
-    @Ignore
-    def 'Fail if context path is empty' () {
+    def 'Fail if context path is empty'() {
         setup:
-        def testMap = [ 'paths':[  '/test', '/path', '' ] ]
+        def testMap = ['paths': ['/test', '/path', '']]
         operationReport.containsFailedResults() >> false
 
         when:
@@ -97,10 +107,9 @@ class SaveWhitelistContextsTest extends Specification {
         report.result() == null
     }
 
-    @Ignore
-    def 'Pass if list is empty (whitelist contexts not required)' () {
+    def 'Pass if list is empty (whitelist contexts not required)'() {
         setup:
-        def testMap = [ 'paths':[] ]
+        def testMap = ['paths': []]
         operationReport.containsFailedResults() >> false
 
         when:
@@ -112,10 +121,9 @@ class SaveWhitelistContextsTest extends Specification {
         report.result().getValue() == []
     }
 
-    @Ignore
-    def 'Fail when fail to persist' () {
+    def 'Fail when fail to persist'() {
         setup:
-        def testMap = [ 'paths':[  '/test', '/path', '/' ] ]
+        def testMap = ['paths': ['/test', '/path', '/']]
         operationReport.containsFailedResults() >> true
 
         when:

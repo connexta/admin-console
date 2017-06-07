@@ -14,7 +14,10 @@
 package org.codice.ddf.admin.sources.wfs
 
 import org.codice.ddf.admin.api.FieldProvider
-import spock.lang.Ignore
+import org.codice.ddf.admin.configurator.ConfiguratorFactory
+import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions
+import org.codice.ddf.internal.admin.configurator.actions.ServiceActions
+import org.codice.ddf.internal.admin.configurator.actions.ServiceReader
 import spock.lang.Specification
 
 class WfsFieldProviderTest extends Specification {
@@ -22,10 +25,12 @@ class WfsFieldProviderTest extends Specification {
     WfsFieldProvider wfsFieldProvider
 
     def setup() {
-        wfsFieldProvider = new WfsFieldProvider()
+        wfsFieldProvider = new WfsFieldProvider(Mock(ConfiguratorFactory),
+                Mock(ServiceActions),
+                Mock(ManagedServiceActions),
+                Mock(ServiceReader))
     }
 
-    @Ignore
     def 'Verify discovery fields immutability'() {
         when:
         wfsFieldProvider.getDiscoveryFields().add(Mock(FieldProvider))
@@ -34,7 +39,6 @@ class WfsFieldProviderTest extends Specification {
         thrown(UnsupportedOperationException)
     }
 
-    @Ignore
     def 'Verify persist functions immutability'() {
         when:
         wfsFieldProvider.getMutationFunctions().add(Mock(FieldProvider))

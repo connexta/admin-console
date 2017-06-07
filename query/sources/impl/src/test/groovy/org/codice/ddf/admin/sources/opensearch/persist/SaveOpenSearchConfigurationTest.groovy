@@ -20,7 +20,9 @@ import org.codice.ddf.admin.configurator.Configurator
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.configurator.OperationReport
 import org.codice.ddf.admin.sources.commons.SourceMessages
-import spock.lang.Ignore
+import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions
+import org.codice.ddf.internal.admin.configurator.actions.ServiceActions
+import org.codice.ddf.internal.admin.configurator.actions.ServiceReader
 import spock.lang.Specification
 
 import static org.codice.ddf.admin.sources.SourceTestCommons.*
@@ -41,6 +43,10 @@ class SaveOpenSearchConfigurationTest extends Specification {
 
     ConfiguratorFactory configuratorFactory
 
+    private ServiceActions serviceActions
+
+    private ServiceReader serviceReader
+
     Configurator configurator
 
     FederatedSource federatedSource
@@ -55,28 +61,30 @@ class SaveOpenSearchConfigurationTest extends Specification {
         configuratorFactory = Mock(ConfiguratorFactory) {
             getConfigurator() >> configurator
         }
-        saveOpenSearchConfiguration = new SaveOpenSearchConfiguration(configuratorFactory, adminActions, managedServiceActions, serviceReader)
+        serviceActions = Mock(ServiceActions)
+        serviceReader = Mock(ServiceReader)
+        def managedServiceActions = Mock(ManagedServiceActions)
+        saveOpenSearchConfiguration = new SaveOpenSearchConfiguration(configuratorFactory, serviceActions,
+                managedServiceActions, serviceReader)
     }
 
-    @Ignore
     def 'Successfully save new OpenSearch configuration'() {
         setup:
         saveOpenSearchConfiguration.setValue(getBaseSaveConfigArgs())
-        configReader.getServices(_, _) >> []
+        serviceReader.getServices(_, _) >> []
         configurator.commit(_, _) >> mockReport(false)
 
         when:
         def report = saveOpenSearchConfiguration.getValue()
 
         then:
-        report.result().getValue() == true
+        report.result().getValue()
     }
 
-    @Ignore
     def 'Fail to save new OpenSearch config due to duplicate source name'() {
         setup:
         saveOpenSearchConfiguration.setValue(getBaseSaveConfigArgs())
-        configReader.getServices(_, _) >> federatedSources
+        serviceReader.getServices(_, _) >> federatedSources
 
         when:
         def report = saveOpenSearchConfiguration.getValue()
@@ -88,44 +96,41 @@ class SaveOpenSearchConfigurationTest extends Specification {
         report.messages().get(0).path == SOURCE_NAME_PATH
     }
 
-    @Ignore
     def 'Fail to save new OpenSearch config due to failure to commit'() {
         setup:
         saveOpenSearchConfiguration.setValue(getBaseSaveConfigArgs())
-        configReader.getServices(_, _) >> []
+        serviceReader.getServices(_, _) >> []
         configurator.commit(_, _) >> mockReport(true)
 
         when:
         def report = saveOpenSearchConfiguration.getValue()
 
         then:
-        report.result().getValue() == false
+        !report.result().getValue()
         report.messages().size() == 1
         report.messages().get(0).path == CONFIG_PATH
         report.messages().get(0).code == DefaultMessages.FAILED_PERSIST
     }
 
-    @Ignore
     def 'Successfully update existing OpenSearch configuration'() {
         setup:
         saveOpenSearchConfiguration.setValue(createUpdateFunctionArgs())
-        configReader.getConfig(_) >> [(ID):TEST_SOURCENAME]
-        configReader.getServices(_, _) >> []
+        serviceActions.read(_) >> [(ID): TEST_SOURCENAME]
+        serviceReader.getServices(_, _) >> []
         configurator.commit(_, _) >> mockReport(false)
 
         when:
         def report = saveOpenSearchConfiguration.getValue()
 
         then:
-        report.result().getValue() == true
+        report.result().getValue()
     }
 
-    @Ignore
     def 'Fail to update config due to existing source name'() {
         setup:
         saveOpenSearchConfiguration.setValue(createUpdateFunctionArgs())
-        configReader.getConfig(_) >> [(ID):'updatedName']
-        configReader.getServices(_, _) >> [new TestSource(S_PID, 'updatedName', false), new TestSource("existingSource", TEST_SOURCENAME, false)]
+        serviceActions.read(_) >> [(ID): 'updatedName']
+        serviceReader.getServices(_, _) >> [new TestSource(S_PID, 'updatedName', false), new TestSource("existingSource", TEST_SOURCENAME, false)]
 
         when:
         def report = saveOpenSearchConfiguration.getValue()
@@ -137,29 +142,27 @@ class SaveOpenSearchConfigurationTest extends Specification {
         report.messages().get(0).code == SourceMessages.DUPLICATE_SOURCE_NAME
     }
 
-    @Ignore
     def 'Fail to update config due to failure to commit'() {
         setup:
         saveOpenSearchConfiguration.setValue(createUpdateFunctionArgs())
-        configReader.getConfig(_) >> [(ID):TEST_SOURCENAME]
-        configReader.getServices(_, _) >> []
+        serviceActions.read(_) >> [(ID): TEST_SOURCENAME]
+        serviceReader.getServices(_, _) >> []
         configurator.commit(_, _) >> mockReport(true)
 
         when:
         def report = saveOpenSearchConfiguration.getValue()
 
         then:
-        report.result().getValue() == false
+        !report.result().getValue()
         report.messages().size() == 1
         report.messages().get(0).path == RESULT_ARGUMENT_PATH
         report.messages().get(0).code == DefaultMessages.FAILED_UPDATE_ERROR
     }
 
-    @Ignore
     def 'Fail to update config due to no existing source specified by the pid'() {
         setup:
         saveOpenSearchConfiguration.setValue(createUpdateFunctionArgs())
-        configReader.getConfig(S_PID) >> [:]
+        serviceActions.read(S_PID) >> [:]
 
         when:
         def report = saveOpenSearchConfiguration.getValue()
@@ -171,7 +174,6 @@ class SaveOpenSearchConfigurationTest extends Specification {
         report.messages().get(0).path == RESULT_ARGUMENT_PATH
     }
 
-    @Ignore
     def 'Fail when missing required fields'() {
         when:
         def report = saveOpenSearchConfiguration.getValue()

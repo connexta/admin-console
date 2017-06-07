@@ -30,13 +30,18 @@ import org.codice.ddf.admin.security.common.fields.wcpm.Realm
 import org.codice.ddf.admin.security.common.services.PolicyManagerServiceProperties
 import org.codice.ddf.admin.security.common.services.StsServiceProperties
 import org.codice.ddf.admin.security.wcpm.WcpmFieldProvider
+import org.codice.ddf.internal.admin.configurator.actions.BundleActions
+import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions
+import org.codice.ddf.internal.admin.configurator.actions.ServiceActions
+import org.codice.ddf.internal.admin.configurator.actions.ServiceReader
 import org.codice.ddf.security.policy.context.impl.PolicyManager
-import spock.lang.Ignore
 import spock.lang.Specification
 
 class SaveContextPoliciesTest extends Specification {
     FieldProvider queryProvider
     ConfiguratorFactory configuratorFactory
+    ServiceActions serviceActions
+    ServiceReader serviceReader
     Configurator configurator
     OperationReport operationReport
     PolicyManager policyManager
@@ -85,15 +90,12 @@ class SaveContextPoliciesTest extends Specification {
 
         operationReport = Mock(OperationReport)
         configuratorFactory = Mock(ConfiguratorFactory)
+        serviceActions = Mock(ServiceActions)
+        serviceReader = Mock(ServiceReader)
         configurator = Mock(Configurator)
-        configurator.updateConfigFile({
-            it == PolicyManagerServiceProperties.POLICY_MANAGER_PID
-        }, _, _) >> {
-            args -> policyManager.setPolicies(args[1])
-        }
 
         stsConfig = [(StsServiceProperties.STS_CLAIMS_PROPS_KEY_CLAIMS): testClaims]
-        configReader.getConfig(_) >> stsConfig
+        serviceActions.read(_) >> stsConfig
 
         policyManager = new PolicyManager()
         ListField<ContextPolicyBin> contextPolicies = new ListFieldImpl<>(ContextPolicyBin.class)
@@ -101,14 +103,17 @@ class SaveContextPoliciesTest extends Specification {
         policyManager.setPolicies(new PolicyManagerServiceProperties().contextPoliciesToPolicyManagerProps(contextPolicies.getList()))
 
         configurator.commit(_, _) >> operationReport
-        configReader.getServiceReference(_) >> policyManager
+        serviceReader.getServiceReference(_) >> policyManager
         configuratorFactory.getConfigurator() >> configurator
-        configuratorFactory.getConfigReader() >> configReader
-        queryProvider = new WcpmFieldProvider(configuratorFactory, adminActions, bundleActions, managedServiceActions, serviceReader)
+
+        def bundleActions = Mock(BundleActions)
+        def managedServiceActions = Mock(ManagedServiceActions)
+
+        queryProvider = new WcpmFieldProvider(configuratorFactory, serviceActions, bundleActions,
+                managedServiceActions, serviceReader)
         saveContextPoliciesFunction = queryProvider.getMutationFunction(SaveContextPolices.FUNCTION_FIELD_NAME)
     }
 
-    @Ignore
     def 'Pass with valid update'() {
         setup:
         operationReport.containsFailedResults() >> false
@@ -122,7 +127,6 @@ class SaveContextPoliciesTest extends Specification {
         report.result().getValue() == testData.policies
     }
 
-    @Ignore
     def 'Fail when failed to persist'() {
         setup:
         operationReport.containsFailedResults() >> true
@@ -138,7 +142,6 @@ class SaveContextPoliciesTest extends Specification {
         report.result() == null
     }
 
-    @Ignore
     def 'Fail if no root context is present'() {
         setup:
         operationReport.containsFailedResults() >> false
@@ -155,7 +158,6 @@ class SaveContextPoliciesTest extends Specification {
         report.result() == null
     }
 
-    @Ignore
     def 'Fail if invalid authType'() {
         setup:
         operationReport.containsFailedResults() >> false
@@ -172,7 +174,6 @@ class SaveContextPoliciesTest extends Specification {
         report.result() == null
     }
 
-    @Ignore
     def 'Fail if no authType'() {
         setup:
         operationReport.containsFailedResults() >> false
@@ -190,7 +191,6 @@ class SaveContextPoliciesTest extends Specification {
 
     }
 
-    @Ignore
     def 'Fail if invalid realm'() {
         setup:
         operationReport.containsFailedResults() >> false
@@ -207,7 +207,6 @@ class SaveContextPoliciesTest extends Specification {
         report.result() == null
     }
 
-    @Ignore
     def 'Fail if no realm'() {
         setup:
         operationReport.containsFailedResults() >> false
@@ -224,7 +223,6 @@ class SaveContextPoliciesTest extends Specification {
         report.result() == null
     }
 
-    @Ignore
     def 'Pass if no claims Mapping'() {
         setup:
         operationReport.containsFailedResults() >> false
@@ -239,7 +237,6 @@ class SaveContextPoliciesTest extends Specification {
         report.result().getValue() == testData.policies
     }
 
-    @Ignore
     def 'Fail if claim entry with no value '() {
         setup:
         operationReport.containsFailedResults() >> false
@@ -252,11 +249,10 @@ class SaveContextPoliciesTest extends Specification {
         then:
         report.messages().size() == 1
         report.messages()[0].code == DefaultMessages.MISSING_REQUIRED_FIELD
-        report.messages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, BaseFunctionField.ARGUMENT, 'policies', ListField.INDEX_DELIMETER + 0, 'claimsMapping', ListField.INDEX_DELIMETER + 0,  ClaimsMapEntry.VALUE_FIELD_NAME]
+        report.messages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, BaseFunctionField.ARGUMENT, 'policies', ListField.INDEX_DELIMETER + 0, 'claimsMapping', ListField.INDEX_DELIMETER + 0, ClaimsMapEntry.VALUE_FIELD_NAME]
         report.result() == null
     }
 
-    @Ignore
     def 'Fail if claim is not supported'() {
         setup:
         operationReport.containsFailedResults() >> false

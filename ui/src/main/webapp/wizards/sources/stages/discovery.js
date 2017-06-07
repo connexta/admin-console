@@ -1,69 +1,59 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import Mount from 'react-mount'
+import { withApollo } from 'react-apollo'
 
-import { getAllConfig, getMessages } from 'admin-wizard/reducer'
-import { getDiscoveryType } from '../reducer'
-import { testSources, setDiscoveryType } from '../actions'
+import { getDiscoveryType, getErrors } from '../reducer'
+import { NavPanes, SideLines } from '../components'
+import { setDefaults } from '../../../actions'
+import { queryAllSources } from '../graphql-queries/source-discovery'
+import {
+  setDiscoveryType,
+  changeStage,
+  setDiscoveredEndpoints,
+  startSubmitting,
+  endSubmitting,
+  setErrors,
+  clearErrors
+} from '../actions'
+import {
+  nextShouldBeDisabled,
+  userNameError,
+  passwordError,
+  portError
+} from '../validation'
 
 import Title from 'components/Title'
 import Description from 'components/Description'
 import ActionGroup from 'components/ActionGroup'
 import Action from 'components/Action'
 import Message from 'components/Message'
+
+import { getAllConfig } from 'admin-wizard/reducer'
+import { Input, Password, Hostname, Port } from 'admin-wizard/inputs'
+
 import FlatButton from 'material-ui/FlatButton'
 
-import {
-  Input,
-  Password,
-  Hostname,
-  Port
-} from 'admin-wizard/inputs'
-
-import { NavPanes, SideLines } from '../components'
-
-import { setDefaults } from '../../../actions'
-import Mount from 'react-mount'
-
-const isEmpty = (string) => {
-  return !string
-}
-
-const isBlank = (string) => {
-  return !string || !string.trim()
-}
+const currentStageId = 'discoveryStage'
 
 const discoveryStageDefaults = {
   sourceHostName: '',
   sourcePort: 8993
 }
 
-const DiscoveryStageView = ({ messages, testSources, setDefaults, configs, discoveryType, setDiscoveryType }) => {
-  const nextShouldBeDisabled = () => {
-    // checks that username & password are either both filled out or both empty (because it's optional)
-    if (isBlank(configs.sourceUserName) !== isEmpty(configs.sourceUserPassword)) {
-      return true
-    }
-
-    // hostname & port discovery checks
-    if (discoveryType === 'hostnamePort') {
-      if (isBlank(configs.sourceHostName) || configs.sourcePort < 0) {
-        return true
-      }
-    }
-
-    // url discovery checks
-    if (discoveryType === 'url') {
-      if (isBlank(configs.endpointUrl)) {
-        return true
-      }
-    }
-
-    return false
-  }
+const DiscoveryStageView = (props) => {
+  const {
+    messages,
+    setDefaults,
+    configs,
+    discoveryType,
+    setDiscoveryType,
+    changeStage
+  } = props
 
   return (
     <Mount on={() => setDefaults(discoveryStageDefaults)}>
-      <NavPanes backClickTarget='welcomeStage' forwardClickTarget='sourceSelectionStage'>
+      <NavPanes back='welcomeStage' forward='sourceSelectionStage'>
         <Title>
           Discover Available Sources
         </Title>
@@ -81,7 +71,7 @@ const DiscoveryStageView = ({ messages, testSources, setDefaults, configs, disco
             visible={discoveryType === 'hostnamePort'}
             id='sourcePort'
             label='Port'
-            errorText={(configs.sourcePort < 0) ? 'Port is not in valid range.' : undefined} />
+            errorText={portError(configs)} />
           <Input
             visible={discoveryType === 'url'}
             id='endpointUrl'
@@ -90,11 +80,21 @@ const DiscoveryStageView = ({ messages, testSources, setDefaults, configs, disco
           {
             (discoveryType === 'hostnamePort') ? (
               <div style={{ textAlign: 'right' }}>
-                <FlatButton primary labelStyle={{fontSize: '14px', textTransform: 'none'}} label='Know the source url?' onClick={() => { setDiscoveryType('url') }} />
+                <FlatButton
+                  primary
+                  labelStyle={{fontSize: '14px', textTransform: 'none'}}
+                  label='Know the source url?'
+                  onClick={() => { setDiscoveryType('url') }}
+                />
               </div>
             ) : (
               <div style={{ textAlign: 'right' }}>
-                <FlatButton primary labelStyle={{fontSize: '14px', textTransform: 'none'}} label={'Don\'t know the source url?'} onClick={() => { setDiscoveryType('hostnamePort') }} />
+                <FlatButton
+                  primary
+                  labelStyle={{fontSize: '14px', textTransform: 'none'}}
+                  label={'Don\'t know the source url?'}
+                  onClick={() => { setDiscoveryType('hostnamePort') }}
+                />
               </div>
             )
           }
@@ -102,18 +102,18 @@ const DiscoveryStageView = ({ messages, testSources, setDefaults, configs, disco
           <Input
             id='sourceUserName'
             label='Username'
-            errorText={(isBlank(configs.sourceUserName) && !isEmpty(configs.sourceUserPassword)) ? 'Password with no username.' : undefined} />
+            errorText={userNameError(configs)} />
           <Password
             id='sourceUserPassword'
             label='Password'
-            errorText={(!isBlank(configs.sourceUserName) && isEmpty(configs.sourceUserPassword)) ? 'Username with no password.' : undefined} />
-          {messages.map((msg, i) => <Message key={i} {...msg} />)}
+            errorText={passwordError(configs)} />
+          {messages.map((msg, i) => <Message key={i} message={msg} type='FAILURE' />)}
           <ActionGroup>
             <Action
               primary
               label='Check'
-              disabled={nextShouldBeDisabled()}
-              onClick={() => testSources('sources', 'sourceSelectionStage', 'discoveryStage', discoveryType)} />
+              disabled={nextShouldBeDisabled(props)}
+              onClick={() => queryAllSources(props, () => changeStage('sourceSelectionStage'))} />
           </ActionGroup>
         </div>
       </NavPanes>
@@ -121,12 +121,19 @@ const DiscoveryStageView = ({ messages, testSources, setDefaults, configs, disco
   )
 }
 
-export default connect((state) => ({
+let DiscoveryStage = connect((state) => ({
   configs: getAllConfig(state),
-  messages: getMessages(state, 'discoveryStage'),
+  messages: getErrors(state)(currentStageId),
   discoveryType: getDiscoveryType(state)
 }), {
-  testSources,
   setDefaults,
-  setDiscoveryType
+  setDiscoveryType,
+  changeStage,
+  setDiscoveredEndpoints,
+  startSubmitting,
+  endSubmitting,
+  setErrors,
+  clearErrors
 })(DiscoveryStageView)
+
+export default withApollo(DiscoveryStage)

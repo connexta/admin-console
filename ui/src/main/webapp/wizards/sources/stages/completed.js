@@ -1,7 +1,11 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { resetSourceWizardState } from '../actions'
+import { clearWizard } from 'admin-wizard/actions'
+
+import Flexbox from 'flexbox-react'
+
+import { Link } from 'react-router'
 
 import Title from 'components/Title'
 import Description from 'components/Description'
@@ -9,11 +13,7 @@ import ActionGroup from 'components/ActionGroup'
 import Action from 'components/Action'
 import LargeStatusIndicator from 'components/LargeStatusIndicator'
 
-import Flexbox from 'flexbox-react'
-
-import { Link } from 'react-router'
-
-const CompletedStageView = ({ messages, resetSourceWizardState }) => (
+const CompletedStageView = ({ messages, clearWizard }) => (
   <Flexbox justifyContent='center' flexDirection='column'>
     <Title>
       All Done!
@@ -24,10 +24,18 @@ const CompletedStageView = ({ messages, resetSourceWizardState }) => (
     <LargeStatusIndicator success />
     <ActionGroup>
       <Link to='/'>
-        <Action primary label='Go Home' onClick={resetSourceWizardState} />
+        <Action
+          primary
+          label='Go Home'
+          onClick={clearWizard}
+        />
       </Link>
-      <Action primary label='Add Another Source' onClick={resetSourceWizardState} />
+      <Action
+        primary
+        label='Add Another Source'
+        onClick={clearWizard}
+      />
     </ActionGroup>
   </Flexbox>
 )
-export default connect(null, { resetSourceWizardState })(CompletedStageView)
+export default connect(null, { clearWizard })(CompletedStageView)

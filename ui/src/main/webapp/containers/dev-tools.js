@@ -20,7 +20,8 @@ const DevTools = createDevTools(
       <LogMonitor
         theme='solarized'
         expandActionRoot={false}
-        select={(state) => state.toJS()} />
+        expandStateRoot={false}
+        select={(state) => state} />
       <Dispatcher
         theme='solarized'
         actionCreators={actions} />

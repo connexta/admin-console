@@ -18,7 +18,7 @@ import ConfirmationStage from './stages/confirmation'
 import CompletedStage from './stages/completed'
 
 const WizardView = ({ id, children, clearWizard }) => (
-  <Mount key={id}>{children}</Mount>
+  <Mount off={clearWizard} key={id}>{children}</Mount>
 )
 
 const Wizard = connect(null, { clearWizard })(WizardView)

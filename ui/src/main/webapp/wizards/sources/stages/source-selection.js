@@ -1,9 +1,25 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import { withApollo } from 'react-apollo'
 
-import { getSourceSelections, getConfigurationHandlerId, getDiscoveryType } from '../reducer'
-import { getMessages } from 'admin-wizard/reducer'
-import { changeStage, testSources } from '../actions'
+import { queryAllSources } from './discovery'
+import { NavPanes, SourceRadioButtons } from '../components'
+import {
+  getDiscoveryType,
+  getDiscoveredEndpoints,
+  getChosenEndpoint
+} from '../reducer'
+import {
+  changeStage,
+  setDiscoveredEndpoints,
+  setChosenEndpoint,
+  startSubmitting,
+  endSubmitting,
+  setErrors,
+  clearErrors
+} from '../actions'
+
+import { getAllConfig, getMessages } from 'admin-wizard/reducer'
 
 import Title from 'components/Title'
 import Description from 'components/Description'
@@ -11,28 +27,43 @@ import ActionGroup from 'components/ActionGroup'
 import Action from 'components/Action'
 import Message from 'components/Message'
 
-import { NavPanes, SourceRadioButtons } from '../components'
+const SourceSelectionStageView = (props) => {
+  const {
+    messages,
+    changeStage,
+    discoveredEndpoints = {},
+    chosenEndpoint,
+    setChosenEndpoint
+  } = props
 
-const SourceSelectionStageView = ({ messages, sourceSelections = [], selectedSourceConfigHandlerId, changeStage, testSources, discoveryType }) => {
-  if (sourceSelections.length !== 0) {
+  if (Object.keys(discoveredEndpoints).length !== 0) {
     return (
-      <NavPanes backClickTarget='discoveryStage' forwardClickTarget='confirmationStage'>
+      <NavPanes back='discoveryStage' forward='confirmationStage'>
         <Title>
           Sources Found!
         </Title>
         <Description>
           Choose which sources to add.
         </Description>
-        <SourceRadioButtons options={sourceSelections} />
-        {messages.map((msg, i) => <Message key={i} {...msg} />)}
+        <SourceRadioButtons
+          options={discoveredEndpoints}
+          valueSelected={chosenEndpoint}
+          onChange={setChosenEndpoint}
+        />
+        {messages.map((msg, i) => <Message key={i} message={msg} type='FAILURE' />)}
         <ActionGroup>
-          <Action primary label='Next' disabled={selectedSourceConfigHandlerId === undefined} onClick={() => changeStage('confirmationStage')} />
+          <Action
+            primary
+            label='Next'
+            disabled={chosenEndpoint === ''}
+            onClick={() => changeStage('confirmationStage')}
+          />
         </ActionGroup>
       </NavPanes>
     )
   } else {
     return (
-      <NavPanes backClickTarget='discoveryStage' forwardClickTarget='manualEntryStage'>
+      <NavPanes back='discoveryStage' forward='manualEntryStage'>
         <Title>
           No Sources Found
         </Title>
@@ -41,18 +72,30 @@ const SourceSelectionStageView = ({ messages, sourceSelections = [], selectedSou
         </Description>
         {messages.map((msg, i) => <Message key={i} {...msg} />)}
         <ActionGroup>
-          <Action primary label='Try Again' onClick={() => testSources('sources', 'sourceSelectionStage', 'discoveryStage', discoveryType)} />
+          <Action
+            primary
+            label='Try Again'
+            onClick={() => queryAllSources(props)} />
         </ActionGroup>
       </NavPanes>
     )
   }
 }
-export default connect((state) => ({
-  sourceSelections: getSourceSelections(state),
-  selectedSourceConfigHandlerId: getConfigurationHandlerId(state),
+
+let SourceSelectionStage = connect((state) => ({
   messages: getMessages(state, 'sourceSelectionStage'),
-  discoveryType: getDiscoveryType(state)
+  discoveryType: getDiscoveryType(state),
+  discoveredEndpoints: getDiscoveredEndpoints(state),
+  configs: getAllConfig(state),
+  chosenEndpoint: getChosenEndpoint(state)
 }), {
   changeStage,
-  testSources
+  setDiscoveredEndpoints,
+  setChosenEndpoint,
+  startSubmitting,
+  endSubmitting,
+  setErrors,
+  clearErrors
 })(SourceSelectionStageView)
+
+export default withApollo(SourceSelectionStage)

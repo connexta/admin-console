@@ -1,0 +1,16 @@
+query GetAuthTypes {
+  wcpm {
+    authTypes,
+    realms,
+    whitelisted,
+    policies {
+      paths
+      authTypes
+      realm
+      claimsMapping {
+        key
+        value
+      }
+    }
+  }
+}

@@ -2,48 +2,46 @@ import React from 'react'
 
 import { connect } from 'react-redux'
 
-import { getProbeValue } from 'admin-wizard/reducer'
+import { getProbeValue, setProbeValue } from 'admin-wizard/reducer'
+
+import { gql, graphql, withApollo } from 'react-apollo'
 
 import { List, ListItem } from 'material-ui/List'
 import { Card, CardActions, CardHeader } from 'material-ui/Card'
 import FlatButton from 'material-ui/FlatButton'
-import NextIcon from 'material-ui/svg-icons/image/navigate-next'
-
-import Mount from 'react-mount'
 
 import Stage from 'components/Stage'
 import Title from 'components/Title'
 import Description from 'components/Description'
-import Action from 'components/Action'
-import ActionGroup from 'components/ActionGroup'
 import Message from 'components/Message'
-import ActionMessage from 'components/ActionMessage'
-import visible from 'react-visible'
+
+import Body from 'components/wizard/Body'
+import Navigation, { Back, Next } from 'components/wizard/Navigation'
 
 import { InputAuto } from 'admin-wizard/inputs'
-
-import { probe } from './actions'
 
 import * as styles from './styles.less'
 
 import muiThemeable from 'material-ui/styles/muiThemeable'
 
-const VisibleActionMessage = visible(ActionMessage)
-
 const QueryResultView = (props) => {
-  const { muiTheme: { palette }, ...rest } = props
+  const { muiTheme: { palette }, entries = [] } = props
 
-  const attrs = Object.keys(rest).map((key, i) =>
+  const attrs = entries.map(({ key, value }, i) =>
     <ListItem key={i}>
-      <b style={{ color: palette.primary1Color }}>{key}:</b> {rest[key]}
+      <b style={{ color: palette.primary1Color }}>{key}:</b> {value}
     </ListItem>
   )
 
-  const { name, uid, cn, ou } = rest
+  const primary = [ 'ou', 'cn', 'uid', 'name' ]
+
+  const primaryText = primary
+    .map((a) => entries.find(({ key: b }) => a === b))
+    .find((value) => value !== undefined)
 
   return (
     <ListItem
-      primaryText={ou || cn || uid || name}
+      primaryText={(primaryText || {}).value}
       nestedItems={attrs}
       primaryTogglesNestedList />
   )
@@ -51,7 +49,33 @@ const QueryResultView = (props) => {
 
 const QueryResult = muiThemeable()(QueryResultView)
 
-const LdapQueryToolView = ({ disabled, probeValue, probe }) => (
+const query = (conn, info, base, query) => ({
+  fetchPolicy: 'network-only',
+  query: gql`
+    query Query($conn: LdapConnection!, $info: BindUserInfo!, $base: DistinguishedName!, $query: LdapQuery!) {
+      ldap {
+        query(connection: $conn, bindInfo: $info, queryBase: $base, query: $query, maxQueryResults: 25) {
+          entries {
+            key
+            value
+          }
+        }
+      }
+    }
+  `,
+  variables: { conn, info, base, query }
+})
+
+const ids = [
+  'baseUserDn',
+  'userNameAttribute',
+  'memberAttributeReferencedInGroup',
+  'baseGroupDn',
+  'groupObjectClass',
+  'groupAttributeHoldingMember'
+]
+
+const LdapQueryToolView = ({ disabled, options = {}, client, conn, info, configs, state = [], setState }) => (
   <Card>
     <CardHeader style={{textAlign: 'center', fontSize: '1.1em'}}
       title='LDAP Query Tool'
@@ -60,20 +84,27 @@ const LdapQueryToolView = ({ disabled, probeValue, probe }) => (
       showExpandableButton
     />
     <CardActions expandable style={{margin: '5px'}}>
-      <InputAuto id='query' disabled={disabled} label='Query' />
-      <InputAuto id='queryBase' disabled={disabled} label='Query Base DN' />
+      <InputAuto id='query' options={['(objectClass=*)']} disabled={disabled} label='Query' />
+      <InputAuto id='queryBase' options={options.queryBases} disabled={disabled} label='Query Base DN' />
 
       <div style={{textAlign: 'right', marginTop: 20}}>
-        <FlatButton disabled={disabled} secondary label='run query' onClick={() => probe('/admin/beta/config/probe/ldap/query')} />
+        <FlatButton
+          secondary
+          label='run query'
+          disabled={disabled}
+          onClick={() => {
+            client.query(query(conn, info, configs.queryBase, configs.query))
+              .then(({ data }) => setState(data.ldap.query))
+          }} />
       </div>
 
         (
         <div className={styles.queryWindow}>
           <Title>Query Results</Title>
-          {probeValue.length === 0
+          {state.length === 0
                 ? 'No results'
                 : <List>
-                  {probeValue.map((v, i) => <QueryResult key={i} {...v} />)}
+                  {state.map((value, i) => <QueryResult key={i} entries={value.entries} />)}
                 </List>
             }
         </div>
@@ -83,12 +114,31 @@ const LdapQueryToolView = ({ disabled, probeValue, probe }) => (
 )
 
 const LdapQueryTool = connect(
-  (state) => ({ probeValue: getProbeValue(state) }),
-  { probe }
-)(LdapQueryToolView)
+  (state) => ({ state: getProbeValue(state) }),
+  { setState: setProbeValue }
+)(withApollo(LdapQueryToolView))
+
+const testDirectorySettings = (conn, info, settings) => ({
+  fetchPolicy: 'network-only',
+  query: gql`
+    query TestDirectorySettings($conn: LdapConnection!, $info: BindUserInfo!, $settings: LdapDirectorySettings!) {
+      ldap {
+        testDirectorySettings(connection: $conn, bindInfo: $info, directorySettings: $settings)
+      }
+    }
+  `,
+  variables: { conn, info, settings }
+})
 
 const DirectorySettings = (props) => {
   const {
+    client,
+    onError,
+    onStartSubmit,
+    onEndSubmit,
+    onClearErrors,
+    next,
+
     disabled,
     submitting,
     configs: {
@@ -96,20 +146,48 @@ const DirectorySettings = (props) => {
     } = {},
     messages = [],
 
-    prev,
-    next,
-    probe,
-    test,
-    allowSkip
+    data,
+    configs,
+
+    prev
   } = props
 
-  const isAttrStore = ldapUseCase === 'authenticationAndAttributeStore' || ldapUseCase === 'attributeStore'
+  const isAttrStore = ldapUseCase === 'AuthenticationAndAttributeStore' || ldapUseCase === 'AttributeStore'
   const nextStageId = isAttrStore ? 'attribute-mapping' : 'confirm'
+
+  let options = {}
+
+  if (data.ldap) {
+    options = data.ldap.recommendedSettings
+  }
+
+  const conn = {
+    hostname: configs.hostname,
+    port: configs.port,
+    encryption: configs.encryption
+  }
+
+  const info = {
+    creds: {
+      username: configs.bindUser,
+      password: configs.bindUserPassword
+    },
+    bindMethod: configs.bindUserMethod,
+    realm: configs.bindRealm
+  }
+
+  const settings = {
+    userNameAttribute: configs.userNameAttribute,
+    baseUserDn: configs.baseUserDn,
+    baseGroupDn: configs.baseGroupDn,
+    groupObjectClass: configs.groupObjectClass,
+    groupAttributeHoldingMember: configs.groupAttributeHoldingMember,
+    memberAttributeReferencedInGroup: configs.memberAttributeReferencedInGroup,
+    useCase: configs.ldapUseCase
+  }
 
   return (
     <Stage submitting={submitting}>
-      <Mount on={probe} probeId='dir-struct' />
-
       <Title>LDAP Directory Structure</Title>
       <Description>
         Next we need to configure the directories for users/members and decide which attributes to use.
@@ -117,50 +195,120 @@ const DirectorySettings = (props) => {
         field's drop-down menu. This page also has an LDAP Query Tool capable of executing queries
         against the connected LDAP to assist in customizing these settings.
       </Description>
-      <InputAuto id='baseUserDn' disabled={disabled} label='Base User DN'
-        tooltip='Distinguished name of the LDAP directory in which users can be found.' />
-      <InputAuto id='userNameAttribute' disabled={disabled} label='User Name Attribute'
-        tooltip='Attribute used to designate the user’s name in LDAP. Typically uid or cn.' />
-      <InputAuto visible={isAttrStore} id='memberAttributeReferencedInGroup' disabled={disabled}
-        label='Member Attribute Referenced in Groups'
-        tooltip='The attribute of the user entry that, when combined with the Base User DN,
-                 forms the reference value, e.g. XXX=jsmith,ou=users,dc=example,dc=com' />
-      <InputAuto id='baseGroupDn' disabled={disabled} label='Base Group DN'
-        tooltip='Distinguished name of the LDAP directory in which groups can be found.' />
-      <InputAuto visible={isAttrStore} id='groupObjectClass' disabled={disabled} label='LDAP Group ObjectClass'
-        tooltip='ObjectClass that defines the structure for group membership in LDAP. Typically groupOfNames.' />
-      <InputAuto visible={isAttrStore} id='groupAttributeHoldingMember' disabled={disabled}
-        label='Group Attribute Holding Member References'
-        tooltip='Multivalued-attribute on the group entry that holds references to users.' />
 
-      <LdapQueryTool disabled={disabled} />
-
-      <ActionGroup>
-        <Action
-          secondary
-          label='back'
-          onClick={prev}
-          disabled={disabled} />
-        <Action
-          primary
-          label='next'
-          onClick={test}
+      <Body>
+        <InputAuto
+          id='baseUserDn'
+          label='Base User DN'
+          tooltip='Distinguished name of the LDAP directory in which users can be found.'
           disabled={disabled}
-          testId='dir-struct'
-          nextStageId={nextStageId} />
-      </ActionGroup>
+          options={options.userDns} />
 
-      <VisibleActionMessage visible={allowSkip || false}
-        type='WARNING'
-        message='There are warnings, would you like to ignore warnings and continue anyway?'
-        label='Skip Warnings'
-        labelPosition='before'
-        icon={<NextIcon />}
-        onClick={() => next({ nextStageId })} />
+        <InputAuto
+          id='userNameAttribute'
+          label='User Name Attribute'
+          tooltip='Attribute used to designate the user’s name in LDAP. Typically uid or cn.'
+          disabled={disabled}
+          options={options.userNameAttributes} />
 
-      {messages.map((msg, i) => <Message key={i} {...msg} />)}
+        <InputAuto
+          id='memberAttributeReferencedInGroup'
+          label='Member Attribute Referenced in Groups'
+          tooltip='The attribute of the user entry that, when combined with the Base User DN, forms the reference value, e.g. XXX=jsmith,ou=users,dc=example,dc=com'
+          visible={isAttrStore}
+          disabled={disabled}
+          options={options.groupAttributesHoldingMember} />
+
+        <InputAuto
+          id='baseGroupDn'
+          label='Base Group DN'
+          tooltip='Distinguished name of the LDAP directory in which groups can be found.'
+          disabled={disabled}
+          options={options.groupsDns} />
+
+        <InputAuto
+          id='groupObjectClass'
+          label='LDAP Group ObjectClass'
+          tooltip='ObjectClass that defines the structure for group membership in LDAP. Typically groupOfNames.'
+          visible={isAttrStore}
+          disabled={disabled}
+          options={options.groupObjectClasses} />
+
+        <InputAuto
+          id='groupAttributeHoldingMember'
+          label='Group Attribute Holding Member References'
+          tooltip='Multivalued-attribute on the group entry that holds references to users.'
+          visible={isAttrStore}
+          disabled={disabled}
+          options={options.groupAttributesHoldingMember} />
+
+        <LdapQueryTool options={options} conn={conn} info={info} configs={configs} disabled={disabled} />
+
+        <Navigation>
+          <Back
+            onClick={prev}
+            disabled={disabled} />
+          <Next
+            onClick={() => {
+              onStartSubmit()
+              client.query(testDirectorySettings(conn, info, settings))
+                .then(() => {
+                  onEndSubmit()
+                  onError([])
+                  onClearErrors()
+                  next({ nextStageId })
+                })
+                .catch((err) => {
+                  onEndSubmit()
+                  onError(err.graphQLErrors.map(({ path, ...rest }) => {
+                    const id = path[path.length - 1]
+                    if (ids.includes(id)) {
+                      return { configFieldId: id, ...rest }
+                    } else {
+                      return { ...rest }
+                    }
+                  }))
+                })
+            }}
+            disabled={disabled} />
+        </Navigation>
+        {messages.map((msg, i) => <Message key={i} {...msg} />)}
+      </Body>
     </Stage>
   )
 }
 
-export default DirectorySettings
+export default graphql(gql`
+  query RecommendedSettings($conn: LdapConnection!, $info: BindUserInfo!, $type: LdapType!) {
+    ldap {
+      recommendedSettings(connection: $conn, bindInfo: $info, type: $type) {
+        userDns
+        groupsDns
+        userNameAttributes
+        groupAttributesHoldingMember
+        groupObjectClasses
+        groupAttributesHoldingMember
+        queryBases
+      }
+    }
+  }
+`, {
+  options: ({ configs }) => ({
+    variables: {
+      conn: {
+        hostname: configs.hostname,
+        port: configs.port,
+        encryption: configs.encryption
+      },
+      info: {
+        creds: {
+          username: configs.bindUser,
+          password: configs.bindUserPassword
+        },
+        bindMethod: configs.bindUserMethod,
+        realm: configs.bindRealm
+      },
+      type: configs.ldapType
+    }
+  })
+})(withApollo(DirectorySettings))

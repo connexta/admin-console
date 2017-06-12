@@ -2,22 +2,19 @@ import React from 'react'
 
 import Flexbox from 'flexbox-react'
 
-import NextIcon from 'material-ui/svg-icons/image/navigate-next'
+import { gql, withApollo } from 'react-apollo'
 
 import Stage from 'components/Stage'
 import Title from 'components/Title'
 import Description from 'components/Description'
-import Action from 'components/Action'
-import ActionGroup from 'components/ActionGroup'
 import Info from 'components/Information'
 import Message from 'components/Message'
 import MapDisplay from 'components/MapDisplay'
-import ActionMessage from 'components/ActionMessage'
-import visible from 'react-visible'
+
+import Body from 'components/wizard/Body'
+import Navigation, { Back, Finish } from 'components/wizard/Navigation'
 
 import { confirmationInfo } from './styles.less'
-
-const VisibleActionMessage = visible(ActionMessage)
 
 const useCaseMapping = {
   authentication: 'Authentication source',
@@ -25,16 +22,66 @@ const useCaseMapping = {
   authenticationAndAttributeStore: 'Authentication and attribute store'
 }
 
-export default (props) => {
+const createLdapConfig = (conn, info, settings, mapping) => ({
+  mutation: gql`
+    mutation CreateLdapConfig(
+      $conn: LdapConnection,
+      $info: BindUserInfo,
+      $settings: LdapDirectorySettings,
+      $mapping: [ClaimsMapEntry]
+    ) {
+      createLdapConfig(config: {
+        connection: $conn,
+        bindInfo: $info,
+        directorySettings: $settings,
+        claimsMapping: $mapping
+      })
+    }
+  `,
+  variables: { conn, info, settings, mapping }
+})
+
+const ConfirmStage = (props) => {
   const {
+    client,
+    onError,
+    onStartSubmit,
+    onEndSubmit,
+    next,
+
     disabled,
     prev,
-    persist,
     submitting,
     messages = [],
-    configs,
-    allowSkip
+    configs
   } = props
+
+  const conn = {
+    hostname: configs.hostname,
+    port: configs.port,
+    encryption: configs.encryption
+  }
+
+  const info = {
+    creds: {
+      username: configs.bindUser,
+      password: configs.bindUserPassword
+    },
+    bindMethod: configs.bindUserMethod,
+    realm: configs.bindRealm
+  }
+
+  const settings = {
+    userNameAttribute: configs.userNameAttribute,
+    baseUserDn: configs.baseUserDn,
+    baseGroupDn: configs.baseGroupDn,
+    groupObjectClass: configs.groupObjectClass,
+    groupAttributeHoldingMember: configs.groupAttributeHoldingMember,
+    memberAttributeReferencedInGroup: configs.memberAttributeReferencedInGroup,
+    useCase: configs.ldapUseCase
+  }
+
+  const mapping = Object.keys(configs.attributeMappings).map((key) => ({ key, value: configs.attributeMappings[key] }))
 
   return (
     <Stage submitting={submitting}>
@@ -49,9 +96,9 @@ export default (props) => {
         <Flexbox flexDirection='row' justifyContent='space-between'>
           <Flexbox className={confirmationInfo} flexDirection='column'>
             <Info label='LDAP Function' value={useCaseMapping[configs.ldapUseCase]} />
-            <Info label='Hostname' value={configs.hostName} />
+            <Info label='Hostname' value={configs.hostname} />
             <Info label='Port' value={configs.port} />
-            <Info label='Encryption Method' value={configs.encryptionMethod} />
+            <Info label='Encryption Method' value={configs.encryption} />
             <Info label='Base User DN' value={configs.baseUserDn} />
             <Info label='User Name Attribute' value={configs.userNameAttribute} />
           </Flexbox>
@@ -72,36 +119,31 @@ export default (props) => {
           mapping={configs.attributeMappings} />
       </Flexbox>
 
-      <ActionGroup>
-        <Action
-          secondary
-          label='back'
-          onClick={prev}
-          disabled={disabled} />
-        <Action
-          primary
-          label='save'
-          onClick={persist}
-          ignoreWarnings={false}
-          disabled={disabled}
-          persistId='create'
-          nextStageId='final-stage' />
-      </ActionGroup>
-
-      {messages.map((msg, i) => <Message key={i} {...msg} />)}
-
-      <VisibleActionMessage visible={allowSkip || false}
-        type='WARNING'
-        message='There are warnings, would you like to ignore warnings and persist?'
-        label='Ignore and Save'
-        labelPosition='before'
-        icon={<NextIcon />}
-        onClick={() => persist({
-          ignoreWarnings: true,
-          persistId: 'create',
-          nextStageId: 'final-stage'
-        })} />
-
+      <Body>
+        <Navigation>
+          <Back
+            onClick={prev}
+            disabled={disabled} />
+          <Finish
+            onClick={() => {
+              onStartSubmit()
+              client.mutate(createLdapConfig(conn, info, settings, mapping))
+                .then(() => {
+                  onEndSubmit()
+                  onError([])
+                  next({ nextStageId: 'final-stage' })
+                })
+                .catch((err) => {
+                  onEndSubmit()
+                  onError(err.graphQLErrors)
+                })
+            }}
+            disabled={disabled} />
+        </Navigation>
+        {messages.map((msg, i) => <Message key={i} {...msg} />)}
+      </Body>
     </Stage>
   )
 }
+
+export default withApollo(ConfirmStage)

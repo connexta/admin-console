@@ -56,7 +56,6 @@ const ConfirmationStageView = (props) => {
         <Info label='Source Address' value={config.endpointUrl} />
         <Info label='Username' value={inputConfigs.sourceUserName || 'none'} />
         <Info label='Password' value={inputConfigs.sourceUserPassword ? '*****' : 'none'} />
-        { messages.map((msg, i) => <Message key={i} message={msg} type='FAILURE' />) }
         <Navigation>
           <Back onClick={() => changeStage('sourceSelectionStage')} />
           <Finish
@@ -74,6 +73,7 @@ const ConfirmationStageView = (props) => {
               })
             }} />
         </Navigation>
+        { messages.map((msg, i) => <Message key={i} message={msg} type='FAILURE' />) }
       </Body>
     </div>
   )

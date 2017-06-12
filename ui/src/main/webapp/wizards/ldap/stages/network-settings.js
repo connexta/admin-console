@@ -1,13 +1,16 @@
 import React from 'react'
 
+import { gql, withApollo } from 'react-apollo'
+
 import Mount from 'react-mount'
 
 import Stage from 'components/Stage'
 import Title from 'components/Title'
 import Description from 'components/Description'
-import Action from 'components/Action'
-import ActionGroup from 'components/ActionGroup'
 import Message from 'components/Message'
+
+import Body from 'components/wizard/Body'
+import Navigation, { Back, Next } from 'components/wizard/Navigation'
 
 import {
   Hostname,
@@ -15,13 +18,30 @@ import {
   Select
 } from 'admin-wizard/inputs'
 
+const testConnect = (conn) => ({
+  fetchPolicy: 'network-only',
+  query: gql`
+    query TestConnect($conn: LdapConnection!) {
+      ldap {
+        testConnect(connection: $conn)
+      }
+    }
+  `,
+  variables: { conn }
+})
+
 const NetworkSettings = (props) => {
   const {
+    client,
     setDefaults,
     prev,
-    test,
+    next,
     submitting,
     disabled,
+    configs,
+    onError,
+    onStartSubmit,
+    onEndSubmit,
     messages = []
   } = props
 
@@ -30,7 +50,7 @@ const NetworkSettings = (props) => {
       <Mount
         on={setDefaults}
         port={636}
-        encryptionMethod='LDAPS' />
+        encryption='ldaps' />
       <Title>LDAP Network Settings</Title>
       <Description>
         To establish a connection to the remote LDAP store, we need the hostname of the
@@ -39,31 +59,42 @@ const NetworkSettings = (props) => {
         StartTLS.
       </Description>
 
-      <Hostname id='hostName' disabled={disabled} autoFocus />
-      <Port id='port' disabled={disabled} options={[389, 636]} />
-      <Select id='encryptionMethod'
-        label='Encryption Method'
-        disabled={disabled}
-        options={[ 'None', 'LDAPS', 'StartTLS' ]} />
-
-      <ActionGroup>
-        <Action
-          secondary
-          label='back'
-          onClick={prev}
-          disabled={disabled} />
-        <Action
-          primary
-          label='next'
-          onClick={test}
+      <Body>
+        <Hostname id='hostname' disabled={disabled} autoFocus />
+        <Port id='port' disabled={disabled} options={[389, 636]} />
+        <Select id='encryption'
+          label='Encryption Method'
           disabled={disabled}
-          nextStageId='bind-settings'
-          testId='connection' />
-      </ActionGroup>
+          options={[ 'none', 'ldaps', 'startTls' ]} />
 
-      {messages.map((msg, i) => <Message key={i} {...msg} />)}
+        <Navigation>
+          <Back
+            onClick={prev}
+            disabled={disabled} />
+          <Next
+            onClick={() => {
+              onStartSubmit()
+              client.query(testConnect({
+                hostname: configs.hostname,
+                port: configs.port,
+                encryption: configs.encryption
+              }))
+                .then(() => {
+                  onEndSubmit()
+                  onError([])
+                  next({ nextStageId: 'bind-settings' })
+                })
+                .catch((err) => {
+                  onEndSubmit()
+                  onError(err.graphQLErrors)
+                })
+            }}
+            disabled={disabled} />
+        </Navigation>
+        {messages.map((msg, i) => <Message key={i} {...msg} />)}
+      </Body>
     </Stage>
   )
 }
 
-export default NetworkSettings
+export default withApollo(NetworkSettings)

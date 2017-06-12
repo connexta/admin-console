@@ -17,7 +17,7 @@ import visible from 'react-visible'
 
 import Flexbox from 'flexbox-react'
 
-const mapStateToProps = (state, { id }) => getConfig(state, id)
+const mapStateToProps = (state, { id, ...rest }) => ({ ...getConfig(state, id), ...rest })
 
 const mapDispatchToProps = (dispatch, { id }) => ({
   onEdit: (value) => dispatch(editConfig(id, value))
@@ -119,8 +119,8 @@ const InputAutoView = ({ value = '', options = [], type = 'text', message = {}, 
 
 const InputAuto = visible(connect(mapStateToProps, mapDispatchToProps)(muiThemeable()(InputAutoView)))
 
-const Port = ({ value = 0, label = 'Port', ...rest }) => (
-  <InputAuto type='number' value={value} label={label} {...rest} />
+const Port = ({ label = 'Port', ...rest }) => (
+  <InputAuto type='number' label={label} {...rest} />
 )
 
 const SelectView = ({ value = '', options = [], label = 'Select', onEdit, error, tooltip, ...rest }) => {

@@ -1,13 +1,14 @@
 import React from 'react'
 
-import Mount from 'react-mount'
+import { gql, withApollo } from 'react-apollo'
 
 import Stage from 'components/Stage'
 import Title from 'components/Title'
 import Description from 'components/Description'
-import Action from 'components/Action'
-import ActionGroup from 'components/ActionGroup'
 import Message from 'components/Message'
+
+import Body from 'components/wizard/Body'
+import Navigation, { Back, Finish } from 'components/wizard/Navigation'
 
 const useCaseDescription = (ldapUseCase) => {
   switch (ldapUseCase) {
@@ -20,8 +21,23 @@ const useCaseDescription = (ldapUseCase) => {
   }
 }
 
+const installEmbeddedLdap = (useCase) => ({
+  mutation: gql`
+    mutation InstallEmbeddedLdap($useCase: LdapUseCase!) {
+      installEmbeddedLdap(useCase: $useCase)
+    }
+  `,
+  variables: { useCase }
+})
+
 const ConfigureEmbeddedLdap = (props) => {
   const {
+    client,
+    onError,
+    onStartSubmit,
+    onEndSubmit,
+    next,
+
     disabled,
     submitting,
     configs: {
@@ -29,19 +45,11 @@ const ConfigureEmbeddedLdap = (props) => {
     } = {},
     messages = [],
 
-    prev,
-    setDefaults,
-    persist
+    prev
   } = props
 
   return (
     <Stage submitting={submitting}>
-      <Mount on={setDefaults}
-        embeddedLdapPort={1389}
-        embeddedLdapsPort={1636}
-        embeddedLdapAdminPort={4444}
-        embeddedLdapStorageLocation='etc/org.codice.opendj/ldap'
-        ldifPath='etc/org.codice.opendj/ldap' />
       <Title>Are You Sure You Want to Install Embedded LDAP?</Title>
       <Description>
         { /* todo - add a 'warning-style' box around this <p/> */ }
@@ -54,26 +62,31 @@ const ConfigureEmbeddedLdap = (props) => {
           configure it as a {useCaseDescription(ldapUseCase)}.
         </p>
       </Description>
-      <ActionGroup>
-        <Action
-          secondary
-          label='back'
-          onClick={prev}
-          disabled={disabled} />
-        <Action
-          primary
-          label='save'
-          onClick={persist}
-          disabled={disabled}
-          nextStageId='final-stage'
-          configHandlerId='embedded-ldap'
-          configurationType='embedded-ldap'
-          persistId='defaults' />
-      </ActionGroup>
-
-      {messages.map((msg, i) => <Message key={i} {...msg} />)}
+      <Body>
+        <Navigation>
+          <Back
+            onClick={prev}
+            disabled={disabled} />
+          <Finish
+            onClick={() => {
+              onStartSubmit()
+              client.mutate(installEmbeddedLdap(ldapUseCase))
+                .then(() => {
+                  onEndSubmit()
+                  onError([])
+                  next({ nextStageId: 'final-stage' })
+                })
+                .catch((err) => {
+                  onEndSubmit()
+                  onError(err.graphQLErrors)
+                })
+            }}
+            disabled={disabled} />
+        </Navigation>
+        {messages.map((msg, i) => <Message key={i} {...msg} />)}
+      </Body>
     </Stage>
   )
 }
 
-export default ConfigureEmbeddedLdap
+export default withApollo(ConfigureEmbeddedLdap)

@@ -2,12 +2,27 @@ import React from 'react'
 
 import Mount from 'react-mount'
 
+import { gql, withApollo } from 'react-apollo'
+
+const testBind = (conn, info) => ({
+  fetchPolicy: 'network-only',
+  query: gql`
+    query TestBind($conn: LdapConnection!, $info: BindUserInfo!) {
+      ldap {
+        testBind(connection: $conn, bindInfo: $info)
+      }
+    }
+  `,
+  variables: { conn, info }
+})
+
 import Stage from 'components/Stage'
 import Title from 'components/Title'
 import Description from 'components/Description'
-import Action from 'components/Action'
-import ActionGroup from 'components/ActionGroup'
 import Message from 'components/Message'
+
+import Body from 'components/wizard/Body'
+import Navigation, { Back, Next } from 'components/wizard/Navigation'
 
 import {
   Input,
@@ -17,6 +32,11 @@ import {
 
 const BindSettings = (props) => {
   const {
+    client,
+    onError,
+    onStartSubmit,
+    onEndSubmit,
+    next,
     // data
     disabled,
     submitting,
@@ -28,7 +48,6 @@ const BindSettings = (props) => {
 
     // actions
     prev,
-    test,
     setDefaults
   } = props
 
@@ -58,39 +77,57 @@ const BindSettings = (props) => {
         The requirements for different LDAP servers vary; please contact your LDAP administrator if you need guidance.
       </Description>
 
-      <Input id='bindUser' disabled={disabled} label='Bind User' />
-      <Password id='bindUserPassword' disabled={disabled} label='Bind User Password' />
-      <Select id='bindUserMethod'
-        label='Bind User Method'
-        disabled={disabled}
-        options={bindUserMethodOptions} />
-      {/* removed options: 'SASL', 'GSSAPI SASL' */}
-      {/* TODO GSSAPI SASL only */}
-      {/* <Input id='bindKdcAddress' disabled={disabled} label='KDC Address (for Kerberos authentication)' /> */}
-      {/* TODO GSSAPI and Digest MD5 SASL only */}
-      {/* Realm is needed for Kerberos and MD5 auth, currently only MD5 is supported by the wizard */}
-      <Input visible={bindUserMethod === 'Digest MD5 SASL'} id='bindRealm'
-        disabled={disabled} label='Realm (for Digest MD5 authentication)' />
-
-      <ActionGroup>
-        <Action
-          secondary
-          label='back'
-          onClick={prev}
-          disabled={disabled} />
-        <Action
-          primary
-          label='next'
-          onClick={test}
+      <Body>
+        <Input id='bindUser' disabled={disabled} label='Bind User' />
+        <Password id='bindUserPassword' disabled={disabled} label='Bind User Password' />
+        <Select id='bindUserMethod'
+          label='Bind User Method'
           disabled={disabled}
-          nextStageId='directory-settings'
-          testId='bind' />
-      </ActionGroup>
+          options={bindUserMethodOptions} />
+        {/* removed options: 'SASL', 'GSSAPI SASL' */}
+        {/* TODO GSSAPI SASL only */}
+        {/* <Input id='bindKdcAddress' disabled={disabled} label='KDC Address (for Kerberos authentication)' /> */}
+        {/* TODO GSSAPI and Digest MD5 SASL only */}
+        {/* Realm is needed for Kerberos and MD5 auth, currently only MD5 is supported by the wizard */}
+        <Input visible={bindUserMethod === 'Digest MD5 SASL'} id='bindRealm'
+          disabled={disabled} label='Realm (for Digest MD5 authentication)' />
 
-      {messages.map((msg, i) => <Message key={i} {...msg} />)}
+        <Navigation>
+          <Back
+            onClick={prev}
+            disabled={disabled} />
+          <Next
+            onClick={() => {
+              onStartSubmit()
+              client.query(testBind({
+                hostname: configs.hostname,
+                port: configs.port,
+                encryption: configs.encryption
+              }, {
+                creds: {
+                  username: configs.bindUser,
+                  password: configs.bindUserPassword
+                },
+                bindMethod: configs.bindUserMethod,
+                realm: configs.bindRealm
+              }))
+                .then(() => {
+                  onEndSubmit()
+                  onError([])
+                  next({ nextStageId: 'directory-settings' })
+                })
+                .catch((err) => {
+                  onEndSubmit()
+                  onError(err.graphQLErrors)
+                })
+            }}
+            disabled={disabled} />
+        </Navigation>
+        {messages.map((msg, i) => <Message key={i} {...msg} />)}
+      </Body>
     </Stage>
   )
 }
 
-export default BindSettings
+export default withApollo(BindSettings)
 

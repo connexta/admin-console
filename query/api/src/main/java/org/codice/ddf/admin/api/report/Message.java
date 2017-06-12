@@ -16,7 +16,6 @@ package org.codice.ddf.admin.api.report;
 import java.util.List;
 
 public interface Message {
-    MessageType getType();
 
     String getCode();
 
@@ -25,8 +24,4 @@ public interface Message {
     Message setPath(List<String> path);
 
     Message copy();
-
-    enum MessageType {
-        WARNING, ERROR
-    }
 }

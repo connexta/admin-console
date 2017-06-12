@@ -13,20 +13,46 @@
  **/
 package org.codice.ddf.admin.common.report.message;
 
+import java.util.LinkedList;
 import java.util.List;
 
-public class ErrorMessage extends BaseMessage {
+import org.codice.ddf.admin.api.report.Message;
+
+public class ErrorMessage implements Message {
+
+    private String code;
+
+    private List<String> path;
 
     public ErrorMessage(String code) {
-        super(MessageType.ERROR, code);
+        this.code = code;
+        path = new LinkedList<>();
     }
 
     public ErrorMessage(String code, String pathOrigin) {
-        super(MessageType.ERROR, code, pathOrigin);
+        this(code);
+        path.add(pathOrigin);
     }
 
     public ErrorMessage(String code, List<String> path) {
-        super(MessageType.ERROR, code, path);
+        this(code);
+        this.path.addAll(path);
+    }
+
+    @Override
+    public String getCode() {
+        return code;
+    }
+
+    @Override
+    public List<String> getPath() {
+        return path;
+    }
+
+    @Override
+    public Message setPath(List<String> path) {
+        this.path = path;
+        return this;
     }
 
     @Override

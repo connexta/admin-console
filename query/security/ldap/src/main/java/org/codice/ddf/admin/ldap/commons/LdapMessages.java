@@ -14,7 +14,6 @@
 package org.codice.ddf.admin.ldap.commons;
 
 import org.codice.ddf.admin.common.report.message.ErrorMessage;
-import org.codice.ddf.admin.common.report.message.WarningMessage;
 
 public class LdapMessages {
 
@@ -25,11 +24,11 @@ public class LdapMessages {
     public static final ErrorMessage BASE_USER_DN_NOT_FOUND = new ErrorMessage("BASE_USER_DN_NOT_FOUND");
     public static final ErrorMessage BASE_GROUP_DN_NOT_FOUND = new ErrorMessage("BASE_GROUP_DN_NOT_FOUND");
 
-    public static final WarningMessage NO_USERS_IN_BASE_USER_DN = new WarningMessage("NO_USERS_IN_BASE_USER_DN");
-    public static final WarningMessage NO_GROUPS_IN_BASE_GROUP_DN = new WarningMessage("NO_GROUPS_IN_BASE_GROUP_DN");
-    public static final WarningMessage NO_GROUPS_WITH_MEMBERS = new WarningMessage("NO_GROUPS_WITH_MEMBERS");
-    public static final WarningMessage NO_REFERENCED_MEMBER = new WarningMessage("NO_REFERENCED_MEMBER");
-    public static final WarningMessage USER_NAME_ATTRIBUTE_NOT_FOUND = new WarningMessage("USER_NAME_ATTRIBUTE_NOT_FOUND");
+    public static final ErrorMessage NO_USERS_IN_BASE_USER_DN = new ErrorMessage("NO_USERS_IN_BASE_USER_DN");
+    public static final ErrorMessage NO_GROUPS_IN_BASE_GROUP_DN = new ErrorMessage("NO_GROUPS_IN_BASE_GROUP_DN");
+    public static final ErrorMessage NO_GROUPS_WITH_MEMBERS = new ErrorMessage("NO_GROUPS_WITH_MEMBERS");
+    public static final ErrorMessage NO_REFERENCED_MEMBER = new ErrorMessage("NO_REFERENCED_MEMBER");
+    public static final ErrorMessage USER_NAME_ATTRIBUTE_NOT_FOUND = new ErrorMessage("USER_NAME_ATTRIBUTE_NOT_FOUND");
 
     public static ErrorMessage invalidDnFormatError(String pathOrigin) {
         return  new ErrorMessage("INVALID_DN", pathOrigin);

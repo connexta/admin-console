@@ -13,23 +13,31 @@
  **/
 package org.codice.ddf.admin.common.fields.base.scalar;
 
+import org.codice.ddf.admin.api.fields.ScalarField;
 import org.codice.ddf.admin.common.fields.base.BaseDataType;
 
-public abstract class BaseScalarField<T> extends BaseDataType<T> {
+public abstract class BaseScalarField<T> extends BaseDataType<T> implements ScalarField<T> {
 
     private T value;
+    private ScalarType scalarType;
 
-    public BaseScalarField(String fieldName, String fieldTypeName, String description,
-            FieldBaseType fieldBaseType) {
-        super(fieldName, fieldTypeName, description, fieldBaseType);
+    public BaseScalarField(String fieldName, String fieldTypeName, String description, ScalarType scalarType) {
+        super(fieldName, fieldTypeName, description);
+        this.scalarType = scalarType;
     }
 
     public T getValue() {
         return value;
     }
 
+
     @Override
     public void setValue(T value) {
         this.value = value;
+    }
+
+    @Override
+    public ScalarType scalarType() {
+        return scalarType;
     }
 }

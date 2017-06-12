@@ -19,13 +19,7 @@
         <reference-listener bind-method="bindFieldProvider" unbind-method="unbindFieldProvider" ref="graphQLServlet"/>
     </reference-list>
 
-    <reference id="configuratorFactory"
-               interface="org.codice.ddf.admin.configurator.ConfiguratorFactory"
-               availability="mandatory" filter="(type=txact)"/>
-
-    <bean id="graphQLServlet" class="org.codice.ddf.admin.graphql.GraphQLServletImpl" >
-        <property name="fieldProviders" ref="fieldProviders" />
-    </bean>
+    <bean id="graphQLServlet" class="org.codice.ddf.admin.graphql.servlet.ExtendedOsgiGraphQLServlet" />
 
     <service ref="graphQLServlet" interface="javax.servlet.Servlet" >
         <service-properties>

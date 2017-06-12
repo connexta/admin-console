@@ -27,35 +27,6 @@
     <packaging>bundle</packaging>
 
     <dependencies>
-        <!--graphql-dependencies-->
-        <dependency>
-            <groupId>com.graphql-java</groupId>
-            <artifactId>graphql-java</artifactId>
-            <version>2.3.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.16.6</version>
-        </dependency>
-        <dependency>
-            <groupId>org.antlr</groupId>
-            <artifactId>antlr4-runtime</artifactId>
-            <version>4.5.1</version>
-        </dependency>
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>3.1.0</version>
-            <!-- TODO: Change to <version>${servlet-api.version}</version>-->
-        </dependency>
-        <dependency>
-            <groupId>org.codice.ddf.admin.beta</groupId>
-            <artifactId>graphql-dependencies</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <!--end graphql-dependencies-->
-
         <!--test dependencies-->
         <dependency>
             <groupId>org.springframework</groupId>
@@ -70,16 +41,43 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-core</artifactId>
-            <version>2.8.4</version>
+            <groupId>org.codice.ddf.admin.beta</groupId>
+            <artifactId>admin-query-common</artifactId>
+            <version>${project.version}</version>
             <scope>test</scope>
+        </dependency>
+        <!--end test dependencies-->
+
+        <!--start graphql dependencies-->
+        <dependency>
+            <groupId>com.graphql-java</groupId>
+            <artifactId>graphql-java</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.graphql-java</groupId>
+            <artifactId>graphql-java-servlet</artifactId>
+            <version>4.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.graphql-java</groupId>
+            <artifactId>graphql-java-annotations</artifactId>
+            <version>0.13.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.16.8</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.0.1</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.8.4</version>
-            <scope>test</scope>
+            <version>2.8.8</version>
         </dependency>
         <dependency>
             <groupId>org.codice.ddf.admin.beta</groupId>
@@ -96,16 +94,22 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>ddf.admin</groupId>
-            <artifactId>admin-configurator-api</artifactId>
-            <version>${ddf.version}</version>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.5</version>
         </dependency>
         <dependency>
-            <groupId>org.codice.ddf.admin.beta</groupId>
-            <artifactId>admin-query-common</artifactId>
-            <version>${project.version}</version>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+            <version>3.2.2</version>
+        </dependency>
+        <dependency>
+            <groupId>io.fastjson</groupId>
+            <artifactId>boon</artifactId>
+            <version>0.34</version>
         </dependency>
     </dependencies>
+
     <build>
         <plugins>
             <plugin>
@@ -114,19 +118,22 @@
                 <configuration>
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}-beta</Bundle-SymbolicName>
-                        <Service-Component />
-                        <Embed-Dependency>
-                            graphql-java,
-                            lombok,
-                            antlr4-runtime,
-                            graphql-dependencies,
-                            admin-query-common
-                        </Embed-Dependency>
                         <Import-Package>
+                            !com.sun.tools.javac*,
                             !org.apache.tools.ant*,
                             !org.eclipse.*,
                             *
                         </Import-Package>
+                        <Embed-Dependency>
+                            graphql-java,
+                            lombok,
+
+                            graphql-java-annotations,
+                            graphql-java-servlet
+                        </Embed-Dependency>
+
+                        <!--graphql-servlet uses SCR, an alternative to blueprint. The line below overrides the service declarations-->
+                        <_dsannotations/>
                     </instructions>
                 </configuration>
             </plugin>
@@ -151,7 +158,7 @@
                         <configuration>
                             <rules>
                                 <ArtifactSizeEnforcerRule implementation="org.codice.ddf.admin.beta.enforcer.ArtifactSizeEnforcerRule">
-                                    <maxArtifactSize>2_MB</maxArtifactSize>
+                                    <maxArtifactSize>1.9_MB</maxArtifactSize>
                                 </ArtifactSizeEnforcerRule>
                             </rules>
                         </configuration>
@@ -169,6 +176,9 @@
                         </goals>
                         <configuration>
                             <haltOnFailure>true</haltOnFailure>
+                            <excludes>
+                                <exclude>**/Delegate**</exclude>
+                            </excludes>
                             <rules>
                                 <rule>
                                     <element>BUNDLE</element>
@@ -176,17 +186,17 @@
                                         <limit>
                                             <counter>INSTRUCTION</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.00</minimum>
+                                            <minimum>0.70</minimum>
                                         </limit>
                                         <limit>
                                             <counter>BRANCH</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.00</minimum>
+                                            <minimum>0.61</minimum>
                                         </limit>
                                         <limit>
                                             <counter>COMPLEXITY</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.00</minimum>
+                                            <minimum>0.63</minimum>
                                         </limit>
                                     </limits>
                                 </rule>

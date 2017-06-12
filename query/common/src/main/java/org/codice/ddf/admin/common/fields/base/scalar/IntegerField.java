@@ -13,7 +13,7 @@
  **/
 package org.codice.ddf.admin.common.fields.base.scalar;
 
-import static org.codice.ddf.admin.api.DataType.FieldBaseType.INTEGER;
+import static org.codice.ddf.admin.api.fields.ScalarField.ScalarType.INTEGER;
 
 public class IntegerField extends BaseScalarField<Integer> {
 

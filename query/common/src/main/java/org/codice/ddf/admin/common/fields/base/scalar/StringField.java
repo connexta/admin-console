@@ -13,7 +13,7 @@
  **/
 package org.codice.ddf.admin.common.fields.base.scalar;
 
-import static org.codice.ddf.admin.api.DataType.FieldBaseType.STRING;
+import static org.codice.ddf.admin.api.fields.ScalarField.ScalarType.STRING;
 import static org.codice.ddf.admin.common.report.message.DefaultMessages.emptyFieldError;
 
 import java.util.List;

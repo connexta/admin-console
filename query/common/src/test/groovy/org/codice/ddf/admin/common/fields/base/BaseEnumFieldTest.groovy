@@ -47,6 +47,6 @@ class BaseEnumFieldTest extends Specification {
         then:
         validationMsgs.size() == 1
         validationMsgs.get(0).getCode() == DefaultMessages.UNSUPPORTED_ENUM
-        validationMsgs.get(0).getPath() == [TestEnumField.TEST_FIELD_NAME]
+        validationMsgs.get(0).getPath() == [TestEnumField.DEFAULT_FIELD_NAME]
     }
 }

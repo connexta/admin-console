@@ -73,8 +73,6 @@ public class ReportImpl implements Report {
     }
 
     public boolean containsErrorMsgs() {
-        return messages().stream()
-                .map(Message::getType)
-                .anyMatch(Message.MessageType.ERROR::equals);
+        return !messages().isEmpty();
     }
 }

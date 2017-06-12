@@ -13,7 +13,6 @@
  **/
 package org.codice.ddf.admin.common.fields.base;
 
-import static org.codice.ddf.admin.api.DataType.FieldBaseType.LIST;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -38,7 +37,7 @@ public class ListFieldImpl<T extends DataType> extends BaseDataType<List>
     protected T listFieldType;
 
     public ListFieldImpl(String fieldName, Class<T> listFieldType) {
-        super(fieldName, null, null, LIST);
+        super(fieldName, null, null);
         this.fields = new ArrayList<>();
         try {
             this.listFieldType = listFieldType.newInstance();
@@ -48,7 +47,7 @@ public class ListFieldImpl<T extends DataType> extends BaseDataType<List>
     }
 
     public ListFieldImpl(String fieldName, T listFieldType) {
-        super(fieldName, null, null, LIST);
+        super(fieldName, null, null);
         this.fields = new ArrayList<>();
         this.listFieldType = listFieldType;
     }

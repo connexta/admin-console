@@ -25,28 +25,19 @@ public class BaseDataType<T> extends BaseField<T, T> implements DataType<T> {
 
     private String fieldTypeName;
 
-    private FieldBaseType fieldBaseType;
-
     private boolean isRequired;
 
     private T value;
 
-    public BaseDataType(String fieldName, String fieldTypeName, String description,
-            FieldBaseType fieldBaseType) {
+    public BaseDataType(String fieldName, String fieldTypeName, String description) {
         super(fieldName, description);
         this.fieldTypeName = fieldTypeName;
-        this.fieldBaseType = fieldBaseType;
         isRequired = false;
     }
 
     @Override
     public String fieldTypeName() {
         return fieldTypeName;
-    }
-
-    @Override
-    public FieldBaseType baseDataType() {
-        return fieldBaseType;
     }
 
     @Override

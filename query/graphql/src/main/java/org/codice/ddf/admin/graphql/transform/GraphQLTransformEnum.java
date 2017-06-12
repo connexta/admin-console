@@ -11,50 +11,40 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.graphql.common;
+package org.codice.ddf.admin.graphql.transform;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
 import org.codice.ddf.admin.api.DataType;
-import org.codice.ddf.admin.api.FieldProvider;
 import org.codice.ddf.admin.api.fields.EnumField;
-import org.codice.ddf.admin.graphql.GraphQLProviderImpl;
 
 import graphql.schema.GraphQLEnumType;
 
-public class GraphQLTransformCommons {
+public class GraphQLTransformEnum {
+    private Map<String, GraphQLEnumType> predefinedEnums;
 
-    private GraphQLTransformOutput transformOutput;
-
-    public GraphQLTransformCommons() {
-        transformOutput = new GraphQLTransformOutput();
+    public GraphQLTransformEnum() {
+        this.predefinedEnums = new HashMap<>();
     }
 
-    public static GraphQLEnumType enumFieldToGraphQLEnumType(EnumField field) {
+    public GraphQLEnumType enumFieldToGraphQLEnumType(EnumField field) {
+
+        if(predefinedEnums.containsKey(field.fieldTypeName())) {
+            return predefinedEnums.get(field.fieldTypeName());
+        }
+
         GraphQLEnumType.Builder builder = GraphQLEnumType.newEnum()
-                .name(capitalize(field.fieldTypeName()))
+                .name(GraphQLTransformCommons.capitalize(field.fieldTypeName()))
                 .description(field.description());
 
         field.getEnumValues()
                 .forEach(val -> builder.value(((DataType) val).fieldName(),
                         ((DataType) val).getValue(),
                         ((DataType) val).description()));
-        return builder.build();
-    }
 
-    public static String capitalize(String str) {
-        return StringUtils.capitalize(str);
-    }
-
-    public GraphQLProviderImpl fieldProviderToGraphQLProvider(FieldProvider provider) {
-        return new GraphQLProviderImpl(provider, transformOutput);
-    }
-
-    public List<GraphQLProviderImpl> fieldProvidersToGraphQLProviders(List<FieldProvider> providers) {
-        return providers.stream()
-                .map(this::fieldProviderToGraphQLProvider)
-                .collect(Collectors.toList());
+        GraphQLEnumType newEnum = builder.build();
+        predefinedEnums.put(field.fieldTypeName(), newEnum);
+        return newEnum;
     }
 }

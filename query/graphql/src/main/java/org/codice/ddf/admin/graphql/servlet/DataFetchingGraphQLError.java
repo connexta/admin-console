@@ -11,7 +11,9 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.graphql;
+package org.codice.ddf.admin.graphql.servlet;
+
+import static graphql.ErrorType.DataFetchingException;
 
 import java.util.List;
 
@@ -21,21 +23,23 @@ import graphql.ErrorType;
 import graphql.GraphQLError;
 import graphql.language.SourceLocation;
 
-public class GraphQLErrorMessageWrapper implements GraphQLError {
+public class DataFetchingGraphQLError implements GraphQLError {
 
-    private Message message;
+    private String code;
+    private List<String> path;
 
-    public GraphQLErrorMessageWrapper(Message message) {
-        this.message = message;
-    }
-
-    public Message getQueryProviderError() {
-        return message;
+    public DataFetchingGraphQLError(Message msg) {
+        this.code = msg.getCode();
+        this.path = msg.getPath();
     }
 
     @Override
     public String getMessage() {
-        return null;
+        return code;
+    }
+
+    public List<String> getPath() {
+        return path;
     }
 
     @Override
@@ -45,6 +49,6 @@ public class GraphQLErrorMessageWrapper implements GraphQLError {
 
     @Override
     public ErrorType getErrorType() {
-        return null;
+        return DataFetchingException;
     }
 }

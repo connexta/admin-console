@@ -11,26 +11,15 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.common.report.message;
+package org.codice.ddf.admin.api.fields;
 
-import org.codice.ddf.admin.common.fields.base.scalar.StringField;
+import org.codice.ddf.admin.api.DataType;
 
-public class MessageCodeField extends StringField {
+public interface ScalarField<S> extends DataType<S> {
 
-    public static final String FIELD_NAME = "code";
+    ScalarType scalarType();
 
-    public static final String FIELD_TYPE_NAME = "MessageCode";
-
-    public static final String DESCRIPTION =
-            "An encapsulating description of what the message means.";
-
-    public MessageCodeField() {
-        super(FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
-    }
-
-    @Override
-    public MessageCodeField isRequired(boolean required) {
-        super.isRequired(required);
-        return this;
+    enum ScalarType {
+        STRING, INTEGER, FLOAT, BOOLEAN
     }
 }

@@ -13,7 +13,6 @@
  **/
 package org.codice.ddf.admin.common.fields.base;
 
-import static org.codice.ddf.admin.api.DataType.FieldBaseType.ENUM;
 import static org.codice.ddf.admin.common.report.message.DefaultMessages.unsupportedEnum;
 
 import java.util.List;
@@ -31,7 +30,7 @@ public abstract class BaseEnumField<S> extends BaseDataType<S>
 
     public BaseEnumField(String fieldName, String fieldTypeName, String description,
             List<DataType<S>> enumValues) {
-        super(fieldName, fieldTypeName, description, ENUM);
+        super(fieldName, fieldTypeName, description);
         this.enumValues = enumValues;
     }
 

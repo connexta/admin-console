@@ -33,11 +33,4 @@ public interface DataType<T> extends Field<T, T> {
     DataType<T> isRequired(boolean required);
 
     DataType<T> matchRequired(DataType<T> fieldToMatch);
-
-    // TODO: tbatie - 5/13/17 - Remove this baseDataType, replace with interface checks. These should be moved to a scalar field or something
-    FieldBaseType baseDataType();
-
-    enum FieldBaseType {
-        STRING, INTEGER, FLOAT, BOOLEAN, LIST, OBJECT, ENUM, UNION
-    }
 }

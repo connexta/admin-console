@@ -13,8 +13,6 @@
  **/
 package org.codice.ddf.admin.common.fields.base;
 
-import static org.codice.ddf.admin.api.DataType.FieldBaseType.OBJECT;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -31,14 +29,8 @@ import org.codice.ddf.admin.api.report.Message;
 public abstract class BaseObjectField extends BaseDataType<Map<String, Object>>
         implements ObjectField {
 
-    // TODO: tbatie - 5/21/17 - Remove the baseType field once unions are moved to interfaces
-    protected BaseObjectField(String fieldName, String fieldTypeName, String description,
-            FieldBaseType baseType) {
-        super(fieldName, fieldTypeName, description, baseType);
-    }
-
     public BaseObjectField(String fieldName, String fieldTypeName, String description) {
-        this(fieldName, fieldTypeName, description, OBJECT);
+        super(fieldName, fieldTypeName, description);
     }
 
     @Override

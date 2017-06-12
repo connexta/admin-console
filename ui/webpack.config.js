@@ -221,10 +221,6 @@ if (process.env.NODE_ENV === 'production') {
         '/admin': {
           target: 'https://localhost:8993',
           secure: false
-        },
-        '/graphql': {
-          target: 'https://localhost:8993',
-          secure: false
         }
       }
     },

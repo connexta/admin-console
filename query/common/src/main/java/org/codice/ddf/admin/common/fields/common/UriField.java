@@ -28,7 +28,8 @@ public class UriField extends StringField {
 
     public static final String FIELD_TYPE_NAME = "URI";
 
-    public static final String DESCRIPTION = "A Universal Resource Indicator used to identify a name or resource on the internet. Formatted according to RFC 3986.";
+    public static final String DESCRIPTION =
+            "A Universal Resource Indicator used to identify a name or resource on the internet. Formatted according to RFC 3986.";
 
     public UriField() {
         this(DEFAULT_FIELD_NAME);
@@ -50,11 +51,11 @@ public class UriField extends StringField {
     @Override
     public List<Message> validate() {
         List<Message> validationMsgs = super.validate();
-        if(!validationMsgs.isEmpty()) {
+        if (!validationMsgs.isEmpty()) {
             return validationMsgs;
         }
 
-        if(getValue() != null) {
+        if (getValue() != null) {
             try {
                 new URI(getValue());
             } catch (URISyntaxException e) {

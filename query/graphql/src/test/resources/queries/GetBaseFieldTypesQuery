@@ -9,6 +9,9 @@ query TestGetBaseValues {
       string
       list
       enumeration
+      innerObjectField {
+        testSubField
+      }
     }
     getEnum
   }

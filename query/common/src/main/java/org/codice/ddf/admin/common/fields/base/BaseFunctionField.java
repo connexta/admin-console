@@ -144,8 +144,7 @@ public abstract class BaseFunctionField<T extends DataType> extends BaseField<Ma
     }
 
     protected BaseFunctionField addMessages(Report report) {
-        addArgumentMessages(report.argumentMessages());
-        addResultMessages(report.resultMessages());
-        return this;
+        return addArgumentMessages(report.argumentMessages()).
+                addResultMessages(report.resultMessages());
     }
 }

@@ -33,14 +33,17 @@ public class ReportImpl implements Report {
         resultMessages = new ArrayList<>();
     }
 
+    @Override
     public List<Message> argumentMessages() {
         return ImmutableList.copyOf(argumentMessages);
     }
 
+    @Override
     public List<Message> resultMessages() {
         return ImmutableList.copyOf(resultMessages);
     }
 
+    @Override
     public List<Message> messages() {
         return ListUtils.union(argumentMessages, resultMessages);
     }

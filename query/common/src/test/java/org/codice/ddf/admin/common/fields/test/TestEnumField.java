@@ -11,39 +11,40 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.graphql.test.provider;
+package org.codice.ddf.admin.common.fields.test;
 
-import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.common.fields.base.BaseEnumField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 
 import com.google.common.collect.ImmutableList;
 
-public class TestEnum extends BaseEnumField<String> {
-    public static final String DEFAULT_FIELD_NAME = "enumeration";
+public class TestEnumField extends BaseEnumField<String> {
+    public static final String TEST_FIELD_NAME = "enumeration";
 
-    public static final String FIELD_TYPE_NAME = "Enumeration";
+    public static final String TEST_TYPE_NAME = "Enumeration";
 
-    public static final String DESCRIPTION =
-            "Sample enum for testing purposes.";
+    public static final String TEST_DESCRIPTION = "Sample enum for testing purposes.";
 
-    public TestEnum() {
+    public static final String ENUM_A = "ENUM_A";
+
+    public static final String ENUM_B = "ENUM_B";
+
+    public TestEnumField() {
         this(null);
     }
 
-    protected TestEnum(DataType<String> enumType) {
-        super(DEFAULT_FIELD_NAME,
-                FIELD_TYPE_NAME,
-                DESCRIPTION,
+    protected TestEnumField(StringField enumValue) {
+        super(TEST_FIELD_NAME,
+                TEST_TYPE_NAME,
+                TEST_DESCRIPTION,
                 ImmutableList.of(new EnumA(), new EnumB()),
-                enumType);
+                enumValue);
     }
 
-    public static final class EnumA extends StringField {
-        public static final String ENUM_A = "ENUM_A";
+    protected static final class EnumA extends StringField {
 
-        public EnumA() {
-            super(ENUM_A);
+        EnumA() {
+            super(ENUM_A, ENUM_A, TEST_DESCRIPTION);
         }
 
         @Override
@@ -52,11 +53,10 @@ public class TestEnum extends BaseEnumField<String> {
         }
     }
 
-    public static final class EnumB extends StringField {
-        public static final String ENUM_B = "ENUM_B";
+    protected static final class EnumB extends StringField {
 
-        public EnumB() {
-            super(ENUM_B);
+        EnumB() {
+            super(ENUM_B, ENUM_B, TEST_DESCRIPTION);
         }
 
         @Override

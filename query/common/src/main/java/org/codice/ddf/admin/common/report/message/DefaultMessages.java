@@ -49,6 +49,8 @@ public class DefaultMessages {
 
     public static final String UNAUTHORIZED = "UNAUTHORIZED";
 
+    public static final String DUPLICATE_MAP_KEY = "DUPLICATE_MAP_KEY";
+
     public static ErrorMessage failedPersistError() {
         return new ErrorMessage(FAILED_PERSIST);
     }
@@ -131,5 +133,9 @@ public class DefaultMessages {
 
     public static ErrorMessage unauthorizedError(List<String> path) {
         return new ErrorMessage(UNAUTHORIZED, path);
+    }
+
+    public static ErrorMessage duplicateMapKeyError(List<String> path) {
+        return new ErrorMessage(DUPLICATE_MAP_KEY, path);
     }
 }

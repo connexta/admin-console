@@ -31,7 +31,7 @@ public class HostnameField extends StringField {
             "Must be between 1 and 63 characters long, and the entire hostname (including the delimiting dots but not a trailing dot)"
                     + " has a maximum of 253 ASCII characters.";
 
-    private static final Pattern HOST_NAME_PATTERN = Pattern.compile("[0-9a-zA-Z.-]+");
+    private static final Pattern HOST_NAME_PATTERN = Pattern.compile("^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])$");
 
     public HostnameField(String fieldName) {
         super(fieldName, FIELD_TYPE_NAME, DESCRIPTION);

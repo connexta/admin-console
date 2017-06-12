@@ -66,7 +66,7 @@ public class RequestUtils {
             clientUrl.fieldName(hostField.fieldName());
             // copy this hostField's path so that if it's used to make errors they have the path of the hostField
             clientUrl.updatePath(hostField.path().subList(0, hostField.path().size() - 1));
-            clientUrl.setValue(String.format(formatUrl, hostField.name(), hostField.port()));
+            clientUrl.setValue(String.format(formatUrl, hostField.hostname(), hostField.port()));
 
             ReportWithResultImpl<String> body = sendGetRequest(clientUrl, creds, queryParams);
             if(!body.containsErrorMsgs()) {

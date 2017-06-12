@@ -11,25 +11,8 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.common.fields.base.scalar;
+package org.codice.ddf.admin.common.fields.test;
 
-import static org.codice.ddf.admin.api.DataType.FieldBaseType.FLOAT;
-
-public class FloatField extends BaseScalarField<Float> {
-
-    public static final String DEFAULT_FIELD_NAME = "float";
-
-    public FloatField() {
-        this(DEFAULT_FIELD_NAME);
-    }
-
-    public FloatField(String fieldName) {
-        super(fieldName, null, null, FLOAT);
-    }
-
-    protected FloatField(String fieldName, String fieldTypeName, String description) {
-        super(fieldName, fieldTypeName, description, FLOAT);
-    }
-
-}
-
+/**
+    Any classes in this package will be exported as a test-jar by the maven-jar-plugin exporting the ../common/fields/test directory.
+ */

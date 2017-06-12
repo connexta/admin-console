@@ -16,17 +16,14 @@ package org.codice.ddf.admin.common.fields.common;
 import static org.codice.ddf.admin.common.report.message.DefaultMessages.invalidUrlError;
 
 import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 
 import org.codice.ddf.admin.api.report.Message;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class UrlField extends StringField {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(UrlField.class);
 
     public static final String DEFAULT_FIELD_NAME = "url";
 
@@ -51,19 +48,17 @@ public class UrlField extends StringField {
     @Override
     public List<Message> validate() {
         List<Message> validationMsgs = super.validate();
-        if(!validationMsgs.isEmpty()) {
+        if (!validationMsgs.isEmpty()) {
             return validationMsgs;
         }
 
-        if(getValue() != null) {
+        if (getValue() != null) {
             try {
-                new URL(getValue());
-            } catch (MalformedURLException e) {
-                LOGGER.debug("Failed to validate URL [{}].", getValue());
+                new URI(getValue()).toURL();
+            } catch (URISyntaxException | MalformedURLException | IllegalArgumentException e) {
                 validationMsgs.add(invalidUrlError(path()));
             }
         }
-
         return validationMsgs;
     }
 }

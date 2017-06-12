@@ -11,25 +11,24 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.common.fields.base.scalar;
+package org.codice.ddf.admin.common.fields.base.scalar
 
-import static org.codice.ddf.admin.api.DataType.FieldBaseType.FLOAT;
+import org.codice.ddf.admin.common.report.message.DefaultMessages;
+import spock.lang.Specification;
 
-public class FloatField extends BaseScalarField<Float> {
+class StringFieldTest extends Specification {
 
-    public static final String DEFAULT_FIELD_NAME = "float";
+    def 'Empty field error when empty string provided'() {
+        setup:
+        def stringField = new StringField()
+        stringField.setValue('')
 
-    public FloatField() {
-        this(DEFAULT_FIELD_NAME);
+        when:
+        def validationMsgs = stringField.validate()
+
+        then:
+        validationMsgs.size() == 1
+        validationMsgs[0].getCode() == DefaultMessages.EMPTY_FIELD
+        validationMsgs[0].getPath() == [StringField.DEFAULT_FIELD_NAME]
     }
-
-    public FloatField(String fieldName) {
-        super(fieldName, null, null, FLOAT);
-    }
-
-    protected FloatField(String fieldName, String fieldTypeName, String description) {
-        super(fieldName, fieldTypeName, description, FLOAT);
-    }
-
 }
-

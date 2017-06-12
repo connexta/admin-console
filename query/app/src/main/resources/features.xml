@@ -27,18 +27,7 @@
 
     <feature name="admin-beta-core" install="manual" version="${project.version}"
              description="DDF Admin Core (Beta)">
-        <feature>admin-beta-temp-configurator</feature>
         <bundle>mvn:org.codice.ddf.admin.beta/admin-query-api/${project.version}</bundle>
-    </feature>
-
-    <feature name="admin-beta-temp-configurator" install="manual" version="${project.version}"
-             description="Temporary version of the Configurator (Beta)">
-        <!-- TODO switch to DDF dependencies after available in a release -->
-        <bundle>mvn:com.google.guava/guava/${guava.version}</bundle>
-        <feature>security-core-api</feature>
-        <bundle>mvn:org.codice.ddf.admin.beta/configurator-api/${project.version}</bundle>
-        <bundle>mvn:org.codice.ddf.admin.beta/configurator-actions-api/${project.version}</bundle>
-        <bundle>mvn:org.codice.ddf.admin.beta/configurator-impl/${project.version}</bundle>
     </feature>
 
     <feature name="admin-beta-federation" install="manual" version="${project.version}"
@@ -65,7 +54,6 @@
     <feature name="admin-beta-ldap" install="manual" version="${project.version}"
              description="DDF Admin Security (Beta) :: LDAP Handler">
         <feature>admin-beta-core</feature>
-        <feature>admin-beta-temp-configurator</feature>
         <bundle>mvn:org.codice.ddf.admin.beta/admin-query-ldap/${project.version}</bundle>
     </feature>
 

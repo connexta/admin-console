@@ -425,8 +425,6 @@
      Remove when project is merged to DDF and re-parented
      -->
     <modules>
-        <!-- TODO Remove when upgrading to DDF that provides configurator -->
-        <module>configurator</module>
         <module>ui</module>
         <module>query</module>
         <module>admin-module</module>

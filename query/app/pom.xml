@@ -35,21 +35,6 @@
 
         <dependency>
             <groupId>org.codice.ddf.admin.beta</groupId>
-            <artifactId>configurator-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.codice.ddf.admin.beta</groupId>
-            <artifactId>configurator-actions-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.codice.ddf.admin.beta</groupId>
-            <artifactId>configurator-impl</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.codice.ddf.admin.beta</groupId>
             <artifactId>admin-query-sources-impl</artifactId>
             <version>${project.version}</version>
         </dependency>

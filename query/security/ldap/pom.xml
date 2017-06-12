@@ -76,19 +76,14 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.codice.ddf.admin.beta</groupId>
-            <artifactId>configurator-api</artifactId>
-            <version>${project.version}</version>
+            <groupId>ddf.admin</groupId>
+            <artifactId>admin-configurator-api</artifactId>
+            <version>${ddf.version}</version>
         </dependency>
         <dependency>
             <groupId>ddf.lib</groupId>
             <artifactId>common-system</artifactId>
             <version>${ddf.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.codice.ddf.admin.beta</groupId>
-            <artifactId>configurator-api</artifactId>
-            <version>${project.version}</version>
         </dependency>
     </dependencies>
     <build>

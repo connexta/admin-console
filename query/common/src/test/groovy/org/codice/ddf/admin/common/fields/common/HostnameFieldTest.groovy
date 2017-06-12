@@ -46,8 +46,7 @@ class HostnameFieldTest extends Specification {
                  'as.uk',
                  'LoCaLhOsT.CoM',
                  'z.com',
-                 'im.an-example.host.name',
-                 'localhost  ']
+                 'im.an-example.host.name']
     }
 
     def 'Invalid hostnames'() {
@@ -69,7 +68,8 @@ class HostnameFieldTest extends Specification {
         '.localhost'              | HOSTNAME_FIELD_PATH | DefaultMessages.INVALID_HOSTNAME
         'local host.com'          | HOSTNAME_FIELD_PATH | DefaultMessages.INVALID_HOSTNAME
         'http://www.apache.org'   | HOSTNAME_FIELD_PATH | DefaultMessages.INVALID_HOSTNAME
-        '  '                      | HOSTNAME_FIELD_PATH | DefaultMessages.EMPTY_FIELD
+        'localhost  '             | HOSTNAME_FIELD_PATH | DefaultMessages.INVALID_HOSTNAME
+        '  '                      | HOSTNAME_FIELD_PATH | DefaultMessages.INVALID_HOSTNAME
     }
 
     def 'Empty field when hostname provided but empty'() {

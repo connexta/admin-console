@@ -46,7 +46,7 @@ class UrlFieldTest extends Specification {
                 'http://223.255.255.254',
                 'ftp://ftp.is.co.za/rfc/rfc1808.txt',
                 'http://localhost:8993',
-                'http://localhost:8993  ']
+        ]
     }
 
     def 'Invalid url'() {
@@ -62,12 +62,13 @@ class UrlFieldTest extends Specification {
         validationMsgs[0].getPath() == [UrlField.DEFAULT_FIELD_NAME]
 
         where:
-        url                 | code
-        'http://'           | DefaultMessages.INVALID_URL_ERROR
-        'http://  test.com' | DefaultMessages.INVALID_URL_ERROR
-        'htp://test.com'    | DefaultMessages.INVALID_URL_ERROR
-        'htps://test.com'   | DefaultMessages.INVALID_URL_ERROR
-        '://google.com'     | DefaultMessages.INVALID_URL_ERROR
-        '  '                | DefaultMessages.EMPTY_FIELD
+        url                       | code
+        'http://'                 | DefaultMessages.INVALID_URL_ERROR
+        'http://  test.com'       | DefaultMessages.INVALID_URL_ERROR
+        'htp://test.com'          | DefaultMessages.INVALID_URL_ERROR
+        'htps://test.com'         | DefaultMessages.INVALID_URL_ERROR
+        '://google.com'           | DefaultMessages.INVALID_URL_ERROR
+        'http://localhost:8993  ' | DefaultMessages.INVALID_URL_ERROR
+        '  '                      | DefaultMessages.INVALID_URL_ERROR
     }
 }

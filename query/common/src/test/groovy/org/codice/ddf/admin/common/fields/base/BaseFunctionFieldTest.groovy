@@ -15,7 +15,9 @@ package org.codice.ddf.admin.common.fields.base
 
 import org.codice.ddf.admin.api.DataType
 import org.codice.ddf.admin.api.fields.FunctionField
+import org.codice.ddf.admin.common.fields.base.scalar.IntegerField
 import org.codice.ddf.admin.common.fields.base.scalar.StringField
+import org.codice.ddf.admin.common.fields.test.TestFieldProvider
 import org.codice.ddf.admin.common.fields.test.TestObjectField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.common.report.message.ErrorMessage
@@ -39,6 +41,7 @@ class BaseFunctionFieldTest extends Specification {
         then:
         functionField.path() == ['newName']
         functionField.getArguments()[0].path() == ['newName', BaseFunctionField.ARGUMENT, StringField.DEFAULT_FIELD_NAME]
+
     }
 
     def 'Function field validates arguments'() {
@@ -67,7 +70,7 @@ class BaseFunctionFieldTest extends Specification {
         report.messages()[0].getPath() == [TestBaseFunctionField.DEFAULT_NAME]
     }
 
-    def 'Setting function arguments'() {
+    def 'Setting function arguments populates argument values correctly'() {
         setup:
         functionField = new TestBaseFunctionField(false)
 

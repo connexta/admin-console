@@ -16,7 +16,7 @@ cache:
   directories:
     - '$HOME/.sonar/cache'
 
-script: mvn clean install sonar:sonar -q -DskipITs=true
+script: mvn clean install sonar:sonar -q -pl \!itests
 
 env:
   global:

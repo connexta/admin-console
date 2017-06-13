@@ -2,37 +2,13 @@ import { combineReducers } from 'redux-immutable'
 import { fromJS, Map } from 'immutable'
 import sub from 'redux-submarine'
 
-const sourceStage = (state = 'welcomeStage', { type, stage }) => {
+const currentStage = (state = 'welcomeStage', { type, stage }) => {
   switch (type) {
     case 'SOURCES/CHANGE_STAGE':
       return stage
     case 'SOURCES/NAV_STAGE':
       return stage
     case 'CLEAR_WIZARD': // also make clear config info
-      return 'welcomeStage'
-    default:
-      return state
-  }
-}
-
-const sourceStagesClean = (state = false, { type }) => {
-  switch (type) {
-    case 'EDIT_CONFIG':
-      return false
-    case 'SOURCES/CHANGE_STAGE':
-      return true
-    case 'CLEAR_WIZARD':
-      return false
-    default:
-      return state
-  }
-}
-
-const sourceStageProgress = (state = 'welcomeStage', { type, stage }) => {
-  switch (type) {
-    case 'SOURCES/CHANGE_STAGE':
-      return stage
-    case 'CLEAR_WIZARD':
       return 'welcomeStage'
     default:
       return state
@@ -101,7 +77,7 @@ const discoveryType = (state = 'hostnamePort', { type, value }) => {
 export const submarine = sub()
 export const getIsSubmitting = (state) => submarine(state).get('isSubmitting')
 export const getDiscoveryType = (state) => submarine(state).get('discoveryType')
-export const getSourceStage = (state) => submarine(state).get('sourceStage')
+export const setStage = (state) => submarine(state).get('currentStage')
 export const getStageProgress = (state) => submarine(state).get('sourceStageProgress')
 export const getStagesClean = (state) => submarine(state).get('sourceStagesClean')
 export const getErrors = (state) => (stageId) => submarine(state).getIn(['errors', stageId], [])
@@ -111,5 +87,12 @@ export const getSourceName = (state) => state.getIn(['wizard', 'config', 'source
 export const getDiscoveredEndpoints = (state) => submarine(state).get('discoveredEndpoints').toJS()
 export const getChosenEndpoint = (state) => submarine(state).get('chosenEndpoint')
 
-export default combineReducers({ sourceStage, sourceStagesClean, sourceStageProgress, isSubmitting, discoveryType, discoveredEndpoints, chosenEndpoint, errors })
+export default combineReducers({
+  currentStage,
+  isSubmitting,
+  discoveryType,
+  discoveredEndpoints,
+  chosenEndpoint,
+  errors
+})
 

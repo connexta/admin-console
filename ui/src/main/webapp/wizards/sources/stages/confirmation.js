@@ -8,11 +8,9 @@ import { Input } from 'admin-wizard/inputs'
 import Info from 'components/Information'
 import Title from 'components/Title'
 import Description from 'components/Description'
-import ActionGroup from 'components/ActionGroup'
-import Action from 'components/Action'
 import Message from 'components/Message'
+import { Navigator, BackNav, NextNav } from 'components/WizardNavigator'
 
-import { NavPanes } from '../components.js'
 import { saveSource } from '../graphql-mutations/source-persist'
 import {
   getSourceName,
@@ -40,62 +38,34 @@ const ConfirmationStageView = (props) => {
   } = props
 
   return (
-    <NavPanes back='sourceSelectionStage' forward='completedStage'>
+    <div>
       <Title>
         Finalize Source Configuration
       </Title>
       <Description>
         Please give your source a unique name, confirm details, and press finish to create source.
       </Description>
-      <div style={{ width: 400, position: 'relative', margin: '0px auto', padding: 0 }}>
+      <div style={{ maxWidth: 600, margin: '0px auto' }}>
         <Input id='sourceName' label='Source Name' autoFocus />
         <Info label='Source Address' value={config.endpointUrl} />
         <Info label='Username' value={inputConfigs.sourceUserName || 'none'} />
         <Info label='Password' value={inputConfigs.sourceUserPassword ? '*****' : 'none'} />
-        {messages.map((msg, i) => <Message key={i} message={msg} type='FAILURE' />)}
+        { messages.map((msg, i) => <Message key={i} message={msg} type='FAILURE' />) }
+        <Navigator
+          max={3}
+          value={2}
+          left={
+            <BackNav onClick={() => changeStage('sourceSelectionStage')} />
+          }
+          right={
+            <NextNav label='Finish'
+              onClick={() => saveSource(props, () => changeStage('completedStage', currentStageId))}
+              disabled={sourceName === undefined || sourceName.trim() === ''} />
+          }
+        />
       </div>
-      <ActionGroup>
-        <Action
-          primary
-          label='Finish'
-          disabled={sourceName === undefined || sourceName.trim() === ''}
-          onClick={() => saveConfiguration(props, () => changeStage('completedStage'))} />
-      </ActionGroup>
-    </NavPanes>
+    </div>
   )
-}
-
-const saveConfiguration = (props, onFinish) => {
-  const {
-    client,
-    type,
-    config,
-    sourceName,
-    inputConfigs,
-    startSubmitting,
-    endSubmitting,
-    setErrors,
-    clearErrors
-  } = props
-
-  startSubmitting()
-  client.mutate(saveSource({
-    type,
-    config,
-    sourceName,
-    creds: {
-      username: inputConfigs.sourceUserName,
-      password: inputConfigs.sourceUserPassword
-    }}))
-    .then(() => {
-      clearErrors()
-      if (onFinish) onFinish()
-      endSubmitting()
-    })
-    .catch(() => {
-      setErrors(currentStageId, ['Network Error'])
-      endSubmitting()
-    })
 }
 
 let ConfirmationStage = connect((state) => ({

@@ -2,8 +2,8 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { withApollo } from 'react-apollo'
 
-import { queryAllSources } from './discovery'
-import { NavPanes, SourceRadioButtons } from '../components'
+import { queryAllSources } from '../graphql-queries/source-discovery'
+import { SourceRadioButtons } from '../components'
 import {
   getDiscoveryType,
   getDiscoveredEndpoints,
@@ -26,6 +26,9 @@ import Description from 'components/Description'
 import ActionGroup from 'components/ActionGroup'
 import Action from 'components/Action'
 import Message from 'components/Message'
+import { Navigator, BackNav, NextNav } from 'components/WizardNavigator'
+
+const currentStageId = 'sourceSelectionStage'
 
 const SourceSelectionStageView = (props) => {
   const {
@@ -33,51 +36,66 @@ const SourceSelectionStageView = (props) => {
     changeStage,
     discoveredEndpoints = {},
     chosenEndpoint,
-    setChosenEndpoint
+    setChosenEndpoint,
+    clearErrors
   } = props
 
   if (Object.keys(discoveredEndpoints).length !== 0) {
     return (
-      <NavPanes back='discoveryStage' forward='confirmationStage'>
+      <div>
         <Title>
           Sources Found!
         </Title>
         <Description>
           Choose which sources to add.
         </Description>
-        <SourceRadioButtons
-          options={discoveredEndpoints}
-          valueSelected={chosenEndpoint}
-          onChange={setChosenEndpoint}
-        />
-        {messages.map((msg, i) => <Message key={i} message={msg} type='FAILURE' />)}
-        <ActionGroup>
-          <Action
-            primary
-            label='Next'
-            disabled={chosenEndpoint === ''}
-            onClick={() => changeStage('confirmationStage')}
+        <div style={{ maxWidth: '600px', margin: '0px auto' }}>
+          <SourceRadioButtons
+            options={discoveredEndpoints}
+            valueSelected={chosenEndpoint}
+            onChange={setChosenEndpoint}
           />
-        </ActionGroup>
-      </NavPanes>
+          {messages.map((msg, i) => <Message key={i} message={msg} type='FAILURE' />)}
+          <Navigator
+            max={3}
+            value={1}
+            left={<BackNav onClick={() => changeStage('discoveryStage')} />}
+            right={<NextNav onClick={() => changeStage('confirmationStage')} disabled={chosenEndpoint === ''} />}
+          />
+        </div>
+      </div>
     )
   } else {
     return (
-      <NavPanes back='discoveryStage' forward='manualEntryStage'>
+      <div>
         <Title>
           No Sources Found
         </Title>
         <Description>
           No sources were found at the given location. Try again or go back to enter a different address.
+          Make sure you entered a valid username and password if the source requires authentication.
         </Description>
-        {messages.map((msg, i) => <Message key={i} {...msg} />)}
-        <ActionGroup>
-          <Action
-            primary
-            label='Try Again'
-            onClick={() => queryAllSources(props)} />
-        </ActionGroup>
-      </NavPanes>
+        <div style={{ maxWidth: '600px', margin: '0px auto' }}>
+          { messages.map((msg, i) => <Message key={i} {...msg} />) }
+          <ActionGroup>
+            <Action
+              primary
+              label='Refresh'
+              onClick={() => queryAllSources(props,
+                () => {
+                  clearErrors()
+                  changeStage('sourceSelectionStage')
+                },
+                (e) => setErrors(currentStageId, e))} />
+          </ActionGroup>
+          <Navigator
+            max={3}
+            value={1}
+            left={<BackNav onClick={() => changeStage('discoveryStage')} />}
+            right={<NextNav disabled />}
+          />
+        </div>
+      </div>
     )
   }
 }

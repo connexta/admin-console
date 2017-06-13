@@ -22,9 +22,9 @@ public interface Report {
      *
      * @return
      */
-    List<Message> argumentMessages();
+    List<ErrorMessage> argumentMessages();
 
-    List<Message> resultMessages();
+    List<ErrorMessage> resultMessages();
 
-    List<Message> messages();
+    List<ErrorMessage> messages();
 }

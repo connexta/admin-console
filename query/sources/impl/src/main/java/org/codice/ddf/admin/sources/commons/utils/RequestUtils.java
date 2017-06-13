@@ -56,7 +56,7 @@ public class RequestUtils {
      * @param urlFormats list of url formats to format with the hostField
      * @param creds credentials for basic authentication
      * @param queryParams additional query params
-     * @return a {@code ReportWithResult} containing a {@code UrlField} on success, or {@link org.codice.ddf.admin.common.report.message.ErrorMessage}s on failure
+     * @return a {@code ReportWithResult} containing a {@code UrlField} on success, or {@link org.codice.ddf.admin.api.report.ErrorMessage}s on failure
      */
     public ReportWithResultImpl<UrlField> discoverUrlFromHost(HostField hostField, List<String> urlFormats, CredentialsField creds,
             Map<String, String> queryParams) {
@@ -89,7 +89,7 @@ public class RequestUtils {
      * @param clientUrl url to send GET request to
      * @param creds optional credentials for basic authentication
      * @param queryParams optional query parameters
-     * @return {@link ReportWithResultImpl} containing the body of the response on success, or containing an {@link org.codice.ddf.admin.common.report.message.ErrorMessage}
+     * @return {@link ReportWithResultImpl} containing the body of the response on success, or containing an {@link org.codice.ddf.admin.api.report.ErrorMessage}
      */
     public ReportWithResultImpl<String> sendGetRequest(UrlField clientUrl, CredentialsField creds, Map<String, String> queryParams) {
         ReportWithResultImpl<String> body = new ReportWithResultImpl<>();
@@ -147,7 +147,7 @@ public class RequestUtils {
      * @param creds       optional credentials consisting of a username and password
      * @param contentType Mime type of the post body
      * @param content     Body of the post request
-     * @return a {@link ReportWithResultImpl} containing the POST request response body or an {@link org.codice.ddf.admin.common.report.message.ErrorMessage} on failure.
+     * @return a {@link ReportWithResultImpl} containing the POST request response body or an {@link org.codice.ddf.admin.api.report.ErrorMessage} on failure.
      */
     public ReportWithResultImpl<String> sendPostRequest(UrlField urlField, CredentialsField creds,
             String contentType, String content) {
@@ -175,7 +175,7 @@ public class RequestUtils {
      * - {@link org.codice.ddf.admin.common.report.message.DefaultMessages#CANNOT_CONNECT}
      *
      * @param urlField {@link UrlField} containing the URL to connect to
-     * @return a {@link ReportImpl} containing no messages on success, or containing {@link org.codice.ddf.admin.common.report.message.ErrorMessage}s on failure.
+     * @return a {@link ReportImpl} containing no messages on success, or containing {@link org.codice.ddf.admin.api.report.ErrorMessage}s on failure.
      */
     public ReportImpl endpointIsReachable(UrlField urlField) {
         ReportImpl report = new ReportImpl();

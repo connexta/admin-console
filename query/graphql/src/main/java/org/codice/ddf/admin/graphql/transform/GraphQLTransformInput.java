@@ -11,12 +11,12 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.graphql.common;
-
-import static org.codice.ddf.admin.graphql.common.GraphQLTransformCommons.enumFieldToGraphQLEnumType;
+package org.codice.ddf.admin.graphql.transform;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.api.DataType;
@@ -24,63 +24,64 @@ import org.codice.ddf.admin.api.fields.EnumField;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.api.fields.ObjectField;
+import org.codice.ddf.admin.api.fields.ScalarField;
 
-import graphql.Scalars;
+import graphql.schema.GraphQLArgument;
 import graphql.schema.GraphQLInputObjectField;
 import graphql.schema.GraphQLInputObjectType;
 import graphql.schema.GraphQLInputType;
 import graphql.schema.GraphQLList;
-import graphql.schema.GraphQLScalarType;
+import graphql.schema.GraphQLNonNull;
 
 public class GraphQLTransformInput {
 
+    private GraphQLTransformScalar transformScalars;
+    private GraphQLTransformEnum transformEnum;
+    private Map<String, GraphQLInputType> predefinedInputTypes;
+
+    public GraphQLTransformInput(GraphQLTransformScalar transformScalars, GraphQLTransformEnum transformEnum) {
+        predefinedInputTypes = new HashMap<>();
+        this.transformScalars = transformScalars;
+        this.transformEnum = transformEnum;
+    }
+
+
+    public GraphQLArgument fieldToGraphQLArgument(DataType field) {
+        GraphQLInputType graphqlInputType = fieldTypeToGraphQLInputType(field);
+
+        return GraphQLArgument.newArgument()
+                .name(field.fieldName())
+                .description(field.description())
+                .type(field.isRequired() ? new GraphQLNonNull(graphqlInputType) : graphqlInputType)
+                .build();
+    }
+
     public GraphQLInputType fieldTypeToGraphQLInputType(DataType field) {
+        if(field.fieldTypeName() != null && predefinedInputTypes.containsKey(field.fieldTypeName())) {
+            return predefinedInputTypes.get(field.fieldTypeName());
+        }
+
         GraphQLInputType type = null;
-        switch (field.baseDataType()) {
-        case OBJECT:
+
+        if(field instanceof ObjectField) {
             type = objectFieldToGraphQLInputType((ObjectField) field);
-            break;
-        case ENUM:
-            type = enumFieldToGraphQLEnumType((EnumField) field);
-            break;
-        case LIST:
+        } else if(field instanceof EnumField) {
+            type = transformEnum.enumFieldToGraphQLEnumType((EnumField) field);
+        } else if(field instanceof ListField) {
             type = new GraphQLList(fieldTypeToGraphQLInputType(((ListField) field).getListFieldType()));
-            break;
-        case INTEGER:
-            if (field.fieldTypeName() == null) {
-                type = Scalars.GraphQLInt;
-            } else {
-                type = new GraphQLScalarType(field.fieldTypeName(),
-                        field.description(),
-                        Scalars.GraphQLInt.getCoercing());
-            }
-            break;
-        case BOOLEAN:
-            if (field.fieldTypeName() == null) {
-                type = Scalars.GraphQLBoolean;
-            } else {
-                type = new GraphQLScalarType(field.fieldTypeName(),
-                        field.description(),
-                        Scalars.GraphQLBoolean.getCoercing());
-            }
-            break;
-        case STRING:
-            if (field.fieldTypeName() == null) {
-                type = Scalars.GraphQLString;
-            } else {
-                type = new GraphQLScalarType(field.fieldTypeName(),
-                        field.description(),
-                        Scalars.GraphQLString.getCoercing());
-            }
-            break;
+        } else if(field instanceof ScalarField){
+            type = transformScalars.resolveScalarType((ScalarField) field);
         }
 
         if (type == null) {
             throw new RuntimeException(
                     "Error transforming input field to GraphQLInputType. Unknown field type: "
-                            + field.baseDataType());
+                            + field.getClass());
         }
 
+        if(field.fieldTypeName() != null) {
+            predefinedInputTypes.put(field.fieldTypeName(), type);
+        }
         return type;
     }
 

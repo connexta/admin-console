@@ -13,12 +13,12 @@
  **/
 package org.codice.ddf.admin.common.fields.base.scalar;
 
-import static org.codice.ddf.admin.api.DataType.FieldBaseType.STRING;
+import static org.codice.ddf.admin.api.fields.ScalarField.ScalarType.STRING;
 import static org.codice.ddf.admin.common.report.message.DefaultMessages.emptyFieldError;
 
 import java.util.List;
 
-import org.codice.ddf.admin.api.report.Message;
+import org.codice.ddf.admin.api.report.ErrorMessage;
 
 public class StringField extends BaseScalarField<String> {
 
@@ -37,8 +37,8 @@ public class StringField extends BaseScalarField<String> {
     }
 
     @Override
-    public List<Message> validate() {
-        List<Message> validationMsgs = super.validate();
+    public List<ErrorMessage> validate() {
+        List<ErrorMessage> validationMsgs = super.validate();
 
         if(!validationMsgs.isEmpty()) {
             return validationMsgs;

@@ -15,7 +15,7 @@ package org.codice.ddf.admin.security.common;
 
 import java.util.List;
 
-import org.codice.ddf.admin.common.report.message.ErrorMessage;
+import org.codice.ddf.admin.common.report.message.ErrorMessageImpl;
 
 public class SecurityMessages {
 
@@ -24,11 +24,11 @@ public class SecurityMessages {
 
     public static final String INVALID_CLAIM_TYPE = "INVALID_CLAIM_TYPE";
 
-    public static ErrorMessage noRootContextError(List<String> path) {
-        return new ErrorMessage(NO_ROOT_CONTEXT, path);
+    public static ErrorMessageImpl noRootContextError(List<String> path) {
+        return new ErrorMessageImpl(NO_ROOT_CONTEXT, path);
     }
 
-    public static ErrorMessage invalidClaimType(List<String> path) {
-        return new ErrorMessage(INVALID_CLAIM_TYPE, path);
+    public static ErrorMessageImpl invalidClaimType(List<String> path) {
+        return new ErrorMessageImpl(INVALID_CLAIM_TYPE, path);
     }
 }

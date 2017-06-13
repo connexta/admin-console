@@ -54,7 +54,7 @@ public class SourceConfigUnionField extends BaseUnionField {
     protected CredentialsField creds;
 
     public SourceConfigUnionField() {
-        super(FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION, UNION_TYPES, false);
+        super(FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION, UNION_TYPES);
 
         pidField = new PidField();
         sourceName = new StringField(SOURCE_NAME_FIELD_NAME);
@@ -63,7 +63,7 @@ public class SourceConfigUnionField extends BaseUnionField {
     }
 
     protected SourceConfigUnionField(String fieldTypeName, String description) {
-        super(FIELD_NAME, fieldTypeName, description, UNION_TYPES, true);
+        super(FIELD_NAME, fieldTypeName, description, UNION_TYPES);
 
         pidField = new PidField();
         sourceName = new StringField(SOURCE_NAME_FIELD_NAME);

@@ -13,7 +13,6 @@
  **/
 package org.codice.ddf.admin.common.fields.base;
 
-import static org.codice.ddf.admin.api.DataType.FieldBaseType.LIST;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,7 +21,7 @@ import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.ListField;
-import org.codice.ddf.admin.api.report.Message;
+import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +37,7 @@ public class ListFieldImpl<T extends DataType> extends BaseDataType<List>
     protected T listFieldType;
 
     public ListFieldImpl(String fieldName, Class<T> listFieldType) {
-        super(fieldName, null, null, LIST);
+        super(fieldName, null, null);
         this.fields = new ArrayList<>();
         try {
             this.listFieldType = listFieldType.newInstance();
@@ -48,7 +47,7 @@ public class ListFieldImpl<T extends DataType> extends BaseDataType<List>
     }
 
     public ListFieldImpl(String fieldName, T listFieldType) {
-        super(fieldName, null, null, LIST);
+        super(fieldName, null, null);
         this.fields = new ArrayList<>();
         this.listFieldType = listFieldType;
     }
@@ -114,12 +113,12 @@ public class ListFieldImpl<T extends DataType> extends BaseDataType<List>
     }
 
     @Override
-    public List<Message> validate() {
-        List<Message> validationMsgs = super.validate();
+    public List<ErrorMessage> validate() {
+        List<ErrorMessage> validationMsgs = super.validate();
 
         if (validationMsgs.isEmpty() && (getList() != null)) {
-            List<Message> fieldValidationMsgs = getList().stream()
-                    .map(field -> (List<Message>) field.validate())
+            List<ErrorMessage> fieldValidationMsgs = getList().stream()
+                    .map(field -> (List<ErrorMessage>) field.validate())
                     .flatMap(Collection::stream)
                     .collect(Collectors.toList());
             validationMsgs.addAll(fieldValidationMsgs);

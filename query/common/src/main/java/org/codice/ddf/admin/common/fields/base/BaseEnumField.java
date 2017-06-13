@@ -13,14 +13,13 @@
  **/
 package org.codice.ddf.admin.common.fields.base;
 
-import static org.codice.ddf.admin.api.DataType.FieldBaseType.ENUM;
 import static org.codice.ddf.admin.common.report.message.DefaultMessages.unsupportedEnum;
 
 import java.util.List;
 
 import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.EnumField;
-import org.codice.ddf.admin.api.report.Message;
+import org.codice.ddf.admin.api.report.ErrorMessage;
 
 public abstract class BaseEnumField<S> extends BaseDataType<S>
         implements EnumField<S, DataType<S>> {
@@ -31,7 +30,7 @@ public abstract class BaseEnumField<S> extends BaseDataType<S>
 
     public BaseEnumField(String fieldName, String fieldTypeName, String description,
             List<DataType<S>> enumValues) {
-        super(fieldName, fieldTypeName, description, ENUM);
+        super(fieldName, fieldTypeName, description);
         this.enumValues = enumValues;
     }
 
@@ -64,8 +63,8 @@ public abstract class BaseEnumField<S> extends BaseDataType<S>
     }
 
     @Override
-    public List<Message> validate() {
-        List<Message> validationMsgs = super.validate();
+    public List<ErrorMessage> validate() {
+        List<ErrorMessage> validationMsgs = super.validate();
 
         if(validationMsgs.isEmpty() && getValue() != null) {
             if (getEnumValues().stream()

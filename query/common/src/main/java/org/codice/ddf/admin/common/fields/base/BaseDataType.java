@@ -19,34 +19,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.codice.ddf.admin.api.DataType;
-import org.codice.ddf.admin.api.report.Message;
+import org.codice.ddf.admin.api.report.ErrorMessage;
 
 public class BaseDataType<T> extends BaseField<T, T> implements DataType<T> {
 
     private String fieldTypeName;
 
-    private FieldBaseType fieldBaseType;
-
     private boolean isRequired;
 
     private T value;
 
-    public BaseDataType(String fieldName, String fieldTypeName, String description,
-            FieldBaseType fieldBaseType) {
+    public BaseDataType(String fieldName, String fieldTypeName, String description) {
         super(fieldName, description);
         this.fieldTypeName = fieldTypeName;
-        this.fieldBaseType = fieldBaseType;
         isRequired = false;
     }
 
     @Override
     public String fieldTypeName() {
         return fieldTypeName;
-    }
-
-    @Override
-    public FieldBaseType baseDataType() {
-        return fieldBaseType;
     }
 
     @Override
@@ -71,8 +62,8 @@ public class BaseDataType<T> extends BaseField<T, T> implements DataType<T> {
     }
 
     @Override
-    public List<Message> validate() {
-        List<Message> errors = new ArrayList<>();
+    public List<ErrorMessage> validate() {
+        List<ErrorMessage> errors = new ArrayList<>();
 
         if (isRequired()) {
             if (getValue() == null) {

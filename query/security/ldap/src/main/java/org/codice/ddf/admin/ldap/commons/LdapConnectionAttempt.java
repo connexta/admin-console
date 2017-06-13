@@ -17,12 +17,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.codice.ddf.admin.api.report.Message;
+import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.forgerock.opendj.ldap.Connection;
 
 public class LdapConnectionAttempt {
 
-    private List<Message> msgs;
+    private List<ErrorMessage> msgs;
     private Optional<Connection> connection;
 
     public LdapConnectionAttempt() {
@@ -30,7 +30,7 @@ public class LdapConnectionAttempt {
         connection = Optional.empty();
     }
 
-    public LdapConnectionAttempt(Message msg) {
+    public LdapConnectionAttempt(ErrorMessage msg) {
         this();
         msgs.add(msg);
     }
@@ -40,7 +40,7 @@ public class LdapConnectionAttempt {
         this.connection = Optional.of(connection);
     }
 
-    public List<Message> messages() {
+    public List<ErrorMessage> messages() {
         return msgs;
     }
 

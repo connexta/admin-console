@@ -13,11 +13,11 @@
  **/
 package org.codice.ddf.admin.common.fields.test;
 
-import static org.codice.ddf.admin.api.DataType.FieldBaseType.STRING;
+import static org.codice.ddf.admin.api.fields.ScalarField.ScalarType.STRING;
 
-import org.codice.ddf.admin.common.fields.base.BaseDataType;
+import org.codice.ddf.admin.common.fields.base.scalar.BaseScalarField;
 
-public class TestDataType<T> extends BaseDataType<T> {
+public class TestDataType<T> extends BaseScalarField<T> {
 
     public static final String FIELD_NAME = "testFieldName";
 

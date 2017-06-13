@@ -15,7 +15,7 @@ package org.codice.ddf.admin.common.report;
 
 import java.util.Optional;
 
-import org.codice.ddf.admin.api.report.Message;
+import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.codice.ddf.admin.api.report.ReportWithResult;
 
 /**
@@ -50,13 +50,13 @@ public class ReportWithResultImpl<T> extends ReportImpl implements ReportWithRes
     }
 
     @Override
-    public ReportWithResultImpl<T> addArgumentMessage(Message message) {
+    public ReportWithResultImpl<T> addArgumentMessage(ErrorMessage message) {
         super.addArgumentMessage(message);
         return this;
     }
 
     @Override
-    public ReportWithResultImpl<T> addResultMessage(Message message) {
+    public ReportWithResultImpl<T> addResultMessage(ErrorMessage message) {
         super.addResultMessage(message);
         return this;
     }

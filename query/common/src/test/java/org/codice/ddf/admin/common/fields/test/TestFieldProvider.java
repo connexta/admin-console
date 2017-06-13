@@ -13,7 +13,6 @@
  **/
 package org.codice.ddf.admin.common.fields.test;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -29,8 +28,7 @@ import org.codice.ddf.admin.common.fields.base.function.GetFunctionField;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.common.fields.base.scalar.IntegerField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
-import org.codice.ddf.admin.common.report.message.ErrorMessage;
-import org.codice.ddf.admin.common.report.message.WarningMessage;
+import org.codice.ddf.admin.common.report.message.ErrorMessageImpl;
 
 import com.google.common.collect.ImmutableList;
 
@@ -42,7 +40,7 @@ public class TestFieldProvider extends BaseFieldProvider {
 
     public static final String MULTIPLE_ARGS_FUNCTION_NAME = "multipleArgs";
 
-    public static final String ERRORS_AND_WARNINGS_FUNCTION_NAME = "returnErrorsAndWarnings";
+    public static final String RETURN_ERRORS_FUNCTION_NAME = "returnErrors";
 
     public static final String GET_INT_FUNCTION_NAME = "getInteger";
 
@@ -74,7 +72,7 @@ public class TestFieldProvider extends BaseFieldProvider {
 
     private GetEnum getEnum;
 
-    private PathField errorAndWarningsPath;
+    private PathField errorsPath;
 
     private MultiArgFunction multiArgFunc;
 
@@ -89,7 +87,7 @@ public class TestFieldProvider extends BaseFieldProvider {
         getString = new GetString();
         getList = new GetList();
         getEnum = new GetEnum();
-        errorAndWarningsPath = new PathField();
+        errorsPath = new PathField();
         multiArgFunc = new MultiArgFunction();
         reqArgFunc = new RequiredArgsFunction();
         sampleMutation = new SampleMutation();
@@ -103,7 +101,7 @@ public class TestFieldProvider extends BaseFieldProvider {
                 getString,
                 getList,
                 getEnum,
-                errorAndWarningsPath,
+                errorsPath,
                 multiArgFunc,
                 reqArgFunc);
     }
@@ -335,27 +333,27 @@ public class TestFieldProvider extends BaseFieldProvider {
 
     public static class PathField3 extends BaseObjectField {
 
-        private ReturnErrorsAndWarning errorsAndWarningFunction;
+        private ReturnErrorsFunction returnErrorsFunction;
 
         public PathField3() {
             super(PATH_3, "Path3", "Sample path");
-            errorsAndWarningFunction = new ReturnErrorsAndWarning();
+            returnErrorsFunction = new ReturnErrorsFunction();
             updateInnerFieldPaths();
         }
 
         @Override
         public List<Field> getFields() {
-            return ImmutableList.of(errorsAndWarningFunction);
+            return ImmutableList.of(returnErrorsFunction);
         }
     }
 
-    public static class ReturnErrorsAndWarning extends BaseFunctionField<TestObjectField> {
+    public static class ReturnErrorsFunction extends BaseFunctionField<TestObjectField> {
 
         private TestObjectField objectFieldArg;
 
-        public ReturnErrorsAndWarning() {
-            super(ERRORS_AND_WARNINGS_FUNCTION_NAME,
-                    "Return a set of errors and warnings about the argument, return value, and general errors.",
+        public ReturnErrorsFunction() {
+            super(RETURN_ERRORS_FUNCTION_NAME,
+                    "Return a set of errors about the argument, return value, and general errors.",
                     TestObjectField.class);
             objectFieldArg = new TestObjectField();
             updateArgumentPaths();
@@ -385,7 +383,6 @@ public class TestFieldProvider extends BaseFieldProvider {
                     .path()));
 
             TestObjectField testObject = TestObjectField.createSampleTestObject();
-            addResultMessage(sampleReturnValueWarning());
             addResultMessage(sampleReturnValueError(testObject.path()));
             addResultMessage(sampleReturnValueError(testObject.getIntegerField()
                     .path()));
@@ -406,24 +403,16 @@ public class TestFieldProvider extends BaseFieldProvider {
 
         @Override
         public FunctionField<TestObjectField> newInstance() {
-            return new ReturnErrorsAndWarning();
+            return new ReturnErrorsFunction();
         }
     }
 
-    public static ErrorMessage sampleArgumentError() {
-        return sampleArgumentError(new ArrayList<>());
+    public static ErrorMessageImpl sampleArgumentError(List<String> path) {
+        return new ErrorMessageImpl(ARGUMENT_MSG, path);
     }
 
-    public static ErrorMessage sampleArgumentError(List<String> path) {
-        return new ErrorMessage(ARGUMENT_MSG, path);
-    }
-
-    public static WarningMessage sampleReturnValueWarning() {
-        return new WarningMessage(RETURN_VALUE_MSG);
-    }
-
-    public static ErrorMessage sampleReturnValueError(List<String> path) {
-        return new ErrorMessage(RETURN_VALUE_MSG, path);
+    public static ErrorMessageImpl sampleReturnValueError(List<String> path) {
+        return new ErrorMessageImpl(RETURN_VALUE_MSG, path);
     }
 
     public static class SampleMutation extends BaseFunctionField<TestObjectField> {

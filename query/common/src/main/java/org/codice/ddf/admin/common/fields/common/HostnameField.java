@@ -18,7 +18,7 @@ import static org.codice.ddf.admin.common.report.message.DefaultMessages.invalid
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.codice.ddf.admin.api.report.Message;
+import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 
 public class HostnameField extends StringField {
@@ -42,8 +42,8 @@ public class HostnameField extends StringField {
     }
 
     @Override
-    public List<Message> validate() {
-        List<Message> validationMsgs = super.validate();
+    public List<ErrorMessage> validate() {
+        List<ErrorMessage> validationMsgs = super.validate();
         if(!validationMsgs.isEmpty()) {
             return validationMsgs;
         }

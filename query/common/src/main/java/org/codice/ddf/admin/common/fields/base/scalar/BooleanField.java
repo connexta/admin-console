@@ -13,7 +13,7 @@
  **/
 package org.codice.ddf.admin.common.fields.base.scalar;
 
-import static org.codice.ddf.admin.api.DataType.FieldBaseType.BOOLEAN;
+import static org.codice.ddf.admin.api.fields.ScalarField.ScalarType.BOOLEAN;
 
 public class BooleanField extends BaseScalarField<Boolean> {
 

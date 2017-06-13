@@ -18,7 +18,7 @@ import static org.codice.ddf.admin.common.report.message.DefaultMessages.invalid
 import java.util.List;
 
 import org.apache.commons.validator.UrlValidator;
-import org.codice.ddf.admin.api.report.Message;
+import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 
 public class ContextPath extends StringField {
@@ -45,8 +45,8 @@ public class ContextPath extends StringField {
     }
 
     @Override
-    public List<Message> validate() {
-        List<Message> msgs = super.validate();
+    public List<ErrorMessage> validate() {
+        List<ErrorMessage> msgs = super.validate();
         if (!msgs.isEmpty()) {
             return msgs;
         } else if (getValue() != null && !getValue().isEmpty()) {

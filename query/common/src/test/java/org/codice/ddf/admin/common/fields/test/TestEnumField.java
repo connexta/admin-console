@@ -19,11 +19,11 @@ import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 import com.google.common.collect.ImmutableList;
 
 public class TestEnumField extends BaseEnumField<String> {
-    public static final String TEST_FIELD_NAME = "enumeration";
+    public static final String DEFAULT_FIELD_NAME = "enumeration";
 
-    public static final String TEST_TYPE_NAME = "Enumeration";
+    public static final String DEFAULT_FIELD_TYPE = "Enumeration";
 
-    public static final String TEST_DESCRIPTION = "Sample enum for testing purposes.";
+    public static final String DESCRIPTION = "Sample enum for testing purposes.";
 
     public static final String ENUM_A = "ENUM_A";
 
@@ -34,9 +34,7 @@ public class TestEnumField extends BaseEnumField<String> {
     }
 
     protected TestEnumField(StringField enumValue) {
-        super(TEST_FIELD_NAME,
-                TEST_TYPE_NAME,
-                TEST_DESCRIPTION,
+        super(DEFAULT_FIELD_NAME, DEFAULT_FIELD_TYPE, DESCRIPTION,
                 ImmutableList.of(new EnumA(), new EnumB()),
                 enumValue);
     }
@@ -44,7 +42,7 @@ public class TestEnumField extends BaseEnumField<String> {
     protected static final class EnumA extends StringField {
 
         EnumA() {
-            super(ENUM_A, ENUM_A, TEST_DESCRIPTION);
+            super(ENUM_A, ENUM_A, DESCRIPTION);
         }
 
         @Override
@@ -56,7 +54,7 @@ public class TestEnumField extends BaseEnumField<String> {
     protected static final class EnumB extends StringField {
 
         EnumB() {
-            super(ENUM_B, ENUM_B, TEST_DESCRIPTION);
+            super(ENUM_B, ENUM_B, DESCRIPTION);
         }
 
         @Override

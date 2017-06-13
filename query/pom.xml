@@ -33,7 +33,5 @@
         <module>security</module>
         <module>utils</module>
         <module>app</module>
-        <module>schema</module>
-        <module>graphql-dependencies</module>
     </modules>
 </project>

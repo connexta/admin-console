@@ -15,13 +15,13 @@ package org.codice.ddf.admin.sources.commons;
 
 import java.util.List;
 
-import org.codice.ddf.admin.common.report.message.ErrorMessage;
+import org.codice.ddf.admin.common.report.message.ErrorMessageImpl;
 
 public class SourceMessages {
 
     public static final String DUPLICATE_SOURCE_NAME = "DUPLICATE_SOURCE_NAME";
 
-    public static ErrorMessage duplicateSourceNameError(List<String> path) {
-        return new ErrorMessage(DUPLICATE_SOURCE_NAME, path);
+    public static ErrorMessageImpl duplicateSourceNameError(List<String> path) {
+        return new ErrorMessageImpl(DUPLICATE_SOURCE_NAME, path);
     }
 }

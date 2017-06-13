@@ -51,91 +51,91 @@ public class DefaultMessages {
 
     public static final String DUPLICATE_MAP_KEY = "DUPLICATE_MAP_KEY";
 
-    public static ErrorMessage failedPersistError() {
-        return new ErrorMessage(FAILED_PERSIST);
+    public static ErrorMessageImpl failedPersistError() {
+        return new ErrorMessageImpl(FAILED_PERSIST);
     }
 
-    public static ErrorMessage failedDeleteError() {
-        return new ErrorMessage(FAILED_DELETE_ERROR);
+    public static ErrorMessageImpl failedDeleteError() {
+        return new ErrorMessageImpl(FAILED_DELETE_ERROR);
     }
 
-    public static ErrorMessage failedUpdateError() {
-        return new ErrorMessage(FAILED_UPDATE_ERROR);
+    public static ErrorMessageImpl failedUpdateError() {
+        return new ErrorMessageImpl(FAILED_UPDATE_ERROR);
     }
 
-    public static ErrorMessage cannotConnectError() {
-        return new ErrorMessage(CANNOT_CONNECT);
+    public static ErrorMessageImpl cannotConnectError() {
+        return new ErrorMessageImpl(CANNOT_CONNECT);
     }
 
-    public static ErrorMessage noExistingConfigError() {
-        return new ErrorMessage(NO_EXISTING_CONFIG);
+    public static ErrorMessageImpl noExistingConfigError() {
+        return new ErrorMessageImpl(NO_EXISTING_CONFIG);
     }
 
-    public static ErrorMessage failedPersistError(List<String> path) {
-        return new ErrorMessage(FAILED_PERSIST, path);
+    public static ErrorMessageImpl failedPersistError(List<String> path) {
+        return new ErrorMessageImpl(FAILED_PERSIST, path);
     }
 
-    public static ErrorMessage unsupportedEnum(List<String> path) {
-        return new ErrorMessage(UNSUPPORTED_ENUM, path);
+    public static ErrorMessageImpl unsupportedEnum(List<String> path) {
+        return new ErrorMessageImpl(UNSUPPORTED_ENUM, path);
     }
 
-    public static ErrorMessage missingKeyValue(List<String> path) {
-        return new ErrorMessage(MISSING_KEY_VALUE, path);
+    public static ErrorMessageImpl missingKeyValue(List<String> path) {
+        return new ErrorMessageImpl(MISSING_KEY_VALUE, path);
     }
 
-    public static ErrorMessage invalidPortRangeError(List<String> path) {
-        return new ErrorMessage(INVALID_PORT_RANGE, path);
+    public static ErrorMessageImpl invalidPortRangeError(List<String> path) {
+        return new ErrorMessageImpl(INVALID_PORT_RANGE, path);
     }
 
-    public static ErrorMessage missingRequiredFieldError(List<String> path) {
-        return new ErrorMessage(MISSING_REQUIRED_FIELD, path);
+    public static ErrorMessageImpl missingRequiredFieldError(List<String> path) {
+        return new ErrorMessageImpl(MISSING_REQUIRED_FIELD, path);
     }
 
-    public static ErrorMessage emptyFieldError(List<String> path) {
-        return new ErrorMessage(EMPTY_FIELD, path);
+    public static ErrorMessageImpl emptyFieldError(List<String> path) {
+        return new ErrorMessageImpl(EMPTY_FIELD, path);
     }
 
-    public static ErrorMessage invalidHostnameError(List<String> path) {
-        return new ErrorMessage(INVALID_HOSTNAME, path);
+    public static ErrorMessageImpl invalidHostnameError(List<String> path) {
+        return new ErrorMessageImpl(INVALID_HOSTNAME, path);
     }
 
-    public static ErrorMessage invalidContextPathError(List<String> path) {
-        return new ErrorMessage(INVALID_CONTEXT_PATH, path);
+    public static ErrorMessageImpl invalidContextPathError(List<String> path) {
+        return new ErrorMessageImpl(INVALID_CONTEXT_PATH, path);
     }
 
-    public static ErrorMessage unknownEndpointError(List<String> path) {
-        return new ErrorMessage(UNKNOWN_ENDPOINT, path);
+    public static ErrorMessageImpl unknownEndpointError(List<String> path) {
+        return new ErrorMessageImpl(UNKNOWN_ENDPOINT, path);
     }
 
-    public static ErrorMessage cannotConnectError(List<String> path) {
-        return new ErrorMessage(CANNOT_CONNECT, path);
+    public static ErrorMessageImpl cannotConnectError(List<String> path) {
+        return new ErrorMessageImpl(CANNOT_CONNECT, path);
     }
 
-    public static ErrorMessage failedUpdateError(List<String> path) {
-        return new ErrorMessage(FAILED_UPDATE_ERROR, path);
+    public static ErrorMessageImpl failedUpdateError(List<String> path) {
+        return new ErrorMessageImpl(FAILED_UPDATE_ERROR, path);
     }
 
-    public static ErrorMessage failedDeleteError(List<String> path) {
-        return new ErrorMessage(FAILED_DELETE_ERROR, path);
+    public static ErrorMessageImpl failedDeleteError(List<String> path) {
+        return new ErrorMessageImpl(FAILED_DELETE_ERROR, path);
     }
 
-    public static ErrorMessage invalidUrlError(List<String> path) {
-        return new ErrorMessage(INVALID_URL_ERROR, path);
+    public static ErrorMessageImpl invalidUrlError(List<String> path) {
+        return new ErrorMessageImpl(INVALID_URL_ERROR, path);
     }
 
-    public static ErrorMessage invalidUriError(List<String> path) {
-        return new ErrorMessage(INVALID_URI_ERROR, path);
+    public static ErrorMessageImpl invalidUriError(List<String> path) {
+        return new ErrorMessageImpl(INVALID_URI_ERROR, path);
     }
 
-    public static ErrorMessage noExistingConfigError(List<String> path) {
-        return new ErrorMessage(NO_EXISTING_CONFIG, path);
+    public static ErrorMessageImpl noExistingConfigError(List<String> path) {
+        return new ErrorMessageImpl(NO_EXISTING_CONFIG, path);
     }
 
-    public static ErrorMessage unauthorizedError(List<String> path) {
-        return new ErrorMessage(UNAUTHORIZED, path);
+    public static ErrorMessageImpl unauthorizedError(List<String> path) {
+        return new ErrorMessageImpl(UNAUTHORIZED, path);
     }
 
-    public static ErrorMessage duplicateMapKeyError(List<String> path) {
-        return new ErrorMessage(DUPLICATE_MAP_KEY, path);
+    public static ErrorMessageImpl duplicateMapKeyError(List<String> path) {
+        return new ErrorMessageImpl(DUPLICATE_MAP_KEY, path);
     }
 }

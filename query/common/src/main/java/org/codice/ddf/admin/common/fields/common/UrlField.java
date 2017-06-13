@@ -20,7 +20,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 
-import org.codice.ddf.admin.api.report.Message;
+import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 
 public class UrlField extends StringField {
@@ -46,8 +46,8 @@ public class UrlField extends StringField {
     }
 
     @Override
-    public List<Message> validate() {
-        List<Message> validationMsgs = super.validate();
+    public List<ErrorMessage> validate() {
+        List<ErrorMessage> validationMsgs = super.validate();
         if (!validationMsgs.isEmpty()) {
             return validationMsgs;
         }

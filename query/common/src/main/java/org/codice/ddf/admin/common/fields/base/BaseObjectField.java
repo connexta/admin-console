@@ -13,8 +13,6 @@
  **/
 package org.codice.ddf.admin.common.fields.base;
 
-import static org.codice.ddf.admin.api.DataType.FieldBaseType.OBJECT;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -26,19 +24,13 @@ import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.api.fields.ObjectField;
-import org.codice.ddf.admin.api.report.Message;
+import org.codice.ddf.admin.api.report.ErrorMessage;
 
 public abstract class BaseObjectField extends BaseDataType<Map<String, Object>>
         implements ObjectField {
 
-    // TODO: tbatie - 5/21/17 - Remove the baseType field once unions are moved to interfaces
-    protected BaseObjectField(String fieldName, String fieldTypeName, String description,
-            FieldBaseType baseType) {
-        super(fieldName, fieldTypeName, description, baseType);
-    }
-
     public BaseObjectField(String fieldName, String fieldTypeName, String description) {
-        this(fieldName, fieldTypeName, description, OBJECT);
+        super(fieldName, fieldTypeName, description);
     }
 
     @Override
@@ -66,8 +58,8 @@ public abstract class BaseObjectField extends BaseDataType<Map<String, Object>>
     }
 
     @Override
-    public List<Message> validate() {
-        List<Message> validationErrors = super.validate();
+    public List<ErrorMessage> validate() {
+        List<ErrorMessage> validationErrors = super.validate();
 
         if (!validationErrors.isEmpty()) {
             return validationErrors;
@@ -75,7 +67,7 @@ public abstract class BaseObjectField extends BaseDataType<Map<String, Object>>
 
         validationErrors.addAll(getFields().stream()
                 .filter(field -> field instanceof DataType)
-                .map(field -> (List<Message>) ((DataType)field).validate())
+                .map(field -> (List<ErrorMessage>) ((DataType)field).validate())
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList()));
         return validationErrors;

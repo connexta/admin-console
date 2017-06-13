@@ -15,12 +15,10 @@ package org.codice.ddf.admin.common.fields.base
 
 import org.codice.ddf.admin.api.DataType
 import org.codice.ddf.admin.api.fields.FunctionField
-import org.codice.ddf.admin.common.fields.base.scalar.IntegerField
 import org.codice.ddf.admin.common.fields.base.scalar.StringField
-import org.codice.ddf.admin.common.fields.test.TestFieldProvider
 import org.codice.ddf.admin.common.fields.test.TestObjectField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
-import org.codice.ddf.admin.common.report.message.ErrorMessage
+import org.codice.ddf.admin.common.report.message.ErrorMessageImpl
 import spock.lang.Specification
 
 class BaseFunctionFieldTest extends Specification {
@@ -60,7 +58,7 @@ class BaseFunctionFieldTest extends Specification {
     def 'Adding result message has correct path on added message'() {
         setup:
         functionField = new TestBaseFunctionField(false)
-        functionField.addResultMessage(new ErrorMessage('test'))
+        functionField.addResultMessage(new ErrorMessageImpl('test'))
 
         when:
         def report = functionField.getValue()

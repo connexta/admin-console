@@ -18,7 +18,7 @@ import static org.codice.ddf.admin.common.report.message.DefaultMessages.missing
 import java.util.List;
 
 import org.codice.ddf.admin.api.Field;
-import org.codice.ddf.admin.api.report.Message;
+import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 
@@ -81,8 +81,8 @@ public class ClaimsMapEntry extends BaseObjectField {
     }
 
     @Override
-    public List<Message> validate() {
-        List<Message> validationMsgs = super.validate();
+    public List<ErrorMessage> validate() {
+        List<ErrorMessage> validationMsgs = super.validate();
         if (!validationMsgs.isEmpty()) {
             return validationMsgs;
         }

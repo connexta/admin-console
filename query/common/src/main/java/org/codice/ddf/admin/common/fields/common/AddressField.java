@@ -16,7 +16,7 @@ package org.codice.ddf.admin.common.fields.common;
 import java.util.List;
 
 import org.codice.ddf.admin.api.Field;
-import org.codice.ddf.admin.api.report.Message;
+import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
 
 import com.google.common.collect.ImmutableList;
@@ -70,7 +70,7 @@ public class AddressField extends BaseObjectField {
     }
 
     @Override
-    public List<Message> validate() {
+    public List<ErrorMessage> validate() {
         if(isRequired() && url.getValue() == null && (host.hostnameField().getValue() != null || host.portField().getValue() != null)) {
             host.isRequired(true);
         } else if(isRequired()) {

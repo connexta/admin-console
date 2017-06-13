@@ -3,7 +3,7 @@ query TestMessagePaths {
     path {
       path2 {
         path3 {
-          returnErrorsAndWarnings(testObj: {list: ["str"]}) {
+          returnErrors(testObj: {list: ["str"]}) {
             integer
             boolean
             string

@@ -261,6 +261,36 @@ class GraphQLTransformationTest extends Specification {
                 ]
     }
 
+    def "batched request with 1 query works"() {
+        setup:
+
+        def query = [
+                query: getQuery('SatisfiedRequiredFieldsQuery'),
+                variables: getVariables()
+        ]
+
+        request.setContent(toJson([query]).bytes)
+
+        when:
+        servlet.doPost(request, response)
+
+        then:
+        response.getStatus() == STATUS_OK
+        getResponseContentAsList()[0].errors == null
+        getResponseContentAsList()[0].data == [
+                (FUNCTION_NAME): [
+                        (TestFieldProvider.REQUIRED_ARG_FUNCTION_NAME): [
+                                (STRING)          : STRING_ARG_VALUE,
+                                (INTEGER)         : INTEGER_ARG_VALUE,
+                                (BOOLEAN)         : BOOLEAN_ARG_VALUE,
+                                (LIST)            : LIST_ARG_VALUE,
+                                (ENUMERATION)     : ENUM_ARG_VALUE,
+                                (INNER_OBJECT): INNER_OBJECT_ARG_VALUE
+                        ]
+                ]
+        ]
+    }
+
     def "batched request with 1 valid query and 1 invalid query"() {
         setup:
 

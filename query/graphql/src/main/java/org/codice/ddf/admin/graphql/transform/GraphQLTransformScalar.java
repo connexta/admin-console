@@ -52,6 +52,9 @@ public class GraphQLTransformScalar {
             type = field.fieldTypeName() == null ? Scalars.GraphQLString :
                         new GraphQLScalarType(field.fieldTypeName(), field.description(), Scalars.GraphQLString.getCoercing());
             break;
+        case FLOAT:
+            type = field.fieldTypeName() == null ? Scalars.GraphQLFloat :
+                    new GraphQLScalarType(field.fieldTypeName(), field.description(), Scalars.GraphQLFloat.getCoercing());
         }
 
         if(field.fieldTypeName() != null && type != null) {

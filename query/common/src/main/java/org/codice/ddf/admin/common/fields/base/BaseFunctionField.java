@@ -20,7 +20,7 @@ import java.util.Map;
 import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.api.report.FunctionReport;
-import org.codice.ddf.admin.api.report.Message;
+import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.codice.ddf.admin.api.report.Report;
 import org.codice.ddf.admin.common.report.FunctionReportImpl;
 
@@ -98,7 +98,7 @@ public abstract class BaseFunctionField<T extends DataType> extends BaseField<Ma
     public void validate() {
         getArguments().stream()
                 .map(DataType::validate)
-                .flatMap(Collection<Message>::stream)
+                .flatMap(Collection<ErrorMessage>::stream)
                 .forEach(msg -> addArgumentMessage(msg));
     }
 
@@ -106,13 +106,13 @@ public abstract class BaseFunctionField<T extends DataType> extends BaseField<Ma
         return report.containsErrorMsgs();
     }
 
-    protected BaseFunctionField addArgumentMessages(List<Message> msgs) {
+    protected BaseFunctionField addArgumentMessages(List<ErrorMessage> msgs) {
         msgs.forEach(this::addArgumentMessage);
         return this;
     }
 
-    protected BaseFunctionField addArgumentMessage(Message msg) {
-        Message copy = msg.copy();
+    protected BaseFunctionField addArgumentMessage(ErrorMessage msg) {
+        ErrorMessage copy = msg.copy();
         if(copy.getPath().isEmpty()) {
             copy.setPath(path());
         }
@@ -121,13 +121,13 @@ public abstract class BaseFunctionField<T extends DataType> extends BaseField<Ma
         return this;
     }
 
-    protected BaseFunctionField addResultMessages(List<Message> msgs) {
+    protected BaseFunctionField addResultMessages(List<ErrorMessage> msgs) {
         msgs.forEach(this::addResultMessage);
         return this;
     }
 
-    protected BaseFunctionField addResultMessage(Message msg) {
-        Message copy = msg.copy();
+    protected BaseFunctionField addResultMessage(ErrorMessage msg) {
+        ErrorMessage copy = msg.copy();
         List<String> copyMsgPath = copy.getPath();
 
         //Remove first element of path because the return object's name will be included in the path

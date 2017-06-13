@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.ListField;
-import org.codice.ddf.admin.api.report.Message;
+import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -113,12 +113,12 @@ public class ListFieldImpl<T extends DataType> extends BaseDataType<List>
     }
 
     @Override
-    public List<Message> validate() {
-        List<Message> validationMsgs = super.validate();
+    public List<ErrorMessage> validate() {
+        List<ErrorMessage> validationMsgs = super.validate();
 
         if (validationMsgs.isEmpty() && (getList() != null)) {
-            List<Message> fieldValidationMsgs = getList().stream()
-                    .map(field -> (List<Message>) field.validate())
+            List<ErrorMessage> fieldValidationMsgs = getList().stream()
+                    .map(field -> (List<ErrorMessage>) field.validate())
                     .flatMap(Collection::stream)
                     .collect(Collectors.toList());
             validationMsgs.addAll(fieldValidationMsgs);

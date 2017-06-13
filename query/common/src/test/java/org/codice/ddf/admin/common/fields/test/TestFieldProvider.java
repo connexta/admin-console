@@ -28,7 +28,7 @@ import org.codice.ddf.admin.common.fields.base.function.GetFunctionField;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.common.fields.base.scalar.IntegerField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
-import org.codice.ddf.admin.common.report.message.ErrorMessage;
+import org.codice.ddf.admin.common.report.message.ErrorMessageImpl;
 
 import com.google.common.collect.ImmutableList;
 
@@ -407,12 +407,12 @@ public class TestFieldProvider extends BaseFieldProvider {
         }
     }
 
-    public static ErrorMessage sampleArgumentError(List<String> path) {
-        return new ErrorMessage(ARGUMENT_MSG, path);
+    public static ErrorMessageImpl sampleArgumentError(List<String> path) {
+        return new ErrorMessageImpl(ARGUMENT_MSG, path);
     }
 
-    public static ErrorMessage sampleReturnValueError(List<String> path) {
-        return new ErrorMessage(RETURN_VALUE_MSG, path);
+    public static ErrorMessageImpl sampleReturnValueError(List<String> path) {
+        return new ErrorMessageImpl(RETURN_VALUE_MSG, path);
     }
 
     public static class SampleMutation extends BaseFunctionField<TestObjectField> {

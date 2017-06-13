@@ -14,7 +14,7 @@
 package org.codice.ddf.admin.common.fields.common
 
 import org.codice.ddf.admin.api.fields.ListField
-import org.codice.ddf.admin.api.report.Message
+import org.codice.ddf.admin.api.report.ErrorMessage
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import spock.lang.Specification
 
@@ -73,7 +73,7 @@ class MapFieldTest extends Specification {
         mapField.setValue(value)
 
         when:
-        List<Message> validationMsgs = mapField.validate()
+        List<ErrorMessage> validationMsgs = mapField.validate()
 
         then:
         validationMsgs.size() == 1

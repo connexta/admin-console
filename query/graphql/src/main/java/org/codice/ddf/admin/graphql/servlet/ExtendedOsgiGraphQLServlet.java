@@ -27,7 +27,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.codice.ddf.admin.api.FieldProvider;
-import org.codice.ddf.admin.api.report.Message;
+import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.codice.ddf.admin.graphql.servlet.request.DelegateRequest;
 import org.codice.ddf.admin.graphql.servlet.request.DelegateResponse;
 import org.codice.ddf.admin.graphql.transform.FunctionDataFetcherException;
@@ -37,7 +37,6 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import graphql.GraphQLError;
 import graphql.annotations.EnhancedExecutionStrategy;
@@ -80,6 +79,7 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet {
         // TODO: tbatie - 6/9/17 - GraphQLServlet does not support batched requests even though a BatchedExecutionStrategy exists. This should be fixed in the GraphQLServlet and contributed back to graphql-java-servlet
         List<String> responses = new ArrayList<>();
         String originalReqContent = IOUtils.toString(originalRequest.getInputStream());
+        boolean isBatchRequest = isBatchRequest(originalReqContent);
 
         try {
             List<String> splitReqs = splitQueries(originalReqContent);
@@ -91,26 +91,27 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet {
 
             originalResponse.setContentType(APPLICATION_JSON_UTF8);
             originalResponse.setStatus(STATUS_OK);
-            originalResponse.getWriter().write(splitReqs.size() == 1 ? responses.get(0) : "[" + String.join(",", responses) + "]");
+            originalResponse.getWriter().write( isBatchRequest ? "[" + String.join(",", responses) + "]" : responses.get(0));
         } catch (Throwable t) {
             originalResponse.setStatus(500);
             log.error("Error executing GraphQL request!", t);
         }
     }
 
-    public List<String> splitQueries(String jsonArray) throws Exception {
+    public List<String> splitQueries(String requestContent) throws Exception {
         List<String> splitElements = new ArrayList<>();
-        JsonNode jsonNode = new ObjectMapper().readTree(jsonArray);
+        JsonNode jsonNode = new ObjectMapper().readTree(requestContent);
         if (jsonNode.isArray()) {
-            ArrayNode arrayNode = (ArrayNode) jsonNode;
-            for (int i = 0; i < arrayNode.size(); i++) {
-                JsonNode individualElement = arrayNode.get(i);
-                splitElements.add(individualElement.toString());
-            }
+            jsonNode.elements()
+                    .forEachRemaining(node -> splitElements.add(node.toString()));
         } else {
             splitElements.add(jsonNode.toString());
         }
         return splitElements;
+    }
+
+    public boolean isBatchRequest(String requestContent) throws IOException {
+        return new ObjectMapper().readTree(requestContent).isArray();
     }
 
     public void bindFieldProvider(FieldProvider fieldProvider) {
@@ -127,13 +128,13 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet {
         }
 
         if (CollectionUtils.isNotEmpty(fieldProvider.getMutationFunctions())) {
-            LOGGER.debug("Binding mutations of field provider [{}] to graphql servlet.", fieldProvider.fieldName());
+            LOGGER.debug("Binding mutations of field provider {} to graphql servlet.", fieldProvider.fieldName());
             try {
                 GraphQLMutationProvider mutationProvider = new GraphQLMutationProviderImpl(fieldProvider, transformCommons);
                 bindMutationProvider(mutationProvider);
                 graphQLMutationProviders.put(fieldProvider.fieldTypeName(), mutationProvider);
             } catch (Exception e) {
-                LOGGER.error("Unable to bind mutations of field provider [{}] to graphql servlet.", fieldProvider.fieldName(), e);
+                LOGGER.error("Unable to bind mutations of field provider {} to graphql servlet.", fieldProvider.fieldName(), e);
             }
         }
     }
@@ -194,7 +195,7 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet {
         protected void handleDataFetchingException(ExecutionContext executionContext,
                 GraphQLFieldDefinition fieldDef, Map<String, Object> argumentValues, Exception e) {
             if(e instanceof FunctionDataFetcherException) {
-                for(Message msg : ((FunctionDataFetcherException) e).getCustomMessages()) {
+                for(ErrorMessage msg : ((FunctionDataFetcherException) e).getCustomMessages()) {
                     executionContext.addError(new DataFetchingGraphQLError(msg));
                 }
             } else {

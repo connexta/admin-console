@@ -13,28 +13,28 @@
  **/
 package org.codice.ddf.admin.ldap.commons;
 
-import org.codice.ddf.admin.common.report.message.ErrorMessage;
+import org.codice.ddf.admin.common.report.message.ErrorMessageImpl;
 
 public class LdapMessages {
 
-    public static final ErrorMessage CANNOT_CONFIGURE = new ErrorMessage("CANNOT_CONFIGURE");
-    public static final ErrorMessage CANNOT_CONNECT = new ErrorMessage("CANNOT_CONNECT");
-    public static final ErrorMessage CANNOT_BIND = new ErrorMessage("CANNOT_BIND");
+    public static final ErrorMessageImpl CANNOT_CONFIGURE = new ErrorMessageImpl("CANNOT_CONFIGURE");
+    public static final ErrorMessageImpl CANNOT_CONNECT = new ErrorMessageImpl("CANNOT_CONNECT");
+    public static final ErrorMessageImpl CANNOT_BIND = new ErrorMessageImpl("CANNOT_BIND");
 
-    public static final ErrorMessage BASE_USER_DN_NOT_FOUND = new ErrorMessage("BASE_USER_DN_NOT_FOUND");
-    public static final ErrorMessage BASE_GROUP_DN_NOT_FOUND = new ErrorMessage("BASE_GROUP_DN_NOT_FOUND");
+    public static final ErrorMessageImpl BASE_USER_DN_NOT_FOUND = new ErrorMessageImpl("BASE_USER_DN_NOT_FOUND");
+    public static final ErrorMessageImpl BASE_GROUP_DN_NOT_FOUND = new ErrorMessageImpl("BASE_GROUP_DN_NOT_FOUND");
 
-    public static final ErrorMessage NO_USERS_IN_BASE_USER_DN = new ErrorMessage("NO_USERS_IN_BASE_USER_DN");
-    public static final ErrorMessage NO_GROUPS_IN_BASE_GROUP_DN = new ErrorMessage("NO_GROUPS_IN_BASE_GROUP_DN");
-    public static final ErrorMessage NO_GROUPS_WITH_MEMBERS = new ErrorMessage("NO_GROUPS_WITH_MEMBERS");
-    public static final ErrorMessage NO_REFERENCED_MEMBER = new ErrorMessage("NO_REFERENCED_MEMBER");
-    public static final ErrorMessage USER_NAME_ATTRIBUTE_NOT_FOUND = new ErrorMessage("USER_NAME_ATTRIBUTE_NOT_FOUND");
+    public static final ErrorMessageImpl NO_USERS_IN_BASE_USER_DN = new ErrorMessageImpl("NO_USERS_IN_BASE_USER_DN");
+    public static final ErrorMessageImpl NO_GROUPS_IN_BASE_GROUP_DN = new ErrorMessageImpl("NO_GROUPS_IN_BASE_GROUP_DN");
+    public static final ErrorMessageImpl NO_GROUPS_WITH_MEMBERS = new ErrorMessageImpl("NO_GROUPS_WITH_MEMBERS");
+    public static final ErrorMessageImpl NO_REFERENCED_MEMBER = new ErrorMessageImpl("NO_REFERENCED_MEMBER");
+    public static final ErrorMessageImpl USER_NAME_ATTRIBUTE_NOT_FOUND = new ErrorMessageImpl("USER_NAME_ATTRIBUTE_NOT_FOUND");
 
-    public static ErrorMessage invalidDnFormatError(String pathOrigin) {
-        return  new ErrorMessage("INVALID_DN", pathOrigin);
+    public static ErrorMessageImpl invalidDnFormatError(String pathOrigin) {
+        return  new ErrorMessageImpl("INVALID_DN", pathOrigin);
     }
 
-    public static ErrorMessage invalidQueryError(String pathOrigin) {
-        return new ErrorMessage("INVALID_QUERY", pathOrigin);
+    public static ErrorMessageImpl invalidQueryError(String pathOrigin) {
+        return new ErrorMessageImpl("INVALID_QUERY", pathOrigin);
     }
 }

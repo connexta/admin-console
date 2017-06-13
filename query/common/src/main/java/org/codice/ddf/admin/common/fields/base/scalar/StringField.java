@@ -18,7 +18,7 @@ import static org.codice.ddf.admin.common.report.message.DefaultMessages.emptyFi
 
 import java.util.List;
 
-import org.codice.ddf.admin.api.report.Message;
+import org.codice.ddf.admin.api.report.ErrorMessage;
 
 public class StringField extends BaseScalarField<String> {
 
@@ -37,8 +37,8 @@ public class StringField extends BaseScalarField<String> {
     }
 
     @Override
-    public List<Message> validate() {
-        List<Message> validationMsgs = super.validate();
+    public List<ErrorMessage> validate() {
+        List<ErrorMessage> validationMsgs = super.validate();
 
         if(!validationMsgs.isEmpty()) {
             return validationMsgs;

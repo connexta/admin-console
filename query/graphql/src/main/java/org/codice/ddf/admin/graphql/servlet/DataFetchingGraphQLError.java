@@ -17,7 +17,7 @@ import static graphql.ErrorType.DataFetchingException;
 
 import java.util.List;
 
-import org.codice.ddf.admin.api.report.Message;
+import org.codice.ddf.admin.api.report.ErrorMessage;
 
 import graphql.ErrorType;
 import graphql.GraphQLError;
@@ -28,7 +28,7 @@ public class DataFetchingGraphQLError implements GraphQLError {
     private String code;
     private List<String> path;
 
-    public DataFetchingGraphQLError(Message msg) {
+    public DataFetchingGraphQLError(ErrorMessage msg) {
         this.code = msg.getCode();
         this.path = msg.getPath();
     }

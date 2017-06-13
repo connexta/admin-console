@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.codice.ddf.admin.api.DataType;
-import org.codice.ddf.admin.api.report.Message;
+import org.codice.ddf.admin.api.report.ErrorMessage;
 
 public class BaseDataType<T> extends BaseField<T, T> implements DataType<T> {
 
@@ -62,8 +62,8 @@ public class BaseDataType<T> extends BaseField<T, T> implements DataType<T> {
     }
 
     @Override
-    public List<Message> validate() {
-        List<Message> errors = new ArrayList<>();
+    public List<ErrorMessage> validate() {
+        List<ErrorMessage> errors = new ArrayList<>();
 
         if (isRequired()) {
             if (getValue() == null) {

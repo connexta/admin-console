@@ -27,7 +27,7 @@ import java.util.List;
 
 import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
-import org.codice.ddf.admin.api.report.Message;
+import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.codice.ddf.admin.common.fields.base.function.TestFunctionField;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.ldap.commons.LdapConnectionAttempt;
@@ -128,9 +128,9 @@ public class LdapTestSettings extends TestFunctionField {
      * @param ldapConnection
      * @return
      */
-    private List<Message> checkUsersInDir(LdapSettingsField ldapSettings,
+    private List<ErrorMessage> checkUsersInDir(LdapSettingsField ldapSettings,
             Connection ldapConnection) {
-        List<Message> errors = new ArrayList<>();
+        List<ErrorMessage> errors = new ArrayList<>();
         List<SearchResultEntry> baseUsersResults = utils.getLdapQueryResults(ldapConnection,
                 ldapSettings.baseUserDn(),
                 Filter.present(ldapSettings.usernameAttribute())
@@ -154,8 +154,8 @@ public class LdapTestSettings extends TestFunctionField {
      * @param settings
      * @param ldapConnection
      */
-    List<Message> checkGroupObjectClass(LdapSettingsField settings, Connection ldapConnection) {
-        List<Message> errors = new ArrayList<>();
+    List<ErrorMessage> checkGroupObjectClass(LdapSettingsField settings, Connection ldapConnection) {
+        List<ErrorMessage> errors = new ArrayList<>();
         List<SearchResultEntry> baseGroupResults = utils.getLdapQueryResults(ldapConnection,
                 settings.baseGroupDn(),
                 Filter.equality("objectClass", settings.groupObjectClass())
@@ -171,8 +171,8 @@ public class LdapTestSettings extends TestFunctionField {
         return errors;
     }
 
-    List<Message> checkGroup(LdapSettingsField settings, Connection ldapConnection) {
-        List<Message> errors = new ArrayList<>();
+    List<ErrorMessage> checkGroup(LdapSettingsField settings, Connection ldapConnection) {
+        List<ErrorMessage> errors = new ArrayList<>();
         List<SearchResultEntry> groups = utils.getLdapQueryResults(ldapConnection,
                 settings.baseGroupDn(),
                 Filter.and(Filter.equality("objectClass", settings.groupObjectClass()),
@@ -190,9 +190,9 @@ public class LdapTestSettings extends TestFunctionField {
         return errors;
     }
 
-    List<Message> checkReferencedUser(LdapSettingsField settings, Connection ldapConnection,
+    List<ErrorMessage> checkReferencedUser(LdapSettingsField settings, Connection ldapConnection,
             SearchResultEntry group) {
-        List<Message> errors = new ArrayList<>();
+        List<ErrorMessage> errors = new ArrayList<>();
         String memberRef = group.getAttribute(settings.groupAttributeHoldingMember())
                 .firstValueAsString();
         // This memberRef will be in the format:

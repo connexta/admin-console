@@ -17,16 +17,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.collections.ListUtils;
-import org.codice.ddf.admin.api.report.Message;
+import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.codice.ddf.admin.api.report.Report;
 
 import com.google.common.collect.ImmutableList;
 
 public class ReportImpl implements Report {
 
-    private List<Message> argumentMessages;
+    private List<ErrorMessage> argumentMessages;
 
-    private List<Message> resultMessages;
+    private List<ErrorMessage> resultMessages;
 
     public ReportImpl() {
         argumentMessages = new ArrayList<>();
@@ -34,36 +34,36 @@ public class ReportImpl implements Report {
     }
 
     @Override
-    public List<Message> argumentMessages() {
+    public List<ErrorMessage> argumentMessages() {
         return ImmutableList.copyOf(argumentMessages);
     }
 
     @Override
-    public List<Message> resultMessages() {
+    public List<ErrorMessage> resultMessages() {
         return ImmutableList.copyOf(resultMessages);
     }
 
     @Override
-    public List<Message> messages() {
+    public List<ErrorMessage> messages() {
         return ListUtils.union(argumentMessages, resultMessages);
     }
 
-    public ReportImpl addArgumentMessages(List<Message> messages) {
+    public ReportImpl addArgumentMessages(List<ErrorMessage> messages) {
         argumentMessages.addAll(messages);
         return this;
     }
 
-    public ReportImpl addArgumentMessage(Message message) {
+    public ReportImpl addArgumentMessage(ErrorMessage message) {
         argumentMessages.add(message);
         return this;
     }
 
-    public ReportImpl addResultMessages(List<Message> messages) {
+    public ReportImpl addResultMessages(List<ErrorMessage> messages) {
         resultMessages.addAll(messages);
         return this;
     }
 
-    public ReportImpl addResultMessage(Message message) {
+    public ReportImpl addResultMessage(ErrorMessage message) {
         resultMessages.add(message);
         return this;
     }

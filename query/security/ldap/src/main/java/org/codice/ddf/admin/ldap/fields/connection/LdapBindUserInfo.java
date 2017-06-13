@@ -18,7 +18,7 @@ import static org.codice.ddf.admin.ldap.fields.connection.LdapBindMethod.DIGEST_
 import java.util.List;
 
 import org.codice.ddf.admin.api.Field;
-import org.codice.ddf.admin.api.report.Message;
+import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
 
@@ -79,7 +79,7 @@ public class LdapBindUserInfo extends BaseObjectField {
     }
 
     @Override
-    public List<Message> validate() {
+    public List<ErrorMessage> validate() {
         if(bindMethod().equals(DIGEST_MD5_SASL)) {
             realm.isRequired(true);
         }

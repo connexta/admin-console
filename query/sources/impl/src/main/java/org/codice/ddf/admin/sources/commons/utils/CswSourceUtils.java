@@ -32,6 +32,7 @@ import org.codice.ddf.admin.common.fields.common.CredentialsField;
 import org.codice.ddf.admin.common.fields.common.HostField;
 import org.codice.ddf.admin.common.fields.common.UrlField;
 import org.codice.ddf.admin.common.report.ReportWithResultImpl;
+import org.codice.ddf.admin.common.report.message.ErrorMessageImpl;
 import org.codice.ddf.admin.sources.fields.type.CswSourceConfigurationField;
 import org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField;
 import org.slf4j.Logger;
@@ -86,7 +87,7 @@ public class CswSourceUtils {
      *
      * @param hostField address to probe for CSW capabilities
      * @param creds        optional credentials for basic authentication
-     * @return a {@link ReportWithResultImpl} containing the {@link UrlField} or an {@link org.codice.ddf.admin.common.report.message.ErrorMessage} on failure.
+     * @return a {@link ReportWithResultImpl} containing the {@link UrlField} or an {@link ErrorMessageImpl} on failure.
      */
     public ReportWithResultImpl<UrlField> discoverCswUrl(HostField hostField, CredentialsField creds) {
         return requestUtils.discoverUrlFromHost(hostField, URL_FORMATS, creds,
@@ -103,7 +104,7 @@ public class CswSourceUtils {
      *
      * @param urlField A URL of an endpoint with CSW capabilities
      * @param creds    optional credentials for basic authentication
-     * @return a {@link ReportWithResultImpl} containing the {@link SourceConfigUnionField} or an {@link org.codice.ddf.admin.common.report.message.ErrorMessage} on failure.
+     * @return a {@link ReportWithResultImpl} containing the {@link SourceConfigUnionField} or an {@link ErrorMessageImpl} on failure.
      */
     public ReportWithResultImpl<SourceConfigUnionField> getPreferredCswConfig(UrlField urlField, CredentialsField creds) {
         ReportWithResultImpl<String> responseBodyResult = requestUtils.sendGetRequest(urlField,

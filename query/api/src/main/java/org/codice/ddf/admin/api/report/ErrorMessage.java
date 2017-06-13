@@ -15,13 +15,13 @@ package org.codice.ddf.admin.api.report;
 
 import java.util.List;
 
-public interface Message {
+public interface ErrorMessage {
 
     String getCode();
 
     List<String> getPath();
 
-    Message setPath(List<String> path);
+    ErrorMessage setPath(List<String> path);
 
-    Message copy();
+    ErrorMessage copy();
 }

@@ -15,7 +15,7 @@ package org.codice.ddf.admin.api;
 
 import java.util.List;
 
-import org.codice.ddf.admin.api.report.Message;
+import org.codice.ddf.admin.api.report.ErrorMessage;
 
 /**
  *
@@ -28,7 +28,7 @@ public interface DataType<T> extends Field<T, T> {
 
     boolean isRequired();
 
-    List<Message> validate();
+    List<ErrorMessage> validate();
 
     DataType<T> isRequired(boolean required);
 

@@ -29,7 +29,7 @@ import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
-import org.codice.ddf.admin.common.report.message.ErrorMessage;
+import org.codice.ddf.admin.common.report.message.ErrorMessageImpl;
 import org.codice.ddf.admin.configurator.Configurator;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.configurator.OperationReport;
@@ -95,14 +95,14 @@ public class InstallEmbeddedLdap extends BaseFunctionField<BooleanField> {
             LOGGER.debug("Unrecognized LDAP use case \"{}\". No commits will be made. ",
                     useCase.getValue());
             // TODO: tbatie - 4/4/17 - change this to specify the arg that was unknown
-            addResultMessage(new ErrorMessage("FAILED_PERSIST"));
+            addResultMessage(new ErrorMessageImpl("FAILED_PERSIST"));
             return new BooleanField(false);
         }
 
         OperationReport report = configurator.commit("Installed Embedded LDAP");
 
         if (report.containsFailedResults()) {
-            addResultMessage(new ErrorMessage("CANNOT_INSTALL"));
+            addResultMessage(new ErrorMessageImpl("CANNOT_INSTALL"));
             return new BooleanField(false);
 
         }

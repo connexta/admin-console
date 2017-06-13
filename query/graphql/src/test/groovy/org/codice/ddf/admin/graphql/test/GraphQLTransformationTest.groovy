@@ -154,7 +154,7 @@ class GraphQLTransformationTest extends Specification {
                 ]
     }
 
-    def 'Data is still returned with errors'() {
+    def 'Data is not returned when there are errors'() {
         setup:
         request.addParameter(GRAPHQL_QUERY, getQuery('MessagePathsQuery'))
         request.addParameter(GRAPHQL_VARIABLES, getVariables())
@@ -261,21 +261,28 @@ class GraphQLTransformationTest extends Specification {
                 ]
     }
 
-    def "successfully query with batched requests"() {
+    def "batched request with 1 valid query and 1 invalid query"() {
         setup:
-        def query = [
+
+        def goodQuery = [
                 query: getQuery('SatisfiedRequiredFieldsQuery'),
                 variables: getVariables()
         ]
 
-        request.setContent(toJson([query, query]).bytes)
+        def badQuery = [
+                query: getQuery('MissingRequiredInnerFieldsArgumentQuery'),
+                variables: getVariables()
+        ]
+
+        request.setContent(toJson([goodQuery, badQuery]).bytes)
 
         when:
         servlet.doPost(request, response)
 
         then:
-        def expectedQueryResponse  =
-        [
+        response.getStatus() == STATUS_OK
+        getResponseContentAsList()[0].errors == null
+        getResponseContentAsList()[0].data == [
                 (FUNCTION_NAME): [
                         (TestFieldProvider.REQUIRED_ARG_FUNCTION_NAME): [
                                 (STRING)          : STRING_ARG_VALUE,
@@ -288,28 +295,7 @@ class GraphQLTransformationTest extends Specification {
                 ]
         ]
 
-        response.getStatus() == STATUS_OK
-        getResponseContentAsList()[0].errors == null
-        getResponseContentAsList()[0].data == expectedQueryResponse
-
-        getResponseContentAsList()[1].errors == null
-        getResponseContentAsList()[1].data == expectedQueryResponse
-    }
-
-    def "successfully query with bad batched requests"() {
-        setup:
-
-        def query = [
-                query: getQuery('MissingRequiredInnerFieldsArgumentQuery'),
-                variables: getVariables()
-        ]
-        request.setContent(toJson([query, query]).bytes)
-
-        when:
-        servlet.doPost(request, response)
-
-        then:
-        def expectedErrors = ([
+        getResponseContentAsList()[1].errors as Set == ([
                 createMissingRequiredFieldError(requiredArgFunctionPath, [TEST_OBJECT_NAME, INTEGER]),
                 createMissingRequiredFieldError(requiredArgFunctionPath, [TEST_OBJECT_NAME, BOOLEAN]),
                 createMissingRequiredFieldError(requiredArgFunctionPath, [TEST_OBJECT_NAME, STRING]),
@@ -318,18 +304,11 @@ class GraphQLTransformationTest extends Specification {
                 createMissingRequiredFieldError(requiredArgFunctionPath, [TEST_OBJECT_NAME, INNER_OBJECT, TestObjectField.SUB_FIELD_OF_INNER_FIELD_NAME])
         ] as Set)
 
-        def expectedData = [
+        getResponseContentAsList()[1].data == [
                 testing: [
                         requiredArg: null
                 ]
         ]
-
-        response.getStatus() == STATUS_OK
-        getResponseContentAsList()[0].errors as Set == expectedErrors
-        getResponseContentAsList()[0].data == expectedData
-
-        getResponseContentAsList()[1].errors as Set == expectedErrors
-        getResponseContentAsList()[1].data == expectedData
     }
 
     def getResponseContentAsMap() {

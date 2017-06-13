@@ -29,6 +29,7 @@ import org.codice.ddf.admin.common.fields.common.CredentialsField;
 import org.codice.ddf.admin.common.fields.common.HostField;
 import org.codice.ddf.admin.common.fields.common.UrlField;
 import org.codice.ddf.admin.common.report.ReportWithResultImpl;
+import org.codice.ddf.admin.common.report.message.ErrorMessageImpl;
 import org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField;
 import org.codice.ddf.admin.sources.fields.type.WfsSourceConfigurationField;
 import org.slf4j.Logger;
@@ -74,7 +75,7 @@ public class WfsSourceUtils {
      *
      * @param hostField address to probe for WFS capabilities
      * @param creds        optional username to add to Basic Auth header
-     * @return a {@link ReportWithResultImpl} containing the {@link UrlField} or an {@link org.codice.ddf.admin.common.report.message.ErrorMessage} on failure.
+     * @return a {@link ReportWithResultImpl} containing the {@link UrlField} or an {@link ErrorMessageImpl} on failure.
      */
     public ReportWithResultImpl<UrlField> discoverWfsUrl(HostField hostField, CredentialsField creds) {
         return requestUtils.discoverUrlFromHost(hostField, URL_FORMATS, creds, GET_CAPABILITIES_PARAMS);
@@ -90,7 +91,7 @@ public class WfsSourceUtils {
      *
      * @param urlField WFS URL to probe for a configuration
      * @param creds    optional username to add to Basic Auth header
-     * @return a {@link ReportWithResultImpl} containing the preferred {@link SourceConfigUnionField}, or containing {@link org.codice.ddf.admin.common.report.message.ErrorMessage}s on failure.
+     * @return a {@link ReportWithResultImpl} containing the preferred {@link SourceConfigUnionField}, or containing {@link ErrorMessageImpl}s on failure.
      */
     public ReportWithResultImpl<SourceConfigUnionField> getPreferredWfsConfig(UrlField urlField, CredentialsField creds) {
         ReportWithResultImpl<String> responseBodyResult = requestUtils.sendGetRequest(urlField, creds, GET_CAPABILITIES_PARAMS);

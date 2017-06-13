@@ -18,7 +18,7 @@ import org.codice.ddf.admin.common.fields.common.CredentialsField
 import org.codice.ddf.admin.common.fields.common.UrlField
 import org.codice.ddf.admin.common.report.ReportWithResultImpl
 import org.codice.ddf.admin.common.report.message.DefaultMessages
-import org.codice.ddf.admin.common.report.message.ErrorMessage
+import org.codice.ddf.admin.common.report.message.ErrorMessageImpl
 import org.codice.ddf.admin.sources.commons.utils.CswSourceUtils
 import org.codice.ddf.admin.sources.fields.SourceInfoField
 import org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField
@@ -128,7 +128,7 @@ class DiscoverCswSourceTest extends Specification {
     def createResult(boolean hasError, Class clazz) {
         if(hasError) {
             return Mock(ReportWithResultImpl) {
-                argumentMessages() >> [new ErrorMessage("code", [])]
+                argumentMessages() >> [new ErrorMessageImpl("code", [])]
                 resultMessages() >> []
             }
         }

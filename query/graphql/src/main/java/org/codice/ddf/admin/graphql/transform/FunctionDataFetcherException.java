@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.boon.Boon;
-import org.codice.ddf.admin.api.report.Message;
+import org.codice.ddf.admin.api.report.ErrorMessage;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -26,16 +26,16 @@ public class FunctionDataFetcherException extends RuntimeException {
     private String functionName;
     private Map<String, Object> args;
 
-    private List<Message> customMessage;
+    private List<ErrorMessage> customMessage;
 
-    public FunctionDataFetcherException(String functionName, Map<String, Object> args, List<Message> customMessage) {
+    public FunctionDataFetcherException(String functionName, Map<String, Object> args, List<ErrorMessage> customMessage) {
         super();
         this.functionName = functionName;
         this.args = args;
         this.customMessage = customMessage;
     }
 
-    public List<Message> getCustomMessages() {
+    public List<ErrorMessage> getCustomMessages() {
         return customMessage;
     }
 

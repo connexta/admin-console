@@ -17,7 +17,7 @@ import static org.codice.ddf.admin.ldap.commons.LdapMessages.invalidDnFormatErro
 
 import java.util.List;
 
-import org.codice.ddf.admin.api.report.Message;
+import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 import org.forgerock.opendj.ldap.DN;
 
@@ -39,8 +39,8 @@ public class LdapDistinguishedName extends StringField {
     }
 
     @Override
-    public List<Message> validate() {
-        List<Message> validationMsgs = super.validate();
+    public List<ErrorMessage> validate() {
+        List<ErrorMessage> validationMsgs = super.validate();
         if(!validationMsgs.isEmpty()) {
             return validationMsgs;
         }

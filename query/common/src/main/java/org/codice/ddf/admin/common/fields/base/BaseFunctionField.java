@@ -19,8 +19,8 @@ import java.util.Map;
 
 import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
-import org.codice.ddf.admin.api.report.FunctionReport;
 import org.codice.ddf.admin.api.report.ErrorMessage;
+import org.codice.ddf.admin.api.report.FunctionReport;
 import org.codice.ddf.admin.api.report.Report;
 import org.codice.ddf.admin.common.report.FunctionReportImpl;
 

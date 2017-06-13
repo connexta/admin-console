@@ -31,7 +31,6 @@ import org.codice.ddf.admin.common.fields.common.HostField;
 import org.codice.ddf.admin.common.fields.common.UrlField;
 import org.codice.ddf.admin.common.report.ReportImpl;
 import org.codice.ddf.admin.common.report.ReportWithResultImpl;
-import org.codice.ddf.admin.common.report.message.ErrorMessageImpl;
 import org.codice.ddf.admin.sources.fields.type.OpenSearchSourceConfigurationField;
 import org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField;
 import org.slf4j.Logger;
@@ -74,7 +73,7 @@ public class OpenSearchSourceUtils {
      *
      * @param urlField The URL to probe for OpenSearch capabilities
      * @param creds    optional credentials to send with Basic Auth header
-     * @return a {@link ReportWithResultImpl} containing the {@link SourceConfigUnionField} or containing {@link ErrorMessageImpl}s on failure.
+     * @return a {@link ReportWithResultImpl} containing the {@link SourceConfigUnionField} or containing {@link org.codice.ddf.admin.api.report.ErrorMessage}s on failure.
      */
     public ReportWithResultImpl<SourceConfigUnionField> getOpenSearchConfig(UrlField urlField, CredentialsField creds) {
         ReportWithResultImpl<SourceConfigUnionField> configResult = new ReportWithResultImpl<>();
@@ -102,7 +101,7 @@ public class OpenSearchSourceUtils {
      *
      * @param urlField endpoint url to verify
      * @param creds optional credentials for authentication
-     * @return an empty {@code Report} on success, otherwise a {@code Report} containing {@link ErrorMessageImpl}s
+     * @return an empty {@code Report} on success, otherwise a {@code Report} containing {@link org.codice.ddf.admin.api.report.ErrorMessage}s
      */
     protected ReportImpl verifyOpenSearchCapabilities(UrlField urlField, CredentialsField creds) {
         ReportWithResultImpl<String> responseBodyResult = requestUtils.sendGetRequest(urlField, creds,
@@ -146,7 +145,7 @@ public class OpenSearchSourceUtils {
      *
      * @param hostField hostname and port to probe for OpenSearch capabilities
      * @param creds        optional credentials for authentication
-     * @return a {@link ReportWithResultImpl} containing the discovered {@link UrlField} on success, or containing {@link ErrorMessageImpl}s on failure.
+     * @return a {@link ReportWithResultImpl} containing the discovered {@link UrlField} on success, or containing {@link org.codice.ddf.admin.api.report.ErrorMessage}s on failure.
      */
     public ReportWithResultImpl<UrlField> discoverOpenSearchUrl(HostField hostField, CredentialsField creds) {
         return requestUtils.discoverUrlFromHost(hostField, URL_FORMATS, creds,

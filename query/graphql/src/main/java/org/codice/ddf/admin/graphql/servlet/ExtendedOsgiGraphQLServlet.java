@@ -51,9 +51,13 @@ import graphql.servlet.OsgiGraphQLServlet;
 public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExtendedOsgiGraphQLServlet.class);
+
     private GraphQLTransformCommons transformCommons;
+
     private ExecutionStrategyProvider execStrategy;
+
     private Map<String, GraphQLMutationProvider> graphQLMutationProviders;
+
     private Map<String, GraphQLQueryProvider> graphQLQueryProviders;
 
     public ExtendedOsgiGraphQLServlet() {
@@ -75,7 +79,8 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest originalRequest, HttpServletResponse originalResponse) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest originalRequest, HttpServletResponse originalResponse)
+            throws ServletException, IOException {
         // TODO: tbatie - 6/9/17 - GraphQLServlet does not support batched requests even though a BatchedExecutionStrategy exists. This should be fixed in the GraphQLServlet and contributed back to graphql-java-servlet
         List<String> responses = new ArrayList<>();
         String originalReqContent = IOUtils.toString(originalRequest.getInputStream());
@@ -91,7 +96,10 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet {
 
             originalResponse.setContentType(APPLICATION_JSON_UTF8);
             originalResponse.setStatus(STATUS_OK);
-            originalResponse.getWriter().write( isBatchRequest ? "[" + String.join(",", responses) + "]" : responses.get(0));
+            originalResponse.getWriter()
+                    .write(isBatchRequest ?
+                            "[" + String.join(",", responses) + "]" :
+                            responses.get(0));
         } catch (Throwable t) {
             originalResponse.setStatus(500);
             log.error("Error executing GraphQL request!", t);
@@ -111,52 +119,68 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet {
     }
 
     public boolean isBatchRequest(String requestContent) throws IOException {
-        return new ObjectMapper().readTree(requestContent).isArray();
+        return new ObjectMapper().readTree(requestContent)
+                .isArray();
     }
 
     public void bindFieldProvider(FieldProvider fieldProvider) {
 
         if (CollectionUtils.isNotEmpty(fieldProvider.getDiscoveryFields())) {
-            LOGGER.debug("Binding queries of field provider {} to graphql servlet.", fieldProvider.fieldName());
+            LOGGER.debug("Binding queries of field provider {} to graphql servlet.",
+                    fieldProvider.fieldName());
             try {
-                GraphQLQueryProvider queryProvider = new GraphQLQueryProviderImpl(fieldProvider, transformCommons);
+                GraphQLQueryProvider queryProvider = new GraphQLQueryProviderImpl(fieldProvider,
+                        transformCommons);
                 bindQueryProvider(queryProvider);
                 graphQLQueryProviders.put(fieldProvider.fieldTypeName(), queryProvider);
             } catch (Exception e) {
-                LOGGER.error("Unable to bind queries of field provider {} to graphql servlet.", fieldProvider.fieldName(), e);
+                LOGGER.error("Unable to bind queries of field provider {} to graphql servlet.",
+                        fieldProvider.fieldName(),
+                        e);
             }
         }
 
         if (CollectionUtils.isNotEmpty(fieldProvider.getMutationFunctions())) {
-            LOGGER.debug("Binding mutations of field provider {} to graphql servlet.", fieldProvider.fieldName());
+            LOGGER.debug("Binding mutations of field provider {} to graphql servlet.",
+                    fieldProvider.fieldName());
             try {
-                GraphQLMutationProvider mutationProvider = new GraphQLMutationProviderImpl(fieldProvider, transformCommons);
+                GraphQLMutationProvider mutationProvider = new GraphQLMutationProviderImpl(
+                        fieldProvider,
+                        transformCommons);
                 bindMutationProvider(mutationProvider);
                 graphQLMutationProviders.put(fieldProvider.fieldTypeName(), mutationProvider);
             } catch (Exception e) {
-                LOGGER.error("Unable to bind mutations of field provider {} to graphql servlet.", fieldProvider.fieldName(), e);
+                LOGGER.error("Unable to bind mutations of field provider {} to graphql servlet.",
+                        fieldProvider.fieldName(),
+                        e);
             }
         }
     }
 
     public void unbindFieldProvider(FieldProvider fieldProvider) {
         if (CollectionUtils.isNotEmpty(fieldProvider.getDiscoveryFields())) {
-            LOGGER.debug("Unbinding queries of field provider {} to graphql servlet.", fieldProvider.fieldName());
+            LOGGER.debug("Unbinding queries of field provider {} to graphql servlet.",
+                    fieldProvider.fieldName());
             try {
                 unbindQueryProvider(graphQLQueryProviders.get(fieldProvider.fieldTypeName()));
                 graphQLQueryProviders.remove(fieldProvider.fieldTypeName());
             } catch (Exception e) {
-                LOGGER.error("Unable to unbind queries of field provider {} from graphql servlet.", fieldProvider.fieldName(), e);
+                LOGGER.error("Unable to unbind queries of field provider {} from graphql servlet.",
+                        fieldProvider.fieldName(),
+                        e);
             }
         }
 
         if (CollectionUtils.isNotEmpty(fieldProvider.getMutationFunctions())) {
-            LOGGER.debug("Unbinding mutations of field provider {} to graphql servlet.", fieldProvider.fieldName());
+            LOGGER.debug("Unbinding mutations of field provider {} to graphql servlet.",
+                    fieldProvider.fieldName());
             try {
                 unbindMutationProvider(graphQLMutationProviders.get(fieldProvider.fieldTypeName()));
                 graphQLMutationProviders.remove(fieldProvider.fieldTypeName());
             } catch (Exception e) {
-                LOGGER.error("Unable to unbind mutations of field provider {} from graphql servlet.", fieldProvider.fieldName(), e);
+                LOGGER.error("Unable to unbind mutations of field provider {} from graphql servlet.",
+                        fieldProvider.fieldName(),
+                        e);
             }
         }
     }
@@ -165,7 +189,8 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet {
 
         private List<GraphQLFieldDefinition> queries;
 
-        public GraphQLQueryProviderImpl(FieldProvider provider, GraphQLTransformCommons transformCommons) {
+        public GraphQLQueryProviderImpl(FieldProvider provider,
+                GraphQLTransformCommons transformCommons) {
             queries = transformCommons.fieldProviderToQueries(provider);
         }
 
@@ -179,7 +204,8 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet {
 
         private List<GraphQLFieldDefinition> mutations;
 
-        public GraphQLMutationProviderImpl(FieldProvider provider, GraphQLTransformCommons transformCommons) {
+        public GraphQLMutationProviderImpl(FieldProvider provider,
+                GraphQLTransformCommons transformCommons) {
             mutations = transformCommons.fieldProviderToMutations(provider);
         }
 
@@ -194,8 +220,8 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet {
         @Override
         protected void handleDataFetchingException(ExecutionContext executionContext,
                 GraphQLFieldDefinition fieldDef, Map<String, Object> argumentValues, Exception e) {
-            if(e instanceof FunctionDataFetcherException) {
-                for(ErrorMessage msg : ((FunctionDataFetcherException) e).getCustomMessages()) {
+            if (e instanceof FunctionDataFetcherException) {
+                for (ErrorMessage msg : ((FunctionDataFetcherException) e).getCustomMessages()) {
                     executionContext.addError(new DataFetchingGraphQLError(msg));
                 }
             } else {

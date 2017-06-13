@@ -36,6 +36,7 @@
     "redux": "^3.5.2"
   },
   "dependencies": {
+    "apollo-client": "^1.4.1",
     "color": "^1.0.3",
     "es6-promise": "^4.1.0",
     "flexbox-react": "^4.4.0",

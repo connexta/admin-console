@@ -64,7 +64,6 @@ class TestLdapBindTest extends Specification {
         report.messages().count {
             it.getCode() == DefaultMessages.MISSING_REQUIRED_FIELD
         } == 6
-        report.result() == null
 
         report.messages()*.getPath() as Set == [missingHostMsgPath, missingPortMsgPath, missingEncryptMsgPath,
                                                 missingUsernameMsgPath, missingUserpasswordMsgPath, missingBindMethodMsgPath] as Set
@@ -81,7 +80,6 @@ class TestLdapBindTest extends Specification {
 
         then:
         report.messages().size() == 1
-        report.result() == null
         report.messages().get(0).getCode() == DefaultMessages.MISSING_REQUIRED_FIELD
         report.messages().get(0).getPath() == [LdapTestBind.ID, FunctionField.ARGUMENT, LdapBindUserInfo.DEFAULT_FIELD_NAME, LdapRealm.DEFAULT_FIELD_NAME]
     }

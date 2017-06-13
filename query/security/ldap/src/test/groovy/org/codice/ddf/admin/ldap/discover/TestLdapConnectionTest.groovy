@@ -72,7 +72,6 @@ class TestLdapConnectionTest extends Specification {
         report.messages().count {
             it.getCode() == DefaultMessages.MISSING_REQUIRED_FIELD
         } == 3
-        report.result() == null
 
         report.messages()*.getPath() as Set == [missingHostMsgPath, missingPortMsgPath, missingEncryptMsgPath] as Set
     }

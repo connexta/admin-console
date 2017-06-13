@@ -39,7 +39,7 @@ public class LdapUserAttributes extends BaseFunctionField<ListField<StringField>
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LdapUserAttributes.class);
 
-    public static final String NAME = "userAttributes";
+    public static final String ID = "userAttributes";
 
     public static final String DESCRIPTION =
             "Retrieves a subset of available user attributes based on the LDAP settings provided.";
@@ -51,10 +51,11 @@ public class LdapUserAttributes extends BaseFunctionField<ListField<StringField>
     private LdapTestingUtils utils;
 
     public LdapUserAttributes() {
-        super(NAME, DESCRIPTION, new ListFieldImpl<>(StringField.class));
+        super(ID, DESCRIPTION, new ListFieldImpl<>(StringField.class));
         config = new LdapConfigurationField();
         ldapType = new LdapTypeField();
         updateArgumentPaths();
+
         utils = new LdapTestingUtils();
     }
 
@@ -65,7 +66,6 @@ public class LdapUserAttributes extends BaseFunctionField<ListField<StringField>
 
     @Override
     public ListField<StringField> performFunction() {
-
         LdapConnectionAttempt ldapConnectionAttempt =
                 utils.bindUserToLdapConnection(config.connectionField(),
                         config.bindUserInfoField());
@@ -100,5 +100,9 @@ public class LdapUserAttributes extends BaseFunctionField<ListField<StringField>
     @Override
     public FunctionField<ListField<StringField>> newInstance() {
         return new LdapUserAttributes();
+    }
+
+    public void setTestingUtils(LdapTestingUtils utils) {
+        this.utils = utils;
     }
 }

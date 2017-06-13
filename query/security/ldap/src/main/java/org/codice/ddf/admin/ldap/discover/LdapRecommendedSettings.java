@@ -29,8 +29,7 @@ import org.codice.ddf.admin.ldap.fields.query.LdapTypeField;
 import com.google.common.collect.ImmutableList;
 
 public class LdapRecommendedSettings extends BaseFunctionField<LdapRecommendedSettingsField> {
-
-    public static final String NAME = "recommendedSettings";
+    public static final String ID = "recommendedSettings";
 
     public static final String DESCRIPTION =
             "Attempts to retrieve recommended settings from the LDAP connection.";
@@ -44,12 +43,13 @@ public class LdapRecommendedSettings extends BaseFunctionField<LdapRecommendedSe
     private LdapTestingUtils utils;
 
     public LdapRecommendedSettings() {
-        super(NAME, DESCRIPTION, new LdapRecommendedSettingsField());
+        super(ID, DESCRIPTION, new LdapRecommendedSettingsField());
         conn = new LdapConnectionField().useDefaultRequired();
         creds = new LdapBindUserInfo().useDefaultRequired();
         ldapType = new LdapTypeField();
-        utils = new LdapTestingUtils();
         updateArgumentPaths();
+
+        utils = new LdapTestingUtils();
     }
 
     @Override
@@ -62,7 +62,8 @@ public class LdapRecommendedSettings extends BaseFunctionField<LdapRecommendedSe
         LdapConnectionAttempt connectionAttempt = utils.bindUserToLdapConnection(conn, creds);
         addResultMessages(connectionAttempt.messages());
         addArgumentMessages(connectionAttempt.argumentMessages());
-        if(!connectionAttempt.connection().isPresent()) {
+        if (!connectionAttempt.connection()
+                .isPresent()) {
             return null;
         }
 
@@ -70,8 +71,7 @@ public class LdapRecommendedSettings extends BaseFunctionField<LdapRecommendedSe
                 connectionAttempt.connection()
                         .get());
 
-        return new LdapRecommendedSettingsField()
-                .userDns(guesser.getUserBaseChoices())
+        return new LdapRecommendedSettingsField().userDns(guesser.getUserBaseChoices())
                 .groupDns(guesser.getGroupBaseChoices())
                 .userNameAttributes(guesser.getUserNameAttribute())
                 .groupObjectClasses(guesser.getGroupObjectClass())
@@ -83,5 +83,9 @@ public class LdapRecommendedSettings extends BaseFunctionField<LdapRecommendedSe
     @Override
     public FunctionField<LdapRecommendedSettingsField> newInstance() {
         return new LdapRecommendedSettings();
+    }
+
+    public void setTestingUtils(LdapTestingUtils utils) {
+        this.utils = utils;
     }
 }

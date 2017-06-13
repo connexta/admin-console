@@ -69,7 +69,9 @@ public class LdapSettingsField extends BaseObjectField {
 
     @Override
     public List<Field> getFields() {
-        return ImmutableList.of(usernameAttribute, baseUserDn, baseGroupDn,
+        return ImmutableList.of(usernameAttribute,
+                baseUserDn,
+                baseGroupDn,
                 groupObjectClass,
                 groupAttributeHoldingMember,
                 memberAttributeReferencedInGroup,
@@ -117,6 +119,10 @@ public class LdapSettingsField extends BaseObjectField {
     //Field getters
     public StringField usernameAttributeField() {
         return usernameAttribute;
+    }
+
+    public LdapUseCase useCaseField() {
+        return useCase;
     }
 
     public LdapDistinguishedName baseUserDnField() {
@@ -175,7 +181,8 @@ public class LdapSettingsField extends BaseObjectField {
         return this;
     }
 
-    public LdapSettingsField memberAttributeReferencedInGroup(String memberAttributeReferencedInGroup) {
+    public LdapSettingsField memberAttributeReferencedInGroup(
+            String memberAttributeReferencedInGroup) {
         this.memberAttributeReferencedInGroup.setValue(memberAttributeReferencedInGroup);
         return this;
     }

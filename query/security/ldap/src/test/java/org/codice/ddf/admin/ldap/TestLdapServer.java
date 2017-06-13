@@ -147,13 +147,17 @@ public class TestLdapServer {
     }
 
     public TestLdapServer startListening() {
+        return startListening("/test-ldap.ldif");
+    }
+
+    public TestLdapServer startListening(String ldifPath) {
         try {
             realServer = new InMemoryDirectoryServer(serverConfig);
             realServer.startListening();
         } catch (LDAPException e) {
             fail(e.getMessage());
         }
-        loadLdifFile();
+        loadLdifFile(ldifPath);
         return this;
     }
 
@@ -168,8 +172,8 @@ public class TestLdapServer {
         return new HashSet<>();
     }
 
-    void loadLdifFile() {
-        try (InputStream ldifStream = getClass().getResourceAsStream("/test-ldap.ldif")) {
+    private void loadLdifFile(String ldifPath) {
+        try (InputStream ldifStream = getClass().getResourceAsStream(ldifPath)) {
             assertThat("Cannot find LDIF test resource file", ldifStream, is(notNullValue()));
             LDIFReader reader = new LDIFReader(ldifStream);
             LDIFChangeRecord readEntry;

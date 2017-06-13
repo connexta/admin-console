@@ -19,10 +19,14 @@ import static org.codice.ddf.admin.ldap.commons.LdapMessages.noGroupsWithMembers
 import static org.codice.ddf.admin.ldap.commons.LdapMessages.noReferencedMemberWarning;
 import static org.codice.ddf.admin.ldap.commons.LdapMessages.noUsersInBaseUserDnError;
 import static org.codice.ddf.admin.ldap.commons.LdapMessages.userNameAttributeNotFoundWarning;
+import static org.codice.ddf.admin.ldap.fields.config.LdapUseCase.ATTRIBUTE_STORE;
+import static org.codice.ddf.admin.ldap.fields.config.LdapUseCase.AUTHENTICATION_AND_ATTRIBUTE_STORE;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
@@ -60,8 +64,19 @@ public class LdapTestSettings extends TestFunctionField {
         conn = new LdapConnectionField().useDefaultRequired();
         bindInfo = new LdapBindUserInfo().useDefaultRequired();
         settings = new LdapSettingsField();
-        utils = new LdapTestingUtils();
+
+        settings.useCaseField()
+                .isRequired(true);
+        settings.usernameAttributeField()
+                .isRequired(true);
+        settings.baseUserDnField()
+                .isRequired(true);
+        settings.baseGroupDnField()
+                .isRequired(true);
+
         updateArgumentPaths();
+
+        utils = new LdapTestingUtils();
     }
 
     @Override
@@ -83,20 +98,31 @@ public class LdapTestSettings extends TestFunctionField {
         Connection ldapConnection = connectionAttempt.connection()
                 .get();
 
-        if (!checkDirExists(settings.baseUserDn(), ldapConnection)) {
-            addArgumentMessage(dnDoesNotExistError(settings.baseUserDnField()
-                    .path()));
-        } else {
-            addArgumentMessages(checkUsersInDir(settings, ldapConnection));
-        }
-
         if (!checkDirExists(settings.baseGroupDn(), ldapConnection)) {
             addArgumentMessage(dnDoesNotExistError(settings.baseGroupDnField()
                     .path()));
-        } else {
-            // First check the group objectClass is on at least one entry in the directory
-            addArgumentMessages(checkGroupObjectClass(settings, ldapConnection));
+        }
+        if (!checkDirExists(settings.baseUserDn(), ldapConnection)) {
+            addArgumentMessage(dnDoesNotExistError(settings.baseUserDnField()
+                    .path()));
+        }
+        // Short-circuit return here, if either the user or group directory does not exist
+        if (containsErrorMsgs()) {
+            return new BooleanField(false);
+        }
 
+        addArgumentMessages(checkUsersInDir(settings, ldapConnection));
+
+        // Short-circuit return here, if there are no users in base dir
+        if (containsErrorMsgs()) {
+            return new BooleanField(false);
+        }
+
+        // Check if group objectClass is on at least one entry in the directory
+        addArgumentMessages(checkGroupObjectClass(settings, ldapConnection));
+
+        // Don't check the group if there is no entry with the correct objectClass
+        if (!containsErrorMsgs()) {
             // Then, check that there is a group entry (of the correct objectClass) that has
             // any member references
             addArgumentMessages(checkGroup(settings, ldapConnection));
@@ -111,7 +137,7 @@ public class LdapTestSettings extends TestFunctionField {
      * @param ldapConnection
      * @return
      */
-    boolean checkDirExists(String dirDn, Connection ldapConnection) {
+    private boolean checkDirExists(String dirDn, Connection ldapConnection) {
         return !utils.getLdapQueryResults(ldapConnection,
                 dirDn,
                 Filter.present("objectClass")
@@ -160,7 +186,7 @@ public class LdapTestSettings extends TestFunctionField {
      * @param ldapConnection
      */
     List<ErrorMessage> checkGroupObjectClass(LdapSettingsField settings, Connection ldapConnection) {
-        List<ErrorMessage> errors = new ArrayList<>();
+        List<Message> errors = new ArrayList<>();
         List<SearchResultEntry> baseGroupResults = utils.getLdapQueryResults(ldapConnection,
                 settings.baseGroupDn(),
                 Filter.equality("objectClass", settings.groupObjectClass())
@@ -180,7 +206,7 @@ public class LdapTestSettings extends TestFunctionField {
     }
 
     List<ErrorMessage> checkGroup(LdapSettingsField settings, Connection ldapConnection) {
-        List<ErrorMessage> errors = new ArrayList<>();
+        List<Message> errors = new ArrayList<>();
         List<SearchResultEntry> groups = utils.getLdapQueryResults(ldapConnection,
                 settings.baseGroupDn(),
                 Filter.and(Filter.equality("objectClass", settings.groupObjectClass()),
@@ -213,22 +239,21 @@ public class LdapTestSettings extends TestFunctionField {
 
         String userFilter = split.get(0);
         String checkUserBase = String.join(",", split.subList(1, split.size()));
-        if (!checkUserBase.equalsIgnoreCase(settings.baseUserDn())) {
-            // TODO: tbatie - 4/18/17 - I think we should return back a general error rather than givving the same error for multiple fields
-            errors.add(noReferencedMemberWarning(settings.memberAttributeReferencedInGroupField()
-                    .path()));
-        }
-        if (!userFilter.split("=")[0].equalsIgnoreCase(settings.memberAttributeReferencedInGroup())) {
-            errors.add(noReferencedMemberWarning(settings.memberAttributeReferencedInGroupField()
-                    .path()));
-        }
-        List<SearchResultEntry> foundMember = utils.getLdapQueryResults(ldapConnection,
-                settings.baseUserDn(),
-                userFilter,
-                SearchScope.WHOLE_SUBTREE,
-                1);
+        // Check that the userFilter is correctly formatted and that the expected userBase was
+        // found in a matched group
+        if (checkUserBase.equalsIgnoreCase(settings.baseUserDn())
+                && userFilter.split("=")[0].equalsIgnoreCase(settings.memberAttributeReferencedInGroup())) {
+            List<SearchResultEntry> foundMember = utils.getLdapQueryResults(ldapConnection,
+                    settings.baseUserDn(),
+                    userFilter,
+                    SearchScope.WHOLE_SUBTREE,
+                    1);
 
-        if (foundMember.isEmpty()) {
+            if (foundMember.isEmpty()) {
+                errors.add(noReferencedMemberWarning(settings.memberAttributeReferencedInGroupField()
+                        .path()));
+            }
+        } else {
             errors.add(noReferencedMemberWarning(settings.memberAttributeReferencedInGroupField()
                     .path()));
         }
@@ -237,22 +262,34 @@ public class LdapTestSettings extends TestFunctionField {
     }
 
     @Override
+    public void validate() {
+        super.validate();
+
+        if (settings.useCase() != null && (settings.useCase()
+                .equals(ATTRIBUTE_STORE) || settings.useCase()
+                .equals(AUTHENTICATION_AND_ATTRIBUTE_STORE))) {
+
+            Stream.of(settings.groupObjectClassField()
+                            .isRequired(true),
+                    settings.groupAttributeHoldingMemberField()
+                            .isRequired(true),
+                    settings.memberAttributeReferencedInGroupField()
+                            .isRequired(true),
+                    settings.attributeMapField()
+                            .isRequired(true))
+                    .map(DataType::validate)
+                    .flatMap(Collection::stream)
+                    .forEach(this::addArgumentMessage);
+
+        }
+    }
+
+    @Override
     public FunctionField<BooleanField> newInstance() {
         return new LdapTestSettings();
     }
 
-    // TODO: tbatie - 4/3/17 - Implement validation
-    //    @Override
-    //    public List<ConfigurationMessage> validateOptionalFields(LdapConfiguration configuration) {
-    //        List<ConfigurationMessage> validationResults = validateBindRealm(configuration);
-    //        if (configuration.ldapUseCase()
-    //                .equals(ATTRIBUTE_STORE) || configuration.ldapUseCase()
-    //                .equals(AUTHENTICATION_AND_ATTRIBUTE_STORE)) {
-    //            validationResults.addAll(configuration.validate(ImmutableList.of(GROUP_OBJECT_CLASS,
-    //                    GROUP_ATTRIBUTE_HOLDING_MEMBER,
-    //                    MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP)));
-    //        }
-    //        return validationResults;
-    //    }
-
+    public void setTestingUtils(LdapTestingUtils utils) {
+        this.utils = utils;
+    }
 }

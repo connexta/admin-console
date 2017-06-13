@@ -70,7 +70,6 @@ class PerformLdapQueryTest extends Specification {
         report.messages().count {
             it.getCode() == DefaultMessages.MISSING_REQUIRED_FIELD
         } == 8
-        report.result() == null
 
         report.messages()*.getPath() as Set == [missingHostMsgPath, missingPortMsgPath, missingEncryptMsgPath,
                                                 missingUsernameMsgPath, missingUserpasswordMsgPath, missingBindMethodMsgPath,
@@ -90,7 +89,6 @@ class PerformLdapQueryTest extends Specification {
 
         then:
         report.messages().size() == 1
-        report.result() == null
         report.messages().get(0).getCode() == DefaultMessages.CANNOT_CONNECT
         report.messages().get(0).getPath() == [LdapQuery.ID, BaseFunctionField.ARGUMENT, LdapConnectionField.DEFAULT_FIELD_NAME]
 
@@ -110,7 +108,6 @@ class PerformLdapQueryTest extends Specification {
 
         then:
         report.messages().size() == 1
-        report.result() == null
         report.messages().get(0).getCode() == LdapMessages.CANNOT_BIND
         report.messages().get(0).getPath() == [LdapQuery.ID, BaseFunctionField.ARGUMENT, LdapBindUserInfo.DEFAULT_FIELD_NAME]
     }

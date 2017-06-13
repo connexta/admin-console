@@ -30,14 +30,21 @@ public class LdapRecommendedSettingsField extends BaseObjectField {
 
     public static final String FIELD_TYPE_NAME = "LdapRecommendedSettings";
 
-    public static final String DESCRIPTION = "An object containing potential values to be used for setting up LDAP.";
+    public static final String DESCRIPTION =
+            "An object containing potential values to be used for setting up LDAP.";
 
     private ListField<LdapDistinguishedName> userDns;
+
     private ListField<LdapDistinguishedName> groupDns;
+
     private ListField<StringField> userNameAttributes;
+
     private ListField<StringField> groupObjectClasses;
+
     private ListField<StringField> groupAttributesHoldingMember;
+
     private ListField<StringField> memberAttributesReferencedInGroup;
+
     private ListField<LdapDistinguishedName> queryBases;
 
     public LdapRecommendedSettingsField() {
@@ -46,10 +53,40 @@ public class LdapRecommendedSettingsField extends BaseObjectField {
         groupDns = new ListFieldImpl<>("groupsDns", LdapDistinguishedName.class);
         userNameAttributes = new ListFieldImpl<>("userNameAttributes", StringField.class);
         groupObjectClasses = new ListFieldImpl<>("groupObjectClasses", StringField.class);
-        groupAttributesHoldingMember = new ListFieldImpl<>("groupAttributesHoldingMember", StringField.class);
-        memberAttributesReferencedInGroup =  new ListFieldImpl<>("memberAttributesReferencedInGroup", StringField.class);
+        groupAttributesHoldingMember = new ListFieldImpl<>("groupAttributesHoldingMember",
+                StringField.class);
+        memberAttributesReferencedInGroup = new ListFieldImpl<>("memberAttributesReferencedInGroup",
+                StringField.class);
         queryBases = new ListFieldImpl<>("queryBases", LdapDistinguishedName.class);
         updateInnerFieldPaths();
+    }
+
+    public ListField<LdapDistinguishedName> userDns() {
+        return userDns;
+    }
+
+    public ListField<LdapDistinguishedName> groupDns() {
+        return groupDns;
+    }
+
+    public ListField<StringField> userNameAttributes() {
+        return userNameAttributes;
+    }
+
+    public ListField<StringField> groupObjectClasses() {
+        return groupObjectClasses;
+    }
+
+    public ListField<StringField> groupAttributesHoldingMember() {
+        return groupAttributesHoldingMember;
+    }
+
+    public ListField<StringField> memberAttributesReferencedInGroup() {
+        return memberAttributesReferencedInGroup;
+    }
+
+    public ListField<LdapDistinguishedName> queryBases() {
+        return queryBases;
     }
 
     public LdapRecommendedSettingsField userDns(List<String> baseDns) {
@@ -72,12 +109,14 @@ public class LdapRecommendedSettingsField extends BaseObjectField {
         return this;
     }
 
-    public LdapRecommendedSettingsField groupAttributesHoldingMember(List<String> groupAttributesHoldingMember) {
+    public LdapRecommendedSettingsField groupAttributesHoldingMember(
+            List<String> groupAttributesHoldingMember) {
         this.groupAttributesHoldingMember.setValue(groupAttributesHoldingMember);
         return this;
     }
 
-    public LdapRecommendedSettingsField memberAttributesReferencedInGroup(List<String> memberAttributesReferencedInGroup) {
+    public LdapRecommendedSettingsField memberAttributesReferencedInGroup(
+            List<String> memberAttributesReferencedInGroup) {
         this.memberAttributesReferencedInGroup.setValue(memberAttributesReferencedInGroup);
         return this;
     }
@@ -89,7 +128,12 @@ public class LdapRecommendedSettingsField extends BaseObjectField {
 
     @Override
     public List<Field> getFields() {
-        return ImmutableList.of(userDns, groupDns, userNameAttributes, groupObjectClasses, groupAttributesHoldingMember, memberAttributesReferencedInGroup,
+        return ImmutableList.of(userDns,
+                groupDns,
+                userNameAttributes,
+                groupObjectClasses,
+                groupAttributesHoldingMember,
+                memberAttributesReferencedInGroup,
                 queryBases);
     }
 }

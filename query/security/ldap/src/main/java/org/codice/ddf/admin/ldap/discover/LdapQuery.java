@@ -84,8 +84,8 @@ public class LdapQuery extends BaseFunctionField<ListField<MapField>> {
     public ListField<MapField> performFunction() {
 
         LdapConnectionAttempt connectionAttempt = utils.bindUserToLdapConnection(conn, creds);
-        addResultMessages(connectionAttempt.messages());
-        addArgumentMessages(connectionAttempt.argumentMessages());
+        addMessages(connectionAttempt);
+
         ListField<MapField> entries = new ListFieldImpl<>(MapField.class);
 
         if(containsErrorMsgs()) {
@@ -93,7 +93,7 @@ public class LdapQuery extends BaseFunctionField<ListField<MapField>> {
         }
 
         List<SearchResultEntry> searchResults = utils.getLdapQueryResults(
-                connectionAttempt.connection().get(),
+                connectionAttempt.result(),
                 queryBase.getValue(),
                 query.getValue(),
                 SearchScope.WHOLE_SUBTREE,

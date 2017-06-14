@@ -69,19 +69,17 @@ public class LdapUserAttributes extends BaseFunctionField<ListField<StringField>
         LdapConnectionAttempt ldapConnectionAttempt =
                 utils.bindUserToLdapConnection(config.connectionField(),
                         config.bindUserInfoField());
-        addResultMessages(ldapConnectionAttempt.messages());
-        addArgumentMessages(ldapConnectionAttempt.argumentMessages());
 
-        if (!ldapConnectionAttempt.connection()
-                .isPresent()) {
+        addMessages(ldapConnectionAttempt);
+
+        if (!ldapConnectionAttempt.isResultPresent()) {
             return null;
         }
 
         Set<String> ldapEntryAttributes = null;
         try {
             ServerGuesser serverGuesser = ServerGuesser.buildGuesser(ldapType.getValue(),
-                    ldapConnectionAttempt.connection()
-                            .get());
+                    ldapConnectionAttempt.result());
             ldapEntryAttributes = serverGuesser.getClaimAttributeOptions(config.settingsField()
                     .baseUserDn());
 

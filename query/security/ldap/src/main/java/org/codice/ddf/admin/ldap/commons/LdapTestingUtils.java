@@ -29,7 +29,7 @@ import java.util.Map;
 
 import javax.net.ssl.SSLContext;
 
-import org.codice.ddf.admin.api.report.Message;
+import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.codice.ddf.admin.ldap.commons.services.LdapServiceCommons;
 import org.codice.ddf.admin.ldap.fields.config.LdapConfigurationField;
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindUserInfo;
@@ -86,7 +86,7 @@ public class LdapTestingUtils {
 
         } catch (Exception e) {
             LOGGER.debug("Error prepping LDAP connection", e);
-            return new LdapConnectionAttempt().addMessage(failedTestSetup());
+            return new LdapConnectionAttempt().addResultMessage(failedTestSetup());
         }
 
         Connection ldapConnection;
@@ -120,13 +120,11 @@ public class LdapTestingUtils {
         // and rewrapped in a new ConnectionAttempt. It is only closed in the case of a bind
         // failure.
         LdapConnectionAttempt connectionAttempt = getLdapConnection(connField);
-        if (!connectionAttempt.connection()
-                .isPresent()) {
+        if (!connectionAttempt.isResultPresent()) {
             return connectionAttempt;
         }
 
-        Connection connection = connectionAttempt.connection()
-                .get();
+        Connection connection = connectionAttempt.result();
 
         try {
             BindRequest bindRequest = selectBindMethod(bindInfo.bindMethod(),
@@ -145,8 +143,7 @@ public class LdapTestingUtils {
                 LOGGER.warn("Error closing LDAP connection", closeException);
             }
             return new LdapConnectionAttempt().addArgumentMessage(LdapMessages.cannotBindError(
-                    bindInfo.path()))
-                    .connection(null);
+                    bindInfo.path()));
         }
 
         return new LdapConnectionAttempt(connection);
@@ -255,12 +252,12 @@ public class LdapTestingUtils {
      * Possible warning types: IDENTICAL_SERVICE_EXISTS
      *
      * @param newConfig           configuration to check for existing configurations for
-     * @return {@code List} with {@link Message}s containing warnings if there are existing configurations that match
+     * @return {@code List} with {@link ErrorMessage}s containing warnings if there are existing configurations that match
      * the {@code configuration}, or empty {@code List} if no matches
      */
-    public List<Message> ldapConnectionExists(LdapConfigurationField newConfig,
+    public List<ErrorMessage> ldapConnectionExists(LdapConfigurationField newConfig,
             ManagedServiceActions managedServiceActions, PropertyActions propertyActions) {
-        List<Message> msgs = new ArrayList<>();
+        List<ErrorMessage> msgs = new ArrayList<>();
         LdapServiceCommons serviceCommons = new LdapServiceCommons(propertyActions,
                 managedServiceActions);
         List<LdapConfigurationField> existingConfigs = serviceCommons.getLdapConfigurations()

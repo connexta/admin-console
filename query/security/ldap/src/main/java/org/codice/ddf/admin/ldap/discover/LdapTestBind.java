@@ -19,7 +19,6 @@ import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.function.TestFunctionField;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
-import org.codice.ddf.admin.ldap.commons.LdapConnectionAttempt;
 import org.codice.ddf.admin.ldap.commons.LdapTestingUtils;
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindUserInfo;
 import org.codice.ddf.admin.ldap.fields.connection.LdapConnectionField;
@@ -53,11 +52,8 @@ public class LdapTestBind extends TestFunctionField {
     // Possible message types: CANNOT_CONFIGURE, CANNOT_CONNECT, CANNOT_BIND
     @Override
     public BooleanField performFunction() {
-        LdapConnectionAttempt connectionAttempt = utils.bindUserToLdapConnection(conn, creds);
-        addResultMessages(connectionAttempt.messages());
-        addArgumentMessages(connectionAttempt.argumentMessages());
-
-        return new BooleanField(connectionAttempt.connection().isPresent());
+        addMessages(utils.bindUserToLdapConnection(conn, creds));
+        return new BooleanField(!containsErrorMsgs());
     }
 
 

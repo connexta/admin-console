@@ -20,6 +20,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.api.Field;
+import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
 import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
@@ -78,7 +79,7 @@ public class MapField extends BaseObjectField {
                         .equals(key));
     }
 
-    public Optional<EntryField> getEntry(String key) {
+    public Optional<PairField> getEntry(String key) {
         return entries.getList()
                 .stream()
                 .filter(entry -> entry.key()

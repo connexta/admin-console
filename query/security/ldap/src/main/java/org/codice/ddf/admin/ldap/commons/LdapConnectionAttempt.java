@@ -15,56 +15,37 @@ package org.codice.ddf.admin.ldap.commons;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 import org.codice.ddf.admin.api.report.ErrorMessage;
+import org.codice.ddf.admin.common.report.ReportWithResultImpl;
 import org.forgerock.opendj.ldap.Connection;
 
-public class LdapConnectionAttempt implements Closeable {
-
-    // TODO: tbatie - 5/1/17 - Change this to maintain an arg messages and return value list of msgs
-    private List<ErrorMessage> msgs;
-    private Optional<Connection> connection;
+public class LdapConnectionAttempt extends ReportWithResultImpl<Connection> implements Closeable {
 
     public LdapConnectionAttempt() {
-        msgs = new ArrayList<>();
-        connection = Optional.empty();
+        super();
     }
 
     public LdapConnectionAttempt(Connection connection) {
-        this();
-        this.connection = Optional.of(connection);
+        super(connection);
     }
 
-    public LdapConnectionAttempt addArgumentMessage(ErrorMessage msg) {
-        msgs.add(msg);
+    @Override
+    public LdapConnectionAttempt addArgumentMessage(ErrorMessage message) {
+        super.addArgumentMessage(message);
         return this;
     }
 
-    public LdapConnectionAttempt addMessage(ErrorMessage msg) {
-        msgs.add(msg);
-        return this;
-    }
-
-    public Optional<Connection> connection() {
-        return connection;
-    }
-
-    public LdapConnectionAttempt connection(Optional<Connection> connection) {
-        if(connection == null) {
-            this.connection = Optional.empty();
-        } else {
-            this.connection = connection;
-        }
+    @Override
+    public LdapConnectionAttempt addResultMessage(ErrorMessage message) {
+        super.addResultMessage(message);
         return this;
     }
 
     @Override
     public void close() throws IOException {
-        if (connection.isPresent() && !connection.get().isClosed()) {
-            connection.get().close();
+        if (isResultPresent() && !result().isClosed()) {
+            result().close();
         }
     }
 }

@@ -19,7 +19,6 @@ import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.function.TestFunctionField;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
-import org.codice.ddf.admin.ldap.commons.LdapConnectionAttempt;
 import org.codice.ddf.admin.ldap.commons.LdapTestingUtils;
 import org.codice.ddf.admin.ldap.fields.connection.LdapConnectionField;
 
@@ -51,11 +50,8 @@ public class LdapTestConnection extends TestFunctionField {
     // Possible message types: CANNOT_CONFIGURE, CANNOT_CONNECT
     @Override
     public BooleanField performFunction() {
-        LdapConnectionAttempt connectionAttempt = utils.getLdapConnection(connection);
-        addResultMessages(connectionAttempt.messages());
-        addArgumentMessages(connectionAttempt.argumentMessages());
-
-        return new BooleanField(connectionAttempt.connection().isPresent());
+        addMessages(utils.getLdapConnection(connection));
+        return new BooleanField(!containsErrorMsgs());
     }
 
     public void setTestingUtils(LdapTestingUtils utils) {

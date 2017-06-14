@@ -87,16 +87,13 @@ public class LdapTestSettings extends TestFunctionField {
     @Override
     public BooleanField performFunction() {
         LdapConnectionAttempt connectionAttempt = utils.bindUserToLdapConnection(conn, bindInfo);
-        addResultMessages(connectionAttempt.messages());
-        addArgumentMessages(connectionAttempt.argumentMessages());
+        addMessages(connectionAttempt);
 
-        if (!connectionAttempt.connection()
-                .isPresent()) {
+        if (!connectionAttempt.isResultPresent()) {
             return new BooleanField(false);
         }
 
-        Connection ldapConnection = connectionAttempt.connection()
-                .get();
+        Connection ldapConnection = connectionAttempt.result();
 
         if (!checkDirExists(settings.baseGroupDn(), ldapConnection)) {
             addArgumentMessage(dnDoesNotExistError(settings.baseGroupDnField()
@@ -186,7 +183,7 @@ public class LdapTestSettings extends TestFunctionField {
      * @param ldapConnection
      */
     List<ErrorMessage> checkGroupObjectClass(LdapSettingsField settings, Connection ldapConnection) {
-        List<Message> errors = new ArrayList<>();
+        List<ErrorMessage> errors = new ArrayList<>();
         List<SearchResultEntry> baseGroupResults = utils.getLdapQueryResults(ldapConnection,
                 settings.baseGroupDn(),
                 Filter.equality("objectClass", settings.groupObjectClass())
@@ -206,7 +203,7 @@ public class LdapTestSettings extends TestFunctionField {
     }
 
     List<ErrorMessage> checkGroup(LdapSettingsField settings, Connection ldapConnection) {
-        List<Message> errors = new ArrayList<>();
+        List<ErrorMessage> errors = new ArrayList<>();
         List<SearchResultEntry> groups = utils.getLdapQueryResults(ldapConnection,
                 settings.baseGroupDn(),
                 Filter.and(Filter.equality("objectClass", settings.groupObjectClass()),

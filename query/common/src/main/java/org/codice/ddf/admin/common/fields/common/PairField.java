@@ -21,7 +21,7 @@ import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 
 import com.google.common.collect.ImmutableList;
 
-public class EntryField extends BaseObjectField {
+public class PairField extends BaseObjectField {
 
     public static final String DEFAULT_FIELD_NAME = "pair";
 
@@ -37,7 +37,7 @@ public class EntryField extends BaseObjectField {
 
     private StringField value;
 
-    public EntryField() {
+    public PairField() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
         key = new StringField(KEY_FIELD_NAME);
         value = new StringField(VALUE_FIELD_NAME);
@@ -49,12 +49,12 @@ public class EntryField extends BaseObjectField {
         return ImmutableList.of(key, value);
     }
 
-    public EntryField key(String key) {
+    public PairField key(String key) {
         this.key.setValue(key);
         return this;
     }
 
-    public EntryField value(String value) {
+    public PairField value(String value) {
         this.value.setValue(value);
         return this;
     }

@@ -31,7 +31,7 @@ class CredentialsFieldTest extends Specification {
     def 'Fail validation when missing required fields'() {
         setup:
         credentialsField.isRequired(true)
-        credentialsField.useDefaultRequired()
+        credentialsField.useDefaultRequiredFields()
 
         when:
         def validationMsgs = credentialsField.validate()
@@ -46,7 +46,7 @@ class CredentialsFieldTest extends Specification {
 
     def 'Missing required password field when credentials are required and username is provided'() {
         setup:
-        credentialsField.useDefaultRequired()
+        credentialsField.useDefaultRequiredFields()
         credentialsField.username('admin')
 
         when:
@@ -60,7 +60,7 @@ class CredentialsFieldTest extends Specification {
 
     def 'Missing required username field when credentials are required and password is provided'() {
         setup:
-        credentialsField.useDefaultRequired()
+        credentialsField.useDefaultRequiredFields()
         credentialsField.password('admin')
 
         when:

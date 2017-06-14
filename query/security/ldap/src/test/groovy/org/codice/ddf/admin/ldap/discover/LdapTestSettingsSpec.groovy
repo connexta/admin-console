@@ -30,10 +30,13 @@ import org.codice.ddf.admin.ldap.fields.connection.LdapConnectionField
 import org.codice.ddf.admin.ldap.fields.connection.LdapEncryptionMethodField
 import spock.lang.Specification
 
+import static org.codice.ddf.admin.ldap.LdapTestingCommons.initLdapSettings
+import static org.codice.ddf.admin.ldap.LdapTestingCommons.noEncryptionLdapConnectionInfo
+import static org.codice.ddf.admin.ldap.LdapTestingCommons.simpleBindInfo
 import static org.codice.ddf.admin.ldap.fields.config.LdapUseCase.ATTRIBUTE_STORE
 import static org.codice.ddf.admin.ldap.fields.config.LdapUseCase.AUTHENTICATION
 
-class TestLdapSettingsTest extends Specification {
+class LdapTestSettingsSpec extends Specification {
     static TestLdapServer server
     Map<String, Object> args
     LdapTestSettings action
@@ -112,7 +115,7 @@ class TestLdapSettingsTest extends Specification {
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue(),
                 (LdapSettingsField.DEFAULT_FIELD_NAME)  : ldapSettings.getValue()]
         action.setValue(args)
-        action.setTestingUtils(new TestLdapConnectionTest.LdapTestingUtilsMock())
+        action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
         when:
         FunctionReport report = action.getValue()
@@ -138,7 +141,7 @@ class TestLdapSettingsTest extends Specification {
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue(),
                 (LdapSettingsField.DEFAULT_FIELD_NAME)  : ldapSettings.getValue()]
         action.setValue(args)
-        action.setTestingUtils(new TestLdapConnectionTest.LdapTestingUtilsMock())
+        action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
         when:
         FunctionReport report = action.getValue()
@@ -161,7 +164,7 @@ class TestLdapSettingsTest extends Specification {
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue(),
                 (LdapSettingsField.DEFAULT_FIELD_NAME)  : ldapSettings.getValue()]
         action.setValue(args)
-        action.setTestingUtils(new TestLdapConnectionTest.LdapTestingUtilsMock())
+        action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
         when:
         FunctionReport report = action.getValue()
@@ -181,7 +184,7 @@ class TestLdapSettingsTest extends Specification {
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().password('badPassword').getValue(),
                 (LdapSettingsField.DEFAULT_FIELD_NAME)  : ldapSettings.getValue()]
         action.setValue(args)
-        action.setTestingUtils(new TestLdapConnectionTest.LdapTestingUtilsMock())
+        action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
         when:
         FunctionReport report = action.getValue()
@@ -203,7 +206,7 @@ class TestLdapSettingsTest extends Specification {
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue(),
                 (LdapSettingsField.DEFAULT_FIELD_NAME)  : ldapSettings.getValue()]
         action.setValue(args)
-        action.setTestingUtils(new TestLdapConnectionTest.LdapTestingUtilsMock())
+        action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
         when:
         FunctionReport report = action.getValue()
@@ -227,7 +230,7 @@ class TestLdapSettingsTest extends Specification {
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue(),
                 (LdapSettingsField.DEFAULT_FIELD_NAME)  : ldapSettings.getValue()]
         action.setValue(args)
-        action.setTestingUtils(new TestLdapConnectionTest.LdapTestingUtilsMock())
+        action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
         when:
         FunctionReport report = action.getValue()
@@ -251,7 +254,7 @@ class TestLdapSettingsTest extends Specification {
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue(),
                 (LdapSettingsField.DEFAULT_FIELD_NAME)  : ldapSettings.getValue()]
         action.setValue(args)
-        action.setTestingUtils(new TestLdapConnectionTest.LdapTestingUtilsMock())
+        action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
         when:
         FunctionReport report = action.getValue()
@@ -275,7 +278,7 @@ class TestLdapSettingsTest extends Specification {
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue(),
                 (LdapSettingsField.DEFAULT_FIELD_NAME)  : ldapSettings.getValue()]
         action.setValue(args)
-        action.setTestingUtils(new TestLdapConnectionTest.LdapTestingUtilsMock())
+        action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
         when:
         FunctionReport report = action.getValue()
@@ -301,7 +304,7 @@ class TestLdapSettingsTest extends Specification {
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue(),
                 (LdapSettingsField.DEFAULT_FIELD_NAME)  : ldapSettings.getValue()]
         action.setValue(args)
-        action.setTestingUtils(new TestLdapConnectionTest.LdapTestingUtilsMock())
+        action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
         when:
         FunctionReport report = action.getValue()
@@ -309,32 +312,5 @@ class TestLdapSettingsTest extends Specification {
         then:
         report.messages().empty
         report.result().getValue()
-    }
-
-    LdapConnectionField noEncryptionLdapConnectionInfo() {
-        return new LdapConnectionField()
-                .hostname(server.getHostname())
-                .port(server.getLdapPort())
-                .encryptionMethod(LdapEncryptionMethodField.NONE)
-    }
-
-    LdapBindUserInfo simpleBindInfo() {
-        return new LdapBindUserInfo().bindMethod(LdapBindMethod.SIMPLE).username(server.getBasicAuthDn()).password(server.getBasicAuthPassword())
-    }
-
-    private LdapSettingsField initLdapSettings(String useCase, boolean includeAttributeFields = false) {
-        def settingsField = new LdapSettingsField()
-                .usernameAttribute('sn')
-                .baseUserDn('ou=users,dc=example,dc=com')
-                .baseGroupDn('ou=groups,dc=example,dc=com')
-                .useCase(useCase)
-        if (includeAttributeFields) {
-            settingsField.groupObjectClass('groupOfNames')
-                    .groupAttributeHoldingMember('member')
-                    .memberAttributeReferencedInGroup('uid')
-                    .attributeMapField(['foobar': 'cn'])
-        }
-
-        settingsField
     }
 }

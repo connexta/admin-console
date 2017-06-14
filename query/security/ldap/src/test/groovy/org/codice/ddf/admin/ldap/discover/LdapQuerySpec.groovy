@@ -30,7 +30,10 @@ import org.codice.ddf.admin.ldap.fields.connection.LdapEncryptionMethodField
 import org.codice.ddf.admin.ldap.fields.query.LdapQueryField
 import spock.lang.Specification
 
-class PerformLdapQueryTest extends Specification {
+import static org.codice.ddf.admin.ldap.LdapTestingCommons.noEncryptionLdapConnectionInfo
+import static org.codice.ddf.admin.ldap.LdapTestingCommons.simpleBindInfo
+
+class LdapQuerySpec extends Specification {
     static TestLdapServer server
     Map<String, Object> args
     LdapQuery ldapQueryFunction
@@ -139,7 +142,7 @@ class PerformLdapQueryTest extends Specification {
                 (LdapQuery.QUERY_BASE_FIELD_NAME)       : exampleQueryBase().getValue(),
                 (LdapQueryField.DEFAULT_FIELD_NAME)     : ldapQuery("(objectClass=person)").getValue()]
 
-        ldapQueryFunction.setTestingUtils(new TestLdapConnectionTest.LdapTestingUtilsMock())
+        ldapQueryFunction.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
         ldapQueryFunction.setValue(args)
 
         when:
@@ -226,22 +229,11 @@ class PerformLdapQueryTest extends Specification {
         return new LdapQueryField().query(query)
     }
 
-    LdapConnectionField noEncryptionLdapConnectionInfo() {
-        return new LdapConnectionField()
-                .hostname(server.getHostname())
-                .port(server.getLdapPort())
-                .encryptionMethod(LdapEncryptionMethodField.NONE)
-    }
-
     LdapConnectionField ldapsLdapConnectionInfo() {
         return new LdapConnectionField()
                 .hostname(server.getHostname())
                 .port(server.getLdapSecurePort())
                 .encryptionMethod(LdapEncryptionMethodField.LDAPS)
-    }
-
-    LdapBindUserInfo simpleBindInfo() {
-        return new LdapBindUserInfo().bindMethod(LdapBindMethod.SIMPLE).username(server.getBasicAuthDn()).password(server.getBasicAuthPassword())
     }
 
     LdapBindUserInfo digestBindInfo() {

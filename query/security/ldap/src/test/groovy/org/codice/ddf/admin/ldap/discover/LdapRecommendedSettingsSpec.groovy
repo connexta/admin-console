@@ -29,7 +29,10 @@ import org.codice.ddf.admin.ldap.fields.connection.LdapEncryptionMethodField
 import org.codice.ddf.admin.ldap.fields.query.LdapRecommendedSettingsField
 import spock.lang.Specification
 
-class TestLdapRecommendedSettings extends Specification {
+import static org.codice.ddf.admin.ldap.LdapTestingCommons.noEncryptionLdapConnectionInfo
+import static org.codice.ddf.admin.ldap.LdapTestingCommons.simpleBindInfo
+
+class LdapRecommendedSettingsSpec extends Specification {
     static TestLdapServer server
     LdapRecommendedSettings action
     Map<String, Object> args
@@ -88,10 +91,10 @@ class TestLdapRecommendedSettings extends Specification {
     def 'fail to connect to LDAP'() {
         setup:
 
-        args = [(LdapConnectionField.DEFAULT_FIELD_NAME)         : noEncryptionLdapConnectionInfo().port(666).getValue(),
-                (LdapBindUserInfo.DEFAULT_FIELD_NAME)            : simpleBindInfo().getValue()]
+        args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().port(666).getValue(),
+                (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue()]
         action.setValue(args)
-        action.setTestingUtils(new TestLdapConnectionTest.LdapTestingUtilsMock())
+        action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
         when:
         FunctionReport report = action.getValue()
@@ -108,7 +111,7 @@ class TestLdapRecommendedSettings extends Specification {
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().password('badPassword').getValue()]
         action.setValue(args)
-        action.setTestingUtils(new TestLdapConnectionTest.LdapTestingUtilsMock())
+        action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
         when:
         FunctionReport report = action.getValue()
@@ -119,13 +122,13 @@ class TestLdapRecommendedSettings extends Specification {
         report.messages().get(0).getPath() == baseMsg + [LdapBindUserInfo.DEFAULT_FIELD_NAME]
     }
 
-    def 'fail for why?'() {
+    def 'succeed'() {
         setup:
 
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue()]
         action.setValue(args)
-        action.setTestingUtils(new TestLdapConnectionTest.LdapTestingUtilsMock())
+        action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
         when:
         LdapRecommendedSettingsField recSettings = action.getValue().result()
@@ -153,16 +156,5 @@ class TestLdapRecommendedSettings extends Specification {
         recSettings.memberAttributesReferencedInGroup().value == ['uid']
 
         recSettings.queryBases().value == ['dc=example,dc=com']
-    }
-
-    LdapConnectionField noEncryptionLdapConnectionInfo() {
-        return new LdapConnectionField()
-                .hostname(server.getHostname())
-                .port(server.getLdapPort())
-                .encryptionMethod(LdapEncryptionMethodField.NONE)
-    }
-
-    LdapBindUserInfo simpleBindInfo() {
-        return new LdapBindUserInfo().bindMethod(LdapBindMethod.SIMPLE).username(server.getBasicAuthDn()).password(server.getBasicAuthPassword())
     }
 }

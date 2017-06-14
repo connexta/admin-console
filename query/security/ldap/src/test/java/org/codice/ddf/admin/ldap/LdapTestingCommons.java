@@ -16,6 +16,14 @@ package org.codice.ddf.admin.ldap;
 import java.io.IOException;
 import java.util.Properties;
 
+import org.codice.ddf.admin.ldap.fields.config.LdapSettingsField;
+import org.codice.ddf.admin.ldap.fields.connection.LdapBindMethod;
+import org.codice.ddf.admin.ldap.fields.connection.LdapBindUserInfo;
+import org.codice.ddf.admin.ldap.fields.connection.LdapConnectionField;
+import org.codice.ddf.admin.ldap.fields.connection.LdapEncryptionMethodField;
+
+import com.google.common.collect.ImmutableMap;
+
 public class LdapTestingCommons {
 
     public static void loadLdapTestProperties() throws IOException {
@@ -24,4 +32,38 @@ public class LdapTestingCommons {
                 .getResourceAsStream("test.properties"));
         properties.forEach((o, o2) -> System.setProperty((String) o, (String) o2));
     }
+
+    public static LdapConnectionField noEncryptionLdapConnectionInfo() {
+        return new LdapConnectionField().hostname(TestLdapServer.getHostname())
+                .port(TestLdapServer.getLdapPort())
+                .encryptionMethod(LdapEncryptionMethodField.NONE);
+    }
+
+    public static LdapBindUserInfo simpleBindInfo() {
+        return new LdapBindUserInfo().bindMethod(LdapBindMethod.SIMPLE)
+                .username(TestLdapServer.getBasicAuthDn())
+                .password(TestLdapServer.getBasicAuthPassword());
+    }
+
+    public static LdapSettingsField initLdapSettings(String useCase) {
+        return initLdapSettings(useCase, false);
+    }
+
+    public static LdapSettingsField initLdapSettings(String useCase,
+            boolean includeAttributeFields) {
+        LdapSettingsField settingsField = new LdapSettingsField().usernameAttribute("sn")
+                .baseUserDn("ou=users,dc=example,dc=com")
+                .baseGroupDn("ou=groups,dc=example,dc=com")
+                .useCase(useCase);
+
+        if (includeAttributeFields) {
+            settingsField.groupObjectClass("groupOfNames")
+                    .groupAttributeHoldingMember("member")
+                    .memberAttributeReferencedInGroup("uid")
+                    .attributeMapField(ImmutableMap.of("foobar", "cn"));
+        }
+
+        return settingsField;
+    }
+
 }

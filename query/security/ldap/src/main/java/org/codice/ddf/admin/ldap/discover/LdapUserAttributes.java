@@ -14,6 +14,7 @@
 package org.codice.ddf.admin.ldap.discover;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -26,7 +27,9 @@ import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 import org.codice.ddf.admin.ldap.commons.LdapConnectionAttempt;
 import org.codice.ddf.admin.ldap.commons.LdapTestingUtils;
 import org.codice.ddf.admin.ldap.commons.ServerGuesser;
-import org.codice.ddf.admin.ldap.fields.config.LdapConfigurationField;
+import org.codice.ddf.admin.ldap.fields.config.LdapSettingsField;
+import org.codice.ddf.admin.ldap.fields.connection.LdapBindUserInfo;
+import org.codice.ddf.admin.ldap.fields.connection.LdapConnectionField;
 import org.codice.ddf.admin.ldap.fields.query.LdapTypeField;
 import org.forgerock.opendj.ldap.LdapException;
 import org.forgerock.opendj.ldap.SearchResultReferenceIOException;
@@ -44,7 +47,11 @@ public class LdapUserAttributes extends BaseFunctionField<ListField<StringField>
     public static final String DESCRIPTION =
             "Retrieves a subset of available user attributes based on the LDAP settings provided.";
 
-    private LdapConfigurationField config;
+    private LdapConnectionField conn;
+
+    private LdapBindUserInfo creds;
+
+    private LdapSettingsField settings;
 
     private LdapTypeField ldapType;
 
@@ -52,7 +59,10 @@ public class LdapUserAttributes extends BaseFunctionField<ListField<StringField>
 
     public LdapUserAttributes() {
         super(ID, DESCRIPTION, new ListFieldImpl<>(StringField.class));
-        config = new LdapConfigurationField();
+        conn = new LdapConnectionField().useDefaultRequired();
+        creds = new LdapBindUserInfo().useDefaultRequired();
+        settings = new LdapSettingsField().useDefaultRequired();
+
         ldapType = new LdapTypeField();
         updateArgumentPaths();
 
@@ -61,36 +71,32 @@ public class LdapUserAttributes extends BaseFunctionField<ListField<StringField>
 
     @Override
     public List<DataType> getArguments() {
-        return ImmutableList.of(config, ldapType);
+        return ImmutableList.of(conn, creds, settings, ldapType);
     }
 
     @Override
     public ListField<StringField> performFunction() {
-        LdapConnectionAttempt ldapConnectionAttempt =
-                utils.bindUserToLdapConnection(config.connectionField(),
-                        config.bindUserInfoField());
+        LdapConnectionAttempt connectionAttempt = utils.bindUserToLdapConnection(conn, creds);
+        addMessages(connectionAttempt);
 
-        addMessages(ldapConnectionAttempt);
-
-        if (!ldapConnectionAttempt.isResultPresent()) {
+        if (!connectionAttempt.isResultPresent()) {
             return null;
         }
 
-        Set<String> ldapEntryAttributes = null;
+        Set<String> ldapEntryAttributes = new HashSet<>();
+        ServerGuesser serverGuesser = ServerGuesser.buildGuesser(ldapType.getValue(),
+                connectionAttempt.result());
+
         try {
-            ServerGuesser serverGuesser = ServerGuesser.buildGuesser(ldapType.getValue(),
-                    ldapConnectionAttempt.result());
-            ldapEntryAttributes = serverGuesser.getClaimAttributeOptions(config.settingsField()
-                    .baseUserDn());
+            ldapEntryAttributes = serverGuesser.getClaimAttributeOptions(settings.baseUserDn());
 
         } catch (SearchResultReferenceIOException | LdapException e) {
-            // TODO: tbatie - 4/3/17 - Make a toString for LDAPConfig
             LOGGER.warn("Error retrieving attributes from LDAP server; this may indicate a "
-                    + "configuration issue with config: ", config.toString());
+                    + "configuration issue with config.");
         }
 
         // TODO: tbatie - 4/3/17 - Make a set field instead
-        ListFieldImpl entries = new ListFieldImpl<>(StringField.class);
+        ListFieldImpl<StringField> entries = new ListFieldImpl<>(StringField.class);
         entries.setValue(Arrays.asList(ldapEntryAttributes.toArray()));
         return entries;
     }

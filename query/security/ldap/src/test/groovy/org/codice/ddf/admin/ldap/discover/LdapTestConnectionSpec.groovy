@@ -31,9 +31,10 @@ import javax.net.ssl.SSLContext
 import java.security.GeneralSecurityException
 import java.security.NoSuchAlgorithmException
 
+import static org.codice.ddf.admin.ldap.LdapTestingCommons.noEncryptionLdapConnectionInfo
 import static org.junit.Assert.fail
 
-class TestLdapConnectionTest extends Specification {
+class LdapTestConnectionSpec extends Specification {
     static TestLdapServer server
     Map<String, Object> args
     LdapTestConnection ldapConnectFunction
@@ -181,13 +182,6 @@ class TestLdapConnectionTest extends Specification {
         report.messages().get(0).getPath() == [LdapTestConnection.ID]
     }
 
-    LdapConnectionField noEncryptionLdapConnectionInfo() {
-        return new LdapConnectionField()
-                .hostname(server.getHostname())
-                .port(server.getLdapPort())
-                .encryptionMethod(LdapEncryptionMethodField.NONE)
-    }
-
     LdapConnectionField ldapsLdapConnectionInfo() {
         return new LdapConnectionField()
                 .hostname(server.getHostname())
@@ -220,7 +214,7 @@ class TestLdapConnectionTest extends Specification {
 
         @Override
         SSLContext getSslContext() throws NoSuchAlgorithmException {
-            if(throwException) {
+            if (throwException) {
                 throw new RuntimeException("Throwing error for " + LdapTestingUtilsMock.class + ".")
             }
             try {

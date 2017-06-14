@@ -26,7 +26,10 @@ import org.codice.ddf.admin.ldap.fields.connection.*
 import spock.lang.Ignore
 import spock.lang.Specification
 
-class TestLdapBindTest extends Specification {
+import static org.codice.ddf.admin.ldap.LdapTestingCommons.noEncryptionLdapConnectionInfo
+import static org.codice.ddf.admin.ldap.LdapTestingCommons.simpleBindInfo
+
+class LdapTestBindSpec extends Specification {
     static TestLdapServer server
     Map<String, Object> args
     LdapTestBind ldapBindFunction
@@ -71,7 +74,7 @@ class TestLdapBindTest extends Specification {
 
     def 'Fail on missing bind realm'() {
         setup:
-        args = [(LdapBindUserInfo.DEFAULT_FIELD_NAME): digestBindInfo().realm(null).getValue(),
+        args = [(LdapBindUserInfo.DEFAULT_FIELD_NAME)   : digestBindInfo().realm(null).getValue(),
                 (LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue()]
         ldapBindFunction.setValue(args)
 
@@ -87,7 +90,7 @@ class TestLdapBindTest extends Specification {
     def 'Fail to connect to LDAP'() {
         setup:
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().port(666).getValue(),
-                (LdapBindUserInfo.DEFAULT_FIELD_NAME): simpleBindInfo().getValue()]
+                (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue()]
         ldapBindFunction.setValue(args)
 
         when:
@@ -103,9 +106,9 @@ class TestLdapBindTest extends Specification {
     def 'Successfully bind user with no encryption using bind method "Simple"'() {
         setup:
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue(),
-                (LdapBindUserInfo.DEFAULT_FIELD_NAME): simpleBindInfo().getValue()]
+                (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue()]
         ldapBindFunction.setValue(args)
-        ldapBindFunction.setTestingUtils(new TestLdapConnectionTest.LdapTestingUtilsMock())
+        ldapBindFunction.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
         when:
         FunctionReport report = ldapBindFunction.getValue()
@@ -118,9 +121,9 @@ class TestLdapBindTest extends Specification {
     def 'Successfully bind user with LDAPS encryption using bind method "Simple"'() {
         setup:
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): ldapsLdapConnectionInfo().getValue(),
-                (LdapBindUserInfo.DEFAULT_FIELD_NAME): simpleBindInfo().getValue()]
+                (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue()]
         ldapBindFunction.setValue(args)
-        ldapBindFunction.setTestingUtils(new TestLdapConnectionTest.LdapTestingUtilsMock())
+        ldapBindFunction.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
         when:
         FunctionReport report = ldapBindFunction.getValue()
@@ -135,7 +138,7 @@ class TestLdapBindTest extends Specification {
     def 'Successfully bind user with no encryption using bind method "DigestMD5SASL"'() {
         setup:
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue(),
-                (LdapBindUserInfo.DEFAULT_FIELD_NAME): simpleBindInfo().getValue()]
+                (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue()]
         ldapBindFunction.setValue(args)
 
         when:
@@ -151,9 +154,9 @@ class TestLdapBindTest extends Specification {
     def 'Successfully bind user with LDAPS encryption using bind method "DigestMD5SASL"'() {
         setup:
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): ldapsLdapConnectionInfo().getValue(),
-                (LdapBindUserInfo.DEFAULT_FIELD_NAME): simpleBindInfo().getValue()]
+                (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue()]
         ldapBindFunction.setValue(args)
-        ldapBindFunction.setTestingUtils(new TestLdapConnectionTest.LdapTestingUtilsMock())
+        ldapBindFunction.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
         when:
         FunctionReport report = ldapBindFunction.getValue()
@@ -167,7 +170,7 @@ class TestLdapBindTest extends Specification {
     def 'Fail to bind user using bind method "DigestMD5SASL" with bad realm'() {
         setup:
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue(),
-                (LdapBindUserInfo.DEFAULT_FIELD_NAME): digestBindInfo().getValue()]
+                (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : digestBindInfo().getValue()]
         ldapBindFunction.setValue(args)
 
         when:
@@ -183,7 +186,7 @@ class TestLdapBindTest extends Specification {
     def 'Fail to bind user over bind method "Simple" with bad password'() {
         setup:
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue(),
-                (LdapBindUserInfo.DEFAULT_FIELD_NAME): simpleBindInfo().password("badPassword").getValue()]
+                (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().password("badPassword").getValue()]
         ldapBindFunction.setValue(args)
 
         when:
@@ -199,7 +202,7 @@ class TestLdapBindTest extends Specification {
     def 'Fail to bind user over bind method "Simple" with bad username'() {
         setup:
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue(),
-                (LdapBindUserInfo.DEFAULT_FIELD_NAME): simpleBindInfo().username("badUsername").getValue()]
+                (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().username("badUsername").getValue()]
         ldapBindFunction.setValue(args)
 
         when:
@@ -212,22 +215,11 @@ class TestLdapBindTest extends Specification {
         report.messages().get(0).getPath() == [LdapTestBind.ID, FunctionField.ARGUMENT, LdapBindUserInfo.DEFAULT_FIELD_NAME]
     }
 
-    LdapConnectionField noEncryptionLdapConnectionInfo() {
-        return new LdapConnectionField()
-                .hostname(server.getHostname())
-                .port(server.getLdapPort())
-                .encryptionMethod(LdapEncryptionMethodField.NONE)
-    }
-
     LdapConnectionField ldapsLdapConnectionInfo() {
         return new LdapConnectionField()
                 .hostname(server.getHostname())
                 .port(server.getLdapSecurePort())
                 .encryptionMethod(LdapEncryptionMethodField.LDAPS)
-    }
-
-    LdapBindUserInfo simpleBindInfo() {
-        return new LdapBindUserInfo().bindMethod(LdapBindMethod.SIMPLE).username(server.getBasicAuthDn()).password(server.getBasicAuthPassword())
     }
 
     LdapBindUserInfo digestBindInfo() {

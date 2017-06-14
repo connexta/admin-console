@@ -104,6 +104,16 @@ public class LdapSettingsField extends BaseObjectField {
         return memberAttributeReferencedInGroup.getValue();
     }
 
+    public LdapSettingsField useDefaultRequired() {
+        baseUserDn.isRequired(true);
+        baseGroupDn.isRequired(true);
+        groupObjectClass.isRequired(true);
+        usernameAttribute.isRequired(true);
+        groupAttributeHoldingMember.isRequired(true);
+        memberAttributeReferencedInGroup.isRequired(true);
+        return this;
+    }
+
     public Map<String, String> attributeMap() {
         Map<String, String> attributes = new HashMap<>();
         attributeMap.getList()

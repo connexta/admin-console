@@ -20,7 +20,6 @@ import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 import com.google.common.collect.ImmutableList;
 
 public class LdapTypeField extends BaseEnumField<String> {
-
     public static final String DEFAULT_FIELD_NAME = "type";
 
     public static final String FIELD_TYPE_NAME = "LdapType";
@@ -41,7 +40,7 @@ public class LdapTypeField extends BaseEnumField<String> {
         this(null);
     }
 
-    protected LdapTypeField(DataType<String> ldapType) {
+    private LdapTypeField(DataType<String> ldapType) {
         super(DEFAULT_FIELD_NAME,
                 FIELD_TYPE_NAME,
                 DESCRIPTION,
@@ -57,7 +56,7 @@ public class LdapTypeField extends BaseEnumField<String> {
         public static final String DESCRIPTION =
                 "Use if the type of LDAP is unknown/is not listed in this enum set.";
 
-        public Unknown() {
+        Unknown() {
             super(UNKNOWN, UNKNOWN, DESCRIPTION);
         }
 
@@ -71,7 +70,7 @@ public class LdapTypeField extends BaseEnumField<String> {
         public static final String DESCRIPTION =
                 "Active Directory (AD) is a directory service that Microsoft developed for Windows domain networks.";
 
-        public ActiveDirectory() {
+        ActiveDirectory() {
             super(ACTIVE_DIRECTORY, ACTIVE_DIRECTORY, DESCRIPTION);
         }
 
@@ -85,7 +84,7 @@ public class LdapTypeField extends BaseEnumField<String> {
         public static final String DESCRIPTION =
                 "OpenLDAP is a free, open source implementation of the Lightweight Directory Access Protocol (LDAP) developed by the OpenLDAP Project.";
 
-        public OpenLdap() {
+        OpenLdap() {
             super(OPEN_LDAP, OPEN_LDAP, DESCRIPTION);
         }
 
@@ -99,7 +98,7 @@ public class LdapTypeField extends BaseEnumField<String> {
         public static final String DESCRIPTION =
                 "OpenDJ is a directory server which implements a wide range of Lightweight Directory Access Protocol and related standards, including full compliance with LDAPv3 but also support for Directory Service Markup Language (DSMLv2).";
 
-        public OpenDJ() {
+        OpenDJ() {
             super(OPEN_DJ, OPEN_DJ, DESCRIPTION);
         }
 
@@ -113,7 +112,7 @@ public class LdapTypeField extends BaseEnumField<String> {
         public static final String DESCRIPTION =
                 "The Embedded LDAP application is an internal LDAP server that has a default set of schemas and users loaded to help facilitate authentication and authorization testing.";
 
-        public EmbeddedLdap() {
+        EmbeddedLdap() {
             super(EMBEDDED, EMBEDDED, DESCRIPTION);
         }
 

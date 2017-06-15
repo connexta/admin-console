@@ -36,12 +36,11 @@ import org.codice.ddf.internal.admin.configurator.actions.PropertyActions;
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
 
 public class LdapFieldProvider extends BaseFieldProvider {
-
-    public static final String NAME = "ldap";
-
-    public static final String TYPE_NAME = "Ldap";
-
     public static final String DESCRIPTION = "Facilities for interacting with LDAP servers.";
+
+    private static final String NAME = "ldap";
+
+    private static final String TYPE_NAME = "Ldap";
 
     private final ConfiguratorFactory configuratorFactory;
 

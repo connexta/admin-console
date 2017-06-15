@@ -64,7 +64,6 @@ public class LdapRecommendedSettings extends BaseFunctionField<LdapRecommendedSe
 
     @Override
     public LdapRecommendedSettingsField performFunction() {
-        ServerGuesser guesser;
         try (LdapConnectionAttempt connectionAttempt = utils.bindUserToLdapConnection(conn,
                 creds)) {
             addMessages(connectionAttempt);
@@ -73,7 +72,8 @@ public class LdapRecommendedSettings extends BaseFunctionField<LdapRecommendedSe
                 return null;
             }
 
-            guesser = ServerGuesser.buildGuesser(ldapType.getValue(), connectionAttempt.result());
+            ServerGuesser guesser = ServerGuesser.buildGuesser(ldapType.getValue(),
+                    connectionAttempt.result());
 
             return new LdapRecommendedSettingsField().userDns(guesser.getUserBaseChoices())
                     .groupDns(guesser.getGroupBaseChoices())

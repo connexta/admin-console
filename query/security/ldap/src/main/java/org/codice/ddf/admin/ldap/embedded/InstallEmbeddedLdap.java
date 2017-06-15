@@ -35,7 +35,6 @@ import org.codice.ddf.internal.admin.configurator.actions.FeatureActions;
 import com.google.common.collect.ImmutableList;
 
 public class InstallEmbeddedLdap extends BaseFunctionField<BooleanField> {
-
     public static final String FIELD_NAME = "installEmbeddedLdap";
 
     public static final String DESCRIPTION =
@@ -53,6 +52,7 @@ public class InstallEmbeddedLdap extends BaseFunctionField<BooleanField> {
         this.configuratorFactory = configuratorFactory;
         this.featureActions = featureActions;
         useCase = new LdapUseCase();
+        useCase.isRequired(true);
         updateArgumentPaths();
     }
 

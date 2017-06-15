@@ -28,7 +28,6 @@ import org.codice.ddf.admin.security.common.fields.wcpm.ClaimsMapEntry;
 import com.google.common.collect.ImmutableList;
 
 public class LdapSettingsField extends BaseObjectField {
-
     public static final String DEFAULT_FIELD_NAME = "settings";
 
     public static final String FIELD_TYPE_NAME = "LdapSettings";
@@ -77,6 +76,39 @@ public class LdapSettingsField extends BaseObjectField {
                 memberAttributeReferencedInGroup,
                 attributeMap,
                 useCase);
+    }
+
+    //Field getters
+    public StringField usernameAttributeField() {
+        return usernameAttribute;
+    }
+
+    public LdapUseCase useCaseField() {
+        return useCase;
+    }
+
+    public LdapDistinguishedName baseUserDnField() {
+        return baseUserDn;
+    }
+
+    public LdapDistinguishedName baseGroupDnField() {
+        return baseGroupDn;
+    }
+
+    public StringField groupObjectClassField() {
+        return groupObjectClass;
+    }
+
+    public StringField groupAttributeHoldingMemberField() {
+        return groupAttributeHoldingMember;
+    }
+
+    public StringField memberAttributeReferencedInGroupField() {
+        return memberAttributeReferencedInGroup;
+    }
+
+    public ListField<ClaimsMapEntry> attributeMapField() {
+        return attributeMap;
     }
 
     //Value getters
@@ -131,39 +163,6 @@ public class LdapSettingsField extends BaseObjectField {
 
     public String useCase() {
         return useCase.getValue();
-    }
-
-    //Field getters
-    public StringField usernameAttributeField() {
-        return usernameAttribute;
-    }
-
-    public LdapUseCase useCaseField() {
-        return useCase;
-    }
-
-    public LdapDistinguishedName baseUserDnField() {
-        return baseUserDn;
-    }
-
-    public LdapDistinguishedName baseGroupDnField() {
-        return baseGroupDn;
-    }
-
-    public StringField groupObjectClassField() {
-        return groupObjectClass;
-    }
-
-    public StringField groupAttributeHoldingMemberField() {
-        return groupAttributeHoldingMember;
-    }
-
-    public StringField memberAttributeReferencedInGroupField() {
-        return memberAttributeReferencedInGroup;
-    }
-
-    public ListField<ClaimsMapEntry> attributeMapField() {
-        return attributeMap;
     }
 
     //Value setters

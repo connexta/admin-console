@@ -16,7 +16,6 @@ package org.codice.ddf.admin.ldap.fields.connection;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 
 public class LdapRealm extends StringField {
-
     public static final String DEFAULT_FIELD_NAME = "realm";
 
     public static final String FIELD_TYPE_NAME = "LdapRealm";
@@ -24,7 +23,7 @@ public class LdapRealm extends StringField {
     public static final String DESCRIPTION =
             "The ldap realm performs authentication using information from an LDAP server. User information includes user name, password, and the groups to which the user belongs. To use an LDAP realm, the users and groups must already be defined in your LDAP directory";
 
-    public LdapRealm() {
+    LdapRealm() {
         super(DEFAULT_FIELD_NAME);
     }
 }

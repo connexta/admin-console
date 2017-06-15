@@ -81,6 +81,11 @@
             <version>${ddf.version}</version>
         </dependency>
         <dependency>
+            <groupId>ddf.admin</groupId>
+            <artifactId>admin-configurator-actions-api</artifactId>
+            <version>${ddf.version}</version>
+        </dependency>
+        <dependency>
             <groupId>ddf.lib</groupId>
             <artifactId>common-system</artifactId>
             <version>${ddf.version}</version>

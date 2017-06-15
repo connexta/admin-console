@@ -33,12 +33,11 @@ import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
 import com.google.common.collect.ImmutableList;
 
 public class LdapConfigurations extends BaseFunctionField<ListField<LdapConfigurationField>> {
-
     public static final String FIELD_NAME = "configs";
 
-    public static final String CONFIGS_ARG_NAME = "configs";
-
     public static final String DESCRIPTION = "Retrieves all currently configured LDAP settings.";
+
+    private static final String CONFIGS_ARG_NAME = "configs";
 
     private PidField pid;
 

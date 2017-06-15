@@ -51,7 +51,7 @@ public class LdapEncryptionMethodField extends BaseEnumField<String> {
     protected static final class NoEncryption extends StringField {
         public static final String DESCRIPTION = "No encryption enabled for LDAP connection";
 
-        public NoEncryption() {
+        NoEncryption() {
             super(NONE, NONE, DESCRIPTION);
         }
 
@@ -65,7 +65,7 @@ public class LdapEncryptionMethodField extends BaseEnumField<String> {
 
         public static final String DESCRIPTION = "Secure LDAPS encryption.";
 
-        public LdapsEncryption() {
+        LdapsEncryption() {
             super(LDAPS, LDAPS, DESCRIPTION);
         }
 
@@ -79,7 +79,7 @@ public class LdapEncryptionMethodField extends BaseEnumField<String> {
         public static final String DESCRIPTION =
                 "Attempts to upgrade a non encrypted connection to LDAPS.";
 
-        public StartTlsEncryption() {
+        StartTlsEncryption() {
             super(START_TLS, START_TLS, DESCRIPTION);
         }
 
@@ -88,5 +88,4 @@ public class LdapEncryptionMethodField extends BaseEnumField<String> {
             return START_TLS;
         }
     }
-
 }

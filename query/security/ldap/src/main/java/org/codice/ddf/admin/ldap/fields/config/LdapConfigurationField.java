@@ -24,7 +24,6 @@ import org.codice.ddf.admin.ldap.fields.connection.LdapConnectionField;
 import com.google.common.collect.ImmutableList;
 
 public class LdapConfigurationField extends BaseObjectField {
-
     public static final String FIELD_NAME = "config";
 
     public static final String FIELD_TYPE_NAME = "LdapConfiguration";
@@ -49,23 +48,7 @@ public class LdapConfigurationField extends BaseObjectField {
         updateInnerFieldPaths();
     }
 
-    public LdapConfigurationField connection(LdapConnectionField connection) {
-        this.connection.setValue(connection.getValue());
-        return this;
-    }
-
-    public LdapConfigurationField bindUserInfo(LdapBindUserInfo bindUserInfo) {
-        this.bindUserInfo.setValue(bindUserInfo.getValue());
-        return this;
-    }
-
-    public LdapConfigurationField settings(LdapSettingsField settings) {
-        this.settings.setValue(settings.getValue());
-        return this;
-    }
-
     //Field getters
-    // TODO: tbatie - 4/11/17 - Rename these to -field
     public LdapConnectionField connectionField() {
         return connection;
     }
@@ -87,9 +70,24 @@ public class LdapConfigurationField extends BaseObjectField {
         return pid.getValue();
     }
 
-    //Setters
+    //Value setters
     public LdapConfigurationField pid(String pid) {
         this.pid.setValue(pid);
+        return this;
+    }
+
+    public LdapConfigurationField connection(LdapConnectionField connection) {
+        this.connection.setValue(connection.getValue());
+        return this;
+    }
+
+    public LdapConfigurationField bindUserInfo(LdapBindUserInfo bindUserInfo) {
+        this.bindUserInfo.setValue(bindUserInfo.getValue());
+        return this;
+    }
+
+    public LdapConfigurationField settings(LdapSettingsField settings) {
+        this.settings.setValue(settings.getValue());
         return this;
     }
 

@@ -42,21 +42,22 @@ public class LdapDistinguishedName extends StringField {
         setValue(dn);
         return this;
     }
+
     @Override
     public List<ErrorMessage> validate() {
         List<ErrorMessage> validationMsgs = super.validate();
-        if(!validationMsgs.isEmpty()) {
+        if (!validationMsgs.isEmpty()) {
             return validationMsgs;
         }
 
-        if(getValue() != null && !isValidDN(getValue())) {
+        if (getValue() != null && !isValidDN(getValue())) {
             validationMsgs.add(invalidDnFormatError(path()));
         }
 
         return validationMsgs;
     }
 
-    public boolean isValidDN(String dn) {
+    private boolean isValidDN(String dn) {
         try {
             DN.valueOf(dn);
         } catch (Exception e) {

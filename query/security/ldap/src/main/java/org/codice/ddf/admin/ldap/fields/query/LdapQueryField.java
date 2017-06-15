@@ -37,6 +37,7 @@ public class LdapQueryField extends StringField {
         setValue(query);
         return this;
     }
+
     @Override
     public List<ErrorMessage> validate() {
         List<ErrorMessage> validationMsgs = super.validate();
@@ -44,14 +45,14 @@ public class LdapQueryField extends StringField {
             return validationMsgs;
         }
 
-        if(getValue() != null && !validQuery(getValue())) {
+        if (getValue() != null && !validQuery(getValue())) {
             validationMsgs.add(invalidQueryError(path()));
         }
 
         return validationMsgs;
     }
 
-    public boolean validQuery(String query) {
+    private boolean validQuery(String query) {
         try {
             Filter.valueOf(query);
         } catch (Exception e) {

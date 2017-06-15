@@ -120,6 +120,22 @@ public class LdapTestSettings extends TestFunctionField {
         return new BooleanField(!containsErrorMsgs());
     }
 
+    @Override
+    public void validate() {
+        if (settings.useCase() != null && (settings.useCase()
+                .equals(ATTRIBUTE_STORE) || settings.useCase()
+                .equals(AUTHENTICATION_AND_ATTRIBUTE_STORE))) {
+            settings.useDefaultAttributeStore();
+        }
+
+        super.validate();
+    }
+
+    @Override
+    public FunctionField<BooleanField> newInstance() {
+        return new LdapTestSettings();
+    }
+
     /**
      * Confirms that the baseUserDn exists.
      *
@@ -233,22 +249,6 @@ public class LdapTestSettings extends TestFunctionField {
             addArgumentMessage(noReferencedMemberError(settings.memberAttributeReferencedInGroupField()
                     .path()));
         }
-    }
-
-    @Override
-    public void validate() {
-        if (settings.useCase() != null && (settings.useCase()
-                .equals(ATTRIBUTE_STORE) || settings.useCase()
-                .equals(AUTHENTICATION_AND_ATTRIBUTE_STORE))) {
-            settings.useDefaultAttributeStore();
-        }
-
-        super.validate();
-    }
-
-    @Override
-    public FunctionField<BooleanField> newInstance() {
-        return new LdapTestSettings();
     }
 
     /**

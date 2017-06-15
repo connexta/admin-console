@@ -25,7 +25,6 @@ import org.codice.ddf.admin.ldap.fields.LdapDistinguishedName;
 import com.google.common.collect.ImmutableList;
 
 public class LdapRecommendedSettingsField extends BaseObjectField {
-
     public static final String DEFAULT_FIELD_NAME = "recommendedSettings";
 
     public static final String FIELD_TYPE_NAME = "LdapRecommendedSettings";
@@ -33,21 +32,20 @@ public class LdapRecommendedSettingsField extends BaseObjectField {
     public static final String DESCRIPTION =
             "An object containing potential values to be used for setting up LDAP.";
 
-    public static final String USER_DNS = "userDns";
+    private static final String USER_DNS = "userDns";
 
-    public static final String GROUPS_DNS = "groupsDns";
+    private static final String GROUPS_DNS = "groupsDns";
 
-    public static final String USER_NAME_ATTRIBUTES = "userNameAttributes";
+    private static final String USER_NAME_ATTRIBUTES = "userNameAttributes";
 
-    public static final String GROUP_OBJECT_CLASSES = "groupObjectClasses";
+    private static final String GROUP_OBJECT_CLASSES = "groupObjectClasses";
 
-    public static final String GROUP_ATTRIBUTES_HOLDING_MEMBER =
-            "groupAttributesHoldingMember";
+    private static final String GROUP_ATTRIBUTES_HOLDING_MEMBER = "groupAttributesHoldingMember";
 
-    public static final String MEMBER_ATTRIBUTES_REFERENCED_IN_GROUP =
+    private static final String MEMBER_ATTRIBUTES_REFERENCED_IN_GROUP =
             "memberAttributesReferencedInGroup";
 
-    public static final String QUERY_BASES = "queryBases";
+    private static final String QUERY_BASES = "queryBases";
 
     private ListField<LdapDistinguishedName> userDns;
 
@@ -78,6 +76,36 @@ public class LdapRecommendedSettingsField extends BaseObjectField {
         updateInnerFieldPaths();
     }
 
+    // Field getters
+    public ListField<LdapDistinguishedName> userDnsField() {
+        return userDns;
+    }
+
+    public ListField<LdapDistinguishedName> groupDnsField() {
+        return groupDns;
+    }
+
+    public ListField<StringField> userNameAttributesField() {
+        return userNameAttributes;
+    }
+
+    public ListField<StringField> groupObjectClassesField() {
+        return groupObjectClasses;
+    }
+
+    public ListField<StringField> groupAttributesHoldingMemberField() {
+        return groupAttributesHoldingMember;
+    }
+
+    public ListField<StringField> memberAttributesReferencedInGroupField() {
+        return memberAttributesReferencedInGroup;
+    }
+
+    public ListField<LdapDistinguishedName> queryBasesField() {
+        return queryBases;
+    }
+
+    // Value setters
     public LdapRecommendedSettingsField userDns(List<String> baseDns) {
         this.userDns.setValue(baseDns);
         return this;
@@ -113,34 +141,6 @@ public class LdapRecommendedSettingsField extends BaseObjectField {
     public LdapRecommendedSettingsField queryBases(List<String> queryBases) {
         this.queryBases.setValue(queryBases);
         return this;
-    }
-
-    public ListField<LdapDistinguishedName> userDnsField() {
-        return userDns;
-    }
-
-    public ListField<LdapDistinguishedName> groupDnsField() {
-        return groupDns;
-    }
-
-    public ListField<StringField> userNameAttributesField() {
-        return userNameAttributes;
-    }
-
-    public ListField<StringField> groupObjectClassesField() {
-        return groupObjectClasses;
-    }
-
-    public ListField<StringField> groupAttributesHoldingMemberField() {
-        return groupAttributesHoldingMember;
-    }
-
-    public ListField<StringField> memberAttributesReferencedInGroupField() {
-        return memberAttributesReferencedInGroup;
-    }
-
-    public ListField<LdapDistinguishedName> queryBasesField() {
-        return queryBases;
     }
 
     @Override

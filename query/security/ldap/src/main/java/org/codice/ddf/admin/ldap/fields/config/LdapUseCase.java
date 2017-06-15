@@ -20,7 +20,6 @@ import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 import com.google.common.collect.ImmutableList;
 
 public class LdapUseCase extends BaseEnumField<String> {
-
     public static final String DEFAULT_FIELD_NAME = "useCase";
 
     public static final String FIELD_TYPE_NAME = "LdapUseCase";
@@ -38,7 +37,7 @@ public class LdapUseCase extends BaseEnumField<String> {
         this(null);
     }
 
-    protected LdapUseCase(DataType<String> bindMethod) {
+    private LdapUseCase(DataType<String> bindMethod) {
         super(DEFAULT_FIELD_NAME,
                 FIELD_TYPE_NAME,
                 DESCRIPTION,
@@ -53,7 +52,7 @@ public class LdapUseCase extends BaseEnumField<String> {
         public static final String DESCRIPTION =
                 "Indicates the LDAP is intended to be used as a source to login into.";
 
-        public Authentication() {
+        Authentication() {
             super(AUTHENTICATION, AUTHENTICATION, DESCRIPTION);
         }
 
@@ -67,7 +66,7 @@ public class LdapUseCase extends BaseEnumField<String> {
         public static final String DESCRIPTION =
                 "Indicates the LDAP is intended to be used as store for retrieving attributes of entries.";
 
-        public AttributeStore() {
+        AttributeStore() {
             super(ATTRIBUTE_STORE, ATTRIBUTE_STORE, DESCRIPTION);
         }
 
@@ -79,9 +78,9 @@ public class LdapUseCase extends BaseEnumField<String> {
 
     protected static final class AuthenticationAndAttributeStore extends StringField {
         public static final String DESCRIPTION =
-                "Inticates the LDAP is intended to be used as both a source of login and a store for retrieving attributes of entries.";
+                "Indicates the LDAP is intended to be used as both a source of login and a store for retrieving attributes of entries.";
 
-        public AuthenticationAndAttributeStore() {
+        AuthenticationAndAttributeStore() {
             super(AUTHENTICATION_AND_ATTRIBUTE_STORE,
                     AUTHENTICATION_AND_ATTRIBUTE_STORE,
                     DESCRIPTION);

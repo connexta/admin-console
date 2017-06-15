@@ -44,6 +44,45 @@ public class LdapConnectionField extends BaseObjectField {
         updateInnerFieldPaths();
     }
 
+    public LdapConnectionField useDefaultRequired() {
+        hostname.isRequired(true);
+        port.isRequired(true);
+        encryptionMethod.isRequired(true);
+        return this;
+    }
+
+    @Override
+    public List<Field> getFields() {
+        return ImmutableList.of(hostname, port, encryptionMethod);
+    }
+
+    // Field getters
+    public HostnameField hostnameField() {
+        return hostname;
+    }
+
+    public PortField portField() {
+        return port;
+    }
+
+    public LdapEncryptionMethodField encryptionField() {
+        return encryptionMethod;
+    }
+
+    // Value getters
+    public String hostname() {
+        return hostname.getValue();
+    }
+
+    public int port() {
+        return port.getValue();
+    }
+
+    public String encryptionMethod() {
+        return encryptionMethod.getValue();
+    }
+
+    // Value setters
     public LdapConnectionField hostname(String hostname) {
         this.hostname.setValue(hostname);
         return this;
@@ -57,41 +96,5 @@ public class LdapConnectionField extends BaseObjectField {
     public LdapConnectionField encryptionMethod(String encryptionMethod) {
         this.encryptionMethod.setValue(encryptionMethod);
         return this;
-    }
-
-    public String hostname() {
-        return hostname.getValue();
-    }
-
-    public int port() {
-        return port.getValue();
-    }
-
-    public String encryptionMethod(){
-        return encryptionMethod.getValue();
-    }
-
-    public HostnameField hostnameField() {
-        return hostname;
-    }
-
-    public PortField portField() {
-        return port;
-    }
-
-    public LdapEncryptionMethodField encryptionField() {
-        return encryptionMethod;
-    }
-
-    public LdapConnectionField useDefaultRequired() {
-        hostname.isRequired(true);
-        port.isRequired(true);
-        encryptionMethod.isRequired(true);
-        return this;
-    }
-
-    @Override
-    public List<Field> getFields() {
-        return ImmutableList.of(hostname, port, encryptionMethod);
     }
 }

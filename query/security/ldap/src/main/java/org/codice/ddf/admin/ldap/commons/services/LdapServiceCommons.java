@@ -19,6 +19,8 @@ import static org.codice.ddf.admin.ldap.fields.config.LdapUseCase.AUTHENTICATION
 import static org.codice.ddf.admin.ldap.fields.connection.LdapEncryptionMethodField.LDAPS;
 
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
@@ -45,8 +47,7 @@ import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
 import org.codice.ddf.internal.admin.configurator.actions.PropertyActions;
 
 public class LdapServiceCommons {
-
-    public static final Pattern URI_MATCHER = Pattern.compile("\\w*://.*");
+    private static final Pattern URI_MATCHER = Pattern.compile("\\w*://.*");
 
     private final PropertyActions propertyActions;
 
@@ -58,6 +59,7 @@ public class LdapServiceCommons {
         this.managedServiceActions = managedServiceActions;
     }
 
+    // TODO: 6/15/17 Add unit tests
     public ListField<LdapConfigurationField> getLdapConfigurations() {
         List<LdapConfigurationField> ldapLoginConfigs = new LdapLoginServiceProperties(
                 managedServiceActions).getLdapLoginManagedServices()
@@ -66,12 +68,11 @@ public class LdapServiceCommons {
                 .map(this::ldapLoginServiceToLdapConfiguration)
                 .collect(Collectors.toList());
 
-        List<LdapConfigurationField> ldapClaimsHandlerConfigs =
-                new LdapClaimsHandlerServiceProperties(managedServiceActions).getLdapClaimsHandlerManagedServices()
-                        .values()
-                        .stream()
-                        .map(this::ldapClaimsHandlerServiceToLdapConfig)
-                        .collect(Collectors.toList());
+        List<LdapConfigurationField> ldapClaimsHandlerConfigs = new LdapClaimsHandlerServiceProperties(managedServiceActions).getLdapClaimsHandlerManagedServices()
+                .values()
+                .stream()
+                .map(this::ldapClaimsHandlerServiceToLdapConfig)
+                .collect(Collectors.toList());
 
         List<LdapConfigurationField> configs = Stream.concat(ldapLoginConfigs.stream(),
                 ldapClaimsHandlerConfigs.stream())
@@ -82,59 +83,6 @@ public class LdapServiceCommons {
                         .password("*******"));
 
         return new ListFieldImpl<>(LdapConfigurationField.class).addAll(configs);
-    }
-
-    public LdapConfigurationField ldapClaimsHandlerServiceToLdapConfig(Map<String, Object> props) {
-
-        LdapConnectionField connection = new LdapConnectionField();
-
-        URI ldapUri =
-                getUriFromProperty((String) props.get(LdapClaimsHandlerServiceProperties.URL));
-        if (ldapUri != null) {
-            connection.encryptionMethod(ldapUri.getScheme())
-                    .hostname(ldapUri.getHost())
-                    .port(ldapUri.getPort());
-        }
-
-        if ((Boolean) props.get(LdapClaimsHandlerServiceProperties.START_TLS)) {
-            connection.encryptionMethod(LdapClaimsHandlerServiceProperties.START_TLS);
-        }
-
-        LdapBindUserInfo bindUserInfo = new LdapBindUserInfo().username(mapStringValue(
-                LdapClaimsHandlerServiceProperties.LDAP_BIND_USER_DN,
-                props))
-                .password(mapStringValue(LdapClaimsHandlerServiceProperties.PASSWORD, props))
-                .bindMethod(mapStringValue(LdapClaimsHandlerServiceProperties.BIND_METHOD, props));
-
-        LdapSettingsField settings = new LdapSettingsField().usernameAttribute(mapStringValue(
-                LdapClaimsHandlerServiceProperties.LOGIN_USER_ATTRIBUTE,
-                props))
-                .baseUserDn(mapStringValue(LdapClaimsHandlerServiceProperties.USER_BASE_DN, props))
-                .baseGroupDn(mapStringValue(LdapClaimsHandlerServiceProperties.GROUP_BASE_DN,
-                        props))
-                .groupObjectClass(mapStringValue(LdapClaimsHandlerServiceProperties.OBJECT_CLASS,
-                        props))
-                .groupAttributeHoldingMember(mapStringValue(LdapClaimsHandlerServiceProperties.MEMBERSHIP_USER_ATTRIBUTE,
-                        props))
-                .memberAttributeReferencedInGroup(mapStringValue(LdapClaimsHandlerServiceProperties.MEMBER_NAME_ATTRIBUTE,
-                        props))
-                .useCase(ATTRIBUTE_STORE);
-
-        String attributeMappingsPath =
-                mapStringValue(LdapClaimsHandlerServiceProperties.PROPERTY_FILE_LOCATION, props);
-        if (StringUtils.isNotEmpty(attributeMappingsPath)) {
-            // TODO: tbatie - 5/26/17 - Need to check if this path exists before trying to read. If it doesn't don't populate the attributeMappings field
-            Map<String, String> attributeMappings = new HashMap<>(propertyActions.getProperties(
-                    Paths.get(attributeMappingsPath)));
-            settings.attributeMapField(attributeMappings);
-        }
-
-        return new LdapConfigurationField().connection(connection)
-                .bindUserInfo(bindUserInfo)
-                .settings(settings)
-                .pid(props.get(ServiceCommons.SERVICE_PID_KEY) == null ?
-                        null :
-                        (String) props.get(ServiceCommons.SERVICE_PID_KEY));
     }
 
     public static Map<String, Object> ldapConfigToLdapClaimsHandlerService(
@@ -185,41 +133,6 @@ public class LdapServiceCommons {
         return props;
     }
 
-    public LdapConfigurationField ldapLoginServiceToLdapConfiguration(Map<String, Object> props) {
-        LdapConnectionField connection = new LdapConnectionField();
-        URI ldapUri = getUriFromProperty(mapStringValue(LdapLoginServiceProperties.LDAP_URL,
-                props));
-        if (ldapUri != null) {
-            connection.encryptionMethod(ldapUri.getScheme())
-                    .hostname(ldapUri.getHost())
-                    .port(ldapUri.getPort());
-        }
-
-        if ((Boolean) props.get(LdapLoginServiceProperties.START_TLS)) {
-            connection.encryptionMethod(LdapLoginServiceProperties.START_TLS);
-        }
-
-        LdapBindUserInfo bindUserInfo = new LdapBindUserInfo().username(mapStringValue(
-                LdapLoginServiceProperties.LDAP_BIND_USER_DN,
-                props))
-                .password(mapStringValue(LdapLoginServiceProperties.LDAP_BIND_USER_PASS, props))
-                .bindMethod(mapStringValue(LdapLoginServiceProperties.BIND_METHOD, props))
-                .realm(mapStringValue(LdapLoginServiceProperties.REALM, props));
-        //        ldapConfiguration.bindKdcAddress((String) props.get(KDC_ADDRESS));
-
-        LdapSettingsField settings = new LdapSettingsField().usernameAttribute(mapStringValue(
-                LdapLoginServiceProperties.USER_NAME_ATTRIBUTE,
-                props))
-                .baseUserDn(mapStringValue(LdapLoginServiceProperties.USER_BASE_DN, props))
-                .baseGroupDn(mapStringValue(LdapLoginServiceProperties.GROUP_BASE_DN, props))
-                .useCase(AUTHENTICATION);
-
-        return new LdapConfigurationField().connection(connection)
-                .bindUserInfo(bindUserInfo)
-                .settings(settings)
-                .pid(mapStringValue(SERVICE_PID_KEY, props));
-    }
-
     public Map<String, Object> ldapConfigurationToLdapLoginService(LdapConfigurationField config) {
         Map<String, Object> ldapStsConfig = new HashMap<>();
 
@@ -267,14 +180,13 @@ public class LdapServiceCommons {
      * <p>
      * Possible error types: IDENTICAL_SERVICE_EXISTS
      *
-     * @param newConfig           configuration to check for existing configurations for
+     * @param newConfig configuration to check for existing configurations for
      * @return {@link Report} with errors indicating there are existing configurations
      * the {@code configuration}
      */
     public Report validateIdenticalLdapConfigDoesNotExist(LdapConfigurationField newConfig) {
         ReportImpl report = new ReportImpl();
-        List<LdapConfigurationField> existingConfigs = getLdapConfigurations()
-                .getList();
+        List<LdapConfigurationField> existingConfigs = getLdapConfigurations().getList();
 
         boolean identicalServiceExists = existingConfigs.stream()
                 .anyMatch(existingConfig -> identicalSettingsExist(existingConfig, newConfig));
@@ -284,6 +196,92 @@ public class LdapServiceCommons {
         }
 
         return report;
+    }
+
+    private LdapConfigurationField ldapClaimsHandlerServiceToLdapConfig(Map<String, Object> props) {
+        LdapConnectionField connection = getLdapConnectionField(props,
+                LdapClaimsHandlerServiceProperties.URL,
+                LdapClaimsHandlerServiceProperties.START_TLS);
+
+        LdapBindUserInfo bindUserInfo = new LdapBindUserInfo().username(mapStringValue(
+                LdapClaimsHandlerServiceProperties.LDAP_BIND_USER_DN,
+                props))
+                .password(mapStringValue(LdapClaimsHandlerServiceProperties.PASSWORD, props))
+                .bindMethod(mapStringValue(LdapClaimsHandlerServiceProperties.BIND_METHOD, props));
+
+        LdapSettingsField settings = new LdapSettingsField().usernameAttribute(mapStringValue(
+                LdapClaimsHandlerServiceProperties.LOGIN_USER_ATTRIBUTE,
+                props))
+                .baseUserDn(mapStringValue(LdapClaimsHandlerServiceProperties.USER_BASE_DN, props))
+                .baseGroupDn(mapStringValue(LdapClaimsHandlerServiceProperties.GROUP_BASE_DN,
+                        props))
+                .groupObjectClass(mapStringValue(LdapClaimsHandlerServiceProperties.OBJECT_CLASS,
+                        props))
+                .groupAttributeHoldingMember(mapStringValue(LdapClaimsHandlerServiceProperties.MEMBERSHIP_USER_ATTRIBUTE,
+                        props))
+                .memberAttributeReferencedInGroup(mapStringValue(LdapClaimsHandlerServiceProperties.MEMBER_NAME_ATTRIBUTE,
+                        props))
+                .useCase(ATTRIBUTE_STORE);
+
+        String attributeMappingsPath =
+                mapStringValue(LdapClaimsHandlerServiceProperties.PROPERTY_FILE_LOCATION, props);
+        if (StringUtils.isNotEmpty(attributeMappingsPath)) {
+            Path path = Paths.get(attributeMappingsPath);
+            if (Files.exists(path)) {
+                Map<String, String> attributeMappings = new HashMap<>(propertyActions.getProperties(
+                        path));
+                settings.attributeMapField(attributeMappings);
+            }
+        }
+
+        return new LdapConfigurationField().connection(connection)
+                .bindUserInfo(bindUserInfo)
+                .settings(settings)
+                .pid(props.get(ServiceCommons.SERVICE_PID_KEY) == null ?
+                        null :
+                        (String) props.get(ServiceCommons.SERVICE_PID_KEY));
+    }
+
+    private LdapConfigurationField ldapLoginServiceToLdapConfiguration(Map<String, Object> props) {
+        LdapConnectionField connection = getLdapConnectionField(props,
+                LdapLoginServiceProperties.LDAP_URL,
+                LdapLoginServiceProperties.START_TLS);
+
+        LdapBindUserInfo bindUserInfo = new LdapBindUserInfo().username(mapStringValue(
+                LdapLoginServiceProperties.LDAP_BIND_USER_DN,
+                props))
+                .password(mapStringValue(LdapLoginServiceProperties.LDAP_BIND_USER_PASS, props))
+                .bindMethod(mapStringValue(LdapLoginServiceProperties.BIND_METHOD, props))
+                .realm(mapStringValue(LdapLoginServiceProperties.REALM, props));
+        //        ldapConfiguration.bindKdcAddress((String) props.get(KDC_ADDRESS));
+
+        LdapSettingsField settings = new LdapSettingsField().usernameAttribute(mapStringValue(
+                LdapLoginServiceProperties.USER_NAME_ATTRIBUTE,
+                props))
+                .baseUserDn(mapStringValue(LdapLoginServiceProperties.USER_BASE_DN, props))
+                .baseGroupDn(mapStringValue(LdapLoginServiceProperties.GROUP_BASE_DN, props))
+                .useCase(AUTHENTICATION);
+
+        return new LdapConfigurationField().connection(connection)
+                .bindUserInfo(bindUserInfo)
+                .settings(settings)
+                .pid(mapStringValue(SERVICE_PID_KEY, props));
+    }
+
+    private LdapConnectionField getLdapConnectionField(Map<String, Object> props, String ldapUrl,
+            String startTls) {
+        LdapConnectionField connection = new LdapConnectionField();
+        URI ldapUri = getUriFromProperty(mapStringValue(ldapUrl, props));
+        if (ldapUri != null) {
+            connection.encryptionMethod(ldapUri.getScheme())
+                    .hostname(ldapUri.getHost())
+                    .port(ldapUri.getPort());
+        }
+
+        if ((Boolean) props.get(startTls)) {
+            connection.encryptionMethod(startTls);
+        }
+        return connection;
     }
 
     private boolean identicalSettingsExist(LdapConfigurationField existingConfiguration,
@@ -299,17 +297,17 @@ public class LdapServiceCommons {
                         .useCase());
     }
 
-    public static boolean isStartTls(LdapConnectionField config) {
+    private static boolean isStartTls(LdapConnectionField config) {
         return config.encryptionMethod()
                 .equalsIgnoreCase(LdapLoginServiceProperties.START_TLS);
     }
 
-    public static String getLdapUrl(LdapConnectionField connection) {
+    private static String getLdapUrl(LdapConnectionField connection) {
         return connection.encryptionMethod()
                 .equalsIgnoreCase(LDAPS) ? "ldaps://" : "ldap://";
     }
 
-    public static URI getUriFromProperty(String ldapUrl) {
+    private static URI getUriFromProperty(String ldapUrl) {
         if (StringUtils.isNotEmpty(ldapUrl)) {
             ldapUrl = PropertyResolver.resolveProperties(ldapUrl);
             if (!URI_MATCHER.matcher(ldapUrl)
@@ -322,7 +320,7 @@ public class LdapServiceCommons {
         return null;
     }
 
-    public static String mapStringValue(String key, Map<String, Object> properties) {
+    private static String mapStringValue(String key, Map<String, Object> properties) {
         return properties.get(key) == null ? null : (String) properties.get(key);
     }
 }

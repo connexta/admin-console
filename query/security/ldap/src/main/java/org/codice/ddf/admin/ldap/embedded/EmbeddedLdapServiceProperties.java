@@ -16,18 +16,6 @@ package org.codice.ddf.admin.ldap.embedded;
 import java.util.Map;
 
 public class EmbeddedLdapServiceProperties {
-
-    public static final String EMBEDDED_LDAP_FEATURE = "opendj-embedded";
-
-    public static final String ALL_DEFAULT_EMBEDDED_LDAP_CONFIG_FEATURE =
-            "ldap-embedded-default-configs";
-
-    public static final String DEFAULT_EMBEDDED_LDAP_LOGIN_CONFIG_FEATURE =
-            "ldap-embedded-default-stslogin-config";
-
-    public static final String DEFAULT_EMBEDDED_LDAP_CLAIMS_HANDLER_CONFIG_FEATURE =
-            "ldap-embedded-default-claimshandler-config";
-
     public static final String EMBEDDED_LDAP_MANAGER_SERVICE_PID =
             "org.codice.opendj.embedded.server.LDAPManager";
 
@@ -41,7 +29,17 @@ public class EmbeddedLdapServiceProperties {
 
     public static final String EMBEDDED_LDAP_STORAGE_LOCATION = "embeddedLdapStorageLocation";
 
-//    public static EmbeddedLdapConfiguration embeddedLdapServiceToEmbeddedLdapConfig(
+    static final String EMBEDDED_LDAP_FEATURE = "opendj-embedded";
+
+    static final String ALL_DEFAULT_EMBEDDED_LDAP_CONFIG_FEATURE = "ldap-embedded-default-configs";
+
+    static final String DEFAULT_EMBEDDED_LDAP_LOGIN_CONFIG_FEATURE =
+            "ldap-embedded-default-stslogin-config";
+
+    static final String DEFAULT_EMBEDDED_LDAP_CLAIMS_HANDLER_CONFIG_FEATURE =
+            "ldap-embedded-default-claimshandler-config";
+
+    //    public static EmbeddedLdapConfiguration embeddedLdapServiceToEmbeddedLdapConfig(
 //            Map<String, Object> props) {
 //        EmbeddedLdapConfiguration config = new EmbeddedLdapConfiguration();
 //        config.embeddedLdapPort(mapIntValue(EMBEDDED_LDAP_PORT, props));

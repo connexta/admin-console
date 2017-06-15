@@ -42,19 +42,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class LdapTestingUtils {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(LdapTestingUtils.class);
 
-    public static final String CIPHER_SUITES_SYS_PROP = "https.cipherSuites";
+    private static final String CIPHER_SUITES_SYS_PROP = "https.cipherSuites";
 
-    public static final String HTTP_PROTOCOLS_SYS_PROP = "https.protocols";
+    private static final String HTTP_PROTOCOLS_SYS_PROP = "https.protocols";
 
     /**
      * Attempts to connect to the given ldap address given the hostname, port, and encryptionMethod
      * <p>
      * Possible message types: CANNOT_CONFIGURE, CANNOT_CONNECT
      *
-     * @return
+     * @return connection attempt wrapper object
      */
     public LdapConnectionAttempt getLdapConnection(LdapConnectionField connection) {
         LDAPOptions ldapOptions = new LDAPOptions();

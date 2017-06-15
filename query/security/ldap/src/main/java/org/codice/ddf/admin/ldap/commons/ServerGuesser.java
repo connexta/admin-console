@@ -58,7 +58,6 @@ import com.google.common.collect.Sets;
  * removed in a future version of the library. </b>
  */
 public abstract class ServerGuesser {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(ServerGuesser.class);
 
     private static final Map<String, Function<Connection, ServerGuesser>> GUESSER_LOOKUP =

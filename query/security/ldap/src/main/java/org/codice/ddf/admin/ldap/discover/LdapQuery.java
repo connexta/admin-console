@@ -47,11 +47,11 @@ public class LdapQuery extends BaseFunctionField<ListField<MapField>> {
 
     public static final String DESCRIPTION = "Executes a query against LDAP.";
 
-    public static final int DEFAULT_MAX_QUERY_RESULTS = 25;
-
     public static final String MAX_QUERY_FIELD_NAME = "maxQueryResults";
 
     public static final String QUERY_BASE_FIELD_NAME = "queryBase";
+
+    private static final int DEFAULT_MAX_QUERY_RESULTS = 25;
 
     private LdapConnectionField conn;
 

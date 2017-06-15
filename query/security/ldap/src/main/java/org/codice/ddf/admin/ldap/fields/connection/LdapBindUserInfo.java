@@ -65,6 +65,21 @@ public class LdapBindUserInfo extends BaseObjectField {
         return ImmutableList.of(creds, bindMethod, realm);
     }
 
+    // Field getters
+    public CredentialsField credentialsField() {
+        return creds;
+    }
+
+    // Value getters
+    public String bindMethod() {
+        return bindMethod.getValue();
+    }
+
+    public String realm() {
+        return realm.getValue();
+    }
+
+    // Value setters
     public LdapBindUserInfo username(String username) {
         this.creds.username(username);
         return this;
@@ -83,17 +98,5 @@ public class LdapBindUserInfo extends BaseObjectField {
     public LdapBindUserInfo realm(String realm) {
         this.realm.setValue(realm);
         return this;
-    }
-
-    public CredentialsField credentialsField() {
-        return creds;
-    }
-
-    public String bindMethod() {
-        return bindMethod.getValue();
-    }
-
-    public String realm() {
-        return realm.getValue();
     }
 }

@@ -47,8 +47,9 @@ public class LdapTestBind extends TestFunctionField {
         super(FIELD_NAME, DESCRIPTION);
         conn = new LdapConnectionField().useDefaultRequired();
         creds = new LdapBindUserInfo().useDefaultRequired();
-        utils = new LdapTestingUtils();
         updateArgumentPaths();
+
+        utils = new LdapTestingUtils();
     }
 
     @Override

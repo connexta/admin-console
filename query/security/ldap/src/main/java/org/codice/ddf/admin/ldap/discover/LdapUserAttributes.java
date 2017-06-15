@@ -76,8 +76,6 @@ public class LdapUserAttributes extends BaseFunctionField<ListField<StringField>
 
     @Override
     public ListField<StringField> performFunction() {
-        Set<String> ldapEntryAttributes;
-        ServerGuesser serverGuesser;
         ListFieldImpl<StringField> entries = null;
         try (LdapConnectionAttempt connectionAttempt = utils.bindUserToLdapConnection(conn,
                 creds)) {
@@ -87,8 +85,8 @@ public class LdapUserAttributes extends BaseFunctionField<ListField<StringField>
                 return null;
             }
 
-            ldapEntryAttributes = new HashSet<>();
-            serverGuesser = ServerGuesser.buildGuesser(ldapType.getValue(),
+            Set<String> ldapEntryAttributes = new HashSet<>();
+            ServerGuesser serverGuesser = ServerGuesser.buildGuesser(ldapType.getValue(),
                     connectionAttempt.result());
             try {
                 ldapEntryAttributes = serverGuesser.getClaimAttributeOptions(settings.baseUserDn());

@@ -15,7 +15,7 @@ package org.codice.ddf.admin.ldap.persist;
 
 import static org.apache.commons.lang.StringUtils.isNotEmpty;
 import static org.codice.ddf.admin.common.report.message.DefaultMessages.failedPersistError;
-import static org.codice.ddf.admin.common.report.message.DefaultMessages.noExistingConfigError;
+import static org.codice.ddf.admin.common.services.ServiceCommons.validateServiceConfigurationExists;
 import static org.codice.ddf.admin.ldap.fields.config.LdapUseCase.ATTRIBUTE_STORE;
 import static org.codice.ddf.admin.ldap.fields.config.LdapUseCase.AUTHENTICATION;
 import static org.codice.ddf.admin.ldap.fields.config.LdapUseCase.AUTHENTICATION_AND_ATTRIBUTE_STORE;
@@ -34,7 +34,6 @@ import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.configurator.Configurator;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.configurator.OperationReport;
-import org.codice.ddf.admin.ldap.commons.LdapTestingUtils;
 import org.codice.ddf.admin.ldap.commons.services.LdapServiceCommons;
 import org.codice.ddf.admin.ldap.fields.config.LdapConfigurationField;
 import org.codice.ddf.admin.security.common.services.LdapClaimsHandlerServiceProperties;
@@ -48,7 +47,7 @@ import com.google.common.collect.ImmutableList;
 
 public class SaveLdapConfiguration extends BaseFunctionField<ListField<LdapConfigurationField>> {
 
-    public static final String NAME = "saveLdapConfig";
+    public static final String FIELD_NAME = "saveLdapConfig";
 
     public static final String DESCRIPTION = "Saves the LDAP configuration.";
 
@@ -64,14 +63,12 @@ public class SaveLdapConfiguration extends BaseFunctionField<ListField<LdapConfi
 
     private final ServiceActions serviceActions;
 
-    private LdapServiceCommons serviceCommons;
-
-    private LdapTestingUtils testingUtils;
+    private LdapServiceCommons ldapServiceCommons;
 
     public SaveLdapConfiguration(ConfiguratorFactory configuratorFactory,
             FeatureActions featureActions, ManagedServiceActions managedServiceActions,
             PropertyActions propertyActions, ServiceActions serviceActions) {
-        super(NAME, DESCRIPTION, new ListFieldImpl<>(LdapConfigurationField.class));
+        super(FIELD_NAME, DESCRIPTION, new ListFieldImpl<>(LdapConfigurationField.class));
         this.configuratorFactory = configuratorFactory;
         this.featureActions = featureActions;
         this.managedServiceActions = managedServiceActions;
@@ -81,9 +78,8 @@ public class SaveLdapConfiguration extends BaseFunctionField<ListField<LdapConfi
         config = new LdapConfigurationField();
         updateArgumentPaths();
 
-        this.serviceCommons = new LdapServiceCommons(this.propertyActions,
+        this.ldapServiceCommons = new LdapServiceCommons(this.propertyActions,
                 this.managedServiceActions);
-        this.testingUtils = new LdapTestingUtils();
     }
 
     @Override
@@ -140,7 +136,7 @@ public class SaveLdapConfiguration extends BaseFunctionField<ListField<LdapConfi
             addResultMessage(failedPersistError());
         }
 
-        return serviceCommons.getLdapConfigurations();
+        return ldapServiceCommons.getLdapConfigurations();
     }
 
     @Override
@@ -150,11 +146,10 @@ public class SaveLdapConfiguration extends BaseFunctionField<ListField<LdapConfi
             return;
         }
 
-        if (config.pid() != null && !testingUtils.serviceExists(config.pid(), serviceActions)) {
-            addArgumentMessage(noExistingConfigError());
+        if (config.pid() != null) {
+            addMessages(validateServiceConfigurationExists(config.pidField(), serviceActions));
         } else {
-            addResultMessages(testingUtils.ldapConnectionExists(config, managedServiceActions,
-                    propertyActions));
+            addMessages(ldapServiceCommons.validateIdenticalLdapConfigDoesNotExist(config));
         }
     }
 

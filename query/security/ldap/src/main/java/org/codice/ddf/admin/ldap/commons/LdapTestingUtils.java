@@ -23,20 +23,12 @@ import static org.codice.ddf.admin.ldap.fields.connection.LdapEncryptionMethodFi
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import javax.net.ssl.SSLContext;
 
-import org.codice.ddf.admin.api.report.ErrorMessage;
-import org.codice.ddf.admin.ldap.commons.services.LdapServiceCommons;
-import org.codice.ddf.admin.ldap.fields.config.LdapConfigurationField;
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindUserInfo;
 import org.codice.ddf.admin.ldap.fields.connection.LdapConnectionField;
-import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
-import org.codice.ddf.internal.admin.configurator.actions.PropertyActions;
-import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.LDAPConnectionFactory;
 import org.forgerock.opendj.ldap.LDAPOptions;
@@ -128,9 +120,9 @@ public class LdapTestingUtils {
 
         try {
             BindRequest bindRequest = selectBindMethod(bindInfo.bindMethod(),
-                    bindInfo.credentials()
+                    bindInfo.credentialsField()
                             .username(),
-                    bindInfo.credentials()
+                    bindInfo.credentialsField()
                             .password(),
                     bindInfo.realm(),
                     null);
@@ -227,64 +219,6 @@ public class LdapTestingUtils {
         }
 
         return request;
-    }
-
-    /**
-     * Checks if the given pid retrieves any properties. If no properties are found or the properties are empty then fail.
-     *
-     * @param pid
-     * @param serviceActions
-     * @return with the serviceExists or not
-     */
-    public boolean serviceExists(String pid, ServiceActions serviceActions) {
-        Map configProps = serviceActions.read(pid);
-        if (configProps != null && !configProps.isEmpty()) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Checks for existing LDAP configurations with the same hostname and port of the {@code configuration}.
-     * If there is an existing configuration, warnings will be returned. If there are no existing configurations
-     * an empty {@code List} will be returned.
-     * <p>
-     * Possible warning types: IDENTICAL_SERVICE_EXISTS
-     *
-     * @param newConfig           configuration to check for existing configurations for
-     * @return {@code List} with {@link ErrorMessage}s containing warnings if there are existing configurations that match
-     * the {@code configuration}, or empty {@code List} if no matches
-     */
-    public List<ErrorMessage> ldapConnectionExists(LdapConfigurationField newConfig,
-            ManagedServiceActions managedServiceActions, PropertyActions propertyActions) {
-        List<ErrorMessage> msgs = new ArrayList<>();
-        LdapServiceCommons serviceCommons = new LdapServiceCommons(propertyActions,
-                managedServiceActions);
-        List<LdapConfigurationField> existingConfigs = serviceCommons.getLdapConfigurations()
-                .getList();
-
-        boolean identicalServiceExists = existingConfigs.stream()
-                .anyMatch(existingConfig -> identicalSettingsExist(existingConfig, newConfig));
-
-        if (identicalServiceExists) {
-            msgs.add(LdapMessages.serviceAlreadyExistsWarning(newConfig.path()));
-        }
-
-        return Collections.emptyList();
-    }
-
-    // TODO: ping host names to see if the they resolve to the same host
-    private boolean identicalSettingsExist(LdapConfigurationField existingConfiguration,
-            LdapConfigurationField newConfiguration) {
-        return existingConfiguration.connectionField()
-                .hostname()
-                .equals(newConfiguration.connectionField()
-                        .hostname()) && existingConfiguration.connectionField()
-                .port() == existingConfiguration.connectionField()
-                .port() && existingConfiguration.settingsField()
-                .useCase()
-                .equals(newConfiguration.settingsField()
-                        .useCase());
     }
 
     public SSLContext getSslContext() throws NoSuchAlgorithmException {

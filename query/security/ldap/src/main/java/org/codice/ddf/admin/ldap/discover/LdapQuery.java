@@ -39,7 +39,7 @@ import com.google.common.collect.ImmutableList;
 
 public class LdapQuery extends BaseFunctionField<ListField<MapField>> {
 
-    public static final String ID = "query";
+    public static final String FIELD_NAME = "query";
 
     public static final String DESCRIPTION = "Executes a query against LDAP.";
 
@@ -62,7 +62,7 @@ public class LdapQuery extends BaseFunctionField<ListField<MapField>> {
     private LdapTestingUtils utils;
 
     public LdapQuery() {
-        super(ID, DESCRIPTION, new ListFieldImpl<>(MapField.class));
+        super(FIELD_NAME, DESCRIPTION, new ListFieldImpl<>(MapField.class));
         conn = new LdapConnectionField().useDefaultRequired();
         creds = new LdapBindUserInfo().useDefaultRequired();
         maxQueryResults = new IntegerField(MAX_QUERY_FIELD_NAME);

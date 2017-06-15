@@ -15,8 +15,8 @@ package org.codice.ddf.admin.sources.csw.persist;
 
 import static org.codice.ddf.admin.common.report.message.DefaultMessages.failedPersistError;
 import static org.codice.ddf.admin.common.services.ServiceCommons.createManagedService;
-import static org.codice.ddf.admin.common.services.ServiceCommons.serviceConfigurationExists;
 import static org.codice.ddf.admin.common.services.ServiceCommons.updateService;
+import static org.codice.ddf.admin.common.services.ServiceCommons.validateServiceConfigurationExists;
 import static org.codice.ddf.admin.sources.commons.utils.SourceValidationUtils.hasSourceName;
 import static org.codice.ddf.admin.sources.commons.utils.SourceValidationUtils.validateSourceName;
 import static org.codice.ddf.admin.sources.services.CswServiceProperties.cswConfigToServiceProps;
@@ -105,7 +105,7 @@ public class SaveCswConfiguration extends BaseFunctionField<BooleanField> {
         }
 
         if (pid.getValue() != null) {
-            addMessages(serviceConfigurationExists(pid, serviceActions));
+            addMessages(validateServiceConfigurationExists(pid, serviceActions));
             if (!containsErrorMsgs() && !hasSourceName(pid.getValue(),
                     config.sourceName(),
                     serviceReader)) {

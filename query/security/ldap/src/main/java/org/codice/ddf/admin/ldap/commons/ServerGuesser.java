@@ -59,7 +59,6 @@ import com.google.common.collect.Sets;
  */
 public abstract class ServerGuesser {
 
-    // TODO: tbatie - 4/17/17 - Fix class to work with the field values
     private static final Logger LOGGER = LoggerFactory.getLogger(ServerGuesser.class);
 
     private static final Map<String, Function<Connection, ServerGuesser>> GUESSER_LOOKUP =

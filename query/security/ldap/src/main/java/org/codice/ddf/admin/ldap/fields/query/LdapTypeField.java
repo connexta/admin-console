@@ -41,7 +41,6 @@ public class LdapTypeField extends BaseEnumField<String> {
         this(null);
     }
 
-    // TODO: tbatie - 3/27/17 - Add constructor for supporting additional authtypes. Do this for all enum fields
     protected LdapTypeField(DataType<String> ldapType) {
         super(DEFAULT_FIELD_NAME,
                 FIELD_TYPE_NAME,

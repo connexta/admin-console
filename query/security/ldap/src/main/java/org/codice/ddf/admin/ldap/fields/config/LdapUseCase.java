@@ -34,18 +34,10 @@ public class LdapUseCase extends BaseEnumField<String> {
     public static final String AUTHENTICATION_AND_ATTRIBUTE_STORE =
             "AuthenticationAndAttributeStore";
 
-    public static final LdapUseCase AUTHENTICATION_FIELD = new LdapUseCase(new Authentication());
-
-    public static final LdapUseCase ATTRIBUTE_STORE_FIELD = new LdapUseCase(new AttributeStore());
-
-    public static final LdapUseCase AUTHENTICATION_AND_ATTRIBUTE_STORE_FIELD =
-            new LdapUseCase(new AuthenticationAndAttributeStore());
-
     public LdapUseCase() {
         this(null);
     }
 
-    // TODO: tbatie - 3/27/17 - Add constructor for supporting additional authtypes. Do this for all enum fields
     protected LdapUseCase(DataType<String> bindMethod) {
         super(DEFAULT_FIELD_NAME,
                 FIELD_TYPE_NAME,

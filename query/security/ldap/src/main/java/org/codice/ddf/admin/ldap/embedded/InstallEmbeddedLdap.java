@@ -36,7 +36,7 @@ import com.google.common.collect.ImmutableList;
 
 public class InstallEmbeddedLdap extends BaseFunctionField<BooleanField> {
 
-    public static final String NAME = "installEmbeddedLdap";
+    public static final String FIELD_NAME = "installEmbeddedLdap";
 
     public static final String DESCRIPTION =
             "Installs the internal embedded LDAP. Used for testing purposes only. LDAP port: 1389, LDAPS port: 1636, ADMIN port: 4444";
@@ -49,7 +49,7 @@ public class InstallEmbeddedLdap extends BaseFunctionField<BooleanField> {
 
     public InstallEmbeddedLdap(ConfiguratorFactory configuratorFactory,
             FeatureActions featureActions) {
-        super(NAME, DESCRIPTION, new BooleanField());
+        super(FIELD_NAME, DESCRIPTION, new BooleanField());
         this.configuratorFactory = configuratorFactory;
         this.featureActions = featureActions;
         useCase = new LdapUseCase();
@@ -63,22 +63,19 @@ public class InstallEmbeddedLdap extends BaseFunctionField<BooleanField> {
 
     @Override
     public BooleanField performFunction() {
-        // TODO: tbatie - 4/4/17 - This should return back the setup config
         Configurator configurator = configuratorFactory.getConfigurator();
+        configurator.add(featureActions.start(EmbeddedLdapServiceProperties.EMBEDDED_LDAP_FEATURE));
+
         switch (useCase.getValue()) {
         case AUTHENTICATION:
-            configurator.add(featureActions.start(EmbeddedLdapServiceProperties.EMBEDDED_LDAP_FEATURE));
-            configurator.add(featureActions.start(EmbeddedLdapServiceProperties.EMBEDDED_LDAP_FEATURE));
             configurator.add(featureActions.start(LDAP_LOGIN_FEATURE));
             configurator.add(featureActions.start(EmbeddedLdapServiceProperties.DEFAULT_EMBEDDED_LDAP_LOGIN_CONFIG_FEATURE));
             break;
         case ATTRIBUTE_STORE:
-            configurator.add(featureActions.start(EmbeddedLdapServiceProperties.EMBEDDED_LDAP_FEATURE));
             configurator.add(featureActions.start(LDAP_CLAIMS_HANDLER_FEATURE));
             configurator.add(featureActions.start(EmbeddedLdapServiceProperties.DEFAULT_EMBEDDED_LDAP_CLAIMS_HANDLER_CONFIG_FEATURE));
             break;
         case AUTHENTICATION_AND_ATTRIBUTE_STORE:
-            configurator.add(featureActions.start(EmbeddedLdapServiceProperties.EMBEDDED_LDAP_FEATURE));
             configurator.add(featureActions.start(LDAP_LOGIN_FEATURE));
             configurator.add(featureActions.start(LDAP_CLAIMS_HANDLER_FEATURE));
             configurator.add(featureActions.start(EmbeddedLdapServiceProperties.ALL_DEFAULT_EMBEDDED_LDAP_CONFIG_FEATURE));
@@ -91,7 +88,7 @@ public class InstallEmbeddedLdap extends BaseFunctionField<BooleanField> {
             addResultMessage(failedPersistError());
         }
 
-        return new BooleanField(report.containsFailedResults());
+        return new BooleanField(!containsErrorMsgs());
     }
 
     @Override

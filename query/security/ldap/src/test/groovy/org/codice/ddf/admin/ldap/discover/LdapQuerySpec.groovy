@@ -55,7 +55,7 @@ class LdapQuerySpec extends Specification {
 
     def 'Fail on missing required fields'() {
         setup:
-        def baseMsg = [LdapQuery.ID, BaseFunctionField.ARGUMENT]
+        def baseMsg = [LdapQuery.FIELD_NAME, BaseFunctionField.ARGUMENT]
         def missingHostMsgPath = baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME, HostnameField.DEFAULT_FIELD_NAME]
         def missingPortMsgPath = baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME, PortField.DEFAULT_FIELD_NAME]
         def missingEncryptMsgPath = baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME, LdapEncryptionMethodField.DEFAULT_FIELD_NAME]
@@ -93,7 +93,7 @@ class LdapQuerySpec extends Specification {
         then:
         report.messages().size() == 1
         report.messages().get(0).getCode() == DefaultMessages.CANNOT_CONNECT
-        report.messages().get(0).getPath() == [LdapQuery.ID, BaseFunctionField.ARGUMENT, LdapConnectionField.DEFAULT_FIELD_NAME]
+        report.messages().get(0).getPath() == [LdapQuery.FIELD_NAME, BaseFunctionField.ARGUMENT, LdapConnectionField.DEFAULT_FIELD_NAME]
 
     }
 
@@ -112,7 +112,7 @@ class LdapQuerySpec extends Specification {
         then:
         report.messages().size() == 1
         report.messages().get(0).getCode() == LdapMessages.CANNOT_BIND
-        report.messages().get(0).getPath() == [LdapQuery.ID, BaseFunctionField.ARGUMENT, LdapBindUserInfo.DEFAULT_FIELD_NAME]
+        report.messages().get(0).getPath() == [LdapQuery.FIELD_NAME, BaseFunctionField.ARGUMENT, LdapBindUserInfo.DEFAULT_FIELD_NAME]
     }
 
     def 'Successfully query with entries found (No encryption)'() {

@@ -29,8 +29,11 @@ import java.util.stream.Stream;
 
 import org.apache.commons.lang.StringUtils;
 import org.codice.ddf.admin.api.fields.ListField;
+import org.codice.ddf.admin.api.report.Report;
 import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
+import org.codice.ddf.admin.common.report.ReportImpl;
 import org.codice.ddf.admin.common.services.ServiceCommons;
+import org.codice.ddf.admin.ldap.commons.LdapMessages;
 import org.codice.ddf.admin.ldap.fields.config.LdapConfigurationField;
 import org.codice.ddf.admin.ldap.fields.config.LdapSettingsField;
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindUserInfo;
@@ -148,11 +151,11 @@ public class LdapServiceCommons {
             props.put(LdapClaimsHandlerServiceProperties.START_TLS, startTls);
             props.put(LdapClaimsHandlerServiceProperties.LDAP_BIND_USER_DN,
                     config.bindUserInfoField()
-                            .credentials()
+                            .credentialsField()
                             .username());
             props.put(LdapClaimsHandlerServiceProperties.PASSWORD,
                     config.bindUserInfoField()
-                            .credentials()
+                            .credentialsField()
                             .password());
             props.put(LdapClaimsHandlerServiceProperties.BIND_METHOD,
                     config.bindUserInfoField()
@@ -175,6 +178,7 @@ public class LdapServiceCommons {
             props.put(LdapClaimsHandlerServiceProperties.MEMBER_NAME_ATTRIBUTE,
                     config.settingsField()
                             .groupAttributeHoldingMember());
+            // TODO: tbatie - 6/14/17 - Does this before merge
             // TODO: tbatie - 4/11/17 - Look up the pid, if it doesn't exist then create a new attribute mapping, else use the existing one
             //            props.put(PROPERTY_FILE_LOCATION, config.settings().attributeMappingPath());
         }
@@ -230,11 +234,11 @@ public class LdapServiceCommons {
             ldapStsConfig.put(LdapLoginServiceProperties.START_TLS, Boolean.toString(startTls));
             ldapStsConfig.put(LdapLoginServiceProperties.LDAP_BIND_USER_DN,
                     config.bindUserInfoField()
-                            .credentials()
+                            .credentialsField()
                             .username());
             ldapStsConfig.put(LdapLoginServiceProperties.LDAP_BIND_USER_PASS,
                     config.bindUserInfoField()
-                            .credentials()
+                            .credentialsField()
                             .password());
             ldapStsConfig.put(LdapLoginServiceProperties.BIND_METHOD,
                     config.bindUserInfoField()
@@ -255,6 +259,44 @@ public class LdapServiceCommons {
                             .baseGroupDn());
         }
         return ldapStsConfig;
+    }
+
+    /**
+     * Checks for existing LDAP configurations with the same hostname and port of the {@code configuration}.
+     * If there is an existing configuration, errors will be returned.
+     * <p>
+     * Possible error types: IDENTICAL_SERVICE_EXISTS
+     *
+     * @param newConfig           configuration to check for existing configurations for
+     * @return {@link Report} with errors indicating there are existing configurations
+     * the {@code configuration}
+     */
+    public Report validateIdenticalLdapConfigDoesNotExist(LdapConfigurationField newConfig) {
+        ReportImpl report = new ReportImpl();
+        List<LdapConfigurationField> existingConfigs = getLdapConfigurations()
+                .getList();
+
+        boolean identicalServiceExists = existingConfigs.stream()
+                .anyMatch(existingConfig -> identicalSettingsExist(existingConfig, newConfig));
+
+        if (identicalServiceExists) {
+            report.addArgumentMessage(LdapMessages.serviceAlreadyExistsError(newConfig.path()));
+        }
+
+        return report;
+    }
+
+    private boolean identicalSettingsExist(LdapConfigurationField existingConfiguration,
+            LdapConfigurationField newConfiguration) {
+        return existingConfiguration.connectionField()
+                .hostname()
+                .equals(newConfiguration.connectionField()
+                        .hostname()) && existingConfiguration.connectionField()
+                .port() == existingConfiguration.connectionField()
+                .port() && existingConfiguration.settingsField()
+                .useCase()
+                .equals(newConfiguration.settingsField()
+                        .useCase());
     }
 
     public static boolean isStartTls(LdapConnectionField config) {

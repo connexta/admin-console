@@ -13,7 +13,7 @@
  */
 package org.codice.ddf.admin.sources.wfs.discover;
 
-import static org.codice.ddf.admin.common.services.ServiceCommons.serviceConfigurationExists;
+import static org.codice.ddf.admin.common.services.ServiceCommons.validateServiceConfigurationExists;
 import static org.codice.ddf.admin.sources.commons.utils.SourceUtilCommons.getSourceConfigurations;
 import static org.codice.ddf.admin.sources.services.WfsServiceProperties.SERVICE_PROPS_TO_WFS_CONFIG;
 import static org.codice.ddf.admin.sources.services.WfsServiceProperties.WFS_FACTORY_PIDS;
@@ -82,7 +82,7 @@ public class GetWfsConfigurations extends BaseFunctionField<ListField<SourceInfo
         }
 
         if (pid.getValue() != null) {
-            addMessages(serviceConfigurationExists(pid, serviceActions));
+            addMessages(validateServiceConfigurationExists(pid, serviceActions));
         }
     }
 

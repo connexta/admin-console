@@ -58,7 +58,7 @@ class LdapTestSettingsSpec extends Specification {
         action = new LdapTestSettings()
 
         // Initialize bad paths
-        baseMsg = [LdapTestSettings.ID, FunctionField.ARGUMENT]
+        baseMsg = [LdapTestSettings.FIELD_NAME, FunctionField.ARGUMENT]
         badPaths = [missingHostPath         : baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME, HostnameField.DEFAULT_FIELD_NAME],
                     missingPortPath         : baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME, PortField.DEFAULT_FIELD_NAME],
                     missingEncryptPath      : baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME, LdapEncryptionMethodField.DEFAULT_FIELD_NAME],

@@ -33,6 +33,22 @@ public class LdapRecommendedSettingsField extends BaseObjectField {
     public static final String DESCRIPTION =
             "An object containing potential values to be used for setting up LDAP.";
 
+    public static final String USER_DNS = "userDns";
+
+    public static final String GROUPS_DNS = "groupsDns";
+
+    public static final String USER_NAME_ATTRIBUTES = "userNameAttributes";
+
+    public static final String GROUP_OBJECT_CLASSES = "groupObjectClasses";
+
+    public static final String GROUP_ATTRIBUTES_HOLDING_MEMBER =
+            "groupAttributesHoldingMember";
+
+    public static final String MEMBER_ATTRIBUTES_REFERENCED_IN_GROUP =
+            "memberAttributesReferencedInGroup";
+
+    public static final String QUERY_BASES = "queryBases";
+
     private ListField<LdapDistinguishedName> userDns;
 
     private ListField<LdapDistinguishedName> groupDns;
@@ -49,44 +65,17 @@ public class LdapRecommendedSettingsField extends BaseObjectField {
 
     public LdapRecommendedSettingsField() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
-        userDns = new ListFieldImpl<>("userDns", LdapDistinguishedName.class);
-        groupDns = new ListFieldImpl<>("groupsDns", LdapDistinguishedName.class);
-        userNameAttributes = new ListFieldImpl<>("userNameAttributes", StringField.class);
-        groupObjectClasses = new ListFieldImpl<>("groupObjectClasses", StringField.class);
-        groupAttributesHoldingMember = new ListFieldImpl<>("groupAttributesHoldingMember",
+        userDns = new ListFieldImpl<>(USER_DNS, LdapDistinguishedName.class);
+        groupDns = new ListFieldImpl<>(GROUPS_DNS, LdapDistinguishedName.class);
+        userNameAttributes = new ListFieldImpl<>(USER_NAME_ATTRIBUTES, StringField.class);
+        groupObjectClasses = new ListFieldImpl<>(GROUP_OBJECT_CLASSES, StringField.class);
+        groupAttributesHoldingMember = new ListFieldImpl<>(GROUP_ATTRIBUTES_HOLDING_MEMBER,
                 StringField.class);
-        memberAttributesReferencedInGroup = new ListFieldImpl<>("memberAttributesReferencedInGroup",
+        memberAttributesReferencedInGroup = new ListFieldImpl<>(
+                MEMBER_ATTRIBUTES_REFERENCED_IN_GROUP,
                 StringField.class);
-        queryBases = new ListFieldImpl<>("queryBases", LdapDistinguishedName.class);
+        queryBases = new ListFieldImpl<>(QUERY_BASES, LdapDistinguishedName.class);
         updateInnerFieldPaths();
-    }
-
-    public ListField<LdapDistinguishedName> userDns() {
-        return userDns;
-    }
-
-    public ListField<LdapDistinguishedName> groupDns() {
-        return groupDns;
-    }
-
-    public ListField<StringField> userNameAttributes() {
-        return userNameAttributes;
-    }
-
-    public ListField<StringField> groupObjectClasses() {
-        return groupObjectClasses;
-    }
-
-    public ListField<StringField> groupAttributesHoldingMember() {
-        return groupAttributesHoldingMember;
-    }
-
-    public ListField<StringField> memberAttributesReferencedInGroup() {
-        return memberAttributesReferencedInGroup;
-    }
-
-    public ListField<LdapDistinguishedName> queryBases() {
-        return queryBases;
     }
 
     public LdapRecommendedSettingsField userDns(List<String> baseDns) {
@@ -124,6 +113,34 @@ public class LdapRecommendedSettingsField extends BaseObjectField {
     public LdapRecommendedSettingsField queryBases(List<String> queryBases) {
         this.queryBases.setValue(queryBases);
         return this;
+    }
+
+    public ListField<LdapDistinguishedName> userDnsField() {
+        return userDns;
+    }
+
+    public ListField<LdapDistinguishedName> groupDnsField() {
+        return groupDns;
+    }
+
+    public ListField<StringField> userNameAttributesField() {
+        return userNameAttributes;
+    }
+
+    public ListField<StringField> groupObjectClassesField() {
+        return groupObjectClasses;
+    }
+
+    public ListField<StringField> groupAttributesHoldingMemberField() {
+        return groupAttributesHoldingMember;
+    }
+
+    public ListField<StringField> memberAttributesReferencedInGroupField() {
+        return memberAttributesReferencedInGroup;
+    }
+
+    public ListField<LdapDistinguishedName> queryBasesField() {
+        return queryBases;
     }
 
     @Override

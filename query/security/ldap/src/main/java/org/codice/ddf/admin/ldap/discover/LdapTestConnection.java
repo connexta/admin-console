@@ -26,7 +26,7 @@ import com.google.common.collect.ImmutableList;
 
 public class LdapTestConnection extends TestFunctionField {
 
-    public static final String ID = "testConnect";
+    public static final String FIELD_NAME = "testConnect";
 
     public static final String DESCRIPTION =
             "Attempts to established a connection with the given connection configuration";
@@ -35,7 +35,7 @@ public class LdapTestConnection extends TestFunctionField {
     private LdapTestingUtils utils;
 
     public LdapTestConnection() {
-        super(ID, DESCRIPTION);
+        super(FIELD_NAME, DESCRIPTION);
         connection = new LdapConnectionField().useDefaultRequired();
         updateArgumentPaths();
 
@@ -47,7 +47,6 @@ public class LdapTestConnection extends TestFunctionField {
         return ImmutableList.of(connection);
     }
 
-    // Possible message types: CANNOT_CONFIGURE, CANNOT_CONNECT
     @Override
     public BooleanField performFunction() {
         addMessages(utils.getLdapConnection(connection));

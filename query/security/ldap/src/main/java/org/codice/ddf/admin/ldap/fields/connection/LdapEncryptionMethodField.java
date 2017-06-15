@@ -34,15 +34,6 @@ public class LdapEncryptionMethodField extends BaseEnumField<String> {
 
     public static final String START_TLS = "startTls";
 
-    public static final LdapEncryptionMethodField NO_ENCRYPTION_FIELD =
-            new LdapEncryptionMethodField(new NoEncryption());
-
-    public static final LdapEncryptionMethodField LDAPS_ENCRYPTION_FIELD =
-            new LdapEncryptionMethodField(new LdapsEncryption());
-
-    public static final LdapEncryptionMethodField START_TLS_FIELD = new LdapEncryptionMethodField(
-            new StartTlsEncryption());
-
     public LdapEncryptionMethodField() {
         this(null);
     }

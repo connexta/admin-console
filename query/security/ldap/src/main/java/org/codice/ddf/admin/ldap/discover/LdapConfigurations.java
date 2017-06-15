@@ -13,7 +13,7 @@
  **/
 package org.codice.ddf.admin.ldap.discover;
 
-import static org.codice.ddf.admin.common.report.message.DefaultMessages.noExistingConfigError;
+import static org.codice.ddf.admin.common.services.ServiceCommons.validateServiceConfigurationExists;
 
 import java.util.List;
 
@@ -24,7 +24,6 @@ import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
-import org.codice.ddf.admin.ldap.commons.LdapTestingUtils;
 import org.codice.ddf.admin.ldap.commons.services.LdapServiceCommons;
 import org.codice.ddf.admin.ldap.fields.config.LdapConfigurationField;
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
@@ -35,7 +34,7 @@ import com.google.common.collect.ImmutableList;
 
 public class LdapConfigurations extends BaseFunctionField<ListField<LdapConfigurationField>> {
 
-    public static final String NAME = "configs";
+    public static final String FIELD_NAME = "configs";
 
     public static final String CONFIGS_ARG_NAME = "configs";
 
@@ -53,12 +52,10 @@ public class LdapConfigurations extends BaseFunctionField<ListField<LdapConfigur
 
     private LdapServiceCommons serviceCommons;
 
-    private LdapTestingUtils testingUtils;
-
     public LdapConfigurations(ConfiguratorFactory configuratorFactory,
             ManagedServiceActions managedServiceActions, PropertyActions propertyActions,
             ServiceActions serviceActions) {
-        super(NAME,
+        super(FIELD_NAME,
                 DESCRIPTION,
                 new ListFieldImpl<>(CONFIGS_ARG_NAME, LdapConfigurationField.class));
         this.configuratorFactory = configuratorFactory;
@@ -70,7 +67,6 @@ public class LdapConfigurations extends BaseFunctionField<ListField<LdapConfigur
         updateArgumentPaths();
 
         serviceCommons = new LdapServiceCommons(this.propertyActions, this.managedServiceActions);
-        testingUtils = new LdapTestingUtils();
     }
 
     @Override
@@ -90,8 +86,8 @@ public class LdapConfigurations extends BaseFunctionField<ListField<LdapConfigur
             return;
         }
 
-        if (pid.getValue() != null && !testingUtils.serviceExists(pid.getValue(), serviceActions)) {
-            addArgumentMessage(noExistingConfigError(pid.path()));
+        if (pid.getValue() != null) {
+            addMessages(validateServiceConfigurationExists(pid, serviceActions));
         }
     }
 

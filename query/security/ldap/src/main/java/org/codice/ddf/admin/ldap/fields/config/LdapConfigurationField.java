@@ -78,6 +78,10 @@ public class LdapConfigurationField extends BaseObjectField {
         return settings;
     }
 
+    public PidField pidField() {
+        return pid;
+    }
+
     //Value getters
     public String pid() {
         return pid.getValue();

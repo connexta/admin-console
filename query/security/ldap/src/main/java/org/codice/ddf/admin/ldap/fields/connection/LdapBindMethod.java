@@ -35,11 +35,6 @@ public class LdapBindMethod extends BaseEnumField<String> {
     //  public static final String SASL = "SASL";
     //  public static final String GSSAPI_SASL = "GSSAPI SASL";
 
-    public static final LdapBindMethod SIMPLE_BIND_FIELD = new LdapBindMethod(new Simple());
-
-    public static final LdapBindMethod DIGEST_MD5_SASL_FIELD =
-            new LdapBindMethod(new DigestMd5Sasl());
-
     public LdapBindMethod() {
         this(null);
     }

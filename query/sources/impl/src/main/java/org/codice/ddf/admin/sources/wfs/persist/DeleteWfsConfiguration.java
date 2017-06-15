@@ -14,7 +14,6 @@
 package org.codice.ddf.admin.sources.wfs.persist;
 
 import static org.codice.ddf.admin.common.services.ServiceCommons.deleteService;
-import static org.codice.ddf.admin.common.services.ServiceCommons.serviceConfigurationExists;
 
 import java.util.List;
 
@@ -23,6 +22,7 @@ import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.common.fields.common.PidField;
+import org.codice.ddf.admin.common.services.ServiceCommons;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
@@ -68,7 +68,7 @@ public class DeleteWfsConfiguration extends BaseFunctionField<BooleanField> {
         if (containsErrorMsgs()) {
             return;
         }
-        addMessages(serviceConfigurationExists(pid, serviceActions));
+        addMessages(ServiceCommons.validateServiceConfigurationExists(pid, serviceActions));
     }
 
     @Override

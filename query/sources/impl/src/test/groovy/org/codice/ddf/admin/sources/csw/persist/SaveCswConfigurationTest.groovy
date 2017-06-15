@@ -171,7 +171,7 @@ class SaveCswConfigurationTest extends Specification {
         !report.result().getValue()
         report.messages().size() == 1
         report.messages().get(0).path == RESULT_ARGUMENT_PATH
-        report.messages().get(0).code == DefaultMessages.FAILED_UPDATE_ERROR
+        report.messages().get(0).code == DefaultMessages.FAILED_PERSIST
     }
 
     def 'Fail to update CSW Configuration due to no existing source config'() {

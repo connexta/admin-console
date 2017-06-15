@@ -13,9 +13,7 @@
  **/
 package org.codice.ddf.admin.common.services;
 
-import static org.codice.ddf.admin.common.report.message.DefaultMessages.failedDeleteError;
 import static org.codice.ddf.admin.common.report.message.DefaultMessages.failedPersistError;
-import static org.codice.ddf.admin.common.report.message.DefaultMessages.failedUpdateError;
 import static org.codice.ddf.admin.common.report.message.DefaultMessages.noExistingConfigError;
 
 import java.util.Arrays;
@@ -72,7 +70,7 @@ public class ServiceCommons {
     public static ReportImpl updateService(PidField servicePid, Map<String, Object> newConfig,
             ConfiguratorFactory configuratorFactory, ServiceActions serviceActions) {
         ReportImpl report = new ReportImpl();
-        report.addMessages(serviceConfigurationExists(servicePid, serviceActions));
+        report.addMessages(validateServiceConfigurationExists(servicePid, serviceActions));
         if (report.containsErrorMsgs()) {
             return report;
         }
@@ -85,7 +83,7 @@ public class ServiceCommons {
                 pid,
                 newConfig.toString());
         if (operationReport.containsFailedResults()) {
-            return report.addResultMessage(failedUpdateError());
+            return report.addResultMessage(failedPersistError());
         }
 
         return report;
@@ -98,21 +96,27 @@ public class ServiceCommons {
         configurator.add(managedServiceActions.delete(servicePid.getValue()));
         if (configurator.commit("Deleted source with pid [{}].", servicePid.getValue())
                 .containsFailedResults()) {
-            report.addResultMessage(failedDeleteError());
+            report.addResultMessage(failedPersistError());
         }
         return report;
     }
 
-    public static ReportImpl serviceConfigurationExists(PidField servicePid,
+    public static ReportImpl validateServiceConfigurationExists(PidField servicePid,
             ServiceActions serviceActions) {
         ReportImpl report = new ReportImpl();
-        if (serviceActions.read(servicePid.getValue())
-                .isEmpty()) {
+        if (!serviceConfigurationExists(servicePid.getValue(), serviceActions)) {
             report.addResultMessage(noExistingConfigError());
         }
         return report;
     }
 
+    /**
+     * Checks if the given pid retrieves any properties. If no properties are found or the properties are empty then fail.
+     *
+     * @param servicePid
+     * @param serviceActions
+     * @return with the serviceExists or not
+     */
     public static boolean serviceConfigurationExists(String servicePid,
             ServiceActions serviceActions) {
         return !serviceActions.read(servicePid)

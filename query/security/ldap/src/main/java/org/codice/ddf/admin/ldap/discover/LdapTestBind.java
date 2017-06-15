@@ -27,7 +27,7 @@ import com.google.common.collect.ImmutableList;
 
 public class LdapTestBind extends TestFunctionField {
 
-    public static final String ID = "testBind";
+    public static final String FIELD_NAME = "testBind";
 
     public static final String DESCRIPTION =
             "Attempts to bind a user to the given ldap connection given the ldap bind user credentials.";
@@ -37,7 +37,7 @@ public class LdapTestBind extends TestFunctionField {
     private LdapTestingUtils utils;
 
     public LdapTestBind() {
-        super(ID, DESCRIPTION);
+        super(FIELD_NAME, DESCRIPTION);
         conn = new LdapConnectionField().useDefaultRequired();
         creds = new LdapBindUserInfo().useDefaultRequired();
         utils = new LdapTestingUtils();

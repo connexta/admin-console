@@ -85,7 +85,7 @@ public class LdapBindUserInfo extends BaseObjectField {
         return this;
     }
 
-    public CredentialsField credentials() {
+    public CredentialsField credentialsField() {
         return creds;
     }
 

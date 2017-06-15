@@ -42,7 +42,7 @@ public class LdapUserAttributes extends BaseFunctionField<ListField<StringField>
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LdapUserAttributes.class);
 
-    public static final String ID = "userAttributes";
+    public static final String FIELD_NAME = "userAttributes";
 
     public static final String DESCRIPTION =
             "Retrieves a subset of available user attributes based on the LDAP settings provided.";
@@ -58,7 +58,7 @@ public class LdapUserAttributes extends BaseFunctionField<ListField<StringField>
     private LdapTestingUtils utils;
 
     public LdapUserAttributes() {
-        super(ID, DESCRIPTION, new ListFieldImpl<>(StringField.class));
+        super(FIELD_NAME, DESCRIPTION, new ListFieldImpl<>(StringField.class));
         conn = new LdapConnectionField().useDefaultRequired();
         creds = new LdapBindUserInfo().useDefaultRequired();
         settings = new LdapSettingsField().useDefaultRequired();
@@ -79,7 +79,7 @@ public class LdapUserAttributes extends BaseFunctionField<ListField<StringField>
         LdapConnectionAttempt connectionAttempt = utils.bindUserToLdapConnection(conn, creds);
         addMessages(connectionAttempt);
 
-        if (!connectionAttempt.isResultPresent()) {
+        if (containsErrorMsgs()) {
             return null;
         }
 
@@ -95,7 +95,6 @@ public class LdapUserAttributes extends BaseFunctionField<ListField<StringField>
                     + "configuration issue with config.");
         }
 
-        // TODO: tbatie - 4/3/17 - Make a set field instead
         ListFieldImpl<StringField> entries = new ListFieldImpl<>(StringField.class);
         entries.setValue(Arrays.asList(ldapEntryAttributes.toArray()));
         return entries;

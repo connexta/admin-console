@@ -56,7 +56,7 @@ class LdapTestConnectionSpec extends Specification {
 
     def 'Fail on missing required connection info fields'() {
         setup:
-        def baseMsg = [LdapTestConnection.ID, FunctionField.ARGUMENT]
+        def baseMsg = [LdapTestConnection.FIELD_NAME, FunctionField.ARGUMENT]
         def missingHostMsgPath = baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME, HostnameField.DEFAULT_FIELD_NAME]
         def missingPortMsgPath = baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME, PortField.DEFAULT_FIELD_NAME]
         def missingEncryptMsgPath = baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME, LdapEncryptionMethodField.DEFAULT_FIELD_NAME]
@@ -148,7 +148,7 @@ class LdapTestConnectionSpec extends Specification {
         report.messages().size() == 1
         !report.result().getValue()
         report.messages().get(0).getCode() == DefaultMessages.CANNOT_CONNECT
-        report.messages().get(0).getPath() == [LdapTestConnection.ID, FunctionField.ARGUMENT, LdapConnectionField.DEFAULT_FIELD_NAME]
+        report.messages().get(0).getPath() == [LdapTestConnection.FIELD_NAME, FunctionField.ARGUMENT, LdapConnectionField.DEFAULT_FIELD_NAME]
     }
 
     def 'Fail to connect to LDAP (Bad port)'() {
@@ -163,7 +163,7 @@ class LdapTestConnectionSpec extends Specification {
         report.messages().size() == 1
         !report.result().getValue()
         report.messages().get(0).getCode() == DefaultMessages.CANNOT_CONNECT
-        report.messages().get(0).getPath() == [LdapTestConnection.ID, FunctionField.ARGUMENT, LdapConnectionField.DEFAULT_FIELD_NAME]
+        report.messages().get(0).getPath() == [LdapTestConnection.FIELD_NAME, FunctionField.ARGUMENT, LdapConnectionField.DEFAULT_FIELD_NAME]
     }
 
     def 'Fail to setup connection test'() {
@@ -179,7 +179,7 @@ class LdapTestConnectionSpec extends Specification {
         report.messages().size() == 1
         !report.result().getValue()
         report.messages().get(0).getCode() == DefaultMessages.FAILED_TEST_SETUP
-        report.messages().get(0).getPath() == [LdapTestConnection.ID]
+        report.messages().get(0).getPath() == [LdapTestConnection.FIELD_NAME]
     }
 
     LdapConnectionField ldapsLdapConnectionInfo() {

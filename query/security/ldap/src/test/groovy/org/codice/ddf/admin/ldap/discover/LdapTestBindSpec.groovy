@@ -51,7 +51,7 @@ class LdapTestBindSpec extends Specification {
 
     def 'Fail on missing required fields'() {
         setup:
-        def baseMsg = [LdapTestBind.ID, FunctionField.ARGUMENT]
+        def baseMsg = [LdapTestBind.FIELD_NAME, FunctionField.ARGUMENT]
         def missingHostMsgPath = baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME, HostnameField.DEFAULT_FIELD_NAME]
         def missingPortMsgPath = baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME, PortField.DEFAULT_FIELD_NAME]
         def missingEncryptMsgPath = baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME, LdapEncryptionMethodField.DEFAULT_FIELD_NAME]
@@ -84,7 +84,7 @@ class LdapTestBindSpec extends Specification {
         then:
         report.messages().size() == 1
         report.messages().get(0).getCode() == DefaultMessages.MISSING_REQUIRED_FIELD
-        report.messages().get(0).getPath() == [LdapTestBind.ID, FunctionField.ARGUMENT, LdapBindUserInfo.DEFAULT_FIELD_NAME, LdapRealm.DEFAULT_FIELD_NAME]
+        report.messages().get(0).getPath() == [LdapTestBind.FIELD_NAME, FunctionField.ARGUMENT, LdapBindUserInfo.DEFAULT_FIELD_NAME, LdapRealm.DEFAULT_FIELD_NAME]
     }
 
     def 'Fail to connect to LDAP'() {
@@ -100,7 +100,7 @@ class LdapTestBindSpec extends Specification {
         report.messages().size() == 1
         !report.result().getValue()
         report.messages().get(0).getCode() == DefaultMessages.CANNOT_CONNECT
-        report.messages().get(0).getPath() == [LdapTestBind.ID, FunctionField.ARGUMENT, LdapConnectionField.DEFAULT_FIELD_NAME]
+        report.messages().get(0).getPath() == [LdapTestBind.FIELD_NAME, FunctionField.ARGUMENT, LdapConnectionField.DEFAULT_FIELD_NAME]
     }
 
     def 'Successfully bind user with no encryption using bind method "Simple"'() {
@@ -180,7 +180,7 @@ class LdapTestBindSpec extends Specification {
         report.messages().size() == 1
         !report.result().getValue()
         report.messages().get(0).getCode() == LdapMessages.CANNOT_BIND
-        report.messages().get(0).getPath() == [LdapTestBind.ID, FunctionField.ARGUMENT, LdapBindUserInfo.DEFAULT_FIELD_NAME]
+        report.messages().get(0).getPath() == [LdapTestBind.FIELD_NAME, FunctionField.ARGUMENT, LdapBindUserInfo.DEFAULT_FIELD_NAME]
     }
 
     def 'Fail to bind user over bind method "Simple" with bad password'() {
@@ -196,7 +196,7 @@ class LdapTestBindSpec extends Specification {
         report.messages().size() == 1
         !report.result().getValue()
         report.messages().get(0).getCode() == LdapMessages.CANNOT_BIND
-        report.messages().get(0).getPath() == [LdapTestBind.ID, FunctionField.ARGUMENT, LdapBindUserInfo.DEFAULT_FIELD_NAME]
+        report.messages().get(0).getPath() == [LdapTestBind.FIELD_NAME, FunctionField.ARGUMENT, LdapBindUserInfo.DEFAULT_FIELD_NAME]
     }
 
     def 'Fail to bind user over bind method "Simple" with bad username'() {
@@ -212,7 +212,7 @@ class LdapTestBindSpec extends Specification {
         report.messages().size() == 1
         !report.result().getValue()
         report.messages().get(0).getCode() == LdapMessages.CANNOT_BIND
-        report.messages().get(0).getPath() == [LdapTestBind.ID, FunctionField.ARGUMENT, LdapBindUserInfo.DEFAULT_FIELD_NAME]
+        report.messages().get(0).getPath() == [LdapTestBind.FIELD_NAME, FunctionField.ARGUMENT, LdapBindUserInfo.DEFAULT_FIELD_NAME]
     }
 
     LdapConnectionField ldapsLdapConnectionInfo() {

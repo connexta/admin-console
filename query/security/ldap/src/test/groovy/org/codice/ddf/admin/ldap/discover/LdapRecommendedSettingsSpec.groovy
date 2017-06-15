@@ -54,7 +54,7 @@ class LdapRecommendedSettingsSpec extends Specification {
         action = new LdapRecommendedSettings()
 
         // Initialize bad paths
-        baseMsg = [LdapRecommendedSettings.ID, FunctionField.ARGUMENT]
+        baseMsg = [LdapRecommendedSettings.FIELD_NAME, FunctionField.ARGUMENT]
         badPaths = [missingHostPath        : baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME, HostnameField.DEFAULT_FIELD_NAME],
                     missingPortPath        : baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME, PortField.DEFAULT_FIELD_NAME],
                     missingEncryptPath     : baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME, LdapEncryptionMethodField.DEFAULT_FIELD_NAME],
@@ -134,27 +134,27 @@ class LdapRecommendedSettingsSpec extends Specification {
         LdapRecommendedSettingsField recSettings = action.getValue().result()
 
         then:
-        recSettings.userDns().value.size() == 1
-        recSettings.userDns().value.first() == 'ou=users,dc=example,dc=com'
+        recSettings.userDnsField().value.size() == 1
+        recSettings.userDnsField().value.first() == 'ou=users,dc=example,dc=com'
 
-        recSettings.groupDns().value.size() == 2
-        recSettings.groupDns().value.any {
+        recSettings.groupDnsField().value.size() == 2
+        recSettings.groupDnsField().value.any {
             it == 'ou=groups,dc=example,dc=com'
         }
 
-        recSettings.userNameAttributes().value.size() == 1
-        recSettings.userNameAttributes().value.first() == 'uid'
+        recSettings.userNameAttributesField().value.size() == 1
+        recSettings.userNameAttributesField().value.first() == 'uid'
 
-        recSettings.groupObjectClasses().value.collect {
+        recSettings.groupObjectClassesField().value.collect {
             it.toLowerCase()
         } as Set == ['group', 'groupofnames', 'posixgroup'] as Set
 
-        recSettings.groupAttributesHoldingMember().value.collect {
+        recSettings.groupAttributesHoldingMemberField().value.collect {
             it.toLowerCase()
         } as Set == ['member', 'uniquemember', 'memberuid'] as Set
 
-        recSettings.memberAttributesReferencedInGroup().value == ['uid']
+        recSettings.memberAttributesReferencedInGroupField().value == ['uid']
 
-        recSettings.queryBases().value == ['dc=example,dc=com']
+        recSettings.queryBasesField().value == ['dc=example,dc=com']
     }
 }

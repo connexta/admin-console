@@ -22,43 +22,61 @@ public class LdapMessages {
 
     public static final String CANNOT_BIND = "CANNOT_BIND";
 
+    public static final String INVALID_DN = "INVALID_DN";
+
+    public static final String INVALID_QUERY = "INVALID_QUERY";
+
+    public static final String IDENTICAL_SERVICE_EXISTS = "IDENTICAL_SERVICE_EXISTS";
+
+    public static final String DN_DOES_NOT_EXIST = "DN_DOES_NOT_EXIST";
+
+    public static final String NO_USERS_IN_BASE_USER_DN = "NO_USERS_IN_BASE_USER_DN";
+
+    public static final String NO_GROUPS_IN_BASE_GROUP_DN = "NO_GROUPS_IN_BASE_GROUP_DN";
+
+    public static final String NO_GROUPS_WITH_MEMBERS = "NO_GROUPS_WITH_MEMBERS";
+
+    public static final String NO_REFERENCED_MEMBER = "NO_REFERENCED_MEMBER";
+
+    public static final String USER_NAME_ATTRIBUTE_NOT_FOUND = "USER_NAME_ATTRIBUTE_NOT_FOUND";
+
     public static ErrorMessage cannotBindError(List<String> path) {
         return new ErrorMessageImpl(CANNOT_BIND, path);
     }
 
     public static ErrorMessage invalidDnFormatError(List<String> path) {
-        return  new ErrorMessageImpl("INVALID_DN", path);
+        return  new ErrorMessageImpl(INVALID_DN, path);
     }
 
     public static ErrorMessage invalidQueryError(List<String> path) {
-        return new ErrorMessageImpl("INVALID_QUERY", path);
+        return new ErrorMessageImpl(INVALID_QUERY, path);
     }
 
-    public static ErrorMessage serviceAlreadyExistsWarning(List<String> path) {
-        return new ErrorMessageImpl("IDENTICAL_SERVICE_EXISTS", path);
+    public static ErrorMessage serviceAlreadyExistsError(List<String> path) {
+        return new ErrorMessageImpl(IDENTICAL_SERVICE_EXISTS, path);
     }
 
     public static ErrorMessage dnDoesNotExistError(List<String> pathOrigin) {
-        return new ErrorMessageImpl("DN_DOES_NOT_EXIST", pathOrigin);
+        return new ErrorMessageImpl(DN_DOES_NOT_EXIST, pathOrigin);
     }
 
     public static ErrorMessage noUsersInBaseUserDnError(List<String> path) {
-        return new ErrorMessageImpl("NO_USERS_IN_BASE_USER_DN", path);
+        return new ErrorMessageImpl(NO_USERS_IN_BASE_USER_DN, path);
     }
 
     public static ErrorMessage noGroupsInBaseGroupDnError(List<String> path) {
-        return new ErrorMessageImpl("NO_GROUPS_IN_BASE_GROUP_DN", path);
+        return new ErrorMessageImpl(NO_GROUPS_IN_BASE_GROUP_DN, path);
     }
 
-    public static ErrorMessage noGroupsWithMembersWarning(List<String> path) {
-        return new ErrorMessageImpl("NO_GROUPS_WITH_MEMBERS", path);
+    public static ErrorMessage noGroupsWithMembersError(List<String> path) {
+        return new ErrorMessageImpl(NO_GROUPS_WITH_MEMBERS, path);
     }
 
-    public static ErrorMessage noReferencedMemberWarning(List<String> path) {
-        return new ErrorMessageImpl("NO_REFERENCED_MEMBER", path);
+    public static ErrorMessage noReferencedMemberError(List<String> path) {
+        return new ErrorMessageImpl(NO_REFERENCED_MEMBER, path);
     }
 
-    public static ErrorMessage userNameAttributeNotFoundWarning(List<String> path) {
-        return new ErrorMessageImpl("USER_NAME_ATTRIBUTE_NOT_FOUND", path);
+    public static ErrorMessage userNameAttributeNotFoundError(List<String> path) {
+        return new ErrorMessageImpl(USER_NAME_ATTRIBUTE_NOT_FOUND, path);
     }
 }

@@ -14,7 +14,7 @@
 package org.codice.ddf.admin.sources.csw.persist;
 
 import static org.codice.ddf.admin.common.services.ServiceCommons.deleteService;
-import static org.codice.ddf.admin.common.services.ServiceCommons.serviceConfigurationExists;
+import static org.codice.ddf.admin.common.services.ServiceCommons.validateServiceConfigurationExists;
 
 import java.util.List;
 
@@ -68,7 +68,7 @@ public class DeleteCswConfiguration extends BaseFunctionField<BooleanField> {
         if (containsErrorMsgs()) {
             return;
         }
-        addMessages(serviceConfigurationExists(pid, serviceActions));
+        addMessages(validateServiceConfigurationExists(pid, serviceActions));
     }
 
     @Override

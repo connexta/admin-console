@@ -25,15 +25,14 @@ import org.codice.ddf.admin.ldap.LdapTestingCommons
 import org.codice.ddf.admin.ldap.TestLdapServer
 import org.codice.ddf.admin.ldap.commons.LdapMessages
 import org.codice.ddf.admin.ldap.fields.config.LdapSettingsField
+import org.codice.ddf.admin.ldap.fields.config.LdapUseCase
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindMethod
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindUserInfo
 import org.codice.ddf.admin.ldap.fields.connection.LdapConnectionField
 import org.codice.ddf.admin.ldap.fields.connection.LdapEncryptionMethodField
 import spock.lang.Specification
 
-import static org.codice.ddf.admin.ldap.LdapTestingCommons.initLdapSettings
-import static org.codice.ddf.admin.ldap.LdapTestingCommons.noEncryptionLdapConnectionInfo
-import static org.codice.ddf.admin.ldap.LdapTestingCommons.simpleBindInfo
+import static org.codice.ddf.admin.ldap.LdapTestingCommons.*
 import static org.codice.ddf.admin.ldap.fields.config.LdapUseCase.ATTRIBUTE_STORE
 
 class LdapUserAttributesSpec extends Specification {
@@ -65,12 +64,14 @@ class LdapUserAttributesSpec extends Specification {
                     missingUsernamePath                 : baseMsg + [LdapBindUserInfo.DEFAULT_FIELD_NAME, CredentialsField.DEFAULT_FIELD_NAME, CredentialsField.USERNAME_FIELD_NAME],
                     missingUserpasswordPath             : baseMsg + [LdapBindUserInfo.DEFAULT_FIELD_NAME, CredentialsField.DEFAULT_FIELD_NAME, CredentialsField.PASSWORD_FIELD_NAME],
                     missingBindMethodPath               : baseMsg + [LdapBindUserInfo.DEFAULT_FIELD_NAME, LdapBindMethod.DEFAULT_FIELD_NAME],
+                    useCasePath                         : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, LdapUseCase.DEFAULT_FIELD_NAME],
                     baseUserDnPath                      : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, 'baseUserDn'],
                     baseGroupDnPath                     : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, 'baseGroupDn'],
                     groupObjectClassPath                : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, 'groupObjectClass'],
                     usernameAttributePath               : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, 'userNameAttribute'],
                     groupAttributeHoldingMemberPath     : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, 'groupAttributeHoldingMember'],
-                    memberAttributeReferencedInGroupPath: baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, 'memberAttributeReferencedInGroup']
+                    memberAttributeReferencedInGroupPath: baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, 'memberAttributeReferencedInGroup'],
+                    attributeMappingPath                : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, 'attributeMapping']
         ]
     }
 
@@ -97,8 +98,6 @@ class LdapUserAttributesSpec extends Specification {
         setup:
 
         def ldapSettings = initLdapSettings(ATTRIBUTE_STORE, true)
-//                .baseUserDn('BAD')
-//                .baseGroupDn('BAD')
 
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().port(666).getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue(),

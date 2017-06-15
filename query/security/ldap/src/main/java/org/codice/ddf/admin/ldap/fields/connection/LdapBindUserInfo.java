@@ -54,7 +54,7 @@ public class LdapBindUserInfo extends BaseObjectField {
 
     @Override
     public List<ErrorMessage> validate() {
-        if(bindMethod() != null && bindMethod().equals(DIGEST_MD5_SASL)) {
+        if (DIGEST_MD5_SASL.equals(bindMethod())) {
             realm.isRequired(true);
         }
         return super.validate();

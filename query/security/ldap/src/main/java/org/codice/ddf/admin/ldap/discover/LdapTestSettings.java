@@ -22,6 +22,7 @@ import static org.codice.ddf.admin.ldap.commons.LdapMessages.userNameAttributeNo
 import static org.codice.ddf.admin.ldap.fields.config.LdapUseCase.ATTRIBUTE_STORE;
 import static org.codice.ddf.admin.ldap.fields.config.LdapUseCase.AUTHENTICATION_AND_ATTRIBUTE_STORE;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -39,10 +40,14 @@ import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.Filter;
 import org.forgerock.opendj.ldap.SearchScope;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableList;
 
 public class LdapTestSettings extends TestFunctionField {
+    private static final Logger LOGGER = LoggerFactory.getLogger(LdapTestSettings.class);
+
     public static final String FIELD_NAME = "testLdapSettings";
 
     public static final String DESCRIPTION =
@@ -60,17 +65,7 @@ public class LdapTestSettings extends TestFunctionField {
         super(FIELD_NAME, DESCRIPTION);
         conn = new LdapConnectionField().useDefaultRequired();
         bindInfo = new LdapBindUserInfo().useDefaultRequired();
-        settings = new LdapSettingsField();
-
-        settings.useCaseField()
-                .isRequired(true);
-        settings.usernameAttributeField()
-                .isRequired(true);
-        settings.baseUserDnField()
-                .isRequired(true);
-        settings.baseGroupDnField()
-                .isRequired(true);
-
+        settings = new LdapSettingsField().useDefaultAuthentication();
         updateArgumentPaths();
 
         utils = new LdapTestingUtils();
@@ -83,38 +78,43 @@ public class LdapTestSettings extends TestFunctionField {
 
     @Override
     public BooleanField performFunction() {
-        LdapConnectionAttempt connectionAttempt = utils.bindUserToLdapConnection(conn, bindInfo);
-        addMessages(connectionAttempt);
+        Connection ldapConnection;
+        try (LdapConnectionAttempt connectionAttempt = utils.bindUserToLdapConnection(conn,
+                bindInfo)) {
+            addMessages(connectionAttempt);
 
-        if (!connectionAttempt.isResultPresent()) {
-            return new BooleanField(false);
-        }
+            if (!connectionAttempt.isResultPresent()) {
+                return new BooleanField(false);
+            }
 
-        Connection ldapConnection = connectionAttempt.result();
+            ldapConnection = connectionAttempt.result();
 
-        checkDirExists(settings.baseGroupDnField(), ldapConnection);
-        checkDirExists(settings.baseUserDnField(), ldapConnection);
+            checkDirExists(settings.baseGroupDnField(), ldapConnection);
+            checkDirExists(settings.baseUserDnField(), ldapConnection);
 
-        // Short-circuit return here, if either the user or group directory does not exist
-        if (containsErrorMsgs()) {
-            return new BooleanField(false);
-        }
+            // Short-circuit return here, if either the user or group directory does not exist
+            if (containsErrorMsgs()) {
+                return new BooleanField(false);
+            }
 
-        checkUsersInDir(ldapConnection);
+            checkUsersInDir(ldapConnection);
 
-        // Short-circuit return here, if there are no users in base dir
-        if (containsErrorMsgs()) {
-            return new BooleanField(false);
-        }
+            // Short-circuit return here, if there are no users in base dir
+            if (containsErrorMsgs()) {
+                return new BooleanField(false);
+            }
 
-        // Check if group objectClass is on at least one entry in the directory
-        checkGroupObjectClass(ldapConnection);
+            // Check if group objectClass is on at least one entry in the directory
+            checkGroupObjectClass(ldapConnection);
 
-        // Don't check the group if there is no entry with the correct objectClass
-        if (!containsErrorMsgs()) {
-            // Then, check that there is a group entry (of the correct objectClass) that has
-            // any member references
-            checkGroup(ldapConnection);
+            // Don't check the group if there is no entry with the correct objectClass
+            if (!containsErrorMsgs()) {
+                // Then, check that there is a group entry (of the correct objectClass) that has
+                // any member references
+                checkGroup(ldapConnection);
+            }
+        } catch (IOException e) {
+            LOGGER.warn("Error closing LDAP connection", e);
         }
 
         return new BooleanField(!containsErrorMsgs());
@@ -135,9 +135,8 @@ public class LdapTestSettings extends TestFunctionField {
                 1)
                 .isEmpty();
 
-        if(!dirExists) {
-            addArgumentMessage(dnDoesNotExistError(dirDn
-                    .path()));
+        if (!dirExists) {
+            addArgumentMessage(dnDoesNotExistError(dirDn.path()));
         }
     }
 
@@ -241,11 +240,7 @@ public class LdapTestSettings extends TestFunctionField {
         if (settings.useCase() != null && (settings.useCase()
                 .equals(ATTRIBUTE_STORE) || settings.useCase()
                 .equals(AUTHENTICATION_AND_ATTRIBUTE_STORE))) {
-
-            settings.groupObjectClassField().isRequired(true);
-            settings.groupAttributeHoldingMemberField().isRequired(true);
-            settings.memberAttributeReferencedInGroupField().isRequired(true);
-            settings.attributeMapField().isRequired(true);
+            settings.useDefaultAttributeStore();
         }
 
         super.validate();
@@ -256,7 +251,15 @@ public class LdapTestSettings extends TestFunctionField {
         return new LdapTestSettings();
     }
 
-    public void setTestingUtils(LdapTestingUtils utils) {
+    /**
+     * Intentionally scoped as private.
+     * This is a test support method to be invoked by Spock tests which will elevate scope as needed
+     * in order to execute. If Java-based unit tests are ever needed, this scope will need to be
+     * updated to package-private.
+     *
+     * @param utils Ldap support utilities
+     */
+    private void setTestingUtils(LdapTestingUtils utils) {
         this.utils = utils;
     }
 }

@@ -104,13 +104,20 @@ public class LdapSettingsField extends BaseObjectField {
         return memberAttributeReferencedInGroup.getValue();
     }
 
-    public LdapSettingsField useDefaultRequired() {
+    public LdapSettingsField useDefaultAuthentication() {
+        useCase.isRequired(true);
         baseUserDn.isRequired(true);
         baseGroupDn.isRequired(true);
-        groupObjectClass.isRequired(true);
         usernameAttribute.isRequired(true);
+        return this;
+    }
+
+    public LdapSettingsField useDefaultAttributeStore() {
+        useDefaultAuthentication();
+        groupObjectClass.isRequired(true);
         groupAttributeHoldingMember.isRequired(true);
         memberAttributeReferencedInGroup.isRequired(true);
+        attributeMap.isRequired(true);
         return this;
     }
 

@@ -42,7 +42,7 @@ public class LdapConfigurations extends BaseFunctionField<ListField<LdapConfigur
 
     private PidField pid;
 
-    private ConfiguratorFactory configuratorFactory;
+    private final ConfiguratorFactory configuratorFactory;
 
     private final ManagedServiceActions managedServiceActions;
 

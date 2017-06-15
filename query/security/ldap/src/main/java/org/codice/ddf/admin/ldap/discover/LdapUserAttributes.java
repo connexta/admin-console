@@ -13,6 +13,7 @@
  **/
 package org.codice.ddf.admin.ldap.discover;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -39,7 +40,6 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.ImmutableList;
 
 public class LdapUserAttributes extends BaseFunctionField<ListField<StringField>> {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(LdapUserAttributes.class);
 
     public static final String FIELD_NAME = "userAttributes";
@@ -61,7 +61,7 @@ public class LdapUserAttributes extends BaseFunctionField<ListField<StringField>
         super(FIELD_NAME, DESCRIPTION, new ListFieldImpl<>(StringField.class));
         conn = new LdapConnectionField().useDefaultRequired();
         creds = new LdapBindUserInfo().useDefaultRequired();
-        settings = new LdapSettingsField().useDefaultRequired();
+        settings = new LdapSettingsField().useDefaultAttributeStore();
 
         ldapType = new LdapTypeField();
         updateArgumentPaths();
@@ -76,27 +76,35 @@ public class LdapUserAttributes extends BaseFunctionField<ListField<StringField>
 
     @Override
     public ListField<StringField> performFunction() {
-        LdapConnectionAttempt connectionAttempt = utils.bindUserToLdapConnection(conn, creds);
-        addMessages(connectionAttempt);
+        Set<String> ldapEntryAttributes;
+        ServerGuesser serverGuesser;
+        ListFieldImpl<StringField> entries = null;
+        try (LdapConnectionAttempt connectionAttempt = utils.bindUserToLdapConnection(conn,
+                creds)) {
+            addMessages(connectionAttempt);
 
-        if (containsErrorMsgs()) {
-            return null;
+            if (containsErrorMsgs()) {
+                return null;
+            }
+
+            ldapEntryAttributes = new HashSet<>();
+            serverGuesser = ServerGuesser.buildGuesser(ldapType.getValue(),
+                    connectionAttempt.result());
+            try {
+                ldapEntryAttributes = serverGuesser.getClaimAttributeOptions(settings.baseUserDn());
+
+            } catch (SearchResultReferenceIOException | LdapException e) {
+                LOGGER.warn("Error retrieving attributes from LDAP server; this may indicate a "
+                        + "configuration issue with config.");
+            }
+
+            entries = new ListFieldImpl<>(StringField.class);
+            entries.setValue(Arrays.asList(ldapEntryAttributes.toArray()));
+
+        } catch (IOException e) {
+            LOGGER.warn("Error closing LDAP connection", e);
         }
 
-        Set<String> ldapEntryAttributes = new HashSet<>();
-        ServerGuesser serverGuesser = ServerGuesser.buildGuesser(ldapType.getValue(),
-                connectionAttempt.result());
-
-        try {
-            ldapEntryAttributes = serverGuesser.getClaimAttributeOptions(settings.baseUserDn());
-
-        } catch (SearchResultReferenceIOException | LdapException e) {
-            LOGGER.warn("Error retrieving attributes from LDAP server; this may indicate a "
-                    + "configuration issue with config.");
-        }
-
-        ListFieldImpl<StringField> entries = new ListFieldImpl<>(StringField.class);
-        entries.setValue(Arrays.asList(ldapEntryAttributes.toArray()));
         return entries;
     }
 
@@ -105,7 +113,15 @@ public class LdapUserAttributes extends BaseFunctionField<ListField<StringField>
         return new LdapUserAttributes();
     }
 
-    public void setTestingUtils(LdapTestingUtils utils) {
+    /**
+     * Intentionally scoped as private.
+     * This is a test support method to be invoked by Spock tests which will elevate scope as needed
+     * in order to execute. If Java-based unit tests are ever needed, this scope will need to be
+     * updated to package-private.
+     *
+     * @param utils Ldap support utilities
+     */
+    private void setTestingUtils(LdapTestingUtils utils) {
         this.utils = utils;
     }
 }

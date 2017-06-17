@@ -11,12 +11,15 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.ldap.commons.services;
+package org.codice.ddf.admin.ldap.commons;
 
+import static org.codice.ddf.admin.common.services.ServiceCommons.FLAG_PASSWORD;
 import static org.codice.ddf.admin.common.services.ServiceCommons.SERVICE_PID_KEY;
+import static org.codice.ddf.admin.common.services.ServiceCommons.mapValue;
 import static org.codice.ddf.admin.ldap.fields.config.LdapUseCase.ATTRIBUTE_STORE;
 import static org.codice.ddf.admin.ldap.fields.config.LdapUseCase.AUTHENTICATION;
 import static org.codice.ddf.admin.ldap.fields.connection.LdapEncryptionMethodField.LDAPS;
+import static org.codice.ddf.admin.security.common.services.LdapClaimsHandlerServiceProperties.PROPERTY_FILE_LOCATION;
 
 import java.net.URI;
 import java.nio.file.Files;
@@ -34,8 +37,8 @@ import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.api.report.Report;
 import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.report.ReportImpl;
+import org.codice.ddf.admin.common.report.message.DefaultMessages;
 import org.codice.ddf.admin.common.services.ServiceCommons;
-import org.codice.ddf.admin.ldap.commons.LdapMessages;
 import org.codice.ddf.admin.ldap.fields.config.LdapConfigurationField;
 import org.codice.ddf.admin.ldap.fields.config.LdapSettingsField;
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindUserInfo;
@@ -59,7 +62,6 @@ public class LdapServiceCommons {
         this.managedServiceActions = managedServiceActions;
     }
 
-    // TODO: 6/15/17 Add unit tests
     public ListField<LdapConfigurationField> getLdapConfigurations() {
         List<LdapConfigurationField> ldapLoginConfigs = new LdapLoginServiceProperties(
                 managedServiceActions).getLdapLoginManagedServices()
@@ -80,13 +82,13 @@ public class LdapServiceCommons {
 
         configs.stream()
                 .forEach(config -> config.bindUserInfoField()
-                        .password("*******"));
+                        .password(FLAG_PASSWORD));
 
         return new ListFieldImpl<>(LdapConfigurationField.class).addAll(configs);
     }
 
-    public static Map<String, Object> ldapConfigToLdapClaimsHandlerService(
-            LdapConfigurationField config) {
+    public Map<String, Object> ldapConfigToLdapClaimsHandlerService(
+            LdapConfigurationField config, String attributeMappingPath) {
         Map<String, Object> props = new HashMap<>();
 
         if (config != null) {
@@ -126,9 +128,7 @@ public class LdapServiceCommons {
             props.put(LdapClaimsHandlerServiceProperties.MEMBER_NAME_ATTRIBUTE,
                     config.settingsField()
                             .groupAttributeHoldingMember());
-            // TODO: tbatie - 6/14/17 - Does this before merge
-            // TODO: tbatie - 4/11/17 - Look up the pid, if it doesn't exist then create a new attribute mapping, else use the existing one
-            //            props.put(PROPERTY_FILE_LOCATION, config.settings().attributeMappingPath());
+            props.put(LdapClaimsHandlerServiceProperties.PROPERTY_FILE_LOCATION, attributeMappingPath);
         }
         return props;
     }
@@ -184,7 +184,7 @@ public class LdapServiceCommons {
      * @return {@link Report} with errors indicating there are existing configurations
      * the {@code configuration}
      */
-    public Report validateIdenticalLdapConfigDoesNotExist(LdapConfigurationField newConfig) {
+    public Report validateSimilarLdapServiceExists(LdapConfigurationField newConfig) {
         ReportImpl report = new ReportImpl();
         List<LdapConfigurationField> existingConfigs = getLdapConfigurations().getList();
 
@@ -192,7 +192,7 @@ public class LdapServiceCommons {
                 .anyMatch(existingConfig -> identicalSettingsExist(existingConfig, newConfig));
 
         if (identicalServiceExists) {
-            report.addArgumentMessage(LdapMessages.serviceAlreadyExistsError(newConfig.path()));
+            report.addArgumentMessage(DefaultMessages.similarServiceExists(newConfig.path()));
         }
 
         return report;
@@ -203,30 +203,27 @@ public class LdapServiceCommons {
                 LdapClaimsHandlerServiceProperties.URL,
                 LdapClaimsHandlerServiceProperties.START_TLS);
 
-        LdapBindUserInfo bindUserInfo = new LdapBindUserInfo().username(mapStringValue(
-                LdapClaimsHandlerServiceProperties.LDAP_BIND_USER_DN,
-                props))
-                .password(mapStringValue(LdapClaimsHandlerServiceProperties.PASSWORD, props))
-                .bindMethod(mapStringValue(LdapClaimsHandlerServiceProperties.BIND_METHOD, props));
+        LdapBindUserInfo bindUserInfo = new LdapBindUserInfo().username(mapValue(props,
+                LdapClaimsHandlerServiceProperties.LDAP_BIND_USER_DN))
+                .password(FLAG_PASSWORD)
+                .bindMethod(mapValue(props, LdapClaimsHandlerServiceProperties.BIND_METHOD));
 
-        LdapSettingsField settings = new LdapSettingsField().usernameAttribute(mapStringValue(
-                LdapClaimsHandlerServiceProperties.LOGIN_USER_ATTRIBUTE,
-                props))
-                .baseUserDn(mapStringValue(LdapClaimsHandlerServiceProperties.USER_BASE_DN, props))
-                .baseGroupDn(mapStringValue(LdapClaimsHandlerServiceProperties.GROUP_BASE_DN,
-                        props))
-                .groupObjectClass(mapStringValue(LdapClaimsHandlerServiceProperties.OBJECT_CLASS,
-                        props))
-                .groupAttributeHoldingMember(mapStringValue(LdapClaimsHandlerServiceProperties.MEMBERSHIP_USER_ATTRIBUTE,
-                        props))
-                .memberAttributeReferencedInGroup(mapStringValue(LdapClaimsHandlerServiceProperties.MEMBER_NAME_ATTRIBUTE,
-                        props))
+        LdapSettingsField settings = new LdapSettingsField().usernameAttribute(mapValue(props,
+                LdapClaimsHandlerServiceProperties.LOGIN_USER_ATTRIBUTE))
+                .baseUserDn(mapValue(props, LdapClaimsHandlerServiceProperties.USER_BASE_DN))
+                .baseGroupDn(mapValue(props, LdapClaimsHandlerServiceProperties.GROUP_BASE_DN))
+                .groupObjectClass(mapValue(props,
+                        LdapClaimsHandlerServiceProperties.OBJECT_CLASS))
+                .groupAttributeHoldingMember(mapValue(props,
+                        LdapClaimsHandlerServiceProperties.MEMBERSHIP_USER_ATTRIBUTE))
+                .memberAttributeReferencedInGroup(mapValue(props,
+                        LdapClaimsHandlerServiceProperties.MEMBER_NAME_ATTRIBUTE))
                 .useCase(ATTRIBUTE_STORE);
 
         String attributeMappingsPath =
-                mapStringValue(LdapClaimsHandlerServiceProperties.PROPERTY_FILE_LOCATION, props);
+                mapValue(props, PROPERTY_FILE_LOCATION);
         if (StringUtils.isNotEmpty(attributeMappingsPath)) {
-            Path path = Paths.get(attributeMappingsPath);
+            Path path = Paths.get(attributeMappingsPath).toAbsolutePath();
             if (Files.exists(path)) {
                 Map<String, String> attributeMappings = new HashMap<>(propertyActions.getProperties(
                         path));
@@ -247,31 +244,29 @@ public class LdapServiceCommons {
                 LdapLoginServiceProperties.LDAP_URL,
                 LdapLoginServiceProperties.START_TLS);
 
-        LdapBindUserInfo bindUserInfo = new LdapBindUserInfo().username(mapStringValue(
-                LdapLoginServiceProperties.LDAP_BIND_USER_DN,
-                props))
-                .password(mapStringValue(LdapLoginServiceProperties.LDAP_BIND_USER_PASS, props))
-                .bindMethod(mapStringValue(LdapLoginServiceProperties.BIND_METHOD, props))
-                .realm(mapStringValue(LdapLoginServiceProperties.REALM, props));
+        LdapBindUserInfo bindUserInfo = new LdapBindUserInfo().username(mapValue(props,
+                LdapLoginServiceProperties.LDAP_BIND_USER_DN))
+                .password(FLAG_PASSWORD)
+                .bindMethod(mapValue(props, LdapLoginServiceProperties.BIND_METHOD))
+                .realm(mapValue(props, LdapLoginServiceProperties.REALM));
         //        ldapConfiguration.bindKdcAddress((String) props.get(KDC_ADDRESS));
 
-        LdapSettingsField settings = new LdapSettingsField().usernameAttribute(mapStringValue(
-                LdapLoginServiceProperties.USER_NAME_ATTRIBUTE,
-                props))
-                .baseUserDn(mapStringValue(LdapLoginServiceProperties.USER_BASE_DN, props))
-                .baseGroupDn(mapStringValue(LdapLoginServiceProperties.GROUP_BASE_DN, props))
+        LdapSettingsField settings = new LdapSettingsField().usernameAttribute(mapValue(props,
+                LdapLoginServiceProperties.USER_NAME_ATTRIBUTE))
+                .baseUserDn(mapValue(props, LdapLoginServiceProperties.USER_BASE_DN))
+                .baseGroupDn(mapValue(props, LdapLoginServiceProperties.GROUP_BASE_DN))
                 .useCase(AUTHENTICATION);
 
         return new LdapConfigurationField().connection(connection)
                 .bindUserInfo(bindUserInfo)
                 .settings(settings)
-                .pid(mapStringValue(SERVICE_PID_KEY, props));
+                .pid(mapValue(props, SERVICE_PID_KEY));
     }
 
     private LdapConnectionField getLdapConnectionField(Map<String, Object> props, String ldapUrl,
             String startTls) {
         LdapConnectionField connection = new LdapConnectionField();
-        URI ldapUri = getUriFromProperty(mapStringValue(ldapUrl, props));
+        URI ldapUri = getUriFromProperty(mapValue(props, ldapUrl));
         if (ldapUri != null) {
             connection.encryptionMethod(ldapUri.getScheme())
                     .hostname(ldapUri.getHost())
@@ -318,9 +313,5 @@ public class LdapServiceCommons {
         }
 
         return null;
-    }
-
-    private static String mapStringValue(String key, Map<String, Object> properties) {
-        return properties.get(key) == null ? null : (String) properties.get(key);
     }
 }

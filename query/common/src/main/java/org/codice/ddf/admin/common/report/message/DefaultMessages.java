@@ -39,17 +39,19 @@ public class DefaultMessages {
 
     public static final String CANNOT_CONNECT = "CANNOT_CONNECT";
 
-    public static final String INVALID_URL_ERROR = "INVALID_URL";
+    public static final String INVALID_URL = "INVALID_URL";
 
     public static final String NO_EXISTING_CONFIG = "NO_EXISTING_CONFIG";
 
-    public static final String INVALID_URI_ERROR = "INVALID_URI";
+    public static final String INVALID_URI = "INVALID_URI";
 
     public static final String UNAUTHORIZED = "UNAUTHORIZED";
 
     public static final String FAILED_TEST_SETUP = "FAILED_TEST_SETUP";
 
     public static final String DUPLICATE_MAP_KEY = "DUPLICATE_MAP_KEY";
+
+    private static final String SIMILAR_SERVICE_EXISTS = "SIMILAR_SERVICE_EXISTS";
 
     public static ErrorMessage failedTestSetup() {
         return new ErrorMessageImpl(FAILED_TEST_SETUP);
@@ -108,11 +110,11 @@ public class DefaultMessages {
     }
 
     public static ErrorMessage invalidUrlError(List<String> path) {
-        return new ErrorMessageImpl(INVALID_URL_ERROR, path);
+        return new ErrorMessageImpl(INVALID_URL, path);
     }
 
     public static ErrorMessage invalidUriError(List<String> path) {
-        return new ErrorMessageImpl(INVALID_URI_ERROR, path);
+        return new ErrorMessageImpl(INVALID_URI, path);
     }
 
     public static ErrorMessage noExistingConfigError(List<String> path) {
@@ -125,5 +127,9 @@ public class DefaultMessages {
 
     public static ErrorMessage duplicateMapKeyError(List<String> path) {
         return new ErrorMessageImpl(DUPLICATE_MAP_KEY, path);
+    }
+
+    public static ErrorMessage similarServiceExists(List<String> path) {
+        return new ErrorMessageImpl(SIMILAR_SERVICE_EXISTS, path);
     }
 }

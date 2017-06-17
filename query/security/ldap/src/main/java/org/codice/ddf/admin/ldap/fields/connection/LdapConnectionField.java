@@ -48,6 +48,7 @@ public class LdapConnectionField extends BaseObjectField {
         hostname.isRequired(true);
         port.isRequired(true);
         encryptionMethod.isRequired(true);
+        isRequired(true);
         return this;
     }
 

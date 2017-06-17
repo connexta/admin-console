@@ -26,6 +26,9 @@ import com.google.common.collect.ImmutableMap;
 
 public class LdapTestingCommons {
 
+    public static final String LDAP_SERVER_BASE_USER_DN = "ou=users,dc=example,dc=com";
+    public static final String LDAP_SERVER_BASE_GROUP_DN = "ou=groups,dc=example,dc=com";
+
     public static void loadLdapTestProperties() throws IOException {
         Properties properties = new Properties();
         properties.load(LdapTestingCommons.class.getClassLoader()
@@ -52,8 +55,8 @@ public class LdapTestingCommons {
     public static LdapSettingsField initLdapSettings(String useCase,
             boolean includeAttributeFields) {
         LdapSettingsField settingsField = new LdapSettingsField().usernameAttribute("sn")
-                .baseUserDn("ou=users,dc=example,dc=com")
-                .baseGroupDn("ou=groups,dc=example,dc=com")
+                .baseUserDn(LDAP_SERVER_BASE_USER_DN)
+                .baseGroupDn(LDAP_SERVER_BASE_GROUP_DN)
                 .useCase(useCase);
 
         if (includeAttributeFields) {

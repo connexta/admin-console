@@ -28,10 +28,9 @@ import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 import org.codice.ddf.admin.ldap.commons.LdapConnectionAttempt;
 import org.codice.ddf.admin.ldap.commons.LdapTestingUtils;
 import org.codice.ddf.admin.ldap.commons.ServerGuesser;
-import org.codice.ddf.admin.ldap.fields.config.LdapSettingsField;
+import org.codice.ddf.admin.ldap.fields.LdapDistinguishedName;
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindUserInfo;
 import org.codice.ddf.admin.ldap.fields.connection.LdapConnectionField;
-import org.codice.ddf.admin.ldap.fields.query.LdapTypeField;
 import org.forgerock.opendj.ldap.LdapException;
 import org.forgerock.opendj.ldap.SearchResultReferenceIOException;
 import org.slf4j.Logger;
@@ -40,6 +39,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.ImmutableList;
 
 public class LdapUserAttributes extends BaseFunctionField<ListField<StringField>> {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(LdapUserAttributes.class);
 
     public static final String FIELD_NAME = "userAttributes";
@@ -47,23 +47,22 @@ public class LdapUserAttributes extends BaseFunctionField<ListField<StringField>
     public static final String DESCRIPTION =
             "Retrieves a subset of available user attributes based on the LDAP settings provided.";
 
+    public static final String BASE_USER_DN = "baseUserDn";
+
     private LdapConnectionField conn;
 
-    private LdapBindUserInfo creds;
+    private LdapBindUserInfo bindInfo;
 
-    private LdapSettingsField settings;
-
-    private LdapTypeField ldapType;
+    private LdapDistinguishedName baseUserDn;
 
     private LdapTestingUtils utils;
 
     public LdapUserAttributes() {
         super(FIELD_NAME, DESCRIPTION, new ListFieldImpl<>(StringField.class));
         conn = new LdapConnectionField().useDefaultRequired();
-        creds = new LdapBindUserInfo().useDefaultRequired();
-        settings = new LdapSettingsField().useDefaultAttributeStore();
-
-        ldapType = new LdapTypeField();
+        bindInfo = new LdapBindUserInfo().useDefaultRequired();
+        baseUserDn = new LdapDistinguishedName(BASE_USER_DN);
+        baseUserDn.isRequired(true);
         updateArgumentPaths();
 
         utils = new LdapTestingUtils();
@@ -71,14 +70,14 @@ public class LdapUserAttributes extends BaseFunctionField<ListField<StringField>
 
     @Override
     public List<DataType> getArguments() {
-        return ImmutableList.of(conn, creds, settings, ldapType);
+        return ImmutableList.of(conn, bindInfo, baseUserDn);
     }
 
     @Override
     public ListField<StringField> performFunction() {
         ListFieldImpl<StringField> entries = null;
         try (LdapConnectionAttempt connectionAttempt = utils.bindUserToLdapConnection(conn,
-                creds)) {
+                bindInfo)) {
             addMessages(connectionAttempt);
 
             if (containsErrorMsgs()) {
@@ -86,10 +85,9 @@ public class LdapUserAttributes extends BaseFunctionField<ListField<StringField>
             }
 
             Set<String> ldapEntryAttributes = new HashSet<>();
-            ServerGuesser serverGuesser = ServerGuesser.buildGuesser(ldapType.getValue(),
-                    connectionAttempt.result());
+            ServerGuesser serverGuesser = ServerGuesser.buildGuesser(connectionAttempt.result());
             try {
-                ldapEntryAttributes = serverGuesser.getClaimAttributeOptions(settings.baseUserDn());
+                ldapEntryAttributes = serverGuesser.getClaimAttributeOptions(baseUserDn.getValue());
 
             } catch (SearchResultReferenceIOException | LdapException e) {
                 LOGGER.warn("Error retrieving attributes from LDAP server; this may indicate a "

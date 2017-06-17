@@ -52,6 +52,7 @@ public class LdapRecommendedSettings extends BaseFunctionField<LdapRecommendedSe
         conn = new LdapConnectionField().useDefaultRequired();
         creds = new LdapBindUserInfo().useDefaultRequired();
         ldapType = new LdapTypeField();
+        ldapType.isRequired(true);
         updateArgumentPaths();
 
         utils = new LdapTestingUtils();

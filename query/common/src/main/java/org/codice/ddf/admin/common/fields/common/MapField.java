@@ -86,6 +86,7 @@ public class MapField extends BaseObjectField {
                         .equals(key))
                 .findFirst();
     }
+
     public boolean isEmpty() {
         return entries.getList()
                 .isEmpty();

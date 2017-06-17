@@ -129,8 +129,7 @@ public class LdapQuery extends BaseFunctionField<ListField<MapField>> {
             LOGGER.warn("Error closing LDAP connection", e);
         }
 
-        entries = new ListFieldImpl<>(MapField.class);
-        return entries.addAll(convertedSearchResults);
+        return new ListFieldImpl<>(MapField.class).addAll(convertedSearchResults);
     }
 
     @Override

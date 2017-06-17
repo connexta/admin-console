@@ -19,25 +19,24 @@ import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.codice.ddf.admin.common.report.message.ErrorMessageImpl;
 
 public class LdapMessages {
+
     public static final String CANNOT_BIND = "CANNOT_BIND";
 
-    private static final String INVALID_DN = "INVALID_DN";
+    public static final String INVALID_DN = "INVALID_DN";
 
-    private static final String INVALID_QUERY = "INVALID_QUERY";
+    public static final String INVALID_QUERY = "INVALID_QUERY";
 
-    private static final String IDENTICAL_SERVICE_EXISTS = "IDENTICAL_SERVICE_EXISTS";
+    public static final String DN_DOES_NOT_EXIST = "DN_DOES_NOT_EXIST";
 
-    private static final String DN_DOES_NOT_EXIST = "DN_DOES_NOT_EXIST";
+    public static final String NO_USERS_IN_BASE_USER_DN = "NO_USERS_IN_BASE_USER_DN";
 
-    private static final String NO_USERS_IN_BASE_USER_DN = "NO_USERS_IN_BASE_USER_DN";
+    public static final String NO_GROUPS_IN_BASE_GROUP_DN = "NO_GROUPS_IN_BASE_GROUP_DN";
 
-    private static final String NO_GROUPS_IN_BASE_GROUP_DN = "NO_GROUPS_IN_BASE_GROUP_DN";
+    public static final String NO_GROUPS_WITH_MEMBERS = "NO_GROUPS_WITH_MEMBERS";
 
-    private static final String NO_GROUPS_WITH_MEMBERS = "NO_GROUPS_WITH_MEMBERS";
+    public static final String NO_REFERENCED_MEMBER = "NO_REFERENCED_MEMBER";
 
-    private static final String NO_REFERENCED_MEMBER = "NO_REFERENCED_MEMBER";
-
-    private static final String USER_NAME_ATTRIBUTE_NOT_FOUND = "USER_NAME_ATTRIBUTE_NOT_FOUND";
+    public static final String USER_NAME_ATTRIBUTE_NOT_FOUND = "USER_NAME_ATTRIBUTE_NOT_FOUND";
 
     public static ErrorMessage invalidDnFormatError(List<String> path) {
         return new ErrorMessageImpl(INVALID_DN, path);
@@ -45,10 +44,6 @@ public class LdapMessages {
 
     public static ErrorMessage invalidQueryError(List<String> path) {
         return new ErrorMessageImpl(INVALID_QUERY, path);
-    }
-
-    public static ErrorMessage serviceAlreadyExistsError(List<String> path) {
-        return new ErrorMessageImpl(IDENTICAL_SERVICE_EXISTS, path);
     }
 
     public static ErrorMessage dnDoesNotExistError(List<String> pathOrigin) {

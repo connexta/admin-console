@@ -27,6 +27,7 @@ import org.codice.ddf.admin.ldap.fields.connection.LdapBindUserInfo
 import org.codice.ddf.admin.ldap.fields.connection.LdapConnectionField
 import org.codice.ddf.admin.ldap.fields.connection.LdapEncryptionMethodField
 import org.codice.ddf.admin.ldap.fields.query.LdapRecommendedSettingsField
+import org.codice.ddf.admin.ldap.fields.query.LdapTypeField
 import spock.lang.Specification
 
 import static org.codice.ddf.admin.ldap.LdapTestingCommons.noEncryptionLdapConnectionInfo
@@ -60,7 +61,8 @@ class LdapRecommendedSettingsSpec extends Specification {
                     missingEncryptPath     : baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME, LdapEncryptionMethodField.DEFAULT_FIELD_NAME],
                     missingUsernamePath    : baseMsg + [LdapBindUserInfo.DEFAULT_FIELD_NAME, CredentialsField.DEFAULT_FIELD_NAME, CredentialsField.USERNAME_FIELD_NAME],
                     missingUserpasswordPath: baseMsg + [LdapBindUserInfo.DEFAULT_FIELD_NAME, CredentialsField.DEFAULT_FIELD_NAME, CredentialsField.PASSWORD_FIELD_NAME],
-                    missingBindMethodPath  : baseMsg + [LdapBindUserInfo.DEFAULT_FIELD_NAME, LdapBindMethod.DEFAULT_FIELD_NAME]
+                    missingBindMethodPath  : baseMsg + [LdapBindUserInfo.DEFAULT_FIELD_NAME, LdapBindMethod.DEFAULT_FIELD_NAME],
+                    missingLdapTypePath    : baseMsg + [LdapTypeField.DEFAULT_FIELD_NAME]
         ]
     }
 
@@ -68,31 +70,30 @@ class LdapRecommendedSettingsSpec extends Specification {
         setup:
         action = new LdapRecommendedSettings()
 
-        args = [(LdapConnectionField.DEFAULT_FIELD_NAME): new LdapConnectionField().getValue()]
-        action.setValue(args)
-
         when:
         FunctionReport report = action.getValue()
 
         then:
-        report.messages().size() == 6
+        report.messages().size() == 7
         report.messages().count {
             it.getCode() == DefaultMessages.MISSING_REQUIRED_FIELD
-        } == 6
+        } == 7
 
         report.messages()*.getPath() as Set == [badPaths.missingHostPath,
                                                 badPaths.missingPortPath,
                                                 badPaths.missingEncryptPath,
                                                 badPaths.missingUsernamePath,
                                                 badPaths.missingUserpasswordPath,
-                                                badPaths.missingBindMethodPath] as Set
+                                                badPaths.missingBindMethodPath,
+                                                badPaths.missingLdapTypePath] as Set
     }
 
     def 'fail to connect to LDAP'() {
         setup:
 
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().port(666).getValue(),
-                (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue()]
+                (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue(),
+                (LdapTypeField.DEFAULT_FIELD_NAME)      : LdapTypeField.UNKNOWN]
         action.setValue(args)
         action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
@@ -109,7 +110,8 @@ class LdapRecommendedSettingsSpec extends Specification {
         setup:
 
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue(),
-                (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().password('badPassword').getValue()]
+                (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().password('badPassword').getValue(),
+                (LdapTypeField.DEFAULT_FIELD_NAME)      : LdapTypeField.UNKNOWN]
         action.setValue(args)
         action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
@@ -122,11 +124,12 @@ class LdapRecommendedSettingsSpec extends Specification {
         report.messages().get(0).getPath() == baseMsg + [LdapBindUserInfo.DEFAULT_FIELD_NAME]
     }
 
-    def 'succeed'() {
+    def 'validate settings successfully'() {
         setup:
 
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue(),
-                (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue()]
+                (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue(),
+                (LdapTypeField.DEFAULT_FIELD_NAME)      : LdapTypeField.UNKNOWN]
         action.setValue(args)
         action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
@@ -155,6 +158,6 @@ class LdapRecommendedSettingsSpec extends Specification {
 
         recSettings.memberAttributesReferencedInGroupField().value == ['uid']
 
-        recSettings.queryBasesField().value == ['dc=example,dc=com']
+        recSettings.queryBasesField().value == [TestLdapServer.getBaseDistinguishedName()]
     }
 }

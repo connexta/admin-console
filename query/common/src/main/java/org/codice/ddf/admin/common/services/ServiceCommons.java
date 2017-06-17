@@ -94,7 +94,7 @@ public class ServiceCommons {
         ReportImpl report = new ReportImpl();
         Configurator configurator = configuratorFactory.getConfigurator();
         configurator.add(managedServiceActions.delete(servicePid.getValue()));
-        if (configurator.commit("Deleted source with pid [{}].", servicePid.getValue())
+        if (configurator.commit("Deleted service with pid [{}].", servicePid.getValue())
                 .containsFailedResults()) {
             report.addResultMessage(failedPersistError());
         }

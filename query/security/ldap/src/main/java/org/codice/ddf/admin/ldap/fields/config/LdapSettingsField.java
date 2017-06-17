@@ -35,6 +35,20 @@ public class LdapSettingsField extends BaseObjectField {
     public static final String DESCRIPTION =
             "Contains information about the LDAP structure and various attributes required to setup.";
 
+    public static final String USER_NAME_ATTRIBUTE = "userNameAttribute";
+
+    public static final String BASE_USER_DN = "baseUserDn";
+
+    public static final String BASE_GROUP_DN = "baseGroupDn";
+
+    public static final String GROUP_OBJECT_CLASS = "groupObjectClass";
+
+    public static final String GROUP_ATTRIBUTE_HOLDING_MEMBER = "groupAttributeHoldingMember";
+
+    public static final String MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP = "memberAttributeReferencedInGroup";
+
+    public static final String ATTRIBUTE_MAPPING = "attributeMapping";
+
     private StringField usernameAttribute;
 
     private LdapDistinguishedName baseUserDn;
@@ -54,13 +68,13 @@ public class LdapSettingsField extends BaseObjectField {
     public LdapSettingsField() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
 
-        this.usernameAttribute = new StringField("userNameAttribute");
-        this.baseUserDn = new LdapDistinguishedName("baseUserDn");
-        this.baseGroupDn = new LdapDistinguishedName("baseGroupDn");
-        this.groupObjectClass = new StringField("groupObjectClass");
-        this.groupAttributeHoldingMember = new StringField("groupAttributeHoldingMember");
-        this.memberAttributeReferencedInGroup = new StringField("memberAttributeReferencedInGroup");
-        this.attributeMap = new ListFieldImpl<>("attributeMapping", ClaimsMapEntry.class);
+        this.usernameAttribute = new StringField(USER_NAME_ATTRIBUTE);
+        this.baseUserDn = new LdapDistinguishedName(BASE_USER_DN);
+        this.baseGroupDn = new LdapDistinguishedName(BASE_GROUP_DN);
+        this.groupObjectClass = new StringField(GROUP_OBJECT_CLASS);
+        this.groupAttributeHoldingMember = new StringField(GROUP_ATTRIBUTE_HOLDING_MEMBER);
+        this.memberAttributeReferencedInGroup = new StringField(MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP);
+        this.attributeMap = new ListFieldImpl<>(ATTRIBUTE_MAPPING, ClaimsMapEntry.class);
         this.useCase = new LdapUseCase();
 
         updateInnerFieldPaths();
@@ -141,6 +155,7 @@ public class LdapSettingsField extends BaseObjectField {
         baseUserDn.isRequired(true);
         baseGroupDn.isRequired(true);
         usernameAttribute.isRequired(true);
+        isRequired(true);
         return this;
     }
 

@@ -26,15 +26,15 @@ public class LdapTypeField extends BaseEnumField<String> {
 
     public static final String DESCRIPTION = "The type of LDAP being connected to.";
 
-    static final String UNKNOWN = "unknown";
+    public static final String UNKNOWN = "unknown";
 
-    static final String ACTIVE_DIRECTORY = "activeDirectory";
+    public static final String ACTIVE_DIRECTORY = "activeDirectory";
 
-    static final String OPEN_LDAP = "openLdap";
+    public static final String OPEN_LDAP = "openLdap";
 
-    static final String OPEN_DJ = "openDj";
+    public static final String OPEN_DJ = "openDj";
 
-    static final String EMBEDDED = "embeddedLdap";
+    public static final String EMBEDDED = "embeddedLdap";
 
     public LdapTypeField() {
         this(null);

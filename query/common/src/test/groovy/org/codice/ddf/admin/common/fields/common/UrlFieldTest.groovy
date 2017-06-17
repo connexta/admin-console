@@ -63,12 +63,12 @@ class UrlFieldTest extends Specification {
 
         where:
         url                       | code
-        'http://'                 | DefaultMessages.INVALID_URL_ERROR
-        'http://  test.com'       | DefaultMessages.INVALID_URL_ERROR
-        'htp://test.com'          | DefaultMessages.INVALID_URL_ERROR
-        'htps://test.com'         | DefaultMessages.INVALID_URL_ERROR
-        '://google.com'           | DefaultMessages.INVALID_URL_ERROR
-        'http://localhost:8993  ' | DefaultMessages.INVALID_URL_ERROR
-        '  '                      | DefaultMessages.INVALID_URL_ERROR
+        'http://'                 | DefaultMessages.INVALID_URL
+        'http://  test.com'       | DefaultMessages.INVALID_URL
+        'htp://test.com'          | DefaultMessages.INVALID_URL
+        'htps://test.com'         | DefaultMessages.INVALID_URL
+        '://google.com'           | DefaultMessages.INVALID_URL
+        'http://localhost:8993  ' | DefaultMessages.INVALID_URL
+        '  '                      | DefaultMessages.INVALID_URL
     }
 }

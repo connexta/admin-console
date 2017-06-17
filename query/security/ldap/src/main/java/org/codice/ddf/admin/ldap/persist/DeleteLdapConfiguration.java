@@ -13,29 +13,24 @@
  **/
 package org.codice.ddf.admin.ldap.persist;
 
-import static org.codice.ddf.admin.common.report.message.DefaultMessages.failedPersistError;
 import static org.codice.ddf.admin.common.services.ServiceCommons.validateServiceConfigurationExists;
 
 import java.util.List;
 
 import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
-import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
-import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
+import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.common.fields.common.PidField;
-import org.codice.ddf.admin.configurator.Configurator;
+import org.codice.ddf.admin.common.services.ServiceCommons;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
-import org.codice.ddf.admin.configurator.OperationReport;
-import org.codice.ddf.admin.ldap.commons.services.LdapServiceCommons;
-import org.codice.ddf.admin.ldap.fields.config.LdapConfigurationField;
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
 import org.codice.ddf.internal.admin.configurator.actions.PropertyActions;
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
 
 import com.google.common.collect.ImmutableList;
 
-public class DeleteLdapConfiguration extends BaseFunctionField<ListField<LdapConfigurationField>> {
+public class DeleteLdapConfiguration extends BaseFunctionField<BooleanField> {
     public static final String FIELD_NAME = "deleteLdapConfig";
 
     public static final String DESCRIPTION = "Deletes the specified LDAP configuration.";
@@ -50,12 +45,10 @@ public class DeleteLdapConfiguration extends BaseFunctionField<ListField<LdapCon
 
     private final ServiceActions serviceActions;
 
-    private LdapServiceCommons serviceCommons;
-
     public DeleteLdapConfiguration(ConfiguratorFactory configuratorFactory,
             ManagedServiceActions managedServiceActions, PropertyActions propertyActions,
             ServiceActions serviceActions) {
-        super(FIELD_NAME, DESCRIPTION, new ListFieldImpl<>(LdapConfigurationField.class));
+        super(FIELD_NAME, DESCRIPTION, new BooleanField());
         this.configuratorFactory = configuratorFactory;
         this.managedServiceActions = managedServiceActions;
         this.propertyActions = propertyActions;
@@ -65,7 +58,6 @@ public class DeleteLdapConfiguration extends BaseFunctionField<ListField<LdapCon
         pid.isRequired(true);
 
         updateArgumentPaths();
-        serviceCommons = new LdapServiceCommons(this.propertyActions, this.managedServiceActions);
     }
 
     @Override
@@ -74,18 +66,9 @@ public class DeleteLdapConfiguration extends BaseFunctionField<ListField<LdapCon
     }
 
     @Override
-    public ListField<LdapConfigurationField> performFunction() {
-        Configurator configurator = configuratorFactory.getConfigurator();
-        configurator.add(managedServiceActions.delete(pid.getValue()));
-        OperationReport report =
-                configurator.commit("LDAP Configuration deleted for servicePid: {}",
-                        pid.getValue());
-
-        if (report.containsFailedResults()) {
-            addResultMessage(failedPersistError());
-        }
-
-        return serviceCommons.getLdapConfigurations();
+    public BooleanField performFunction() {
+        addMessages(ServiceCommons.deleteService(pid, configuratorFactory, managedServiceActions));
+        return new BooleanField(!containsErrorMsgs());
     }
 
     @Override
@@ -99,7 +82,7 @@ public class DeleteLdapConfiguration extends BaseFunctionField<ListField<LdapCon
     }
 
     @Override
-    public FunctionField<ListField<LdapConfigurationField>> newInstance() {
+    public FunctionField<BooleanField> newInstance() {
         return new DeleteLdapConfiguration(configuratorFactory,
                 managedServiceActions,
                 propertyActions,

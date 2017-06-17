@@ -30,9 +30,7 @@ import org.codice.ddf.admin.ldap.fields.connection.LdapConnectionField
 import org.codice.ddf.admin.ldap.fields.connection.LdapEncryptionMethodField
 import spock.lang.Specification
 
-import static org.codice.ddf.admin.ldap.LdapTestingCommons.initLdapSettings
-import static org.codice.ddf.admin.ldap.LdapTestingCommons.noEncryptionLdapConnectionInfo
-import static org.codice.ddf.admin.ldap.LdapTestingCommons.simpleBindInfo
+import static org.codice.ddf.admin.ldap.LdapTestingCommons.*
 import static org.codice.ddf.admin.ldap.fields.config.LdapUseCase.ATTRIBUTE_STORE
 import static org.codice.ddf.admin.ldap.fields.config.LdapUseCase.AUTHENTICATION
 
@@ -66,15 +64,15 @@ class LdapTestSettingsSpec extends Specification {
                     missingUserpasswordPath : baseMsg + [LdapBindUserInfo.DEFAULT_FIELD_NAME, CredentialsField.DEFAULT_FIELD_NAME, CredentialsField.PASSWORD_FIELD_NAME],
                     missingBindMethodPath   : baseMsg + [LdapBindUserInfo.DEFAULT_FIELD_NAME, LdapBindMethod.DEFAULT_FIELD_NAME],
                     missingUseCasePath      : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, LdapUseCase.DEFAULT_FIELD_NAME],
-                    missingUserPath         : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, 'baseUserDn'],
-                    missingGroupPath        : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, 'baseGroupDn'],
-                    missingUserNameAttrPath : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, 'userNameAttribute'],
-                    missingGroupObjectPath  : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, 'groupObjectClass'],
-                    missingGroupAttribPath  : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, 'groupAttributeHoldingMember'],
-                    missingMemberAttribPath : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, 'memberAttributeReferencedInGroup'],
-                    missingAttribMappingPath: baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, 'attributeMapping'],
-                    badUserDnPath           : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, 'baseUserDn'],
-                    badGroupDnPath          : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, 'baseGroupDn']
+                    missingUserPath         : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, LdapSettingsField.BASE_USER_DN],
+                    missingGroupPath        : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, LdapSettingsField.BASE_GROUP_DN],
+                    missingUserNameAttrPath : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, LdapSettingsField.USER_NAME_ATTRIBUTE],
+                    missingGroupObjectPath  : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, LdapSettingsField.GROUP_OBJECT_CLASS],
+                    missingGroupAttribPath  : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, LdapSettingsField.GROUP_ATTRIBUTE_HOLDING_MEMBER],
+                    missingMemberAttribPath : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, LdapSettingsField.MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP],
+                    missingAttribMappingPath: baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, LdapSettingsField.ATTRIBUTE_MAPPING],
+                    badUserDnPath           : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, LdapSettingsField.BASE_USER_DN],
+                    badGroupDnPath          : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, LdapSettingsField.BASE_GROUP_DN]
 
         ]
     }
@@ -82,9 +80,6 @@ class LdapTestSettingsSpec extends Specification {
     def 'fail on missing required fields'() {
         setup:
         action = new LdapTestSettings()
-
-        args = [(LdapConnectionField.DEFAULT_FIELD_NAME): new LdapConnectionField().getValue()]
-        action.setValue(args)
 
         when:
         FunctionReport report = action.getValue()
@@ -149,7 +144,7 @@ class LdapTestSettingsSpec extends Specification {
         then:
         report.messages().size() == 2
         report.messages().count {
-            it.getCode() == 'INVALID_DN'
+            it.getCode() == LdapMessages.INVALID_DN
         } == 2
 
         report.messages()*.getPath() as Set == [badPaths.badUserDnPath,
@@ -214,7 +209,7 @@ class LdapTestSettingsSpec extends Specification {
         then:
         report.messages().size() == 2
         report.messages().count {
-            it.getCode() == 'DN_DOES_NOT_EXIST'
+            it.getCode() == LdapMessages.DN_DOES_NOT_EXIST
         } == 2
 
         report.messages()*.getPath() as Set == [badPaths.badUserDnPath,
@@ -238,7 +233,7 @@ class LdapTestSettingsSpec extends Specification {
         then:
         report.messages().size() == 2
         report.messages().count {
-            it.getCode() == 'NO_GROUPS_IN_BASE_GROUP_DN'
+            it.getCode() == LdapMessages.NO_GROUPS_IN_BASE_GROUP_DN
         } == 2
 
         report.messages()*.getPath() as Set == [badPaths.badGroupDnPath,
@@ -262,7 +257,7 @@ class LdapTestSettingsSpec extends Specification {
         then:
         report.messages().size() == 2
         report.messages().count {
-            it.getCode() == 'NO_GROUPS_IN_BASE_GROUP_DN'
+            it.getCode() == LdapMessages.NO_GROUPS_IN_BASE_GROUP_DN
         } == 2
 
         report.messages()*.getPath() as Set == [badPaths.badGroupDnPath,
@@ -286,10 +281,10 @@ class LdapTestSettingsSpec extends Specification {
         then:
         report.messages().size() == 2
         report.messages().count {
-            it.getCode() == 'NO_USERS_IN_BASE_USER_DN'
+            it.getCode() == LdapMessages.NO_USERS_IN_BASE_USER_DN
         } == 1
         report.messages().count {
-            it.getCode() == 'USER_NAME_ATTRIBUTE_NOT_FOUND'
+            it.getCode() == LdapMessages.USER_NAME_ATTRIBUTE_NOT_FOUND
         } == 1
 
         report.messages()*.getPath() as Set == [badPaths.badUserDnPath,

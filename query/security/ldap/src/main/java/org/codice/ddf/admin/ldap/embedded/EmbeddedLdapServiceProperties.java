@@ -13,21 +13,7 @@
  */
 package org.codice.ddf.admin.ldap.embedded;
 
-import java.util.Map;
-
 public class EmbeddedLdapServiceProperties {
-    public static final String EMBEDDED_LDAP_MANAGER_SERVICE_PID =
-            "org.codice.opendj.embedded.server.LDAPManager";
-
-    public static final String EMBEDDED_LDAP_PORT = "embeddedLdapPort";
-
-    public static final String EMBEDDED_LDAPS_PORT = "embeddedLdapsPort";
-
-    public static final String EMBEDDED_LDAP_ADMIN_PORT = "embeddedLdapAdminPort";
-
-    public static final String LDIF_PATH = "ldifPath";
-
-    public static final String EMBEDDED_LDAP_STORAGE_LOCATION = "embeddedLdapStorageLocation";
 
     static final String EMBEDDED_LDAP_FEATURE = "opendj-embedded";
 
@@ -38,21 +24,4 @@ public class EmbeddedLdapServiceProperties {
 
     static final String DEFAULT_EMBEDDED_LDAP_CLAIMS_HANDLER_CONFIG_FEATURE =
             "ldap-embedded-default-claimshandler-config";
-
-    //    public static EmbeddedLdapConfiguration embeddedLdapServiceToEmbeddedLdapConfig(
-//            Map<String, Object> props) {
-//        EmbeddedLdapConfiguration config = new EmbeddedLdapConfiguration();
-//        config.embeddedLdapPort(mapIntValue(EMBEDDED_LDAP_PORT, props));
-//        config.embeddedLdapsPort(mapIntValue(EMBEDDED_LDAPS_PORT, props));
-//        config.embeddedLdapAdminPort(mapIntValue(EMBEDDED_LDAP_ADMIN_PORT, props));
-//        config.ldifPath(props.get(LDIF_PATH) == null ? null : (String) props.get(LDIF_PATH));
-//        config.embeddedLdapStorageLocation(props.get(EMBEDDED_LDAP_STORAGE_LOCATION) == null ?
-//                null :
-//                (String) props.get(EMBEDDED_LDAP_STORAGE_LOCATION));
-//        return config;
-//    }
-
-    public static int mapIntValue(String property, Map<String, Object> properties) {
-        return properties.get(property) == null ? -1 : (int) properties.get(property);
-    }
 }

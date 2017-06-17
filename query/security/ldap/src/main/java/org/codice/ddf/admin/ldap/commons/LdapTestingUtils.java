@@ -51,7 +51,7 @@ public class LdapTestingUtils {
     /**
      * Attempts to connect to the given ldap address given the hostname, port, and encryptionMethod
      * <p>
-     * Possible message types: CANNOT_CONFIGURE, CANNOT_CONNECT
+     * Possible message types: FAILED_TEST_SETUP, CANNOT_CONNECT, FAILED_TEST_SETUP
      *
      * @return connection attempt wrapper object
      */
@@ -99,7 +99,7 @@ public class LdapTestingUtils {
     /**
      * Binds the user to the LDAP connection.
      * <p>
-     * Possible message types: CANNOT_CONFIGURE, CANNOT_CONNECT, CANNOT_BIND
+     * Possible message types: FAILED_TEST_SETUP, CANNOT_CONNECT, CANNOT_BIND
      *
      * @param connField
      * @param bindInfo
@@ -184,7 +184,6 @@ public class LdapTestingUtils {
             String realm, String kdcAddress) {
         BindRequest request;
 
-        // TODO RAP 31 Jan 17: These case statements should operate in a case-insensitive manner
         switch (bindMethod) {
         //        case SASL:
         //            request = Requests.newPlainSASLBindRequest(bindUserDN,

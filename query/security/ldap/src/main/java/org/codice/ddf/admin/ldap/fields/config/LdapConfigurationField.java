@@ -24,7 +24,7 @@ import org.codice.ddf.admin.ldap.fields.connection.LdapConnectionField;
 import com.google.common.collect.ImmutableList;
 
 public class LdapConfigurationField extends BaseObjectField {
-    public static final String FIELD_NAME = "config";
+    public static final String DEFAULT_FIELD_NAME = "config";
 
     public static final String FIELD_TYPE_NAME = "LdapConfiguration";
 
@@ -40,7 +40,7 @@ public class LdapConfigurationField extends BaseObjectField {
     private LdapSettingsField settings;
 
     public LdapConfigurationField() {
-        super(FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
+        super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
         pid = new PidField();
         connection = new LdapConnectionField();
         bindUserInfo = new LdapBindUserInfo();
@@ -99,6 +99,14 @@ public class LdapConfigurationField extends BaseObjectField {
     @Override
     public LdapConfigurationField allFieldsRequired(boolean required) {
         super.allFieldsRequired(required);
+        return this;
+    }
+
+    public LdapConfigurationField useDefaultRequired() {
+        connection.useDefaultRequired();
+        bindUserInfo.useDefaultRequired();
+        settings.useDefaultAuthentication();
+        isRequired(true);
         return this;
     }
 }

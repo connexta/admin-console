@@ -26,9 +26,8 @@ public class LdapDistinguishedName extends StringField {
 
     public static final String FIELD_TYPE_NAME = "DistinguishedName";
 
-    // TODO: tbatie - 2/21/17 - Add examples of DN's here
     public static final String DESCRIPTION =
-            "A specific position within the Directory Information Tree (DIT).";
+            "A specific position within the Directory Information Tree (DIT). For more information visit https://www.ldap.com/ldap-dns-and-rdns.";
 
     public LdapDistinguishedName() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);

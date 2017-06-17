@@ -48,7 +48,7 @@ import com.google.common.collect.ImmutableList;
 public class LdapTestSettings extends TestFunctionField {
     private static final Logger LOGGER = LoggerFactory.getLogger(LdapTestSettings.class);
 
-    public static final String FIELD_NAME = "testLdapSettings";
+    public static final String FIELD_NAME = "testSettings";
 
     public static final String DESCRIPTION =
             "Tests whether the given LDAP dn's and user attributes exist.";
@@ -78,16 +78,15 @@ public class LdapTestSettings extends TestFunctionField {
 
     @Override
     public BooleanField performFunction() {
-        Connection ldapConnection;
         try (LdapConnectionAttempt connectionAttempt = utils.bindUserToLdapConnection(conn,
                 bindInfo)) {
             addMessages(connectionAttempt);
 
-            if (!connectionAttempt.isResultPresent()) {
+            if (containsErrorMsgs()) {
                 return new BooleanField(false);
             }
 
-            ldapConnection = connectionAttempt.result();
+            Connection ldapConnection = connectionAttempt.result();
 
             checkDirExists(settings.baseGroupDnField(), ldapConnection);
             checkDirExists(settings.baseUserDnField(), ldapConnection);
@@ -137,10 +136,9 @@ public class LdapTestSettings extends TestFunctionField {
     }
 
     /**
-     * Confirms that the baseUserDn exists.
+     * Confirms that the dn exists
      *
      * @param ldapConnection
-     * @return
      */
     private void checkDirExists(LdapDistinguishedName dirDn, Connection ldapConnection) {
         boolean dirExists = !utils.getLdapQueryResults(ldapConnection,
@@ -158,11 +156,8 @@ public class LdapTestSettings extends TestFunctionField {
 
     /**
      * Checks the baseUserDn for users.
-     * <p>
-     * Possible message return types: NO_USERS_IN_BASE_USER_DN, USER_NAME_ATTRIBUTE_NOT_FOUND
      *
      * @param ldapConnection
-     * @return
      */
     private void checkUsersInDir(Connection ldapConnection) {
         List<SearchResultEntry> baseUsersResults = utils.getLdapQueryResults(ldapConnection,
@@ -182,8 +177,6 @@ public class LdapTestSettings extends TestFunctionField {
 
     /**
      * Checks if the baseGroupDn contains the groupObjectclass
-     * <p>
-     * Possible message return types:
      *
      * @param ldapConnection
      */

@@ -30,15 +30,10 @@ public class LdapBindMethod extends BaseEnumField<String> {
 
     public static final String DIGEST_MD5_SASL = "DigestMD5SASL";
 
-    //  These fields are not currently supported for binding
-    //  public static final String SASL = "SASL";
-    //  public static final String GSSAPI_SASL = "GSSAPI SASL";
-
     LdapBindMethod() {
         this(null);
     }
 
-    // TODO: tbatie - 3/27/17 - Add constructor for supporting additional authtypes. Do this for all enum fields
     private LdapBindMethod(DataType<String> bindMethod) {
         super(DEFAULT_FIELD_NAME,
                 FIELD_TYPE_NAME,

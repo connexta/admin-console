@@ -49,6 +49,7 @@ public class LdapBindUserInfo extends BaseObjectField {
     public LdapBindUserInfo useDefaultRequired() {
         creds.useDefaultRequiredFields();
         bindMethod.isRequired(true);
+        isRequired(true);
         return this;
     }
 

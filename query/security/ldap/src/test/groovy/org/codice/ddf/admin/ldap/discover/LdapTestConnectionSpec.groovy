@@ -25,6 +25,7 @@ import org.codice.ddf.admin.ldap.fields.connection.LdapConnectionField
 import org.codice.ddf.admin.ldap.fields.connection.LdapEncryptionMethodField
 import org.forgerock.opendj.ldap.SSLContextBuilder
 import org.forgerock.opendj.ldap.TrustManagers
+import org.junit.Ignore
 import spock.lang.Specification
 
 import javax.net.ssl.SSLContext
@@ -62,8 +63,6 @@ class LdapTestConnectionSpec extends Specification {
         def missingEncryptMsgPath = baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME, LdapEncryptionMethodField.DEFAULT_FIELD_NAME]
 
         ldapConnectFunction = new LdapTestConnection()
-        args = [(LdapConnectionField.DEFAULT_FIELD_NAME): new LdapConnectionField().getValue()]
-        ldapConnectFunction.setValue(args)
 
         when:
         FunctionReport report = ldapConnectFunction.getValue()
@@ -104,22 +103,9 @@ class LdapTestConnectionSpec extends Specification {
         report.result().getValue()
     }
 
+    // TODO: tbatie - 5/4/17 - need to figure out a way to check if the connection was successfully upgraded to TLS or has no encryption. This information should be relayed back to the user.
+    @Ignore
     def 'Successfully connect using startTls on insecure port (Should not upgrade)'() {
-        setup:
-        args = [(LdapConnectionField.DEFAULT_FIELD_NAME): startTlsLdapConnectionInfo(server.getLdapPort()).getValue()]
-        ldapConnectFunction.setValue(args)
-
-        when:
-        FunctionReport report = ldapConnectFunction.getValue()
-
-        then:
-        // TODO: tbatie - 5/4/17 - need to figure out a way to check if the connection was successfully upgraded to TLS or has no encryption. This information should be relayed back to the user as a warning.
-//        report.messages().size() == 1
-//        report.messages().get(0).getCode() == (The expected return code)
-//        report.messages().get(0).getPath() == (The expected msg path)
-//        report.result().getValue() == true
-        report.messages().size() == 0
-        report.result().getValue()
     }
 
     def 'Successfully connect using startTls on LDAPS port (Should upgrade)'() {

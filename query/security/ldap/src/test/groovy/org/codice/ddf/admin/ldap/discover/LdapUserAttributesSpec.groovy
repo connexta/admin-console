@@ -24,8 +24,6 @@ import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.ldap.LdapTestingCommons
 import org.codice.ddf.admin.ldap.TestLdapServer
 import org.codice.ddf.admin.ldap.commons.LdapMessages
-import org.codice.ddf.admin.ldap.fields.config.LdapSettingsField
-import org.codice.ddf.admin.ldap.fields.config.LdapUseCase
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindMethod
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindUserInfo
 import org.codice.ddf.admin.ldap.fields.connection.LdapConnectionField
@@ -64,23 +62,13 @@ class LdapUserAttributesSpec extends Specification {
                     missingUsernamePath                 : baseMsg + [LdapBindUserInfo.DEFAULT_FIELD_NAME, CredentialsField.DEFAULT_FIELD_NAME, CredentialsField.USERNAME_FIELD_NAME],
                     missingUserpasswordPath             : baseMsg + [LdapBindUserInfo.DEFAULT_FIELD_NAME, CredentialsField.DEFAULT_FIELD_NAME, CredentialsField.PASSWORD_FIELD_NAME],
                     missingBindMethodPath               : baseMsg + [LdapBindUserInfo.DEFAULT_FIELD_NAME, LdapBindMethod.DEFAULT_FIELD_NAME],
-                    useCasePath                         : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, LdapUseCase.DEFAULT_FIELD_NAME],
-                    baseUserDnPath                      : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, 'baseUserDn'],
-                    baseGroupDnPath                     : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, 'baseGroupDn'],
-                    groupObjectClassPath                : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, 'groupObjectClass'],
-                    usernameAttributePath               : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, 'userNameAttribute'],
-                    groupAttributeHoldingMemberPath     : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, 'groupAttributeHoldingMember'],
-                    memberAttributeReferencedInGroupPath: baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, 'memberAttributeReferencedInGroup'],
-                    attributeMappingPath                : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, 'attributeMapping']
+                    baseUserDnPath                      : baseMsg + [LdapUserAttributes.BASE_USER_DN],
         ]
     }
 
     def 'fail on missing required fields'() {
         setup:
         action = new LdapUserAttributes()
-
-        args = [(LdapConnectionField.DEFAULT_FIELD_NAME): new LdapConnectionField().getValue()]
-        action.setValue(args)
 
         when:
         FunctionReport report = action.getValue()
@@ -101,7 +89,7 @@ class LdapUserAttributesSpec extends Specification {
 
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().port(666).getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue(),
-                (LdapSettingsField.DEFAULT_FIELD_NAME)  : ldapSettings.getValue()]
+                (LdapUserAttributes.BASE_USER_DN)  : LdapTestingCommons.LDAP_SERVER_BASE_GROUP_DN]
         action.setValue(args)
         action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
@@ -119,7 +107,7 @@ class LdapUserAttributesSpec extends Specification {
         def ldapSettings = initLdapSettings(ATTRIBUTE_STORE, true)
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().password('badPassword').getValue(),
-                (LdapSettingsField.DEFAULT_FIELD_NAME)  : ldapSettings.getValue()]
+                (LdapUserAttributes.BASE_USER_DN)  : LdapTestingCommons.LDAP_SERVER_BASE_GROUP_DN]
         action.setValue(args)
         action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
@@ -137,7 +125,7 @@ class LdapUserAttributesSpec extends Specification {
         def ldapSettings = initLdapSettings(ATTRIBUTE_STORE, true)
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue(),
-                (LdapSettingsField.DEFAULT_FIELD_NAME)  : ldapSettings.getValue()]
+                (LdapUserAttributes.BASE_USER_DN)  : LdapTestingCommons.LDAP_SERVER_BASE_GROUP_DN]
         action.setValue(args)
         action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 

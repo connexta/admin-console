@@ -13,7 +13,6 @@
  **/
 package org.codice.ddf.admin.ldap;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.codice.ddf.admin.api.Field;
@@ -28,79 +27,72 @@ import org.codice.ddf.admin.ldap.discover.LdapTestConnection;
 import org.codice.ddf.admin.ldap.discover.LdapTestSettings;
 import org.codice.ddf.admin.ldap.discover.LdapUserAttributes;
 import org.codice.ddf.admin.ldap.embedded.InstallEmbeddedLdap;
+import org.codice.ddf.admin.ldap.persist.CreateLdapConfiguration;
 import org.codice.ddf.admin.ldap.persist.DeleteLdapConfiguration;
-import org.codice.ddf.admin.ldap.persist.SaveLdapConfiguration;
 import org.codice.ddf.internal.admin.configurator.actions.FeatureActions;
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
 import org.codice.ddf.internal.admin.configurator.actions.PropertyActions;
+import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
+
+import com.google.common.collect.ImmutableList;
 
 public class LdapFieldProvider extends BaseFieldProvider {
-
-    public static final String NAME = "ldap";
-
-    public static final String TYPE_NAME = "Ldap";
-
     public static final String DESCRIPTION = "Facilities for interacting with LDAP servers.";
 
-    //Discovery functions
-    private LdapRecommendedSettings getRecommendedSettings;
+    private static final String NAME = "ldap";
 
+    private static final String TYPE_NAME = "Ldap";
+
+    //Discovery
     private LdapTestConnection testConnection;
-
     private LdapTestBind testBind;
-
     private LdapTestSettings testSettings;
+    private LdapRecommendedSettings recommendedSettings;
+    private LdapQuery ldapQuery;
+    private LdapUserAttributes getUserAttris;
+    private LdapConfigurations getConfigs;
 
-    private LdapQuery runLdapQuery;
-
-    private LdapUserAttributes getLdapUserAttributes;
-
-    private LdapConfigurations getLdapConfigs;
-
-    //Mutation functions
-    private SaveLdapConfiguration saveConfig;
-
+    //Mutate
+    private CreateLdapConfiguration createConfig;
     private DeleteLdapConfiguration deleteConfig;
-
     private InstallEmbeddedLdap installEmbeddedLdap;
 
     public LdapFieldProvider(ConfiguratorFactory configuratorFactory, FeatureActions featureActions,
-            ManagedServiceActions managedServiceActions, PropertyActions propertyActions) {
+            ManagedServiceActions managedServiceActions, PropertyActions propertyActions,
+            ServiceActions serviceActions) {
         super(NAME, TYPE_NAME, DESCRIPTION);
-        getRecommendedSettings = new LdapRecommendedSettings();
         testConnection = new LdapTestConnection();
         testBind = new LdapTestBind();
         testSettings = new LdapTestSettings();
-        runLdapQuery = new LdapQuery();
-        getLdapUserAttributes = new LdapUserAttributes();
-        getLdapConfigs = new LdapConfigurations(configuratorFactory,
+        recommendedSettings = new LdapRecommendedSettings();
+        ldapQuery = new LdapQuery();
+        getUserAttris = new LdapUserAttributes();
+        getConfigs = new LdapConfigurations(managedServiceActions, propertyActions);
+
+        createConfig = new CreateLdapConfiguration(configuratorFactory,
+                featureActions,
                 managedServiceActions,
                 propertyActions);
-
-        saveConfig = new SaveLdapConfiguration(configuratorFactory,
-                propertyActions,
-                featureActions,
-                managedServiceActions);
         deleteConfig = new DeleteLdapConfiguration(configuratorFactory,
+                managedServiceActions,
                 propertyActions,
-                managedServiceActions);
+                serviceActions);
         installEmbeddedLdap = new InstallEmbeddedLdap(configuratorFactory, featureActions);
-        updateInnerFieldPaths();
     }
 
     @Override
     public List<Field> getDiscoveryFields() {
-        return Arrays.asList(testConnection,
+        return ImmutableList.of(testConnection,
                 testBind,
-                getRecommendedSettings,
                 testSettings,
-                runLdapQuery,
-                getLdapUserAttributes,
-                getLdapConfigs);
+                recommendedSettings,
+                ldapQuery,
+                getUserAttris,
+                getConfigs);
     }
 
     @Override
     public List<FunctionField> getMutationFunctions() {
-        return Arrays.asList(saveConfig, deleteConfig, installEmbeddedLdap);
+        return ImmutableList.of(createConfig, deleteConfig, installEmbeddedLdap);
     }
 }

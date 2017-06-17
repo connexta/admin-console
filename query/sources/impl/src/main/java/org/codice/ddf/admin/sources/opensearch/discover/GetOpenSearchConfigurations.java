@@ -13,7 +13,7 @@
  */
 package org.codice.ddf.admin.sources.opensearch.discover;
 
-import static org.codice.ddf.admin.common.services.ServiceCommons.serviceConfigurationExists;
+import static org.codice.ddf.admin.common.services.ServiceCommons.validateServiceConfigurationExists;
 import static org.codice.ddf.admin.sources.commons.utils.SourceUtilCommons.getSourceConfigurations;
 import static org.codice.ddf.admin.sources.services.OpenSearchServiceProperties.OPENSEARCH_FACTORY_PIDS;
 import static org.codice.ddf.admin.sources.services.OpenSearchServiceProperties.SERVICE_PROPS_TO_OPENSEARCH_CONFIG;
@@ -82,7 +82,7 @@ public class GetOpenSearchConfigurations extends BaseFunctionField<ListField<Sou
         }
 
         if (pid.getValue() != null) {
-            addMessages(serviceConfigurationExists(pid, serviceActions));
+            addMessages(validateServiceConfigurationExists(pid, serviceActions));
         }
     }
 

@@ -58,7 +58,7 @@ class UriFieldTest extends Specification {
 
         then:
         validationMsgs.size() == 1
-        validationMsgs[0].getCode() == DefaultMessages.INVALID_URI_ERROR
+        validationMsgs[0].getCode() == DefaultMessages.INVALID_URI
         validationMsgs[0].getPath() == [UriField.DEFAULT_FIELD_NAME]
 
         where:

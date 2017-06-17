@@ -26,9 +26,8 @@ public class LdapDistinguishedName extends StringField {
 
     public static final String FIELD_TYPE_NAME = "DistinguishedName";
 
-    // TODO: tbatie - 2/21/17 - Add examples of DN's here
     public static final String DESCRIPTION =
-            "A specific position within the Directory Information Tree (DIT).";
+            "A specific position within the Directory Information Tree (DIT). For more information visit https://www.ldap.com/ldap-dns-and-rdns.";
 
     public LdapDistinguishedName() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
@@ -38,21 +37,26 @@ public class LdapDistinguishedName extends StringField {
         super(fieldName, FIELD_TYPE_NAME, DESCRIPTION);
     }
 
+    public LdapDistinguishedName dn(String dn) {
+        setValue(dn);
+        return this;
+    }
+
     @Override
     public List<ErrorMessage> validate() {
         List<ErrorMessage> validationMsgs = super.validate();
-        if(!validationMsgs.isEmpty()) {
+        if (!validationMsgs.isEmpty()) {
             return validationMsgs;
         }
 
-        if(getValue() != null && !isValidDN(getValue())) {
-            validationMsgs.add(invalidDnFormatError(fieldName()));
+        if (getValue() != null && !isValidDN(getValue())) {
+            validationMsgs.add(invalidDnFormatError(path()));
         }
 
         return validationMsgs;
     }
 
-    public boolean isValidDN(String dn) {
+    private boolean isValidDN(String dn) {
         try {
             DN.valueOf(dn);
         } catch (Exception e) {

@@ -13,7 +13,7 @@
  */
 package org.codice.ddf.admin.sources.csw.discover;
 
-import static org.codice.ddf.admin.common.services.ServiceCommons.serviceConfigurationExists;
+import static org.codice.ddf.admin.common.services.ServiceCommons.validateServiceConfigurationExists;
 import static org.codice.ddf.admin.sources.commons.utils.SourceUtilCommons.getSourceConfigurations;
 import static org.codice.ddf.admin.sources.services.CswServiceProperties.CSW_FACTORY_PIDS;
 import static org.codice.ddf.admin.sources.services.CswServiceProperties.SERVICE_PROPS_TO_CSW_CONFIG;
@@ -82,7 +82,7 @@ public class GetCswConfigurations extends BaseFunctionField<ListField<SourceInfo
         }
 
         if (pid.getValue() != null) {
-            addMessages(serviceConfigurationExists(pid, serviceActions));
+            addMessages(validateServiceConfigurationExists(pid, serviceActions));
         }
     }
 

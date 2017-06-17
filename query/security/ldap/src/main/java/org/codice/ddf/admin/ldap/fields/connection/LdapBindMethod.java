@@ -20,7 +20,6 @@ import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 import com.google.common.collect.ImmutableList;
 
 public class LdapBindMethod extends BaseEnumField<String> {
-
     public static final String DEFAULT_FIELD_NAME = "bindMethod";
 
     public static final String FIELD_TYPE_NAME = "BindMethod";
@@ -31,21 +30,11 @@ public class LdapBindMethod extends BaseEnumField<String> {
 
     public static final String DIGEST_MD5_SASL = "DigestMD5SASL";
 
-    //  These fields are not currently supported for binding
-    //  public static final String SASL = "SASL";
-    //  public static final String GSSAPI_SASL = "GSSAPI SASL";
-
-    public static final LdapBindMethod SIMPLE_BIND_FIELD = new LdapBindMethod(new Simple());
-
-    public static final LdapBindMethod DIGEST_MD5_SASL_FIELD =
-            new LdapBindMethod(new DigestMd5Sasl());
-
-    public LdapBindMethod() {
+    LdapBindMethod() {
         this(null);
     }
 
-    // TODO: tbatie - 3/27/17 - Add constructor for supporting additional authtypes. Do this for all enum fields
-    protected LdapBindMethod(DataType<String> bindMethod) {
+    private LdapBindMethod(DataType<String> bindMethod) {
         super(DEFAULT_FIELD_NAME,
                 FIELD_TYPE_NAME,
                 DESCRIPTION,
@@ -56,12 +45,12 @@ public class LdapBindMethod extends BaseEnumField<String> {
     protected static final class Simple extends StringField {
         public static final String FIELD_NAME = SIMPLE;
 
-        public static final String FIELD_TYPE = SIMPLE;
-
         public static final String DESCRIPTION =
                 "Authenticates a client to a server, using a plaintext password";
 
-        public Simple() {
+        static final String FIELD_TYPE = SIMPLE;
+
+        Simple() {
             super(FIELD_NAME, FIELD_TYPE, DESCRIPTION);
         }
 
@@ -74,12 +63,12 @@ public class LdapBindMethod extends BaseEnumField<String> {
     protected static final class DigestMd5Sasl extends StringField {
         public static final String FIELD_NAME = DIGEST_MD5_SASL;
 
-        public static final String FIELD_TYPE = DIGEST_MD5_SASL;
-
         public static final String DESCRIPTION =
                 "Allows for password-based authentication without exposing the password in the clear (although it does require that both the client and the server have access to the clear-text password).";
 
-        public DigestMd5Sasl() {
+        static final String FIELD_TYPE = DIGEST_MD5_SASL;
+
+        DigestMd5Sasl() {
             super(FIELD_NAME, FIELD_TYPE, DESCRIPTION);
         }
 

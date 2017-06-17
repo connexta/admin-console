@@ -13,6 +13,7 @@
  **/
 package org.codice.ddf.admin.ldap.discover;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,14 +35,23 @@ import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.ByteString;
 import org.forgerock.opendj.ldap.SearchScope;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableList;
 
 public class LdapQuery extends BaseFunctionField<ListField<MapField>> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(LdapQuery.class);
 
-    public static final String NAME = "query";
+    public static final String FIELD_NAME = "query";
 
     public static final String DESCRIPTION = "Executes a query against LDAP.";
+
+    public static final String MAX_QUERY_FIELD_NAME = "maxQueryResults";
+
+    public static final String QUERY_BASE_FIELD_NAME = "queryBase";
+
+    private static final int DEFAULT_MAX_QUERY_RESULTS = 25;
 
     private LdapConnectionField conn;
 
@@ -49,66 +59,74 @@ public class LdapQuery extends BaseFunctionField<ListField<MapField>> {
 
     private IntegerField maxQueryResults;
 
-    private LdapDistinguishedName dn;
+    private LdapDistinguishedName queryBase;
 
     private LdapQueryField query;
 
     private LdapTestingUtils utils;
 
     public LdapQuery() {
-        super(NAME, DESCRIPTION, new ListFieldImpl<>(MapField.class));
-        conn = new LdapConnectionField();
-        creds = new LdapBindUserInfo();
-        maxQueryResults = new IntegerField("maxQueryResults");
-        dn = new LdapDistinguishedName("queryBase");
+        super(FIELD_NAME, DESCRIPTION, new ListFieldImpl<>(MapField.class));
+        conn = new LdapConnectionField().useDefaultRequired();
+        creds = new LdapBindUserInfo().useDefaultRequired();
+        maxQueryResults = new IntegerField(MAX_QUERY_FIELD_NAME);
+        queryBase = new LdapDistinguishedName(QUERY_BASE_FIELD_NAME);
+        queryBase.isRequired(true);
         query = new LdapQueryField();
-        utils = new LdapTestingUtils();
+        query.isRequired(true);
         updateArgumentPaths();
+
+        utils = new LdapTestingUtils();
     }
 
     @Override
     public List<DataType> getArguments() {
-        // TODO: tbatie - 4/3/17 - Add other args
-        return ImmutableList.of(conn, creds, dn, maxQueryResults, query);
+        return ImmutableList.of(conn, creds, maxQueryResults, queryBase, query);
     }
 
     @Override
     public ListField<MapField> performFunction() {
-
-        LdapConnectionAttempt connectionAttempt = utils.bindUserToLdapConnection(conn, creds);
-        addResultMessages(connectionAttempt.messages());
-
-        if(!connectionAttempt.connection().isPresent()) {
-            return null;
-        }
-
-        List<SearchResultEntry> searchResults = utils.getLdapQueryResults(
-                connectionAttempt.connection().get(),
-                dn.getValue(),
-                query.getValue(),
-                SearchScope.WHOLE_SUBTREE,
-                maxQueryResults.getValue());
-
+        List<SearchResultEntry> searchResults;
         List<MapField> convertedSearchResults = new ArrayList<>();
+        ListField<MapField> entries;
+        try (LdapConnectionAttempt connectionAttempt = utils.bindUserToLdapConnection(conn,
+                creds)) {
+            addMessages(connectionAttempt);
 
-        for (SearchResultEntry entry : searchResults) {
-            MapField entryMap = new MapField();
-            for (Attribute attri : entry.getAllAttributes()) {
-                entryMap.put("name",
-                        entry.getName()
-                                .toString());
-                if (!attri.getAttributeDescriptionAsString()
-                        .toLowerCase()
-                        .contains("password")) {
-                    List<String> attributeValueList = attri.parallelStream()
-                            .map(ByteString::toString)
-                            .collect(Collectors.toList());
-                    String attributeValue = attributeValueList.size() == 1 ? attributeValueList.get(
-                            0) : attributeValueList.toString();
-                    entryMap.put(attri.getAttributeDescriptionAsString(), attributeValue);
-                }
+            if (containsErrorMsgs()) {
+                return null;
             }
-            convertedSearchResults.add(entryMap);
+
+            searchResults = utils.getLdapQueryResults(connectionAttempt.result(),
+                    queryBase.getValue(),
+                    query.getValue(),
+                    SearchScope.WHOLE_SUBTREE,
+                    maxQueryResults.getValue() == null ?
+                            DEFAULT_MAX_QUERY_RESULTS :
+                            maxQueryResults.getValue());
+
+            for (SearchResultEntry entry : searchResults) {
+                MapField entryMap = new MapField();
+                for (Attribute attri : entry.getAllAttributes()) {
+                    entryMap.put("name",
+                            entry.getName()
+                                    .toString());
+                    if (!attri.getAttributeDescriptionAsString()
+                            .toLowerCase()
+                            .contains("password")) {
+                        List<String> attributeValueList = attri.parallelStream()
+                                .map(ByteString::toString)
+                                .collect(Collectors.toList());
+                        String attributeValue = attributeValueList.size() == 1 ?
+                                attributeValueList.get(0) :
+                                attributeValueList.toString();
+                        entryMap.put(attri.getAttributeDescriptionAsString(), attributeValue);
+                    }
+                }
+                convertedSearchResults.add(entryMap);
+            }
+        } catch (IOException e) {
+            LOGGER.warn("Error closing LDAP connection", e);
         }
 
         return new ListFieldImpl<>(MapField.class).addAll(convertedSearchResults);
@@ -117,5 +135,17 @@ public class LdapQuery extends BaseFunctionField<ListField<MapField>> {
     @Override
     public FunctionField<ListField<MapField>> newInstance() {
         return new LdapQuery();
+    }
+
+    /**
+     * Intentionally scoped as private.
+     * This is a test support method to be invoked by Spock tests which will elevate scope as needed
+     * in order to execute. If Java-based unit tests are ever needed, this scope will need to be
+     * updated to package-private.
+     *
+     * @param utils Ldap support utilities
+     */
+    private void setTestingUtils(LdapTestingUtils utils) {
+        this.utils = utils;
     }
 }

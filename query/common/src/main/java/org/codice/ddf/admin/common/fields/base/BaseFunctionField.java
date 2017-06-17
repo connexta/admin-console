@@ -99,7 +99,7 @@ public abstract class BaseFunctionField<T extends DataType> extends BaseField<Ma
         getArguments().stream()
                 .map(DataType::validate)
                 .flatMap(Collection<ErrorMessage>::stream)
-                .forEach(msg -> addArgumentMessage(msg));
+                .forEach(this::addArgumentMessage);
     }
 
     protected boolean containsErrorMsgs() {

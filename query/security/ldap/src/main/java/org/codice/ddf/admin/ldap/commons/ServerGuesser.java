@@ -31,6 +31,7 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.codice.ddf.admin.ldap.fields.query.LdapTypeField;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.opendj.ldap.Entries;
@@ -61,14 +62,15 @@ public abstract class ServerGuesser {
     private static final Logger LOGGER = LoggerFactory.getLogger(ServerGuesser.class);
 
     private static final Map<String, Function<Connection, ServerGuesser>> GUESSER_LOOKUP =
-            ImmutableMap.of("activeDirectory",
+            ImmutableMap.of(LdapTypeField.ACTIVE_DIRECTORY,
                     ServerGuesser.ADGuesser::new,
-                    "embeddedLdap",
+                    LdapTypeField.EMBEDDED,
                     ServerGuesser.EmbeddedGuesser::new,
-                    "openLdap",
+                    LdapTypeField.OPEN_LDAP,
                     ServerGuesser.OpenLdapGuesser::new,
-                    "openDj",
-                    ServerGuesser.OpenDjGuesser::new);
+                    LdapTypeField.OPEN_DJ,
+                    ServerGuesser.OpenDjGuesser::new,
+                    LdapTypeField.UNKNOWN, DefaultGuesser::new);
 
     protected final Connection connection;
 
@@ -83,6 +85,10 @@ public abstract class ServerGuesser {
         return Optional.ofNullable(GUESSER_LOOKUP.get(ldapType))
                 .orElse(DefaultGuesser::new)
                 .apply(connection);
+    }
+
+    public static ServerGuesser buildGuesser(Connection connection) {
+        return buildGuesser(null, connection);
     }
 
     public List<String> getBaseContexts() {

@@ -24,8 +24,7 @@ import org.codice.ddf.admin.ldap.fields.connection.LdapConnectionField;
 import com.google.common.collect.ImmutableList;
 
 public class LdapConfigurationField extends BaseObjectField {
-
-    public static final String FIELD_NAME = "config";
+    public static final String DEFAULT_FIELD_NAME = "config";
 
     public static final String FIELD_TYPE_NAME = "LdapConfiguration";
 
@@ -41,12 +40,40 @@ public class LdapConfigurationField extends BaseObjectField {
     private LdapSettingsField settings;
 
     public LdapConfigurationField() {
-        super(FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
+        super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
         pid = new PidField();
         connection = new LdapConnectionField();
         bindUserInfo = new LdapBindUserInfo();
         settings = new LdapSettingsField();
         updateInnerFieldPaths();
+    }
+
+    //Field getters
+    public LdapConnectionField connectionField() {
+        return connection;
+    }
+
+    public LdapBindUserInfo bindUserInfoField() {
+        return bindUserInfo;
+    }
+
+    public LdapSettingsField settingsField() {
+        return settings;
+    }
+
+    public PidField pidField() {
+        return pid;
+    }
+
+    //Value getters
+    public String pid() {
+        return pid.getValue();
+    }
+
+    //Value setters
+    public LdapConfigurationField pid(String pid) {
+        this.pid.setValue(pid);
+        return this;
     }
 
     public LdapConfigurationField connection(LdapConnectionField connection) {
@@ -64,31 +91,6 @@ public class LdapConfigurationField extends BaseObjectField {
         return this;
     }
 
-    //Field getters
-    // TODO: tbatie - 4/11/17 - Rename these to -field
-    public LdapConnectionField connectionField() {
-        return connection;
-    }
-
-    public LdapBindUserInfo bindUserInfoField() {
-        return bindUserInfo;
-    }
-
-    public LdapSettingsField settingsField() {
-        return settings;
-    }
-
-    //Value getters
-    public String pid() {
-        return pid.getValue();
-    }
-
-    //Setters
-    public LdapConfigurationField pid(String pid) {
-        this.pid.setValue(pid);
-        return this;
-    }
-
     @Override
     public List<Field> getFields() {
         return ImmutableList.of(pid, connection, bindUserInfo, settings);
@@ -97,6 +99,14 @@ public class LdapConfigurationField extends BaseObjectField {
     @Override
     public LdapConfigurationField allFieldsRequired(boolean required) {
         super.allFieldsRequired(required);
+        return this;
+    }
+
+    public LdapConfigurationField useDefaultRequired() {
+        connection.useDefaultRequired();
+        bindUserInfo.useDefaultRequired();
+        settings.useDefaultAuthentication();
+        isRequired(true);
         return this;
     }
 }

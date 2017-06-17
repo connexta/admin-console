@@ -13,33 +13,22 @@
  **/
 package org.codice.ddf.admin.ldap.discover;
 
-import java.util.List;
-
-import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.api.fields.ListField;
-import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
-import org.codice.ddf.admin.common.fields.common.PidField;
-import org.codice.ddf.admin.configurator.ConfiguratorFactory;
-import org.codice.ddf.admin.ldap.commons.services.LdapServiceCommons;
+import org.codice.ddf.admin.common.fields.base.function.GetFunctionField;
+import org.codice.ddf.admin.ldap.commons.LdapServiceCommons;
 import org.codice.ddf.admin.ldap.fields.config.LdapConfigurationField;
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
 import org.codice.ddf.internal.admin.configurator.actions.PropertyActions;
 
-import com.google.common.collect.ImmutableList;
+public class LdapConfigurations extends GetFunctionField<ListField<LdapConfigurationField>> {
 
-public class LdapConfigurations extends BaseFunctionField<ListField<LdapConfigurationField>> {
-
-    public static final String NAME = "configs";
-
-    public static final String CONFIGS_ARG_NAME = "configs";
+    public static final String FIELD_NAME = "configs";
 
     public static final String DESCRIPTION = "Retrieves all currently configured LDAP settings.";
 
-    private PidField pid;
-
-    private ConfiguratorFactory configuratorFactory;
+    private static final String CONFIGS_ARG_NAME = "configs";
 
     private final ManagedServiceActions managedServiceActions;
 
@@ -47,22 +36,15 @@ public class LdapConfigurations extends BaseFunctionField<ListField<LdapConfigur
 
     private LdapServiceCommons serviceCommons;
 
-    public LdapConfigurations(ConfiguratorFactory configuratorFactory,
-            ManagedServiceActions managedServiceActions, PropertyActions propertyActions) {
-        super(NAME, DESCRIPTION, new ListFieldImpl<>(CONFIGS_ARG_NAME, LdapConfigurationField.class));
-        this.configuratorFactory = configuratorFactory;
+    public LdapConfigurations(ManagedServiceActions managedServiceActions, PropertyActions propertyActions) {
+        super(FIELD_NAME,
+                DESCRIPTION,
+                new ListFieldImpl<>(CONFIGS_ARG_NAME, LdapConfigurationField.class));
         this.managedServiceActions = managedServiceActions;
         this.propertyActions = propertyActions;
-
-        pid = new PidField();
         updateArgumentPaths();
 
-        serviceCommons = new LdapServiceCommons(propertyActions, managedServiceActions);
-    }
-
-    @Override
-    public List<DataType> getArguments() {
-        return ImmutableList.of(pid);
+        serviceCommons = new LdapServiceCommons(this.propertyActions, this.managedServiceActions);
     }
 
     @Override
@@ -72,6 +54,6 @@ public class LdapConfigurations extends BaseFunctionField<ListField<LdapConfigur
 
     @Override
     public FunctionField<ListField<LdapConfigurationField>> newInstance() {
-        return new LdapConfigurations(configuratorFactory, managedServiceActions, propertyActions);
+        return new LdapConfigurations(managedServiceActions, propertyActions);
     }
 }

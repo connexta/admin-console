@@ -13,6 +13,7 @@
  **/
 package org.codice.ddf.admin.ldap.discover;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.codice.ddf.admin.api.DataType;
@@ -25,12 +26,15 @@ import org.codice.ddf.admin.ldap.fields.connection.LdapBindUserInfo;
 import org.codice.ddf.admin.ldap.fields.connection.LdapConnectionField;
 import org.codice.ddf.admin.ldap.fields.query.LdapRecommendedSettingsField;
 import org.codice.ddf.admin.ldap.fields.query.LdapTypeField;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableList;
 
 public class LdapRecommendedSettings extends BaseFunctionField<LdapRecommendedSettingsField> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(LdapRecommendedSettings.class);
 
-    public static final String NAME = "recommendedSettings";
+    public static final String FIELD_NAME = "recommendedSettings";
 
     public static final String DESCRIPTION =
             "Attempts to retrieve recommended settings from the LDAP connection.";
@@ -44,12 +48,14 @@ public class LdapRecommendedSettings extends BaseFunctionField<LdapRecommendedSe
     private LdapTestingUtils utils;
 
     public LdapRecommendedSettings() {
-        super(NAME, DESCRIPTION, new LdapRecommendedSettingsField());
-        conn = new LdapConnectionField();
-        creds = new LdapBindUserInfo();
+        super(FIELD_NAME, DESCRIPTION, new LdapRecommendedSettingsField());
+        conn = new LdapConnectionField().useDefaultRequired();
+        creds = new LdapBindUserInfo().useDefaultRequired();
         ldapType = new LdapTypeField();
-        utils = new LdapTestingUtils();
+        ldapType.isRequired(true);
         updateArgumentPaths();
+
+        utils = new LdapTestingUtils();
     }
 
     @Override
@@ -59,28 +65,44 @@ public class LdapRecommendedSettings extends BaseFunctionField<LdapRecommendedSe
 
     @Override
     public LdapRecommendedSettingsField performFunction() {
-        LdapConnectionAttempt connectionAttempt = utils.bindUserToLdapConnection(conn, creds);
-        addResultMessages(connectionAttempt.messages());
-        if(!connectionAttempt.connection().isPresent()) {
+        try (LdapConnectionAttempt connectionAttempt = utils.bindUserToLdapConnection(conn,
+                creds)) {
+            addMessages(connectionAttempt);
+
+            if (!connectionAttempt.isResultPresent()) {
+                return null;
+            }
+
+            ServerGuesser guesser = ServerGuesser.buildGuesser(ldapType.getValue(),
+                    connectionAttempt.result());
+
+            return new LdapRecommendedSettingsField().userDns(guesser.getUserBaseChoices())
+                    .groupDns(guesser.getGroupBaseChoices())
+                    .userNameAttributes(guesser.getUserNameAttribute())
+                    .groupObjectClasses(guesser.getGroupObjectClass())
+                    .groupAttributesHoldingMember(guesser.getGroupAttributeHoldingMember())
+                    .memberAttributesReferencedInGroup(guesser.getMemberAttributeReferencedInGroup())
+                    .queryBases(guesser.getBaseContexts());
+        } catch (IOException e) {
+            LOGGER.warn("Error closing LDAP connection", e);
             return null;
         }
-
-        ServerGuesser guesser = ServerGuesser.buildGuesser(ldapType.getValue(),
-                connectionAttempt.connection()
-                        .get());
-
-        return new LdapRecommendedSettingsField()
-                .userDns(guesser.getUserBaseChoices())
-                .groupDns(guesser.getGroupBaseChoices())
-                .userNameAttributes(guesser.getUserNameAttribute())
-                .groupObjectClasses(guesser.getGroupObjectClass())
-                .groupAttributesHoldingMember(guesser.getGroupAttributeHoldingMember())
-                .memberAttributesReferencedInGroup(guesser.getMemberAttributeReferencedInGroup())
-                .queryBases(guesser.getBaseContexts());
     }
 
     @Override
     public FunctionField<LdapRecommendedSettingsField> newInstance() {
         return new LdapRecommendedSettings();
+    }
+
+    /**
+     * Intentionally scoped as private.
+     * This is a test support method to be invoked by Spock tests which will elevate scope as needed
+     * in order to execute. If Java-based unit tests are ever needed, this scope will need to be
+     * updated to package-private.
+     *
+     * @param utils Ldap support utilities
+     */
+    private void setTestingUtils(LdapTestingUtils utils) {
+        this.utils = utils;
     }
 }

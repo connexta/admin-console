@@ -1,0 +1,76 @@
+dn: dc=example,dc=com
+changetype: add
+objectClass: top
+objectClass: domain
+dc: example
+
+dn: ou=groups,dc=example,dc=com
+changetype: add
+objectClass: organizationalUnit
+objectClass: top
+ou: groups
+
+dn: ou=ignorelevel,dc=example,dc=com
+changetype: add
+objectClass: organizationalUnit
+objectClass: top
+ou: ignorelevel
+
+dn: ou=groups,ou=ignorelevel,dc=example,dc=com
+changetype: add
+objectClass: organizationalUnit
+objectClass: top
+ou: groups
+
+dn: ou=emptygroups,dc=example,dc=com
+changetype: add
+objectClass: organizationalUnit
+objectClass: top
+ou: emptygroups
+
+dn: cn=avengers,ou=groups,dc=example,dc=com
+changetype: add
+objectClass: groupOfNames
+objectClass: top
+member: uid=tstark,ou=users,dc=example,dc=com
+member: uid=bbanner,ou=users,dc=example,dc=com
+cn: avengers
+
+dn: ou=users,dc=example,dc=com
+changetype: add
+objectClass: organizationalUnit
+objectClass: top
+ou: organizationalUnit
+ou: users
+
+dn: ou=emptyusers,dc=example,dc=com
+changetype: add
+objectClass: organizationalUnit
+objectClass: top
+ou: organizationalUnit
+ou: emptyusers
+
+dn: uid=tstark,ou=users,dc=example,dc=com
+changetype: add
+objectClass: person
+objectClass: top
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+cn: Tony Stark
+sn: tstark
+employeeType: ironman
+userPassword: password1
+uid: tstark
+
+dn: uid=bbanner,ou=users,dc=example,dc=com
+changetype: add
+objectClass: person
+objectClass: top
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+cn: Bruce Banner
+sn: bbanner
+employeeType: hulk
+userPassword: password1
+uid: bbanner
+

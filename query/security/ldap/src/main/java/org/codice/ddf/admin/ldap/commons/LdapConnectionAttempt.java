@@ -13,38 +13,39 @@
  **/
 package org.codice.ddf.admin.ldap.commons;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.io.Closeable;
+import java.io.IOException;
 
 import org.codice.ddf.admin.api.report.ErrorMessage;
+import org.codice.ddf.admin.common.report.ReportWithResultImpl;
 import org.forgerock.opendj.ldap.Connection;
 
-public class LdapConnectionAttempt {
-
-    private List<ErrorMessage> msgs;
-    private Optional<Connection> connection;
+public class LdapConnectionAttempt extends ReportWithResultImpl<Connection> implements Closeable {
 
     public LdapConnectionAttempt() {
-        this.msgs = new ArrayList<>();
-        connection = Optional.empty();
-    }
-
-    public LdapConnectionAttempt(ErrorMessage msg) {
-        this();
-        msgs.add(msg);
+        super();
     }
 
     public LdapConnectionAttempt(Connection connection) {
-        this();
-        this.connection = Optional.of(connection);
+        super(connection);
     }
 
-    public List<ErrorMessage> messages() {
-        return msgs;
+    @Override
+    public LdapConnectionAttempt addArgumentMessage(ErrorMessage message) {
+        super.addArgumentMessage(message);
+        return this;
     }
 
-    public Optional<Connection> connection() {
-        return connection;
+    @Override
+    public LdapConnectionAttempt addResultMessage(ErrorMessage message) {
+        super.addResultMessage(message);
+        return this;
+    }
+
+    @Override
+    public void close() throws IOException {
+        if (isResultPresent() && !result().isClosed()) {
+            result().close();
+        }
     }
 }

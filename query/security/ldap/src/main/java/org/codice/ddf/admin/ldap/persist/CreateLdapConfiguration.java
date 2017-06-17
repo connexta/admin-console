@@ -13,9 +13,10 @@
  **/
 package org.codice.ddf.admin.ldap.persist;
 
+import static org.codice.ddf.admin.common.report.message.DefaultMessages.failedPersistError;
 import static org.codice.ddf.admin.ldap.fields.config.LdapUseCase.ATTRIBUTE_STORE;
-import static org.codice.ddf.admin.ldap.fields.config.LdapUseCase.LOGIN;
-import static org.codice.ddf.admin.ldap.fields.config.LdapUseCase.LOGIN_AND_ATTRIBUTE_STORE;
+import static org.codice.ddf.admin.ldap.fields.config.LdapUseCase.AUTHENTICATION;
+import static org.codice.ddf.admin.ldap.fields.config.LdapUseCase.AUTHENTICATION_AND_ATTRIBUTE_STORE;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -25,13 +26,12 @@ import java.util.UUID;
 
 import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
-import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
-import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
+import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.configurator.Configurator;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.configurator.OperationReport;
-import org.codice.ddf.admin.ldap.commons.services.LdapServiceCommons;
+import org.codice.ddf.admin.ldap.commons.LdapServiceCommons;
 import org.codice.ddf.admin.ldap.fields.config.LdapConfigurationField;
 import org.codice.ddf.admin.security.common.services.LdapClaimsHandlerServiceProperties;
 import org.codice.ddf.admin.security.common.services.LdapLoginServiceProperties;
@@ -41,37 +41,37 @@ import org.codice.ddf.internal.admin.configurator.actions.PropertyActions;
 
 import com.google.common.collect.ImmutableList;
 
-public class SaveLdapConfiguration extends BaseFunctionField<ListField<LdapConfigurationField>> {
+public class CreateLdapConfiguration extends BaseFunctionField<BooleanField> {
 
-    public static final String NAME = "saveLdapConfig";
+    public static final String FIELD_NAME = "createLdapConfig";
 
-    public static final String DESCRIPTION = "Saves the LDAP configuration.";
+    public static final String DESCRIPTION = "Creates a LDAP configuration.";
 
     private LdapConfigurationField config;
 
-    private ConfiguratorFactory configuratorFactory;
-
-    private final PropertyActions propertyActions;
+    private final ConfiguratorFactory configuratorFactory;
 
     private final FeatureActions featureActions;
 
     private final ManagedServiceActions managedServiceActions;
 
-    private LdapServiceCommons serviceCommons;
+    private final PropertyActions propertyActions;
 
-    public SaveLdapConfiguration(ConfiguratorFactory configuratorFactory,
-            PropertyActions propertyActions, FeatureActions featureActions,
-            ManagedServiceActions managedServiceActions) {
-        super(NAME, DESCRIPTION, new ListFieldImpl<>(LdapConfigurationField.class));
+    private LdapServiceCommons ldapServiceCommons;
 
-        this.propertyActions = propertyActions;
+    public CreateLdapConfiguration(ConfiguratorFactory configuratorFactory,
+            FeatureActions featureActions, ManagedServiceActions managedServiceActions,
+            PropertyActions propertyActions) {
+        super(FIELD_NAME, DESCRIPTION, new BooleanField());
+        this.configuratorFactory = configuratorFactory;
         this.featureActions = featureActions;
         this.managedServiceActions = managedServiceActions;
-        config = new LdapConfigurationField();
+        this.propertyActions = propertyActions;
+
+        config = new LdapConfigurationField().useDefaultRequired();
         updateArgumentPaths();
 
-        this.configuratorFactory = configuratorFactory;
-        this.serviceCommons = new LdapServiceCommons(this.propertyActions,
+        this.ldapServiceCommons = new LdapServiceCommons(this.propertyActions,
                 this.managedServiceActions);
     }
 
@@ -81,54 +81,71 @@ public class SaveLdapConfiguration extends BaseFunctionField<ListField<LdapConfi
     }
 
     @Override
-    public ListField<LdapConfigurationField> performFunction() {
+    public BooleanField performFunction() {
         Configurator configurator = configuratorFactory.getConfigurator();
-        if (config.settingsField()
-                .useCase()
-                .equals(LOGIN) || config.settingsField()
-                .useCase()
-                .equals(LOGIN_AND_ATTRIBUTE_STORE)) {
 
+        switch (config.settingsField()
+                .useCase()) {
+        case AUTHENTICATION:
+        case AUTHENTICATION_AND_ATTRIBUTE_STORE: {
             Map<String, Object> ldapLoginServiceProps =
-                    serviceCommons.ldapConfigurationToLdapLoginService(config);
+                    ldapServiceCommons.ldapConfigurationToLdapLoginService(config);
             configurator.add(featureActions.start(LdapLoginServiceProperties.LDAP_LOGIN_FEATURE));
             configurator.add(managedServiceActions.create(LdapLoginServiceProperties.LDAP_LOGIN_MANAGED_SERVICE_FACTORY_PID,
                     ldapLoginServiceProps));
         }
+        }
 
-        if (config.settingsField()
-                .useCase()
-                .equals(ATTRIBUTE_STORE) || config.settingsField()
-                .useCase()
-                .equals(LOGIN_AND_ATTRIBUTE_STORE)) {
-
+        switch (config.settingsField()
+                .useCase()) {
+        case ATTRIBUTE_STORE:
+        case AUTHENTICATION_AND_ATTRIBUTE_STORE: {
             Path newAttributeMappingPath = Paths.get(System.getProperty("ddf.home"),
                     "etc",
                     "ws-security",
                     "ldapAttributeMap-" + UUID.randomUUID()
                             .toString() + ".props");
             Map<String, Object> ldapClaimsServiceProps =
-                    LdapServiceCommons.ldapConfigToLdapClaimsHandlerService(config);
+                    ldapServiceCommons.ldapConfigToLdapClaimsHandlerService(config,
+                            newAttributeMappingPath.toString());
             configurator.add(propertyActions.create(newAttributeMappingPath,
                     config.settingsField()
                             .attributeMap()));
             configurator.add(featureActions.start(LdapClaimsHandlerServiceProperties.LDAP_CLAIMS_HANDLER_FEATURE));
-            configurator.add(managedServiceActions.create(LdapClaimsHandlerServiceProperties.LDAP_CLAIMS_HANDLER_MANAGED_SERVICE_FACTORY_PID,
-                    ldapClaimsServiceProps));
+            configurator.add(managedServiceActions.create(LdapClaimsHandlerServiceProperties.LDAP_CLAIMS_HANDLER_MANAGED_SERVICE_FACTORY_PID, ldapClaimsServiceProps));
+        }
         }
 
-        OperationReport report = configurator.commit("LDAP Configuration saved with details: {}",
-                config.toString());
+        OperationReport report = configurator.commit("Creating LDAP configuration.");
 
-        // TODO: tbatie - 4/3/17 - Handle error messages
-        return serviceCommons.getLdapConfigurations();
+        if (report.containsFailedResults()) {
+            addResultMessage(failedPersistError());
+        }
+
+        return new BooleanField(!containsErrorMsgs());
     }
 
     @Override
-    public FunctionField<ListField<LdapConfigurationField>> newInstance() {
-        return new SaveLdapConfiguration(configuratorFactory,
-                propertyActions,
+    public void validate() {
+        if (config.settingsField().useCase() != null && (config.settingsField().useCase()
+                .equals(ATTRIBUTE_STORE) || config.settingsField().useCase()
+                .equals(AUTHENTICATION_AND_ATTRIBUTE_STORE))) {
+            config.settingsField().useDefaultAttributeStore();
+        }
+
+        super.validate();
+        if (containsErrorMsgs()) {
+            return;
+        }
+
+        addMessages(ldapServiceCommons.validateSimilarLdapServiceExists(config));
+    }
+
+    @Override
+    public FunctionField<BooleanField> newInstance() {
+        return new CreateLdapConfiguration(configuratorFactory,
                 featureActions,
-                managedServiceActions);
+                managedServiceActions,
+                propertyActions);
     }
 }

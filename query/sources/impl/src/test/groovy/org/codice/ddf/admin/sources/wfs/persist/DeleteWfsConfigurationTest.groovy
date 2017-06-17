@@ -95,7 +95,7 @@ class DeleteWfsConfigurationTest extends Specification {
         then:
         !report.result().getValue()
         report.messages().size() == 1
-        report.messages().get(0).code == DefaultMessages.FAILED_DELETE_ERROR
+        report.messages().get(0).code == DefaultMessages.FAILED_PERSIST
         report.messages().get(0).path == RESULT_ARGUMENT_PATH
     }
 

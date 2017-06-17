@@ -16,6 +16,7 @@ package org.codice.ddf.admin.common.fields.common;
 import static org.codice.ddf.admin.common.report.message.DefaultMessages.duplicateMapKeyError;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.api.Field;
@@ -76,6 +77,14 @@ public class MapField extends BaseObjectField {
                 .stream()
                 .anyMatch(pair -> pair.key()
                         .equals(key));
+    }
+
+    public Optional<PairField> getEntry(String key) {
+        return entries.getList()
+                .stream()
+                .filter(entry -> entry.key()
+                        .equals(key))
+                .findFirst();
     }
 
     public boolean isEmpty() {

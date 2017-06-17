@@ -21,7 +21,7 @@ import com.google.common.collect.ImmutableList;
 
 public class LdapEncryptionMethodField extends BaseEnumField<String> {
 
-    public static final String FIELD_NAME = "encryption";
+    public static final String DEFAULT_FIELD_NAME = "encryption";
 
     public static final String FIELD_TYPE_NAME = "EncryptionMethod";
 
@@ -34,21 +34,12 @@ public class LdapEncryptionMethodField extends BaseEnumField<String> {
 
     public static final String START_TLS = "startTls";
 
-    public static final LdapEncryptionMethodField NO_ENCRYPTION_FIELD =
-            new LdapEncryptionMethodField(new NoEncryption());
-
-    public static final LdapEncryptionMethodField LDAPS_ENCRYPTION_FIELD =
-            new LdapEncryptionMethodField(new LdapsEncryption());
-
-    public static final LdapEncryptionMethodField START_TLS_FIELD = new LdapEncryptionMethodField(
-            new StartTlsEncryption());
-
     public LdapEncryptionMethodField() {
         this(null);
     }
 
     protected LdapEncryptionMethodField(DataType<String> encryptionMethod) {
-        super(FIELD_NAME,
+        super(DEFAULT_FIELD_NAME,
                 FIELD_TYPE_NAME,
                 DESCRIPTION,
                 ImmutableList.of(new NoEncryption(),
@@ -60,7 +51,7 @@ public class LdapEncryptionMethodField extends BaseEnumField<String> {
     protected static final class NoEncryption extends StringField {
         public static final String DESCRIPTION = "No encryption enabled for LDAP connection";
 
-        public NoEncryption() {
+        NoEncryption() {
             super(NONE, NONE, DESCRIPTION);
         }
 
@@ -74,7 +65,7 @@ public class LdapEncryptionMethodField extends BaseEnumField<String> {
 
         public static final String DESCRIPTION = "Secure LDAPS encryption.";
 
-        public LdapsEncryption() {
+        LdapsEncryption() {
             super(LDAPS, LDAPS, DESCRIPTION);
         }
 
@@ -88,7 +79,7 @@ public class LdapEncryptionMethodField extends BaseEnumField<String> {
         public static final String DESCRIPTION =
                 "Attempts to upgrade a non encrypted connection to LDAPS.";
 
-        public StartTlsEncryption() {
+        StartTlsEncryption() {
             super(START_TLS, START_TLS, DESCRIPTION);
         }
 
@@ -97,5 +88,4 @@ public class LdapEncryptionMethodField extends BaseEnumField<String> {
             return START_TLS;
         }
     }
-
 }

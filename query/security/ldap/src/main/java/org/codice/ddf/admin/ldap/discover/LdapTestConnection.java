@@ -13,6 +13,7 @@
  **/
 package org.codice.ddf.admin.ldap.discover;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.codice.ddf.admin.api.DataType;
@@ -22,24 +23,29 @@ import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.ldap.commons.LdapConnectionAttempt;
 import org.codice.ddf.admin.ldap.commons.LdapTestingUtils;
 import org.codice.ddf.admin.ldap.fields.connection.LdapConnectionField;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableList;
 
 public class LdapTestConnection extends TestFunctionField {
+    private static final Logger LOGGER = LoggerFactory.getLogger(LdapTestConnection.class);
 
-    public static final String NAME = "testConnect";
+    public static final String FIELD_NAME = "testConnect";
 
     public static final String DESCRIPTION =
             "Attempts to established a connection with the given connection configuration";
 
     private LdapConnectionField connection;
+
     private LdapTestingUtils utils;
 
     public LdapTestConnection() {
-        super(NAME, DESCRIPTION);
-        connection = new LdapConnectionField();
-        utils = new LdapTestingUtils();
+        super(FIELD_NAME, DESCRIPTION);
+        connection = new LdapConnectionField().useDefaultRequired();
         updateArgumentPaths();
+
+        utils = new LdapTestingUtils();
     }
 
     @Override
@@ -47,16 +53,31 @@ public class LdapTestConnection extends TestFunctionField {
         return ImmutableList.of(connection);
     }
 
-    // Possible message types: CANNOT_CONFIGURE, CANNOT_CONNECT
     @Override
     public BooleanField performFunction() {
-        LdapConnectionAttempt connectionAttempt = utils.getLdapConnection(connection);
-        addResultMessages(connectionAttempt.messages());
-        return new BooleanField(connectionAttempt.connection().isPresent());
+        try (LdapConnectionAttempt ldapConnectionAttempt = utils.getLdapConnection(connection)) {
+            addMessages(ldapConnectionAttempt);
+            return new BooleanField(!containsErrorMsgs());
+        } catch (IOException e) {
+            LOGGER.warn("Error closing LDAP connection", e);
+            return new BooleanField(false);
+        }
     }
 
     @Override
     public FunctionField<BooleanField> newInstance() {
         return new LdapTestConnection();
+    }
+
+    /**
+     * Intentionally scoped as private.
+     * This is a test support method to be invoked by Spock tests which will elevate scope as needed
+     * in order to execute. If Java-based unit tests are ever needed, this scope will need to be
+     * updated to package-private.
+     *
+     * @param utils Ldap support utilities
+     */
+    private void setTestingUtils(LdapTestingUtils utils) {
+        this.utils = utils;
     }
 }

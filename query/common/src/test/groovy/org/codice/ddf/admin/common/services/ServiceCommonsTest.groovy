@@ -22,6 +22,8 @@ import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions
 import spock.lang.Specification
 
+import static org.codice.ddf.admin.common.services.ServiceCommons.validateServiceConfigurationExists
+
 class ServiceCommonsTest extends Specification {
 
     ConfiguratorFactory configuratorFactory
@@ -86,7 +88,7 @@ class ServiceCommonsTest extends Specification {
 
         then:
         report.messages().size() == 1
-        report.messages()[0].getCode() == DefaultMessages.FAILED_UPDATE_ERROR
+        report.messages()[0].getCode() == DefaultMessages.FAILED_PERSIST
         report.messages()[0].getPath() == []
     }
 
@@ -110,7 +112,7 @@ class ServiceCommonsTest extends Specification {
 
         then:
         report.messages().size() == 1
-        report.messages()[0].getCode() == DefaultMessages.FAILED_DELETE_ERROR
+        report.messages()[0].getCode() == DefaultMessages.FAILED_PERSIST
         report.messages()[0].getPath() == []
     }
 
@@ -119,7 +121,7 @@ class ServiceCommonsTest extends Specification {
         serviceActions.read(_) >> ['config':'exists']
 
         when:
-        def report = ServiceCommons.serviceConfigurationExists(createTestField('testValue'), serviceActions)
+        def report = validateServiceConfigurationExists(createTestField('testValue'), serviceActions)
 
         then:
         report.messages().size() == 0
@@ -130,7 +132,7 @@ class ServiceCommonsTest extends Specification {
         serviceActions.read(_) >> [:]
 
         when:
-        def report = ServiceCommons.serviceConfigurationExists(createTestField('testValue'), serviceActions)
+        def report = validateServiceConfigurationExists(createTestField('testValue'), serviceActions)
 
         then:
         report.messages().size() == 1

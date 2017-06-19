@@ -17,10 +17,11 @@ import {
   clearErrors
 } from '../actions'
 import {
-  nextShouldBeDisabled,
+  discoveryStageDisableNext,
   userNameError,
   passwordError,
-  portError
+  portError,
+  urlError
 } from '../validation'
 
 import Title from 'components/Title'
@@ -76,7 +77,8 @@ const DiscoveryStageView = (props) => {
             visible={discoveryType === 'url'}
             id='endpointUrl'
             label='Source URL'
-            autoFocus />
+            autoFocus
+            errorText={urlError(configs)} />
           {
             (discoveryType === 'hostnamePort') ? (
               <div style={{ textAlign: 'right' }}>
@@ -116,13 +118,18 @@ const DiscoveryStageView = (props) => {
             }
             right={
               <NextNav
-                onClick={() => queryAllSources(props,
-                  () => {
-                    clearErrors()
-                    changeStage('sourceSelectionStage')
-                  },
-                  (e) => setErrors(currentStageId, e))}
-                disabled={nextShouldBeDisabled(props)} />
+                onClick={() => {
+                  queryAllSources(props)
+                    .then((endpoints) => {
+                      props.setDiscoveredEndpoints(endpoints)
+                      clearErrors()
+                      changeStage('sourceSelectionStage')
+                    })
+                    .catch((e) => {
+                      setErrors(currentStageId, e)
+                    })
+                }}
+                disabled={discoveryStageDisableNext(props)} />
             } />
         </div>
       </div>
@@ -132,7 +139,7 @@ const DiscoveryStageView = (props) => {
 
 let DiscoveryStage = connect((state) => ({
   configs: getAllConfig(state),
-  messages: getErrors(state)(currentStageId),
+  messages: getErrors(state, currentStageId),
   discoveryType: getDiscoveryType(state)
 }), {
   setDefaults,

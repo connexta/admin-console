@@ -21,19 +21,19 @@ const saveSourceMutations = {
 const getSourceMutation = ({ type, config, sourceName, creds }) => {
   let finalConfig = {
     ...config,
-    sourceName: sourceName
+    sourceName
   }
 
   if (creds) {
     finalConfig.creds = creds
   }
 
-  return ({
+  return {
     mutation: saveSourceMutations[type],
     variables: {
       config: finalConfig
     }
-  })
+  }
 }
 
 const saveSource = (props, onFinish, currentStageId) => {
@@ -49,6 +49,7 @@ const saveSource = (props, onFinish, currentStageId) => {
     clearErrors
   } = props
 
+  clearErrors()
   startSubmitting()
   client.mutate(getSourceMutation({
     type,
@@ -59,7 +60,6 @@ const saveSource = (props, onFinish, currentStageId) => {
       password: inputConfigs.sourceUserPassword
     }}))
     .then(() => {
-      clearErrors()
       if (onFinish) onFinish()
       endSubmitting()
     })

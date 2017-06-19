@@ -70,16 +70,16 @@ const ConfirmationStageView = (props) => {
 
 let ConfirmationStage = connect((state) => ({
   sourceName: getSourceName(state),
-  messages: getErrors(state)(currentStageId),
+  messages: getErrors(state, currentStageId),
   inputConfigs: getAllConfig(state),
   type: getChosenEndpoint(state),
   config: getDiscoveredEndpoints(state)[getChosenEndpoint(state)]
-}), ({
+}), {
   changeStage,
   startSubmitting,
   endSubmitting,
   setErrors,
   clearErrors
-}))(ConfirmationStageView)
+})(ConfirmationStageView)
 
 export default withApollo(ConfirmationStage)

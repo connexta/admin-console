@@ -27,7 +27,7 @@ const LdapUseCases = [
 // TODO Make the value selected from the radio button persist
 const UseCaseStage = ({ disabled, next, prev, configs: { ldapUseCase } = {} }) => (
   <Stage>
-    <Title>How do you plan to use LDAPs?</Title>
+    <Title>How do you plan to use LDAP?</Title>
     <Description>
       LDAP can be configured as an authentication source for users to log in or it
       can be setup as an attribute store to provide user attributes to a different

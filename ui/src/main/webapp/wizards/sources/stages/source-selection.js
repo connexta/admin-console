@@ -7,7 +7,8 @@ import { SourceRadioButtons } from '../components'
 import {
   getDiscoveryType,
   getDiscoveredEndpoints,
-  getChosenEndpoint
+  getChosenEndpoint,
+  getErrors
 } from '../reducer'
 import {
   changeStage,
@@ -19,7 +20,7 @@ import {
   clearErrors
 } from '../actions'
 
-import { getAllConfig, getMessages } from 'admin-wizard/reducer'
+import { getAllConfig } from 'admin-wizard/reducer'
 
 import Title from 'components/Title'
 import Description from 'components/Description'
@@ -100,8 +101,8 @@ const SourceSelectionStageView = (props) => {
   }
 }
 
-let SourceSelectionStage = connect((state) => ({
-  messages: getMessages(state, 'sourceSelectionStage'),
+const SourceSelectionStage = connect((state) => ({
+  messages: getErrors(state, currentStageId),
   discoveryType: getDiscoveryType(state),
   discoveredEndpoints: getDiscoveredEndpoints(state),
   configs: getAllConfig(state),

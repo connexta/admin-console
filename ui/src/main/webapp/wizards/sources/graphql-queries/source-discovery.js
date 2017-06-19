@@ -156,85 +156,67 @@ export const discoverSources = ({ sourceType, configs, discoveryType }) => {
   return query
 }
 
-export const acceptableErrors = [
+const nonFatalErrors = [
   'UNKNOWN_ENDPOINT',
   'CANNOT_CONNECT',
   'UNAUTHORIZED'
 ]
 
-export const isAcceptableError = (code) => acceptableErrors.includes(code)
+const isFatalError = (code) => !nonFatalErrors.includes(code)
 
-// combines, flattens, dedupes, filters out OK errors
-export const cleanErrors = (results) => (
-  combineAndReduceErrors(results).filter((code) => !isAcceptableError(code))
-)
+const groupResponses = (responses) => responses.reduce((acc, response) => {
+  const { foundSources = {}, uniqueErrors = [], fatalErrors = [] } = acc
+  const { type, sourceType, value } = response
 
-// combines, flattens, and dedupes
-export const combineAndReduceErrors = (results) => (
-  results.map(({ value }) => value)
-    .reduce((acc, value) => acc.concat(value), [])
-    .map(({ message }) => message)
-    .filter((message, i, errors) => errors.indexOf(message) === i)
-)
+  if (type === 'SUCCESS') {
+    foundSources[sourceType] = value
+  } else {
+    value.forEach((error) => {
+      const code = error.message
+      if (!uniqueErrors.includes(code)) {
+        uniqueErrors.push(code)
+        if (isFatalError(code)) {
+          fatalErrors.push(code)
+        }
+      }
+    })
+  }
 
-// gets friendly messages
-export const mapToFriendlyMessages = (messages) => (
-  messages.map((code) => getFriendlyMessage(code))
-)
+  return { foundSources, uniqueErrors, fatalErrors }
+}, {})
 
-// removes errors and maps sourceType to sourceConfigs
-export const formatSources = (results) => (
-  results.filter(({ type }) => type !== 'ERROR')
-    .reduce((acc, { sourceType, value }) => ({ ...acc, [sourceType]: value }), {})
-)
-
-export const queryAllSources = (props, onPass, onFail) => {
+export const queryAllSources = (props) => {
   const {
     client,
     configs,
     discoveryType,
     startSubmitting,
-    endSubmitting,
-    setDiscoveredEndpoints
+    endSubmitting
   } = props
 
   const dispatchQuery = (sourceType, extractConfig) =>
     client.query(discoverSources({ sourceType, configs, discoveryType }))
-      .then(({ data }) => ({
-        type: 'SUCCESS',
-        sourceType,
-        value: extractConfig(data)
-      }))
+      .then(({ data }) => ({ type: 'SUCCESS', sourceType, value: extractConfig(data) }))
       .catch((e) => ({ type: 'ERROR', sourceType, value: e.graphQLErrors }))
 
   startSubmitting()
-  Promise.all([
+  return Promise.all([
     dispatchQuery('CSW', (data) => (data.csw.discoverCsw.sourceConfig)),
     dispatchQuery('WFS', (data) => (data.wfs.discoverWfs.sourceConfig)),
     dispatchQuery('OpenSearch', (data) => (data.openSearch.discoverOpenSearch.sourceConfig))
-  ]).then((values) => {
+  ]).then((responses) => new Promise((resolve, reject) => {
     endSubmitting()
 
-    // if all results have error, check for causes
-    if (values.every(({type}) => type === 'ERROR')) {
-      // if performing a URL discovery, display all errors
-      if (discoveryType === 'url') {
-        if (onFail) onFail(mapToFriendlyMessages(combineAndReduceErrors(values)))
-        return
-      }
+    const { foundSources, uniqueErrors, fatalErrors } = groupResponses(responses)
 
-      const uniqueErrors = cleanErrors(values)
-      // if no actual errors remain, just set empty source results
-      if (uniqueErrors.length === 0) {
-        setDiscoveredEndpoints({})
-        if (onPass) onPass()
-        return
-      }
-      if (onFail) onFail(mapToFriendlyMessages(uniqueErrors))
+    if (Object.keys(foundSources).length > 0) {
+      resolve(foundSources)
+    } else if (discoveryType === 'url') {
+      reject(uniqueErrors.map(getFriendlyMessage))
+    } else if (fatalErrors.length > 0) {
+      reject(fatalErrors.map(getFriendlyMessage))
     } else {
-      // if any results come back successful, set source results
-      setDiscoveredEndpoints(formatSources(values))
-      if (onPass) onPass()
+      resolve({})
     }
-  })
+  }))
 }

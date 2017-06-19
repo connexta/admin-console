@@ -33,7 +33,7 @@ const CompletedStageView = ({ messages, clearWizard }) => (
         }
         right={
           <Link to='/' >
-            <FlatButton primary label='Home' labelPosition='before' icon={<HomeIcon />} onClick={clearWizard} />
+            <FlatButton primary label='Home' labelPosition='before' icon={<HomeIcon />} />
           </Link>
         }
       />

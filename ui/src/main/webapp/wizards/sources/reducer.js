@@ -37,12 +37,10 @@ const discoveredEndpoints = (state = Map(), { type, endpointConfigs }) => {
   }
 }
 
-const errors = (state = Map(), { type, stageId, errorList, error }) => {
+const errors = (state = Map(), { type, stageId, errorList }) => {
   switch (type) {
     case 'SOURCES/SET_ERRORS':
       return state.set(stageId, errorList)
-    case 'SOURCES/ADD_ERROR':
-      return state.set(stageId, state.get(stageId).push(error))
     case 'SOURCES/CLEAR_ERRORS':
     case 'CLEAR_WIZARD':
       return Map()
@@ -78,12 +76,8 @@ export const submarine = sub()
 export const getIsSubmitting = (state) => submarine(state).get('isSubmitting')
 export const getDiscoveryType = (state) => submarine(state).get('discoveryType')
 export const setStage = (state) => submarine(state).get('currentStage')
-export const getStageProgress = (state) => submarine(state).get('sourceStageProgress')
-export const getStagesClean = (state) => submarine(state).get('sourceStagesClean')
-export const getErrors = (state) => (stageId) => submarine(state).getIn(['errors', stageId], [])
-
+export const getErrors = (state, stageId) => submarine(state).getIn(['errors', stageId], [])
 export const getSourceName = (state) => state.getIn(['wizard', 'config', 'sourceName', 'value'])
-
 export const getDiscoveredEndpoints = (state) => submarine(state).get('discoveredEndpoints').toJS()
 export const getChosenEndpoint = (state) => submarine(state).get('chosenEndpoint')
 

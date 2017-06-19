@@ -88,7 +88,7 @@ class SaveWhitelistContextsTest extends Specification {
 
         then:
         report.messages()[0].code == DefaultMessages.INVALID_CONTEXT_PATH
-        report.messages()[0].path == [WcpmFieldProvider.NAME, SaveWhitelistContexts.FIELD_NAME, BaseFunctionField.ARGUMENT, 'paths', ListField.INDEX_DELIMETER + 2]
+        report.messages()[0].path == [WcpmFieldProvider.NAME, SaveWhitelistContexts.FIELD_NAME, BaseFunctionField.ARGUMENT, 'paths', 2]
         report.result() == null
     }
 
@@ -103,7 +103,7 @@ class SaveWhitelistContextsTest extends Specification {
 
         then:
         report.messages()[0].code == DefaultMessages.EMPTY_FIELD
-        report.messages()[0].path == [WcpmFieldProvider.NAME, SaveWhitelistContexts.FIELD_NAME, BaseFunctionField.ARGUMENT, 'paths', ListField.INDEX_DELIMETER + 2]
+        report.messages()[0].path == [WcpmFieldProvider.NAME, SaveWhitelistContexts.FIELD_NAME, BaseFunctionField.ARGUMENT, 'paths', 2]
         report.result() == null
     }
 

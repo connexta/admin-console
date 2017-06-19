@@ -24,18 +24,14 @@ import java.util.function.Function;
 
 import org.codice.ddf.admin.common.services.ServiceCommons;
 import org.codice.ddf.admin.sources.fields.WfsVersion;
-import org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField;
+import org.codice.ddf.admin.sources.fields.type.SourceConfigField;
 import org.codice.ddf.admin.sources.fields.type.WfsSourceConfigurationField;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableList;
 
 public class WfsServiceProperties {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(WfsServiceProperties.class);
 
     // --- WFS Service Properties
     public static final String WFS_URL = "wfsUrl";
@@ -47,6 +43,10 @@ public class WfsServiceProperties {
     public static final String ID = "id";
     // ---
 
+    public static final String WFS1_FEATURE = "spatial-wfs-v1_0_0";
+
+    public static final String WFS2_FEATURE = "spatial-wfs-v2_0_0";
+
     public static final String WFS1_FACTORY_PID = "Wfs_v1_0_0_Federated_Source";
 
     public static final String WFS2_FACTORY_PID = "Wfs_v2_0_0_Federated_Source";
@@ -54,37 +54,43 @@ public class WfsServiceProperties {
     public static final List<String> WFS_FACTORY_PIDS = ImmutableList.of(WFS1_FACTORY_PID,
             WFS2_FACTORY_PID);
 
-    public static final Function<Map<String, Object>, SourceConfigUnionField>
+    public static final Function<Map<String, Object>, SourceConfigField>
             SERVICE_PROPS_TO_WFS_CONFIG = WfsServiceProperties::servicePropsToWfsConfig;
 
-    private static final BiMap<String, String> WFS_VERSION_MAPPING = ImmutableBiMap.of(
-            WfsVersion.WFS_VERSION_1, WFS1_FACTORY_PID,
-            WfsVersion.WFS_VERSION_2, WFS2_FACTORY_PID);
+    private static final BiMap<String, String> WFS_VERSION_MAPPING =
+            ImmutableBiMap.of(WfsVersion.WFS_VERSION_1,
+                    WFS1_FACTORY_PID,
+                    WfsVersion.WFS_VERSION_2,
+                    WFS2_FACTORY_PID);
 
-    public static WfsSourceConfigurationField servicePropsToWfsConfig(
-            Map<String, Object> props) {
+    public static WfsSourceConfigurationField servicePropsToWfsConfig(Map<String, Object> props) {
         WfsSourceConfigurationField wfsConfig = new WfsSourceConfigurationField();
         wfsConfig.pid(mapValue(props, SERVICE_PID_KEY));
         wfsConfig.sourceName(mapValue(props, ID));
         wfsConfig.endpointUrl(mapValue(props, WFS_URL));
-        wfsConfig.credentials().username(mapValue(props, USERNAME));
-        wfsConfig.credentials().password(FLAG_PASSWORD);
+        wfsConfig.credentials()
+                .username(mapValue(props, USERNAME));
+        wfsConfig.credentials()
+                .password(FLAG_PASSWORD);
         wfsConfig.wfsVersion(wfsFactoryPidToVersion(mapValue(props, FACTORY_PID_KEY)));
         return wfsConfig;
     }
 
-    public static Map<String, Object> wfsConfigToServiceProps(
-            WfsSourceConfigurationField config) {
+    public static Map<String, Object> wfsConfigToServiceProps(WfsSourceConfigurationField config) {
         ServiceCommons.ServicePropertyBuilder builder =
                 new ServiceCommons.ServicePropertyBuilder().putPropertyIfNotNull(ID,
                         config.sourceNameField())
                         .putPropertyIfNotNull(WFS_URL, config.endpointUrlField())
                         .putPropertyIfNotNull(USERNAME,
-                                config.credentials().usernameField());
+                                config.credentials()
+                                        .usernameField());
 
-        String password = config.credentials().password();
-        if(password != null && !password.equals(FLAG_PASSWORD)) {
-            builder.put(PASSWORD, config.credentials().password());
+        String password = config.credentials()
+                .password();
+        if (password != null && !password.equals(FLAG_PASSWORD)) {
+            builder.put(PASSWORD,
+                    config.credentials()
+                            .password());
         }
         return builder.build();
     }
@@ -94,6 +100,7 @@ public class WfsServiceProperties {
     }
 
     public static String wfsFactoryPidToVersion(String factoryPid) throws IllegalArgumentException {
-        return WFS_VERSION_MAPPING.inverse().get(factoryPid);
+        return WFS_VERSION_MAPPING.inverse()
+                .get(factoryPid);
     }
 }

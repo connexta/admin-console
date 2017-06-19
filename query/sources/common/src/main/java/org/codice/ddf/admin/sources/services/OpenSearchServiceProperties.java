@@ -24,7 +24,7 @@ import java.util.function.Function;
 
 import org.codice.ddf.admin.common.services.ServiceCommons;
 import org.codice.ddf.admin.sources.fields.type.OpenSearchSourceConfigurationField;
-import org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField;
+import org.codice.ddf.admin.sources.fields.type.SourceConfigField;
 
 public class OpenSearchServiceProperties {
 
@@ -40,14 +40,16 @@ public class OpenSearchServiceProperties {
 
     public static final String OPENSEARCH_FACTORY_PID = "OpenSearchSource";
 
+    public static final String OPENSEARCH_FEATURE = "catalog-opensearch-source";
+
     public static final List<String> OPENSEARCH_FACTORY_PIDS = Collections.singletonList(
             OPENSEARCH_FACTORY_PID);
 
-    public static final Function<Map<String, Object>, SourceConfigUnionField>
+    public static final Function<Map<String, Object>, SourceConfigField>
             SERVICE_PROPS_TO_OPENSEARCH_CONFIG =
             OpenSearchServiceProperties::servicePropsToOpenSearchConfig;
 
-    public static final OpenSearchSourceConfigurationField servicePropsToOpenSearchConfig(
+    public static OpenSearchSourceConfigurationField servicePropsToOpenSearchConfig(
             Map<String, Object> props) {
         OpenSearchSourceConfigurationField config = new OpenSearchSourceConfigurationField();
         config.pid(mapValue(props, SERVICE_PID_KEY));
@@ -58,7 +60,7 @@ public class OpenSearchServiceProperties {
         return config;
     }
 
-    public static final Map<String, Object> openSearchConfigToServiceProps(
+    public static Map<String, Object> openSearchConfigToServiceProps(
             OpenSearchSourceConfigurationField config) {
         ServiceCommons.ServicePropertyBuilder builder =
                 new ServiceCommons.ServicePropertyBuilder().putPropertyIfNotNull(SHORTNAME,

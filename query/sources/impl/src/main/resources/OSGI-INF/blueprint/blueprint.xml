@@ -18,6 +18,7 @@
             <argument ref="serviceActions"/>
             <argument ref="managedServiceActions"/>
             <argument ref="serviceReader"/>
+            <argument ref="featureActions"/>
         </bean>
     </service>
 
@@ -27,6 +28,7 @@
             <argument ref="serviceActions"/>
             <argument ref="managedServiceActions"/>
             <argument ref="serviceReader"/>
+            <argument ref="featureActions"/>
         </bean>
     </service>
 
@@ -36,6 +38,7 @@
             <argument ref="serviceActions"/>
             <argument ref="managedServiceActions"/>
             <argument ref="serviceReader"/>
+            <argument ref="featureActions"/>
         </bean>
     </service>
 
@@ -53,6 +56,10 @@
 
     <reference id="serviceReader"
                interface="org.codice.ddf.internal.admin.configurator.actions.ServiceReader"
+               availability="mandatory"/>
+
+    <reference id="featureActions"
+               interface="org.codice.ddf.internal.admin.configurator.actions.FeatureActions"
                availability="mandatory"/>
 
 </blueprint>

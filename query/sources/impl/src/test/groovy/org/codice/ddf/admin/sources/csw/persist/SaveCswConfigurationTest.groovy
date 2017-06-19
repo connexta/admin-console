@@ -19,7 +19,7 @@ import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.configurator.Configurator
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.configurator.OperationReport
-import org.codice.ddf.admin.sources.commons.SourceMessages
+import org.codice.ddf.admin.sources.SourceMessages
 import org.codice.ddf.admin.sources.fields.CswProfile
 import org.codice.ddf.admin.sources.fields.type.CswSourceConfigurationField
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions
@@ -61,6 +61,8 @@ class SaveCswConfigurationTest extends Specification {
 
     ServiceActions serviceActions
 
+    ManagedServiceActions managedServiceActions
+
     Source federatedSource
 
     def actionArgs
@@ -72,14 +74,14 @@ class SaveCswConfigurationTest extends Specification {
         configurator = Mock(Configurator)
         configuratorFactory = Mock(ConfiguratorFactory)
         serviceActions = Mock(ServiceActions)
-        def managedServiceActions = Mock(ManagedServiceActions)
+        managedServiceActions = Mock(ManagedServiceActions)
         serviceReader = Mock(ServiceReader)
 
         federatedSource = new TestSource(S_PID, TEST_SOURCENAME, false)
         federatedSources.add(federatedSource)
         configuratorFactory.getConfigurator() >> configurator
-        saveCswConfiguration = new SaveCswConfiguration(configuratorFactory, this.serviceActions,
-                managedServiceActions, this.serviceReader)
+        saveCswConfiguration = new SaveCswConfiguration(configuratorFactory, serviceActions,
+                managedServiceActions, serviceReader)
     }
 
     def 'Successfully save new CSW configuration'() {

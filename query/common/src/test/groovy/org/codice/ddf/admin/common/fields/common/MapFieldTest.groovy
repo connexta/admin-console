@@ -78,7 +78,7 @@ class MapFieldTest extends Specification {
         then:
         validationMsgs.size() == 1
         validationMsgs.get(0).getCode() == DefaultMessages.DUPLICATE_MAP_KEY
-        validationMsgs.get(0).getPath() == [MapField.DEFAULT_FIELD_NAME, ENTRIES, ListField.INDEX_DELIMETER + 2]
+        validationMsgs.get(0).getPath() == [MapField.DEFAULT_FIELD_NAME, ENTRIES, 2]
     }
 
     def createEntry(String key, String value) {

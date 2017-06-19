@@ -11,50 +11,45 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.sources.fields.type;
+package org.codice.ddf.admin.sources.wfs;
 
 import java.util.List;
 
 import org.codice.ddf.admin.api.Field;
-import org.codice.ddf.admin.sources.fields.WfsVersion;
+import org.codice.ddf.admin.sources.fields.SourceInfoField;
+import org.codice.ddf.admin.sources.fields.type.WfsSourceConfigurationField;
 
 import com.google.common.collect.ImmutableList;
 
-public class WfsSourceConfigurationField extends SourceConfigField {
+public class WfsSourceInfoField extends SourceInfoField {
 
-    public static final String DEFAULT_FIELD_NAME = "source";
+    public static final String DEFAULT_FIELD_NAME = "wfsSourceInfo";
 
-    public static final String FIELD_TYPE_NAME = "WfsSourceConfiguration";
+    public static final String FIELD_TYPE_NAME = "WfsSourceInfo";
 
-    public static final String DESCRIPTION =
-            "Represents a WFS configuration containing properties to be saved.";
+    public static final String DESCRIPTION = "Contains the availability and properties of the WFS source.";
 
-    private WfsVersion wfsVersion;
+    private WfsSourceConfigurationField config;
 
-    public WfsSourceConfigurationField() {
+    public WfsSourceInfoField() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
-        wfsVersion = new WfsVersion();
+        config = new WfsSourceConfigurationField();
         updateInnerFieldPaths();
     }
 
-    public WfsSourceConfigurationField wfsVersion(String wfsVersion) {
-        this.wfsVersion.setValue(wfsVersion);
+    public WfsSourceInfoField config(WfsSourceConfigurationField config) {
+        this.config = config;
         return this;
     }
 
-    public String wfsVersion() {
-        return wfsVersion.getValue();
-    }
-
-    public WfsVersion wfsVersionField() {
-        return wfsVersion;
+    public WfsSourceConfigurationField config() {
+        return config;
     }
 
     @Override
     public List<Field> getFields() {
         return new ImmutableList.Builder<Field>().addAll(super.getFields())
-                .add(wfsVersion)
+                .add(config)
                 .build();
     }
-
 }

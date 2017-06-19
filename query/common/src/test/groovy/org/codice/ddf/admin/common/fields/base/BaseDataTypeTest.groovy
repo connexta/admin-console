@@ -59,7 +59,7 @@ class BaseDataTypeTest extends Specification {
         testField.path() == [TestDataType.FIELD_NAME]
 
         when:
-        testField.fieldName('updatedName')
+        testField.pathName('updatedName')
 
         then:
         testField.path() == ['updatedName']

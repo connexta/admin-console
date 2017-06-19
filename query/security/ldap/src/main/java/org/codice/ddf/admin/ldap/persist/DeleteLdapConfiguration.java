@@ -13,8 +13,6 @@
  **/
 package org.codice.ddf.admin.ldap.persist;
 
-import static org.codice.ddf.admin.common.services.ServiceCommons.validateServiceConfigurationExists;
-
 import java.util.List;
 
 import org.codice.ddf.admin.api.DataType;
@@ -45,6 +43,8 @@ public class DeleteLdapConfiguration extends BaseFunctionField<BooleanField> {
 
     private final ServiceActions serviceActions;
 
+    private ServiceCommons serviceCommons;
+
     public DeleteLdapConfiguration(ConfiguratorFactory configuratorFactory,
             ManagedServiceActions managedServiceActions, PropertyActions propertyActions,
             ServiceActions serviceActions) {
@@ -58,6 +58,10 @@ public class DeleteLdapConfiguration extends BaseFunctionField<BooleanField> {
         pid.isRequired(true);
 
         updateArgumentPaths();
+        serviceCommons = new ServiceCommons(managedServiceActions,
+                serviceActions,
+                null,
+                configuratorFactory);
     }
 
     @Override
@@ -67,7 +71,7 @@ public class DeleteLdapConfiguration extends BaseFunctionField<BooleanField> {
 
     @Override
     public BooleanField performFunction() {
-        addMessages(ServiceCommons.deleteService(pid, configuratorFactory, managedServiceActions));
+        addMessages(serviceCommons.deleteService(pid));
         return new BooleanField(!containsErrorMsgs());
     }
 
@@ -78,7 +82,7 @@ public class DeleteLdapConfiguration extends BaseFunctionField<BooleanField> {
             return;
         }
 
-        addMessages(validateServiceConfigurationExists(pid, serviceActions));
+        addMessages(serviceCommons.serviceConfigurationExists(pid));
     }
 
     @Override

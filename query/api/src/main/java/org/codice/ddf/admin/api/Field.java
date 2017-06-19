@@ -33,7 +33,7 @@ public interface Field<S, G> {
     /**
      * @param fieldName the new name of the {@code Field}
      */
-    void fieldName(String fieldName);
+    void pathName(String fieldName);
 
     /**
      * @return a description describing this {@code Field}

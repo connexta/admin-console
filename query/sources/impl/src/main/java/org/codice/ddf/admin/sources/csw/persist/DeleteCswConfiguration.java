@@ -13,9 +13,6 @@
  */
 package org.codice.ddf.admin.sources.csw.persist;
 
-import static org.codice.ddf.admin.common.services.ServiceCommons.deleteService;
-import static org.codice.ddf.admin.common.services.ServiceCommons.validateServiceConfigurationExists;
-
 import java.util.List;
 
 import org.codice.ddf.admin.api.DataType;
@@ -23,6 +20,7 @@ import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.common.fields.common.PidField;
+import org.codice.ddf.admin.common.services.ServiceCommons;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
@@ -34,11 +32,13 @@ public class DeleteCswConfiguration extends BaseFunctionField<BooleanField> {
     public static final String ID = "deleteCswSource";
 
     public static final String DESCRIPTION =
-            "Deletes a CSW source configuration provided by the servicePid and returns true on success and false on failure.";
+            "Deletes a CSW source configuration provided by the pid and returns true on success and false on failure.";
 
     private PidField pid;
 
-    private ConfiguratorFactory configuratorFactory;
+    private ServiceCommons serviceCommons;
+
+    private final ConfiguratorFactory configuratorFactory;
 
     private final ServiceActions serviceActions;
 
@@ -54,11 +54,16 @@ public class DeleteCswConfiguration extends BaseFunctionField<BooleanField> {
         pid = new PidField();
         pid.isRequired(true);
         updateArgumentPaths();
+
+        serviceCommons = new ServiceCommons(managedServiceActions,
+                serviceActions,
+                null,
+                configuratorFactory);
     }
 
     @Override
     public BooleanField performFunction() {
-        addMessages(deleteService(pid, configuratorFactory, managedServiceActions));
+        addMessages(serviceCommons.deleteService(pid));
         return new BooleanField(!containsErrorMsgs());
     }
 
@@ -68,7 +73,7 @@ public class DeleteCswConfiguration extends BaseFunctionField<BooleanField> {
         if (containsErrorMsgs()) {
             return;
         }
-        addMessages(validateServiceConfigurationExists(pid, serviceActions));
+        addMessages(serviceCommons.serviceConfigurationExists(pid));
     }
 
     @Override

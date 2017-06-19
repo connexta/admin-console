@@ -100,7 +100,7 @@ public class ListFieldImpl<T extends DataType> extends BaseDataType<List>
     @Override
     public ListFieldImpl<T> add(T value) {
         value.matchRequired(listFieldType);
-        value.fieldName(INDEX_DELIMETER + fields.size());
+        value.pathName(Integer.toString(fields.size()));
         value.updatePath(path());
         fields.add(value);
         return this;
@@ -148,8 +148,8 @@ public class ListFieldImpl<T extends DataType> extends BaseDataType<List>
     }
 
     @Override
-    public void fieldName(String fieldName) {
-        super.fieldName(fieldName);
+    public void pathName(String fieldName) {
+        super.pathName(fieldName);
         getList().forEach(field -> field.updatePath(path()));
     }
 }

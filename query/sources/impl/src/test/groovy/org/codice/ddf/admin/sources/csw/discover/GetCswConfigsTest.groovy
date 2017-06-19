@@ -40,7 +40,7 @@ class GetCswConfigsTest extends Specification {
 
     static TEST_FACTORY_PID = CswServiceProperties.CSW_PROFILE_FACTORY_PID
 
-    static BASE_PATH = [GetCswConfigurations.ID, FunctionField.ARGUMENT]
+    static BASE_PATH = [GetCswConfigurations.FIELD_NAME, FunctionField.ARGUMENT]
 
     GetCswConfigurations getCswConfigsFunction
 
@@ -112,13 +112,12 @@ class GetCswConfigsTest extends Specification {
         report.result() == null
         report.messages().size() == 1
         report.messages().get(0).code == DefaultMessages.NO_EXISTING_CONFIG
-        report.messages().get(0).path == [GetCswConfigurations.ID]
+        report.messages().get(0).path == [GetCswConfigurations.FIELD_NAME]
     }
 
-    private
     def assertConfig(Field field, int index, Map<String, Object> properties, String sourceName, String pid, boolean availability) {
         def sourceInfo = (SourceInfoField) field
-        assert sourceInfo.fieldName() == ListFieldImpl.INDEX_DELIMETER + index
+        assert sourceInfo.fieldName() == index
         assert sourceInfo.isAvailable() == availability
         assert sourceInfo.config().endpointUrl() == properties.get(CswServiceProperties.CSW_URL)
         assert sourceInfo.config().credentials().password() == FLAG_PASSWORD
@@ -129,7 +128,7 @@ class GetCswConfigsTest extends Specification {
         return true
     }
 
-    private def createCswManagedServiceConfigs() {
+    def createCswManagedServiceConfigs() {
         managedServiceConfigs = baseManagedServiceConfigs
         managedServiceConfigs.get(S_PID_1).put((EVENT_SERVICE_ADDRESS), TEST_EVENT_SERVICE_ADDRESS)
         managedServiceConfigs.get(S_PID_1).put((CswServiceProperties.CSW_URL), TEST_URL)

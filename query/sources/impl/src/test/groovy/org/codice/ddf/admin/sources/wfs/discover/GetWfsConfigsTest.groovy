@@ -50,7 +50,7 @@ class GetWfsConfigsTest extends Specification {
 
     static TEST_FACTORY_PID_2 = WfsServiceProperties.WFS2_FACTORY_PID
 
-    static RESULT_ARGUMENT_PATH = [GetWfsConfigurations.ID]
+    static RESULT_ARGUMENT_PATH = [GetWfsConfigurations.FIELD_NAME]
 
     static BASE_PATH = [RESULT_ARGUMENT_PATH, FunctionField.ARGUMENT].flatten()
 
@@ -126,7 +126,7 @@ class GetWfsConfigsTest extends Specification {
     private
     def assertConfig(Field field, int index, String sourceName, String pid, boolean availability, String wfsVersion) {
         def sourceInfo = (SourceInfoField) field
-        assert sourceInfo.fieldName() == ListFieldImpl.INDEX_DELIMETER + index
+        assert sourceInfo.fieldName() == index
         assert sourceInfo.isAvailable() == availability
         assert sourceInfo.config().credentials().password() == FLAG_PASSWORD
         assert sourceInfo.config().credentials().username() == TEST_USERNAME

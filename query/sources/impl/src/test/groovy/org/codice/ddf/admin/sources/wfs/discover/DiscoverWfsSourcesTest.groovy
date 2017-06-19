@@ -19,9 +19,9 @@ import org.codice.ddf.admin.common.fields.common.UrlField
 import org.codice.ddf.admin.common.report.ReportWithResultImpl
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.common.report.message.ErrorMessageImpl
-import org.codice.ddf.admin.sources.commons.utils.WfsSourceUtils
+import org.codice.ddf.admin.sources.wfs.WfsSourceUtils
 import org.codice.ddf.admin.sources.fields.SourceInfoField
-import org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField
+import org.codice.ddf.admin.sources.fields.type.SourceConfigField
 import spock.lang.Specification
 
 import static org.codice.ddf.admin.sources.SourceTestCommons.*
@@ -51,7 +51,7 @@ class DiscoverWfsSourcesTest extends Specification {
         def report = discoverWfs.getValue()
 
         then:
-        1 * wfsSourceUtils.getPreferredWfsConfig(_ , _) >> createResult(false, SourceConfigUnionField.class)
+        1 * wfsSourceUtils.getPreferredWfsConfig(_ , _) >> createResult(false, SourceConfigField.class)
         report.result() instanceof SourceInfoField
         ((SourceInfoField) report.result()).isAvailable()
         ((SourceInfoField) report.result()).config() != null
@@ -66,7 +66,7 @@ class DiscoverWfsSourcesTest extends Specification {
 
         then:
         1 * wfsSourceUtils.discoverWfsUrl(_, _) >> createResult(false, UrlField.class)
-        1 * wfsSourceUtils.getPreferredWfsConfig(_, _) >> createResult(false, SourceConfigUnionField.class)
+        1 * wfsSourceUtils.getPreferredWfsConfig(_, _) >> createResult(false, SourceConfigField.class)
         report.result() instanceof SourceInfoField
         ((SourceInfoField) report.result()).isAvailable()
         ((SourceInfoField) report.result()).config() != null

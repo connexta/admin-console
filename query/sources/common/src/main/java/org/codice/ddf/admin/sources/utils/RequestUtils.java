@@ -11,13 +11,10 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  */
-package org.codice.ddf.admin.sources.commons.utils;
+package org.codice.ddf.admin.sources.utils;
 
 import static java.net.HttpURLConnection.HTTP_OK;
-import static java.net.HttpURLConnection.HTTP_UNAUTHORIZED;
 import static org.codice.ddf.admin.common.report.message.DefaultMessages.cannotConnectError;
-import static org.codice.ddf.admin.common.report.message.DefaultMessages.unauthorizedError;
-import static org.codice.ddf.admin.common.report.message.DefaultMessages.unknownEndpointError;
 
 import java.io.IOException;
 import java.net.URL;
@@ -25,6 +22,7 @@ import java.net.URLConnection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.core.Response;
@@ -32,6 +30,7 @@ import javax.ws.rs.core.Response;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
 import org.codice.ddf.admin.common.fields.common.HostField;
+import org.codice.ddf.admin.common.fields.common.ResponseField;
 import org.codice.ddf.admin.common.fields.common.UrlField;
 import org.codice.ddf.admin.common.report.ReportImpl;
 import org.codice.ddf.admin.common.report.ReportWithResultImpl;
@@ -45,84 +44,88 @@ public class RequestUtils {
 
     /**
      * Takes a list of url formats, for example "https://%s:%d/wfs", formats them together with the
-     * hostField name and port, then sends GET requests to those URLs. If an HTTP 200 and response body is returned on one the the formatted
-     * URLs, then a {@link UrlField} whose value is the formatted URL is returned. The {@code UrlField} returned
-     * will have the same path and field name as the hostField passed in.
-     *
+     * hostField name and port, then sends GET requests to those URLs. The request {@code UrlField} returned
+     * in the response will have the same path and field name as the hostField passed in.
+     * <p>
      * Possible Error Codes to be returned
      * - {@link org.codice.ddf.admin.common.report.message.DefaultMessages#CANNOT_CONNECT}
      *
-     * @param hostField host field containing the host name and port
-     * @param urlFormats list of url formats to format with the hostField
-     * @param creds credentials for basic authentication
+     * @param hostField   host field containing the host name and port
+     * @param urlFormats  list of url formats to format with the hostField
+     * @param creds       credentials for basic authentication
      * @param queryParams additional query params
-     * @return a {@code ReportWithResult} containing a {@code UrlField} on success, or {@link org.codice.ddf.admin.api.report.ErrorMessage}s on failure
+     * @return a {@code ReportWithResult} containing a {@code ResponseField} on success, or {@link org.codice.ddf.admin.api.report.ErrorMessage}s on failure
      */
-    public ReportWithResultImpl<UrlField> discoverUrlFromHost(HostField hostField, List<String> urlFormats, CredentialsField creds,
-            Map<String, String> queryParams) {
-        ReportWithResultImpl<UrlField> responseBody = new ReportWithResultImpl<>();
-        for(String formatUrl : urlFormats) {
+    public ReportWithResultImpl<ResponseField> discoverUrlFromHost(HostField hostField,
+            List<String> urlFormats, CredentialsField creds, Map<String, String> queryParams) {
+        ReportWithResultImpl<ResponseField> responseReport = new ReportWithResultImpl<>();
+        for (String formatUrl : urlFormats) {
             UrlField clientUrl = new UrlField();
-            clientUrl.fieldName(hostField.fieldName());
-            // copy this hostField's path so that if it's used to make errors they have the path of the hostField
-            clientUrl.updatePath(hostField.path().subList(0, hostField.path().size() - 1));
             clientUrl.setValue(String.format(formatUrl, hostField.hostname(), hostField.port()));
 
-            ReportWithResultImpl<String> body = sendGetRequest(clientUrl, creds, queryParams);
-            if(!body.containsErrorMsgs()) {
-                responseBody.result(clientUrl);
-                return responseBody;
+            responseReport = sendGetRequest(clientUrl, creds, queryParams);
+            if (!responseReport.containsErrorMsgs()) {
+                return responseReport;
             }
         }
-        return responseBody.addResultMessage(cannotConnectError());
+
+        responseReport.messages().forEach(msg -> msg.setPath(hostField.path()));
+        responseReport.addResultMessage(cannotConnectError());
+        return responseReport;
     }
 
     /**
      * Creates a secure CXF {@code WebClient} and sends a GET request to the URL given by the clientUrl and
      * optional queryParams.
-     *
+     * <p>
      * Possible Error Codes to be returned
      * - {@link org.codice.ddf.admin.common.report.message.DefaultMessages#CANNOT_CONNECT}
-     * - {@link org.codice.ddf.admin.common.report.message.DefaultMessages#UNAUTHORIZED}
-     * - {@link org.codice.ddf.admin.common.report.message.DefaultMessages#UNKNOWN_ENDPOINT}
      *
-     * @param clientUrl url to send GET request to
-     * @param creds optional credentials for basic authentication
+     * @param requestUrl  url to send GET request to
+     * @param creds       optional credentials for basic authentication
      * @param queryParams optional query parameters
-     * @return {@link ReportWithResultImpl} containing the body of the response on success, or containing an {@link org.codice.ddf.admin.api.report.ErrorMessage}
+     * @return {@link ReportWithResultImpl} containing a {@link ResponseField}, or containing an {@link org.codice.ddf.admin.api.report.ErrorMessage}
      */
-    public ReportWithResultImpl<String> sendGetRequest(UrlField clientUrl, CredentialsField creds, Map<String, String> queryParams) {
-        ReportWithResultImpl<String> body = new ReportWithResultImpl<>();
-        ReportWithResultImpl<Response> responseResult = executeGetRequest(clientUrl, creds, queryParams);
-        if(responseResult.containsErrorMsgs()) {
-            body.addMessages(responseResult);
-            return body;
+    public ReportWithResultImpl<ResponseField> sendGetRequest(UrlField requestUrl,
+            CredentialsField creds, Map<String, String> queryParams) {
+        ReportWithResultImpl<ResponseField> responseResult = new ReportWithResultImpl<>();
+        responseResult.addMessages(endpointIsReachable(requestUrl));
+        if (responseResult.containsErrorMsgs()) {
+            return responseResult;
         }
 
-        Response response = responseResult.result();
-        String responseString = response.readEntity(String.class);
-        if (response.getStatus() == HTTP_OK && !responseString.equals("")) {
-            body.result(responseString);
-        } else if(response.getStatus() == HTTP_UNAUTHORIZED) {
-            body.addArgumentMessage(unauthorizedError(creds.path()));
-        } else {
-            body.addArgumentMessage(unknownEndpointError(clientUrl.path()));
+        ReportWithResultImpl<Response> httpResponse = executeGetRequest(requestUrl,
+                creds,
+                queryParams);
+        if (httpResponse.containsErrorMsgs()) {
+            responseResult.addMessages(httpResponse);
+            return responseResult;
         }
-        return body;
+
+        Response response = httpResponse.result();
+        ResponseField responseField =
+                new ResponseField().responseBody(response.readEntity(String.class))
+                        .statusCode(response.getStatus())
+                        .requestUrlField(requestUrl);
+
+        ReportWithResultImpl<ResponseField> result = new ReportWithResultImpl<>();
+        result.result(responseField);
+        return result;
     }
 
     /**
      * Executes a request by creating a Secure CXF Client from the provided url, credentials, and query params.
-     *
+     * <p>
      * Possible Error Codes to return
      * - {@link org.codice.ddf.admin.common.report.message.DefaultMessages#CANNOT_CONNECT}
      *
-     * @param clientUrl url to send GET request to
-     * @param creds optional basic authentication
+     * @param clientUrl   url to send GET request to
+     * @param creds       optional basic authentication
      * @param queryParams additional query parameters
      * @return {@link Response} of the request
      */
-    public ReportWithResultImpl<Response> executeGetRequest(UrlField clientUrl, CredentialsField creds, Map<String, String> queryParams) {
+    public ReportWithResultImpl<Response> executeGetRequest(UrlField clientUrl,
+            CredentialsField creds, Map<String, String> queryParams) {
         WebClient client = generateClient(clientUrl.getValue(), creds, queryParams);
         ReportWithResultImpl<Response> report = new ReportWithResultImpl<>();
         Response response;
@@ -139,7 +142,7 @@ public class RequestUtils {
 
     /**
      * Sends a POST request to the specified url.
-     *
+     * <p>
      * Possible Error Codes to be returned
      * - {@link org.codice.ddf.admin.common.report.message.DefaultMessages#CANNOT_CONNECT}
      *
@@ -149,6 +152,7 @@ public class RequestUtils {
      * @param content     Body of the post request
      * @return a {@link ReportWithResultImpl} containing the POST request response body or an {@link org.codice.ddf.admin.api.report.ErrorMessage} on failure.
      */
+    // TODO: 6/15/17 phuffer - clean this up to return ResponseField
     public ReportWithResultImpl<String> sendPostRequest(UrlField urlField, CredentialsField creds,
             String contentType, String content) {
         WebClient client = generateClient(urlField.getValue(), creds, Collections.emptyMap());
@@ -170,7 +174,7 @@ public class RequestUtils {
 
     /**
      * Attempts to open a connection to a URL.
-     *
+     * <p>
      * Possible Error Codes to be returned
      * - {@link org.codice.ddf.admin.common.report.message.DefaultMessages#CANNOT_CONNECT}
      *
@@ -179,19 +183,30 @@ public class RequestUtils {
      */
     public ReportImpl endpointIsReachable(UrlField urlField) {
         ReportImpl report = new ReportImpl();
+        URLConnection urlConnection = null;
         try {
-            URLConnection urlConnection = (new URL(urlField.getValue()).openConnection());
-            urlConnection.setConnectTimeout(500);
+            urlConnection = new URL(urlField.getValue()).openConnection();
+            urlConnection.setConnectTimeout((int) TimeUnit.SECONDS.toMillis(10));
             urlConnection.connect();
             LOGGER.debug("Successfully reached {}.", urlField);
         } catch (IOException e) {
             LOGGER.debug("Failed to reach {}, returning an error.", urlField, e);
             report.addArgumentMessage(cannotConnectError(urlField.path()));
+        } finally {
+            try {
+                if (urlConnection != null) {
+                    urlConnection.getInputStream()
+                            .close();
+                }
+            } catch (IOException e) {
+                LOGGER.debug("Error closing connection stream.");
+            }
         }
         return report;
     }
 
-    private WebClient generateClient(String url, CredentialsField creds, Map<String, String> queryParams) {
+    private WebClient generateClient(String url, CredentialsField creds,
+            Map<String, String> queryParams) {
         String username = creds == null ? null : creds.username();
         String password = creds == null ? null : creds.password();
         SecureCxfClientFactory<WebClient> clientFactory =
@@ -202,7 +217,7 @@ public class RequestUtils {
                         password);
 
         WebClient client = clientFactory.getClient();
-        if(queryParams != null) {
+        if (queryParams != null) {
             queryParams.entrySet()
                     .forEach(entry -> client.query(entry.getKey(), entry.getValue()));
         }

@@ -13,13 +13,15 @@
  **/
 package org.codice.ddf.admin.sources.fields.type;
 
-public class OpenSearchSourceConfigurationField extends SourceConfigUnionField {
+public class OpenSearchSourceConfigurationField extends SourceConfigField {
+
+    public static final String DEFAULT_FIELD_NAME = "source";
 
     private static final String FIELD_TYPE_NAME = "OpenSearchConfiguration";
 
     private static final String DESCRIPTION = "Represents an OpenSearch configuration containing properties to be saved.";
 
     public OpenSearchSourceConfigurationField() {
-        super(FIELD_TYPE_NAME, DESCRIPTION);
+        super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
     }
 }

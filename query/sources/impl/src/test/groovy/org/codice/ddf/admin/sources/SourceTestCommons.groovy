@@ -25,11 +25,11 @@ import org.codice.ddf.admin.common.fields.common.CredentialsField
 import org.codice.ddf.admin.common.fields.common.PidField
 import org.codice.ddf.admin.common.fields.common.UrlField
 import org.codice.ddf.admin.common.services.ServiceCommons
-import org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField
+import org.codice.ddf.admin.sources.fields.type.SourceConfigField
 
 class SourceTestCommons {
 
-    static final ENDPOINT_URL = SourceConfigUnionField.ENDPOINT_URL_FIELD_NAME
+    static final ENDPOINT_URL = SourceConfigField.ENDPOINT_URL_FIELD_NAME
 
     static final CREDENTIALS = CredentialsField.DEFAULT_FIELD_NAME
 
@@ -47,9 +47,9 @@ class SourceTestCommons {
 
     static final SERVICE_PID_KEY = ServiceCommons.SERVICE_PID_KEY
 
-    static final SOURCE_NAME = SourceConfigUnionField.SOURCE_NAME_FIELD_NAME
+    static final SOURCE_NAME = SourceConfigField.SOURCE_NAME_FIELD_NAME
 
-    static final SOURCE_CONFIG = SourceConfigUnionField.FIELD_NAME
+    static final SOURCE_CONFIG = SourceConfigField.FIELD_NAME
 
     static final ID = 'id'
 
@@ -119,7 +119,7 @@ class SourceTestCommons {
     ]
 
     static createSourceConfigUnionField() {
-        def source = new SourceConfigUnionField()
+        def source = new SourceConfigField()
         source.endpointUrl('https://localhost:8993').sourceName(TEST_SOURCENAME)
                 .credentials().username(TEST_USERNAME).password(TEST_PASSWORD)
         return source

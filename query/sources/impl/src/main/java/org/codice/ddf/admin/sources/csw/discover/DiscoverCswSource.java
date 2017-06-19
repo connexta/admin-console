@@ -13,24 +13,21 @@
  **/
 package org.codice.ddf.admin.sources.csw.discover;
 
-import static org.codice.ddf.admin.sources.commons.utils.SourceUtilCommons.createSourceInfoField;
-
 import java.util.List;
 
 import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
+import org.codice.ddf.admin.api.report.ReportWithResult;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.common.AddressField;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
-import org.codice.ddf.admin.common.fields.common.UrlField;
-import org.codice.ddf.admin.common.report.ReportWithResultImpl;
-import org.codice.ddf.admin.sources.commons.utils.CswSourceUtils;
-import org.codice.ddf.admin.sources.fields.SourceInfoField;
-import org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField;
+import org.codice.ddf.admin.common.fields.common.ResponseField;
+import org.codice.ddf.admin.sources.csw.CswSourceUtils;
+import org.codice.ddf.admin.sources.fields.type.CswSourceConfigurationField;
 
 import com.google.common.collect.ImmutableList;
 
-public class DiscoverCswSource extends BaseFunctionField<SourceInfoField> {
+public class DiscoverCswSource extends BaseFunctionField<CswSourceConfigurationField> {
 
     public static final String ID = "discoverCsw";
 
@@ -45,7 +42,7 @@ public class DiscoverCswSource extends BaseFunctionField<SourceInfoField> {
     private CswSourceUtils cswSourceUtils;
 
     public DiscoverCswSource() {
-        super(ID, DESCRIPTION, new SourceInfoField());
+        super(ID, DESCRIPTION, new CswSourceConfigurationField());
         credentials = new CredentialsField();
         address = new AddressField();
         address.isRequired(true);
@@ -60,28 +57,27 @@ public class DiscoverCswSource extends BaseFunctionField<SourceInfoField> {
     }
 
     @Override
-    public SourceInfoField performFunction() {
-        ReportWithResultImpl<SourceConfigUnionField> configResult;
+    public CswSourceConfigurationField performFunction() {
+        ReportWithResult<ResponseField> responseResult;
         if (address.url() != null) {
-            configResult = cswSourceUtils.getPreferredCswConfig(address.urlField(), credentials);
-            addMessages(configResult);
-            if (containsErrorMsgs()) {
-                return null;
-            }
+            responseResult = cswSourceUtils.sendRequest(address.urlField(), credentials);
         } else {
-            ReportWithResultImpl<UrlField> discoveredUrl = cswSourceUtils.discoverCswUrl(address.host(), credentials);
-            addMessages(discoveredUrl);
-            if (containsErrorMsgs()) {
-                return null;
-            }
-
-            configResult = cswSourceUtils.getPreferredCswConfig(discoveredUrl.result(), credentials);
-            addMessages(configResult);
-            if (containsErrorMsgs()) {
-                return null;
-            }
+            responseResult = cswSourceUtils.discoverCswUrl(address.host(), credentials);
         }
-        return createSourceInfoField(true, configResult.result());
+
+        addMessages(responseResult);
+        if (containsErrorMsgs()) {
+            return null;
+        }
+
+        ReportWithResult<CswSourceConfigurationField> configResult =
+                cswSourceUtils.getPreferredCswConfig(responseResult.result(), credentials);
+        addMessages(configResult);
+        if (containsErrorMsgs() || !configResult.isResultPresent()) {
+            return null;
+        }
+
+        return configResult.result();
     }
 
     @Override
@@ -90,7 +86,7 @@ public class DiscoverCswSource extends BaseFunctionField<SourceInfoField> {
     }
 
     @Override
-    public FunctionField<SourceInfoField> newInstance() {
+    public FunctionField<CswSourceConfigurationField> newInstance() {
         return new DiscoverCswSource();
     }
 }

@@ -122,7 +122,7 @@ class GetOpenSearchConfigsTest extends Specification {
     private
     def assertConfig(Field field, int index, String sourceName, String pid, boolean availability) {
         def sourceInfo = (SourceInfoField) field
-        assert sourceInfo.fieldName() == ListFieldImpl.INDEX_DELIMETER + index
+        assert sourceInfo.fieldName() == index
         assert sourceInfo.isAvailable() == availability
         assert sourceInfo.config().credentials().password() == FLAG_PASSWORD
         assert sourceInfo.config().credentials().username() == TEST_USERNAME

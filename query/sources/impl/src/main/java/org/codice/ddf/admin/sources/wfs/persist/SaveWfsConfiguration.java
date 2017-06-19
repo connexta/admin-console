@@ -14,24 +14,26 @@
 package org.codice.ddf.admin.sources.wfs.persist;
 
 import static org.codice.ddf.admin.common.report.message.DefaultMessages.failedPersistError;
-import static org.codice.ddf.admin.common.services.ServiceCommons.createManagedService;
-import static org.codice.ddf.admin.common.services.ServiceCommons.updateService;
-import static org.codice.ddf.admin.common.services.ServiceCommons.validateServiceConfigurationExists;
-import static org.codice.ddf.admin.sources.commons.utils.SourceValidationUtils.hasSourceName;
-import static org.codice.ddf.admin.sources.commons.utils.SourceValidationUtils.validateSourceName;
+import static org.codice.ddf.admin.sources.services.WfsServiceProperties.WFS1_FEATURE;
+import static org.codice.ddf.admin.sources.services.WfsServiceProperties.WFS2_FEATURE;
 import static org.codice.ddf.admin.sources.services.WfsServiceProperties.wfsConfigToServiceProps;
 import static org.codice.ddf.admin.sources.services.WfsServiceProperties.wfsVersionToFactoryPid;
 
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.common.fields.common.PidField;
+import org.codice.ddf.admin.configurator.Configurator;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
+import org.codice.ddf.admin.configurator.OperationReport;
+import org.codice.ddf.admin.sources.fields.WfsVersion;
 import org.codice.ddf.admin.sources.fields.type.WfsSourceConfigurationField;
+import org.codice.ddf.admin.sources.utils.SourceUtilCommons;
+import org.codice.ddf.admin.sources.utils.SourceValidationUtils;
+import org.codice.ddf.internal.admin.configurator.actions.FeatureActions;
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
 import org.codice.ddf.internal.admin.configurator.actions.ServiceReader;
@@ -49,7 +51,11 @@ public class SaveWfsConfiguration extends BaseFunctionField<BooleanField> {
 
     private PidField pid;
 
-    private ConfiguratorFactory configuratorFactory;
+    private SourceValidationUtils sourceValidationUtils;
+
+    private SourceUtilCommons sourceUtilCommons;
+
+    private final ConfiguratorFactory configuratorFactory;
 
     private final ServiceActions serviceActions;
 
@@ -57,14 +63,17 @@ public class SaveWfsConfiguration extends BaseFunctionField<BooleanField> {
 
     private final ServiceReader serviceReader;
 
+    private final FeatureActions featureActions;
+
     public SaveWfsConfiguration(ConfiguratorFactory configuratorFactory,
             ServiceActions serviceActions, ManagedServiceActions managedServiceActions,
-            ServiceReader serviceReader) {
+            ServiceReader serviceReader, FeatureActions featureActions) {
         super(ID, DESCRIPTION, new BooleanField());
         this.configuratorFactory = configuratorFactory;
         this.serviceActions = serviceActions;
         this.managedServiceActions = managedServiceActions;
         this.serviceReader = serviceReader;
+        this.featureActions = featureActions;
 
         config = new WfsSourceConfigurationField();
         pid = new PidField();
@@ -76,24 +85,38 @@ public class SaveWfsConfiguration extends BaseFunctionField<BooleanField> {
         config.endpointUrlField()
                 .isRequired(true);
         updateArgumentPaths();
+
+        sourceValidationUtils = new SourceValidationUtils(serviceReader,
+                managedServiceActions,
+                configuratorFactory,
+                serviceActions);
+        sourceUtilCommons = new SourceUtilCommons(managedServiceActions,
+                serviceActions,
+                serviceReader,
+                configuratorFactory);
     }
 
     @Override
     public BooleanField performFunction() {
-        if (StringUtils.isNotEmpty(pid.getValue())) {
-            addMessages(updateService(pid,
-                    wfsConfigToServiceProps(config),
-                    configuratorFactory,
-                    serviceActions));
-        } else {
-            String factoryPid = wfsVersionToFactoryPid(config.wfsVersion());
-            if (createManagedService(wfsConfigToServiceProps(config),
-                    factoryPid,
-                    configuratorFactory,
-                    managedServiceActions).containsErrorMsgs()) {
-                addArgumentMessage(failedPersistError(config.path()));
-            }
+        Configurator configurator = configuratorFactory.getConfigurator();
+        OperationReport report = null;
+        if (config.wfsVersion()
+                .equals(WfsVersion.WFS_VERSION_2)) {
+            configurator.add(featureActions.start(WFS2_FEATURE));
+            report = configurator.commit("Starting feature [{}].", WFS2_FEATURE);
+        } else if (config.wfsVersion()
+                .equals(WfsVersion.WFS_VERSION_1)) {
+            configurator.add(featureActions.start(WFS1_FEATURE));
+            report = configurator.commit("Starting feature [{}].", WFS1_FEATURE);
         }
+
+        if(report != null && report.containsFailedResults()) {
+            addResultMessage(failedPersistError());
+        }
+
+        addMessages(sourceUtilCommons.saveSource(pid,
+                wfsConfigToServiceProps(config),
+                wfsVersionToFactoryPid(config.wfsVersion())));
         return new BooleanField(!containsErrorMsgs());
     }
 
@@ -103,17 +126,7 @@ public class SaveWfsConfiguration extends BaseFunctionField<BooleanField> {
         if (containsErrorMsgs()) {
             return;
         }
-
-        if (pid.getValue() != null) {
-            addMessages(validateServiceConfigurationExists(pid, serviceActions));
-            if (!containsErrorMsgs() && !hasSourceName(pid.getValue(),
-                    config.sourceName(),
-                    serviceReader)) {
-                addMessages(validateSourceName(config.sourceNameField(), serviceReader));
-            }
-        } else {
-            addMessages(validateSourceName(config.sourceNameField(), serviceReader));
-        }
+        addMessages(sourceValidationUtils.validateSourceName(config.sourceNameField(), pid));
     }
 
     @Override
@@ -126,6 +139,7 @@ public class SaveWfsConfiguration extends BaseFunctionField<BooleanField> {
         return new SaveWfsConfiguration(configuratorFactory,
                 serviceActions,
                 managedServiceActions,
-                serviceReader);
+                serviceReader,
+                featureActions);
     }
 }

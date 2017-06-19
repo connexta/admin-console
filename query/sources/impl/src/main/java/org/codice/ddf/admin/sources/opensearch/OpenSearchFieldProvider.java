@@ -23,6 +23,7 @@ import org.codice.ddf.admin.sources.opensearch.discover.DiscoverOpenSearchSource
 import org.codice.ddf.admin.sources.opensearch.discover.GetOpenSearchConfigurations;
 import org.codice.ddf.admin.sources.opensearch.persist.DeleteOpenSearchConfiguration;
 import org.codice.ddf.admin.sources.opensearch.persist.SaveOpenSearchConfiguration;
+import org.codice.ddf.internal.admin.configurator.actions.FeatureActions;
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
 import org.codice.ddf.internal.admin.configurator.actions.ServiceReader;
@@ -48,7 +49,7 @@ public class OpenSearchFieldProvider extends BaseFieldProvider {
 
     public OpenSearchFieldProvider(ConfiguratorFactory configuratorFactory,
             ServiceActions serviceActions, ManagedServiceActions managedServiceActions,
-            ServiceReader serviceReader) {
+            ServiceReader serviceReader, FeatureActions featureActions) {
         super(ID, TYPE_NAME, DESCRIPTION);
         discoverOpenSearchSource = new DiscoverOpenSearchSource();
         getOpenSearchConfigs = new GetOpenSearchConfigurations(configuratorFactory,
@@ -59,7 +60,7 @@ public class OpenSearchFieldProvider extends BaseFieldProvider {
         saveOpenSearchConfigs = new SaveOpenSearchConfiguration(configuratorFactory,
                 serviceActions,
                 managedServiceActions,
-                serviceReader);
+                serviceReader, featureActions);
         deleteOpenSearchConfig = new DeleteOpenSearchConfiguration(configuratorFactory,
                 serviceActions,
                 managedServiceActions);

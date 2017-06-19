@@ -61,6 +61,7 @@ import com.google.common.collect.Sets;
 public abstract class ServerGuesser {
     private static final Logger LOGGER = LoggerFactory.getLogger(ServerGuesser.class);
 
+    @SuppressWarnings("StaticInitializerReferencesSubClass")
     private static final Map<String, Function<Connection, ServerGuesser>> GUESSER_LOOKUP =
             ImmutableMap.of(LdapTypeField.ACTIVE_DIRECTORY,
                     ServerGuesser.ADGuesser::new,
@@ -152,7 +153,6 @@ public abstract class ServerGuesser {
                         .toLowerCase()
                         .matches(".*person.*"));
 
-        // TODO RAP 24 Jan 17: This should be moved elsewhere
         // Find any given user with the clearance attribute
         SearchRequest clearanceReq = Requests.newSearchRequest(DN.valueOf(baseUserDn),
                 SearchScope.WHOLE_SUBTREE,
@@ -296,8 +296,6 @@ public abstract class ServerGuesser {
             super(connection);
         }
 
-        // TODO RAP 07 Dec 16: Will more likely execute queries for these values and remove
-        // these custom overrides
         @Override
         public List<String> getUserBaseChoices() {
             return Collections.singletonList("ou=users,dc=example,dc=com");

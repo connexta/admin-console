@@ -22,11 +22,10 @@ import org.codice.ddf.admin.ldap.fields.connection.LdapBindUserInfo;
 import org.codice.ddf.admin.ldap.fields.connection.LdapConnectionField;
 import org.codice.ddf.admin.ldap.fields.connection.LdapEncryptionMethodField;
 
-import com.google.common.collect.ImmutableMap;
-
 public class LdapTestingCommons {
 
     public static final String LDAP_SERVER_BASE_USER_DN = "ou=users,dc=example,dc=com";
+
     public static final String LDAP_SERVER_BASE_GROUP_DN = "ou=groups,dc=example,dc=com";
 
     public static void loadLdapTestProperties() throws IOException {
@@ -62,8 +61,7 @@ public class LdapTestingCommons {
         if (includeAttributeFields) {
             settingsField.groupObjectClass("groupOfNames")
                     .groupAttributeHoldingMember("member")
-                    .memberAttributeReferencedInGroup("uid")
-                    .attributeMapField(ImmutableMap.of("foobar", "cn"));
+                    .memberAttributeReferencedInGroup("uid");
         }
 
         return settingsField;

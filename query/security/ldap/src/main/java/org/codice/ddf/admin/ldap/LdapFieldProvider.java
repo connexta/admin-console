@@ -22,6 +22,7 @@ import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.ldap.discover.LdapConfigurations;
 import org.codice.ddf.admin.ldap.discover.LdapQuery;
 import org.codice.ddf.admin.ldap.discover.LdapRecommendedSettings;
+import org.codice.ddf.admin.ldap.discover.LdapTestAttributeMappings;
 import org.codice.ddf.admin.ldap.discover.LdapTestBind;
 import org.codice.ddf.admin.ldap.discover.LdapTestConnection;
 import org.codice.ddf.admin.ldap.discover.LdapTestSettings;
@@ -48,6 +49,8 @@ public class LdapFieldProvider extends BaseFieldProvider {
     private LdapTestBind testBind;
     private LdapTestSettings testSettings;
     private LdapRecommendedSettings recommendedSettings;
+
+    private LdapTestAttributeMappings attributeMappings;
     private LdapQuery ldapQuery;
     private LdapUserAttributes getUserAttris;
     private LdapConfigurations getConfigs;
@@ -65,6 +68,8 @@ public class LdapFieldProvider extends BaseFieldProvider {
         testBind = new LdapTestBind();
         testSettings = new LdapTestSettings();
         recommendedSettings = new LdapRecommendedSettings();
+        attributeMappings = new LdapTestAttributeMappings();
+
         ldapQuery = new LdapQuery();
         getUserAttris = new LdapUserAttributes();
         getConfigs = new LdapConfigurations(managedServiceActions, propertyActions);
@@ -85,7 +90,7 @@ public class LdapFieldProvider extends BaseFieldProvider {
         return ImmutableList.of(testConnection,
                 testBind,
                 testSettings,
-                recommendedSettings,
+                recommendedSettings, attributeMappings,
                 ldapQuery,
                 getUserAttris,
                 getConfigs);

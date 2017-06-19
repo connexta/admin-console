@@ -52,7 +52,7 @@ class LdapTestSettingsSpec extends Specification {
     }
 
     def setup() {
-        LdapTestingCommons.loadLdapTestProperties()
+        loadLdapTestProperties()
         action = new LdapTestSettings()
 
         // Initialize bad paths
@@ -70,10 +70,8 @@ class LdapTestSettingsSpec extends Specification {
                     missingGroupObjectPath  : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, LdapSettingsField.GROUP_OBJECT_CLASS],
                     missingGroupAttribPath  : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, LdapSettingsField.GROUP_ATTRIBUTE_HOLDING_MEMBER],
                     missingMemberAttribPath : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, LdapSettingsField.MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP],
-                    missingAttribMappingPath: baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, LdapSettingsField.ATTRIBUTE_MAPPING],
                     badUserDnPath           : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, LdapSettingsField.BASE_USER_DN],
                     badGroupDnPath          : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, LdapSettingsField.BASE_GROUP_DN]
-
         ]
     }
 
@@ -116,14 +114,13 @@ class LdapTestSettingsSpec extends Specification {
         FunctionReport report = action.getValue()
 
         then:
-        report.messages().size() == 4
+        report.messages().size() == 3
         report.messages().count {
             it.getCode() == DefaultMessages.MISSING_REQUIRED_FIELD
-        } == 4
+        } == 3
         report.messages()*.getPath() as Set == [badPaths.missingGroupObjectPath,
                                                 badPaths.missingGroupAttribPath,
-                                                badPaths.missingMemberAttribPath,
-                                                badPaths.missingAttribMappingPath] as Set
+                                                badPaths.missingMemberAttribPath] as Set
     }
 
     def 'fail with invalid user/group dn'() {

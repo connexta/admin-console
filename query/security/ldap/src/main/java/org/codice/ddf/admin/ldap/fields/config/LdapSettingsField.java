@@ -164,6 +164,11 @@ public class LdapSettingsField extends BaseObjectField {
         groupObjectClass.isRequired(true);
         groupAttributeHoldingMember.isRequired(true);
         memberAttributeReferencedInGroup.isRequired(true);
+        return this;
+    }
+
+    public LdapSettingsField useDefaultUserAttributes() {
+        useDefaultAttributeStore();
         attributeMap.isRequired(true);
         return this;
     }

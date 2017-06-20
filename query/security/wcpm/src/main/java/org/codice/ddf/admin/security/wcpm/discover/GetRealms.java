@@ -16,15 +16,13 @@ package org.codice.ddf.admin.security.wcpm.discover;
 import static org.codice.ddf.admin.security.common.services.PolicyManagerServiceProperties.IDP_SERVER_BUNDLE_NAME;
 
 import org.codice.ddf.admin.api.fields.FunctionField;
-import org.codice.ddf.admin.api.fields.ListField;
-import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.fields.base.function.GetFunctionField;
 import org.codice.ddf.admin.security.common.fields.wcpm.Realm;
 import org.codice.ddf.admin.security.common.services.LdapLoginServiceProperties;
 import org.codice.ddf.internal.admin.configurator.actions.BundleActions;
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
 
-public class GetRealms extends GetFunctionField<ListField<Realm>> {
+public class GetRealms extends GetFunctionField<Realm.Realms> {
 
     public static final String FIELD_NAME = "realms";
 
@@ -44,8 +42,9 @@ public class GetRealms extends GetFunctionField<ListField<Realm>> {
     }
 
     @Override
-    public ListField<Realm> performFunction() {
-        ListField<Realm> realms = new ListFieldImpl<>(Realm.class);
+    public Realm.Realms performFunction() {
+        Realm.Realms realms = new Realm.Realms();
+
         realms.add(Realm.KARAF_REALM);
 
         if (bundleActions.isStarted(IDP_SERVER_BUNDLE_NAME)) {
@@ -62,12 +61,12 @@ public class GetRealms extends GetFunctionField<ListField<Realm>> {
     }
 
     @Override
-    public ListField<Realm> getReturnType() {
-        return new ListFieldImpl<>(Realm.class);
+    public Realm.Realms getReturnType() {
+        return new Realm.Realms();
     }
 
     @Override
-    public FunctionField<ListField<Realm>> newInstance() {
+    public FunctionField<Realm.Realms> newInstance() {
         return new GetRealms(managedServiceActions, bundleActions);
     }
 }

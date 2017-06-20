@@ -18,7 +18,6 @@ import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.api.fields.ListField
 import org.codice.ddf.admin.api.report.ReportWithResult
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField
-import org.codice.ddf.admin.common.fields.base.ListFieldImpl
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.configurator.Configurator
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
@@ -98,7 +97,7 @@ class SaveContextPoliciesTest extends Specification {
         serviceActions.read(_) >> stsConfig
 
         policyManager = new PolicyManager()
-        ListField<ContextPolicyBin> contextPolicies = new ListFieldImpl<>(ContextPolicyBin.class)
+        ContextPolicyBin.ContextPolicies contextPolicies = new ContextPolicyBin.ContextPolicies()
         contextPolicies.setValue(testData.policies)
         policyManager.setPolicies(new PolicyManagerServiceProperties().contextPoliciesToPolicyManagerProps(contextPolicies.getList()))
 

@@ -100,26 +100,6 @@ public abstract class BaseObjectField extends BaseDataType<Map<String, Object>>
         updateInnerFieldPaths();
     }
 
-    @Override
-    public DataType matchRequired(DataType field) {
-        super.matchRequired(field);
-
-        if(!(field instanceof ObjectField)) {
-            throw new RuntimeException("Cannot match required field that is not of type ObjectField.");
-        }
-
-        for(Field subField : ((ObjectField)field).getFields()) {
-            for(Field toSetSubField : getFields()) {
-                if(toSetSubField instanceof DataType && toSetSubField.fieldName().equals(subField.fieldName())) {
-                    ((DataType)toSetSubField).matchRequired((DataType) subField);
-                    break;
-                }
-            }
-        }
-
-        return this;
-    }
-
     public void updateInnerFieldPaths() {
         getFields().stream()
                 .filter(Objects::nonNull)

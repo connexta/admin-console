@@ -7,7 +7,6 @@ import graphql.validation.ValidationErrorType
 import groovy.json.JsonBuilder
 import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.api.fields.ListField
-import org.codice.ddf.admin.common.fields.base.ListFieldImpl
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField
 import org.codice.ddf.admin.common.fields.base.scalar.IntegerField
 import org.codice.ddf.admin.common.fields.base.scalar.StringField
@@ -45,7 +44,7 @@ class GraphQLTransformationTest extends Specification {
 
     static INTEGER = IntegerField.DEFAULT_FIELD_NAME
 
-    static LIST = ListFieldImpl.DEFAULT_FIELD_NAME
+    static LIST = TestFieldProvider.LIST_FIELD_NAME
 
     static ENUMERATION = TestEnumField.DEFAULT_FIELD_NAME
 
@@ -86,7 +85,6 @@ class GraphQLTransformationTest extends Specification {
         servlet.bindFieldProvider(new TestFieldProvider())
         request = new MockHttpServletRequest()
         response = new MockHttpServletResponse()
-
     }
 
     def 'successfully retrieve GraphQL schema'() {

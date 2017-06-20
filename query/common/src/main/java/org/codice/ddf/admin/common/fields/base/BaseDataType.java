@@ -75,10 +75,4 @@ public class BaseDataType<T> extends BaseField<T, T> implements DataType<T> {
 
         return errors;
     }
-
-    @Override
-    public DataType<T> matchRequired(DataType<T> fieldToMatch) {
-        isRequired(fieldToMatch.isRequired());
-        return this;
-    }
 }

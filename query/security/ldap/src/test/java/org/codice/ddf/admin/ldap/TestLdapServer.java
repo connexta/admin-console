@@ -86,13 +86,13 @@ public class TestLdapServer {
 
     public static int getLdapPort() {
         // return server.getListenPort("ldap");
-        return 1389;
+        return 11389;
 
     }
 
     public static int getLdapSecurePort() {
         // return server.getListenPort("ldaps");
-        return 1636;
+        return 11636;
     }
 
     public static String getHostname() {

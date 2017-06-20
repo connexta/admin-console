@@ -13,8 +13,12 @@
  **/
 package org.codice.ddf.admin.security.common.fields.wcpm;
 
+import java.util.Collection;
+import java.util.concurrent.Callable;
+
 import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.common.fields.base.BaseEnumField;
+import org.codice.ddf.admin.common.fields.base.BaseListField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 
 import com.google.common.collect.ImmutableList;
@@ -150,6 +154,40 @@ public class AuthType extends BaseEnumField<String> {
         @Override
         public String getValue() {
             return GUEST;
+        }
+    }
+
+    public static class AuthTypes extends BaseListField<AuthType> {
+
+        public static final String DEFAULT_FIELD_NAME = "authTypes";
+
+        private Callable<AuthType> newAuthType;
+
+        public AuthTypes() {
+            super(DEFAULT_FIELD_NAME);
+            newAuthType = AuthType::new;
+        }
+
+        @Override
+        public Callable<AuthType> getCreateListEntryCallable() {
+            return newAuthType;
+        }
+
+        public AuthTypes useDefaultIsRequired(){
+            newAuthType =  () -> {
+                AuthType authType = new AuthType();
+                authType.isRequired(true);
+                return authType;
+            };
+
+            isRequired(true);
+            return this;
+        }
+
+        @Override
+        public AuthTypes addAll(Collection<AuthType> values) {
+            super.addAll(values);
+            return this;
         }
     }
 

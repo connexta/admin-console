@@ -23,7 +23,6 @@ import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
-import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.common.services.ServiceCommons;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
@@ -44,10 +43,8 @@ public class GetWfsConfigurations extends BaseFunctionField<ListField<WfsSourceI
     public static final String DESCRIPTION =
             "Retrieves all currently configured WFS sources. If a source pid is specified, only that source configuration will be returned.";
 
-    public static final ListFieldImpl<WfsSourceInfoField> RETURN_TYPE =
-            new ListFieldImpl<>(WfsSourceInfoField.class);
-
-    public static final String WFS_SOURCES = "wfsSources";
+    public static final SourceInfoField.SourceInfos RETURN_TYPE =
+            new SourceInfoField.SourceInfos();
 
     private PidField pid;
 

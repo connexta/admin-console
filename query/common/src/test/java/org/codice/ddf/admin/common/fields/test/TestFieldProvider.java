@@ -22,7 +22,6 @@ import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
-import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.fields.base.function.BaseFieldProvider;
 import org.codice.ddf.admin.common.fields.base.function.GetFunctionField;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
@@ -33,6 +32,8 @@ import org.codice.ddf.admin.common.report.message.ErrorMessageImpl;
 import com.google.common.collect.ImmutableList;
 
 public class TestFieldProvider extends BaseFieldProvider {
+
+    public static final String LIST_FIELD_NAME = "list";
 
     public static final String TEST_FUNCTION_NAME = "testing";
 
@@ -204,8 +205,8 @@ public class TestFieldProvider extends BaseFieldProvider {
         public static final TestObjectField ENTRY_3_VALUE =
                 TestObjectField.createSampleTestObject();
 
-        public static final ListFieldImpl<TestObjectField> RETURN_TYPE =
-                new ListFieldImpl<>(TestObjectField.class);
+        public static final TestObjectField.TestObjects RETURN_TYPE =
+                new TestObjectField.TestObjects();
 
         public GetList() {
             super(GET_LIST_FUNCTION_NAME, "Returns a sample list of sample objects.");
@@ -213,7 +214,7 @@ public class TestFieldProvider extends BaseFieldProvider {
 
         @Override
         public ListField performFunction() {
-            ListFieldImpl<TestObjectField> list = new ListFieldImpl<>(TestObjectField.class);
+            TestObjectField.TestObjects list = new TestObjectField.TestObjects();
             list.addAll(Arrays.asList(ENTRY_1_VALUE, ENTRY_2_VALUE, ENTRY_3_VALUE));
             return list;
         }
@@ -302,7 +303,7 @@ public class TestFieldProvider extends BaseFieldProvider {
 
         private BooleanField booleanArg;
 
-        private ListFieldImpl<StringField> listArg;
+        private StringField.Strings listArg;
 
         private TestEnumField enumArg;
 
@@ -312,7 +313,7 @@ public class TestFieldProvider extends BaseFieldProvider {
             stringArg = new StringField();
             integerArg = new IntegerField();
             booleanArg = new BooleanField();
-            listArg = new ListFieldImpl<>(StringField.class);
+            listArg = new StringField.Strings(LIST_FIELD_NAME);
             enumArg = new TestEnumField();
             updateArgumentPaths();
         }

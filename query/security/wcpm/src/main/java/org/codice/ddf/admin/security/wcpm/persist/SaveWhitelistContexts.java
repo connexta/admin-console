@@ -18,9 +18,7 @@ import static org.codice.ddf.admin.common.report.message.DefaultMessages.failedP
 import java.util.List;
 
 import org.codice.ddf.admin.api.DataType;
-import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
-import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.fields.common.ContextPath;
 import org.codice.ddf.admin.configurator.Configurator;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
@@ -30,17 +28,17 @@ import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
 
 import com.google.common.collect.ImmutableList;
 
-public class SaveWhitelistContexts extends BaseFunctionField<ListField<ContextPath>> {
+public class SaveWhitelistContexts extends BaseFunctionField<ContextPath.ContextPaths> {
 
     public static final String FIELD_NAME = "saveWhitelistContexts";
 
     public static final String DESCRIPTION =
             "Persists the given contexts paths as white listed contexts. White listing a context path will result in no security being applied to the given paths.";
 
-    public static final ListFieldImpl<ContextPath> RETURN_TYPE =
-            new ListFieldImpl<>(ContextPath.class);
+    public static final ContextPath.ContextPaths RETURN_TYPE =
+            new ContextPath.ContextPaths();
 
-    private ListField<ContextPath> contexts;
+    private ContextPath.ContextPaths contexts;
 
     private ConfiguratorFactory configuratorFactory;
 
@@ -52,12 +50,12 @@ public class SaveWhitelistContexts extends BaseFunctionField<ListField<ContextPa
         this.configuratorFactory = configuratorFactory;
         this.serviceActions = serviceActions;
 
-        contexts = new ListFieldImpl<>("paths", new ContextPath());
+        contexts = new ContextPath.ContextPaths();
         updateArgumentPaths();
     }
 
     @Override
-    public ListField<ContextPath> performFunction() {
+    public ContextPath.ContextPaths performFunction() {
         Configurator configurator = configuratorFactory.getConfigurator();
         configurator.add(serviceActions.build(PolicyManagerServiceProperties.POLICY_MANAGER_PID,
                 new PolicyManagerServiceProperties().whiteListToPolicyManagerProps(contexts),
@@ -75,7 +73,7 @@ public class SaveWhitelistContexts extends BaseFunctionField<ListField<ContextPa
     }
 
     @Override
-    public ListField<ContextPath> getReturnType() {
+    public ContextPath.ContextPaths getReturnType() {
         return RETURN_TYPE;
     }
 

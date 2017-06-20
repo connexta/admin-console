@@ -16,20 +16,18 @@ package org.codice.ddf.admin.security.sts.discover;
 import java.util.List;
 
 import org.codice.ddf.admin.api.fields.FunctionField;
-import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.fields.base.function.GetFunctionField;
 import org.codice.ddf.admin.security.common.fields.sts.StsClaimField;
 import org.codice.ddf.admin.security.common.services.StsServiceProperties;
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
 
-public class GetStsClaimsFunctionField extends GetFunctionField<ListFieldImpl<StsClaimField>> {
+public class GetStsClaimsFunctionField extends GetFunctionField<StsClaimField.StsClaims> {
 
     public static final String NAME = "claims";
 
     public static final String DESCRIPTION = "All currently configured claims the STS supports.";
 
-    public static final ListFieldImpl<StsClaimField> RETURN_TYPE =
-            new ListFieldImpl<>(StsClaimField.class);
+    public static final StsClaimField.StsClaims RETURN_TYPE = new StsClaimField.StsClaims();
 
     private final ServiceActions serviceActions;
 
@@ -39,11 +37,11 @@ public class GetStsClaimsFunctionField extends GetFunctionField<ListFieldImpl<St
     }
 
     @Override
-    public ListFieldImpl<StsClaimField> performFunction() {
+    public StsClaimField.StsClaims performFunction() {
         List<String> supportedClaims = new StsServiceProperties().getConfiguredStsClaims(
                 serviceActions);
 
-        ListFieldImpl<StsClaimField> claims = new ListFieldImpl<>(StsClaimField.class);
+        StsClaimField.StsClaims claims = new StsClaimField.StsClaims();
 
         supportedClaims.stream()
                 .forEach(claim -> {
@@ -56,12 +54,12 @@ public class GetStsClaimsFunctionField extends GetFunctionField<ListFieldImpl<St
     }
 
     @Override
-    public ListFieldImpl<StsClaimField> getReturnType() {
+    public StsClaimField.StsClaims getReturnType() {
         return RETURN_TYPE;
     }
 
     @Override
-    public FunctionField<ListFieldImpl<StsClaimField>> newInstance() {
+    public FunctionField<StsClaimField.StsClaims> newInstance() {
         return new GetStsClaimsFunctionField(serviceActions);
     }
 }

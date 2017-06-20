@@ -20,9 +20,7 @@ import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
-import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
-import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.fields.base.scalar.IntegerField;
 import org.codice.ddf.admin.common.fields.common.MapField;
 import org.codice.ddf.admin.ldap.commons.LdapConnectionAttempt;
@@ -40,7 +38,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableList;
 
-public class LdapQuery extends BaseFunctionField<ListField<MapField>> {
+public class LdapQuery extends BaseFunctionField<MapField.Maps> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LdapQuery.class);
 
@@ -54,7 +52,7 @@ public class LdapQuery extends BaseFunctionField<ListField<MapField>> {
 
     private static final int DEFAULT_MAX_QUERY_RESULTS = 25;
 
-    public static final ListFieldImpl<MapField> RETURN_TYPE = new ListFieldImpl<>(MapField.class);
+    public static final MapField.Maps RETURN_TYPE = new MapField.Maps();
 
     private LdapConnectionField conn;
 
@@ -88,10 +86,9 @@ public class LdapQuery extends BaseFunctionField<ListField<MapField>> {
     }
 
     @Override
-    public ListField<MapField> performFunction() {
+    public MapField.Maps performFunction() {
         List<SearchResultEntry> searchResults;
         List<MapField> convertedSearchResults = new ArrayList<>();
-        ListField<MapField> entries;
         try (LdapConnectionAttempt connectionAttempt = utils.bindUserToLdapConnection(conn,
                 creds)) {
             addMessages(connectionAttempt);
@@ -132,17 +129,17 @@ public class LdapQuery extends BaseFunctionField<ListField<MapField>> {
             LOGGER.warn("Error closing LDAP connection", e);
         }
 
-        return new ListFieldImpl<>(MapField.class).addAll(convertedSearchResults);
+        return new MapField.Maps().addAll(convertedSearchResults);
     }
 
     @Override
-    public FunctionField<ListField<MapField>> newInstance() {
+    public FunctionField<MapField.Maps> newInstance() {
         return new LdapQuery();
     }
 
 
     @Override
-    public ListField<MapField> getReturnType() {
+    public MapField.Maps getReturnType() {
         return RETURN_TYPE;
     }
 

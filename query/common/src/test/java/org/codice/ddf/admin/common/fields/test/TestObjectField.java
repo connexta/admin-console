@@ -13,14 +13,17 @@
  **/
 package org.codice.ddf.admin.common.fields.test;
 
+import static org.codice.ddf.admin.common.fields.test.TestFieldProvider.LIST_FIELD_NAME;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.api.fields.ObjectField;
+import org.codice.ddf.admin.common.fields.base.BaseListField;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
-import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.common.fields.base.scalar.IntegerField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
@@ -56,7 +59,7 @@ public class TestObjectField extends BaseObjectField {
 
     private StringField stringField;
 
-    private ListFieldImpl<StringField> listField;
+    private StringField.Strings listField;
 
     private TestEnumField enumField;
 
@@ -65,7 +68,7 @@ public class TestObjectField extends BaseObjectField {
         integerField = new IntegerField();
         booleanField = new BooleanField();
         stringField = new StringField();
-        listField = new ListFieldImpl<>(new StringField().isRequired(true));
+        listField = new StringField.Strings(LIST_FIELD_NAME).useDefaultIsRequired();
         enumField = new TestEnumField();
         innerTestObjectField = new InnerTestObjectField();
         updateInnerFieldPaths();
@@ -83,7 +86,7 @@ public class TestObjectField extends BaseObjectField {
         return stringField;
     }
 
-    public ListFieldImpl<StringField> getListField() {
+    public StringField.Strings getListField() {
         return listField;
     }
 
@@ -174,6 +177,22 @@ public class TestObjectField extends BaseObjectField {
         @Override
         public List<Field> getFields() {
             return ImmutableList.of(subFieldOfInnerField);
+        }
+    }
+
+    public static class TestObjects extends BaseListField<TestObjectField> {
+
+        public TestObjects(String fieldName) {
+            super(fieldName);
+        }
+
+        public TestObjects() {
+            this(LIST_FIELD_NAME);
+        }
+
+        @Override
+        public Callable<TestObjectField> getCreateListEntryCallable() {
+            return TestObjectField::new;
         }
     }
 }

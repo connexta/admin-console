@@ -13,8 +13,11 @@
  **/
 package org.codice.ddf.admin.security.common.fields.wcpm;
 
+import java.util.concurrent.Callable;
+
 import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.common.fields.base.BaseEnumField;
+import org.codice.ddf.admin.common.fields.base.BaseListField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 
 import com.google.common.collect.ImmutableList;
@@ -79,6 +82,20 @@ public class Realm extends BaseEnumField<String> {
         @Override
         public String getValue() {
             return KARAF;
+        }
+    }
+
+    public static class Realms extends BaseListField<Realm> {
+
+        public static final String DEFAULT_FIELD_NAME = "realm";
+
+        public Realms() {
+            super(DEFAULT_FIELD_NAME);
+        }
+
+        @Override
+        public Callable<Realm> getCreateListEntryCallable() {
+            return Realm::new;
         }
     }
 }

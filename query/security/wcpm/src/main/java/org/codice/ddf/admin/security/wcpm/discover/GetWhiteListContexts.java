@@ -31,10 +31,13 @@ public class GetWhiteListContexts extends GetFunctionField<ListField<ContextPath
     public static final String DESCRIPTION =
             "Returns all white listed contexts. Any contexts that are white listed have no security policy applied to them.";
 
+    public static final ListFieldImpl<ContextPath> RETURN_TYPE =
+            new ListFieldImpl<>(ContextPath.class);
+
     private final ServiceActions serviceActions;
 
     public GetWhiteListContexts(ServiceActions serviceActions) {
-        super(DEFAULT_FIELD_NAME, DESCRIPTION, new ListFieldImpl<>(ContextPath.class));
+        super(DEFAULT_FIELD_NAME, DESCRIPTION);
 
         this.serviceActions = serviceActions;
     }
@@ -49,6 +52,11 @@ public class GetWhiteListContexts extends GetFunctionField<ListField<ContextPath
             whiteListedField.add(newContextPath);
         }
         return whiteListedField;
+    }
+
+    @Override
+    public ListField<ContextPath> getReturnType() {
+        return RETURN_TYPE;
     }
 
     @Override

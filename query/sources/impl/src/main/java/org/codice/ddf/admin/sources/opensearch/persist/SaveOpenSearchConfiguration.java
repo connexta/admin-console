@@ -45,6 +45,8 @@ public class SaveOpenSearchConfiguration extends BaseFunctionField<BooleanField>
     public static final String DESCRIPTION =
             "Saves an OpenSearch source configuration. If a pid is specified, the source configuration specified by the pid will be updated. Returns true on success and false on failure.";
 
+    public static final BooleanField RETURN_TYPE = new BooleanField();
+
     private OpenSearchSourceConfigurationField config;
 
     private PidField pid;
@@ -66,7 +68,7 @@ public class SaveOpenSearchConfiguration extends BaseFunctionField<BooleanField>
     public SaveOpenSearchConfiguration(ConfiguratorFactory configuratorFactory,
             ServiceActions serviceActions, ManagedServiceActions managedServiceActions,
             ServiceReader serviceReader, FeatureActions featureActions) {
-        super(FIELD_NAME, DESCRIPTION, new BooleanField());
+        super(FIELD_NAME, DESCRIPTION);
         this.configuratorFactory = configuratorFactory;
         this.serviceActions = serviceActions;
         this.managedServiceActions = managedServiceActions;
@@ -111,6 +113,11 @@ public class SaveOpenSearchConfiguration extends BaseFunctionField<BooleanField>
             return;
         }
         addMessages(sourceValidationUtils.validateSourceName(config.sourceNameField(), pid));
+    }
+
+    @Override
+    public BooleanField getReturnType() {
+        return RETURN_TYPE;
     }
 
     @Override

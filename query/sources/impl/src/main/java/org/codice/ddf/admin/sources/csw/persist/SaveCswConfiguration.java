@@ -45,6 +45,8 @@ public class SaveCswConfiguration extends BaseFunctionField<BooleanField> {
     public static final String DESCRIPTION =
             "Saves a CSW source configuration. If a pid is specified, the source configuration specified by the pid will be updated. Returns true on success and false on failure.";
 
+    public static final BooleanField RETURN_TYPE = new BooleanField();
+
     private CswSourceConfigurationField config;
 
     private PidField pid;
@@ -66,7 +68,7 @@ public class SaveCswConfiguration extends BaseFunctionField<BooleanField> {
     public SaveCswConfiguration(ConfiguratorFactory configuratorFactory,
             ServiceActions serviceActions, ManagedServiceActions managedServiceActions,
             ServiceReader serviceReader, FeatureActions featureActions) {
-        super(FIELD_NAME, DESCRIPTION, new BooleanField());
+        super(FIELD_NAME, DESCRIPTION);
         this.configuratorFactory = configuratorFactory;
         this.serviceActions = serviceActions;
         this.managedServiceActions = managedServiceActions;
@@ -111,6 +113,11 @@ public class SaveCswConfiguration extends BaseFunctionField<BooleanField> {
             return;
         }
         addMessages(sourceValidationUtils.validateSourceName(config.sourceNameField(), pid));
+    }
+
+    @Override
+    public BooleanField getReturnType() {
+        return RETURN_TYPE;
     }
 
     @Override

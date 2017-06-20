@@ -29,10 +29,12 @@ public class GetAuthTypes extends GetFunctionField<ListField<AuthType>> {
     public static final String DESCRIPTION =
             "Retrieves all currently configured authentication types.";
 
+    public static final ListFieldImpl<AuthType> RETURN_TYPE = new ListFieldImpl<>(AuthType.class);
+
     private ConfiguratorFactory configuratorFactory;
 
     public GetAuthTypes(ConfiguratorFactory configuratorFactory) {
-        super(FIELD_NAME, DESCRIPTION, new ListFieldImpl<>(AuthType.class));
+        super(FIELD_NAME, DESCRIPTION);
         this.configuratorFactory = configuratorFactory;
     }
 
@@ -45,6 +47,11 @@ public class GetAuthTypes extends GetFunctionField<ListField<AuthType>> {
                 AuthType.IDP_AUTH));
 
         return authTypes;
+    }
+
+    @Override
+    public ListField<AuthType> getReturnType() {
+        return RETURN_TYPE;
     }
 
     @Override

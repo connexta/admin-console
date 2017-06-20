@@ -44,6 +44,9 @@ public class GetWfsConfigurations extends BaseFunctionField<ListField<WfsSourceI
     public static final String DESCRIPTION =
             "Retrieves all currently configured WFS sources. If a source pid is specified, only that source configuration will be returned.";
 
+    public static final ListFieldImpl<WfsSourceInfoField> RETURN_TYPE =
+            new ListFieldImpl<>(WfsSourceInfoField.class);
+
     public static final String WFS_SOURCES = "wfsSources";
 
     private PidField pid;
@@ -63,7 +66,7 @@ public class GetWfsConfigurations extends BaseFunctionField<ListField<WfsSourceI
     public GetWfsConfigurations(ConfiguratorFactory configuratorFactory,
             ServiceActions serviceActions, ManagedServiceActions managedServiceActions,
             ServiceReader serviceReader) {
-        super(FIELD_NAME, DESCRIPTION, new ListFieldImpl<>(WfsSourceInfoField.class));
+        super(FIELD_NAME, DESCRIPTION);
         this.configuratorFactory = configuratorFactory;
         this.serviceActions = serviceActions;
         this.managedServiceActions = managedServiceActions;
@@ -128,5 +131,10 @@ public class GetWfsConfigurations extends BaseFunctionField<ListField<WfsSourceI
                 serviceActions,
                 managedServiceActions,
                 serviceReader);
+    }
+
+    @Override
+    public ListField<WfsSourceInfoField> getReturnType() {
+        return RETURN_TYPE;
     }
 }

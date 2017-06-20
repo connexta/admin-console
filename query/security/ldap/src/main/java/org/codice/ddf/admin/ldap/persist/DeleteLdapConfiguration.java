@@ -33,6 +33,8 @@ public class DeleteLdapConfiguration extends BaseFunctionField<BooleanField> {
 
     public static final String DESCRIPTION = "Deletes the specified LDAP configuration.";
 
+    public static final BooleanField RETURN_TYPE = new BooleanField();
+
     private PidField pid;
 
     private final ConfiguratorFactory configuratorFactory;
@@ -48,7 +50,7 @@ public class DeleteLdapConfiguration extends BaseFunctionField<BooleanField> {
     public DeleteLdapConfiguration(ConfiguratorFactory configuratorFactory,
             ManagedServiceActions managedServiceActions, PropertyActions propertyActions,
             ServiceActions serviceActions) {
-        super(FIELD_NAME, DESCRIPTION, new BooleanField());
+        super(FIELD_NAME, DESCRIPTION);
         this.configuratorFactory = configuratorFactory;
         this.managedServiceActions = managedServiceActions;
         this.propertyActions = propertyActions;
@@ -62,6 +64,11 @@ public class DeleteLdapConfiguration extends BaseFunctionField<BooleanField> {
                 serviceActions,
                 null,
                 configuratorFactory);
+    }
+
+    @Override
+    public BooleanField getReturnType() {
+        return RETURN_TYPE;
     }
 
     @Override

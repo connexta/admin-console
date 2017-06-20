@@ -28,18 +28,26 @@ public class GetContextPolicies extends GetFunctionField<ListField<ContextPolicy
     public static final String DESCRIPTION =
             "Returns all currently configured policies applied to context paths.";
 
+    public static final ListFieldImpl<ContextPolicyBin> RETURN_TYPE =
+            new ListFieldImpl<>(ContextPolicyBin.class);
+
     private final ServiceReader serviceReader;
 
     private PolicyManagerServiceProperties wcpmServiceProps = new PolicyManagerServiceProperties();
 
     public GetContextPolicies(ServiceReader serviceReader) {
-        super(DEFAULT_FIELD_NAME, DESCRIPTION, new ListFieldImpl<>(ContextPolicyBin.class));
+        super(DEFAULT_FIELD_NAME, DESCRIPTION);
         this.serviceReader = serviceReader;
     }
 
     @Override
     public ListField<ContextPolicyBin> performFunction() {
         return wcpmServiceProps.contextPolicyServiceToContextPolicyFields(serviceReader);
+    }
+
+    @Override
+    public ListField<ContextPolicyBin> getReturnType() {
+        return RETURN_TYPE;
     }
 
     @Override

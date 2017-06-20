@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import org.codice.ddf.admin.api.report.ErrorMessage;
+import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 
 public class ContextPath extends StringField {
@@ -114,6 +115,15 @@ public class ContextPath extends StringField {
                 }
             }
             return count;
+        }
+    }
+
+    public static class ContextPaths extends ListFieldImpl<ContextPath> {
+
+        public static final String PATHS_FIELD_NAME = "paths";
+
+        public ContextPaths(String fieldName, Class<ContextPath> listFieldType) {
+            super(fieldName, listFieldType);
         }
     }
 }

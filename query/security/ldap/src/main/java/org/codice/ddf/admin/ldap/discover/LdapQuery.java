@@ -41,6 +41,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.ImmutableList;
 
 public class LdapQuery extends BaseFunctionField<ListField<MapField>> {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(LdapQuery.class);
 
     public static final String FIELD_NAME = "query";
@@ -52,6 +53,8 @@ public class LdapQuery extends BaseFunctionField<ListField<MapField>> {
     public static final String QUERY_BASE_FIELD_NAME = "queryBase";
 
     private static final int DEFAULT_MAX_QUERY_RESULTS = 25;
+
+    public static final ListFieldImpl<MapField> RETURN_TYPE = new ListFieldImpl<>(MapField.class);
 
     private LdapConnectionField conn;
 
@@ -66,7 +69,7 @@ public class LdapQuery extends BaseFunctionField<ListField<MapField>> {
     private LdapTestingUtils utils;
 
     public LdapQuery() {
-        super(FIELD_NAME, DESCRIPTION, new ListFieldImpl<>(MapField.class));
+        super(FIELD_NAME, DESCRIPTION);
         conn = new LdapConnectionField().useDefaultRequired();
         creds = new LdapBindUserInfo().useDefaultRequired();
         maxQueryResults = new IntegerField(MAX_QUERY_FIELD_NAME);
@@ -135,6 +138,12 @@ public class LdapQuery extends BaseFunctionField<ListField<MapField>> {
     @Override
     public FunctionField<ListField<MapField>> newInstance() {
         return new LdapQuery();
+    }
+
+
+    @Override
+    public ListField<MapField> getReturnType() {
+        return RETURN_TYPE;
     }
 
     /**

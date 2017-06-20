@@ -28,7 +28,8 @@ public class LdapConfigurations extends GetFunctionField<ListField<LdapConfigura
 
     public static final String DESCRIPTION = "Retrieves all currently configured LDAP settings.";
 
-    private static final String CONFIGS_ARG_NAME = "configs";
+    public static final ListFieldImpl<LdapConfigurationField> RETURN_TYPE =
+            new ListFieldImpl<>(LdapConfigurationField.class);
 
     private final ManagedServiceActions managedServiceActions;
 
@@ -37,9 +38,7 @@ public class LdapConfigurations extends GetFunctionField<ListField<LdapConfigura
     private LdapServiceCommons serviceCommons;
 
     public LdapConfigurations(ManagedServiceActions managedServiceActions, PropertyActions propertyActions) {
-        super(FIELD_NAME,
-                DESCRIPTION,
-                new ListFieldImpl<>(CONFIGS_ARG_NAME, LdapConfigurationField.class));
+        super(FIELD_NAME, DESCRIPTION);
         this.managedServiceActions = managedServiceActions;
         this.propertyActions = propertyActions;
         updateArgumentPaths();
@@ -50,6 +49,11 @@ public class LdapConfigurations extends GetFunctionField<ListField<LdapConfigura
     @Override
     public ListField<LdapConfigurationField> performFunction() {
         return serviceCommons.getLdapConfigurations();
+    }
+
+    @Override
+    public ListField<LdapConfigurationField> getReturnType() {
+        return RETURN_TYPE;
     }
 
     @Override

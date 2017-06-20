@@ -37,6 +37,9 @@ public class SaveWhitelistContexts extends BaseFunctionField<ListField<ContextPa
     public static final String DESCRIPTION =
             "Persists the given contexts paths as white listed contexts. White listing a context path will result in no security being applied to the given paths.";
 
+    public static final ListFieldImpl<ContextPath> RETURN_TYPE =
+            new ListFieldImpl<>(ContextPath.class);
+
     private ListField<ContextPath> contexts;
 
     private ConfiguratorFactory configuratorFactory;
@@ -45,7 +48,7 @@ public class SaveWhitelistContexts extends BaseFunctionField<ListField<ContextPa
 
     public SaveWhitelistContexts(ConfiguratorFactory configuratorFactory,
             ServiceActions serviceActions) {
-        super(FIELD_NAME, DESCRIPTION, new ListFieldImpl<>(ContextPath.class));
+        super(FIELD_NAME, DESCRIPTION);
         this.configuratorFactory = configuratorFactory;
         this.serviceActions = serviceActions;
 
@@ -69,6 +72,11 @@ public class SaveWhitelistContexts extends BaseFunctionField<ListField<ContextPa
         }
 
         return configReport.containsFailedResults() ? null : contexts;
+    }
+
+    @Override
+    public ListField<ContextPath> getReturnType() {
+        return RETURN_TYPE;
     }
 
     @Override

@@ -115,8 +115,10 @@ public class TestFieldProvider extends BaseFieldProvider {
 
         public static final int GET_INT_VALUE = 999;
 
+        public static final IntegerField RETURN_TYPE = new IntegerField();
+
         public GetInt() {
-            super(GET_INT_FUNCTION_NAME, "Returns a sample integer.", IntegerField.class);
+            super(GET_INT_FUNCTION_NAME, "Returns a sample integer.");
         }
 
         @Override
@@ -124,6 +126,11 @@ public class TestFieldProvider extends BaseFieldProvider {
             IntegerField integerField = new IntegerField();
             integerField.setValue(GET_INT_VALUE);
             return integerField;
+        }
+
+        @Override
+        public IntegerField getReturnType() {
+            return RETURN_TYPE;
         }
 
         @Override
@@ -135,9 +142,10 @@ public class TestFieldProvider extends BaseFieldProvider {
     public static class GetBoolean extends GetFunctionField<BooleanField> {
 
         public static final boolean GET_BOOLEAN_VALUE = true;
+        public static final BooleanField RETURN_TYPE = new BooleanField();
 
         public GetBoolean() {
-            super(GET_BOOL_FUNCTION_NAME, "Returns a sample boolean.", BooleanField.class);
+            super(GET_BOOL_FUNCTION_NAME, "Returns a sample boolean.");
         }
 
         @Override
@@ -145,6 +153,11 @@ public class TestFieldProvider extends BaseFieldProvider {
             BooleanField booleanField = new BooleanField();
             booleanField.setValue(GET_BOOLEAN_VALUE);
             return booleanField;
+        }
+
+        @Override
+        public BooleanField getReturnType() {
+            return RETURN_TYPE;
         }
 
         @Override
@@ -156,9 +169,10 @@ public class TestFieldProvider extends BaseFieldProvider {
     public static class GetString extends GetFunctionField<StringField> {
 
         public static final String GET_STRING_VALUE = "SAMPLE_STRING";
+        public static final StringField RETURN_TYPE = new StringField();
 
         public GetString() {
-            super(GET_STRING_FUNCTION_NAME, "Returns a sample string.", StringField.class);
+            super(GET_STRING_FUNCTION_NAME, "Returns a sample string.");
         }
 
         @Override
@@ -166,6 +180,11 @@ public class TestFieldProvider extends BaseFieldProvider {
             StringField strField = new StringField();
             strField.setValue(GET_STRING_VALUE);
             return strField;
+        }
+
+        @Override
+        public StringField getReturnType() {
+            return RETURN_TYPE;
         }
 
         @Override
@@ -185,10 +204,11 @@ public class TestFieldProvider extends BaseFieldProvider {
         public static final TestObjectField ENTRY_3_VALUE =
                 TestObjectField.createSampleTestObject();
 
+        public static final ListFieldImpl<TestObjectField> RETURN_TYPE =
+                new ListFieldImpl<>(TestObjectField.class);
+
         public GetList() {
-            super(GET_LIST_FUNCTION_NAME,
-                    "Returns a sample list of sample objects.",
-                    new ListFieldImpl<>(TestObjectField.class));
+            super(GET_LIST_FUNCTION_NAME, "Returns a sample list of sample objects.");
         }
 
         @Override
@@ -196,6 +216,11 @@ public class TestFieldProvider extends BaseFieldProvider {
             ListFieldImpl<TestObjectField> list = new ListFieldImpl<>(TestObjectField.class);
             list.addAll(Arrays.asList(ENTRY_1_VALUE, ENTRY_2_VALUE, ENTRY_3_VALUE));
             return list;
+        }
+
+        @Override
+        public ListField<TestObjectField> getReturnType() {
+            return RETURN_TYPE;
         }
 
         @Override
@@ -209,7 +234,7 @@ public class TestFieldProvider extends BaseFieldProvider {
         public static final String GET_ENUM_VALUE = TestEnumField.ENUM_A;
 
         public GetEnum() {
-            super(GET_ENUM_FUNCTION_NAME, "Returns a sample enumerated value.", TestEnumField.class);
+            super(GET_ENUM_FUNCTION_NAME, "Returns a sample enumerated value.");
         }
 
         @Override
@@ -220,6 +245,11 @@ public class TestFieldProvider extends BaseFieldProvider {
         }
 
         @Override
+        public TestEnumField getReturnType() {
+            return new TestEnumField();
+        }
+
+        @Override
         public FunctionField<TestEnumField> newInstance() {
             return new GetEnum();
         }
@@ -227,13 +257,20 @@ public class TestFieldProvider extends BaseFieldProvider {
 
     public static class RequiredArgsFunction extends BaseFunctionField<TestObjectField> {
 
+        public static final TestObjectField RETURN_TYPE = new TestObjectField();
+
         private TestObjectField objArg;
 
         public RequiredArgsFunction() {
-            super(REQUIRED_ARG_FUNCTION_NAME, "Returns the object passed as an argument", new TestObjectField());
+            super(REQUIRED_ARG_FUNCTION_NAME, "Returns the object passed as an argument");
             objArg = new TestObjectField();
             objArg.allFieldsRequired(true);
             updateArgumentPaths();
+        }
+
+        @Override
+        public TestObjectField getReturnType() {
+            return RETURN_TYPE;
         }
 
         @Override
@@ -257,6 +294,8 @@ public class TestFieldProvider extends BaseFieldProvider {
 
     public static class MultiArgFunction extends BaseFunctionField<TestObjectField> {
 
+        public static final TestObjectField RETURN_TYPE = new TestObjectField();
+
         private StringField stringArg;
 
         private IntegerField integerArg;
@@ -269,14 +308,18 @@ public class TestFieldProvider extends BaseFieldProvider {
 
         public MultiArgFunction() {
             super(MULTIPLE_ARGS_FUNCTION_NAME,
-                    "Generates a TestObjectField using the various args passed.",
-                    new TestObjectField());
+                    "Generates a TestObjectField using the various args passed.");
             stringArg = new StringField();
             integerArg = new IntegerField();
             booleanArg = new BooleanField();
             listArg = new ListFieldImpl<>(StringField.class);
             enumArg = new TestEnumField();
             updateArgumentPaths();
+        }
+
+        @Override
+        public TestObjectField getReturnType() {
+            return RETURN_TYPE;
         }
 
         @Override
@@ -349,14 +392,20 @@ public class TestFieldProvider extends BaseFieldProvider {
 
     public static class ReturnErrorsFunction extends BaseFunctionField<TestObjectField> {
 
+        public static final TestObjectField RETURN_TYPE = new TestObjectField();
+
         private TestObjectField objectFieldArg;
 
         public ReturnErrorsFunction() {
             super(RETURN_ERRORS_FUNCTION_NAME,
-                    "Return a set of errors about the argument, return value, and general errors.",
-                    TestObjectField.class);
+                    "Return a set of errors about the argument, return value, and general errors.");
             objectFieldArg = new TestObjectField();
             updateArgumentPaths();
+        }
+
+        @Override
+        public TestObjectField getReturnType() {
+            return RETURN_TYPE;
         }
 
         @Override
@@ -417,14 +466,20 @@ public class TestFieldProvider extends BaseFieldProvider {
 
     public static class SampleMutation extends BaseFunctionField<TestObjectField> {
 
+        public static final TestObjectField RETURN_TYPE = new TestObjectField();
+
         private TestObjectField objFieldArg;
 
         public SampleMutation() {
             super("sampleMutation",
-                    "Returns the argument. Also returns an error about the argument and an error about the return value.",
-                    TestObjectField.class);
+                    "Returns the argument. Also returns an error about the argument and an error about the return value.");
             objFieldArg = new TestObjectField();
             updateArgumentPaths();
+        }
+
+        @Override
+        public TestObjectField getReturnType() {
+            return RETURN_TYPE;
         }
 
         @Override

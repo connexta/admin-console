@@ -34,6 +34,8 @@ public class DeleteWfsConfiguration extends BaseFunctionField<BooleanField> {
     public static final String DESCRIPTION =
             "Deletes a WFS source configuration specified by the pid and returns true on success and false on failure.";
 
+    public static final BooleanField RETURN_TYPE = new BooleanField();
+
     private PidField pid;
 
     private ServiceCommons serviceCommons;
@@ -46,7 +48,7 @@ public class DeleteWfsConfiguration extends BaseFunctionField<BooleanField> {
 
     public DeleteWfsConfiguration(ConfiguratorFactory configuratorFactory,
             ServiceActions serviceActions, ManagedServiceActions managedServiceActions) {
-        super(FIELD_NAME, DESCRIPTION, new BooleanField());
+        super(FIELD_NAME, DESCRIPTION);
         this.configuratorFactory = configuratorFactory;
         this.serviceActions = serviceActions;
         this.managedServiceActions = managedServiceActions;
@@ -74,6 +76,11 @@ public class DeleteWfsConfiguration extends BaseFunctionField<BooleanField> {
             return;
         }
         addMessages(serviceCommons.serviceConfigurationExists(pid));
+    }
+
+    @Override
+    public BooleanField getReturnType() {
+        return RETURN_TYPE;
     }
 
     @Override

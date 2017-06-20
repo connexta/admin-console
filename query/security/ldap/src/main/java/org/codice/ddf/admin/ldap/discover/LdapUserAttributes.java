@@ -49,6 +49,9 @@ public class LdapUserAttributes extends BaseFunctionField<ListField<StringField>
 
     public static final String BASE_USER_DN = "baseUserDn";
 
+    public static final ListFieldImpl<StringField> RETURN_TYPE =
+            new ListFieldImpl<>(StringField.class);
+
     private LdapConnectionField conn;
 
     private LdapBindUserInfo bindInfo;
@@ -58,7 +61,7 @@ public class LdapUserAttributes extends BaseFunctionField<ListField<StringField>
     private LdapTestingUtils utils;
 
     public LdapUserAttributes() {
-        super(FIELD_NAME, DESCRIPTION, new ListFieldImpl<>(StringField.class));
+        super(FIELD_NAME, DESCRIPTION);
         conn = new LdapConnectionField().useDefaultRequired();
         bindInfo = new LdapBindUserInfo().useDefaultRequired();
         baseUserDn = new LdapDistinguishedName(BASE_USER_DN);
@@ -102,6 +105,11 @@ public class LdapUserAttributes extends BaseFunctionField<ListField<StringField>
         }
 
         return entries;
+    }
+
+    @Override
+    public ListField<StringField> getReturnType() {
+        return RETURN_TYPE;
     }
 
     @Override

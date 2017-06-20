@@ -21,12 +21,8 @@ import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 
 public abstract class GetFunctionField<T extends DataType> extends BaseFunctionField<T> {
 
-    public GetFunctionField(String fieldName, String description, T returnType) {
-        super(fieldName, description, returnType);
-    }
-
-    public GetFunctionField(String fieldName, String description, Class<T> returnType) {
-        super(fieldName, description, returnType);
+    public GetFunctionField(String fieldName, String description) {
+        super(fieldName, description);
     }
 
     @Override

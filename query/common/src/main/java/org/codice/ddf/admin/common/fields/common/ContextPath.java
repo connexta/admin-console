@@ -18,10 +18,12 @@ import static org.codice.ddf.admin.common.report.message.DefaultMessages.invalid
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.concurrent.Callable;
+
 import java.util.regex.Pattern;
 
 import org.codice.ddf.admin.api.report.ErrorMessage;
-import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
+import org.codice.ddf.admin.common.fields.base.BaseListField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 
 public class ContextPath extends StringField {
@@ -118,12 +120,17 @@ public class ContextPath extends StringField {
         }
     }
 
-    public static class ContextPaths extends ListFieldImpl<ContextPath> {
+    public static class ContextPaths extends BaseListField<ContextPath> {
 
-        public static final String PATHS_FIELD_NAME = "paths";
+        public static final String DEFAULT_NAME = "paths";
 
-        public ContextPaths(String fieldName, Class<ContextPath> listFieldType) {
-            super(fieldName, listFieldType);
+        public ContextPaths() {
+            super(DEFAULT_NAME);
+        }
+
+        @Override
+        public Callable<ContextPath> getCreateListEntryCallable() {
+            return ContextPath::new;
         }
     }
 }

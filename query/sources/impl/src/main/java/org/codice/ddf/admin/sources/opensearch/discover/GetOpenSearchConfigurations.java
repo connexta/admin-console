@@ -23,7 +23,6 @@ import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
-import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.common.services.ServiceCommons;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
@@ -45,11 +44,8 @@ public class GetOpenSearchConfigurations
     public static final String DESCRIPTION =
             "Retrieves all currently configured OpenSearch sources. If a source pid is specified, only that source configuration will be returned.";
 
-    public static final ListFieldImpl<OpenSearchSourceInfoField> RETURN_TYPE =
-            new ListFieldImpl<>(OpenSearchSourceInfoField.class);
-
-
-    public static final String OPEN_SEARCH_SOURCES = "openSearchSource";
+    public static final SourceInfoField.SourceInfos RETURN_TYPE =
+            new SourceInfoField.SourceInfos();
 
     private PidField pid;
 

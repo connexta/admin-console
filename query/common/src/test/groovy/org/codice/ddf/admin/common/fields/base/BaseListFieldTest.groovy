@@ -19,13 +19,13 @@ import org.codice.ddf.admin.common.fields.test.TestObjectField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import spock.lang.Specification
 
-class ListFieldImplTest extends Specification {
+class BaseListFieldTest extends Specification {
 
     static final String TEST_LIST_FIELD_NAME = "testListFieldName"
 
     def 'The path of fields in ListFields are the ListFields path + their own'() {
         when:
-        ListFieldImpl<StringField> listField = new ListFieldImpl<>(TEST_LIST_FIELD_NAME, StringField.class)
+        StringField.Strings listField = new StringField.Strings(TEST_LIST_FIELD_NAME)
         listField.add(new StringField())
         listField.add(new StringField())
 
@@ -37,7 +37,7 @@ class ListFieldImplTest extends Specification {
 
     def 'The path of ObjectFields and their inner fields in ListFields are correct'() {
         when:
-        ListFieldImpl<ObjectField> listField = new ListFieldImpl<>(TEST_LIST_FIELD_NAME, TestObjectField.class)
+        TestObjectField.TestObjects listField = new TestObjectField.TestObjects(TEST_LIST_FIELD_NAME)
         listField.add(new TestObjectField())
 
         def innerObjectField = listField.getList()[0].getFields().find {
@@ -58,7 +58,7 @@ class ListFieldImplTest extends Specification {
 
     def 'Newly added required elements match the requirement of the ListFields field type'() {
         setup:
-        ListFieldImpl<StringField> listField = new ListFieldImpl<>(TEST_LIST_FIELD_NAME, new StringField().isRequired(true))
+        StringField.Strings listField = new StringField.Strings(TEST_LIST_FIELD_NAME).useDefaultIsRequired()
 
         when:
         listField.add(new StringField())
@@ -69,7 +69,7 @@ class ListFieldImplTest extends Specification {
 
     def 'Validation fails when list elements fail to validate'() {
         setup:
-        ListFieldImpl<StringField> listField = new ListFieldImpl<>(TEST_LIST_FIELD_NAME, new StringField().isRequired(true))
+        StringField.Strings listField = new StringField.Strings(TEST_LIST_FIELD_NAME).useDefaultIsRequired()
         def element1 = new StringField('element1')
         element1.setValue('')
         def element2 = new StringField('element2')
@@ -92,7 +92,7 @@ class ListFieldImplTest extends Specification {
 
     def 'Setting null or empty list value clears the list'() {
         setup:
-        ListFieldImpl<StringField> listField = new ListFieldImpl<>(TEST_LIST_FIELD_NAME, new StringField())
+        StringField.Strings listField = new StringField.Strings(TEST_LIST_FIELD_NAME)
 
         when:
         listField.add(new StringField())
@@ -110,30 +110,9 @@ class ListFieldImplTest extends Specification {
         value << [null, []]
     }
 
-    def 'matchRequired updates list and its elements requirements'() {
-        setup:
-        ListFieldImpl<StringField> listField = new ListFieldImpl<>(TEST_LIST_FIELD_NAME, new StringField().isRequired(false))
-        listField.add(new StringField())
-
-        expect:
-        !listField.isRequired()
-        !listField.getListFieldType().isRequired()
-        !listField.getList()[0].isRequired()
-
-        when:
-        def fieldToMatch = new ListFieldImpl<StringField>(TEST_LIST_FIELD_NAME, new StringField().isRequired(true))
-        fieldToMatch.isRequired(true)
-        listField.matchRequired(fieldToMatch)
-
-        then:
-        listField.isRequired()
-        listField.getListFieldType().isRequired()
-        listField.getList()[0].isRequired()
-    }
-
     def 'Updating list field name updates list elements paths'() {
         setup:
-        ListFieldImpl<StringField> listField = new ListFieldImpl<>(TEST_LIST_FIELD_NAME, new StringField().isRequired(false))
+        StringField.Strings listField = new StringField.Strings(TEST_LIST_FIELD_NAME)
         listField.add(new StringField())
 
         expect:
@@ -150,7 +129,7 @@ class ListFieldImplTest extends Specification {
 
     def 'Set list values'() {
         setup:
-        ListFieldImpl<StringField> listField = new ListFieldImpl<>(TEST_LIST_FIELD_NAME, new StringField())
+        StringField.Strings listField = new StringField.Strings(TEST_LIST_FIELD_NAME)
 
         when:
         listField.setValue(['string1', 'string2'])
@@ -160,18 +139,5 @@ class ListFieldImplTest extends Specification {
         listField.getList()[0].path() == [TEST_LIST_FIELD_NAME, '0']
         listField.getList()[1].getValue() == 'string2'
         listField.getList()[1].path() == [TEST_LIST_FIELD_NAME, '1']
-    }
-
-    def 'RuntimeException when list field class type has no default constructor'() {
-        when:
-        new ListFieldImpl<>(TEST_LIST_FIELD_NAME, ClassWithNoDefaultConstructor.class)
-
-        then:
-        thrown(RuntimeException)
-    }
-
-    class ClassWithNoDefaultConstructor extends StringField {
-        ClassWithNoDefaultConstructor(String test) {
-        }
     }
 }

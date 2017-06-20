@@ -69,7 +69,11 @@ public class GraphQLTransformOutput {
         } else if (field instanceof EnumField) {
             type = transformEnum.enumFieldToGraphQLEnumType((EnumField) field);
         } else if (field instanceof ListField) {
-            type = new GraphQLList(fieldToGraphQLOutputType(((ListField) field).getListFieldType()));
+            try {
+                type = new GraphQLList(fieldToGraphQLOutputType(((ListField<DataType>) field).createListEntry()));
+            } catch (Exception e) {
+                throw new RuntimeException("Unable to build field list content type for output type: " + field.fieldName());
+            }
         } else if(field instanceof ScalarField) {
             type = transformScalar.resolveScalarType((ScalarField) field);
         }

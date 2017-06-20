@@ -17,6 +17,7 @@ package org.codice.ddf.admin.common.fields.base;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.api.DataType;
@@ -25,45 +26,19 @@ import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ListFieldImpl<T extends DataType> extends BaseDataType<List>
+public abstract class BaseListField<T extends DataType> extends BaseDataType<List>
         implements ListField<T> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ListFieldImpl.class);
-
-    public static final String DEFAULT_FIELD_NAME  = "list";
+    private static final Logger LOGGER = LoggerFactory.getLogger(BaseListField.class);
 
     protected List<T> fields;
 
-    protected T listFieldType;
-
-    public ListFieldImpl(String fieldName, Class<T> listFieldType) {
+    public BaseListField(String fieldName) {
         super(fieldName, null, null);
         this.fields = new ArrayList<>();
-        try {
-            this.listFieldType = listFieldType.newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
-            throw new RuntimeException(String.format("Unable to create new instance of class [%s]. Ensure there is a default constructor for the ListFieldImpl to initialize.", listFieldType.getClass()));
-        }
     }
 
-    public ListFieldImpl(String fieldName, T listFieldType) {
-        super(fieldName, null, null);
-        this.fields = new ArrayList<>();
-        this.listFieldType = listFieldType;
-    }
-
-    public ListFieldImpl(Class<T> listFieldType) {
-        this(DEFAULT_FIELD_NAME, listFieldType);
-    }
-
-    public ListFieldImpl(T listFieldType) {
-        this(DEFAULT_FIELD_NAME, listFieldType);
-    }
-
-    @Override
-    public T getListFieldType() {
-        return listFieldType;
-    }
+    public abstract Callable<T> getCreateListEntryCallable();
 
     @Override
     public List<T> getList() {
@@ -85,29 +60,33 @@ public class ListFieldImpl<T extends DataType> extends BaseDataType<List>
         }
 
         for (Object val : values) {
-            try {
-                T newField = (T) getListFieldType().getClass()
-                        .newInstance();
-                newField.setValue(val);
-                add(newField);
-            } catch (IllegalAccessException | InstantiationException e) {
-                LOGGER.debug("Unable to create instance of fieldType {}",
-                        getListFieldType().fieldTypeName());
-            }
+            T newField = createListEntry();
+            newField.setValue(val);
+            add(newField);
         }
     }
 
     @Override
-    public ListFieldImpl<T> add(T value) {
-        value.matchRequired(listFieldType);
-        value.pathName(Integer.toString(fields.size()));
-        value.updatePath(path());
-        fields.add(value);
+    public T createListEntry() {
+        try {
+            return getCreateListEntryCallable().call();
+        } catch (Exception e) {
+            throw new RuntimeException("Unable to create new instance of list content for field: " + fieldName());
+        }
+    }
+
+    @Override
+    public BaseListField<T> add(T value) {
+        T newElem = createListEntry();
+        newElem.setValue(value.getValue());
+        newElem.pathName(Integer.toString(fields.size()));
+        newElem.updatePath(path());
+        fields.add(newElem);
         return this;
     }
 
     @Override
-    public ListFieldImpl<T> addAll(Collection<T> values) {
+    public BaseListField<T> addAll(Collection<T> values) {
         values.forEach(field -> add(field));
         return this;
     }
@@ -128,15 +107,7 @@ public class ListFieldImpl<T extends DataType> extends BaseDataType<List>
     }
 
     @Override
-    public ListField<T> matchRequired(DataType fieldToMatch) {
-        super.matchRequired(fieldToMatch);
-        listFieldType.matchRequired(((ListField) fieldToMatch).getListFieldType());
-        getList().forEach(field -> field.matchRequired(listFieldType));
-        return this;
-    }
-
-    @Override
-    public ListFieldImpl<T> isRequired(boolean required) {
+    public BaseListField<T> isRequired(boolean required) {
         super.isRequired(required);
         return this;
     }

@@ -16,20 +16,18 @@ package org.codice.ddf.admin.security.wcpm.discover;
 import java.util.Arrays;
 
 import org.codice.ddf.admin.api.fields.FunctionField;
-import org.codice.ddf.admin.api.fields.ListField;
-import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.fields.base.function.GetFunctionField;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.security.common.fields.wcpm.AuthType;
 
-public class GetAuthTypes extends GetFunctionField<ListField<AuthType>> {
+public class GetAuthTypes extends GetFunctionField<AuthType.AuthTypes> {
 
     public static final String FIELD_NAME = "authTypes";
 
     public static final String DESCRIPTION =
             "Retrieves all currently configured authentication types.";
 
-    public static final ListFieldImpl<AuthType> RETURN_TYPE = new ListFieldImpl<>(AuthType.class);
+    public static final AuthType.AuthTypes RETURN_TYPE = new AuthType.AuthTypes();
 
     private ConfiguratorFactory configuratorFactory;
 
@@ -39,23 +37,21 @@ public class GetAuthTypes extends GetFunctionField<ListField<AuthType>> {
     }
 
     @Override
-    public ListField<AuthType> performFunction() {
-        ListField<AuthType> authTypes = new ListFieldImpl<>(AuthType.class).addAll(Arrays.asList(AuthType.BASIC_AUTH,
+    public AuthType.AuthTypes performFunction() {
+        return new AuthType.AuthTypes().addAll(Arrays.asList(AuthType.BASIC_AUTH,
                 AuthType.SAML_AUTH,
                 AuthType.PKI_AUTH,
                 AuthType.GUEST_AUTH,
                 AuthType.IDP_AUTH));
-
-        return authTypes;
     }
 
     @Override
-    public ListField<AuthType> getReturnType() {
+    public AuthType.AuthTypes getReturnType() {
         return RETURN_TYPE;
     }
 
     @Override
-    public FunctionField<ListField<AuthType>> newInstance() {
+    public FunctionField<AuthType.AuthTypes> newInstance() {
         return new GetAuthTypes(configuratorFactory);
     }
 }

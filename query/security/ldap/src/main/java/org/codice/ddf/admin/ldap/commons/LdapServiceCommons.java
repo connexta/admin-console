@@ -35,7 +35,6 @@ import java.util.stream.Stream;
 import org.apache.commons.lang.StringUtils;
 import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.api.report.Report;
-import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.report.ReportImpl;
 import org.codice.ddf.admin.common.report.message.DefaultMessages;
 import org.codice.ddf.admin.common.services.ServiceCommons;
@@ -85,7 +84,7 @@ public class LdapServiceCommons {
                 .forEach(config -> config.bindUserInfoField()
                         .password(FLAG_PASSWORD));
 
-        return new ListFieldImpl<>(LdapConfigurationField.class).addAll(configs);
+        return new LdapConfigurationField.LdapConfigurations().addAll(configs);
     }
 
     public Map<String, Object> ldapConfigToLdapClaimsHandlerService(LdapConfigurationField config,

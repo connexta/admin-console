@@ -23,7 +23,6 @@ import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
-import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.common.services.ServiceCommons;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
@@ -44,10 +43,7 @@ public class GetCswConfigurations extends BaseFunctionField<ListField<CswSourceI
     public static final String DESCRIPTION =
             "Retrieves all currently configured CSW sources. If the pid argument is specified, only the source configuration with that pid will be returned.";
 
-    public static final ListFieldImpl<CswSourceInfoField> RETURN_TYPE =
-            new ListFieldImpl<>(CswSourceInfoField.class);
-
-    public static final String CSW_SOURCES = "cswSources";
+    public static final SourceInfoField.SourceInfos RETURN_TYPE = new SourceInfoField.SourceInfos();
 
     private PidField pid;
 

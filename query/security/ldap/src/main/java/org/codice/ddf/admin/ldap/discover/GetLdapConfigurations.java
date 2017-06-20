@@ -15,21 +15,19 @@ package org.codice.ddf.admin.ldap.discover;
 
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.api.fields.ListField;
-import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.fields.base.function.GetFunctionField;
 import org.codice.ddf.admin.ldap.commons.LdapServiceCommons;
 import org.codice.ddf.admin.ldap.fields.config.LdapConfigurationField;
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
 import org.codice.ddf.internal.admin.configurator.actions.PropertyActions;
 
-public class LdapConfigurations extends GetFunctionField<ListField<LdapConfigurationField>> {
+public class GetLdapConfigurations extends GetFunctionField<ListField<LdapConfigurationField>> {
 
     public static final String FIELD_NAME = "configs";
 
     public static final String DESCRIPTION = "Retrieves all currently configured LDAP settings.";
 
-    public static final ListFieldImpl<LdapConfigurationField> RETURN_TYPE =
-            new ListFieldImpl<>(LdapConfigurationField.class);
+    public static final LdapConfigurationField.LdapConfigurations RETURN_TYPE = new LdapConfigurationField.LdapConfigurations();
 
     private final ManagedServiceActions managedServiceActions;
 
@@ -37,7 +35,7 @@ public class LdapConfigurations extends GetFunctionField<ListField<LdapConfigura
 
     private LdapServiceCommons serviceCommons;
 
-    public LdapConfigurations(ManagedServiceActions managedServiceActions, PropertyActions propertyActions) {
+    public GetLdapConfigurations(ManagedServiceActions managedServiceActions, PropertyActions propertyActions) {
         super(FIELD_NAME, DESCRIPTION);
         this.managedServiceActions = managedServiceActions;
         this.propertyActions = propertyActions;
@@ -58,6 +56,6 @@ public class LdapConfigurations extends GetFunctionField<ListField<LdapConfigura
 
     @Override
     public FunctionField<ListField<LdapConfigurationField>> newInstance() {
-        return new LdapConfigurations(managedServiceActions, propertyActions);
+        return new GetLdapConfigurations(managedServiceActions, propertyActions);
     }
 }

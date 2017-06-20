@@ -25,6 +25,8 @@ import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.api.fields.ObjectField;
 import org.codice.ddf.admin.api.fields.ScalarField;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import graphql.schema.GraphQLArgument;
 import graphql.schema.GraphQLInputObjectField;
@@ -34,6 +36,8 @@ import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
 
 public class GraphQLTransformInput {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(GraphQLTransformInput.class);
 
     private GraphQLTransformScalar transformScalars;
     private GraphQLTransformEnum transformEnum;
@@ -68,7 +72,11 @@ public class GraphQLTransformInput {
         } else if(field instanceof EnumField) {
             type = transformEnum.enumFieldToGraphQLEnumType((EnumField) field);
         } else if(field instanceof ListField) {
-            type = new GraphQLList(fieldTypeToGraphQLInputType(((ListField) field).getListFieldType()));
+            try {
+                type = new GraphQLList(fieldTypeToGraphQLInputType(((ListField<DataType>) field).createListEntry()));
+            } catch (Exception e) {
+                throw new RuntimeException("Unable to build field list content type for input type: " + field.fieldName());
+            }
         } else if(field instanceof ScalarField){
             type = transformScalars.resolveScalarType((ScalarField) field);
         }

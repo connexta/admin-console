@@ -31,6 +31,4 @@ public interface DataType<T> extends Field<T, T> {
     List<ErrorMessage> validate();
 
     DataType<T> isRequired(boolean required);
-
-    DataType<T> matchRequired(DataType<T> fieldToMatch);
 }

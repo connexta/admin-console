@@ -17,7 +17,6 @@ import com.google.common.collect.ImmutableMap
 import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.api.fields.ListField
 import org.codice.ddf.admin.api.report.FunctionReport
-import org.codice.ddf.admin.common.fields.base.ListFieldImpl
 import org.codice.ddf.admin.common.fields.base.scalar.StringField
 import org.codice.ddf.admin.common.fields.common.CredentialsField
 import org.codice.ddf.admin.common.fields.common.HostnameField
@@ -78,7 +77,7 @@ class LdapTestClaimMappingsSpec extends Specification {
         userAttribute.setValue('uid')
         baseDn = new LdapDistinguishedName()
         baseDn.setValue(LDAP_SERVER_BASE_USER_DN)
-        claimMappings = new ListFieldImpl<>(ClaimsMapEntry.class)
+        claimMappings = new ClaimsMapEntry.ClaimsMap()
 
         // Initialize bad paths
         baseMsg = [LdapTestClaimMappings.FIELD_NAME, FunctionField.ARGUMENT]
@@ -277,8 +276,8 @@ class LdapTestClaimMappingsSpec extends Specification {
         report.result().getValue()
     }
 
-    private static ListFieldImpl<ClaimsMapEntry> createClaimsMapping(Map<String, String> claims) {
-        def claimMappings = new ListFieldImpl<>(ClaimsMapEntry.class)
+    private static ClaimsMapEntry.ClaimsMap createClaimsMapping(Map<String, String> claims) {
+        def claimMappings = new ClaimsMapEntry.ClaimsMap()
         claims.each {
             claimMappings.add(new ClaimsMapEntry().key(it.key).value(it.value))
         }

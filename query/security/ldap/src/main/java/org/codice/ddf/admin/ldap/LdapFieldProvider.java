@@ -20,7 +20,7 @@ import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.function.BaseFieldProvider;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
-import org.codice.ddf.admin.ldap.discover.LdapConfigurations;
+import org.codice.ddf.admin.ldap.discover.GetLdapConfigurations;
 import org.codice.ddf.admin.ldap.discover.LdapQuery;
 import org.codice.ddf.admin.ldap.discover.LdapRecommendedSettings;
 import org.codice.ddf.admin.ldap.discover.LdapTestBind;
@@ -59,7 +59,7 @@ public class LdapFieldProvider extends BaseFieldProvider {
 
     private LdapUserAttributes getUserAttris;
 
-    private LdapConfigurations getConfigs;
+    private GetLdapConfigurations getConfigs;
 
     //Mutate
     private CreateLdapConfiguration createConfig;
@@ -82,7 +82,7 @@ public class LdapFieldProvider extends BaseFieldProvider {
 
         ldapQuery = new LdapQuery();
         getUserAttris = new LdapUserAttributes();
-        getConfigs = new LdapConfigurations(managedServiceActions, propertyActions);
+        getConfigs = new GetLdapConfigurations(managedServiceActions, propertyActions);
 
         createConfig = new CreateLdapConfiguration(configuratorFactory,
                 featureActions,

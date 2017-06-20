@@ -23,8 +23,8 @@ import org.codice.ddf.admin.common.fields.common.PortField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.ldap.TestLdapServer
 import org.codice.ddf.admin.ldap.commons.LdapMessages
-import org.codice.ddf.admin.ldap.fields.config.LdapSettingsField
-import org.codice.ddf.admin.ldap.fields.config.LdapUseCase
+import org.codice.ddf.admin.ldap.fields.config.LdapConfigurationField
+import org.codice.ddf.admin.ldap.fields.config.LdapDirectorySettingsField
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindMethod
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindUserInfo
 import org.codice.ddf.admin.ldap.fields.connection.LdapConnectionField
@@ -35,9 +35,9 @@ import spock.lang.Specification
 import static org.codice.ddf.admin.ldap.LdapTestingCommons.*
 import static org.codice.ddf.admin.ldap.fields.config.LdapUseCase.AUTHENTICATION_AND_ATTRIBUTE_STORE
 
-class LdapTestAttributeMappingsSpec extends Specification {
+class LdapTestClaimMappingsSpec extends Specification {
     static TestLdapServer server
-    LdapTestAttributeMappings action
+    LdapTestClaimMappings action
     Map<String, Object> args
     def badPaths
     def baseMsg
@@ -56,24 +56,19 @@ class LdapTestAttributeMappingsSpec extends Specification {
     def setup() {
         loadLdapTestProperties()
 
-        action = new LdapTestAttributeMappings()
+        action = new LdapTestClaimMappings()
 
         // Initialize bad paths
-        baseMsg = [LdapTestAttributeMappings.FIELD_NAME, FunctionField.ARGUMENT]
+        baseMsg = [LdapTestClaimMappings.FIELD_NAME, FunctionField.ARGUMENT]
         badPaths = [missingHostPath        : baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME, HostnameField.DEFAULT_FIELD_NAME],
                     missingPortPath        : baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME, PortField.DEFAULT_FIELD_NAME],
                     missingEncryptPath     : baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME, LdapEncryptionMethodField.DEFAULT_FIELD_NAME],
                     missingUsernamePath    : baseMsg + [LdapBindUserInfo.DEFAULT_FIELD_NAME, CredentialsField.DEFAULT_FIELD_NAME, CredentialsField.USERNAME_FIELD_NAME],
                     missingUserpasswordPath: baseMsg + [LdapBindUserInfo.DEFAULT_FIELD_NAME, CredentialsField.DEFAULT_FIELD_NAME, CredentialsField.PASSWORD_FIELD_NAME],
                     missingBindMethodPath  : baseMsg + [LdapBindUserInfo.DEFAULT_FIELD_NAME, LdapBindMethod.DEFAULT_FIELD_NAME],
-                    missingUseCasePath     : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, LdapUseCase.DEFAULT_FIELD_NAME],
-                    missingUserPath        : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, LdapSettingsField.BASE_USER_DN],
-                    missingGroupPath       : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, LdapSettingsField.BASE_GROUP_DN],
-                    missingUserNameAttrPath: baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, LdapSettingsField.USER_NAME_ATTRIBUTE],
-                    missingGroupObjectPath : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, LdapSettingsField.GROUP_OBJECT_CLASS],
-                    missingGroupAttribPath : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, LdapSettingsField.GROUP_ATTRIBUTE_HOLDING_MEMBER],
-                    missingMemberAttribPath: baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, LdapSettingsField.MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP],
-                    badAttribMappingPath   : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, LdapSettingsField.ATTRIBUTE_MAPPING]
+                    missingUserPath        : baseMsg + [LdapDirectorySettingsField.DEFAULT_FIELD_NAME, LdapDirectorySettingsField.BASE_USER_DN],
+                    missingUserNameAttrPath: baseMsg + [LdapDirectorySettingsField.DEFAULT_FIELD_NAME, LdapDirectorySettingsField.USER_NAME_ATTRIBUTE],
+                    badClaimMappingPath    : baseMsg + [LdapConfigurationField.DEFAULT_FIELD_NAME, LdapConfigurationField.CLAIM_MAPPING]
         ]
     }
 
@@ -96,11 +91,11 @@ class LdapTestAttributeMappingsSpec extends Specification {
         setup:
         def ldapSettings = initLdapSettings(AUTHENTICATION_AND_ATTRIBUTE_STORE, true)
                 .baseUserDn('BAD')
-                .attributeMapField(ImmutableMap.of("foobar", "cn"))
 
-        args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue(),
-                (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue(),
-                (LdapSettingsField.DEFAULT_FIELD_NAME)  : ldapSettings.getValue()]
+        args = [(LdapConnectionField.DEFAULT_FIELD_NAME)       : noEncryptionLdapConnectionInfo().getValue(),
+                (LdapBindUserInfo.DEFAULT_FIELD_NAME)          : simpleBindInfo().getValue(),
+                (LdapDirectorySettingsField.DEFAULT_FIELD_NAME): ldapSettings.getValue(),
+                (LdapConfigurationField.DEFAULT_FIELD_NAME)    : createClaimsMapping(ImmutableMap.of("foobar", "cn")).getValue()]
         action.setValue(args)
         action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
@@ -119,11 +114,12 @@ class LdapTestAttributeMappingsSpec extends Specification {
     def 'fail to connect to LDAP'() {
         setup:
         def ldapSettings = initLdapSettings(AUTHENTICATION_AND_ATTRIBUTE_STORE, true)
-                .attributeMapField(ImmutableMap.of("foobar", "cn"))
 
-        args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().port(666).getValue(),
-                (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue(),
-                (LdapSettingsField.DEFAULT_FIELD_NAME)  : ldapSettings.getValue()]
+        args = [(LdapConnectionField.DEFAULT_FIELD_NAME)       : noEncryptionLdapConnectionInfo().port(666).getValue(),
+                (LdapBindUserInfo.DEFAULT_FIELD_NAME)          : simpleBindInfo().getValue(),
+                (LdapDirectorySettingsField.DEFAULT_FIELD_NAME): ldapSettings.getValue(),
+                (LdapConfigurationField.DEFAULT_FIELD_NAME)    : createClaimsMapping(ImmutableMap.of("foobar", "cn")).getValue()]
+
         action.setValue(args)
         action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
@@ -140,11 +136,12 @@ class LdapTestAttributeMappingsSpec extends Specification {
     def 'fail to bind to LDAP'() {
         setup:
         def ldapSettings = initLdapSettings(AUTHENTICATION_AND_ATTRIBUTE_STORE, true)
-                .attributeMapField(ImmutableMap.of("foobar", "cn"))
 
-        args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue(),
-                (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().password('badPassword').getValue(),
-                (LdapSettingsField.DEFAULT_FIELD_NAME)  : ldapSettings.getValue()]
+        args = [(LdapConnectionField.DEFAULT_FIELD_NAME)       : noEncryptionLdapConnectionInfo().getValue(),
+                (LdapBindUserInfo.DEFAULT_FIELD_NAME)          : simpleBindInfo().password('badPassword').getValue(),
+                (LdapDirectorySettingsField.DEFAULT_FIELD_NAME): ldapSettings.getValue(),
+                (LdapConfigurationField.DEFAULT_FIELD_NAME)    : createClaimsMapping(ImmutableMap.of("foobar", "cn")).getValue()]
+
         action.setValue(args)
         action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
@@ -162,11 +159,12 @@ class LdapTestAttributeMappingsSpec extends Specification {
         setup:
         def ldapSettings = initLdapSettings(AUTHENTICATION_AND_ATTRIBUTE_STORE, true)
                 .baseUserDn('ou=users,dc=example,dc=BAD')
-                .attributeMapField(ImmutableMap.of("foobar", "cn"))
 
-        args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue(),
-                (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue(),
-                (LdapSettingsField.DEFAULT_FIELD_NAME)  : ldapSettings.getValue()]
+        args = [(LdapConnectionField.DEFAULT_FIELD_NAME)       : noEncryptionLdapConnectionInfo().getValue(),
+                (LdapBindUserInfo.DEFAULT_FIELD_NAME)          : simpleBindInfo().getValue(),
+                (LdapDirectorySettingsField.DEFAULT_FIELD_NAME): ldapSettings.getValue(),
+                (LdapConfigurationField.DEFAULT_FIELD_NAME)    : createClaimsMapping(ImmutableMap.of("foobar", "cn")).getValue()]
+
         action.setValue(args)
         action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
@@ -185,17 +183,19 @@ class LdapTestAttributeMappingsSpec extends Specification {
     def 'fail when missing user attributes are supplied for mapping'() {
         setup:
         def ldapSettings = initLdapSettings(AUTHENTICATION_AND_ATTRIBUTE_STORE, true)
-                .attributeMapField(ImmutableMap.of("claim1", "XXX"))
-                .attributeMapField(ImmutableMap.of("claim2", "cn"))
-                .attributeMapField(ImmutableMap.of("claim3", "YYY"))
-                .attributeMapField(ImmutableMap.of("claim4", "employeetype"))
 
-        def failedPaths = [badPaths.badAttribMappingPath + (ListFieldImpl.INDEX_DELIMETER + 0) + ClaimsMapEntry.VALUE_FIELD_NAME,
-                           badPaths.badAttribMappingPath + (ListFieldImpl.INDEX_DELIMETER + 2) + ClaimsMapEntry.VALUE_FIELD_NAME] as Set
+        def failedPaths = [badPaths.badClaimMappingPath + (ListFieldImpl.INDEX_DELIMETER + 0) + ClaimsMapEntry.VALUE_FIELD_NAME,
+                           badPaths.badClaimMappingPath + (ListFieldImpl.INDEX_DELIMETER + 2) + ClaimsMapEntry.VALUE_FIELD_NAME] as Set
 
-        args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue(),
-                (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue(),
-                (LdapSettingsField.DEFAULT_FIELD_NAME)  : ldapSettings.getValue()]
+        def claimsMapping = createClaimsMapping(ImmutableMap.of("claim1", "XXX",
+                "claim2", "cn",
+                "claim3", "YYY",
+                "claim4", "employeetype"))
+        args = [(LdapConnectionField.DEFAULT_FIELD_NAME)       : noEncryptionLdapConnectionInfo().getValue(),
+                (LdapBindUserInfo.DEFAULT_FIELD_NAME)          : simpleBindInfo().getValue(),
+                (LdapDirectorySettingsField.DEFAULT_FIELD_NAME): ldapSettings.getValue(),
+                (LdapConfigurationField.DEFAULT_FIELD_NAME)    : claimsMapping.getValue()]
+
         action.setValue(args)
         action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
@@ -205,7 +205,7 @@ class LdapTestAttributeMappingsSpec extends Specification {
         then:
         report.messages().size() == 2
         report.messages().count {
-            it.getCode() == LdapMessages.MAPPING_ATTRIBUTE_NOT_FOUND
+            it.getCode() == LdapMessages.USER_ATTRIBUTE_NOT_FOUND
         } == 2
 
         report.messages()*.path as Set == failedPaths
@@ -214,16 +214,19 @@ class LdapTestAttributeMappingsSpec extends Specification {
     def 'pass when all user attributes found'() {
         setup:
         def ldapSettings = initLdapSettings(AUTHENTICATION_AND_ATTRIBUTE_STORE, true)
-                .attributeMapField(ImmutableMap.of("claim1", "sn"))
-                .attributeMapField(ImmutableMap.of("claim2", "cn"))
-                .attributeMapField(ImmutableMap.of("claim3", "employeetype"))
+        def claimsMapping = createClaimsMapping(ImmutableMap.of("claim1", "sn",
+                "claim2", "cn",
+                "claim3", "employeetype"))
 
-        def failedPaths = [badPaths.badAttribMappingPath + (ListFieldImpl.INDEX_DELIMETER + 0) + ClaimsMapEntry.VALUE_FIELD_NAME,
-                           badPaths.badAttribMappingPath + (ListFieldImpl.INDEX_DELIMETER + 2) + ClaimsMapEntry.VALUE_FIELD_NAME] as Set
 
-        args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue(),
-                (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue(),
-                (LdapSettingsField.DEFAULT_FIELD_NAME)  : ldapSettings.getValue()]
+        def failedPaths = [badPaths.badClaimMappingPath + (ListFieldImpl.INDEX_DELIMETER + 0) + ClaimsMapEntry.VALUE_FIELD_NAME,
+                           badPaths.badClaimMappingPath + (ListFieldImpl.INDEX_DELIMETER + 2) + ClaimsMapEntry.VALUE_FIELD_NAME] as Set
+
+        args = [(LdapConnectionField.DEFAULT_FIELD_NAME)       : noEncryptionLdapConnectionInfo().getValue(),
+                (LdapBindUserInfo.DEFAULT_FIELD_NAME)          : simpleBindInfo().getValue(),
+                (LdapDirectorySettingsField.DEFAULT_FIELD_NAME): ldapSettings.getValue(),
+                (LdapConfigurationField.DEFAULT_FIELD_NAME)    : claimsMapping.getValue()]
+
         action.setValue(args)
         action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
@@ -233,5 +236,9 @@ class LdapTestAttributeMappingsSpec extends Specification {
         then:
         report.messages().empty
         report.result().getValue()
+    }
+
+    private LdapConfigurationField createClaimsMapping(Map<String, String> claims) {
+        return new LdapConfigurationField().mapAllClaims(claims)
     }
 }

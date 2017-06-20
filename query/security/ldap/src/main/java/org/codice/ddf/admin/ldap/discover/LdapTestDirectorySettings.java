@@ -13,12 +13,11 @@
  **/
 package org.codice.ddf.admin.ldap.discover;
 
-import static org.codice.ddf.admin.ldap.commons.LdapMessages.dnDoesNotExistError;
 import static org.codice.ddf.admin.ldap.commons.LdapMessages.noGroupsInBaseGroupDnError;
 import static org.codice.ddf.admin.ldap.commons.LdapMessages.noGroupsWithMembersError;
 import static org.codice.ddf.admin.ldap.commons.LdapMessages.noReferencedMemberError;
 import static org.codice.ddf.admin.ldap.commons.LdapMessages.noUsersInBaseUserDnError;
-import static org.codice.ddf.admin.ldap.commons.LdapMessages.userNameAttributeNotFoundError;
+import static org.codice.ddf.admin.ldap.commons.LdapMessages.userAttributeNotFoundError;
 import static org.codice.ddf.admin.ldap.fields.config.LdapUseCase.ATTRIBUTE_STORE;
 import static org.codice.ddf.admin.ldap.fields.config.LdapUseCase.AUTHENTICATION_AND_ATTRIBUTE_STORE;
 
@@ -32,8 +31,7 @@ import org.codice.ddf.admin.common.fields.base.function.TestFunctionField;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.ldap.commons.LdapConnectionAttempt;
 import org.codice.ddf.admin.ldap.commons.LdapTestingUtils;
-import org.codice.ddf.admin.ldap.fields.LdapDistinguishedName;
-import org.codice.ddf.admin.ldap.fields.config.LdapSettingsField;
+import org.codice.ddf.admin.ldap.fields.config.LdapDirectorySettingsField;
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindUserInfo;
 import org.codice.ddf.admin.ldap.fields.connection.LdapConnectionField;
 import org.forgerock.opendj.ldap.Connection;
@@ -45,27 +43,27 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableList;
 
-public class LdapTestSettings extends TestFunctionField {
-    private static final Logger LOGGER = LoggerFactory.getLogger(LdapTestSettings.class);
+public class LdapTestDirectorySettings extends TestFunctionField {
+    private static final Logger LOGGER = LoggerFactory.getLogger(LdapTestDirectorySettings.class);
 
-    public static final String FIELD_NAME = "testSettings";
+    public static final String FIELD_NAME = "testDirectorySettings";
 
     public static final String DESCRIPTION =
-            "Tests whether the given LDAP dn's and user attributes exist.";
+            "Tests whether the given LDAP DNs and user attributes exist.";
 
     private LdapConnectionField conn;
 
     private LdapBindUserInfo bindInfo;
 
-    private LdapSettingsField settings;
+    private LdapDirectorySettingsField settings;
 
     private LdapTestingUtils utils;
 
-    public LdapTestSettings() {
+    public LdapTestDirectorySettings() {
         super(FIELD_NAME, DESCRIPTION);
         conn = new LdapConnectionField().useDefaultRequired();
         bindInfo = new LdapBindUserInfo().useDefaultRequired();
-        settings = new LdapSettingsField().useDefaultAuthentication();
+        settings = new LdapDirectorySettingsField().useDefaultAuthentication();
         updateArgumentPaths();
 
         utils = new LdapTestingUtils();
@@ -88,8 +86,10 @@ public class LdapTestSettings extends TestFunctionField {
 
             Connection ldapConnection = connectionAttempt.result();
 
-            checkDirExists(settings.baseGroupDnField(), ldapConnection);
-            checkDirExists(settings.baseUserDnField(), ldapConnection);
+            utils.checkDirExists(settings.baseGroupDnField(), ldapConnection)
+                    .ifPresent(this::addArgumentMessage);
+            utils.checkDirExists(settings.baseUserDnField(), ldapConnection)
+                    .ifPresent(this::addArgumentMessage);
 
             // Short-circuit return here, if either the user or group directory does not exist
             if (containsErrorMsgs()) {
@@ -132,26 +132,7 @@ public class LdapTestSettings extends TestFunctionField {
 
     @Override
     public FunctionField<BooleanField> newInstance() {
-        return new LdapTestSettings();
-    }
-
-    /**
-     * Confirms that the dn exists
-     *
-     * @param ldapConnection
-     */
-    private void checkDirExists(LdapDistinguishedName dirDn, Connection ldapConnection) {
-        boolean dirExists = !utils.getLdapQueryResults(ldapConnection,
-                dirDn.getValue(),
-                Filter.present("objectClass")
-                        .toString(),
-                SearchScope.BASE_OBJECT,
-                1)
-                .isEmpty();
-
-        if (!dirExists) {
-            addArgumentMessage(dnDoesNotExistError(dirDn.path()));
-        }
+        return new LdapTestDirectorySettings();
     }
 
     /**
@@ -170,7 +151,7 @@ public class LdapTestSettings extends TestFunctionField {
         if (baseUsersResults.isEmpty()) {
             addArgumentMessage(noUsersInBaseUserDnError(settings.baseUserDnField()
                     .path()));
-            addArgumentMessage(userNameAttributeNotFoundError(settings.usernameAttributeField()
+            addArgumentMessage(userAttributeNotFoundError(settings.usernameAttributeField()
                     .path()));
         }
     }

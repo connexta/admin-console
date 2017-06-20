@@ -20,7 +20,7 @@ import org.codice.ddf.admin.common.fields.common.HostnameField
 import org.codice.ddf.admin.common.fields.common.PortField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.ldap.fields.config.LdapConfigurationField
-import org.codice.ddf.admin.ldap.fields.config.LdapSettingsField
+import org.codice.ddf.admin.ldap.fields.config.LdapDirectorySettingsField
 import org.codice.ddf.admin.ldap.fields.config.LdapUseCase
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindMethod
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindUserInfo
@@ -37,22 +37,21 @@ class CreateLdapConfigurationSpec extends Specification {
     def setup() {
         // Initialize bad paths
         baseMsg = [CreateLdapConfiguration.FIELD_NAME, FunctionField.ARGUMENT, LdapConfigurationField.DEFAULT_FIELD_NAME]
-        badPaths = [missingHostPath         : baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME, HostnameField.DEFAULT_FIELD_NAME],
-                    missingPortPath         : baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME, PortField.DEFAULT_FIELD_NAME],
-                    missingEncryptPath      : baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME, LdapEncryptionMethodField.DEFAULT_FIELD_NAME],
-                    missingUsernamePath     : baseMsg + [LdapBindUserInfo.DEFAULT_FIELD_NAME, CredentialsField.DEFAULT_FIELD_NAME, CredentialsField.USERNAME_FIELD_NAME],
-                    missingUserpasswordPath : baseMsg + [LdapBindUserInfo.DEFAULT_FIELD_NAME, CredentialsField.DEFAULT_FIELD_NAME, CredentialsField.PASSWORD_FIELD_NAME],
-                    missingBindMethodPath   : baseMsg + [LdapBindUserInfo.DEFAULT_FIELD_NAME, LdapBindMethod.DEFAULT_FIELD_NAME],
-                    missingUseCasePath      : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, LdapUseCase.DEFAULT_FIELD_NAME],
-                    missingUserPath         : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, LdapSettingsField.BASE_USER_DN],
-                    missingGroupPath        : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, LdapSettingsField.BASE_GROUP_DN],
-                    missingUserNameAttrPath : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, LdapSettingsField.USER_NAME_ATTRIBUTE],
-                    missingGroupObjectPath  : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, LdapSettingsField.GROUP_OBJECT_CLASS],
-                    missingGroupAttribPath  : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, LdapSettingsField.GROUP_ATTRIBUTE_HOLDING_MEMBER],
-                    missingMemberAttribPath : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, LdapSettingsField.MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP],
-                    missingAttribMappingPath: baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, LdapSettingsField.ATTRIBUTE_MAPPING],
-                    badUserDnPath           : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, LdapSettingsField.BASE_USER_DN],
-                    badGroupDnPath          : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, LdapSettingsField.BASE_GROUP_DN]
+        badPaths = [missingHostPath        : baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME, HostnameField.DEFAULT_FIELD_NAME],
+                    missingPortPath        : baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME, PortField.DEFAULT_FIELD_NAME],
+                    missingEncryptPath     : baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME, LdapEncryptionMethodField.DEFAULT_FIELD_NAME],
+                    missingUsernamePath    : baseMsg + [LdapBindUserInfo.DEFAULT_FIELD_NAME, CredentialsField.DEFAULT_FIELD_NAME, CredentialsField.USERNAME_FIELD_NAME],
+                    missingUserpasswordPath: baseMsg + [LdapBindUserInfo.DEFAULT_FIELD_NAME, CredentialsField.DEFAULT_FIELD_NAME, CredentialsField.PASSWORD_FIELD_NAME],
+                    missingBindMethodPath  : baseMsg + [LdapBindUserInfo.DEFAULT_FIELD_NAME, LdapBindMethod.DEFAULT_FIELD_NAME],
+                    missingUseCasePath     : baseMsg + [LdapDirectorySettingsField.DEFAULT_FIELD_NAME, LdapUseCase.DEFAULT_FIELD_NAME],
+                    missingUserPath        : baseMsg + [LdapDirectorySettingsField.DEFAULT_FIELD_NAME, LdapDirectorySettingsField.BASE_USER_DN],
+                    missingGroupPath       : baseMsg + [LdapDirectorySettingsField.DEFAULT_FIELD_NAME, LdapDirectorySettingsField.BASE_GROUP_DN],
+                    missingUserNameAttrPath: baseMsg + [LdapDirectorySettingsField.DEFAULT_FIELD_NAME, LdapDirectorySettingsField.USER_NAME_ATTRIBUTE],
+                    missingGroupObjectPath : baseMsg + [LdapDirectorySettingsField.DEFAULT_FIELD_NAME, LdapDirectorySettingsField.GROUP_OBJECT_CLASS],
+                    missingGroupAttribPath : baseMsg + [LdapDirectorySettingsField.DEFAULT_FIELD_NAME, LdapDirectorySettingsField.GROUP_ATTRIBUTE_HOLDING_MEMBER],
+                    missingMemberAttribPath: baseMsg + [LdapDirectorySettingsField.DEFAULT_FIELD_NAME, LdapDirectorySettingsField.MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP],
+                    badUserDnPath          : baseMsg + [LdapDirectorySettingsField.DEFAULT_FIELD_NAME, LdapDirectorySettingsField.BASE_USER_DN],
+                    badGroupDnPath         : baseMsg + [LdapDirectorySettingsField.DEFAULT_FIELD_NAME, LdapDirectorySettingsField.BASE_GROUP_DN]
 
         ]
     }

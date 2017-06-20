@@ -13,24 +13,19 @@
  **/
 package org.codice.ddf.admin.ldap.fields.config;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.codice.ddf.admin.api.Field;
-import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
-import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 import org.codice.ddf.admin.ldap.fields.LdapDistinguishedName;
-import org.codice.ddf.admin.security.common.fields.wcpm.ClaimsMapEntry;
 
 import com.google.common.collect.ImmutableList;
 
-public class LdapSettingsField extends BaseObjectField {
-    public static final String DEFAULT_FIELD_NAME = "settings";
+public class LdapDirectorySettingsField extends BaseObjectField {
+    public static final String DEFAULT_FIELD_NAME = "directorySettings";
 
-    public static final String FIELD_TYPE_NAME = "LdapSettings";
+    public static final String FIELD_TYPE_NAME = "LdapDirectorySettings";
 
     public static final String DESCRIPTION =
             "Contains information about the LDAP structure and various attributes required to setup.";
@@ -47,8 +42,6 @@ public class LdapSettingsField extends BaseObjectField {
 
     public static final String MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP = "memberAttributeReferencedInGroup";
 
-    public static final String ATTRIBUTE_MAPPING = "attributeMapping";
-
     private StringField usernameAttribute;
 
     private LdapDistinguishedName baseUserDn;
@@ -61,11 +54,9 @@ public class LdapSettingsField extends BaseObjectField {
 
     private StringField memberAttributeReferencedInGroup;
 
-    private ListField<ClaimsMapEntry> attributeMap;
-
     private LdapUseCase useCase;
 
-    public LdapSettingsField() {
+    public LdapDirectorySettingsField() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
 
         this.usernameAttribute = new StringField(USER_NAME_ATTRIBUTE);
@@ -74,7 +65,6 @@ public class LdapSettingsField extends BaseObjectField {
         this.groupObjectClass = new StringField(GROUP_OBJECT_CLASS);
         this.groupAttributeHoldingMember = new StringField(GROUP_ATTRIBUTE_HOLDING_MEMBER);
         this.memberAttributeReferencedInGroup = new StringField(MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP);
-        this.attributeMap = new ListFieldImpl<>(ATTRIBUTE_MAPPING, ClaimsMapEntry.class);
         this.useCase = new LdapUseCase();
 
         updateInnerFieldPaths();
@@ -88,7 +78,6 @@ public class LdapSettingsField extends BaseObjectField {
                 groupObjectClass,
                 groupAttributeHoldingMember,
                 memberAttributeReferencedInGroup,
-                attributeMap,
                 useCase);
     }
 
@@ -121,10 +110,6 @@ public class LdapSettingsField extends BaseObjectField {
         return memberAttributeReferencedInGroup;
     }
 
-    public ListField<ClaimsMapEntry> attributeMapField() {
-        return attributeMap;
-    }
-
     //Value getters
     public String baseUserDn() {
         return baseUserDn.getValue();
@@ -150,16 +135,21 @@ public class LdapSettingsField extends BaseObjectField {
         return memberAttributeReferencedInGroup.getValue();
     }
 
-    public LdapSettingsField useDefaultAuthentication() {
-        useCase.isRequired(true);
+    public LdapDirectorySettingsField useDefaultUser() {
         baseUserDn.isRequired(true);
-        baseGroupDn.isRequired(true);
         usernameAttribute.isRequired(true);
+        return this;
+    }
+
+    public LdapDirectorySettingsField useDefaultAuthentication() {
+        useDefaultUser();
+        useCase.isRequired(true);
+        baseGroupDn.isRequired(true);
         isRequired(true);
         return this;
     }
 
-    public LdapSettingsField useDefaultAttributeStore() {
+    public LdapDirectorySettingsField useDefaultAttributeStore() {
         useDefaultAuthentication();
         groupObjectClass.isRequired(true);
         groupAttributeHoldingMember.isRequired(true);
@@ -167,71 +157,44 @@ public class LdapSettingsField extends BaseObjectField {
         return this;
     }
 
-    public LdapSettingsField useDefaultUserAttributes() {
-        useDefaultAttributeStore();
-        attributeMap.isRequired(true);
-        return this;
-    }
-
-    public Map<String, String> attributeMap() {
-        Map<String, String> attributes = new HashMap<>();
-        attributeMap.getList()
-                .stream()
-                .forEach(entry -> attributes.put(entry.key(), entry.value()));
-        return attributes;
-    }
-
     public String useCase() {
         return useCase.getValue();
     }
 
     //Value setters
-    public LdapSettingsField baseUserDn(String baseUserDn) {
+    public LdapDirectorySettingsField baseUserDn(String baseUserDn) {
         this.baseUserDn.setValue(baseUserDn);
         return this;
     }
 
-    public LdapSettingsField baseGroupDn(String baseGroupDn) {
+    public LdapDirectorySettingsField baseGroupDn(String baseGroupDn) {
         this.baseGroupDn.setValue(baseGroupDn);
         return this;
     }
 
-    public LdapSettingsField groupObjectClass(String groupObjectCLass) {
+    public LdapDirectorySettingsField groupObjectClass(String groupObjectCLass) {
         this.groupObjectClass.setValue(groupObjectCLass);
         return this;
     }
 
-    public LdapSettingsField usernameAttribute(String usernameAttribute) {
+    public LdapDirectorySettingsField usernameAttribute(String usernameAttribute) {
         this.usernameAttribute.setValue(usernameAttribute);
         return this;
     }
 
-    public LdapSettingsField mappingEntry(String claim, String attribute) {
-        attributeMap.add(new ClaimsMapEntry().key(claim)
-                .value(attribute));
-        return this;
-    }
-
-    public LdapSettingsField groupAttributeHoldingMember(String groupAttributeHoldingMember) {
+    public LdapDirectorySettingsField groupAttributeHoldingMember(
+            String groupAttributeHoldingMember) {
         this.groupAttributeHoldingMember.setValue(groupAttributeHoldingMember);
         return this;
     }
 
-    public LdapSettingsField memberAttributeReferencedInGroup(
+    public LdapDirectorySettingsField memberAttributeReferencedInGroup(
             String memberAttributeReferencedInGroup) {
         this.memberAttributeReferencedInGroup.setValue(memberAttributeReferencedInGroup);
         return this;
     }
 
-    public LdapSettingsField attributeMapField(Map<String, String> mapping) {
-        mapping.entrySet()
-                .stream()
-                .forEach(entry -> attributeMap.add(new ClaimsMapEntry().key(entry.getKey())
-                        .value(entry.getValue())));
-        return this;
-    }
-
-    public LdapSettingsField useCase(String useCase) {
+    public LdapDirectorySettingsField useCase(String useCase) {
         this.useCase.setValue(useCase);
         return this;
     }

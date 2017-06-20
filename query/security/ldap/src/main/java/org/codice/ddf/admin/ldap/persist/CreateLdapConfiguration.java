@@ -109,10 +109,10 @@ public class CreateLdapConfiguration extends BaseFunctionField<BooleanField> {
                     ldapServiceCommons.ldapConfigToLdapClaimsHandlerService(config,
                             newAttributeMappingPath.toString());
             configurator.add(propertyActions.create(newAttributeMappingPath,
-                    config.settingsField()
-                            .attributeMap()));
+                    config.claimMappings()));
             configurator.add(featureActions.start(LdapClaimsHandlerServiceProperties.LDAP_CLAIMS_HANDLER_FEATURE));
-            configurator.add(managedServiceActions.create(LdapClaimsHandlerServiceProperties.LDAP_CLAIMS_HANDLER_MANAGED_SERVICE_FACTORY_PID, ldapClaimsServiceProps));
+            configurator.add(managedServiceActions.create(LdapClaimsHandlerServiceProperties.LDAP_CLAIMS_HANDLER_MANAGED_SERVICE_FACTORY_PID,
+                    ldapClaimsServiceProps));
         }
         }
 
@@ -127,10 +127,14 @@ public class CreateLdapConfiguration extends BaseFunctionField<BooleanField> {
 
     @Override
     public void validate() {
-        if (config.settingsField().useCase() != null && (config.settingsField().useCase()
-                .equals(ATTRIBUTE_STORE) || config.settingsField().useCase()
-                .equals(AUTHENTICATION_AND_ATTRIBUTE_STORE))) {
-            config.settingsField().useDefaultAttributeStore();
+        String useCase = config.settingsField()
+                .useCase();
+        if (useCase != null && (useCase.equals(ATTRIBUTE_STORE) || useCase.equals(
+                AUTHENTICATION_AND_ATTRIBUTE_STORE))) {
+            config.settingsField()
+                    .useDefaultAttributeStore();
+            config.claimMappingsField()
+                    .isRequired(true);
         }
 
         super.validate();

@@ -40,7 +40,7 @@ import org.codice.ddf.admin.common.report.ReportImpl;
 import org.codice.ddf.admin.common.report.message.DefaultMessages;
 import org.codice.ddf.admin.common.services.ServiceCommons;
 import org.codice.ddf.admin.ldap.fields.config.LdapConfigurationField;
-import org.codice.ddf.admin.ldap.fields.config.LdapSettingsField;
+import org.codice.ddf.admin.ldap.fields.config.LdapDirectorySettingsField;
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindUserInfo;
 import org.codice.ddf.admin.ldap.fields.connection.LdapConnectionField;
 import org.codice.ddf.admin.security.common.services.LdapClaimsHandlerServiceProperties;
@@ -70,11 +70,12 @@ public class LdapServiceCommons {
                 .map(this::ldapLoginServiceToLdapConfiguration)
                 .collect(Collectors.toList());
 
-        List<LdapConfigurationField> ldapClaimsHandlerConfigs = new LdapClaimsHandlerServiceProperties(managedServiceActions).getLdapClaimsHandlerManagedServices()
-                .values()
-                .stream()
-                .map(this::ldapClaimsHandlerServiceToLdapConfig)
-                .collect(Collectors.toList());
+        List<LdapConfigurationField> ldapClaimsHandlerConfigs =
+                new LdapClaimsHandlerServiceProperties(managedServiceActions).getLdapClaimsHandlerManagedServices()
+                        .values()
+                        .stream()
+                        .map(this::ldapClaimsHandlerServiceToLdapConfig)
+                        .collect(Collectors.toList());
 
         List<LdapConfigurationField> configs = Stream.concat(ldapLoginConfigs.stream(),
                 ldapClaimsHandlerConfigs.stream())
@@ -87,8 +88,8 @@ public class LdapServiceCommons {
         return new ListFieldImpl<>(LdapConfigurationField.class).addAll(configs);
     }
 
-    public Map<String, Object> ldapConfigToLdapClaimsHandlerService(
-            LdapConfigurationField config, String attributeMappingPath) {
+    public Map<String, Object> ldapConfigToLdapClaimsHandlerService(LdapConfigurationField config,
+            String attributeMappingPath) {
         Map<String, Object> props = new HashMap<>();
 
         if (config != null) {
@@ -128,7 +129,8 @@ public class LdapServiceCommons {
             props.put(LdapClaimsHandlerServiceProperties.MEMBER_NAME_ATTRIBUTE,
                     config.settingsField()
                             .groupAttributeHoldingMember());
-            props.put(LdapClaimsHandlerServiceProperties.PROPERTY_FILE_LOCATION, attributeMappingPath);
+            props.put(LdapClaimsHandlerServiceProperties.PROPERTY_FILE_LOCATION,
+                    attributeMappingPath);
         }
         return props;
     }
@@ -208,32 +210,31 @@ public class LdapServiceCommons {
                 .password(FLAG_PASSWORD)
                 .bindMethod(mapValue(props, LdapClaimsHandlerServiceProperties.BIND_METHOD));
 
-        LdapSettingsField settings = new LdapSettingsField().usernameAttribute(mapValue(props,
-                LdapClaimsHandlerServiceProperties.LOGIN_USER_ATTRIBUTE))
+        LdapDirectorySettingsField settings = new LdapDirectorySettingsField().usernameAttribute(
+                mapValue(props, LdapClaimsHandlerServiceProperties.LOGIN_USER_ATTRIBUTE))
                 .baseUserDn(mapValue(props, LdapClaimsHandlerServiceProperties.USER_BASE_DN))
                 .baseGroupDn(mapValue(props, LdapClaimsHandlerServiceProperties.GROUP_BASE_DN))
-                .groupObjectClass(mapValue(props,
-                        LdapClaimsHandlerServiceProperties.OBJECT_CLASS))
+                .groupObjectClass(mapValue(props, LdapClaimsHandlerServiceProperties.OBJECT_CLASS))
                 .groupAttributeHoldingMember(mapValue(props,
                         LdapClaimsHandlerServiceProperties.MEMBERSHIP_USER_ATTRIBUTE))
                 .memberAttributeReferencedInGroup(mapValue(props,
                         LdapClaimsHandlerServiceProperties.MEMBER_NAME_ATTRIBUTE))
                 .useCase(ATTRIBUTE_STORE);
 
-        String attributeMappingsPath =
-                mapValue(props, PROPERTY_FILE_LOCATION);
+        Map<String, String> claimMappings = null;
+        String attributeMappingsPath = mapValue(props, PROPERTY_FILE_LOCATION);
         if (StringUtils.isNotEmpty(attributeMappingsPath)) {
-            Path path = Paths.get(attributeMappingsPath).toAbsolutePath();
+            Path path = Paths.get(attributeMappingsPath)
+                    .toAbsolutePath();
             if (Files.exists(path)) {
-                Map<String, String> attributeMappings = new HashMap<>(propertyActions.getProperties(
-                        path));
-                settings.attributeMapField(attributeMappings);
+                claimMappings = new HashMap<>(propertyActions.getProperties(path));
             }
         }
 
         return new LdapConfigurationField().connection(connection)
                 .bindUserInfo(bindUserInfo)
                 .settings(settings)
+                .mapAllClaims(claimMappings)
                 .pid(props.get(ServiceCommons.SERVICE_PID_KEY) == null ?
                         null :
                         (String) props.get(ServiceCommons.SERVICE_PID_KEY));
@@ -251,8 +252,8 @@ public class LdapServiceCommons {
                 .realm(mapValue(props, LdapLoginServiceProperties.REALM));
         //        ldapConfiguration.bindKdcAddress((String) props.get(KDC_ADDRESS));
 
-        LdapSettingsField settings = new LdapSettingsField().usernameAttribute(mapValue(props,
-                LdapLoginServiceProperties.USER_NAME_ATTRIBUTE))
+        LdapDirectorySettingsField settings = new LdapDirectorySettingsField().usernameAttribute(
+                mapValue(props, LdapLoginServiceProperties.USER_NAME_ATTRIBUTE))
                 .baseUserDn(mapValue(props, LdapLoginServiceProperties.USER_BASE_DN))
                 .baseGroupDn(mapValue(props, LdapLoginServiceProperties.GROUP_BASE_DN))
                 .useCase(AUTHENTICATION);

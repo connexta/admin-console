@@ -13,8 +13,7 @@
  **/
 package org.codice.ddf.admin.ldap.discover;
 
-import static org.codice.ddf.admin.ldap.commons.LdapMessages.dnDoesNotExistError;
-import static org.codice.ddf.admin.ldap.commons.LdapMessages.mappingAttributeNotFoundError;
+import static org.codice.ddf.admin.ldap.commons.LdapMessages.userAttributeNotFoundError;
 
 import java.io.IOException;
 import java.util.List;
@@ -25,8 +24,8 @@ import org.codice.ddf.admin.common.fields.base.function.TestFunctionField;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.ldap.commons.LdapConnectionAttempt;
 import org.codice.ddf.admin.ldap.commons.LdapTestingUtils;
-import org.codice.ddf.admin.ldap.fields.LdapDistinguishedName;
-import org.codice.ddf.admin.ldap.fields.config.LdapSettingsField;
+import org.codice.ddf.admin.ldap.fields.config.LdapConfigurationField;
+import org.codice.ddf.admin.ldap.fields.config.LdapDirectorySettingsField;
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindUserInfo;
 import org.codice.ddf.admin.ldap.fields.connection.LdapConnectionField;
 import org.codice.ddf.admin.security.common.fields.wcpm.ClaimsMapEntry;
@@ -38,10 +37,10 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableList;
 
-public class LdapTestAttributeMappings extends TestFunctionField {
-    private static final Logger LOGGER = LoggerFactory.getLogger(LdapTestAttributeMappings.class);
+public class LdapTestClaimMappings extends TestFunctionField {
+    private static final Logger LOGGER = LoggerFactory.getLogger(LdapTestClaimMappings.class);
 
-    public static final String FIELD_NAME = "testAttributeFields";
+    public static final String FIELD_NAME = "testClaimMappings";
 
     public static final String DESCRIPTION =
             "Tests whether the attributes mapped to claims exist on users beneath the user base.";
@@ -50,15 +49,21 @@ public class LdapTestAttributeMappings extends TestFunctionField {
 
     private LdapBindUserInfo bindInfo;
 
-    private LdapSettingsField settings;
+    private LdapDirectorySettingsField settings;
+
+    private LdapConfigurationField configurations;
 
     private LdapTestingUtils utils;
 
-    public LdapTestAttributeMappings() {
+    public LdapTestClaimMappings() {
         super(FIELD_NAME, DESCRIPTION);
         conn = new LdapConnectionField().useDefaultRequired();
         bindInfo = new LdapBindUserInfo().useDefaultRequired();
-        settings = new LdapSettingsField().useDefaultUserAttributes();
+        settings = new LdapDirectorySettingsField().useDefaultUser();
+        configurations = new LdapConfigurationField();
+        configurations.claimMappingsField()
+                .isRequired(true);
+
         updateArgumentPaths();
 
         utils = new LdapTestingUtils();
@@ -66,12 +71,12 @@ public class LdapTestAttributeMappings extends TestFunctionField {
 
     @Override
     public List<DataType> getArguments() {
-        return ImmutableList.of(conn, bindInfo, settings);
+        return ImmutableList.of(conn, bindInfo, settings, configurations);
     }
 
     @Override
     public FunctionField<BooleanField> newInstance() {
-        return new LdapTestAttributeMappings();
+        return new LdapTestClaimMappings();
     }
 
     @Override
@@ -86,48 +91,25 @@ public class LdapTestAttributeMappings extends TestFunctionField {
 
             Connection ldapConnection = connectionAttempt.result();
 
-            checkUserDirExists(ldapConnection);
+            utils.checkDirExists(settings.baseUserDnField(), ldapConnection)
+                    .ifPresent(this::addArgumentMessage);
 
             // Short-circuit return here, if either the user or group directory does not exist
             if (containsErrorMsgs()) {
                 return new BooleanField(false);
             }
 
-            settings.attributeMapField()
+            configurations.claimMappingsField()
                     .getList()
                     .stream()
                     .map(ClaimsMapEntry::claimValueField)
                     .filter(claim -> !mappingAttributeFound(ldapConnection, claim.getValue()))
-                    .forEach(claim -> addArgumentMessage(mappingAttributeNotFoundError(claim.path())));
-
-            if (containsErrorMsgs()) {
-                return new BooleanField(false);
-            }
+                    .forEach(claim -> addArgumentMessage(userAttributeNotFoundError(claim.path())));
         } catch (IOException e) {
             LOGGER.warn("Error closing LDAP connection", e);
         }
 
         return new BooleanField(!containsErrorMsgs());
-    }
-
-    /**
-     * Confirms that at least one user exists in the user base with the attribute provided
-     *
-     * @param ldapConnection connection used to query ldap
-     */
-    private void checkUserDirExists(Connection ldapConnection) {
-        LdapDistinguishedName dirDn = settings.baseUserDnField();
-        boolean dirExists = !utils.getLdapQueryResults(ldapConnection,
-                dirDn.getValue(),
-                Filter.present("objectClass")
-                        .toString(),
-                SearchScope.BASE_OBJECT,
-                1)
-                .isEmpty();
-
-        if (!dirExists) {
-            addArgumentMessage(dnDoesNotExistError(dirDn.path()));
-        }
     }
 
     /**

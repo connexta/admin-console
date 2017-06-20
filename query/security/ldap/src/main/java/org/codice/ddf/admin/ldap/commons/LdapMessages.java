@@ -36,9 +36,7 @@ public class LdapMessages {
 
     public static final String NO_REFERENCED_MEMBER = "NO_REFERENCED_MEMBER";
 
-    public static final String USER_NAME_ATTRIBUTE_NOT_FOUND = "USER_NAME_ATTRIBUTE_NOT_FOUND";
-
-    public static final String MAPPING_ATTRIBUTE_NOT_FOUND = "MAPPING_ATTRIBUTE_NOT_FOUND";
+    public static final String USER_ATTRIBUTE_NOT_FOUND = "USER_ATTRIBUTE_NOT_FOUND";
 
     public static ErrorMessage invalidDnFormatError(List<String> path) {
         return new ErrorMessageImpl(INVALID_DN, path);
@@ -68,12 +66,8 @@ public class LdapMessages {
         return new ErrorMessageImpl(NO_REFERENCED_MEMBER, path);
     }
 
-    public static ErrorMessage userNameAttributeNotFoundError(List<String> path) {
-        return new ErrorMessageImpl(USER_NAME_ATTRIBUTE_NOT_FOUND, path);
-    }
-
-    public static ErrorMessage mappingAttributeNotFoundError(List<String> path) {
-        return new ErrorMessageImpl(MAPPING_ATTRIBUTE_NOT_FOUND, path);
+    public static ErrorMessage userAttributeNotFoundError(List<String> path) {
+        return new ErrorMessageImpl(USER_ATTRIBUTE_NOT_FOUND, path);
     }
 
     static ErrorMessage cannotBindError(List<String> path) {

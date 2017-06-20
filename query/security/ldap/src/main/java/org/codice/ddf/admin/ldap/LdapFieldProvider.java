@@ -76,7 +76,7 @@ public class LdapFieldProvider extends BaseFieldProvider {
         testBind = new LdapTestBind();
         testSettings = new LdapTestDirectorySettings();
         recommendedSettings = new LdapRecommendedSettings();
-        claimMappings = new LdapTestClaimMappings();
+        claimMappings = new LdapTestClaimMappings(serviceActions);
 
         ldapQuery = new LdapQuery();
         getUserAttris = new LdapUserAttributes();
@@ -96,8 +96,7 @@ public class LdapFieldProvider extends BaseFieldProvider {
     @Override
     public List<Field> getDiscoveryFields() {
         return ImmutableList.of(testConnection,
-                testBind,
-                testSettings, recommendedSettings, claimMappings,
+                testBind, testSettings, recommendedSettings, claimMappings,
                 ldapQuery,
                 getUserAttris,
                 getConfigs);

@@ -135,22 +135,17 @@ public class LdapDirectorySettingsField extends BaseObjectField {
         return memberAttributeReferencedInGroup.getValue();
     }
 
-    public LdapDirectorySettingsField useDefaultUser() {
+    public LdapDirectorySettingsField useDefaultRequiredForAuthentication() {
         baseUserDn.isRequired(true);
         usernameAttribute.isRequired(true);
-        return this;
-    }
-
-    public LdapDirectorySettingsField useDefaultAuthentication() {
-        useDefaultUser();
         useCase.isRequired(true);
         baseGroupDn.isRequired(true);
         isRequired(true);
         return this;
     }
 
-    public LdapDirectorySettingsField useDefaultAttributeStore() {
-        useDefaultAuthentication();
+    public LdapDirectorySettingsField useDefaultRequiredForAttributeStore() {
+        useDefaultRequiredForAuthentication();
         groupObjectClass.isRequired(true);
         groupAttributeHoldingMember.isRequired(true);
         memberAttributeReferencedInGroup.isRequired(true);

@@ -63,7 +63,7 @@ public class LdapTestDirectorySettings extends TestFunctionField {
         super(FIELD_NAME, DESCRIPTION);
         conn = new LdapConnectionField().useDefaultRequired();
         bindInfo = new LdapBindUserInfo().useDefaultRequired();
-        settings = new LdapDirectorySettingsField().useDefaultAuthentication();
+        settings = new LdapDirectorySettingsField().useDefaultRequiredForAuthentication();
         updateArgumentPaths();
 
         utils = new LdapTestingUtils();
@@ -124,7 +124,7 @@ public class LdapTestDirectorySettings extends TestFunctionField {
         if (settings.useCase() != null && (settings.useCase()
                 .equals(ATTRIBUTE_STORE) || settings.useCase()
                 .equals(AUTHENTICATION_AND_ATTRIBUTE_STORE))) {
-            settings.useDefaultAttributeStore();
+            settings.useDefaultRequiredForAttributeStore();
         }
 
         super.validate();

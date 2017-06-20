@@ -38,6 +38,8 @@ public class LdapMessages {
 
     public static final String USER_ATTRIBUTE_NOT_FOUND = "USER_ATTRIBUTE_NOT_FOUND";
 
+    public static final String STS_CLAIM_NOT_FOUND = "STS_CLAIM_NOT_FOUND";
+
     public static ErrorMessage invalidDnFormatError(List<String> path) {
         return new ErrorMessageImpl(INVALID_DN, path);
     }
@@ -68,6 +70,10 @@ public class LdapMessages {
 
     public static ErrorMessage userAttributeNotFoundError(List<String> path) {
         return new ErrorMessageImpl(USER_ATTRIBUTE_NOT_FOUND, path);
+    }
+
+    public static ErrorMessage stsClaimNotFoundError(List<String> path) {
+        return new ErrorMessageImpl(STS_CLAIM_NOT_FOUND, path);
     }
 
     static ErrorMessage cannotBindError(List<String> path) {

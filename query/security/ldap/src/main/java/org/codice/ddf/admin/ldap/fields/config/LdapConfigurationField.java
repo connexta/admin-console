@@ -139,7 +139,7 @@ public class LdapConfigurationField extends BaseObjectField {
     public LdapConfigurationField useDefaultRequired() {
         connection.useDefaultRequired();
         bindUserInfo.useDefaultRequired();
-        settings.useDefaultAuthentication();
+        settings.useDefaultRequiredForAuthentication();
         isRequired(true);
         return this;
     }

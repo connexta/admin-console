@@ -132,7 +132,7 @@ public class CreateLdapConfiguration extends BaseFunctionField<BooleanField> {
         if (useCase != null && (useCase.equals(ATTRIBUTE_STORE) || useCase.equals(
                 AUTHENTICATION_AND_ATTRIBUTE_STORE))) {
             config.settingsField()
-                    .useDefaultAttributeStore();
+                    .useDefaultRequiredForAttributeStore();
             config.claimMappingsField()
                     .isRequired(true);
         }

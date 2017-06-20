@@ -13,22 +13,28 @@
  **/
 package org.codice.ddf.admin.ldap.discover;
 
+import static org.codice.ddf.admin.ldap.commons.LdapMessages.stsClaimNotFoundError;
 import static org.codice.ddf.admin.ldap.commons.LdapMessages.userAttributeNotFoundError;
+import static org.codice.ddf.admin.ldap.fields.config.LdapConfigurationField.CLAIM_MAPPING;
 
 import java.io.IOException;
 import java.util.List;
 
 import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
+import org.codice.ddf.admin.api.fields.ListField;
+import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.fields.base.function.TestFunctionField;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
+import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 import org.codice.ddf.admin.ldap.commons.LdapConnectionAttempt;
 import org.codice.ddf.admin.ldap.commons.LdapTestingUtils;
-import org.codice.ddf.admin.ldap.fields.config.LdapConfigurationField;
-import org.codice.ddf.admin.ldap.fields.config.LdapDirectorySettingsField;
+import org.codice.ddf.admin.ldap.fields.LdapDistinguishedName;
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindUserInfo;
 import org.codice.ddf.admin.ldap.fields.connection.LdapConnectionField;
 import org.codice.ddf.admin.security.common.fields.wcpm.ClaimsMapEntry;
+import org.codice.ddf.admin.security.common.services.StsServiceProperties;
+import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.Filter;
 import org.forgerock.opendj.ldap.SearchScope;
@@ -45,44 +51,70 @@ public class LdapTestClaimMappings extends TestFunctionField {
     public static final String DESCRIPTION =
             "Tests whether the attributes mapped to claims exist on users beneath the user base.";
 
+    public static final String USER_NAME_ATTRIBUTE = "userNameAttribute";
+
+    public static final String BASE_USER_DN = "baseUserDn";
+
+    private StsServiceProperties stsServiceProperties;
+
     private LdapConnectionField conn;
 
     private LdapBindUserInfo bindInfo;
 
-    private LdapDirectorySettingsField settings;
+    private StringField usernameAttribute;
 
-    private LdapConfigurationField configurations;
+    private LdapDistinguishedName baseUserDn;
+
+    private ListField<ClaimsMapEntry> claimMappings;
 
     private LdapTestingUtils utils;
 
-    public LdapTestClaimMappings() {
+    private final ServiceActions serviceActions;
+
+    public LdapTestClaimMappings(ServiceActions serviceActions) {
         super(FIELD_NAME, DESCRIPTION);
+        this.serviceActions = serviceActions;
+
         conn = new LdapConnectionField().useDefaultRequired();
         bindInfo = new LdapBindUserInfo().useDefaultRequired();
-        settings = new LdapDirectorySettingsField().useDefaultUser();
-        configurations = new LdapConfigurationField();
-        configurations.claimMappingsField()
-                .isRequired(true);
+        usernameAttribute = new StringField(USER_NAME_ATTRIBUTE).isRequired(true);
+        baseUserDn = new LdapDistinguishedName(BASE_USER_DN);
+        baseUserDn.isRequired(true);
+        claimMappings = new ListFieldImpl<>(CLAIM_MAPPING, ClaimsMapEntry.class);
+        claimMappings.isRequired(true);
 
         updateArgumentPaths();
 
+        stsServiceProperties = new StsServiceProperties();
         utils = new LdapTestingUtils();
     }
 
     @Override
     public List<DataType> getArguments() {
-        return ImmutableList.of(conn, bindInfo, settings, configurations);
+        return ImmutableList.of(conn, bindInfo, usernameAttribute, baseUserDn, claimMappings);
     }
 
     @Override
     public FunctionField<BooleanField> newInstance() {
-        return new LdapTestClaimMappings();
+        return new LdapTestClaimMappings(serviceActions);
+    }
+
+    @Override
+    public void validate() {
+        super.validate();
+        List<String> configuredStsClaims = stsServiceProperties.getConfiguredStsClaims(
+                serviceActions);
+
+        claimMappings.getList()
+                .stream()
+                .map(ClaimsMapEntry::claimField)
+                .filter(claimKey -> !configuredStsClaims.contains(claimKey.getValue()))
+                .forEach(claimKey -> addArgumentMessage(stsClaimNotFoundError(claimKey.path())));
     }
 
     @Override
     public BooleanField performFunction() {
-        try (LdapConnectionAttempt connectionAttempt = utils.bindUserToLdapConnection(conn,
-                bindInfo)) {
+        try (LdapConnectionAttempt connectionAttempt = utils.bindUserToLdapConnection(conn, bindInfo)) {
             addMessages(connectionAttempt);
 
             if (containsErrorMsgs()) {
@@ -91,7 +123,7 @@ public class LdapTestClaimMappings extends TestFunctionField {
 
             Connection ldapConnection = connectionAttempt.result();
 
-            utils.checkDirExists(settings.baseUserDnField(), ldapConnection)
+            utils.checkDirExists(baseUserDn, ldapConnection)
                     .ifPresent(this::addArgumentMessage);
 
             // Short-circuit return here, if either the user or group directory does not exist
@@ -99,8 +131,7 @@ public class LdapTestClaimMappings extends TestFunctionField {
                 return new BooleanField(false);
             }
 
-            configurations.claimMappingsField()
-                    .getList()
+            claimMappings.getList()
                     .stream()
                     .map(ClaimsMapEntry::claimValueField)
                     .filter(claim -> !mappingAttributeFound(ldapConnection, claim.getValue()))
@@ -116,12 +147,12 @@ public class LdapTestClaimMappings extends TestFunctionField {
      * Checks the baseUserDn for users.
      *
      * @param ldapConnection connection used to query ldap
-     * @param mapAttribute
+     * @param mapAttribute   the attribute to check against the ldap users
      */
     private boolean mappingAttributeFound(Connection ldapConnection, String mapAttribute) {
         return !utils.getLdapQueryResults(ldapConnection,
-                settings.baseUserDn(),
-                Filter.and(Filter.present(settings.usernameAttribute()),
+                baseUserDn.getValue(),
+                Filter.and(Filter.present(usernameAttribute.getValue()),
                         Filter.present(mapAttribute))
                         .toString(),
                 SearchScope.WHOLE_SUBTREE,
@@ -139,5 +170,17 @@ public class LdapTestClaimMappings extends TestFunctionField {
      */
     private void setTestingUtils(LdapTestingUtils utils) {
         this.utils = utils;
+    }
+
+    /**
+     * Intentionally scoped as private.
+     * This is a test support method to be invoked by Spock tests which will elevate scope as needed
+     * in order to execute. If Java-based unit tests are ever needed, this scope will need to be
+     * updated to package-private.
+     *
+     * @param stsServiceProperties service properties for mocking
+     */
+    private void setStsServiceProperties(StsServiceProperties stsServiceProperties) {
+        this.stsServiceProperties = stsServiceProperties;
     }
 }

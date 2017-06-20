@@ -44,6 +44,9 @@ public class GetCswConfigurations extends BaseFunctionField<ListField<CswSourceI
     public static final String DESCRIPTION =
             "Retrieves all currently configured CSW sources. If the pid argument is specified, only the source configuration with that pid will be returned.";
 
+    public static final ListFieldImpl<CswSourceInfoField> RETURN_TYPE =
+            new ListFieldImpl<>(CswSourceInfoField.class);
+
     public static final String CSW_SOURCES = "cswSources";
 
     private PidField pid;
@@ -63,7 +66,7 @@ public class GetCswConfigurations extends BaseFunctionField<ListField<CswSourceI
     public GetCswConfigurations(ConfiguratorFactory configuratorFactory,
             ServiceActions serviceActions, ManagedServiceActions managedServiceActions,
             ServiceReader serviceReader) {
-        super(FIELD_NAME, DESCRIPTION, new ListFieldImpl<>(CswSourceInfoField.class));
+        super(FIELD_NAME, DESCRIPTION);
         this.configuratorFactory = configuratorFactory;
         this.serviceActions = serviceActions;
         this.managedServiceActions = managedServiceActions;
@@ -116,6 +119,11 @@ public class GetCswConfigurations extends BaseFunctionField<ListField<CswSourceI
         if (pid.getValue() != null) {
             addMessages(serviceCommons.serviceConfigurationExists(pid));
         }
+    }
+
+    @Override
+    public ListField<CswSourceInfoField> getReturnType() {
+        return RETURN_TYPE;
     }
 
     @Override

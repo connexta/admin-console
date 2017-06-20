@@ -28,10 +28,13 @@ public class GetStsClaimsFunctionField extends GetFunctionField<ListFieldImpl<St
 
     public static final String DESCRIPTION = "All currently configured claims the STS supports.";
 
+    public static final ListFieldImpl<StsClaimField> RETURN_TYPE =
+            new ListFieldImpl<>(StsClaimField.class);
+
     private final ServiceActions serviceActions;
 
     public GetStsClaimsFunctionField(ServiceActions serviceActions) {
-        super(NAME, DESCRIPTION, new ListFieldImpl<>(StsClaimField.class));
+        super(NAME, DESCRIPTION);
         this.serviceActions = serviceActions;
     }
 
@@ -50,6 +53,11 @@ public class GetStsClaimsFunctionField extends GetFunctionField<ListFieldImpl<St
                 });
 
         return claims;
+    }
+
+    @Override
+    public ListFieldImpl<StsClaimField> getReturnType() {
+        return RETURN_TYPE;
     }
 
     @Override

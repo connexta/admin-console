@@ -37,7 +37,7 @@ public class GetRealms extends GetFunctionField<ListField<Realm>> {
     LdapLoginServiceProperties serviceCommons;
 
     public GetRealms(ManagedServiceActions managedServiceActions, BundleActions bundleActions) {
-        super(FIELD_NAME, DESCRIPTION, new ListFieldImpl<>(Realm.class));
+        super(FIELD_NAME, DESCRIPTION);
         this.managedServiceActions = managedServiceActions;
         serviceCommons = new LdapLoginServiceProperties(managedServiceActions);
         this.bundleActions = bundleActions;
@@ -59,6 +59,11 @@ public class GetRealms extends GetFunctionField<ListField<Realm>> {
         }
 
         return realms;
+    }
+
+    @Override
+    public ListField<Realm> getReturnType() {
+        return new ListFieldImpl<>(Realm.class);
     }
 
     @Override

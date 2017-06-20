@@ -48,6 +48,9 @@ public class SaveContextPolices extends BaseFunctionField<ListField<ContextPolic
     public static final String DESCRIPTION =
             "Saves a list of policies to be applied to their corresponding context paths.";
 
+    public static final ListFieldImpl<ContextPolicyBin> RETURN_TYPE =
+            new ListFieldImpl<>(ContextPolicyBin.class);
+
     private ConfiguratorFactory configuratorFactory;
 
     private final ServiceActions serviceActions;
@@ -58,7 +61,7 @@ public class SaveContextPolices extends BaseFunctionField<ListField<ContextPolic
 
     public SaveContextPolices(ConfiguratorFactory configuratorFactory,
             ServiceActions serviceActions) {
-        super(FUNCTION_FIELD_NAME, DESCRIPTION, new ListFieldImpl<>(ContextPolicyBin.class));
+        super(FUNCTION_FIELD_NAME, DESCRIPTION);
         this.configuratorFactory = configuratorFactory;
         this.serviceActions = serviceActions;
 
@@ -117,6 +120,11 @@ public class SaveContextPolices extends BaseFunctionField<ListField<ContextPolic
                 .noneMatch(ROOT_CONTEXT_PATH::equals)) {
             addArgumentMessage(noRootContextError(contextPolicies.path()));
         }
+    }
+
+    @Override
+    public ListField<ContextPolicyBin> getReturnType() {
+        return RETURN_TYPE;
     }
 
     @Override

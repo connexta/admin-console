@@ -34,6 +34,8 @@ public class DeleteCswConfiguration extends BaseFunctionField<BooleanField> {
     public static final String DESCRIPTION =
             "Deletes a CSW source configuration provided by the pid and returns true on success and false on failure.";
 
+    public static final BooleanField RETURN_TYPE = new BooleanField();
+
     private PidField pid;
 
     private ServiceCommons serviceCommons;
@@ -46,7 +48,7 @@ public class DeleteCswConfiguration extends BaseFunctionField<BooleanField> {
 
     public DeleteCswConfiguration(ConfiguratorFactory configuratorFactory,
             ServiceActions serviceActions, ManagedServiceActions managedServiceActions) {
-        super(FIELD_NAME, DESCRIPTION, new BooleanField());
+        super(FIELD_NAME, DESCRIPTION);
         this.configuratorFactory = configuratorFactory;
         this.serviceActions = serviceActions;
         this.managedServiceActions = managedServiceActions;
@@ -79,6 +81,11 @@ public class DeleteCswConfiguration extends BaseFunctionField<BooleanField> {
     @Override
     public List<DataType> getArguments() {
         return ImmutableList.of(pid);
+    }
+
+    @Override
+    public BooleanField getReturnType() {
+        return RETURN_TYPE;
     }
 
     @Override

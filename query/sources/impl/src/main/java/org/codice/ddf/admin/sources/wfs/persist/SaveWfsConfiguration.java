@@ -47,6 +47,8 @@ public class SaveWfsConfiguration extends BaseFunctionField<BooleanField> {
     private static final String DESCRIPTION =
             "Saves a WFS source configuration. If a pid is specified, the source configuration specified by the pid will be updated. Returns true on success and false on failure.";
 
+    public static final BooleanField RETURN_TYPE = new BooleanField();
+
     private WfsSourceConfigurationField config;
 
     private PidField pid;
@@ -68,7 +70,7 @@ public class SaveWfsConfiguration extends BaseFunctionField<BooleanField> {
     public SaveWfsConfiguration(ConfiguratorFactory configuratorFactory,
             ServiceActions serviceActions, ManagedServiceActions managedServiceActions,
             ServiceReader serviceReader, FeatureActions featureActions) {
-        super(FIELD_NAME, DESCRIPTION, new BooleanField());
+        super(FIELD_NAME, DESCRIPTION);
         this.configuratorFactory = configuratorFactory;
         this.serviceActions = serviceActions;
         this.managedServiceActions = managedServiceActions;
@@ -126,6 +128,11 @@ public class SaveWfsConfiguration extends BaseFunctionField<BooleanField> {
     @Override
     public List<DataType> getArguments() {
         return ImmutableList.of(config, pid);
+    }
+
+    @Override
+    public BooleanField getReturnType() {
+        return RETURN_TYPE;
     }
 
     @Override

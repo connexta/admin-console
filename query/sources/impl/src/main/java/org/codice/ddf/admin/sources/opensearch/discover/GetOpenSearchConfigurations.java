@@ -45,6 +45,10 @@ public class GetOpenSearchConfigurations
     public static final String DESCRIPTION =
             "Retrieves all currently configured OpenSearch sources. If a source pid is specified, only that source configuration will be returned.";
 
+    public static final ListFieldImpl<OpenSearchSourceInfoField> RETURN_TYPE =
+            new ListFieldImpl<>(OpenSearchSourceInfoField.class);
+
+
     public static final String OPEN_SEARCH_SOURCES = "openSearchSource";
 
     private PidField pid;
@@ -64,7 +68,7 @@ public class GetOpenSearchConfigurations
     public GetOpenSearchConfigurations(ConfiguratorFactory configuratorFactory,
             ServiceActions serviceActions, ManagedServiceActions managedServiceActions,
             ServiceReader serviceReader) {
-        super(FIELD_NAME, DESCRIPTION, new ListFieldImpl<>(OpenSearchSourceInfoField.class));
+        super(FIELD_NAME, DESCRIPTION);
         this.configuratorFactory = configuratorFactory;
         this.serviceActions = serviceActions;
         this.managedServiceActions = managedServiceActions;
@@ -118,6 +122,11 @@ public class GetOpenSearchConfigurations
         if (pid.getValue() != null) {
             addMessages(serviceCommons.serviceConfigurationExists(pid));
         }
+    }
+
+    @Override
+    public ListField<OpenSearchSourceInfoField> getReturnType() {
+        return RETURN_TYPE;
     }
 
     @Override

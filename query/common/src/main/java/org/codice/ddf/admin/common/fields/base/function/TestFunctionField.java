@@ -18,7 +18,14 @@ import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 
 public abstract class TestFunctionField extends BaseFunctionField<BooleanField> {
 
+    public static final BooleanField RETURN_TYPE = new BooleanField();
+
     public TestFunctionField(String fieldName, String description) {
-        super(fieldName, description, new BooleanField(null));
+        super(fieldName, description);
+    }
+
+    @Override
+    public BooleanField getReturnType() {
+        return RETURN_TYPE;
     }
 }

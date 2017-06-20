@@ -36,22 +36,16 @@ const getSourceMutation = ({ type, config, sourceName, creds }) => {
   }
 }
 
-const saveSource = (props, onFinish, currentStageId) => {
+const saveSource = (props) => {
   const {
     client,
     type,
     config,
     sourceName,
-    inputConfigs,
-    startSubmitting,
-    endSubmitting,
-    setErrors,
-    clearErrors
+    inputConfigs
   } = props
 
-  clearErrors()
-  startSubmitting()
-  client.mutate(getSourceMutation({
+  return client.mutate(getSourceMutation({
     type,
     config,
     sourceName,
@@ -59,14 +53,6 @@ const saveSource = (props, onFinish, currentStageId) => {
       username: inputConfigs.sourceUserName,
       password: inputConfigs.sourceUserPassword
     }}))
-    .then(() => {
-      if (onFinish) onFinish()
-      endSubmitting()
-    })
-    .catch(() => {
-      setErrors(currentStageId, ['Network Error'])
-      endSubmitting()
-    })
 }
 
 export { saveSourceMutations, saveSource }

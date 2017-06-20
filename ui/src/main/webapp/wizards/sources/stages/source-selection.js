@@ -38,7 +38,8 @@ const SourceSelectionStageView = (props) => {
     discoveredEndpoints = {},
     chosenEndpoint,
     setChosenEndpoint,
-    clearErrors
+    clearErrors,
+    setErrors
   } = props
 
   if (Object.keys(discoveredEndpoints).length !== 0) {
@@ -82,12 +83,16 @@ const SourceSelectionStageView = (props) => {
             <Action
               primary
               label='Refresh'
-              onClick={() => queryAllSources(props,
-                () => {
-                  clearErrors()
-                  changeStage('sourceSelectionStage')
-                },
-                (e) => setErrors(currentStageId, e))} />
+              onClick={() => {
+                queryAllSources(props)
+                  .then((endpoints) => {
+                    props.setDiscoveredEndpoints(endpoints)
+                    clearErrors()
+                  })
+                  .catch((e) => {
+                    setErrors(currentStageId, e)
+                  })
+              }} />
           </ActionGroup>
           <Navigator
             max={3}

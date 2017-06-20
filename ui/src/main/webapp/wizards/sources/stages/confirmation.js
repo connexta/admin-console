@@ -34,7 +34,11 @@ const ConfirmationStageView = (props) => {
     sourceName,
     inputConfigs,
     config,
-    changeStage
+    changeStage,
+    endSubmitting,
+    clearErrors,
+    startSubmitting,
+    setErrors
   } = props
 
   return (
@@ -59,7 +63,17 @@ const ConfirmationStageView = (props) => {
           }
           right={
             <NextNav label='Finish'
-              onClick={() => saveSource(props, () => changeStage('completedStage', currentStageId))}
+              onClick={() => {
+                clearErrors()
+                startSubmitting()
+                saveSource(props).then(() => {
+                  changeStage('completedStage', currentStageId)
+                  endSubmitting()
+                }).catch(() => {
+                  setErrors(currentStageId, ['Network Error'])
+                  endSubmitting()
+                })
+              }}
               disabled={sourceName === undefined || sourceName.trim() === ''} />
           }
         />

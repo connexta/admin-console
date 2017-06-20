@@ -164,7 +164,7 @@ const nonFatalErrors = [
 
 const isFatalError = (code) => !nonFatalErrors.includes(code)
 
-const groupResponses = (responses) => responses.reduce((acc, response) => {
+export const groupResponses = (responses) => responses.reduce((acc, response) => {
   const { foundSources = {}, uniqueErrors = [], fatalErrors = [] } = acc
   const { type, sourceType, value } = response
 

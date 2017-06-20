@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { setStage, getIsSubmitting } from './reducer'
+import { getStage, getIsSubmitting } from './reducer'
 
 import Flexbox from 'flexbox-react'
 import CircularProgress from 'material-ui/CircularProgress'
@@ -35,7 +35,7 @@ let StageRouter = ({ stage }) => {
   return React.createElement(stageMapping[stage])
 }
 StageRouter = connect((state) => ({
-  stage: setStage(state)
+  stage: getStage(state)
 }))(StageRouter)
 
 let SourceApp = ({ isSubmitting = false, value = {}, setDefaults, messages }) => (

@@ -23,139 +23,232 @@ describe('Sources Validation', () => {
   })
 
   describe('User + Pass', () => {
-    var configs = {
+    const baseConfig = (changes) => ({
       sourceUserName: '',
       sourceUserPassword: '',
       sourceHostName: 'localhost',
-      sourcePort: 8993
-    }
-    var discoveryType = 'hostnamePort'
+      sourcePort: 8993,
+      ...changes
+    })
+    const discoveryType = 'hostnamePort'
+
     it('Can handle undefined values: enables Next', () => {
-      configs.sourceUserName = undefined
-      configs.sourceUserPassword = undefined
-      expect(discoveryStageDisableNext({ configs, discoveryType }), 'Next button should be enabled').to.equal(false)
+      const configs = baseConfig({
+        sourceUserName: undefined,
+        sourceUserPassword: undefined
+      })
+      expect(discoveryStageDisableNext({
+        configs,
+        discoveryType
+      }), 'Next button should be enabled').to.equal(false)
       expect(userNameError(configs), 'Username should not report an error').to.be.undefined
       expect(passwordError(configs), 'Password should not report an error').to.be.undefined
     })
     it('User + Empty pass: disables Next', () => {
-      configs.sourceUserName = 'username'
-      configs.sourceUserPassword = ''
-      const discoveryType = 'hostnamePort'
-      expect(discoveryStageDisableNext({ configs, discoveryType }), 'Next button should be disabled').to.equal(true)
+      const configs = baseConfig({
+        sourceUserName: 'username',
+        sourceUserPassword: ''
+      })
+      expect(discoveryStageDisableNext({
+        configs,
+        discoveryType
+      }), 'Next button should be disabled').to.equal(true)
       expect(userNameError(configs), 'Username should not report an error').to.be.undefined
       expect(passwordError(configs), 'Password should report an error').to.be.a('string').that.is.not.empty
     })
     it('Empty User + Pass: disables Next', () => {
-      configs.sourceUserName = ''
-      configs.sourceUserPassword = 'password'
-      const discoveryType = 'hostnamePort'
-      expect(discoveryStageDisableNext({ configs, discoveryType }), 'Next button should be disabled').to.equal(true)
+      const configs = baseConfig({
+        sourceUserName: '',
+        sourceUserPassword: 'password'
+      })
+      expect(discoveryStageDisableNext({
+        configs,
+        discoveryType
+      }), 'Next button should be disabled').to.equal(true)
       expect(userNameError(configs), 'Username should report an error').to.be.a('string').that.is.not.empty
       expect(passwordError(configs), 'Password should not report an error').to.be.undefined
     })
     it('User + Pass: enables Next', () => {
-      configs.sourceUserName = 'username'
-      configs.sourceUserPassword = 'password'
-      expect(discoveryStageDisableNext({ configs, discoveryType }), 'Next button should be enabled').to.equal(false)
+      const configs = baseConfig({
+        sourceUserName: 'username',
+        sourceUserPassword: 'password'
+      })
+      expect(discoveryStageDisableNext({
+        configs,
+        discoveryType
+      }), 'Next button should be enabled').to.equal(false)
       expect(userNameError(configs), 'Username should not report an error').to.be.undefined
       expect(passwordError(configs), 'Password should not report an error').to.be.undefined
     })
     it('Empty User + Empty Pass: enables Next', () => {
-      configs.sourceUserName = ''
-      configs.sourceUserPassword = ''
-      expect(discoveryStageDisableNext({ configs, discoveryType }), 'Next button should be enabled').to.equal(false)
+      const configs = baseConfig({
+        sourceUserName: '',
+        sourceUserPassword: ''
+      })
+      expect(discoveryStageDisableNext({
+        configs,
+        discoveryType
+      }), 'Next button should be enabled').to.equal(false)
       expect(userNameError(configs), 'Username should not report an error').to.be.undefined
       expect(passwordError(configs), 'Password should not report an error').to.be.undefined
     })
     it('User + Blank (not empty) Pass: enables Next', () => {
-      configs.sourceUserName = 'username'
-      configs.sourceUserPassword = '        '
-      const discoveryType = 'hostnamePort'
-      expect(discoveryStageDisableNext({ configs, discoveryType }), 'Next button should be enabled').to.equal(false)
+      const configs = baseConfig({
+        sourceUserName: 'username',
+        sourceUserPassword: '        '
+      })
+      expect(discoveryStageDisableNext({
+        configs,
+        discoveryType
+      }), 'Next button should be enabled').to.equal(false)
       expect(userNameError(configs), 'Username should not report an error').to.be.undefined
       expect(passwordError(configs), 'Password should not report an error').to.be.undefined
     })
   })
 
   describe('Hostname + Port', () => {
-    var configs = {
+    const baseConfig = (changes) => ({
       sourceUserName: 'username',
       sourceUserPassword: 'password',
       sourceHostName: '',
-      sourcePort: 0
-    }
-    var discoveryType = 'hostnamePort'
+      sourcePort: 0,
+      ...changes
+    })
+    const discoveryType = 'hostnamePort'
+
     it('Can handle undefined values: disables Next', () => {
-      configs.sourceHostName = undefined
-      configs.sourcePort = undefined
-      expect(discoveryStageDisableNext({ configs, discoveryType }), 'Next button should be disabled').to.equal(true)
+      const configs = baseConfig({
+        sourceHostName: undefined,
+        sourcePort: undefined
+      })
+      expect(discoveryStageDisableNext({
+        configs,
+        discoveryType
+      }), 'Next button should be disabled').to.equal(true)
     })
     it('No Hostname + Valid Port: disables Next', () => {
-      configs.sourceHostName = ''
-      configs.sourcePort = 8993
-      expect(discoveryStageDisableNext({ configs, discoveryType }), 'Next button should be disabled').to.equal(true)
+      const configs = baseConfig({
+        sourceHostName: '',
+        sourcePort: 8993
+      })
+      expect(discoveryStageDisableNext({
+        configs,
+        discoveryType
+      }), 'Next button should be disabled').to.equal(true)
       expect(portError(configs), 'Port should not return an error').to.be.undefined
     })
     it('Blank (not empty) Hostname + Valid Port: disables Next', () => {
-      configs.sourceHostName = '        '
-      configs.sourcePort = 8993
-      expect(discoveryStageDisableNext({ configs, discoveryType }), 'Next button should be disabled').to.equal(true)
+      const configs = baseConfig({
+        sourceHostName: '        ',
+        sourcePort: 8993
+      })
+      expect(discoveryStageDisableNext({
+        configs,
+        discoveryType
+      }), 'Next button should be disabled').to.equal(true)
       expect(portError(configs), 'Port should not return an error').to.be.undefined
     })
     it('Invalid port range, lower bound: disables Next', () => {
-      configs.sourceHostName = 'localhost'
-      configs.sourcePort = -1
-      expect(discoveryStageDisableNext({ configs, discoveryType }), 'Next button should be disabled').to.equal(true)
+      const configs = baseConfig({
+        sourceHostName: 'localhost',
+        sourcePort: -1
+      })
+      expect(discoveryStageDisableNext({
+        configs,
+        discoveryType
+      }), 'Next button should be disabled').to.equal(true)
       expect(portError(configs), 'Port should return an error').to.be.a('string').that.is.not.empty
     })
     it('Valid port range, lower bound: enables Next', () => {
-      configs.sourceHostName = 'localhost'
-      configs.sourcePort = 0
-      expect(discoveryStageDisableNext({ configs, discoveryType }), 'Next button should be enabled').to.equal(false)
+      const configs = baseConfig({
+        sourceHostName: 'localhost',
+        sourcePort: 0
+      })
+      expect(discoveryStageDisableNext({
+        configs,
+        discoveryType
+      }), 'Next button should be enabled').to.equal(false)
       expect(portError(configs), 'Port should not return an error').to.be.undefined
     })
     it('Valid port range, upper bound: enables Next', () => {
-      configs.sourceHostName = 'localhost'
-      configs.sourcePort = 65535
-      expect(discoveryStageDisableNext({ configs, discoveryType }), 'Next button should be enabled').to.equal(false)
+      const configs = baseConfig({
+        sourceHostName: 'localhost',
+        sourcePort: 65535
+      })
+      expect(discoveryStageDisableNext({
+        configs,
+        discoveryType
+      }), 'Next button should be enabled').to.equal(false)
       expect(portError(configs), 'Port should not return an error').to.be.undefined
     })
     it('Invalid port range, upper bound: disables Next', () => {
-      configs.sourceHostName = 'localhost'
-      configs.sourcePort = 65536
-      expect(discoveryStageDisableNext({ configs, discoveryType }), 'Next button should be disabled').to.equal(true)
+      const configs = baseConfig({
+        sourceHostName: 'localhost',
+        sourcePort: 65536
+      })
+      expect(discoveryStageDisableNext({
+        configs,
+        discoveryType
+      }), 'Next button should be disabled').to.equal(true)
       expect(portError(configs), 'Port should return an error').to.be.a('string').that.is.not.empty
     })
     it('Valid Hostname + Valid Port: enables Next', () => {
-      configs.sourceHostName = 'localhost'
-      configs.sourcePort = 8993
-      expect(discoveryStageDisableNext({ configs, discoveryType }), 'Next button should be enabled').to.equal(false)
+      const configs = baseConfig({
+        sourceHostName: 'localhost',
+        sourcePort: 8993
+      })
+      expect(discoveryStageDisableNext({
+        configs,
+        discoveryType
+      }), 'Next button should be enabled').to.equal(false)
       expect(portError(configs), 'Port should not return an error').to.be.undefined
     })
   })
 
   describe('Url', () => {
-    var configs = {
+    const baseConfig = (changes) => ({
       sourceUserName: 'username',
       sourceUserPassword: 'password',
-      endpointUrl: ''
-    }
-    var discoveryType = 'url'
+      endpointUrl: '',
+      ...changes
+    })
+    const discoveryType = 'url'
+
     it('Can handle undefined value: disables Next', () => {
-      configs.endpointUrl = undefined
-      expect(discoveryStageDisableNext({ configs, discoveryType }), 'Next button should be disabled').to.equal(true)
+      const configs = baseConfig({
+        endpointUrl: undefined
+      })
+      expect(discoveryStageDisableNext({
+        configs,
+        discoveryType
+      }), 'Next button should be disabled').to.equal(true)
     })
     it('No url: disables Next', () => {
-      configs.endpointUrl = ''
-      expect(discoveryStageDisableNext({ configs, discoveryType }), 'Next button should be disabled').to.equal(true)
+      const configs = baseConfig({
+        endpointUrl: ''
+      })
+      expect(discoveryStageDisableNext({
+        configs,
+        discoveryType
+      }), 'Next button should be disabled').to.equal(true)
     })
     it('Blank (not empty) url: disables Next', () => {
-      configs.endpointUrl = '        '
-      expect(discoveryStageDisableNext({ configs, discoveryType }), 'Next button should be disabled').to.equal(true)
+      const configs = baseConfig({
+        endpointUrl: '        '
+      })
+      expect(discoveryStageDisableNext({
+        configs,
+        discoveryType
+      }), 'Next button should be disabled').to.equal(true)
     })
     it('Valid url: enables Next', () => {
-      configs.endpointUrl = 'https://localhost:8993/'
-      expect(discoveryStageDisableNext({ configs, discoveryType }), 'Next button should be enabled').to.equal(false)
+      const configs = baseConfig({
+        endpointUrl: 'https://localhost:8993/'
+      })
+      expect(discoveryStageDisableNext({
+        configs,
+        discoveryType
+      }), 'Next button should be enabled').to.equal(false)
     })
   })
 })

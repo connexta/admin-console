@@ -75,7 +75,7 @@ const discoveryType = (state = 'hostnamePort', { type, value }) => {
 export const submarine = sub()
 export const getIsSubmitting = (state) => submarine(state).get('isSubmitting')
 export const getDiscoveryType = (state) => submarine(state).get('discoveryType')
-export const setStage = (state) => submarine(state).get('currentStage')
+export const getStage = (state) => submarine(state).get('currentStage')
 export const getErrors = (state, stageId) => submarine(state).getIn(['errors', stageId], [])
 export const getSourceName = (state) => state.getIn(['wizard', 'config', 'sourceName', 'value'])
 export const getDiscoveredEndpoints = (state) => submarine(state).get('discoveredEndpoints').toJS()

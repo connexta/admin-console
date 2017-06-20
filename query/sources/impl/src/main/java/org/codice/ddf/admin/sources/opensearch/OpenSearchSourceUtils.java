@@ -13,6 +13,7 @@
  */
 package org.codice.ddf.admin.sources.opensearch;
 
+import static java.net.HttpURLConnection.HTTP_OK;
 import static org.codice.ddf.admin.common.report.message.DefaultMessages.unknownEndpointError;
 import static org.codice.ddf.admin.common.services.ServiceCommons.FLAG_PASSWORD;
 import static org.codice.ddf.admin.sources.utils.SourceUtilCommons.SOURCES_NAMESPACE_CONTEXT;
@@ -104,19 +105,25 @@ public class OpenSearchSourceUtils {
      * @return a {@link ReportWithResultImpl} containing the {@link OpenSearchSourceConfigurationField} or containing {@link org.codice.ddf.admin.api.report.ErrorMessage}s on failure.
      */
     public ReportWithResultImpl<OpenSearchSourceConfigurationField> getOpenSearchConfig(
-            ResponseField responseField, CredentialsField creds) {
+            ResponseField responseField, CredentialsField creds, UrlField urlField) {
         ReportWithResultImpl<OpenSearchSourceConfigurationField> configResult =
                 new ReportWithResultImpl<>();
 
-        String body = responseField.responseBody();
-        UrlField urlField = responseField.requestUrlField();
+        String responseBody = responseField.responseBody();
+        int statusCode = responseField.statusCode();
+        UrlField requestUrl = responseField.requestUrlField();
+
+        if (statusCode != HTTP_OK || responseBody.length() < 1) {
+            addUnknownEndpointError(configResult, urlField);
+            return configResult;
+        }
 
         Document capabilitiesXml;
         try {
-            capabilitiesXml = sourceUtilCommons.createDocument(body);
+            capabilitiesXml = sourceUtilCommons.createDocument(responseBody);
         } catch (Exception e) {
             LOGGER.debug("Failed to read response from OpenSearch endpoint.");
-            configResult.addArgumentMessage(unknownEndpointError(urlField.path()));
+            addUnknownEndpointError(configResult, urlField);
             return configResult;
         }
 
@@ -127,7 +134,8 @@ public class OpenSearchSourceUtils {
         try {
             if ((Boolean) xpath.compile(TOTAL_RESULTS_XPATH)
                     .evaluate(capabilitiesXml, XPathConstants.BOOLEAN)) {
-                OpenSearchSourceConfigurationField config = new OpenSearchSourceConfigurationField();
+                OpenSearchSourceConfigurationField config =
+                        new OpenSearchSourceConfigurationField();
                 config.endpointUrl(responseField.requestUrl())
                         .credentials()
                         .username(creds.username())
@@ -137,9 +145,17 @@ public class OpenSearchSourceUtils {
             }
         } catch (XPathExpressionException e) {
             LOGGER.debug("Failed to compile OpenSearch totalResults XPath.");
-            configResult.addArgumentMessage(unknownEndpointError(urlField.path()));
+            addUnknownEndpointError(configResult, urlField);
         }
 
         return configResult;
+    }
+
+    private void addUnknownEndpointError(ReportWithResultImpl report, UrlField urlField) {
+        if (urlField.getValue() != null) {
+            report.addArgumentMessage(unknownEndpointError(urlField.path()));
+        } else {
+            report.addResultMessage(unknownEndpointError());
+        }
     }
 }

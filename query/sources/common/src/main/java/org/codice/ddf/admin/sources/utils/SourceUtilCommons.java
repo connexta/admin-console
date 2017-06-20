@@ -14,7 +14,6 @@
 package org.codice.ddf.admin.sources.utils;
 
 import static org.codice.ddf.admin.common.report.message.DefaultMessages.failedPersistError;
-import static org.codice.ddf.admin.common.services.ServiceCommons.FLAG_PASSWORD;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -134,15 +133,6 @@ public class SourceUtilCommons {
         sources.addAll(serviceReader.getServices(FederatedSource.class, null));
         sources.addAll(serviceReader.getServices(ConnectedSource.class, null));
         return sources;
-    }
-
-    public SourceInfoField createSourceInfoField(boolean isAvailable, SourceConfigField config) {
-        config.credentials()
-                .password(FLAG_PASSWORD);
-        SourceInfoField sourceInfoField = new SourceInfoField();
-        sourceInfoField.isAvaliable(isAvailable);
-        //        sourceInfoField.configuration(config);
-        return sourceInfoField;
     }
 
     /**

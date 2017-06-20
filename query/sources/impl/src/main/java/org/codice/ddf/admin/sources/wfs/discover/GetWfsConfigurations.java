@@ -13,6 +13,7 @@
  */
 package org.codice.ddf.admin.sources.wfs.discover;
 
+import static org.codice.ddf.admin.common.services.ServiceCommons.FLAG_PASSWORD;
 import static org.codice.ddf.admin.sources.services.WfsServiceProperties.SERVICE_PROPS_TO_WFS_CONFIG;
 import static org.codice.ddf.admin.sources.services.WfsServiceProperties.WFS_FACTORY_PIDS;
 
@@ -97,6 +98,7 @@ public class GetWfsConfigurations extends BaseFunctionField<ListField<WfsSourceI
             sourceUtilCommons.populateAvailability(sourceInfoField,
                     sourceInfoField.config()
                             .pidField());
+            sourceInfoField.config().credentials().password(FLAG_PASSWORD);
         }
 
         return cswSourceInfoFields;

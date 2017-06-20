@@ -29,7 +29,7 @@ import com.google.common.collect.ImmutableList;
 
 public class DiscoverCswSource extends BaseFunctionField<CswSourceConfigurationField> {
 
-    public static final String ID = "discoverCsw";
+    public static final String FIELD_NAME = "discoverCsw";
 
     public static final String DESCRIPTION =
             "Attempts to discover a CSW source using the given hostname and port or URL. If a URL is provided, "
@@ -42,7 +42,7 @@ public class DiscoverCswSource extends BaseFunctionField<CswSourceConfigurationF
     private CswSourceUtils cswSourceUtils;
 
     public DiscoverCswSource() {
-        super(ID, DESCRIPTION, new CswSourceConfigurationField());
+        super(FIELD_NAME, DESCRIPTION, new CswSourceConfigurationField());
         credentials = new CredentialsField();
         address = new AddressField();
         address.isRequired(true);
@@ -71,7 +71,9 @@ public class DiscoverCswSource extends BaseFunctionField<CswSourceConfigurationF
         }
 
         ReportWithResult<CswSourceConfigurationField> configResult =
-                cswSourceUtils.getPreferredCswConfig(responseResult.result(), credentials);
+                cswSourceUtils.getPreferredCswConfig(responseResult.result(),
+                        credentials,
+                        address.urlField());
         addMessages(configResult);
         if (containsErrorMsgs() || !configResult.isResultPresent()) {
             return null;

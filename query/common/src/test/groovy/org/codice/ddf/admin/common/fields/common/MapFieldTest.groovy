@@ -13,7 +13,6 @@
  **/
 package org.codice.ddf.admin.common.fields.common
 
-import org.codice.ddf.admin.api.fields.ListField
 import org.codice.ddf.admin.api.report.ErrorMessage
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import spock.lang.Specification
@@ -66,7 +65,7 @@ class MapFieldTest extends Specification {
     def 'Fail validation due to duplicate keys'() {
         setup:
         def value = [(ENTRIES): [
-                createEntry('key1', 'valuef1'),
+                createEntry('key1', 'value1'),
                 createEntry('key2', 'value2'),
                 createEntry('key1', 'value3')
         ]]
@@ -78,7 +77,7 @@ class MapFieldTest extends Specification {
         then:
         validationMsgs.size() == 1
         validationMsgs.get(0).getCode() == DefaultMessages.DUPLICATE_MAP_KEY
-        validationMsgs.get(0).getPath() == [MapField.DEFAULT_FIELD_NAME, ENTRIES, 2]
+        validationMsgs.get(0).getPath() == [MapField.DEFAULT_FIELD_NAME, ENTRIES, '2']
     }
 
     def createEntry(String key, String value) {

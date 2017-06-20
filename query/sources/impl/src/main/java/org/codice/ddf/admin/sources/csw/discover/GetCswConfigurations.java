@@ -13,6 +13,7 @@
  */
 package org.codice.ddf.admin.sources.csw.discover;
 
+import static org.codice.ddf.admin.common.services.ServiceCommons.FLAG_PASSWORD;
 import static org.codice.ddf.admin.sources.services.CswServiceProperties.CSW_FACTORY_PIDS;
 import static org.codice.ddf.admin.sources.services.CswServiceProperties.SERVICE_PROPS_TO_CSW_CONFIG;
 
@@ -98,6 +99,7 @@ public class GetCswConfigurations extends BaseFunctionField<ListField<CswSourceI
             sourceUtilCommons.populateAvailability(sourceInfoField,
                     sourceInfoField.config()
                             .pidField());
+            sourceInfoField.config().credentials().password(FLAG_PASSWORD);
         }
 
         return cswSourceInfoFields;

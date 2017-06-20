@@ -73,7 +73,9 @@ public class DiscoverOpenSearchSource
         }
 
         ReportWithResult<OpenSearchSourceConfigurationField> configResult =
-                openSearchSourceUtils.getOpenSearchConfig(responseField.result(), credentials);
+                openSearchSourceUtils.getOpenSearchConfig(responseField.result(),
+                        credentials,
+                        address.urlField());
         addMessages(configResult);
         if (containsErrorMsgs() || !configResult.isResultPresent()) {
             return null;

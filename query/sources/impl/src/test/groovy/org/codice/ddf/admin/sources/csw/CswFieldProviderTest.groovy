@@ -15,6 +15,7 @@ package org.codice.ddf.admin.sources.csw
 
 import org.codice.ddf.admin.api.FieldProvider
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
+import org.codice.ddf.internal.admin.configurator.actions.FeatureActions
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceReader
@@ -28,7 +29,8 @@ class CswFieldProviderTest extends Specification {
         cswFieldProvider = new CswFieldProvider(Mock(ConfiguratorFactory),
                 Mock(ServiceActions),
                 Mock(ManagedServiceActions),
-                Mock(ServiceReader))
+                Mock(ServiceReader),
+                Mock(FeatureActions))
     }
 
     def 'Verify discovery fields immutability'() {

@@ -94,6 +94,14 @@ public class CswSourceConfigurationField extends SourceConfigField {
         return cswProfile.getValue();
     }
 
+    public CswSourceConfigurationField useDefaultRequired() {
+        isRequired(true);
+        cswProfile.isRequired(true);
+        sourceNameField().isRequired(true);
+        endpointUrlField().isRequired(true);
+        return this;
+    }
+
     @Override
     public CswSourceConfigurationField allFieldsRequired(boolean required) {
         super.allFieldsRequired(required);

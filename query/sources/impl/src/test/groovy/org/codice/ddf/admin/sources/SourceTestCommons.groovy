@@ -23,7 +23,10 @@ import ddf.catalog.source.UnsupportedQueryException
 import org.codice.ddf.admin.common.fields.common.AddressField
 import org.codice.ddf.admin.common.fields.common.CredentialsField
 import org.codice.ddf.admin.common.fields.common.PidField
+import org.codice.ddf.admin.common.fields.common.ResponseField
 import org.codice.ddf.admin.common.fields.common.UrlField
+import org.codice.ddf.admin.common.report.ReportWithResultImpl
+import org.codice.ddf.admin.common.report.message.ErrorMessageImpl
 import org.codice.ddf.admin.common.services.ServiceCommons
 import org.codice.ddf.admin.sources.fields.type.SourceConfigField
 
@@ -86,9 +89,9 @@ class SourceTestCommons {
         ]
     }
 
-    static getBaseDiscoverByUrlArgs() {
+    static getBaseDiscoverByUrlArgs(String url) {
         return [
-            (ADDRESS) : new AddressField().url("http://localhost:8993/sevices/csw").getValue(),
+            (ADDRESS) : new AddressField().url(url).getValue(),
             (CREDENTIALS) : new CredentialsField().username(TEST_USERNAME).password(TEST_PASSWORD).getValue()
         ]
     }

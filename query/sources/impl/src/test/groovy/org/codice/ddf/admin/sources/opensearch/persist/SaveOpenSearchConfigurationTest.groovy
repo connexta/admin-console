@@ -20,6 +20,7 @@ import org.codice.ddf.admin.configurator.Configurator
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.configurator.OperationReport
 import org.codice.ddf.admin.sources.SourceMessages
+import org.codice.ddf.internal.admin.configurator.actions.FeatureActions
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceReader
@@ -43,9 +44,13 @@ class SaveOpenSearchConfigurationTest extends Specification {
 
     ConfiguratorFactory configuratorFactory
 
-    private ServiceActions serviceActions
+    ServiceActions serviceActions
 
-    private ServiceReader serviceReader
+    ServiceReader serviceReader
+
+    FeatureActions featureActions
+
+    ManagedServiceActions managedServiceActions
 
     Configurator configurator
 
@@ -55,17 +60,19 @@ class SaveOpenSearchConfigurationTest extends Specification {
 
     def setup() {
         configurator = Mock(Configurator)
+        serviceActions = Mock(ServiceActions)
+        serviceReader = Mock(ServiceReader)
+        managedServiceActions = Mock(ManagedServiceActions)
+        featureActions = Mock(FeatureActions)
+
         federatedSource = Mock(FederatedSource)
         federatedSource.getId() >> TEST_SOURCENAME
         federatedSources.add(federatedSource)
-        configuratorFactory = Mock(ConfiguratorFactory) {
-            getConfigurator() >> configurator
-        }
-        serviceActions = Mock(ServiceActions)
-        serviceReader = Mock(ServiceReader)
-        def managedServiceActions = Mock(ManagedServiceActions)
+        configuratorFactory = Mock(ConfiguratorFactory)
+        configuratorFactory.getConfigurator() >> configurator
+
         saveOpenSearchConfiguration = new SaveOpenSearchConfiguration(configuratorFactory, serviceActions,
-                managedServiceActions, serviceReader)
+                managedServiceActions, serviceReader, featureActions)
     }
 
     def 'Successfully save new OpenSearch configuration'() {
@@ -100,15 +107,16 @@ class SaveOpenSearchConfigurationTest extends Specification {
         setup:
         saveOpenSearchConfiguration.setValue(getBaseSaveConfigArgs())
         serviceReader.getServices(_, _) >> []
-        configurator.commit(_, _) >> mockReport(true)
 
         when:
         def report = saveOpenSearchConfiguration.getValue()
 
         then:
+        1 * configurator.commit(_, _) >> mockReport(false)
+        1 * configurator.commit(_, _) >> mockReport(true)
         !report.result().getValue()
         report.messages().size() == 1
-        report.messages().get(0).path == CONFIG_PATH
+        report.messages().get(0).path == RESULT_ARGUMENT_PATH
         report.messages().get(0).code == DefaultMessages.FAILED_PERSIST
     }
 
@@ -153,6 +161,8 @@ class SaveOpenSearchConfigurationTest extends Specification {
         def report = saveOpenSearchConfiguration.getValue()
 
         then:
+        1 * configurator.commit(_, _) >> mockReport(false)
+        1 * configurator.commit(_, _) >> mockReport(true)
         !report.result().getValue()
         report.messages().size() == 1
         report.messages().get(0).path == RESULT_ARGUMENT_PATH

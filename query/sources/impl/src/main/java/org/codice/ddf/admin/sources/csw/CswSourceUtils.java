@@ -56,11 +56,11 @@ public class CswSourceUtils {
     private static final List<String> URL_FORMATS = ImmutableList.of("https://%s:%d/services/csw",
             "https://%s:%d/csw");
 
-    protected static final String GMD_OUTPUT_SCHEMA = "http://www.isotc211.org/2005/gmd";
+    public static final String GMD_OUTPUT_SCHEMA = "http://www.isotc211.org/2005/gmd";
 
-    protected static final String CSW_2_0_2_OUTPUT_SCHEMA = "http://www.opengis.net/cat/csw/2.0.2";
+    public static final String CSW_2_0_2_OUTPUT_SCHEMA = "http://www.opengis.net/cat/csw/2.0.2";
 
-    protected static final String METACARD_OUTPUT_SCHEMA = "urn:catalog:metacard";
+    public static final String METACARD_OUTPUT_SCHEMA = "urn:catalog:metacard";
 
     private static final String HAS_CATALOG_METACARD_EXP =
             "//ows:OperationsMetadata//ows:Operation[@name='GetRecords']/ows:Parameter[@name='OutputSchema' or @name='outputSchema']/ows:Value/text()='urn:catalog:metacard'";
@@ -118,16 +118,15 @@ public class CswSourceUtils {
      * @return a {@link ReportWithResultImpl} containing the {@link CswSourceConfigurationField} or an {@link org.codice.ddf.admin.api.report.ErrorMessage} on failure.
      */
     public ReportWithResult<CswSourceConfigurationField> getPreferredCswConfig(
-            ResponseField responseField, CredentialsField creds) {
+            ResponseField responseField, CredentialsField creds, UrlField urlField) {
         ReportWithResultImpl<CswSourceConfigurationField> configResult =
                 new ReportWithResultImpl<>();
 
         String responseBody = responseField.responseBody();
         int statusCode = responseField.statusCode();
-        UrlField requestUrl = responseField.requestUrlField();
+
         if (statusCode != HTTP_OK || responseBody.length() < 1) {
-            configResult.addArgumentMessage(unknownEndpointError(responseField.requestUrlField()
-                    .path()));
+            addUnknownEndpointError(configResult, urlField);
             return configResult;
         }
 
@@ -136,12 +135,14 @@ public class CswSourceUtils {
             capabilitiesXml = sourceUtilCommons.createDocument(responseBody);
         } catch (Exception e) {
             LOGGER.debug("Failed to create XML document from response.");
-            configResult.addArgumentMessage(unknownEndpointError(requestUrl.path()));
+            addUnknownEndpointError(configResult, urlField);
             return configResult;
         }
 
+        String requestUrl = responseField.requestUrlField()
+                .getValue();
         CswSourceConfigurationField preferred = new CswSourceConfigurationField();
-        preferred.endpointUrl(requestUrl.getValue())
+        preferred.endpointUrl(requestUrl)
                 .credentials()
                 .username(creds.username())
                 .password(FLAG_PASSWORD);
@@ -183,8 +184,16 @@ public class CswSourceUtils {
         }
 
         LOGGER.debug("URL [{}] responded to GetCapabilities request, but response was not readable.",
-                requestUrl.getValue());
-        configResult.addArgumentMessage(unknownEndpointError(requestUrl.path()));
+                requestUrl);
+        addUnknownEndpointError(configResult, urlField);
         return configResult;
+    }
+
+    private void addUnknownEndpointError(ReportWithResultImpl report, UrlField urlField) {
+        if (urlField.getValue() != null) {
+            report.addArgumentMessage(unknownEndpointError(urlField.path()));
+        } else {
+            report.addResultMessage(unknownEndpointError());
+        }
     }
 }

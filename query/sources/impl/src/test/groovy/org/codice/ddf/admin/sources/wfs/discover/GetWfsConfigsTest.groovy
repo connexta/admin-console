@@ -23,6 +23,7 @@ import org.codice.ddf.admin.sources.fields.SourceInfoField
 import org.codice.ddf.admin.sources.fields.WfsVersion
 import org.codice.ddf.admin.sources.fields.type.WfsSourceConfigurationField
 import org.codice.ddf.admin.sources.services.WfsServiceProperties
+import org.codice.ddf.admin.sources.wfs.WfsSourceInfoField
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceReader
@@ -80,10 +81,10 @@ class GetWfsConfigsTest extends Specification {
         def list = ((ListField) report.result())
 
         then:
-        1 * serviceReader.getServices(_, _) >> [new TestSource(S_PID_1, true)]
-        1 * serviceReader.getServices(_, _) >> [new TestSource(S_PID_2, false)]
         1 * managedServiceActions.read(_ as String) >> managedServiceConfigs
         1 * managedServiceActions.read(_ as String) >> [:]
+        2 * serviceReader.getServices(_, _) >> [new TestSource(S_PID_1, true)]
+        2 * serviceReader.getServices(_, _) >> [new TestSource(S_PID_2, false)]
         report.result() != null
         list.getList().size() == 2
         assertConfig(list.getList().get(0), 0, SOURCE_ID_1, S_PID_1, true, TEST_WFS_VERSION_1)
@@ -123,20 +124,19 @@ class GetWfsConfigsTest extends Specification {
         report.messages().get(0).path == RESULT_ARGUMENT_PATH
     }
 
-    private
     def assertConfig(Field field, int index, String sourceName, String pid, boolean availability, String wfsVersion) {
-        def sourceInfo = (SourceInfoField) field
-        assert sourceInfo.fieldName() == index
+        def sourceInfo = (WfsSourceInfoField) field
+        assert sourceInfo.path()[-1] == index.toString()
         assert sourceInfo.isAvailable() == availability
         assert sourceInfo.config().credentials().password() == FLAG_PASSWORD
         assert sourceInfo.config().credentials().username() == TEST_USERNAME
         assert sourceInfo.config().sourceName() == sourceName
         assert sourceInfo.config().pid() == pid
-        assert ((WfsSourceConfigurationField) sourceInfo.config()).wfsVersion() == wfsVersion
+        assert sourceInfo.config().wfsVersion() == wfsVersion
         return true
     }
 
-    private def createWfsManagedServiceConfigs() {
+    def createWfsManagedServiceConfigs() {
         managedServiceConfigs = baseManagedServiceConfigs
         managedServiceConfigs.get(S_PID_1).put(FACTORY_PID_KEY, TEST_FACTORY_PID_1)
         managedServiceConfigs.get(S_PID_2).put(FACTORY_PID_KEY, TEST_FACTORY_PID_2)

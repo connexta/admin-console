@@ -32,8 +32,12 @@ import org.codice.ddf.admin.configurator.OperationReport;
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
 import org.codice.ddf.internal.admin.configurator.actions.ServiceReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ServiceCommons {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ServiceCommons.class);
 
     public static final String SERVICE_PID_KEY = "service.pid";
 
@@ -75,32 +79,47 @@ public class ServiceCommons {
 
     public ReportImpl createManagedService(Map<String, Object> serviceProps, String factoryPid) {
         ReportImpl report = new ReportImpl();
-        Configurator configurator = configuratorFactory.getConfigurator();
 
-        configurator.add(managedServiceActions.create(factoryPid, serviceProps));
-        if (configurator.commit("Service saved with details [{}]", serviceProps.toString())
-                .containsFailedResults()) {
+        if (configuratorFactory != null && managedServiceActions != null) {
+            Configurator configurator = configuratorFactory.getConfigurator();
+            configurator.add(managedServiceActions.create(factoryPid, serviceProps));
+
+            if (configurator.commit("Service saved with details [{}]", serviceProps.toString())
+                    .containsFailedResults()) {
+                report.addResultMessage(failedPersistError());
+            }
+        } else {
+            LOGGER.debug(
+                    "Unable to create managed service due to missing configuratorFactory or managedServiceActions.");
             report.addResultMessage(failedPersistError());
         }
+
         return report;
     }
 
     public ReportImpl updateService(PidField servicePid, Map<String, Object> newConfig) {
         ReportImpl report = new ReportImpl();
-        report.addMessages(serviceConfigurationExists(servicePid));
-        if (report.containsErrorMsgs()) {
-            return report;
-        }
 
-        String pid = servicePid.getValue();
-        Configurator configurator = configuratorFactory.getConfigurator();
-        configurator.add(serviceActions.build(pid, newConfig, true));
-        OperationReport operationReport = configurator.commit(
-                "Updated config with pid [{}] and new service properties [{}]",
-                pid,
-                newConfig.toString());
-        if (operationReport.containsFailedResults()) {
-            return report.addResultMessage(failedPersistError());
+        if (configuratorFactory != null && serviceActions != null) {
+            report.addMessages(serviceConfigurationExists(servicePid));
+            if (report.containsErrorMsgs()) {
+                return report;
+            }
+
+            String pid = servicePid.getValue();
+            Configurator configurator = configuratorFactory.getConfigurator();
+            configurator.add(serviceActions.build(pid, newConfig, true));
+            OperationReport operationReport = configurator.commit(
+                    "Updated config with pid [{}] and new service properties [{}]",
+                    pid,
+                    newConfig.toString());
+            if (operationReport.containsFailedResults()) {
+                report.addResultMessage(failedPersistError());
+            }
+        } else {
+            LOGGER.debug(
+                    "Unable to update service due to missing configuratorFactory or serviceActions.");
+            report.addResultMessage(failedPersistError());
         }
 
         return report;
@@ -108,10 +127,17 @@ public class ServiceCommons {
 
     public ReportImpl deleteService(PidField servicePid) {
         ReportImpl report = new ReportImpl();
-        Configurator configurator = configuratorFactory.getConfigurator();
-        configurator.add(managedServiceActions.delete(servicePid.getValue()));
-        if (configurator.commit("Deleted service with pid [{}].", servicePid.getValue())
-                .containsFailedResults()) {
+
+        if(configuratorFactory != null && managedServiceActions != null) {
+            Configurator configurator = configuratorFactory.getConfigurator();
+            configurator.add(managedServiceActions.delete(servicePid.getValue()));
+            if (configurator.commit("Deleted service with pid [{}].", servicePid.getValue())
+                    .containsFailedResults()) {
+                report.addResultMessage(failedPersistError());
+            }
+        } else {
+            LOGGER.debug(
+                    "Unable to delete service to missing configuratorFactory or managedServiceActions.");
             report.addResultMessage(failedPersistError());
         }
         return report;
@@ -132,7 +158,7 @@ public class ServiceCommons {
      * @return with the serviceExists or not
      */
     public boolean serviceConfigurationExists(String servicePid) {
-        return !serviceActions.read(servicePid)
+        return serviceActions != null && !serviceActions.read(servicePid)
                 .isEmpty();
     }
 

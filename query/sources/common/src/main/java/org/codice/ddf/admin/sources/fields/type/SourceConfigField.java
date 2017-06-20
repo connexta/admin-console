@@ -27,7 +27,6 @@ import org.codice.ddf.admin.common.fields.common.UrlField;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
 
-// TODO: 6/19/17 phuffer - make this abstract?
 public class SourceConfigField extends BaseObjectField {
 
     public static final String FIELD_NAME = "source";

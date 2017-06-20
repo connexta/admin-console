@@ -69,6 +69,10 @@ public class DefaultMessages {
         return new ErrorMessageImpl(NO_EXISTING_CONFIG);
     }
 
+    public static ErrorMessage unknownEndpointError() {
+        return new ErrorMessageImpl(UNKNOWN_ENDPOINT);
+    }
+
     public static ErrorMessage failedPersistError(List<String> path) {
         return new ErrorMessageImpl(FAILED_PERSIST, path);
     }

@@ -16,12 +16,10 @@ package org.codice.ddf.admin.sources.csw.discover
 import org.codice.ddf.admin.api.Field
 import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.api.fields.ListField
-import org.codice.ddf.admin.common.fields.base.ListFieldImpl
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
+import org.codice.ddf.admin.sources.csw.CswSourceInfoField
 import org.codice.ddf.admin.sources.fields.CswProfile
-import org.codice.ddf.admin.sources.fields.SourceInfoField
-import org.codice.ddf.admin.sources.fields.type.CswSourceConfigurationField
 import org.codice.ddf.admin.sources.services.CswServiceProperties
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions
@@ -64,8 +62,8 @@ class GetCswConfigsTest extends Specification {
         managedServiceActions = Mock(ManagedServiceActions)
         serviceReader = Mock(ServiceReader)
 
-        getCswConfigsFunction = new GetCswConfigurations(configuratorFactory, this.serviceActions,
-                this.managedServiceActions, this.serviceReader)
+        getCswConfigsFunction = new GetCswConfigurations(configuratorFactory, serviceActions,
+                managedServiceActions, serviceReader)
     }
 
     def 'No pid argument returns all configs'() {
@@ -74,10 +72,10 @@ class GetCswConfigsTest extends Specification {
         def list = ((ListField) report.result())
 
         then:
-        1 * serviceReader.getServices(_, _) >> [new TestSource(S_PID_1, true)]
-        1 * serviceReader.getServices(_, _) >> [new TestSource(S_PID_2, false)]
         1 * managedServiceActions.read(TEST_FACTORY_PID) >> managedServiceConfigs
         2 * managedServiceActions.read(_ as String) >> [:]
+        2 * serviceReader.getServices(_, _) >> [new TestSource(S_PID_1, true)]
+        2 * serviceReader.getServices(_, _) >> [new TestSource(S_PID_2, false)]
         report.result() != null
         list.getList().size() == 2
         assertConfig(list.getList().get(0), 0, managedServiceConfigs.get(S_PID_1), SOURCE_ID_1, S_PID_1, true)
@@ -116,15 +114,15 @@ class GetCswConfigsTest extends Specification {
     }
 
     def assertConfig(Field field, int index, Map<String, Object> properties, String sourceName, String pid, boolean availability) {
-        def sourceInfo = (SourceInfoField) field
-        assert sourceInfo.fieldName() == index
+        def sourceInfo = (CswSourceInfoField) field
+        assert sourceInfo.path()[-1] == index.toString()
         assert sourceInfo.isAvailable() == availability
         assert sourceInfo.config().endpointUrl() == properties.get(CswServiceProperties.CSW_URL)
         assert sourceInfo.config().credentials().password() == FLAG_PASSWORD
         assert sourceInfo.config().credentials().username() == TEST_USERNAME
         assert sourceInfo.config().sourceName() == sourceName
         assert sourceInfo.config().pid() == pid
-        assert ((CswSourceConfigurationField) sourceInfo.config()).cswProfile() == CswProfile.CSW_FEDERATION_PROFILE_SOURCE
+        assert sourceInfo.config().cswProfile() == CswProfile.CSW_FEDERATION_PROFILE_SOURCE
         return true
     }
 

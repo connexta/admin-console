@@ -13,7 +13,6 @@
  */
 package org.codice.ddf.admin.sources.utils;
 
-import static java.net.HttpURLConnection.HTTP_OK;
 import static org.codice.ddf.admin.common.report.message.DefaultMessages.cannotConnectError;
 
 import java.io.IOException;
@@ -69,7 +68,8 @@ public class RequestUtils {
             }
         }
 
-        responseReport.messages().forEach(msg -> msg.setPath(hostField.path()));
+        responseReport.messages()
+                .forEach(msg -> msg.setPath(hostField.path()));
         responseReport.addResultMessage(cannotConnectError());
         return responseReport;
     }
@@ -150,26 +150,27 @@ public class RequestUtils {
      * @param creds       optional credentials consisting of a username and password
      * @param contentType Mime type of the post body
      * @param content     Body of the post request
-     * @return a {@link ReportWithResultImpl} containing the POST request response body or an {@link org.codice.ddf.admin.api.report.ErrorMessage} on failure.
+     * @return a {@link ReportWithResultImpl} containing a {@link ResponseField} or an {@link org.codice.ddf.admin.api.report.ErrorMessage} on failure.
      */
-    // TODO: 6/15/17 phuffer - clean this up to return ResponseField
-    public ReportWithResultImpl<String> sendPostRequest(UrlField urlField, CredentialsField creds,
-            String contentType, String content) {
+    public ReportWithResultImpl<ResponseField> sendPostRequest(UrlField urlField,
+            CredentialsField creds, String contentType, String content) {
+        ReportWithResultImpl<ResponseField> responseResult = new ReportWithResultImpl<>();
+        responseResult.addMessages(endpointIsReachable(urlField));
+        if (responseResult.containsErrorMsgs()) {
+            return responseResult;
+        }
+
         WebClient client = generateClient(urlField.getValue(), creds, Collections.emptyMap());
         Response response = client.type(contentType)
                 .post(content);
 
-        ReportWithResultImpl<String> responseBodyResult = new ReportWithResultImpl<>();
-        if (response.getStatus() != HTTP_OK || response.readEntity(String.class)
-                .equals("")) {
-            LOGGER.debug("Bad or empty response received from sending POST to {}.",
-                    urlField.getValue());
-            responseBodyResult.addArgumentMessage(cannotConnectError(urlField.path()));
-            return responseBodyResult;
-        }
+        ResponseField responseField = new ResponseField();
+        responseField.statusCode(response.getStatus())
+                .responseBody(response.readEntity(String.class))
+                .requestUrlField(urlField);
 
-        responseBodyResult.result(response.readEntity(String.class));
-        return responseBodyResult;
+        responseResult.result(responseField);
+        return responseResult;
     }
 
     /**

@@ -172,13 +172,13 @@ class GraphQLTransformationTest extends Specification {
                 createArgumentError([TEST_OBJECT_NAME, STRING]),
                 createArgumentError([TEST_OBJECT_NAME, ENUMERATION]),
                 createArgumentError([TEST_OBJECT_NAME, LIST]),
-                createArgumentError([TEST_OBJECT_NAME, LIST, 0]),
+                createArgumentError([TEST_OBJECT_NAME, LIST, '0']),
                 createReturnValueError([]),
                 createReturnValueError([INTEGER]),
                 createReturnValueError([BOOLEAN]),
                 createReturnValueError([STRING]),
                 createReturnValueError([LIST]),
-                createReturnValueError([LIST, 0]),
+                createReturnValueError([LIST, '0']),
                 createReturnValueError([ENUMERATION])
         ] as Set
 

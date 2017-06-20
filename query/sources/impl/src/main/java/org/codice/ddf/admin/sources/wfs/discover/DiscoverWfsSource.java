@@ -71,7 +71,9 @@ public class DiscoverWfsSource extends BaseFunctionField<WfsSourceConfigurationF
         }
 
         ReportWithResultImpl<WfsSourceConfigurationField> configResult =
-                wfsSourceUtils.getPreferredWfsConfig(responseResult.result(), credentials);
+                wfsSourceUtils.getPreferredWfsConfig(responseResult.result(),
+                        credentials,
+                        address.urlField());
         addMessages(configResult);
         if (containsErrorMsgs() || !configResult.isResultPresent()) {
             return null;

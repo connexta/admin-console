@@ -13,9 +13,7 @@
  */
 package org.codice.ddf.admin.security.wcpm.persist
 
-import org.codice.ddf.admin.api.FieldProvider
 import org.codice.ddf.admin.api.fields.FunctionField
-import org.codice.ddf.admin.api.fields.ListField
 import org.codice.ddf.admin.api.report.ReportWithResult
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
@@ -32,7 +30,7 @@ import org.codice.ddf.security.policy.context.impl.PolicyManager
 import spock.lang.Specification
 
 class SaveWhitelistContextsTest extends Specification {
-    FieldProvider WcpmFieldProvider
+    WcpmFieldProvider wcpmFieldProvider
     ConfiguratorFactory configuratorFactory
     ServiceActions serviceActions
     Configurator configurator
@@ -55,12 +53,12 @@ class SaveWhitelistContextsTest extends Specification {
         }
 
 
-        WcpmFieldProvider = new WcpmFieldProvider(configuratorFactory,
+        wcpmFieldProvider = new WcpmFieldProvider(configuratorFactory,
                 serviceActions,
                 Mock(BundleActions),
                 Mock(ManagedServiceActions),
                 Mock(ServiceReader))
-        saveWhitelistContextsFunction = WcpmFieldProvider.getMutationFunction(SaveWhitelistContexts.FIELD_NAME)
+        saveWhitelistContextsFunction = wcpmFieldProvider.getMutationFunction(SaveWhitelistContexts.FIELD_NAME)
     }
 
     def 'Pass with valid context list'() {
@@ -88,7 +86,7 @@ class SaveWhitelistContextsTest extends Specification {
 
         then:
         report.messages()[0].code == DefaultMessages.INVALID_CONTEXT_PATH
-        report.messages()[0].path == [WcpmFieldProvider.NAME, SaveWhitelistContexts.FIELD_NAME, BaseFunctionField.ARGUMENT, 'paths', 2]
+        report.messages()[0].path == [WcpmFieldProvider.NAME, SaveWhitelistContexts.FIELD_NAME, BaseFunctionField.ARGUMENT, 'paths', '2']
         report.result() == null
     }
 
@@ -103,7 +101,7 @@ class SaveWhitelistContextsTest extends Specification {
 
         then:
         report.messages()[0].code == DefaultMessages.EMPTY_FIELD
-        report.messages()[0].path == [WcpmFieldProvider.NAME, SaveWhitelistContexts.FIELD_NAME, BaseFunctionField.ARGUMENT, 'paths', 2]
+        report.messages()[0].path == [WcpmFieldProvider.NAME, SaveWhitelistContexts.FIELD_NAME, BaseFunctionField.ARGUMENT, 'paths', '2']
         report.result() == null
     }
 
@@ -132,7 +130,7 @@ class SaveWhitelistContextsTest extends Specification {
 
         then:
         report.messages()[0].code == DefaultMessages.FAILED_PERSIST
-        report.messages()[0].path == [WcpmFieldProvider.NAME, SaveWhitelistContexts.FIELD_NAME]
+        report.messages()[0].path == [wcpmFieldProvider.NAME, SaveWhitelistContexts.FIELD_NAME]
         report.result() == null
     }
 }

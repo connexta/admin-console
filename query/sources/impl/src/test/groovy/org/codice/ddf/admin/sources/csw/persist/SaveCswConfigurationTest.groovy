@@ -22,6 +22,7 @@ import org.codice.ddf.admin.configurator.OperationReport
 import org.codice.ddf.admin.sources.SourceMessages
 import org.codice.ddf.admin.sources.fields.CswProfile
 import org.codice.ddf.admin.sources.fields.type.CswSourceConfigurationField
+import org.codice.ddf.internal.admin.configurator.actions.FeatureActions
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceReader
@@ -39,7 +40,7 @@ class SaveCswConfigurationTest extends Specification {
 
     static OUTPUT_SCHEMA = CswSourceConfigurationField.OUTPUT_SCHEMA_FIELD_NAME
 
-    static RESULT_ARGUMENT_PATH = [SaveCswConfiguration.ID]
+    static RESULT_ARGUMENT_PATH = [SaveCswConfiguration.FIELD_NAME]
 
     static BASE_PATH = [RESULT_ARGUMENT_PATH, FunctionField.ARGUMENT].flatten()
 
@@ -63,6 +64,8 @@ class SaveCswConfigurationTest extends Specification {
 
     ManagedServiceActions managedServiceActions
 
+    FeatureActions featureActions
+
     Source federatedSource
 
     def actionArgs
@@ -76,12 +79,13 @@ class SaveCswConfigurationTest extends Specification {
         serviceActions = Mock(ServiceActions)
         managedServiceActions = Mock(ManagedServiceActions)
         serviceReader = Mock(ServiceReader)
+        featureActions = Mock(FeatureActions)
 
         federatedSource = new TestSource(S_PID, TEST_SOURCENAME, false)
         federatedSources.add(federatedSource)
         configuratorFactory.getConfigurator() >> configurator
         saveCswConfiguration = new SaveCswConfiguration(configuratorFactory, serviceActions,
-                managedServiceActions, serviceReader)
+                managedServiceActions, serviceReader, featureActions)
     }
 
     def 'Successfully save new CSW configuration'() {
@@ -113,13 +117,14 @@ class SaveCswConfigurationTest extends Specification {
         when:
         saveCswConfiguration.setValue(actionArgs)
         serviceReader.getServices(_, _) >> []
-        configurator.commit(_, _) >> mockReport(true)
         def report = saveCswConfiguration.getValue()
 
         then:
+        1 * configurator.commit(_, _) >> mockReport(false)
+        1 * configurator.commit(_, _) >> mockReport(true)
         !report.result().getValue()
         report.messages().size() == 1
-        report.messages().get(0).path == CONFIG_PATH
+        report.messages().get(0).path == RESULT_ARGUMENT_PATH
         report.messages().get(0).code == DefaultMessages.FAILED_PERSIST
     }
 
@@ -164,12 +169,13 @@ class SaveCswConfigurationTest extends Specification {
         saveCswConfiguration.setValue(actionArgs)
         serviceActions.read(_) >> [(ID): TEST_SOURCENAME]
         serviceReader.getServices(_, _) >> []
-        configurator.commit(_, _) >> mockReport(true)
 
         when:
         def report = saveCswConfiguration.getValue()
 
         then:
+        1 * configurator.commit(_, _) >> mockReport(false)
+        1 * configurator.commit(_, _) >> mockReport(true)
         !report.result().getValue()
         report.messages().size() == 1
         report.messages().get(0).path == RESULT_ARGUMENT_PATH

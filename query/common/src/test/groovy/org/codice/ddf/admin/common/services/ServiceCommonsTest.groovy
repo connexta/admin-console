@@ -20,6 +20,7 @@ import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.configurator.OperationReport
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions
+import org.codice.ddf.internal.admin.configurator.actions.ServiceReader
 import spock.lang.Specification
 
 import static org.codice.ddf.admin.common.services.ServiceCommons.validateServiceConfigurationExists
@@ -34,12 +35,18 @@ class ServiceCommonsTest extends Specification {
 
     ServiceActions serviceActions
 
+    ServiceReader serviceReader
+
+    ServiceCommons serviceCommons
+
     def setup() {
         managedServiceActions = Mock(ManagedServiceActions)
         serviceActions = Mock(ServiceActions)
         configurator = Mock(Configurator)
         configuratorFactory = Mock(ConfiguratorFactory)
+        serviceReader = Mock(ServiceReader)
         configuratorFactory.getConfigurator() >> configurator
+        serviceCommons = new ServiceCommons(managedServiceActions, serviceActions, serviceReader, configuratorFactory)
     }
 
     def 'Create managed service success'() {
@@ -47,7 +54,7 @@ class ServiceCommonsTest extends Specification {
         configurator.commit(_, _) >> mockReport(false)
 
         when:
-        def report = ServiceCommons.createManagedService([:], '', configuratorFactory, managedServiceActions)
+        def report = serviceCommons.createManagedService([:], '')
 
         then:
         report.messages().size() == 0
@@ -58,7 +65,7 @@ class ServiceCommonsTest extends Specification {
         configurator.commit(_, _) >> mockReport(true)
 
         when:
-        def report = ServiceCommons.createManagedService([:], '', configuratorFactory, managedServiceActions)
+        def report = serviceCommons.createManagedService([:], '')
 
         then:
         report.messages().size() == 1
@@ -72,7 +79,7 @@ class ServiceCommonsTest extends Specification {
         configurator.commit(_, _) >> mockReport(false)
 
         when:
-        def report = ServiceCommons.updateService(createTestField('testValue'), [:], configuratorFactory, serviceActions)
+        def report = serviceCommons.updateService(createTestField('testValue'), [:])
 
         then:
         report.messages().size() == 0
@@ -84,7 +91,7 @@ class ServiceCommonsTest extends Specification {
         configurator.commit(_, _) >> mockReport(true)
 
         when:
-        def report = ServiceCommons.updateService(createTestField('testValue'), [:], configuratorFactory, serviceActions)
+        def report = serviceCommons.updateService(createTestField('testValue'), [:])
 
         then:
         report.messages().size() == 1
@@ -97,7 +104,7 @@ class ServiceCommonsTest extends Specification {
         configurator.commit(_, _) >> mockReport(false)
 
         when:
-        def report = ServiceCommons.deleteService(createTestField('testValue'), configuratorFactory, managedServiceActions)
+        def report = serviceCommons.deleteService(createTestField('testValue'))
 
         then:
         report.messages().size() == 0
@@ -108,7 +115,7 @@ class ServiceCommonsTest extends Specification {
         configurator.commit(_, _) >> mockReport(true)
 
         when:
-        def report = ServiceCommons.deleteService(createTestField('testValue'), configuratorFactory, managedServiceActions)
+        def report = serviceCommons.deleteService(createTestField('testValue'))
 
         then:
         report.messages().size() == 1
@@ -121,7 +128,7 @@ class ServiceCommonsTest extends Specification {
         serviceActions.read(_) >> ['config':'exists']
 
         when:
-        def report = validateServiceConfigurationExists(createTestField('testValue'), serviceActions)
+        def report = serviceCommons.serviceConfigurationExists(createTestField('testValue'))
 
         then:
         report.messages().size() == 0
@@ -132,7 +139,7 @@ class ServiceCommonsTest extends Specification {
         serviceActions.read(_) >> [:]
 
         when:
-        def report = validateServiceConfigurationExists(createTestField('testValue'), serviceActions)
+        def report = serviceCommons.serviceConfigurationExists(createTestField('testValue'))
 
         then:
         report.messages().size() == 1

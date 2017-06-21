@@ -36,7 +36,7 @@ public class LdapConfigurationField extends BaseObjectField {
     public static final String DESCRIPTION =
             "A configuration containing all the required fields for saving LDAP settings";
 
-    public static final String CLAIM_MAPPING = "claimMapping";
+    public static final String CLAIMS_MAPPING = "claimsMapping";
 
     private PidField pid;
 
@@ -54,7 +54,7 @@ public class LdapConfigurationField extends BaseObjectField {
         connection = new LdapConnectionField();
         bindUserInfo = new LdapBindUserInfo();
         settings = new LdapDirectorySettingsField();
-        claimMappings = new ListFieldImpl<>(CLAIM_MAPPING, ClaimsMapEntry.class);
+        claimMappings = new ListFieldImpl<>(CLAIMS_MAPPING, ClaimsMapEntry.class);
 
         updateInnerFieldPaths();
     }
@@ -85,7 +85,7 @@ public class LdapConfigurationField extends BaseObjectField {
         return pid.getValue();
     }
 
-    public Map<String, String> claimMappings() {
+    public Map<String, String> claimsMapping() {
         return claimMappings.getList()
                 .stream()
                 .collect(Collectors.toMap(ClaimsMapEntry::key, ClaimsMapEntry::value));

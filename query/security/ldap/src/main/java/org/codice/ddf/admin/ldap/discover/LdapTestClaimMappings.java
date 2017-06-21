@@ -13,12 +13,12 @@
  **/
 package org.codice.ddf.admin.ldap.discover;
 
-import static org.codice.ddf.admin.ldap.commons.LdapMessages.stsClaimNotFoundError;
 import static org.codice.ddf.admin.ldap.commons.LdapMessages.userAttributeNotFoundError;
-import static org.codice.ddf.admin.ldap.fields.config.LdapConfigurationField.CLAIM_MAPPING;
+import static org.codice.ddf.admin.ldap.fields.config.LdapConfigurationField.CLAIMS_MAPPING;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
@@ -32,6 +32,7 @@ import org.codice.ddf.admin.ldap.commons.LdapTestingUtils;
 import org.codice.ddf.admin.ldap.fields.LdapDistinguishedName;
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindUserInfo;
 import org.codice.ddf.admin.ldap.fields.connection.LdapConnectionField;
+import org.codice.ddf.admin.security.common.SecurityValidation;
 import org.codice.ddf.admin.security.common.fields.wcpm.ClaimsMapEntry;
 import org.codice.ddf.admin.security.common.services.StsServiceProperties;
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
@@ -80,7 +81,7 @@ public class LdapTestClaimMappings extends TestFunctionField {
         usernameAttribute = new StringField(USER_NAME_ATTRIBUTE).isRequired(true);
         baseUserDn = new LdapDistinguishedName(BASE_USER_DN);
         baseUserDn.isRequired(true);
-        claimMappings = new ListFieldImpl<>(CLAIM_MAPPING, ClaimsMapEntry.class);
+        claimMappings = new ListFieldImpl<>(CLAIMS_MAPPING, ClaimsMapEntry.class);
         claimMappings.isRequired(true);
 
         updateArgumentPaths();
@@ -102,14 +103,17 @@ public class LdapTestClaimMappings extends TestFunctionField {
     @Override
     public void validate() {
         super.validate();
-        List<String> configuredStsClaims = stsServiceProperties.getConfiguredStsClaims(
-                serviceActions);
 
-        claimMappings.getList()
+        if(containsErrorMsgs()) {
+            return;
+        }
+
+        List<StringField> claimArgs = claimMappings.getList()
                 .stream()
                 .map(ClaimsMapEntry::claimField)
-                .filter(claimKey -> !configuredStsClaims.contains(claimKey.getValue()))
-                .forEach(claimKey -> addArgumentMessage(stsClaimNotFoundError(claimKey.path())));
+                .collect(Collectors.toList());
+
+        addMessages(SecurityValidation.validateStsClaimsExist(claimArgs, serviceActions, stsServiceProperties));
     }
 
     @Override
@@ -123,8 +127,7 @@ public class LdapTestClaimMappings extends TestFunctionField {
 
             Connection ldapConnection = connectionAttempt.result();
 
-            utils.checkDirExists(baseUserDn, ldapConnection)
-                    .ifPresent(this::addArgumentMessage);
+            addMessages(utils.checkDirExists(baseUserDn, ldapConnection));
 
             // Short-circuit return here, if either the user or group directory does not exist
             if (containsErrorMsgs()) {

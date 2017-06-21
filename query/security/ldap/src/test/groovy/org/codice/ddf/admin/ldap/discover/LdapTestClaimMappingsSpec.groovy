@@ -31,13 +31,14 @@ import org.codice.ddf.admin.ldap.fields.connection.LdapBindMethod
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindUserInfo
 import org.codice.ddf.admin.ldap.fields.connection.LdapConnectionField
 import org.codice.ddf.admin.ldap.fields.connection.LdapEncryptionMethodField
+import org.codice.ddf.admin.security.common.SecurityMessages
 import org.codice.ddf.admin.security.common.fields.wcpm.ClaimsMapEntry
 import org.codice.ddf.admin.security.common.services.StsServiceProperties
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions
 import spock.lang.Specification
 
 import static org.codice.ddf.admin.ldap.LdapTestingCommons.*
-import static org.codice.ddf.admin.ldap.fields.config.LdapConfigurationField.CLAIM_MAPPING
+import static org.codice.ddf.admin.ldap.fields.config.LdapConfigurationField.CLAIMS_MAPPING
 
 class LdapTestClaimMappingsSpec extends Specification {
     static TestLdapServer server
@@ -89,7 +90,7 @@ class LdapTestClaimMappingsSpec extends Specification {
                     missingUsernamePath    : baseMsg + [LdapBindUserInfo.DEFAULT_FIELD_NAME, CredentialsField.DEFAULT_FIELD_NAME, CredentialsField.USERNAME_FIELD_NAME],
                     missingUserpasswordPath: baseMsg + [LdapBindUserInfo.DEFAULT_FIELD_NAME, CredentialsField.DEFAULT_FIELD_NAME, CredentialsField.PASSWORD_FIELD_NAME],
                     missingBindMethodPath  : baseMsg + [LdapBindUserInfo.DEFAULT_FIELD_NAME, LdapBindMethod.DEFAULT_FIELD_NAME],
-                    badClaimMappingPath    : baseMsg + [CLAIM_MAPPING]
+                    badClaimMappingPath    : baseMsg + [CLAIMS_MAPPING]
         ]
     }
 
@@ -116,7 +117,7 @@ class LdapTestClaimMappingsSpec extends Specification {
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)      : simpleBindInfo().getValue(),
                 (LdapTestClaimMappings.USER_NAME_ATTRIBUTE): userAttribute.getValue(),
                 (LdapTestClaimMappings.BASE_USER_DN)       : baseDn.getValue(),
-                (CLAIM_MAPPING)                            : createClaimsMapping(ImmutableMap.of("claim1", "cn")).getValue()]
+                (CLAIMS_MAPPING)                           : createClaimsMapping(ImmutableMap.of("claim1", "cn")).getValue()]
         action.setValue(args)
 
         when:
@@ -138,7 +139,7 @@ class LdapTestClaimMappingsSpec extends Specification {
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)      : simpleBindInfo().getValue(),
                 (LdapTestClaimMappings.USER_NAME_ATTRIBUTE): userAttribute.getValue(),
                 (LdapTestClaimMappings.BASE_USER_DN)       : baseDn.getValue(),
-                (CLAIM_MAPPING)                            : createClaimsMapping(ImmutableMap.of("claim1", "cn")).getValue()]
+                (CLAIMS_MAPPING)                           : createClaimsMapping(ImmutableMap.of("claim1", "cn")).getValue()]
 
         action.setValue(args)
 
@@ -159,7 +160,7 @@ class LdapTestClaimMappingsSpec extends Specification {
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)      : simpleBindInfo().password('badPassword').getValue(),
                 (LdapTestClaimMappings.USER_NAME_ATTRIBUTE): userAttribute.getValue(),
                 (LdapTestClaimMappings.BASE_USER_DN)       : baseDn.getValue(),
-                (CLAIM_MAPPING)                            : createClaimsMapping(ImmutableMap.of("claim1", "cn")).getValue()]
+                (CLAIMS_MAPPING)                           : createClaimsMapping(ImmutableMap.of("claim1", "cn")).getValue()]
 
         action.setValue(args)
 
@@ -181,7 +182,7 @@ class LdapTestClaimMappingsSpec extends Specification {
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)      : simpleBindInfo().getValue(),
                 (LdapTestClaimMappings.USER_NAME_ATTRIBUTE): userAttribute.getValue(),
                 (LdapTestClaimMappings.BASE_USER_DN)       : baseDn.getValue(),
-                (CLAIM_MAPPING)                            : createClaimsMapping(ImmutableMap.of("claim1", "cn")).getValue()]
+                (CLAIMS_MAPPING)                           : createClaimsMapping(ImmutableMap.of("claim1", "cn")).getValue()]
 
         action.setValue(args)
 
@@ -209,7 +210,7 @@ class LdapTestClaimMappingsSpec extends Specification {
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)      : simpleBindInfo().getValue(),
                 (LdapTestClaimMappings.USER_NAME_ATTRIBUTE): userAttribute.getValue(),
                 (LdapTestClaimMappings.BASE_USER_DN)       : baseDn.getValue(),
-                (CLAIM_MAPPING)                            : claimsMapping.getValue()]
+                (CLAIMS_MAPPING)                           : claimsMapping.getValue()]
 
         action.setValue(args)
 
@@ -219,7 +220,7 @@ class LdapTestClaimMappingsSpec extends Specification {
         then:
         report.messages().size() == 2
         report.messages().count {
-            it.getCode() == LdapMessages.STS_CLAIM_NOT_FOUND
+            it.getCode() == SecurityMessages.INVALID_CLAIM_TYPE
         } == 2
 
         report.messages()*.path as Set == failedPaths
@@ -238,7 +239,7 @@ class LdapTestClaimMappingsSpec extends Specification {
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)      : simpleBindInfo().getValue(),
                 (LdapTestClaimMappings.USER_NAME_ATTRIBUTE): userAttribute.getValue(),
                 (LdapTestClaimMappings.BASE_USER_DN)       : baseDn.getValue(),
-                (CLAIM_MAPPING)                            : claimsMapping.getValue()]
+                (CLAIMS_MAPPING)                           : claimsMapping.getValue()]
 
         action.setValue(args)
 
@@ -264,7 +265,7 @@ class LdapTestClaimMappingsSpec extends Specification {
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)      : simpleBindInfo().getValue(),
                 (LdapTestClaimMappings.USER_NAME_ATTRIBUTE): userAttribute.getValue(),
                 (LdapTestClaimMappings.BASE_USER_DN)       : baseDn.getValue(),
-                (CLAIM_MAPPING)                            : claimsMapping.getValue()]
+                (CLAIMS_MAPPING)                           : claimsMapping.getValue()]
 
         action.setValue(args)
 

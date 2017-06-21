@@ -109,7 +109,7 @@ public class CreateLdapConfiguration extends BaseFunctionField<BooleanField> {
                     ldapServiceCommons.ldapConfigToLdapClaimsHandlerService(config,
                             newAttributeMappingPath.toString());
             configurator.add(propertyActions.create(newAttributeMappingPath,
-                    config.claimMappings()));
+                    config.claimsMapping()));
             configurator.add(featureActions.start(LdapClaimsHandlerServiceProperties.LDAP_CLAIMS_HANDLER_FEATURE));
             configurator.add(managedServiceActions.create(LdapClaimsHandlerServiceProperties.LDAP_CLAIMS_HANDLER_MANAGED_SERVICE_FACTORY_PID,
                     ldapClaimsServiceProps));

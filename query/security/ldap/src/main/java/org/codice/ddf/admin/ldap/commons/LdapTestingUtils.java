@@ -25,11 +25,11 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import javax.net.ssl.SSLContext;
 
-import org.codice.ddf.admin.api.report.ErrorMessage;
+import org.codice.ddf.admin.api.report.Report;
+import org.codice.ddf.admin.common.report.ReportImpl;
 import org.codice.ddf.admin.ldap.fields.LdapDistinguishedName;
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindUserInfo;
 import org.codice.ddf.admin.ldap.fields.connection.LdapConnectionField;
@@ -237,8 +237,9 @@ public class LdapTestingUtils {
      * @return If the path does not exist, the {@code Optional} contains
      * the path to the DN; else, an empty {@code Optional}.
      */
-    public Optional<ErrorMessage> checkDirExists(LdapDistinguishedName dirDn,
+    public Report checkDirExists(LdapDistinguishedName dirDn,
             Connection ldapConnection) {
+        ReportImpl report = new ReportImpl();
         boolean dirExists = !getLdapQueryResults(ldapConnection,
                 dirDn.getValue(),
                 Filter.present("objectClass")
@@ -247,9 +248,9 @@ public class LdapTestingUtils {
                 1).isEmpty();
 
         if (!dirExists) {
-            return Optional.of(dnDoesNotExistError(dirDn.path()));
-        } else {
-            return Optional.empty();
+            report.addArgumentMessage(dnDoesNotExistError(dirDn.path()));
         }
+
+        return report;
     }
 }

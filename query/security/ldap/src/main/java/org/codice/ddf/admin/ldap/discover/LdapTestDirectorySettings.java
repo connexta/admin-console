@@ -86,10 +86,8 @@ public class LdapTestDirectorySettings extends TestFunctionField {
 
             Connection ldapConnection = connectionAttempt.result();
 
-            utils.checkDirExists(settings.baseGroupDnField(), ldapConnection)
-                    .ifPresent(this::addArgumentMessage);
-            utils.checkDirExists(settings.baseUserDnField(), ldapConnection)
-                    .ifPresent(this::addArgumentMessage);
+            addMessages(utils.checkDirExists(settings.baseGroupDnField(), ldapConnection));
+            addMessages(utils.checkDirExists(settings.baseUserDnField(), ldapConnection));
 
             // Short-circuit return here, if either the user or group directory does not exist
             if (containsErrorMsgs()) {

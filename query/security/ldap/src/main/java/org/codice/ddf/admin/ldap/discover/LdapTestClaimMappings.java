@@ -104,7 +104,7 @@ public class LdapTestClaimMappings extends TestFunctionField {
     public void validate() {
         super.validate();
 
-        if(containsErrorMsgs()) {
+        if (containsErrorMsgs()) {
             return;
         }
 
@@ -113,12 +113,15 @@ public class LdapTestClaimMappings extends TestFunctionField {
                 .map(ClaimsMapEntry::claimField)
                 .collect(Collectors.toList());
 
-        addMessages(SecurityValidation.validateStsClaimsExist(claimArgs, serviceActions, stsServiceProperties));
+        addMessages(SecurityValidation.validateStsClaimsExist(claimArgs,
+                serviceActions,
+                stsServiceProperties));
     }
 
     @Override
     public BooleanField performFunction() {
-        try (LdapConnectionAttempt connectionAttempt = utils.bindUserToLdapConnection(conn, bindInfo)) {
+        try (LdapConnectionAttempt connectionAttempt = utils.bindUserToLdapConnection(conn,
+                bindInfo)) {
             addMessages(connectionAttempt);
 
             if (containsErrorMsgs()) {

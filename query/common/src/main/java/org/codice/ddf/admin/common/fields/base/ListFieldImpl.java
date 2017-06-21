@@ -148,8 +148,8 @@ public class ListFieldImpl<T extends DataType> extends BaseDataType<List>
     }
 
     @Override
-    public void pathName(String fieldName) {
-        super.pathName(fieldName);
+    public void pathName(String pathName) {
+        super.pathName(pathName);
         getList().forEach(field -> field.updatePath(path()));
     }
 }

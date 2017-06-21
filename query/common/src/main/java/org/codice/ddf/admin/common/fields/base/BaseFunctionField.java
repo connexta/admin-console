@@ -83,8 +83,8 @@ public abstract class BaseFunctionField<T extends DataType> extends BaseField<Ma
     }
 
     @Override
-    public void pathName(String fieldName) {
-        super.pathName(fieldName);
+    public void pathName(String pathName) {
+        super.pathName(pathName);
         updateArgumentPaths();
     }
 

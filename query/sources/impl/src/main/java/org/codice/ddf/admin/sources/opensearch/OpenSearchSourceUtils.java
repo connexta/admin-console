@@ -102,6 +102,7 @@ public class OpenSearchSourceUtils {
      *
      * @param responseField The URL to probe for OpenSearch capabilities
      * @param creds         optional credentials used in the original capabilities request
+     * @param urlField      original request {@code UrlField}
      * @return a {@link ReportWithResultImpl} containing the {@link OpenSearchSourceConfigurationField} or containing {@link org.codice.ddf.admin.api.report.ErrorMessage}s on failure.
      */
     public ReportWithResultImpl<OpenSearchSourceConfigurationField> getOpenSearchConfig(
@@ -111,7 +112,6 @@ public class OpenSearchSourceUtils {
 
         String responseBody = responseField.responseBody();
         int statusCode = responseField.statusCode();
-        UrlField requestUrl = responseField.requestUrlField();
 
         if (statusCode != HTTP_OK || responseBody.length() < 1) {
             addUnknownEndpointError(configResult, urlField);

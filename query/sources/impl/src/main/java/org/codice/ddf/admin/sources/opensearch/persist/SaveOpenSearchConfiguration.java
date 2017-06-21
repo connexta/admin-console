@@ -40,7 +40,7 @@ import com.google.common.collect.ImmutableList;
 
 public class SaveOpenSearchConfiguration extends BaseFunctionField<BooleanField> {
 
-    public static final String ID = "saveOpenSearchSource";
+    public static final String FIELD_NAME = "saveOpenSearchSource";
 
     public static final String DESCRIPTION =
             "Saves an OpenSearch source configuration. If a pid is specified, the source configuration specified by the pid will be updated. Returns true on success and false on failure.";
@@ -66,20 +66,16 @@ public class SaveOpenSearchConfiguration extends BaseFunctionField<BooleanField>
     public SaveOpenSearchConfiguration(ConfiguratorFactory configuratorFactory,
             ServiceActions serviceActions, ManagedServiceActions managedServiceActions,
             ServiceReader serviceReader, FeatureActions featureActions) {
-        super(ID, DESCRIPTION, new BooleanField());
+        super(FIELD_NAME, DESCRIPTION, new BooleanField());
         this.configuratorFactory = configuratorFactory;
         this.serviceActions = serviceActions;
         this.managedServiceActions = managedServiceActions;
         this.serviceReader = serviceReader;
         this.featureActions = featureActions;
 
-        config = new OpenSearchSourceConfigurationField();
         pid = new PidField();
-        config.isRequired(true);
-        config.sourceNameField()
-                .isRequired(true);
-        config.endpointUrlField()
-                .isRequired(true);
+        config = new OpenSearchSourceConfigurationField();
+        config.useDefaultRequired();
         updateArgumentPaths();
 
         sourceValidationUtils = new SourceValidationUtils(serviceReader,

@@ -102,6 +102,7 @@ public class WfsSourceUtils {
      *
      * @param responseField WFS URL to probe for a configuration
      * @param creds         optional username to add to Basic Auth header used in the original request
+     * @param urlField      original request {@code UrlField}
      * @return a {@link ReportWithResultImpl} containing the preferred {@link WfsSourceConfigurationField}, or containing {@link org.codice.ddf.admin.api.report.ErrorMessage}s on failure.
      */
     public ReportWithResultImpl<WfsSourceConfigurationField> getPreferredWfsConfig(

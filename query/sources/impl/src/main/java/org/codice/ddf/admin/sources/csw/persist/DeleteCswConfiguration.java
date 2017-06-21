@@ -29,7 +29,7 @@ import com.google.common.collect.ImmutableList;
 
 public class DeleteCswConfiguration extends BaseFunctionField<BooleanField> {
 
-    public static final String ID = "deleteCswSource";
+    public static final String FIELD_NAME = "deleteCswSource";
 
     public static final String DESCRIPTION =
             "Deletes a CSW source configuration provided by the pid and returns true on success and false on failure.";
@@ -46,7 +46,7 @@ public class DeleteCswConfiguration extends BaseFunctionField<BooleanField> {
 
     public DeleteCswConfiguration(ConfiguratorFactory configuratorFactory,
             ServiceActions serviceActions, ManagedServiceActions managedServiceActions) {
-        super(ID, DESCRIPTION, new BooleanField());
+        super(FIELD_NAME, DESCRIPTION, new BooleanField());
         this.configuratorFactory = configuratorFactory;
         this.serviceActions = serviceActions;
         this.managedServiceActions = managedServiceActions;

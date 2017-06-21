@@ -21,24 +21,11 @@ import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 
 import com.google.common.collect.ImmutableList;
 
-public class SourceInfoField extends BaseObjectField {
-
-    public static final String DEFAULT_FIELD_NAME = "sourceInfo";
+public abstract class SourceInfoField extends BaseObjectField {
 
     public static final String IS_AVAILABLE_FIELD_NAME = "isAvailable";
 
-    private static final String FIELD_TYPE_NAME = "SourceInfo";
-
-    private static final String DESCRIPTION =
-            "Contains various information such as if the source is reachable, and the source configuration.";
-
     protected BooleanField isAvailable;
-
-    public SourceInfoField() {
-        super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
-        isAvailable = new BooleanField(IS_AVAILABLE_FIELD_NAME);
-        updateInnerFieldPaths();
-    }
 
     public SourceInfoField(String fieldName, String fieldTypeName, String description) {
         super(fieldName, fieldTypeName, description);

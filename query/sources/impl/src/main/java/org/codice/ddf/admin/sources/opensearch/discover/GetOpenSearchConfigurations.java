@@ -40,7 +40,7 @@ import com.google.common.collect.ImmutableList;
 public class GetOpenSearchConfigurations
         extends BaseFunctionField<ListField<OpenSearchSourceInfoField>> {
 
-    public static final String ID = "sources";
+    public static final String FIELD_NAME = "sources";
 
     public static final String DESCRIPTION =
             "Retrieves all currently configured OpenSearch sources. If a source pid is specified, only that source configuration will be returned.";
@@ -64,7 +64,7 @@ public class GetOpenSearchConfigurations
     public GetOpenSearchConfigurations(ConfiguratorFactory configuratorFactory,
             ServiceActions serviceActions, ManagedServiceActions managedServiceActions,
             ServiceReader serviceReader) {
-        super(ID, DESCRIPTION, new ListFieldImpl<>(OpenSearchSourceInfoField.class));
+        super(FIELD_NAME, DESCRIPTION, new ListFieldImpl<>(OpenSearchSourceInfoField.class));
         this.configuratorFactory = configuratorFactory;
         this.serviceActions = serviceActions;
         this.managedServiceActions = managedServiceActions;
@@ -87,21 +87,22 @@ public class GetOpenSearchConfigurations
                 OPEN_SEARCH_SOURCES,
                 OpenSearchSourceInfoField.class);
 
-        ListField<SourceConfigField> configs = sourceUtilCommons.getSourceConfigurations(
+        List<SourceConfigField> configs = sourceUtilCommons.getSourceConfigurations(
                 OPENSEARCH_FACTORY_PIDS,
                 SERVICE_PROPS_TO_OPENSEARCH_CONFIG,
                 pid.getValue());
 
-        configs.getList()
-                .forEach(config -> {
-                    cswSourceInfoFields.add(new OpenSearchSourceInfoField().config((OpenSearchSourceConfigurationField) config));
-                });
+        configs.forEach(config -> {
+            cswSourceInfoFields.add(new OpenSearchSourceInfoField().config((OpenSearchSourceConfigurationField) config));
+        });
 
         for (OpenSearchSourceInfoField sourceInfoField : cswSourceInfoFields.getList()) {
             sourceUtilCommons.populateAvailability(sourceInfoField,
                     sourceInfoField.config()
                             .pidField());
-            sourceInfoField.config().credentials().password(FLAG_PASSWORD);
+            sourceInfoField.config()
+                    .credentials()
+                    .password(FLAG_PASSWORD);
         }
 
         return cswSourceInfoFields;

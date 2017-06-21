@@ -74,12 +74,9 @@ public class DiscoverCswSource extends BaseFunctionField<CswSourceConfigurationF
                 cswSourceUtils.getPreferredCswConfig(responseResult.result(),
                         credentials,
                         address.urlField());
-        addMessages(configResult);
-        if (containsErrorMsgs() || !configResult.isResultPresent()) {
-            return null;
-        }
 
-        return configResult.result();
+        addMessages(configResult);
+        return containsErrorMsgs() ? null : configResult.result();
     }
 
     @Override

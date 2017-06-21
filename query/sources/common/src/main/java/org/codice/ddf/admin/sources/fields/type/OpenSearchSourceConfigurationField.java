@@ -19,9 +19,16 @@ public class OpenSearchSourceConfigurationField extends SourceConfigField {
 
     private static final String FIELD_TYPE_NAME = "OpenSearchConfiguration";
 
-    private static final String DESCRIPTION = "Represents an OpenSearch configuration containing properties to be saved.";
+    private static final String DESCRIPTION =
+            "Represents an OpenSearch configuration containing properties to be saved.";
 
     public OpenSearchSourceConfigurationField() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
+    }
+
+    public void useDefaultRequired() {
+        isRequired(true);
+        sourceNameField().isRequired(true);
+        endpointUrlField().isRequired(true);
     }
 }

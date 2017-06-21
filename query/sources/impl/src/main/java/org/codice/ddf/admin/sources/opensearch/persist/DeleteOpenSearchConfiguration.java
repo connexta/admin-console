@@ -28,7 +28,7 @@ import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
 import com.google.common.collect.ImmutableList;
 
 public class DeleteOpenSearchConfiguration extends BaseFunctionField<BooleanField> {
-    public static final String ID = "deleteOpenSearchSource";
+    public static final String FIELD_NAME = "deleteOpenSearchSource";
 
     public static final String DESCRIPTION =
             "Deletes an OpenSearch source configuration specified by the pid and returns true on success and false on failure.";
@@ -45,7 +45,7 @@ public class DeleteOpenSearchConfiguration extends BaseFunctionField<BooleanFiel
 
     public DeleteOpenSearchConfiguration(ConfiguratorFactory configuratorFactory,
             ServiceActions serviceActions, ManagedServiceActions managedServiceActions) {
-        super(ID, DESCRIPTION, new BooleanField());
+        super(FIELD_NAME, DESCRIPTION, new BooleanField());
         this.configuratorFactory = configuratorFactory;
         this.serviceActions = serviceActions;
         this.managedServiceActions = managedServiceActions;

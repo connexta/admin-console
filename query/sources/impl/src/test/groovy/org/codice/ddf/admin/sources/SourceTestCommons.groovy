@@ -52,8 +52,6 @@ class SourceTestCommons {
 
     static final SOURCE_NAME = SourceConfigField.SOURCE_NAME_FIELD_NAME
 
-    static final SOURCE_CONFIG = SourceConfigField.FIELD_NAME
-
     static final ID = 'id'
 
     static final FLAG_PASSWORD = ServiceCommons.FLAG_PASSWORD
@@ -75,12 +73,6 @@ class SourceTestCommons {
     static TEST_PASSWORD = "admin"
 
     static TEST_SOURCENAME = "testSourceName"
-
-    static getBaseSaveConfigArgs() {
-        return [
-            (SOURCE_CONFIG) : createSourceConfigUnionField().getValue()
-        ]
-    }
 
     static getBaseDiscoverByAddressArgs() {
         return [
@@ -120,13 +112,6 @@ class SourceTestCommons {
         (SERVICE_PID_KEY)             : S_PID,
         (USERNAME)                    : TEST_USERNAME
     ]
-
-    static createSourceConfigUnionField() {
-        def source = new SourceConfigField()
-        source.endpointUrl('https://localhost:8993').sourceName(TEST_SOURCENAME)
-                .credentials().username(TEST_USERNAME).password(TEST_PASSWORD)
-        return source
-    }
 
     /**
      * Needed to be able to successfully test the case where a Source is casted to a ConfiguredService

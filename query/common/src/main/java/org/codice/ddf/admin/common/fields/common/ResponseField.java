@@ -29,7 +29,7 @@ public class ResponseField extends BaseObjectField {
     public static final String FIELD_TYPE_NAME = "Response";
 
     public static final String DESCRIPTION =
-            "Represents the response body and status code of an HTTP response.";
+            "Represents an HTTP response containing the status code, response body, and request URL.";
 
     public static final String STATUS_CODE_FIELD_NAME = "statusCode";
 
@@ -97,6 +97,6 @@ public class ResponseField extends BaseObjectField {
 
     @Override
     public List<Field> getFields() {
-        return ImmutableList.of(statusCode, responseBody);
+        return ImmutableList.of(statusCode, responseBody, requestUrl);
     }
 }

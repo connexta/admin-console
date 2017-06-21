@@ -38,7 +38,7 @@ class DiscoverOpenSearchTest extends Specification {
 
     static OPEN_SEARCH_CAPABILITIES_FILE_PATH = 'responses/opensearch/openSearchQueryResponse.xml'
 
-    static BASE_PATH = [DiscoverOpenSearchSource.ID, FunctionField.ARGUMENT]
+    static BASE_PATH = [DiscoverOpenSearchSource.FIELD_NAME, FunctionField.ARGUMENT]
 
     static ADDRESS_FIELD_PATH = [BASE_PATH, ADDRESS].flatten()
 

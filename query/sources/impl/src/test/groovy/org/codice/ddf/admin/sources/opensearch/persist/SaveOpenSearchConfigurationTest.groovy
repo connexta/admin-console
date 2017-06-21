@@ -20,6 +20,9 @@ import org.codice.ddf.admin.configurator.Configurator
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.configurator.OperationReport
 import org.codice.ddf.admin.sources.SourceMessages
+import org.codice.ddf.admin.sources.fields.type.OpenSearchSourceConfigurationField
+import org.codice.ddf.admin.sources.fields.type.SourceConfigField
+import org.codice.ddf.admin.sources.opensearch.OpenSearchSourceInfoField
 import org.codice.ddf.internal.admin.configurator.actions.FeatureActions
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions
@@ -30,13 +33,13 @@ import static org.codice.ddf.admin.sources.SourceTestCommons.*
 
 class SaveOpenSearchConfigurationTest extends Specification {
 
-    static RESULT_ARGUMENT_PATH = [SaveOpenSearchConfiguration.ID]
+    static RESULT_ARGUMENT_PATH = [SaveOpenSearchConfiguration.FIELD_NAME]
 
     static BASE_PATH = [RESULT_ARGUMENT_PATH, FunctionField.ARGUMENT].flatten()
 
-    static CONFIG_PATH = [BASE_PATH, SOURCE_CONFIG].flatten()
+    static CONFIG_PATH = [BASE_PATH, OpenSearchSourceConfigurationField.DEFAULT_FIELD_NAME].flatten()
 
-    static SOURCE_NAME_PATH = [CONFIG_PATH, SOURCE_NAME].flatten()
+    static SOURCE_NAME_PATH = [CONFIG_PATH, SourceConfigField.SOURCE_NAME_FIELD_NAME].flatten()
 
     static ENDPOINT_URL_PATH = [CONFIG_PATH, ENDPOINT_URL].flatten()
 
@@ -77,7 +80,7 @@ class SaveOpenSearchConfigurationTest extends Specification {
 
     def 'Successfully save new OpenSearch configuration'() {
         setup:
-        saveOpenSearchConfiguration.setValue(getBaseSaveConfigArgs())
+        saveOpenSearchConfiguration.setValue(createFunctionArgs())
         serviceReader.getServices(_, _) >> []
         configurator.commit(_, _) >> mockReport(false)
 
@@ -90,7 +93,7 @@ class SaveOpenSearchConfigurationTest extends Specification {
 
     def 'Fail to save new OpenSearch config due to duplicate source name'() {
         setup:
-        saveOpenSearchConfiguration.setValue(getBaseSaveConfigArgs())
+        saveOpenSearchConfiguration.setValue(createFunctionArgs())
         serviceReader.getServices(_, _) >> federatedSources
 
         when:
@@ -105,7 +108,7 @@ class SaveOpenSearchConfigurationTest extends Specification {
 
     def 'Fail to save new OpenSearch config due to failure to commit'() {
         setup:
-        saveOpenSearchConfiguration.setValue(getBaseSaveConfigArgs())
+        saveOpenSearchConfiguration.setValue(createFunctionArgs())
         serviceReader.getServices(_, _) >> []
 
         when:
@@ -197,15 +200,21 @@ class SaveOpenSearchConfigurationTest extends Specification {
         report.messages()*.getPath() == [SOURCE_NAME_PATH, ENDPOINT_URL_PATH]
     }
 
-    private def mockReport(boolean hasError) {
+    def mockReport(boolean hasError) {
         def report = Mock(OperationReport)
         report.containsFailedResults() >> hasError
         return report
     }
 
-    private def createUpdateFunctionArgs() {
-        def args = getBaseSaveConfigArgs()
+    def createUpdateFunctionArgs() {
+        def args = createFunctionArgs()
         args.put(PID, S_PID)
         return args
+    }
+
+    def createFunctionArgs() {
+        def config = new OpenSearchSourceConfigurationField().endpointUrl('https://localhost:8993').sourceName(TEST_SOURCENAME)
+        config.credentials().username(TEST_USERNAME).password(TEST_PASSWORD)
+        return [(OpenSearchSourceConfigurationField.DEFAULT_FIELD_NAME) : config.getValue()]
     }
 }

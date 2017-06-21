@@ -32,30 +32,13 @@ import ddf.catalog.util.Describable;
 
 public class SourceValidationUtils {
 
-    private ConfiguratorFactory configuratorFactory;
-
-    private ManagedServiceActions managedServiceActions;
-
-    private ServiceActions serviceActions;
-
-    private ServiceReader serviceReader;
-
     private SourceUtilCommons sourceUtilCommons;
 
     private ServiceCommons serviceCommons;
 
-    public SourceValidationUtils(ServiceActions serviceActions) {
-        this(null, null, null, serviceActions);
-    }
-
     public SourceValidationUtils(ServiceReader serviceReader,
             ManagedServiceActions managedServiceActions, ConfiguratorFactory configuratorFactory,
             ServiceActions serviceActions) {
-        this.serviceReader = serviceReader;
-        this.managedServiceActions = managedServiceActions;
-        this.configuratorFactory = configuratorFactory;
-        this.serviceActions = serviceActions;
-
         sourceUtilCommons = new SourceUtilCommons(managedServiceActions,
                 serviceActions,
                 serviceReader,
@@ -69,7 +52,6 @@ public class SourceValidationUtils {
 
     /**
      * Determines whether the service configuration identified by the service pid has the same name as sourceName.
-     * If the service configuration's id equals the sourceName return {@code true}, otherwise {@code false}.
      *
      * @param servicePid service pid of the service configuration
      * @param sourceName source name to check against existing source name
@@ -90,15 +72,12 @@ public class SourceValidationUtils {
     }
 
     /**
-     * Validates the {@code sourceName} against the existing source names in the system. An empty {@link ReportImpl} will be returned
-     * if there are no existing source names with with name {@code sourceName}, or a {@link ReportImpl} with error messages.
+     * Validates the {@code sourceName} against the existing source names in the system.
      *
      * @param sourceName source name to validate
-     * @return a {@link ReportImpl} containing a {@link org.codice.ddf.admin.sources.SourceMessages#DUPLICATE_SOURCE_NAME}
-     * error, or a Report with
-     * no messages on success.
+     * @return a {@link Report} containing a {@link SourceMessages#DUPLICATE_SOURCE_NAME} error.
      */
-    public ReportImpl sourceNameExists(StringField sourceName) {
+    public Report sourceNameExists(StringField sourceName) {
         List<Source> sources = sourceUtilCommons.getAllSourceReferences();
         boolean matchFound = sources.stream()
                 .map(Describable::getId)
@@ -112,9 +91,16 @@ public class SourceValidationUtils {
     }
 
     /**
-     * @param sourceName
-     * @param pid
-     * @return
+     * Validates that the validates whether the existing service properties identified by the {@code pid}
+     * has the {@code sourceName}.
+     *
+     * Possible error codes
+     * {@link org.codice.ddf.admin.common.report.message.DefaultMessages#NO_EXISTING_CONFIG}
+     * {@link SourceMessages#DUPLICATE_SOURCE_NAME}
+     *
+     * @param sourceName source name to validate
+     * @param pid service pid of the service properties
+     * @return a {@link Report} containing an {@link org.codice.ddf.admin.api.report.ErrorMessage}s on failure
      */
     public Report validateSourceName(StringField sourceName, PidField pid) {
         ReportImpl sourceNameReport = new ReportImpl();
@@ -128,21 +114,5 @@ public class SourceValidationUtils {
             sourceNameReport.addMessages(sourceNameExists(sourceName));
         }
         return sourceNameReport;
-    }
-
-    public void setManagedServiceActions(ManagedServiceActions managedServiceActions) {
-        this.managedServiceActions = managedServiceActions;
-    }
-
-    public void setConfiguratorFactory(ConfiguratorFactory configuratorFactory) {
-        this.configuratorFactory = configuratorFactory;
-    }
-
-    public void setServiceActions(ServiceActions serviceActions) {
-        this.serviceActions = serviceActions;
-    }
-
-    public void setServiceReader(ServiceReader serviceReader) {
-        this.serviceReader = serviceReader;
     }
 }

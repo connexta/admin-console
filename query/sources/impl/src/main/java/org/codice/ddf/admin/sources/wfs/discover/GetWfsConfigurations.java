@@ -84,21 +84,22 @@ public class GetWfsConfigurations extends BaseFunctionField<ListField<WfsSourceI
         ListField<WfsSourceInfoField> cswSourceInfoFields = new ListFieldImpl<>(WFS_SOURCES,
                 WfsSourceInfoField.class);
 
-        ListField<SourceConfigField> configs = sourceUtilCommons.getSourceConfigurations(
-                WFS_FACTORY_PIDS,
-                SERVICE_PROPS_TO_WFS_CONFIG,
-                pid.getValue());
+        List<SourceConfigField> configs =
+                sourceUtilCommons.getSourceConfigurations(WFS_FACTORY_PIDS,
+                        SERVICE_PROPS_TO_WFS_CONFIG,
+                        pid.getValue());
 
-        configs.getList()
-                .forEach(config -> {
-                    cswSourceInfoFields.add(new WfsSourceInfoField().config((WfsSourceConfigurationField) config));
-                });
+        configs.forEach(config -> {
+            cswSourceInfoFields.add(new WfsSourceInfoField().config((WfsSourceConfigurationField) config));
+        });
 
         for (WfsSourceInfoField sourceInfoField : cswSourceInfoFields.getList()) {
             sourceUtilCommons.populateAvailability(sourceInfoField,
                     sourceInfoField.config()
                             .pidField());
-            sourceInfoField.config().credentials().password(FLAG_PASSWORD);
+            sourceInfoField.config()
+                    .credentials()
+                    .password(FLAG_PASSWORD);
         }
 
         return cswSourceInfoFields;

@@ -50,6 +50,13 @@ public class WfsSourceConfigurationField extends SourceConfigField {
         return wfsVersion;
     }
 
+    public void useDefaultRequired() {
+        isRequired(true);
+        wfsVersion.isRequired(true);
+        sourceNameField().isRequired(true);
+        endpointUrlField().isRequired(true);
+    }
+
     @Override
     public List<Field> getFields() {
         return new ImmutableList.Builder<Field>().addAll(super.getFields())

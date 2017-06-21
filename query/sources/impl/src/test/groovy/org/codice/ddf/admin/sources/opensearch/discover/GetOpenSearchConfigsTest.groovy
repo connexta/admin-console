@@ -16,10 +16,8 @@ package org.codice.ddf.admin.sources.opensearch.discover
 import org.codice.ddf.admin.api.Field
 import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.api.fields.ListField
-import org.codice.ddf.admin.common.fields.base.ListFieldImpl
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
-import org.codice.ddf.admin.sources.fields.SourceInfoField
 import org.codice.ddf.admin.sources.opensearch.OpenSearchSourceInfoField
 import org.codice.ddf.admin.sources.services.OpenSearchServiceProperties
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions
@@ -35,7 +33,7 @@ class GetOpenSearchConfigsTest extends Specification {
 
     static TEST_SHORT_NAME = "openSearchSource"
 
-    static RESULT_ARGUMENT_PATH = [GetOpenSearchConfigurations.ID]
+    static RESULT_ARGUMENT_PATH = [GetOpenSearchConfigurations.FIELD_NAME]
 
     static BASE_PATH = [RESULT_ARGUMENT_PATH, FunctionField.ARGUMENT].flatten()
 

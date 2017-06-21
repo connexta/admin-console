@@ -115,6 +115,7 @@ public class CswSourceUtils {
      *
      * @param responseField an HTTP response containing the result of a getCapabilities request
      * @param creds         credentials used for the original HTTP request
+     * @param urlField      original request {@code UrlField}
      * @return a {@link ReportWithResultImpl} containing the {@link CswSourceConfigurationField} or an {@link org.codice.ddf.admin.api.report.ErrorMessage} on failure.
      */
     public ReportWithResult<CswSourceConfigurationField> getPreferredCswConfig(
@@ -123,9 +124,7 @@ public class CswSourceUtils {
                 new ReportWithResultImpl<>();
 
         String responseBody = responseField.responseBody();
-        int statusCode = responseField.statusCode();
-
-        if (statusCode != HTTP_OK || responseBody.length() < 1) {
+        if (responseField.statusCode() != HTTP_OK || responseBody.length() < 1) {
             addUnknownEndpointError(configResult, urlField);
             return configResult;
         }

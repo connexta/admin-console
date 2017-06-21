@@ -42,10 +42,10 @@ import com.google.common.collect.ImmutableList;
 
 public class SaveWfsConfiguration extends BaseFunctionField<BooleanField> {
 
-    public static final String ID = "saveWfsSource";
+    public static final String FIELD_NAME = "saveWfsSource";
 
     private static final String DESCRIPTION =
-            "Saves a WFS source configuration. If a servicePid is specified, the source configuration specified by the pid will be updated. Returns true on success and false on failure.";
+            "Saves a WFS source configuration. If a pid is specified, the source configuration specified by the pid will be updated. Returns true on success and false on failure.";
 
     private WfsSourceConfigurationField config;
 
@@ -68,22 +68,16 @@ public class SaveWfsConfiguration extends BaseFunctionField<BooleanField> {
     public SaveWfsConfiguration(ConfiguratorFactory configuratorFactory,
             ServiceActions serviceActions, ManagedServiceActions managedServiceActions,
             ServiceReader serviceReader, FeatureActions featureActions) {
-        super(ID, DESCRIPTION, new BooleanField());
+        super(FIELD_NAME, DESCRIPTION, new BooleanField());
         this.configuratorFactory = configuratorFactory;
         this.serviceActions = serviceActions;
         this.managedServiceActions = managedServiceActions;
         this.serviceReader = serviceReader;
         this.featureActions = featureActions;
 
-        config = new WfsSourceConfigurationField();
         pid = new PidField();
-        config.isRequired(true);
-        config.wfsVersionField()
-                .isRequired(true);
-        config.sourceNameField()
-                .isRequired(true);
-        config.endpointUrlField()
-                .isRequired(true);
+        config = new WfsSourceConfigurationField();
+        config.useDefaultRequired();
         updateArgumentPaths();
 
         sourceValidationUtils = new SourceValidationUtils(serviceReader,

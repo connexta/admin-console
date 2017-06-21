@@ -85,21 +85,22 @@ public class GetCswConfigurations extends BaseFunctionField<ListField<CswSourceI
         ListField<CswSourceInfoField> cswSourceInfoFields = new ListFieldImpl<>(CSW_SOURCES,
                 CswSourceInfoField.class);
 
-        ListField<SourceConfigField> configs = sourceUtilCommons.getSourceConfigurations(
-                CSW_FACTORY_PIDS,
-                SERVICE_PROPS_TO_CSW_CONFIG,
-                pid.getValue());
+        List<SourceConfigField> configs =
+                sourceUtilCommons.getSourceConfigurations(CSW_FACTORY_PIDS,
+                        SERVICE_PROPS_TO_CSW_CONFIG,
+                        pid.getValue());
 
-        configs.getList()
-                .forEach(config -> {
-                    cswSourceInfoFields.add(new CswSourceInfoField().config((CswSourceConfigurationField) config));
-                });
+        configs.forEach(config -> {
+            cswSourceInfoFields.add(new CswSourceInfoField().config((CswSourceConfigurationField) config));
+        });
 
         for (CswSourceInfoField sourceInfoField : cswSourceInfoFields.getList()) {
             sourceUtilCommons.populateAvailability(sourceInfoField,
                     sourceInfoField.config()
                             .pidField());
-            sourceInfoField.config().credentials().password(FLAG_PASSWORD);
+            sourceInfoField.config()
+                    .credentials()
+                    .password(FLAG_PASSWORD);
         }
 
         return cswSourceInfoFields;

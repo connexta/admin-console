@@ -43,8 +43,8 @@ public abstract class BaseField<S, G> implements Field<S, G> {
     }
 
     @Override
-    public void pathName(String index) {
-        this.pathName = index;
+    public void pathName(String pathName) {
+        this.pathName = pathName;
     }
 
     @Override

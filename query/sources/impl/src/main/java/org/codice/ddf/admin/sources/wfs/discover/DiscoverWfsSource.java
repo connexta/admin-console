@@ -29,7 +29,7 @@ import com.google.common.collect.ImmutableList;
 
 public class DiscoverWfsSource extends BaseFunctionField<WfsSourceConfigurationField> {
 
-    public static final String ID = "discoverWfs";
+    public static final String FIELD_NAME = "discoverWfs";
 
     public static final String DESCRIPTION =
             "Attempts to discover a WFS source using the given hostname and port or URL. If a URL"
@@ -42,7 +42,7 @@ public class DiscoverWfsSource extends BaseFunctionField<WfsSourceConfigurationF
     private WfsSourceUtils wfsSourceUtils;
 
     public DiscoverWfsSource() {
-        super(ID, DESCRIPTION, new WfsSourceConfigurationField());
+        super(FIELD_NAME, DESCRIPTION, new WfsSourceConfigurationField());
         credentials = new CredentialsField();
         address = new AddressField();
         address.isRequired(true);
@@ -74,12 +74,9 @@ public class DiscoverWfsSource extends BaseFunctionField<WfsSourceConfigurationF
                 wfsSourceUtils.getPreferredWfsConfig(responseResult.result(),
                         credentials,
                         address.urlField());
-        addMessages(configResult);
-        if (containsErrorMsgs() || !configResult.isResultPresent()) {
-            return null;
-        }
 
-        return configResult.result();
+        addMessages(configResult);
+        return containsErrorMsgs() ? null : configResult.result();
     }
 
     @Override

@@ -21,6 +21,8 @@ import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.configurator.OperationReport
 import org.codice.ddf.admin.sources.SourceMessages
 import org.codice.ddf.admin.sources.fields.WfsVersion
+import org.codice.ddf.admin.sources.fields.type.WfsSourceConfigurationField
+import org.codice.ddf.admin.sources.wfs.WfsSourceInfoField
 import org.codice.ddf.internal.admin.configurator.actions.FeatureActions
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions
@@ -31,11 +33,11 @@ import static org.codice.ddf.admin.sources.SourceTestCommons.*
 
 class SaveWfsConfigurationTest extends Specification {
 
-    static RESULT_ARGUMENT_PATH = [SaveWfsConfiguration.ID]
+    static RESULT_ARGUMENT_PATH = [SaveWfsConfiguration.FIELD_NAME]
 
     static BASE_PATH = [RESULT_ARGUMENT_PATH, FunctionField.ARGUMENT].flatten()
 
-    static CONFIG_PATH = [BASE_PATH, SOURCE_CONFIG].flatten()
+    static CONFIG_PATH = [BASE_PATH, WfsSourceConfigurationField.DEFAULT_FIELD_NAME].flatten()
 
     static SOURCE_NAME_PATH = [CONFIG_PATH, SOURCE_NAME].flatten()
 
@@ -96,6 +98,7 @@ class SaveWfsConfigurationTest extends Specification {
         def report = saveWfsConfiguration.getValue()
 
         then:
+        report.result() != null
         report.result().getValue()
     }
 
@@ -212,10 +215,11 @@ class SaveWfsConfigurationTest extends Specification {
         report.messages()*.getPath() == [SOURCE_NAME_PATH, ENDPOINT_URL_PATH, WFS_VERSION_PATH]
     }
 
-    private def createWfsSaveArgs() {
-        functionArgs = getBaseSaveConfigArgs()
-        functionArgs.get(SOURCE_CONFIG).put(WFS_VERSION, TEST_WFS_VERSION)
-        return functionArgs
+    def createWfsSaveArgs() {
+        def config = new WfsSourceConfigurationField().wfsVersion(TEST_WFS_VERSION)
+                .endpointUrl('https://localhost:8993/geoserver/wfs').sourceName(TEST_SOURCENAME)
+        config.credentials().username(TEST_USERNAME).password(TEST_PASSWORD)
+        return [(WfsSourceConfigurationField.DEFAULT_FIELD_NAME): config.getValue()]
     }
 
     def mockReport(boolean hasError) {

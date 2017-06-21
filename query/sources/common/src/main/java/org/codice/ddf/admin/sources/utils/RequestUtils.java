@@ -41,10 +41,13 @@ public class RequestUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RequestUtils.class);
 
+    private static final long CLIENT_TIMEOUT_MILLIS = TimeUnit.SECONDS.toMillis(10);
+
+    // TODO: 6/21/17 phuffer - Once graphql-java releases its path solution, this javadoc needs to be updated.
     /**
      * Takes a list of url formats, for example "https://%s:%d/wfs", formats them together with the
-     * hostField name and port, then sends GET requests to those URLs. The request {@code UrlField} returned
-     * in the response will have the same path and field name as the hostField passed in.
+     * hostField name and port, then sends GET requests to those URLs. If a request URL is returned in the
+     * {@code ResponseField}, it will not have the same path as the {@code hostField}.
      * <p>
      * Possible Error Codes to be returned
      * - {@link org.codice.ddf.admin.common.report.message.DefaultMessages#CANNOT_CONNECT}
@@ -53,7 +56,7 @@ public class RequestUtils {
      * @param urlFormats  list of url formats to format with the hostField
      * @param creds       credentials for basic authentication
      * @param queryParams additional query params
-     * @return a {@code ReportWithResult} containing a {@code ResponseField} on success, or {@link org.codice.ddf.admin.api.report.ErrorMessage}s on failure
+     * @return a {@link ReportWithResultImpl} containing a {@link ResponseField} on success, or {@link org.codice.ddf.admin.api.report.ErrorMessage}s on failure
      */
     public ReportWithResultImpl<ResponseField> discoverUrlFromHost(HostField hostField,
             List<String> urlFormats, CredentialsField creds, Map<String, String> queryParams) {
@@ -68,8 +71,6 @@ public class RequestUtils {
             }
         }
 
-        responseReport.messages()
-                .forEach(msg -> msg.setPath(hostField.path()));
         responseReport.addResultMessage(cannotConnectError());
         return responseReport;
     }
@@ -164,8 +165,7 @@ public class RequestUtils {
         Response response = client.type(contentType)
                 .post(content);
 
-        ResponseField responseField = new ResponseField();
-        responseField.statusCode(response.getStatus())
+        ResponseField responseField = new ResponseField().statusCode(response.getStatus())
                 .responseBody(response.readEntity(String.class))
                 .requestUrlField(urlField);
 
@@ -187,7 +187,7 @@ public class RequestUtils {
         URLConnection urlConnection = null;
         try {
             urlConnection = new URL(urlField.getValue()).openConnection();
-            urlConnection.setConnectTimeout((int) TimeUnit.SECONDS.toMillis(10));
+            urlConnection.setConnectTimeout((int) CLIENT_TIMEOUT_MILLIS);
             urlConnection.connect();
             LOGGER.debug("Successfully reached {}.", urlField);
         } catch (IOException e) {

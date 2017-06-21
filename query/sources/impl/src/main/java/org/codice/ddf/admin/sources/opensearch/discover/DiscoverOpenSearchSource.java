@@ -30,7 +30,7 @@ import com.google.common.collect.ImmutableList;
 public class DiscoverOpenSearchSource
         extends BaseFunctionField<OpenSearchSourceConfigurationField> {
 
-    public static final String ID = "discoverOpenSearch";
+    public static final String FIELD_NAME = "discoverOpenSearch";
 
     public static final String DESCRIPTION =
             "Attempts to discover an OpenSearch source using the given hostname and port or URL. If a URL "
@@ -43,7 +43,7 @@ public class DiscoverOpenSearchSource
     private OpenSearchSourceUtils openSearchSourceUtils;
 
     public DiscoverOpenSearchSource() {
-        super(ID, DESCRIPTION, new OpenSearchSourceConfigurationField());
+        super(FIELD_NAME, DESCRIPTION, new OpenSearchSourceConfigurationField());
         credentials = new CredentialsField();
         address = new AddressField();
         address.isRequired(true);
@@ -76,11 +76,9 @@ public class DiscoverOpenSearchSource
                 openSearchSourceUtils.getOpenSearchConfig(responseField.result(),
                         credentials,
                         address.urlField());
+
         addMessages(configResult);
-        if (containsErrorMsgs() || !configResult.isResultPresent()) {
-            return null;
-        }
-        return configResult.result();
+        return containsErrorMsgs() ? null : configResult.result();
     }
 
     @Override

@@ -13,8 +13,6 @@
  **/
 package org.codice.ddf.admin.sources.fields.type;
 
-import static org.codice.ddf.admin.common.services.ServiceCommons.FLAG_PASSWORD;
-
 import java.util.List;
 
 import org.codice.ddf.admin.api.Field;
@@ -24,16 +22,9 @@ import org.codice.ddf.admin.common.fields.common.CredentialsField;
 import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.common.fields.common.UrlField;
 
-import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
 
-public class SourceConfigField extends BaseObjectField {
-
-    public static final String FIELD_NAME = "source";
-
-    public static final String FIELD_TYPE_NAME = "SourceConfiguration";
-
-    public static final String DESCRIPTION = "Source configuration containing base elements.";
+public abstract class SourceConfigField extends BaseObjectField {
 
     public static final String SOURCE_NAME_FIELD_NAME = "sourceName";
 
@@ -46,15 +37,6 @@ public class SourceConfigField extends BaseObjectField {
     private UrlField endpointUrl;
 
     private CredentialsField creds;
-
-    public SourceConfigField() {
-        super(FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
-
-        pidField = new PidField();
-        sourceName = new StringField(SOURCE_NAME_FIELD_NAME);
-        endpointUrl = new UrlField(ENDPOINT_URL_FIELD_NAME);
-        creds = new CredentialsField();
-    }
 
     protected SourceConfigField(String fieldName, String fieldTypeName, String description) {
         super(fieldName, fieldTypeName, description);
@@ -120,16 +102,5 @@ public class SourceConfigField extends BaseObjectField {
     @Override
     public List<Field> getFields() {
         return ImmutableList.of(pidField, sourceName, endpointUrl, creds);
-    }
-
-    @Override
-    public String toString() {
-        return MoreObjects.toStringHelper(this)
-                .add(PidField.DEFAULT_FIELD_NAME, pid())
-                .add(SOURCE_NAME_FIELD_NAME, sourceName())
-                .add(ENDPOINT_URL_FIELD_NAME, endpointUrl())
-                .add(CredentialsField.USERNAME_FIELD_NAME, credentials().username())
-                .add(CredentialsField.PASSWORD_FIELD_NAME, FLAG_PASSWORD)
-                .toString();
     }
 }

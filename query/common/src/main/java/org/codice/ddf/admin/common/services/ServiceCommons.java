@@ -100,7 +100,11 @@ public class ServiceCommons {
     public ReportImpl updateService(PidField servicePid, Map<String, Object> newConfig) {
         ReportImpl report = new ReportImpl();
 
-        if (configuratorFactory != null && serviceActions != null) {
+        if (configuratorFactory == null || serviceActions == null) {
+            LOGGER.debug(
+                    "Unable to update service due to missing configuratorFactory or serviceActions.");
+            report.addResultMessage(failedPersistError());
+        } else {
             report.addMessages(serviceConfigurationExists(servicePid));
             if (report.containsErrorMsgs()) {
                 return report;
@@ -116,10 +120,6 @@ public class ServiceCommons {
             if (operationReport.containsFailedResults()) {
                 report.addResultMessage(failedPersistError());
             }
-        } else {
-            LOGGER.debug(
-                    "Unable to update service due to missing configuratorFactory or serviceActions.");
-            report.addResultMessage(failedPersistError());
         }
 
         return report;
@@ -128,7 +128,7 @@ public class ServiceCommons {
     public ReportImpl deleteService(PidField servicePid) {
         ReportImpl report = new ReportImpl();
 
-        if(configuratorFactory != null && managedServiceActions != null) {
+        if (configuratorFactory != null && managedServiceActions != null) {
             Configurator configurator = configuratorFactory.getConfigurator();
             configurator.add(managedServiceActions.delete(servicePid.getValue()));
             if (configurator.commit("Deleted service with pid [{}].", servicePid.getValue())
@@ -143,6 +143,12 @@ public class ServiceCommons {
         return report;
     }
 
+    /**
+     * Determines whether the service identified by the {@code servicePid} exists.
+     *
+     * @param servicePid identifier of the service
+     * @return
+     */
     public ReportImpl serviceConfigurationExists(PidField servicePid) {
         ReportImpl report = new ReportImpl();
         if (!serviceConfigurationExists(servicePid.getValue())) {

@@ -43,7 +43,7 @@ class DiscoverWfsSourcesTest extends Specification {
 
     static UNRECOGNIZED_GET_CAPABILITIES_FILE_PATH = 'responses/wfs/unsupportedVersionGetCapabilities.xml'
 
-    static BASE_PATH = [DiscoverWfsSource.ID, FunctionField.ARGUMENT]
+    static BASE_PATH = [DiscoverWfsSource.FIELD_NAME, FunctionField.ARGUMENT]
 
     static ADDRESS_FIELD_PATH = [BASE_PATH, ADDRESS].flatten()
 

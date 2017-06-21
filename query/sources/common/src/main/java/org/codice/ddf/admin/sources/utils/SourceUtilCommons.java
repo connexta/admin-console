@@ -18,6 +18,7 @@ import static org.codice.ddf.admin.common.report.message.DefaultMessages.failedP
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -28,9 +29,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang.StringUtils;
-import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.api.report.Report;
-import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.common.report.ReportImpl;
 import org.codice.ddf.admin.common.services.ServiceCommons;
@@ -40,6 +39,8 @@ import org.codice.ddf.admin.sources.fields.type.SourceConfigField;
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
 import org.codice.ddf.internal.admin.configurator.actions.ServiceReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -50,6 +51,8 @@ import ddf.catalog.source.FederatedSource;
 import ddf.catalog.source.Source;
 
 public class SourceUtilCommons {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SourceUtilCommons.class);
 
     private ServiceCommons serviceCommons;
 
@@ -129,6 +132,11 @@ public class SourceUtilCommons {
     }
 
     public List<Source> getAllSourceReferences() {
+        if (serviceReader == null) {
+            LOGGER.debug("Unable to get source references due to missing serviceReader");
+            return Collections.emptyList();
+        }
+
         List<Source> sources = new ArrayList<>();
         sources.addAll(serviceReader.getServices(FederatedSource.class, null));
         sources.addAll(serviceReader.getServices(ConnectedSource.class, null));
@@ -145,11 +153,15 @@ public class SourceUtilCommons {
      * @param pid         a servicePid to select a single configuration, returns all configs when null or empty
      * @return a list of {@code SourceInfoField}s configured in the system
      */
-    public ListField<SourceConfigField> getSourceConfigurations(List<String> factoryPids,
+    public List<SourceConfigField> getSourceConfigurations(List<String> factoryPids,
             Function<Map<String, Object>, SourceConfigField> mapper, String pid) {
-        ListFieldImpl<SourceConfigField> sourceInfoListField =
-                new ListFieldImpl<>(SourceConfigField.class);
+        if (serviceActions == null || managedServiceActions == null) {
+            LOGGER.debug(
+                    "Unable to get source configurations due to missing serviceActions or managedServiceActions");
+            return Collections.emptyList();
+        }
 
+        List<SourceConfigField> sourceInfoListField = new ArrayList<>();
         if (StringUtils.isNotEmpty(pid)) {
             SourceConfigField config = mapper.apply(serviceActions.read(pid));
             sourceInfoListField.add(config);

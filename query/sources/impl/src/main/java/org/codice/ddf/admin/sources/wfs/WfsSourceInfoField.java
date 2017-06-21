@@ -16,24 +16,31 @@ package org.codice.ddf.admin.sources.wfs;
 import java.util.List;
 
 import org.codice.ddf.admin.api.Field;
-import org.codice.ddf.admin.sources.fields.SourceInfoField;
+import org.codice.ddf.admin.common.fields.base.BaseObjectField;
+import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.sources.fields.type.WfsSourceConfigurationField;
 
 import com.google.common.collect.ImmutableList;
 
-public class WfsSourceInfoField extends SourceInfoField {
+public class WfsSourceInfoField extends BaseObjectField {
 
     public static final String DEFAULT_FIELD_NAME = "wfsSourceInfo";
 
     public static final String FIELD_TYPE_NAME = "WfsSourceInfo";
 
-    public static final String DESCRIPTION = "Contains the availability and properties of the WFS source.";
+    public static final String DESCRIPTION =
+            "Contains the availability and properties of the WFS source.";
+
+    public static final String IS_AVAILABLE_FIELD_NAME = "isAvailable";
 
     private WfsSourceConfigurationField config;
+
+    private BooleanField isAvailable;
 
     public WfsSourceInfoField() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
         config = new WfsSourceConfigurationField();
+        isAvailable = new BooleanField(IS_AVAILABLE_FIELD_NAME);
         updateInnerFieldPaths();
     }
 
@@ -42,14 +49,25 @@ public class WfsSourceInfoField extends SourceInfoField {
         return this;
     }
 
+    public WfsSourceInfoField isAvailable(boolean isAvailable) {
+        this.isAvailable.setValue(isAvailable);
+        return this;
+    }
+
     public WfsSourceConfigurationField config() {
         return config;
     }
 
+    public Boolean isAvailable() {
+        return isAvailable.getValue();
+    }
+
+    public BooleanField isAvailableField() {
+        return isAvailable;
+    }
+
     @Override
     public List<Field> getFields() {
-        return new ImmutableList.Builder<Field>().addAll(super.getFields())
-                .add(config)
-                .build();
+        return ImmutableList.of(config, isAvailable);
     }
 }

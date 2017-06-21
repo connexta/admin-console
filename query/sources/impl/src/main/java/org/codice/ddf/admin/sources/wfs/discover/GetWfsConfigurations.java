@@ -94,7 +94,7 @@ public class GetWfsConfigurations extends BaseFunctionField<ListField<WfsSourceI
         });
 
         for (WfsSourceInfoField sourceInfoField : cswSourceInfoFields.getList()) {
-            sourceUtilCommons.populateAvailability(sourceInfoField,
+            sourceUtilCommons.populateAvailability(sourceInfoField.isAvailableField(),
                     sourceInfoField.config()
                             .pidField());
             sourceInfoField.config()

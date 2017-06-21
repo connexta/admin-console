@@ -16,25 +16,31 @@ package org.codice.ddf.admin.sources.opensearch;
 import java.util.List;
 
 import org.codice.ddf.admin.api.Field;
-import org.codice.ddf.admin.sources.fields.SourceInfoField;
+import org.codice.ddf.admin.common.fields.base.BaseObjectField;
+import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.sources.fields.type.OpenSearchSourceConfigurationField;
 
 import com.google.common.collect.ImmutableList;
 
-public class OpenSearchSourceInfoField extends SourceInfoField {
+public class OpenSearchSourceInfoField extends BaseObjectField {
 
     public static final String DEFAULT_FIELD_NAME = "openSearchSourceInfo";
 
     public static final String FIELD_TYPE_NAME = "OpenSearchSourceInfo";
+
+    public static final String IS_AVAILABLE_FIELD_NAME = "isAvailable";
 
     public static final String DESCRIPTION =
             "Contains the availability and properties of the OpenSearch source.";
 
     private OpenSearchSourceConfigurationField config;
 
+    private BooleanField isAvailable;
+
     public OpenSearchSourceInfoField() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
         config = new OpenSearchSourceConfigurationField();
+        isAvailable = new BooleanField(IS_AVAILABLE_FIELD_NAME);
         updateInnerFieldPaths();
     }
 
@@ -43,14 +49,25 @@ public class OpenSearchSourceInfoField extends SourceInfoField {
         return this;
     }
 
+    public OpenSearchSourceInfoField isAvailable(boolean isAvailable) {
+        this.isAvailable.setValue(isAvailable);
+        return this;
+    }
+
     public OpenSearchSourceConfigurationField config() {
         return config;
     }
 
+    public Boolean isAvailable() {
+        return isAvailable.getValue();
+    }
+
+    public BooleanField isAvailableField() {
+        return isAvailable;
+    }
+
     @Override
     public List<Field> getFields() {
-        return new ImmutableList.Builder<Field>().addAll(super.getFields())
-                .add(config)
-                .build();
+        return ImmutableList.of(config, isAvailable);
     }
 }

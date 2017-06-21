@@ -16,25 +16,31 @@ package org.codice.ddf.admin.sources.csw;
 import java.util.List;
 
 import org.codice.ddf.admin.api.Field;
-import org.codice.ddf.admin.sources.fields.SourceInfoField;
+import org.codice.ddf.admin.common.fields.base.BaseObjectField;
+import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.sources.fields.type.CswSourceConfigurationField;
 
 import com.google.common.collect.ImmutableList;
 
-public class CswSourceInfoField extends SourceInfoField {
+public class CswSourceInfoField extends BaseObjectField {
 
     public static final String DEFAULT_FIELD_NAME = "cswSourceInfo";
 
     public static final String FIELD_TYPE_NAME = "CswSourceInfo";
+
+    public static final String IS_AVAILABLE_FIELD_NAME = "isAvailable";
 
     public static final String DESCRIPTION =
             "Contains the availability and properties of the CSW source.";
 
     private CswSourceConfigurationField config;
 
+    private BooleanField isAvailable;
+
     public CswSourceInfoField() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
         config = new CswSourceConfigurationField();
+        isAvailable = new BooleanField(IS_AVAILABLE_FIELD_NAME);
         updateInnerFieldPaths();
     }
 
@@ -43,14 +49,25 @@ public class CswSourceInfoField extends SourceInfoField {
         return this;
     }
 
+    public CswSourceInfoField isAvaliable(boolean available) {
+        isAvailable.setValue(available);
+        return this;
+    }
+
     public CswSourceConfigurationField config() {
         return config;
     }
 
+    public Boolean isAvailable() {
+        return isAvailable.getValue();
+    }
+
+    public BooleanField isAvailableField() {
+        return isAvailable;
+    }
+
     @Override
     public List<Field> getFields() {
-        return new ImmutableList.Builder<Field>().addAll(super.getFields())
-                .add(config)
-                .build();
+        return ImmutableList.of(config, isAvailable);
     }
 }

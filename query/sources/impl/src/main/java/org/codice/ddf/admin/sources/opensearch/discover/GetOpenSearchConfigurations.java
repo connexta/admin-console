@@ -97,7 +97,7 @@ public class GetOpenSearchConfigurations
         });
 
         for (OpenSearchSourceInfoField sourceInfoField : cswSourceInfoFields.getList()) {
-            sourceUtilCommons.populateAvailability(sourceInfoField,
+            sourceUtilCommons.populateAvailability(sourceInfoField.isAvailableField(),
                     sourceInfoField.config()
                             .pidField());
             sourceInfoField.config()

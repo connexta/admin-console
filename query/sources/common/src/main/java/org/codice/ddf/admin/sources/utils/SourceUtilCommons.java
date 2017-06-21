@@ -30,11 +30,11 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang.StringUtils;
 import org.codice.ddf.admin.api.report.Report;
+import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.common.report.ReportImpl;
 import org.codice.ddf.admin.common.services.ServiceCommons;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
-import org.codice.ddf.admin.sources.fields.SourceInfoField;
 import org.codice.ddf.admin.sources.fields.type.SourceConfigField;
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
@@ -191,13 +191,13 @@ public class SourceUtilCommons {
         return saveSourceReport;
     }
 
-    public void populateAvailability(SourceInfoField sourceInfoField, PidField pid) {
+    public void populateAvailability(BooleanField availability, PidField pid) {
         for (Source source : getAllSourceReferences()) {
             if (source instanceof ConfiguredService) {
                 ConfiguredService service = (ConfiguredService) source;
                 if (service.getConfigurationPid()
                         .equals(pid.getValue())) {
-                    sourceInfoField.isAvaliable(source.isAvailable());
+                    availability.setValue(source.isAvailable());
                     break;
                 }
             }

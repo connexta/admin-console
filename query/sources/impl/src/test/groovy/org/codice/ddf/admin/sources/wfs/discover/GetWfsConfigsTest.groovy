@@ -16,12 +16,9 @@ package org.codice.ddf.admin.sources.wfs.discover
 import org.codice.ddf.admin.api.Field
 import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.api.fields.ListField
-import org.codice.ddf.admin.common.fields.base.ListFieldImpl
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
-import org.codice.ddf.admin.sources.fields.SourceInfoField
 import org.codice.ddf.admin.sources.fields.WfsVersion
-import org.codice.ddf.admin.sources.fields.type.WfsSourceConfigurationField
 import org.codice.ddf.admin.sources.services.WfsServiceProperties
 import org.codice.ddf.admin.sources.wfs.WfsSourceInfoField
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions

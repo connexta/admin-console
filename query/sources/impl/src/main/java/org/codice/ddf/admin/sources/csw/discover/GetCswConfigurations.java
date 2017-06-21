@@ -95,7 +95,7 @@ public class GetCswConfigurations extends BaseFunctionField<ListField<CswSourceI
         });
 
         for (CswSourceInfoField sourceInfoField : cswSourceInfoFields.getList()) {
-            sourceUtilCommons.populateAvailability(sourceInfoField,
+            sourceUtilCommons.populateAvailability(sourceInfoField.isAvailableField(),
                     sourceInfoField.config()
                             .pidField());
             sourceInfoField.config()

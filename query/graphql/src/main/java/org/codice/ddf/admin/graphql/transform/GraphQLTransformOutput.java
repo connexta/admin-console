@@ -13,14 +13,10 @@
  **/
 package org.codice.ddf.admin.graphql.transform;
 
-import static org.codice.ddf.admin.api.fields.UnionField.FIELD_TYPE_NAME_KEY;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.api.DataType;
@@ -31,14 +27,12 @@ import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.api.fields.ObjectField;
 import org.codice.ddf.admin.api.fields.ScalarField;
-import org.codice.ddf.admin.api.fields.UnionField;
 import org.codice.ddf.admin.api.report.FunctionReport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 
-import graphql.TypeResolutionEnvironment;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLArgument;
 import graphql.schema.GraphQLFieldDefinition;
@@ -46,8 +40,6 @@ import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLTypeReference;
-import graphql.schema.GraphQLUnionType;
-import graphql.schema.TypeResolver;
 
 public class GraphQLTransformOutput {
 
@@ -72,9 +64,7 @@ public class GraphQLTransformOutput {
 
         GraphQLOutputType type = null;
 
-        if (field instanceof UnionField) {
-            type = unionToGraphQLOutputType((UnionField) field);
-        } else if (field instanceof ObjectField) {
+        if (field instanceof ObjectField) {
             type = fieldToGraphQLObjectType((ObjectField)field);
         } else if (field instanceof EnumField) {
             type = transformEnum.enumFieldToGraphQLEnumType((EnumField) field);
@@ -187,56 +177,6 @@ public class GraphQLTransformOutput {
         }
 
         return field.getValue();
-    }
-
-    // TODO: tbatie - 5/15/17 - Replace unions with interface
-    public GraphQLOutputType unionToGraphQLOutputType(UnionField field) {
-        GraphQLObjectType[] unionValues = field.getUnionTypes()
-                .stream()
-                .map(fi -> fieldToGraphQLObjectType((ObjectField) fi))
-                .toArray(GraphQLObjectType[]::new);
-
-        return GraphQLUnionType.newUnionType()
-                .name(field.fieldTypeName())
-                .description(field.description())
-                .typeResolver(new UnionTypeResolver(unionValues))
-                .possibleTypes(unionValues)
-                .build();
-    }
-
-    public static class UnionTypeResolver implements TypeResolver {
-
-        List<GraphQLObjectType> supportedTypes;
-
-        //The graphql library requires the same object reference it was given to build the schema
-        //So we have to keep track of the objects and match them after being processed by the datafetcher
-        public UnionTypeResolver(GraphQLObjectType... supportedTypes) {
-            this.supportedTypes = Arrays.asList(supportedTypes);
-        }
-
-        @Override
-        public GraphQLObjectType getType(TypeResolutionEnvironment typeResolutionEnvironment) {
-            // TODO: tbatie - 6/7/17 -  See if you can return a type reference instad
-            if (!(typeResolutionEnvironment.getObject() instanceof Map) || ((Map) typeResolutionEnvironment.getObject()).get(FIELD_TYPE_NAME_KEY) == null) {
-                LOGGER.error("Cannot handle supposed union object: " + typeResolutionEnvironment.getObject().toString());
-                throw new RuntimeException(
-                        "Cannot handle supposed union object: " + typeResolutionEnvironment.getObject().toString());
-            }
-
-            String fieldTypeName = (String) ((Map<String, Object>) typeResolutionEnvironment.getObject()).get(FIELD_TYPE_NAME_KEY);
-            String payloadFieldTypeName = fieldTypeName + "Payload";
-            Optional<GraphQLObjectType> foundUnionType = supportedTypes.stream()
-                    .filter(type -> type.getName()
-                            .equals(payloadFieldTypeName))
-                    .findFirst();
-
-            if (!foundUnionType.isPresent()) {
-                LOGGER.error("UNKNOWN UNION TYPE: " + fieldTypeName);
-                throw new RuntimeException("UNKNOWN UNION TYPE: " + payloadFieldTypeName);
-            }
-
-            return foundUnionType.get();
-        }
     }
 
 

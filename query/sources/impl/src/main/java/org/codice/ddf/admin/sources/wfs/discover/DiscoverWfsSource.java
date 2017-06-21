@@ -13,8 +13,6 @@
  **/
 package org.codice.ddf.admin.sources.wfs.discover;
 
-import static org.codice.ddf.admin.sources.commons.utils.SourceUtilCommons.createSourceInfoField;
-
 import java.util.List;
 
 import org.codice.ddf.admin.api.DataType;
@@ -22,17 +20,16 @@ import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.common.AddressField;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
-import org.codice.ddf.admin.common.fields.common.UrlField;
+import org.codice.ddf.admin.common.fields.common.ResponseField;
 import org.codice.ddf.admin.common.report.ReportWithResultImpl;
-import org.codice.ddf.admin.sources.commons.utils.WfsSourceUtils;
-import org.codice.ddf.admin.sources.fields.SourceInfoField;
-import org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField;
+import org.codice.ddf.admin.sources.fields.type.WfsSourceConfigurationField;
+import org.codice.ddf.admin.sources.wfs.WfsSourceUtils;
 
 import com.google.common.collect.ImmutableList;
 
-public class DiscoverWfsSource extends BaseFunctionField<SourceInfoField> {
+public class DiscoverWfsSource extends BaseFunctionField<WfsSourceConfigurationField> {
 
-    public static final String ID = "discoverWfs";
+    public static final String FIELD_NAME = "discoverWfs";
 
     public static final String DESCRIPTION =
             "Attempts to discover a WFS source using the given hostname and port or URL. If a URL"
@@ -45,7 +42,7 @@ public class DiscoverWfsSource extends BaseFunctionField<SourceInfoField> {
     private WfsSourceUtils wfsSourceUtils;
 
     public DiscoverWfsSource() {
-        super(ID, DESCRIPTION, new SourceInfoField());
+        super(FIELD_NAME, DESCRIPTION, new WfsSourceConfigurationField());
         credentials = new CredentialsField();
         address = new AddressField();
         address.isRequired(true);
@@ -60,28 +57,25 @@ public class DiscoverWfsSource extends BaseFunctionField<SourceInfoField> {
     }
 
     @Override
-    public SourceInfoField performFunction() {
-        ReportWithResultImpl<SourceConfigUnionField> configResult;
+    public WfsSourceConfigurationField performFunction() {
+        ReportWithResultImpl<ResponseField> responseResult;
         if (address.url() != null) {
-            configResult = wfsSourceUtils.getPreferredWfsConfig(address.urlField(), credentials);
-            addMessages(configResult);
-            if (containsErrorMsgs()) {
-                return null;
-            }
+            responseResult = wfsSourceUtils.sendRequest(address.urlField(), credentials);
         } else {
-            ReportWithResultImpl<UrlField> discoveredUrl = wfsSourceUtils.discoverWfsUrl(address.host(), credentials);
-            addMessages(discoveredUrl);
-            if (containsErrorMsgs()) {
-                return null;
-            }
-
-            configResult = wfsSourceUtils.getPreferredWfsConfig(discoveredUrl.result(), credentials);
-            addMessages(configResult);
-            if (containsErrorMsgs()) {
-                return null;
-            }
+            responseResult = wfsSourceUtils.discoverWfsUrl(address.host(), credentials);
         }
-        return createSourceInfoField(true, configResult.result());
+
+        addMessages(responseResult);
+        if (containsErrorMsgs()) {
+            return null;
+        }
+
+        ReportWithResultImpl<WfsSourceConfigurationField> configResult =
+                wfsSourceUtils.getPreferredWfsConfig(responseResult.result(),
+                        credentials);
+
+        addMessages(configResult);
+        return configResult.isResultPresent() ? configResult.result() : null;
     }
 
     @Override
@@ -90,7 +84,7 @@ public class DiscoverWfsSource extends BaseFunctionField<SourceInfoField> {
     }
 
     @Override
-    public FunctionField<SourceInfoField> newInstance() {
-        return  new DiscoverWfsSource();
+    public FunctionField<WfsSourceConfigurationField> newInstance() {
+        return new DiscoverWfsSource();
     }
 }

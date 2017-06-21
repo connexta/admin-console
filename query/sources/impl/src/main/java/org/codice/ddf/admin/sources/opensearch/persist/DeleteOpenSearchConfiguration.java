@@ -13,9 +13,6 @@
  */
 package org.codice.ddf.admin.sources.opensearch.persist;
 
-import static org.codice.ddf.admin.common.services.ServiceCommons.deleteService;
-import static org.codice.ddf.admin.common.services.ServiceCommons.validateServiceConfigurationExists;
-
 import java.util.List;
 
 import org.codice.ddf.admin.api.DataType;
@@ -23,6 +20,7 @@ import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.common.fields.common.PidField;
+import org.codice.ddf.admin.common.services.ServiceCommons;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
@@ -30,14 +28,16 @@ import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
 import com.google.common.collect.ImmutableList;
 
 public class DeleteOpenSearchConfiguration extends BaseFunctionField<BooleanField> {
-    public static final String ID = "deleteOpenSearchSource";
+    public static final String FIELD_NAME = "deleteOpenSearchSource";
 
     public static final String DESCRIPTION =
-            "Deletes an OpenSearch source configuration and returns true on success and false on failure.";
+            "Deletes an OpenSearch source configuration specified by the pid and returns true on success and false on failure.";
 
     private PidField pid;
 
-    private ConfiguratorFactory configuratorFactory;
+    private ServiceCommons serviceCommons;
+
+    private final ConfiguratorFactory configuratorFactory;
 
     private final ServiceActions serviceActions;
 
@@ -45,7 +45,7 @@ public class DeleteOpenSearchConfiguration extends BaseFunctionField<BooleanFiel
 
     public DeleteOpenSearchConfiguration(ConfiguratorFactory configuratorFactory,
             ServiceActions serviceActions, ManagedServiceActions managedServiceActions) {
-        super(ID, DESCRIPTION, new BooleanField());
+        super(FIELD_NAME, DESCRIPTION, new BooleanField());
         this.configuratorFactory = configuratorFactory;
         this.serviceActions = serviceActions;
         this.managedServiceActions = managedServiceActions;
@@ -53,11 +53,16 @@ public class DeleteOpenSearchConfiguration extends BaseFunctionField<BooleanFiel
         pid = new PidField();
         pid.isRequired(true);
         updateArgumentPaths();
+
+        serviceCommons = new ServiceCommons(managedServiceActions,
+                serviceActions,
+                null,
+                configuratorFactory);
     }
 
     @Override
     public BooleanField performFunction() {
-        addMessages(deleteService(pid, configuratorFactory, managedServiceActions));
+        addMessages(serviceCommons.deleteService(pid));
         return new BooleanField(!containsErrorMsgs());
     }
 
@@ -67,7 +72,7 @@ public class DeleteOpenSearchConfiguration extends BaseFunctionField<BooleanFiel
         if (containsErrorMsgs()) {
             return;
         }
-        addMessages(validateServiceConfigurationExists(pid, serviceActions));
+        addMessages(serviceCommons.serviceConfigurationExists(pid));
     }
 
     @Override

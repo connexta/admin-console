@@ -24,7 +24,9 @@ import org.codice.ddf.admin.sources.fields.CswSpatialOperator;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
 
-public class CswSourceConfigurationField extends SourceConfigUnionField {
+public class CswSourceConfigurationField extends SourceConfigField {
+
+    public static final String DEFAULT_FIELD_NAME = "source";
 
     public static final String FIELD_TYPE_NAME = "CswSourceConfiguration";
 
@@ -46,7 +48,7 @@ public class CswSourceConfigurationField extends SourceConfigUnionField {
     private CswProfile cswProfile;
 
     public CswSourceConfigurationField() {
-        super(FIELD_TYPE_NAME, DESCRIPTION);
+        super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
         outputSchema = new CswOutputSchemaField(OUTPUT_SCHEMA_FIELD_NAME);
         cswProfile = new CswProfile();
         spatialOperator = new CswSpatialOperator();
@@ -90,6 +92,14 @@ public class CswSourceConfigurationField extends SourceConfigUnionField {
 
     public String cswProfile() {
         return cswProfile.getValue();
+    }
+
+    public CswSourceConfigurationField useDefaultRequired() {
+        isRequired(true);
+        cswProfile.isRequired(true);
+        sourceNameField().isRequired(true);
+        endpointUrlField().isRequired(true);
+        return this;
     }
 
     @Override

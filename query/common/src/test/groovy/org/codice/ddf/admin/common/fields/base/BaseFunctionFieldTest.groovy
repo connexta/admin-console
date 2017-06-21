@@ -34,7 +34,7 @@ class BaseFunctionFieldTest extends Specification {
         functionField.getArguments()[0].path() == [TestBaseFunctionField.DEFAULT_NAME, BaseFunctionField.ARGUMENT, StringField.DEFAULT_FIELD_NAME]
 
         when:
-        functionField.fieldName('newName')
+        functionField.pathName('newName')
 
         then:
         functionField.path() == ['newName']

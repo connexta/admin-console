@@ -13,57 +13,33 @@
  **/
 package org.codice.ddf.admin.sources.fields.type;
 
-import static org.codice.ddf.admin.common.services.ServiceCommons.FLAG_PASSWORD;
-
 import java.util.List;
 
 import org.codice.ddf.admin.api.Field;
-import org.codice.ddf.admin.api.fields.ObjectField;
-import org.codice.ddf.admin.common.fields.base.BaseUnionField;
+import org.codice.ddf.admin.common.fields.base.BaseObjectField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
 import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.common.fields.common.UrlField;
 
-import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
 
-public class SourceConfigUnionField extends BaseUnionField {
-
-    public static final String FIELD_NAME = "sourceConfig";
-
-    public static final String FIELD_TYPE_NAME = "SourceConfiguration";
-
-    public static final String DESCRIPTION = "All supported source configuration types.";
+public abstract class SourceConfigField extends BaseObjectField {
 
     public static final String SOURCE_NAME_FIELD_NAME = "sourceName";
 
     public static final String ENDPOINT_URL_FIELD_NAME = "endpointUrl";
 
-    private static final List<ObjectField> UNION_TYPES =
-            ImmutableList.of(new CswSourceConfigurationField(),
-                    new WfsSourceConfigurationField(),
-                    new OpenSearchSourceConfigurationField());
+    private PidField pidField;
 
-    protected PidField pidField;
+    private StringField sourceName;
 
-    protected StringField sourceName;
+    private UrlField endpointUrl;
 
-    protected UrlField endpointUrl;
+    private CredentialsField creds;
 
-    protected CredentialsField creds;
-
-    public SourceConfigUnionField() {
-        super(FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION, UNION_TYPES);
-
-        pidField = new PidField();
-        sourceName = new StringField(SOURCE_NAME_FIELD_NAME);
-        endpointUrl = new UrlField(ENDPOINT_URL_FIELD_NAME);
-        creds = new CredentialsField();
-    }
-
-    protected SourceConfigUnionField(String fieldTypeName, String description) {
-        super(FIELD_NAME, fieldTypeName, description, UNION_TYPES);
+    protected SourceConfigField(String fieldName, String fieldTypeName, String description) {
+        super(fieldName, fieldTypeName, description);
 
         pidField = new PidField();
         sourceName = new StringField(SOURCE_NAME_FIELD_NAME);
@@ -73,22 +49,22 @@ public class SourceConfigUnionField extends BaseUnionField {
 
     // Setters
 
-    public SourceConfigUnionField pid(String servicePid) {
+    public SourceConfigField pid(String servicePid) {
         this.pidField.setValue(servicePid);
         return this;
     }
 
-    public SourceConfigUnionField sourceName(String sourceName) {
+    public SourceConfigField sourceName(String sourceName) {
         this.sourceName.setValue(sourceName);
         return this;
     }
 
-    public SourceConfigUnionField endpointUrl(String url) {
+    public SourceConfigField endpointUrl(String url) {
         this.endpointUrl.setValue(url);
         return this;
     }
 
-    public SourceConfigUnionField credentials(String username, String password) {
+    public SourceConfigField credentials(String username, String password) {
         this.creds.username(username)
                 .password(password);
         return this;
@@ -126,16 +102,5 @@ public class SourceConfigUnionField extends BaseUnionField {
     @Override
     public List<Field> getFields() {
         return ImmutableList.of(pidField, sourceName, endpointUrl, creds);
-    }
-
-    @Override
-    public String toString() {
-        return MoreObjects.toStringHelper(this)
-                .add(PidField.DEFAULT_FIELD_NAME, pid())
-                .add(SOURCE_NAME_FIELD_NAME, sourceName())
-                .add(ENDPOINT_URL_FIELD_NAME, endpointUrl())
-                .add(CredentialsField.USERNAME_FIELD_NAME, credentials().username())
-                .add(CredentialsField.PASSWORD_FIELD_NAME, FLAG_PASSWORD)
-                .toString();
     }
 }

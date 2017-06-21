@@ -28,10 +28,13 @@ public abstract class BaseField<S, G> implements Field<S, G> {
 
     private List<String> subpath;
 
+    private String pathName;
+
     public BaseField(String fieldName, String description) {
         this.fieldName = fieldName;
         this.description = description;
         subpath = new ArrayList<>();
+        pathName = fieldName;
     }
 
     @Override
@@ -40,8 +43,8 @@ public abstract class BaseField<S, G> implements Field<S, G> {
     }
 
     @Override
-    public void fieldName(String fieldName) {
-        this.fieldName = fieldName;
+    public void pathName(String pathName) {
+        this.pathName = pathName;
     }
 
     @Override
@@ -52,7 +55,7 @@ public abstract class BaseField<S, G> implements Field<S, G> {
     @Override
     public List<String> path() {
         return new ImmutableList.Builder().addAll(subpath)
-                .add(fieldName)
+                .add(pathName)
                 .build();
     }
 

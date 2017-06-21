@@ -20,7 +20,9 @@ import org.codice.ddf.admin.sources.fields.WfsVersion;
 
 import com.google.common.collect.ImmutableList;
 
-public class WfsSourceConfigurationField extends SourceConfigUnionField {
+public class WfsSourceConfigurationField extends SourceConfigField {
+
+    public static final String DEFAULT_FIELD_NAME = "source";
 
     public static final String FIELD_TYPE_NAME = "WfsSourceConfiguration";
 
@@ -30,7 +32,7 @@ public class WfsSourceConfigurationField extends SourceConfigUnionField {
     private WfsVersion wfsVersion;
 
     public WfsSourceConfigurationField() {
-        super(FIELD_TYPE_NAME, DESCRIPTION);
+        super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
         wfsVersion = new WfsVersion();
         updateInnerFieldPaths();
     }
@@ -46,6 +48,13 @@ public class WfsSourceConfigurationField extends SourceConfigUnionField {
 
     public WfsVersion wfsVersionField() {
         return wfsVersion;
+    }
+
+    public void useDefaultRequired() {
+        isRequired(true);
+        wfsVersion.isRequired(true);
+        sourceNameField().isRequired(true);
+        endpointUrlField().isRequired(true);
     }
 
     @Override

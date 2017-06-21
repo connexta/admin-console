@@ -170,7 +170,7 @@ class SaveContextPoliciesTest extends Specification {
         then:
         report.messages().size() == 1
         report.messages()[0].code == DefaultMessages.UNSUPPORTED_ENUM
-        report.messages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, BaseFunctionField.ARGUMENT, 'policies', ListField.INDEX_DELIMETER + 0, 'authTypes', ListField.INDEX_DELIMETER + 1]
+        report.messages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, BaseFunctionField.ARGUMENT, 'policies', '0', 'authTypes', '1']
         report.result() == null
     }
 
@@ -186,7 +186,7 @@ class SaveContextPoliciesTest extends Specification {
         then:
         report.messages().size() == 1
         report.messages()[0].code == DefaultMessages.MISSING_REQUIRED_FIELD
-        report.messages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, BaseFunctionField.ARGUMENT, 'policies', ListField.INDEX_DELIMETER + 0, 'authTypes']
+        report.messages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, BaseFunctionField.ARGUMENT, 'policies', '0', 'authTypes']
         report.result() == null
 
     }
@@ -203,7 +203,7 @@ class SaveContextPoliciesTest extends Specification {
         then:
         report.messages().size() == 1
         report.messages()[0].code == DefaultMessages.UNSUPPORTED_ENUM
-        report.messages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, BaseFunctionField.ARGUMENT, 'policies', ListField.INDEX_DELIMETER + 0, Realm.DEFAULT_FIELD_NAME]
+        report.messages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, BaseFunctionField.ARGUMENT, 'policies', '0', Realm.DEFAULT_FIELD_NAME]
         report.result() == null
     }
 
@@ -219,7 +219,7 @@ class SaveContextPoliciesTest extends Specification {
         then:
         report.messages().size() == 1
         report.messages()[0].code == DefaultMessages.MISSING_REQUIRED_FIELD
-        report.messages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, BaseFunctionField.ARGUMENT, 'policies', ListField.INDEX_DELIMETER + 0, Realm.DEFAULT_FIELD_NAME]
+        report.messages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, BaseFunctionField.ARGUMENT, 'policies', '0', Realm.DEFAULT_FIELD_NAME]
         report.result() == null
     }
 
@@ -249,7 +249,7 @@ class SaveContextPoliciesTest extends Specification {
         then:
         report.messages().size() == 1
         report.messages()[0].code == DefaultMessages.MISSING_REQUIRED_FIELD
-        report.messages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, BaseFunctionField.ARGUMENT, 'policies', ListField.INDEX_DELIMETER + 0, 'claimsMapping', ListField.INDEX_DELIMETER + 0, ClaimsMapEntry.VALUE_FIELD_NAME]
+        report.messages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, BaseFunctionField.ARGUMENT, 'policies', '0', 'claimsMapping', '0', ClaimsMapEntry.VALUE_FIELD_NAME]
         report.result() == null
     }
 
@@ -265,7 +265,7 @@ class SaveContextPoliciesTest extends Specification {
         then:
         report.messages().size() == 1
         report.messages()[0].code == SecurityMessages.INVALID_CLAIM_TYPE
-        report.messages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, BaseFunctionField.ARGUMENT, 'policies', ListField.INDEX_DELIMETER + 0, 'claimsMapping', ListField.INDEX_DELIMETER + 0, ClaimsMapEntry.KEY_FIELD_NAME]
+        report.messages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, BaseFunctionField.ARGUMENT, 'policies', '0', 'claimsMapping', '0', ClaimsMapEntry.KEY_FIELD_NAME]
         report.result() == null
     }
 }

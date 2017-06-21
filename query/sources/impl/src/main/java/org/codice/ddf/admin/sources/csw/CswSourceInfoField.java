@@ -11,59 +11,63 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.sources.fields;
+package org.codice.ddf.admin.sources.csw;
 
 import java.util.List;
 
 import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
-import org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField;
+import org.codice.ddf.admin.sources.fields.type.CswSourceConfigurationField;
 
 import com.google.common.collect.ImmutableList;
 
-public class SourceInfoField extends BaseObjectField {
+public class CswSourceInfoField extends BaseObjectField {
 
-    public static final String DEFAULT_FIELD_NAME = "sourceInfo";
+    public static final String DEFAULT_FIELD_NAME = "cswSourceInfo";
+
+    public static final String FIELD_TYPE_NAME = "CswSourceInfo";
 
     public static final String IS_AVAILABLE_FIELD_NAME = "isAvailable";
 
-    private static final String FIELD_TYPE_NAME = "SourceInfo";
+    public static final String DESCRIPTION =
+            "Contains the availability and properties of the CSW source.";
 
-    private static final String DESCRIPTION =
-            "Contains various information such as if the source is reachable, and the source configuration";
+    private CswSourceConfigurationField config;
 
     private BooleanField isAvailable;
 
-    private SourceConfigUnionField config;
-
-    public SourceInfoField() {
+    public CswSourceInfoField() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
-        config = new SourceConfigUnionField();
+        config = new CswSourceConfigurationField();
         isAvailable = new BooleanField(IS_AVAILABLE_FIELD_NAME);
         updateInnerFieldPaths();
     }
 
-    public SourceInfoField isAvaliable(boolean available) {
+    public CswSourceInfoField config(CswSourceConfigurationField config) {
+        this.config = config;
+        return this;
+    }
+
+    public CswSourceInfoField isAvaliable(boolean available) {
         isAvailable.setValue(available);
         return this;
     }
 
-    public SourceInfoField configuration(SourceConfigUnionField config) {
-        this.config = config;
-        return this;
+    public CswSourceConfigurationField config() {
+        return config;
     }
 
     public Boolean isAvailable() {
         return isAvailable.getValue();
     }
 
-    public SourceConfigUnionField config() {
-        return config;
+    public BooleanField isAvailableField() {
+        return isAvailable;
     }
 
     @Override
     public List<Field> getFields() {
-        return ImmutableList.of(isAvailable, config);
+        return ImmutableList.of(config, isAvailable);
     }
 }

@@ -24,7 +24,7 @@ import java.util.List;
 public interface Field<S, G> {
 
     /**
-     * Returns the name of this {@code Field}. The name is mutable.
+     * Returns the name of this {@code Field}.
      *
      * @return the name of this field
      */
@@ -33,7 +33,7 @@ public interface Field<S, G> {
     /**
      * @param fieldName the new name of the {@code Field}
      */
-    void fieldName(String fieldName);
+    void pathName(String fieldName);
 
     /**
      * @return a description describing this {@code Field}

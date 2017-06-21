@@ -19,7 +19,7 @@ class DeleteOpenSearchConfigurationTest extends Specification {
 
     Configurator configurator
 
-    static RESULT_ARGUMENT_PATH = [DeleteOpenSearchConfiguration.ID]
+    static RESULT_ARGUMENT_PATH = [DeleteOpenSearchConfiguration.FIELD_NAME]
 
     static BASE_PATH = [RESULT_ARGUMENT_PATH, FunctionField.ARGUMENT].flatten()
 

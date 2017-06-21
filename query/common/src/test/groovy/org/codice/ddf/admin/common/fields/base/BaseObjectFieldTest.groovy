@@ -88,7 +88,7 @@ class BaseObjectFieldTest extends Specification {
 
     def 'Changing ObjectField name correctly updates inner fields paths'() {
         when:
-        topLevelField.fieldName('newFieldName')
+        topLevelField.pathName('newFieldName')
         def innerField = topLevelField.getFields()[5]
         def subFieldOfInnerField = ((ObjectField) innerField).getFields()[0]
 

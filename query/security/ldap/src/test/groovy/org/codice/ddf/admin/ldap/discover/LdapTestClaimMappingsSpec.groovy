@@ -200,8 +200,8 @@ class LdapTestClaimMappingsSpec extends Specification {
 
     def 'fail when bad sts claim keys are supplied for mapping'() {
         setup:
-        def failedPaths = [badPaths.badClaimMappingPath + (ListFieldImpl.INDEX_DELIMETER + 0) + ClaimsMapEntry.KEY_FIELD_NAME,
-                           badPaths.badClaimMappingPath + (ListFieldImpl.INDEX_DELIMETER + 1) + ClaimsMapEntry.KEY_FIELD_NAME] as Set
+        def failedPaths = [badPaths.badClaimMappingPath + '0' + ClaimsMapEntry.KEY_FIELD_NAME,
+                           badPaths.badClaimMappingPath + '1' + ClaimsMapEntry.KEY_FIELD_NAME] as Set
 
         def claimsMapping = createClaimsMapping(ImmutableMap.of("badclaim1", "cn",
                 "badclaim2", "employeetype",
@@ -228,8 +228,8 @@ class LdapTestClaimMappingsSpec extends Specification {
 
     def 'fail when missing user attributes are supplied for mapping'() {
         setup:
-        def failedPaths = [badPaths.badClaimMappingPath + (ListFieldImpl.INDEX_DELIMETER + 0) + ClaimsMapEntry.VALUE_FIELD_NAME,
-                           badPaths.badClaimMappingPath + (ListFieldImpl.INDEX_DELIMETER + 2) + ClaimsMapEntry.VALUE_FIELD_NAME] as Set
+        def failedPaths = [badPaths.badClaimMappingPath + '0' + ClaimsMapEntry.VALUE_FIELD_NAME,
+                           badPaths.badClaimMappingPath + '2' + ClaimsMapEntry.VALUE_FIELD_NAME] as Set
 
         def claimsMapping = createClaimsMapping(ImmutableMap.of("claim1", "XXX",
                 "claim2", "cn",

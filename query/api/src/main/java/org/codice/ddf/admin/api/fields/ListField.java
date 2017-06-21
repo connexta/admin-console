@@ -20,8 +20,6 @@ import org.codice.ddf.admin.api.DataType;
 
 public interface ListField<T extends DataType> extends DataType<List> {
 
-    String INDEX_DELIMETER = "__index:";
-
     T getListFieldType();
 
     List<T> getList();

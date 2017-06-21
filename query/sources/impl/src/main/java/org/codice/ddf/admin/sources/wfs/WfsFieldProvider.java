@@ -23,6 +23,7 @@ import org.codice.ddf.admin.sources.wfs.discover.DiscoverWfsSource;
 import org.codice.ddf.admin.sources.wfs.discover.GetWfsConfigurations;
 import org.codice.ddf.admin.sources.wfs.persist.DeleteWfsConfiguration;
 import org.codice.ddf.admin.sources.wfs.persist.SaveWfsConfiguration;
+import org.codice.ddf.internal.admin.configurator.actions.FeatureActions;
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
 import org.codice.ddf.internal.admin.configurator.actions.ServiceReader;
@@ -48,7 +49,8 @@ public class WfsFieldProvider extends BaseFieldProvider {
     private DeleteWfsConfiguration deleteWfsConfig;
 
     public WfsFieldProvider(ConfiguratorFactory configuratorFactory, ServiceActions serviceActions,
-            ManagedServiceActions managedServiceActions, ServiceReader serviceReader) {
+            ManagedServiceActions managedServiceActions, ServiceReader serviceReader,
+            FeatureActions featureActions) {
         super(NAME, TYPE_NAME, DESCRIPTION);
         discoverWfsSource = new DiscoverWfsSource();
         getWfsConfigs = new GetWfsConfigurations(configuratorFactory,
@@ -59,7 +61,8 @@ public class WfsFieldProvider extends BaseFieldProvider {
         saveWfsConfig = new SaveWfsConfiguration(configuratorFactory,
                 serviceActions,
                 managedServiceActions,
-                serviceReader);
+                serviceReader,
+                featureActions);
         deleteWfsConfig = new DeleteWfsConfiguration(configuratorFactory,
                 serviceActions,
                 managedServiceActions);

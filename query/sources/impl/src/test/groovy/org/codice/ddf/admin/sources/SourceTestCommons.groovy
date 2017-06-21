@@ -23,13 +23,16 @@ import ddf.catalog.source.UnsupportedQueryException
 import org.codice.ddf.admin.common.fields.common.AddressField
 import org.codice.ddf.admin.common.fields.common.CredentialsField
 import org.codice.ddf.admin.common.fields.common.PidField
+import org.codice.ddf.admin.common.fields.common.ResponseField
 import org.codice.ddf.admin.common.fields.common.UrlField
+import org.codice.ddf.admin.common.report.ReportWithResultImpl
+import org.codice.ddf.admin.common.report.message.ErrorMessageImpl
 import org.codice.ddf.admin.common.services.ServiceCommons
-import org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField
+import org.codice.ddf.admin.sources.fields.type.SourceConfigField
 
 class SourceTestCommons {
 
-    static final ENDPOINT_URL = SourceConfigUnionField.ENDPOINT_URL_FIELD_NAME
+    static final ENDPOINT_URL = SourceConfigField.ENDPOINT_URL_FIELD_NAME
 
     static final CREDENTIALS = CredentialsField.DEFAULT_FIELD_NAME
 
@@ -47,9 +50,7 @@ class SourceTestCommons {
 
     static final SERVICE_PID_KEY = ServiceCommons.SERVICE_PID_KEY
 
-    static final SOURCE_NAME = SourceConfigUnionField.SOURCE_NAME_FIELD_NAME
-
-    static final SOURCE_CONFIG = SourceConfigUnionField.FIELD_NAME
+    static final SOURCE_NAME = SourceConfigField.SOURCE_NAME_FIELD_NAME
 
     static final ID = 'id'
 
@@ -73,12 +74,6 @@ class SourceTestCommons {
 
     static TEST_SOURCENAME = "testSourceName"
 
-    static getBaseSaveConfigArgs() {
-        return [
-            (SOURCE_CONFIG) : createSourceConfigUnionField().getValue()
-        ]
-    }
-
     static getBaseDiscoverByAddressArgs() {
         return [
             (ADDRESS) : new AddressField().hostname('localhost').port(8993).getValue(),
@@ -86,9 +81,9 @@ class SourceTestCommons {
         ]
     }
 
-    static getBaseDiscoverByUrlArgs() {
+    static getBaseDiscoverByUrlArgs(String url) {
         return [
-            (ADDRESS) : new AddressField().url("http://localhost:8993/sevices/csw").getValue(),
+            (ADDRESS) : new AddressField().url(url).getValue(),
             (CREDENTIALS) : new CredentialsField().username(TEST_USERNAME).password(TEST_PASSWORD).getValue()
         ]
     }
@@ -117,13 +112,6 @@ class SourceTestCommons {
         (SERVICE_PID_KEY)             : S_PID,
         (USERNAME)                    : TEST_USERNAME
     ]
-
-    static createSourceConfigUnionField() {
-        def source = new SourceConfigUnionField()
-        source.endpointUrl('https://localhost:8993').sourceName(TEST_SOURCENAME)
-                .credentials().username(TEST_USERNAME).password(TEST_PASSWORD)
-        return source
-    }
 
     /**
      * Needed to be able to successfully test the case where a Source is casted to a ConfiguredService

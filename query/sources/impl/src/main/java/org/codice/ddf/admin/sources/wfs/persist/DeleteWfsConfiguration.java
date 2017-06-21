@@ -13,8 +13,6 @@
  */
 package org.codice.ddf.admin.sources.wfs.persist;
 
-import static org.codice.ddf.admin.common.services.ServiceCommons.deleteService;
-
 import java.util.List;
 
 import org.codice.ddf.admin.api.DataType;
@@ -31,14 +29,16 @@ import com.google.common.collect.ImmutableList;
 
 public class DeleteWfsConfiguration extends BaseFunctionField<BooleanField> {
 
-    public static final String ID = "deleteWfsSource";
+    public static final String FIELD_NAME = "deleteWfsSource";
 
     public static final String DESCRIPTION =
-            "Deletes a WFS source configuration specified by the servicePid and returns true on success and false on failure.";
+            "Deletes a WFS source configuration specified by the pid and returns true on success and false on failure.";
 
     private PidField pid;
 
-    private ConfiguratorFactory configuratorFactory;
+    private ServiceCommons serviceCommons;
+
+    private final ConfiguratorFactory configuratorFactory;
 
     private final ServiceActions serviceActions;
 
@@ -46,7 +46,7 @@ public class DeleteWfsConfiguration extends BaseFunctionField<BooleanField> {
 
     public DeleteWfsConfiguration(ConfiguratorFactory configuratorFactory,
             ServiceActions serviceActions, ManagedServiceActions managedServiceActions) {
-        super(ID, DESCRIPTION, new BooleanField());
+        super(FIELD_NAME, DESCRIPTION, new BooleanField());
         this.configuratorFactory = configuratorFactory;
         this.serviceActions = serviceActions;
         this.managedServiceActions = managedServiceActions;
@@ -54,11 +54,16 @@ public class DeleteWfsConfiguration extends BaseFunctionField<BooleanField> {
         pid = new PidField();
         pid.isRequired(true);
         updateArgumentPaths();
+
+        serviceCommons = new ServiceCommons(managedServiceActions,
+                serviceActions,
+                null,
+                configuratorFactory);
     }
 
     @Override
     public BooleanField performFunction() {
-        addMessages(deleteService(pid, configuratorFactory, managedServiceActions));
+        addMessages(serviceCommons.deleteService(pid));
         return new BooleanField(!containsErrorMsgs());
     }
 
@@ -68,7 +73,7 @@ public class DeleteWfsConfiguration extends BaseFunctionField<BooleanField> {
         if (containsErrorMsgs()) {
             return;
         }
-        addMessages(ServiceCommons.validateServiceConfigurationExists(pid, serviceActions));
+        addMessages(serviceCommons.serviceConfigurationExists(pid));
     }
 
     @Override

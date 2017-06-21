@@ -16,10 +16,9 @@ package org.codice.ddf.admin.sources.opensearch.discover
 import org.codice.ddf.admin.api.Field
 import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.api.fields.ListField
-import org.codice.ddf.admin.common.fields.base.ListFieldImpl
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
-import org.codice.ddf.admin.sources.fields.SourceInfoField
+import org.codice.ddf.admin.sources.opensearch.OpenSearchSourceInfoField
 import org.codice.ddf.admin.sources.services.OpenSearchServiceProperties
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions
@@ -34,7 +33,7 @@ class GetOpenSearchConfigsTest extends Specification {
 
     static TEST_SHORT_NAME = "openSearchSource"
 
-    static RESULT_ARGUMENT_PATH = [GetOpenSearchConfigurations.ID]
+    static RESULT_ARGUMENT_PATH = [GetOpenSearchConfigurations.FIELD_NAME]
 
     static BASE_PATH = [RESULT_ARGUMENT_PATH, FunctionField.ARGUMENT].flatten()
 
@@ -70,9 +69,9 @@ class GetOpenSearchConfigsTest extends Specification {
         def list = ((ListField) report.result())
 
         then:
-        1 * serviceReader.getServices(_, _) >> [new TestSource(S_PID_1, true)]
-        1 * serviceReader.getServices(_, _) >> [new TestSource(S_PID_2, false)]
         1 * managedServiceActions.read(_ as String) >> baseManagedServiceConfigs
+        2 * serviceReader.getServices(_, _) >> [new TestSource(S_PID_1, true)]
+        2 * serviceReader.getServices(_, _) >> [new TestSource(S_PID_2, false)]
         report.result() != null
         list.getList().size() == 2
         assertConfig(list.getList().get(0), 0, TEST_SHORT_NAME, S_PID_1, true)
@@ -112,17 +111,16 @@ class GetOpenSearchConfigsTest extends Specification {
         report.messages().get(0).path == RESULT_ARGUMENT_PATH
     }
 
-    private def createOpenSearchManagedServiceConfigs() {
+    def createOpenSearchManagedServiceConfigs() {
         managedServiceConfigs = baseManagedServiceConfigs
         managedServiceConfigs.get(S_PID_1).put(SHORT_NAME, TEST_SHORT_NAME)
         managedServiceConfigs.get(S_PID_2).put(SHORT_NAME, TEST_SHORT_NAME)
         return managedServiceConfigs
     }
 
-    private
     def assertConfig(Field field, int index, String sourceName, String pid, boolean availability) {
-        def sourceInfo = (SourceInfoField) field
-        assert sourceInfo.fieldName() == ListFieldImpl.INDEX_DELIMETER + index
+        def sourceInfo = (OpenSearchSourceInfoField) field
+        assert sourceInfo.path()[-1] == index.toString()
         assert sourceInfo.isAvailable() == availability
         assert sourceInfo.config().credentials().password() == FLAG_PASSWORD
         assert sourceInfo.config().credentials().username() == TEST_USERNAME

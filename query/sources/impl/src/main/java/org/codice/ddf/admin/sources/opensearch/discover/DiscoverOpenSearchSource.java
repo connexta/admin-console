@@ -13,8 +13,6 @@
  **/
 package org.codice.ddf.admin.sources.opensearch.discover;
 
-import static org.codice.ddf.admin.sources.commons.utils.SourceUtilCommons.createSourceInfoField;
-
 import java.util.List;
 
 import org.codice.ddf.admin.api.DataType;
@@ -23,17 +21,17 @@ import org.codice.ddf.admin.api.report.ReportWithResult;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.common.AddressField;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
-import org.codice.ddf.admin.common.fields.common.UrlField;
+import org.codice.ddf.admin.common.fields.common.ResponseField;
 import org.codice.ddf.admin.common.report.ReportWithResultImpl;
-import org.codice.ddf.admin.sources.commons.utils.OpenSearchSourceUtils;
-import org.codice.ddf.admin.sources.fields.SourceInfoField;
-import org.codice.ddf.admin.sources.fields.type.SourceConfigUnionField;
+import org.codice.ddf.admin.sources.fields.type.OpenSearchSourceConfigurationField;
+import org.codice.ddf.admin.sources.opensearch.OpenSearchSourceUtils;
 
 import com.google.common.collect.ImmutableList;
 
-public class DiscoverOpenSearchSource extends BaseFunctionField<SourceInfoField> {
+public class DiscoverOpenSearchSource
+        extends BaseFunctionField<OpenSearchSourceConfigurationField> {
 
-    public static final String ID = "discoverOpenSearch";
+    public static final String FIELD_NAME = "discoverOpenSearch";
 
     public static final String DESCRIPTION =
             "Attempts to discover an OpenSearch source using the given hostname and port or URL. If a URL "
@@ -46,7 +44,7 @@ public class DiscoverOpenSearchSource extends BaseFunctionField<SourceInfoField>
     private OpenSearchSourceUtils openSearchSourceUtils;
 
     public DiscoverOpenSearchSource() {
-        super(ID, DESCRIPTION, new SourceInfoField());
+        super(FIELD_NAME, DESCRIPTION, new OpenSearchSourceConfigurationField());
         credentials = new CredentialsField();
         address = new AddressField();
         address.isRequired(true);
@@ -61,28 +59,25 @@ public class DiscoverOpenSearchSource extends BaseFunctionField<SourceInfoField>
     }
 
     @Override
-    public SourceInfoField performFunction() {
-        ReportWithResult<SourceConfigUnionField> configResult;
+    public OpenSearchSourceConfigurationField performFunction() {
+        ReportWithResult<ResponseField> responseField;
         if (address.url() != null) {
-            configResult = openSearchSourceUtils.getOpenSearchConfig(address.urlField(), credentials);
-            addMessages(configResult);
-            if (containsErrorMsgs()) {
-                return null;
-            }
+            responseField = openSearchSourceUtils.sendRequest(address.urlField(), credentials);
         } else {
-            ReportWithResultImpl<UrlField> discoveredUrl = openSearchSourceUtils.discoverOpenSearchUrl(address.host(), credentials);
-            addMessages(discoveredUrl);
-            if (containsErrorMsgs()) {
-                return null;
-            }
-
-            configResult = openSearchSourceUtils.getOpenSearchConfig(discoveredUrl.result(), credentials);
-            addMessages(configResult);
-            if (containsErrorMsgs()) {
-                return null;
-            }
+            responseField = openSearchSourceUtils.discoverOpenSearchUrl(address.host(),
+                    credentials);
         }
-        return createSourceInfoField(true, configResult.result());
+
+        addMessages(responseField);
+        if (containsErrorMsgs()) {
+            return null;
+        }
+
+        ReportWithResultImpl<OpenSearchSourceConfigurationField> configResult =
+                openSearchSourceUtils.getOpenSearchConfig(responseField.result(), credentials);
+
+        addMessages(configResult);
+        return configResult.isResultPresent() ? configResult.result() : null;
     }
 
     @Override
@@ -91,7 +86,7 @@ public class DiscoverOpenSearchSource extends BaseFunctionField<SourceInfoField>
     }
 
     @Override
-    public FunctionField<SourceInfoField> newInstance() {
+    public FunctionField<OpenSearchSourceConfigurationField> newInstance() {
         return new DiscoverOpenSearchSource();
     }
 }

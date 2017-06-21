@@ -19,7 +19,11 @@ import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.configurator.Configurator
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.configurator.OperationReport
-import org.codice.ddf.admin.sources.commons.SourceMessages
+import org.codice.ddf.admin.sources.SourceMessages
+import org.codice.ddf.admin.sources.fields.type.OpenSearchSourceConfigurationField
+import org.codice.ddf.admin.sources.fields.type.SourceConfigField
+import org.codice.ddf.admin.sources.opensearch.OpenSearchSourceInfoField
+import org.codice.ddf.internal.admin.configurator.actions.FeatureActions
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceReader
@@ -29,13 +33,13 @@ import static org.codice.ddf.admin.sources.SourceTestCommons.*
 
 class SaveOpenSearchConfigurationTest extends Specification {
 
-    static RESULT_ARGUMENT_PATH = [SaveOpenSearchConfiguration.ID]
+    static RESULT_ARGUMENT_PATH = [SaveOpenSearchConfiguration.FIELD_NAME]
 
     static BASE_PATH = [RESULT_ARGUMENT_PATH, FunctionField.ARGUMENT].flatten()
 
-    static CONFIG_PATH = [BASE_PATH, SOURCE_CONFIG].flatten()
+    static CONFIG_PATH = [BASE_PATH, OpenSearchSourceConfigurationField.DEFAULT_FIELD_NAME].flatten()
 
-    static SOURCE_NAME_PATH = [CONFIG_PATH, SOURCE_NAME].flatten()
+    static SOURCE_NAME_PATH = [CONFIG_PATH, SourceConfigField.SOURCE_NAME_FIELD_NAME].flatten()
 
     static ENDPOINT_URL_PATH = [CONFIG_PATH, ENDPOINT_URL].flatten()
 
@@ -43,9 +47,13 @@ class SaveOpenSearchConfigurationTest extends Specification {
 
     ConfiguratorFactory configuratorFactory
 
-    private ServiceActions serviceActions
+    ServiceActions serviceActions
 
-    private ServiceReader serviceReader
+    ServiceReader serviceReader
+
+    FeatureActions featureActions
+
+    ManagedServiceActions managedServiceActions
 
     Configurator configurator
 
@@ -55,22 +63,24 @@ class SaveOpenSearchConfigurationTest extends Specification {
 
     def setup() {
         configurator = Mock(Configurator)
+        serviceActions = Mock(ServiceActions)
+        serviceReader = Mock(ServiceReader)
+        managedServiceActions = Mock(ManagedServiceActions)
+        featureActions = Mock(FeatureActions)
+
         federatedSource = Mock(FederatedSource)
         federatedSource.getId() >> TEST_SOURCENAME
         federatedSources.add(federatedSource)
-        configuratorFactory = Mock(ConfiguratorFactory) {
-            getConfigurator() >> configurator
-        }
-        serviceActions = Mock(ServiceActions)
-        serviceReader = Mock(ServiceReader)
-        def managedServiceActions = Mock(ManagedServiceActions)
+        configuratorFactory = Mock(ConfiguratorFactory)
+        configuratorFactory.getConfigurator() >> configurator
+
         saveOpenSearchConfiguration = new SaveOpenSearchConfiguration(configuratorFactory, serviceActions,
-                managedServiceActions, serviceReader)
+                managedServiceActions, serviceReader, featureActions)
     }
 
     def 'Successfully save new OpenSearch configuration'() {
         setup:
-        saveOpenSearchConfiguration.setValue(getBaseSaveConfigArgs())
+        saveOpenSearchConfiguration.setValue(createFunctionArgs())
         serviceReader.getServices(_, _) >> []
         configurator.commit(_, _) >> mockReport(false)
 
@@ -83,7 +93,7 @@ class SaveOpenSearchConfigurationTest extends Specification {
 
     def 'Fail to save new OpenSearch config due to duplicate source name'() {
         setup:
-        saveOpenSearchConfiguration.setValue(getBaseSaveConfigArgs())
+        saveOpenSearchConfiguration.setValue(createFunctionArgs())
         serviceReader.getServices(_, _) >> federatedSources
 
         when:
@@ -98,17 +108,18 @@ class SaveOpenSearchConfigurationTest extends Specification {
 
     def 'Fail to save new OpenSearch config due to failure to commit'() {
         setup:
-        saveOpenSearchConfiguration.setValue(getBaseSaveConfigArgs())
+        saveOpenSearchConfiguration.setValue(createFunctionArgs())
         serviceReader.getServices(_, _) >> []
-        configurator.commit(_, _) >> mockReport(true)
 
         when:
         def report = saveOpenSearchConfiguration.getValue()
 
         then:
+        1 * configurator.commit(_, _) >> mockReport(false)
+        1 * configurator.commit(_, _) >> mockReport(true)
         !report.result().getValue()
         report.messages().size() == 1
-        report.messages().get(0).path == CONFIG_PATH
+        report.messages().get(0).path == RESULT_ARGUMENT_PATH
         report.messages().get(0).code == DefaultMessages.FAILED_PERSIST
     }
 
@@ -153,6 +164,8 @@ class SaveOpenSearchConfigurationTest extends Specification {
         def report = saveOpenSearchConfiguration.getValue()
 
         then:
+        1 * configurator.commit(_, _) >> mockReport(false)
+        1 * configurator.commit(_, _) >> mockReport(true)
         !report.result().getValue()
         report.messages().size() == 1
         report.messages().get(0).path == RESULT_ARGUMENT_PATH
@@ -187,15 +200,21 @@ class SaveOpenSearchConfigurationTest extends Specification {
         report.messages()*.getPath() == [SOURCE_NAME_PATH, ENDPOINT_URL_PATH]
     }
 
-    private def mockReport(boolean hasError) {
+    def mockReport(boolean hasError) {
         def report = Mock(OperationReport)
         report.containsFailedResults() >> hasError
         return report
     }
 
-    private def createUpdateFunctionArgs() {
-        def args = getBaseSaveConfigArgs()
+    def createUpdateFunctionArgs() {
+        def args = createFunctionArgs()
         args.put(PID, S_PID)
         return args
+    }
+
+    def createFunctionArgs() {
+        def config = new OpenSearchSourceConfigurationField().endpointUrl('https://localhost:8993').sourceName(TEST_SOURCENAME)
+        config.credentials().username(TEST_USERNAME).password(TEST_PASSWORD)
+        return [(OpenSearchSourceConfigurationField.DEFAULT_FIELD_NAME) : config.getValue()]
     }
 }

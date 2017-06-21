@@ -19,9 +19,12 @@ import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.configurator.Configurator
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.configurator.OperationReport
-import org.codice.ddf.admin.sources.commons.SourceMessages
+import org.codice.ddf.admin.sources.SourceMessages
+import org.codice.ddf.admin.sources.csw.CswSourceInfoField
 import org.codice.ddf.admin.sources.fields.CswProfile
 import org.codice.ddf.admin.sources.fields.type.CswSourceConfigurationField
+import org.codice.ddf.admin.sources.fields.type.SourceConfigField
+import org.codice.ddf.internal.admin.configurator.actions.FeatureActions
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceReader
@@ -37,17 +40,15 @@ class SaveCswConfigurationTest extends Specification {
 
     static CSW_PROFILE = CswProfile.DEFAULT_FIELD_NAME
 
-    static OUTPUT_SCHEMA = CswSourceConfigurationField.OUTPUT_SCHEMA_FIELD_NAME
-
-    static RESULT_ARGUMENT_PATH = [SaveCswConfiguration.ID]
+    static RESULT_ARGUMENT_PATH = [SaveCswConfiguration.FIELD_NAME]
 
     static BASE_PATH = [RESULT_ARGUMENT_PATH, FunctionField.ARGUMENT].flatten()
 
-    static CONFIG_PATH = [BASE_PATH, SOURCE_CONFIG].flatten()
+    static CONFIG_PATH = [BASE_PATH, CswSourceConfigurationField.DEFAULT_FIELD_NAME].flatten()
 
     static ENDPOINT_URL_PATH = [CONFIG_PATH, ENDPOINT_URL].flatten()
 
-    static SOURCE_NAME_PATH = [CONFIG_PATH, SOURCE_NAME].flatten()
+    static SOURCE_NAME_PATH = [CONFIG_PATH, SourceConfigField.SOURCE_NAME_FIELD_NAME].flatten()
 
     static CSW_PROFILE_PATH = [CONFIG_PATH, CSW_PROFILE].flatten()
 
@@ -61,6 +62,10 @@ class SaveCswConfigurationTest extends Specification {
 
     ServiceActions serviceActions
 
+    ManagedServiceActions managedServiceActions
+
+    FeatureActions featureActions
+
     Source federatedSource
 
     def actionArgs
@@ -72,19 +77,20 @@ class SaveCswConfigurationTest extends Specification {
         configurator = Mock(Configurator)
         configuratorFactory = Mock(ConfiguratorFactory)
         serviceActions = Mock(ServiceActions)
-        def managedServiceActions = Mock(ManagedServiceActions)
+        managedServiceActions = Mock(ManagedServiceActions)
         serviceReader = Mock(ServiceReader)
+        featureActions = Mock(FeatureActions)
 
         federatedSource = new TestSource(S_PID, TEST_SOURCENAME, false)
         federatedSources.add(federatedSource)
         configuratorFactory.getConfigurator() >> configurator
-        saveCswConfiguration = new SaveCswConfiguration(configuratorFactory, this.serviceActions,
-                managedServiceActions, this.serviceReader)
+        saveCswConfiguration = new SaveCswConfiguration(configuratorFactory, serviceActions,
+                managedServiceActions, serviceReader, featureActions)
     }
 
     def 'Successfully save new CSW configuration'() {
         when:
-        saveCswConfiguration.setValue(actionArgs)
+        saveCswConfiguration.setValue(createCswSaveArgs())
         serviceReader.getServices(_, _) >> []
         configurator.commit(_, _) >> mockReport(false)
         def report = saveCswConfiguration.getValue()
@@ -111,13 +117,14 @@ class SaveCswConfigurationTest extends Specification {
         when:
         saveCswConfiguration.setValue(actionArgs)
         serviceReader.getServices(_, _) >> []
-        configurator.commit(_, _) >> mockReport(true)
         def report = saveCswConfiguration.getValue()
 
         then:
+        1 * configurator.commit(_, _) >> mockReport(false)
+        1 * configurator.commit(_, _) >> mockReport(true)
         !report.result().getValue()
         report.messages().size() == 1
-        report.messages().get(0).path == CONFIG_PATH
+        report.messages().get(0).path == RESULT_ARGUMENT_PATH
         report.messages().get(0).code == DefaultMessages.FAILED_PERSIST
     }
 
@@ -162,12 +169,13 @@ class SaveCswConfigurationTest extends Specification {
         saveCswConfiguration.setValue(actionArgs)
         serviceActions.read(_) >> [(ID): TEST_SOURCENAME]
         serviceReader.getServices(_, _) >> []
-        configurator.commit(_, _) >> mockReport(true)
 
         when:
         def report = saveCswConfiguration.getValue()
 
         then:
+        1 * configurator.commit(_, _) >> mockReport(false)
+        1 * configurator.commit(_, _) >> mockReport(true)
         !report.result().getValue()
         report.messages().size() == 1
         report.messages().get(0).path == RESULT_ARGUMENT_PATH
@@ -210,9 +218,11 @@ class SaveCswConfigurationTest extends Specification {
     }
 
     def createCswSaveArgs() {
-        actionArgs = getBaseSaveConfigArgs()
-        actionArgs.get(SOURCE_CONFIG).put(OUTPUT_SCHEMA, TEST_OUTPUT_SCHEMA)
-        actionArgs.get(SOURCE_CONFIG).put(CSW_PROFILE, TEST_CSW_PROFILE)
-        return actionArgs
+        def config = new CswSourceConfigurationField()
+                .outputSchema(TEST_OUTPUT_SCHEMA)
+                .cswProfile(TEST_CSW_PROFILE)
+                .endpointUrl('https://localhost:8993').sourceName(TEST_SOURCENAME)
+        config.credentials().username(TEST_USERNAME).password(TEST_PASSWORD)
+        return [(CswSourceConfigurationField.DEFAULT_FIELD_NAME): config.getValue()]
     }
 }

@@ -95,8 +95,8 @@ public abstract class BaseObjectField extends BaseDataType<Map<String, Object>>
     }
 
     @Override
-    public void fieldName(String fieldName) {
-        super.fieldName(fieldName);
+    public void pathName(String pathName) {
+        super.pathName(pathName);
         updateInnerFieldPaths();
     }
 

@@ -23,6 +23,7 @@ import org.codice.ddf.admin.sources.csw.discover.DiscoverCswSource;
 import org.codice.ddf.admin.sources.csw.discover.GetCswConfigurations;
 import org.codice.ddf.admin.sources.csw.persist.DeleteCswConfiguration;
 import org.codice.ddf.admin.sources.csw.persist.SaveCswConfiguration;
+import org.codice.ddf.internal.admin.configurator.actions.FeatureActions;
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
 import org.codice.ddf.internal.admin.configurator.actions.ServiceReader;
@@ -48,18 +49,19 @@ public class CswFieldProvider extends BaseFieldProvider {
     private DeleteCswConfiguration deleteCswConfiguration;
 
     public CswFieldProvider(ConfiguratorFactory configuratorFactory, ServiceActions serviceActions,
-            ManagedServiceActions managedServiceActions, ServiceReader serviceReader) {
+            ManagedServiceActions managedServiceActions, ServiceReader serviceReader,
+            FeatureActions featureActions) {
         super(ID, TYPE_NAME, DESCRIPTION);
+        discoverCswSource = new DiscoverCswSource();
         getCswConfigurations = new GetCswConfigurations(configuratorFactory,
                 serviceActions,
                 managedServiceActions,
                 serviceReader);
-        discoverCswSource = new DiscoverCswSource();
-
         saveCswConfiguration = new SaveCswConfiguration(configuratorFactory,
                 serviceActions,
                 managedServiceActions,
-                serviceReader);
+                serviceReader,
+                featureActions);
         deleteCswConfiguration = new DeleteCswConfiguration(configuratorFactory,
                 serviceActions,
                 managedServiceActions);

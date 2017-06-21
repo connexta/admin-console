@@ -41,9 +41,9 @@ class DeleteCswConfigurationTest extends Specification {
 
     static TEST_EVENT_SERVICE_ADDRESS = "testEventServiceAddress"
 
-    static RESULT_ARGUMENT_PATH = [DeleteCswConfiguration.ID]
+    static RESULT_ARGUMENT_PATH = [DeleteCswConfiguration.FIELD_NAME]
 
-    static BASE_PATH = [DeleteCswConfiguration.ID, FunctionField.ARGUMENT]
+    static BASE_PATH = [DeleteCswConfiguration.FIELD_NAME, FunctionField.ARGUMENT]
 
     static SERVICE_PID_PATH = [BASE_PATH, PID].flatten()
 

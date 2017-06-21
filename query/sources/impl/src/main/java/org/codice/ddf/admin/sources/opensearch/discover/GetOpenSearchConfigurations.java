@@ -13,8 +13,7 @@
  */
 package org.codice.ddf.admin.sources.opensearch.discover;
 
-import static org.codice.ddf.admin.common.services.ServiceCommons.validateServiceConfigurationExists;
-import static org.codice.ddf.admin.sources.commons.utils.SourceUtilCommons.getSourceConfigurations;
+import static org.codice.ddf.admin.common.services.ServiceCommons.FLAG_PASSWORD;
 import static org.codice.ddf.admin.sources.services.OpenSearchServiceProperties.OPENSEARCH_FACTORY_PIDS;
 import static org.codice.ddf.admin.sources.services.OpenSearchServiceProperties.SERVICE_PROPS_TO_OPENSEARCH_CONFIG;
 
@@ -26,24 +25,35 @@ import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.fields.common.PidField;
+import org.codice.ddf.admin.common.services.ServiceCommons;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
-import org.codice.ddf.admin.sources.fields.SourceInfoField;
+import org.codice.ddf.admin.sources.fields.type.OpenSearchSourceConfigurationField;
+import org.codice.ddf.admin.sources.fields.type.SourceConfigField;
+import org.codice.ddf.admin.sources.opensearch.OpenSearchSourceInfoField;
+import org.codice.ddf.admin.sources.utils.SourceUtilCommons;
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
 import org.codice.ddf.internal.admin.configurator.actions.ServiceReader;
 
 import com.google.common.collect.ImmutableList;
 
-public class GetOpenSearchConfigurations extends BaseFunctionField<ListField<SourceInfoField>> {
+public class GetOpenSearchConfigurations
+        extends BaseFunctionField<ListField<OpenSearchSourceInfoField>> {
 
-    public static final String ID = "openSearchConfigs";
+    public static final String FIELD_NAME = "sources";
 
     public static final String DESCRIPTION =
             "Retrieves all currently configured OpenSearch sources. If a source pid is specified, only that source configuration will be returned.";
 
+    public static final String OPEN_SEARCH_SOURCES = "openSearchSource";
+
     private PidField pid;
 
-    private ConfiguratorFactory configuratorFactory;
+    private SourceUtilCommons sourceUtilCommons;
+
+    private ServiceCommons serviceCommons;
+
+    private final ConfiguratorFactory configuratorFactory;
 
     private final ServiceActions serviceActions;
 
@@ -54,7 +64,7 @@ public class GetOpenSearchConfigurations extends BaseFunctionField<ListField<Sou
     public GetOpenSearchConfigurations(ConfiguratorFactory configuratorFactory,
             ServiceActions serviceActions, ManagedServiceActions managedServiceActions,
             ServiceReader serviceReader) {
-        super(ID, DESCRIPTION, new ListFieldImpl<>(SourceInfoField.class));
+        super(FIELD_NAME, DESCRIPTION, new ListFieldImpl<>(OpenSearchSourceInfoField.class));
         this.configuratorFactory = configuratorFactory;
         this.serviceActions = serviceActions;
         this.managedServiceActions = managedServiceActions;
@@ -62,16 +72,40 @@ public class GetOpenSearchConfigurations extends BaseFunctionField<ListField<Sou
 
         pid = new PidField();
         updateArgumentPaths();
+
+        sourceUtilCommons = new SourceUtilCommons(managedServiceActions,
+                serviceActions,
+                serviceReader,
+                configuratorFactory);
+        serviceCommons = new ServiceCommons(null, serviceActions, null, null);
+
     }
 
     @Override
-    public ListField<SourceInfoField> performFunction() {
-        return getSourceConfigurations(OPENSEARCH_FACTORY_PIDS,
+    public ListField<OpenSearchSourceInfoField> performFunction() {
+        ListField<OpenSearchSourceInfoField> cswSourceInfoFields = new ListFieldImpl<>(
+                OPEN_SEARCH_SOURCES,
+                OpenSearchSourceInfoField.class);
+
+        List<SourceConfigField> configs = sourceUtilCommons.getSourceConfigurations(
+                OPENSEARCH_FACTORY_PIDS,
                 SERVICE_PROPS_TO_OPENSEARCH_CONFIG,
-                pid.getValue(),
-                serviceActions,
-                managedServiceActions,
-                serviceReader);
+                pid.getValue());
+
+        configs.forEach(config -> {
+            cswSourceInfoFields.add(new OpenSearchSourceInfoField().config((OpenSearchSourceConfigurationField) config));
+        });
+
+        for (OpenSearchSourceInfoField sourceInfoField : cswSourceInfoFields.getList()) {
+            sourceUtilCommons.populateAvailability(sourceInfoField.isAvailableField(),
+                    sourceInfoField.config()
+                            .pidField());
+            sourceInfoField.config()
+                    .credentials()
+                    .password(FLAG_PASSWORD);
+        }
+
+        return cswSourceInfoFields;
     }
 
     @Override
@@ -82,7 +116,7 @@ public class GetOpenSearchConfigurations extends BaseFunctionField<ListField<Sou
         }
 
         if (pid.getValue() != null) {
-            addMessages(validateServiceConfigurationExists(pid, serviceActions));
+            addMessages(serviceCommons.serviceConfigurationExists(pid));
         }
     }
 
@@ -92,7 +126,7 @@ public class GetOpenSearchConfigurations extends BaseFunctionField<ListField<Sou
     }
 
     @Override
-    public FunctionField<ListField<SourceInfoField>> newInstance() {
+    public FunctionField<ListField<OpenSearchSourceInfoField>> newInstance() {
         return new GetOpenSearchConfigurations(configuratorFactory,
                 serviceActions,
                 managedServiceActions,

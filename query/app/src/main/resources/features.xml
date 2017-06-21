@@ -41,13 +41,14 @@
              description="DDF Admin Security (Beta)">
         <feature>admin-beta-core</feature>
         <feature>admin-beta-ldap</feature>
+        <feature>admin-beta-embeddedldap</feature>
         <feature>admin-beta-wcpm</feature>
         <bundle>mvn:org.codice.ddf.admin.beta/admin-query-sts/${project.version}</bundle>
     </feature>
 
     <feature name="admin-beta-wcpm" install="manual" version="${project.version}"
              description="DDF Admin Web Context Policy Manager (Beta)">
-        <feature >admin-beta-core</feature>
+        <feature>admin-beta-core</feature>
         <bundle>mvn:org.codice.ddf.admin.beta/admin-query-wcpm/${project.version}</bundle>
     </feature>
 
@@ -57,17 +58,16 @@
         <bundle>mvn:org.codice.ddf.admin.beta/admin-query-ldap/${project.version}</bundle>
     </feature>
 
+    <feature name="admin-beta-embeddedldap" install="manual" version="${project.version}"
+             description="DDF Admin Security (Beta) :: Embedded LDAP Installer">
+        <bundle>mvn:org.codice.ddf.admin.beta/admin-query-embeddedldap/${project.version}</bundle>
+    </feature>
+
     <feature name="admin-beta-utils" install="manual" version="${project.version}"
              description="DDF Admin Security (Beta) :: LDAP Handler">
         <feature>admin-beta-core</feature>
         <bundle>mvn:org.codice.ddf.admin.beta/admin-query-utils/${project.version}</bundle>
     </feature>
-    <!--<feature name="admin-beta-embedded-ldap" install="auto" version="${project.version}"-->
-             <!--description="DDF Admin Security (Beta) :: Embedded LDAP Handler ">-->
-        <!--<feature >admin-beta-core</feature>-->
-        <!--<bundle>mvn:org.codice.ddf.admin.beta/embedded-ldap-config-handler/${project.version}-->
-        <!--</bundle>-->
-    <!--</feature>-->
 
     <feature name="admin-beta-ui" install="auto" version="${project.version}"
              description="DDF Admin UI (Beta)">
@@ -84,7 +84,8 @@
         <bundle>mvn:org.codice.ddf.admin.beta/admin-graphql/${project.version}</bundle>
     </feature>
 
-    <feature name="graphql-dependencies" install="manual" version="${project.version}" description="Required dependencies for admin-beta-graphql">
+    <feature name="graphql-dependencies" install="manual" version="${project.version}"
+             description="Required dependencies for admin-beta-graphql">
         <bundle>mvn:commons-io/commons-io/2.5</bundle>
         <bundle>mvn:javax.servlet/javax.servlet-api/3.1.0</bundle>
         <bundle>mvn:com.fasterxml.jackson.core/jackson-core/2.8.4</bundle>

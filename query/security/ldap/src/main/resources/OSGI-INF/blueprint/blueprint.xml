@@ -15,13 +15,18 @@
 
     <service id="ldapFieldProvider" interface="org.codice.ddf.admin.api.FieldProvider">
         <bean class="org.codice.ddf.admin.ldap.LdapFieldProvider">
-            <argument ref="configuratorFactory" />
+            <argument ref="configuratorFactory"/>
             <argument ref="featureActions"/>
             <argument ref="managedServiceActions"/>
             <argument ref="propertyActions"/>
             <argument ref="serviceActions"/>
+            <property name="installEmbeddedLdap" ref="installEmbeddedLdap"/>
         </bean>
     </service>
+
+    <reference id="installEmbeddedLdap"
+               interface="org.codice.ddf.admin.api.fields.FunctionField"
+               availability="mandatory" filter="(id=installEmbeddedLdap)"/>
 
     <reference id="configuratorFactory"
                interface="org.codice.ddf.admin.configurator.ConfiguratorFactory"

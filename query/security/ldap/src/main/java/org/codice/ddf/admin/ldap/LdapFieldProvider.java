@@ -27,7 +27,6 @@ import org.codice.ddf.admin.ldap.discover.LdapTestClaimMappings;
 import org.codice.ddf.admin.ldap.discover.LdapTestConnection;
 import org.codice.ddf.admin.ldap.discover.LdapTestDirectorySettings;
 import org.codice.ddf.admin.ldap.discover.LdapUserAttributes;
-import org.codice.ddf.admin.ldap.embedded.InstallEmbeddedLdap;
 import org.codice.ddf.admin.ldap.persist.CreateLdapConfiguration;
 import org.codice.ddf.admin.ldap.persist.DeleteLdapConfiguration;
 import org.codice.ddf.internal.admin.configurator.actions.FeatureActions;
@@ -66,7 +65,7 @@ public class LdapFieldProvider extends BaseFieldProvider {
 
     private DeleteLdapConfiguration deleteConfig;
 
-    private InstallEmbeddedLdap installEmbeddedLdap;
+    private FunctionField installEmbeddedLdap;
 
     public LdapFieldProvider(ConfiguratorFactory configuratorFactory, FeatureActions featureActions,
             ManagedServiceActions managedServiceActions, PropertyActions propertyActions,
@@ -90,13 +89,15 @@ public class LdapFieldProvider extends BaseFieldProvider {
                 managedServiceActions,
                 propertyActions,
                 serviceActions);
-        installEmbeddedLdap = new InstallEmbeddedLdap(configuratorFactory, featureActions);
     }
 
     @Override
     public List<Field> getDiscoveryFields() {
         return ImmutableList.of(testConnection,
-                testBind, testSettings, recommendedSettings, claimMappings,
+                testBind,
+                testSettings,
+                recommendedSettings,
+                claimMappings,
                 ldapQuery,
                 getUserAttris,
                 getConfigs);
@@ -105,5 +106,9 @@ public class LdapFieldProvider extends BaseFieldProvider {
     @Override
     public List<FunctionField> getMutationFunctions() {
         return ImmutableList.of(createConfig, deleteConfig, installEmbeddedLdap);
+    }
+
+    public void setInstallEmbeddedLdap(FunctionField installEmbeddedLdap) {
+        this.installEmbeddedLdap = installEmbeddedLdap;
     }
 }

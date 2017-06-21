@@ -102,11 +102,10 @@ public class OpenSearchSourceUtils {
      *
      * @param responseField The URL to probe for OpenSearch capabilities
      * @param creds         optional credentials used in the original capabilities request
-     * @param urlField      original request {@code UrlField}
      * @return a {@link ReportWithResultImpl} containing the {@link OpenSearchSourceConfigurationField} or containing {@link org.codice.ddf.admin.api.report.ErrorMessage}s on failure.
      */
     public ReportWithResultImpl<OpenSearchSourceConfigurationField> getOpenSearchConfig(
-            ResponseField responseField, CredentialsField creds, UrlField urlField) {
+            ResponseField responseField, CredentialsField creds) {
         ReportWithResultImpl<OpenSearchSourceConfigurationField> configResult =
                 new ReportWithResultImpl<>();
 
@@ -114,7 +113,7 @@ public class OpenSearchSourceUtils {
         int statusCode = responseField.statusCode();
 
         if (statusCode != HTTP_OK || responseBody.length() < 1) {
-            addUnknownEndpointError(configResult, urlField);
+            configResult.addResultMessage(unknownEndpointError());
             return configResult;
         }
 
@@ -123,7 +122,7 @@ public class OpenSearchSourceUtils {
             capabilitiesXml = sourceUtilCommons.createDocument(responseBody);
         } catch (Exception e) {
             LOGGER.debug("Failed to read response from OpenSearch endpoint.");
-            addUnknownEndpointError(configResult, urlField);
+            configResult.addResultMessage(unknownEndpointError());
             return configResult;
         }
 
@@ -142,20 +141,14 @@ public class OpenSearchSourceUtils {
                         .password(FLAG_PASSWORD);
 
                 configResult.result(config);
+            } else {
+                configResult.addResultMessage(unknownEndpointError());
             }
         } catch (XPathExpressionException e) {
             LOGGER.debug("Failed to compile OpenSearch totalResults XPath.");
-            addUnknownEndpointError(configResult, urlField);
+            configResult.addResultMessage(unknownEndpointError());
         }
 
         return configResult;
-    }
-
-    private void addUnknownEndpointError(ReportWithResultImpl report, UrlField urlField) {
-        if (urlField.getValue() != null) {
-            report.addArgumentMessage(unknownEndpointError(urlField.path()));
-        } else {
-            report.addResultMessage(unknownEndpointError());
-        }
     }
 }

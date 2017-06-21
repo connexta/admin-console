@@ -122,7 +122,7 @@ class DiscoverWfsSourcesTest extends Specification {
         1 * requestUtils.sendGetRequest(_, _, _) >> createResponseFieldResult(false, UNRECOGNIZED_GET_CAPABILITIES_FILE_PATH, 200, TEST_WFS_URL)
         report.messages().size() == 1
         report.messages()[0].getCode() == DefaultMessages.UNKNOWN_ENDPOINT
-        report.messages()[0].getPath() == URL_FIELD_PATH
+        report.messages()[0].getPath() == [DiscoverWfsSource.FIELD_NAME]
     }
 
     def 'Unknown endpoint error when bad HTTP code received'() {
@@ -136,7 +136,7 @@ class DiscoverWfsSourcesTest extends Specification {
         1 * requestUtils.sendGetRequest(_, _, _) >> createResponseFieldResult(false, WFS_20_GET_CAPABILITIES_FILE_PATH, 500, TEST_WFS_URL)
         report.messages().size() == 1
         report.messages()[0].getCode() == DefaultMessages.UNKNOWN_ENDPOINT
-        report.messages()[0].getPath() == URL_FIELD_PATH
+        report.messages()[0].getPath() == [DiscoverWfsSource.FIELD_NAME]
     }
 
     def 'Unknown endpoint error when unrecognized response received'() {
@@ -150,7 +150,7 @@ class DiscoverWfsSourcesTest extends Specification {
         1 * requestUtils.sendGetRequest(_, _, _) >> createResponseFieldResult(false, 'responses/badResponse.xml', 200, TEST_WFS_URL)
         report.messages().size() == 1
         report.messages()[0].getCode() == DefaultMessages.UNKNOWN_ENDPOINT
-        report.messages()[0].getPath() == URL_FIELD_PATH
+        report.messages()[0].getPath() == [DiscoverWfsSource.FIELD_NAME]
     }
 
     def 'Fail when missing required fields'() {

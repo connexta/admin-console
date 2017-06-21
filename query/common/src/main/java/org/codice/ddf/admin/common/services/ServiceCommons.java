@@ -35,6 +35,7 @@ import org.codice.ddf.internal.admin.configurator.actions.ServiceReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+// TODO: 6/21/17 phuffer - Make this back into static methods
 public class ServiceCommons {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ServiceCommons.class);

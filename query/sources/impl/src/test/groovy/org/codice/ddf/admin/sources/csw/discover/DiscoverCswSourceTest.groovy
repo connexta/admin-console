@@ -165,7 +165,7 @@ class DiscoverCswSourceTest extends Specification {
         1 * requestUtils.sendGetRequest(_, _, _) >> createResponseFieldResult(false, GMD_CSW_GET_CAPABILITIES_FILE_PATH, 500, TEST_CSW_URL)
         report.messages().size() == 1
         report.messages()[0].getCode() == DefaultMessages.UNKNOWN_ENDPOINT
-        report.messages()[0].getPath() == URL_FIELD_PATH
+        report.messages()[0].getPath() == [DiscoverCswSource.FIELD_NAME]
     }
 
     def 'Unknown endpoint error with unrecognized response when using URL'() {
@@ -179,7 +179,7 @@ class DiscoverCswSourceTest extends Specification {
         1 * requestUtils.sendGetRequest(_, _, _) >> createResponseFieldResult(false, "responses/badResponse.xml", 200, TEST_CSW_URL)
         report.messages().size() == 1
         report.messages()[0].getCode() == DefaultMessages.UNKNOWN_ENDPOINT
-        report.messages()[0].getPath() == URL_FIELD_PATH
+        report.messages()[0].getPath() == [DiscoverCswSource.FIELD_NAME]
     }
 
     def 'Unknown endpoint error with unrecognized response when using hostname+port'() {

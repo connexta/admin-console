@@ -87,7 +87,7 @@ class DiscoverOpenSearchTest extends Specification {
         1 * requestUtils.sendGetRequest(_, _, _) >> createResponseFieldResult(false, 'responses/badResponse.xml', 200, TEST_OPEN_SEARCH_URL)
         report.messages().size() == 1
         report.messages()[0].getCode() == DefaultMessages.UNKNOWN_ENDPOINT
-        report.messages()[0].getPath() == URL_FIELD_PATH
+        report.messages()[0].getPath() == [DiscoverOpenSearchSource.FIELD_NAME]
     }
 
     def 'Unknown endpoint with bad HTTP status code received'() {
@@ -101,7 +101,7 @@ class DiscoverOpenSearchTest extends Specification {
         1 * requestUtils.sendGetRequest(_, _, _) >> createResponseFieldResult(false, OPEN_SEARCH_CAPABILITIES_FILE_PATH, 500, TEST_OPEN_SEARCH_URL)
         report.messages().size() == 1
         report.messages()[0].getCode() == DefaultMessages.UNKNOWN_ENDPOINT
-        report.messages()[0].getPath() == URL_FIELD_PATH
+        report.messages()[0].getPath() == [DiscoverOpenSearchSource.FIELD_NAME]
     }
 
     def 'Fail when missing required fields'() {

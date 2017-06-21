@@ -41,9 +41,9 @@ public class RequestUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RequestUtils.class);
 
-    private static final long CLIENT_TIMEOUT_MILLIS = TimeUnit.SECONDS.toMillis(10);
+    private static final int CLIENT_TIMEOUT_MILLIS =
+            new Long(TimeUnit.SECONDS.toMillis(10)).intValue();
 
-    // TODO: 6/21/17 phuffer - Once graphql-java releases its path solution, this javadoc needs to be updated.
     /**
      * Takes a list of url formats, for example "https://%s:%d/wfs", formats them together with the
      * hostField name and port, then sends GET requests to those URLs. If a request URL is returned in the
@@ -187,7 +187,7 @@ public class RequestUtils {
         URLConnection urlConnection = null;
         try {
             urlConnection = new URL(urlField.getValue()).openConnection();
-            urlConnection.setConnectTimeout((int) CLIENT_TIMEOUT_MILLIS);
+            urlConnection.setConnectTimeout(CLIENT_TIMEOUT_MILLIS);
             urlConnection.connect();
             LOGGER.debug("Successfully reached {}.", urlField);
         } catch (IOException e) {

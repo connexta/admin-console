@@ -102,11 +102,10 @@ public class WfsSourceUtils {
      *
      * @param responseField WFS URL to probe for a configuration
      * @param creds         optional username to add to Basic Auth header used in the original request
-     * @param urlField      original request {@code UrlField}
      * @return a {@link ReportWithResultImpl} containing the preferred {@link WfsSourceConfigurationField}, or containing {@link org.codice.ddf.admin.api.report.ErrorMessage}s on failure.
      */
     public ReportWithResultImpl<WfsSourceConfigurationField> getPreferredWfsConfig(
-            ResponseField responseField, CredentialsField creds, UrlField urlField) {
+            ResponseField responseField, CredentialsField creds) {
         ReportWithResultImpl<WfsSourceConfigurationField> configResult =
                 new ReportWithResultImpl<>();
 
@@ -114,7 +113,7 @@ public class WfsSourceUtils {
         UrlField requestUrl = responseField.requestUrlField();
 
         if (responseField.statusCode() != HTTP_OK || responseBody.length() < 1) {
-            addUnknownEndpointError(configResult, urlField);
+            configResult.addResultMessage(unknownEndpointError());
             return configResult;
         }
 
@@ -123,7 +122,7 @@ public class WfsSourceUtils {
             capabilitiesXml = sourceUtilCommons.createDocument(responseBody);
         } catch (Exception e) {
             LOGGER.debug("Failed to read response from WFS endpoint.");
-            addUnknownEndpointError(configResult, urlField);
+            configResult.addResultMessage(unknownEndpointError());
             return configResult;
         }
 
@@ -142,24 +141,16 @@ public class WfsSourceUtils {
                     .evaluate(capabilitiesXml);
         } catch (XPathExpressionException e) {
             LOGGER.debug("Failed to parse XML response.");
-            addUnknownEndpointError(configResult, urlField);
+            configResult.addResultMessage(unknownEndpointError());
             return configResult;
         }
 
         configResult.result(preferredConfig.wfsVersion(wfsVersion));
         if (!preferredConfig.validate()
                 .isEmpty()) {
-            addUnknownEndpointError(configResult, urlField);
+            configResult.addResultMessage(unknownEndpointError());
         }
 
         return configResult;
-    }
-
-    private void addUnknownEndpointError(ReportWithResultImpl report, UrlField urlField) {
-        if (urlField.getValue() != null) {
-            report.addArgumentMessage(unknownEndpointError(urlField.path()));
-        } else {
-            report.addResultMessage(unknownEndpointError());
-        }
     }
 }

@@ -22,6 +22,7 @@ import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.common.AddressField;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
 import org.codice.ddf.admin.common.fields.common.ResponseField;
+import org.codice.ddf.admin.common.report.ReportWithResultImpl;
 import org.codice.ddf.admin.sources.fields.type.OpenSearchSourceConfigurationField;
 import org.codice.ddf.admin.sources.opensearch.OpenSearchSourceUtils;
 
@@ -72,13 +73,11 @@ public class DiscoverOpenSearchSource
             return null;
         }
 
-        ReportWithResult<OpenSearchSourceConfigurationField> configResult =
-                openSearchSourceUtils.getOpenSearchConfig(responseField.result(),
-                        credentials,
-                        address.urlField());
+        ReportWithResultImpl<OpenSearchSourceConfigurationField> configResult =
+                openSearchSourceUtils.getOpenSearchConfig(responseField.result(), credentials);
 
         addMessages(configResult);
-        return containsErrorMsgs() ? null : configResult.result();
+        return configResult.isResultPresent() ? configResult.result() : null;
     }
 
     @Override

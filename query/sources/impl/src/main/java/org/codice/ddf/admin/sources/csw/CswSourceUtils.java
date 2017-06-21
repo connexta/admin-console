@@ -115,17 +115,16 @@ public class CswSourceUtils {
      *
      * @param responseField an HTTP response containing the result of a getCapabilities request
      * @param creds         credentials used for the original HTTP request
-     * @param urlField      original request {@code UrlField}
      * @return a {@link ReportWithResultImpl} containing the {@link CswSourceConfigurationField} or an {@link org.codice.ddf.admin.api.report.ErrorMessage} on failure.
      */
     public ReportWithResult<CswSourceConfigurationField> getPreferredCswConfig(
-            ResponseField responseField, CredentialsField creds, UrlField urlField) {
+            ResponseField responseField, CredentialsField creds) {
         ReportWithResultImpl<CswSourceConfigurationField> configResult =
                 new ReportWithResultImpl<>();
 
         String responseBody = responseField.responseBody();
         if (responseField.statusCode() != HTTP_OK || responseBody.length() < 1) {
-            addUnknownEndpointError(configResult, urlField);
+            configResult.addResultMessage(unknownEndpointError());
             return configResult;
         }
 
@@ -134,7 +133,7 @@ public class CswSourceUtils {
             capabilitiesXml = sourceUtilCommons.createDocument(responseBody);
         } catch (Exception e) {
             LOGGER.debug("Failed to create XML document from response.");
-            addUnknownEndpointError(configResult, urlField);
+            configResult.addResultMessage(unknownEndpointError());
             return configResult;
         }
 
@@ -184,15 +183,7 @@ public class CswSourceUtils {
 
         LOGGER.debug("URL [{}] responded to GetCapabilities request, but response was not readable.",
                 requestUrl);
-        addUnknownEndpointError(configResult, urlField);
+        configResult.addResultMessage(unknownEndpointError());
         return configResult;
-    }
-
-    private void addUnknownEndpointError(ReportWithResultImpl report, UrlField urlField) {
-        if (urlField.getValue() != null) {
-            report.addArgumentMessage(unknownEndpointError(urlField.path()));
-        } else {
-            report.addResultMessage(unknownEndpointError());
-        }
     }
 }

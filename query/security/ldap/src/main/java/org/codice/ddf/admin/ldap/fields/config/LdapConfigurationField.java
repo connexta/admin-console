@@ -14,12 +14,17 @@
 package org.codice.ddf.admin.ldap.fields.config;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.api.Field;
+import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
+import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindUserInfo;
 import org.codice.ddf.admin.ldap.fields.connection.LdapConnectionField;
+import org.codice.ddf.admin.security.common.fields.wcpm.ClaimsMapEntry;
 
 import com.google.common.collect.ImmutableList;
 
@@ -31,20 +36,26 @@ public class LdapConfigurationField extends BaseObjectField {
     public static final String DESCRIPTION =
             "A configuration containing all the required fields for saving LDAP settings";
 
+    public static final String CLAIMS_MAPPING = "claimsMapping";
+
     private PidField pid;
 
     private LdapConnectionField connection;
 
     private LdapBindUserInfo bindUserInfo;
 
-    private LdapSettingsField settings;
+    private LdapDirectorySettingsField settings;
+
+    private ListField<ClaimsMapEntry> claimMappings;
 
     public LdapConfigurationField() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
         pid = new PidField();
         connection = new LdapConnectionField();
         bindUserInfo = new LdapBindUserInfo();
-        settings = new LdapSettingsField();
+        settings = new LdapDirectorySettingsField();
+        claimMappings = new ListFieldImpl<>(CLAIMS_MAPPING, ClaimsMapEntry.class);
+
         updateInnerFieldPaths();
     }
 
@@ -57,7 +68,7 @@ public class LdapConfigurationField extends BaseObjectField {
         return bindUserInfo;
     }
 
-    public LdapSettingsField settingsField() {
+    public LdapDirectorySettingsField settingsField() {
         return settings;
     }
 
@@ -65,9 +76,19 @@ public class LdapConfigurationField extends BaseObjectField {
         return pid;
     }
 
+    public ListField<ClaimsMapEntry> claimMappingsField() {
+        return claimMappings;
+    }
+
     //Value getters
     public String pid() {
         return pid.getValue();
+    }
+
+    public Map<String, String> claimsMapping() {
+        return claimMappings.getList()
+                .stream()
+                .collect(Collectors.toMap(ClaimsMapEntry::key, ClaimsMapEntry::value));
     }
 
     //Value setters
@@ -86,14 +107,27 @@ public class LdapConfigurationField extends BaseObjectField {
         return this;
     }
 
-    public LdapConfigurationField settings(LdapSettingsField settings) {
+    public LdapConfigurationField settings(LdapDirectorySettingsField settings) {
         this.settings.setValue(settings.getValue());
+        return this;
+    }
+
+    public LdapConfigurationField mapClaim(String claim, String attribute) {
+        claimMappings.add(new ClaimsMapEntry().key(claim)
+                .value(attribute));
+        return this;
+    }
+
+    public LdapConfigurationField mapAllClaims(Map<String, String> mapping) {
+        mapping.entrySet()
+                .forEach(entry -> claimMappings.add(new ClaimsMapEntry().key(entry.getKey())
+                        .value(entry.getValue())));
         return this;
     }
 
     @Override
     public List<Field> getFields() {
-        return ImmutableList.of(pid, connection, bindUserInfo, settings);
+        return ImmutableList.of(pid, connection, bindUserInfo, settings, claimMappings);
     }
 
     @Override
@@ -105,7 +139,7 @@ public class LdapConfigurationField extends BaseObjectField {
     public LdapConfigurationField useDefaultRequired() {
         connection.useDefaultRequired();
         bindUserInfo.useDefaultRequired();
-        settings.useDefaultAuthentication();
+        settings.useDefaultRequiredForAuthentication();
         isRequired(true);
         return this;
     }

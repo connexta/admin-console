@@ -23,8 +23,9 @@ import org.codice.ddf.admin.ldap.discover.LdapConfigurations;
 import org.codice.ddf.admin.ldap.discover.LdapQuery;
 import org.codice.ddf.admin.ldap.discover.LdapRecommendedSettings;
 import org.codice.ddf.admin.ldap.discover.LdapTestBind;
+import org.codice.ddf.admin.ldap.discover.LdapTestClaimMappings;
 import org.codice.ddf.admin.ldap.discover.LdapTestConnection;
-import org.codice.ddf.admin.ldap.discover.LdapTestSettings;
+import org.codice.ddf.admin.ldap.discover.LdapTestDirectorySettings;
 import org.codice.ddf.admin.ldap.discover.LdapUserAttributes;
 import org.codice.ddf.admin.ldap.embedded.InstallEmbeddedLdap;
 import org.codice.ddf.admin.ldap.persist.CreateLdapConfiguration;
@@ -45,16 +46,26 @@ public class LdapFieldProvider extends BaseFieldProvider {
 
     //Discovery
     private LdapTestConnection testConnection;
+
     private LdapTestBind testBind;
-    private LdapTestSettings testSettings;
+
+    private LdapTestDirectorySettings testSettings;
+
     private LdapRecommendedSettings recommendedSettings;
+
+    private LdapTestClaimMappings claimMappings;
+
     private LdapQuery ldapQuery;
+
     private LdapUserAttributes getUserAttris;
+
     private LdapConfigurations getConfigs;
 
     //Mutate
     private CreateLdapConfiguration createConfig;
+
     private DeleteLdapConfiguration deleteConfig;
+
     private InstallEmbeddedLdap installEmbeddedLdap;
 
     public LdapFieldProvider(ConfiguratorFactory configuratorFactory, FeatureActions featureActions,
@@ -63,8 +74,10 @@ public class LdapFieldProvider extends BaseFieldProvider {
         super(NAME, TYPE_NAME, DESCRIPTION);
         testConnection = new LdapTestConnection();
         testBind = new LdapTestBind();
-        testSettings = new LdapTestSettings();
+        testSettings = new LdapTestDirectorySettings();
         recommendedSettings = new LdapRecommendedSettings();
+        claimMappings = new LdapTestClaimMappings(serviceActions);
+
         ldapQuery = new LdapQuery();
         getUserAttris = new LdapUserAttributes();
         getConfigs = new LdapConfigurations(managedServiceActions, propertyActions);
@@ -83,9 +96,7 @@ public class LdapFieldProvider extends BaseFieldProvider {
     @Override
     public List<Field> getDiscoveryFields() {
         return ImmutableList.of(testConnection,
-                testBind,
-                testSettings,
-                recommendedSettings,
+                testBind, testSettings, recommendedSettings, claimMappings,
                 ldapQuery,
                 getUserAttris,
                 getConfigs);

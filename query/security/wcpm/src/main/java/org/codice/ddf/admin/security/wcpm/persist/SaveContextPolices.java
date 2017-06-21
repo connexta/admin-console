@@ -14,7 +14,6 @@
 package org.codice.ddf.admin.security.wcpm.persist;
 
 import static org.codice.ddf.admin.common.report.message.DefaultMessages.failedPersistError;
-import static org.codice.ddf.admin.security.common.SecurityMessages.invalidClaimType;
 import static org.codice.ddf.admin.security.common.SecurityMessages.noRootContextError;
 import static org.codice.ddf.admin.security.common.services.PolicyManagerServiceProperties.POLICY_MANAGER_PID;
 import static org.codice.ddf.admin.security.common.services.PolicyManagerServiceProperties.ROOT_CONTEXT_PATH;
@@ -33,6 +32,7 @@ import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 import org.codice.ddf.admin.configurator.Configurator;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.configurator.OperationReport;
+import org.codice.ddf.admin.security.common.SecurityValidation;
 import org.codice.ddf.admin.security.common.fields.wcpm.ClaimsMapEntry;
 import org.codice.ddf.admin.security.common.fields.wcpm.ContextPolicyBin;
 import org.codice.ddf.admin.security.common.services.PolicyManagerServiceProperties;
@@ -92,11 +92,10 @@ public class SaveContextPolices extends BaseFunctionField<ListField<ContextPolic
     public void validate() {
         super.validate();
         checkRootPathExists();
-        checkClaimsValidity();
-    }
 
-    private void checkClaimsValidity() {
-        List<String> supportedClaims = stsServiceProps.getConfiguredStsClaims(serviceActions);
+        if(containsErrorMsgs()) {
+            return;
+        }
 
         List<StringField> claimArgs = new ArrayList<>();
         for (ContextPolicyBin bin : contextPolicies.getList()) {
@@ -107,9 +106,7 @@ public class SaveContextPolices extends BaseFunctionField<ListField<ContextPolic
                     .collect(Collectors.toList()));
         }
 
-        claimArgs.stream()
-                .filter(claimArg -> !supportedClaims.contains(claimArg.getValue()))
-                .forEach(claimArg -> addArgumentMessage(invalidClaimType(claimArg.path())));
+        addMessages(SecurityValidation.validateStsClaimsExist(claimArgs, serviceActions, stsServiceProps));
     }
 
     private void checkRootPathExists() {

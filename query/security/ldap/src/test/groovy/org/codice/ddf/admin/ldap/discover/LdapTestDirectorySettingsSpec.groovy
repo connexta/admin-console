@@ -19,10 +19,9 @@ import org.codice.ddf.admin.common.fields.common.CredentialsField
 import org.codice.ddf.admin.common.fields.common.HostnameField
 import org.codice.ddf.admin.common.fields.common.PortField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
-import org.codice.ddf.admin.ldap.LdapTestingCommons
 import org.codice.ddf.admin.ldap.TestLdapServer
 import org.codice.ddf.admin.ldap.commons.LdapMessages
-import org.codice.ddf.admin.ldap.fields.config.LdapSettingsField
+import org.codice.ddf.admin.ldap.fields.config.LdapDirectorySettingsField
 import org.codice.ddf.admin.ldap.fields.config.LdapUseCase
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindMethod
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindUserInfo
@@ -34,10 +33,10 @@ import static org.codice.ddf.admin.ldap.LdapTestingCommons.*
 import static org.codice.ddf.admin.ldap.fields.config.LdapUseCase.ATTRIBUTE_STORE
 import static org.codice.ddf.admin.ldap.fields.config.LdapUseCase.AUTHENTICATION
 
-class LdapTestSettingsSpec extends Specification {
+class LdapTestDirectorySettingsSpec extends Specification {
     static TestLdapServer server
     Map<String, Object> args
-    LdapTestSettings action
+    LdapTestDirectorySettings action
     def badPaths
     def baseMsg
 
@@ -52,34 +51,32 @@ class LdapTestSettingsSpec extends Specification {
     }
 
     def setup() {
-        LdapTestingCommons.loadLdapTestProperties()
-        action = new LdapTestSettings()
+        loadLdapTestProperties()
+        action = new LdapTestDirectorySettings()
 
         // Initialize bad paths
-        baseMsg = [LdapTestSettings.FIELD_NAME, FunctionField.ARGUMENT]
-        badPaths = [missingHostPath         : baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME, HostnameField.DEFAULT_FIELD_NAME],
-                    missingPortPath         : baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME, PortField.DEFAULT_FIELD_NAME],
-                    missingEncryptPath      : baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME, LdapEncryptionMethodField.DEFAULT_FIELD_NAME],
-                    missingUsernamePath     : baseMsg + [LdapBindUserInfo.DEFAULT_FIELD_NAME, CredentialsField.DEFAULT_FIELD_NAME, CredentialsField.USERNAME_FIELD_NAME],
-                    missingUserpasswordPath : baseMsg + [LdapBindUserInfo.DEFAULT_FIELD_NAME, CredentialsField.DEFAULT_FIELD_NAME, CredentialsField.PASSWORD_FIELD_NAME],
-                    missingBindMethodPath   : baseMsg + [LdapBindUserInfo.DEFAULT_FIELD_NAME, LdapBindMethod.DEFAULT_FIELD_NAME],
-                    missingUseCasePath      : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, LdapUseCase.DEFAULT_FIELD_NAME],
-                    missingUserPath         : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, LdapSettingsField.BASE_USER_DN],
-                    missingGroupPath        : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, LdapSettingsField.BASE_GROUP_DN],
-                    missingUserNameAttrPath : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, LdapSettingsField.USER_NAME_ATTRIBUTE],
-                    missingGroupObjectPath  : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, LdapSettingsField.GROUP_OBJECT_CLASS],
-                    missingGroupAttribPath  : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, LdapSettingsField.GROUP_ATTRIBUTE_HOLDING_MEMBER],
-                    missingMemberAttribPath : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, LdapSettingsField.MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP],
-                    missingAttribMappingPath: baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, LdapSettingsField.ATTRIBUTE_MAPPING],
-                    badUserDnPath           : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, LdapSettingsField.BASE_USER_DN],
-                    badGroupDnPath          : baseMsg + [LdapSettingsField.DEFAULT_FIELD_NAME, LdapSettingsField.BASE_GROUP_DN]
-
+        baseMsg = [LdapTestDirectorySettings.FIELD_NAME, FunctionField.ARGUMENT]
+        badPaths = [missingHostPath        : baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME, HostnameField.DEFAULT_FIELD_NAME],
+                    missingPortPath        : baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME, PortField.DEFAULT_FIELD_NAME],
+                    missingEncryptPath     : baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME, LdapEncryptionMethodField.DEFAULT_FIELD_NAME],
+                    missingUsernamePath    : baseMsg + [LdapBindUserInfo.DEFAULT_FIELD_NAME, CredentialsField.DEFAULT_FIELD_NAME, CredentialsField.USERNAME_FIELD_NAME],
+                    missingUserpasswordPath: baseMsg + [LdapBindUserInfo.DEFAULT_FIELD_NAME, CredentialsField.DEFAULT_FIELD_NAME, CredentialsField.PASSWORD_FIELD_NAME],
+                    missingBindMethodPath  : baseMsg + [LdapBindUserInfo.DEFAULT_FIELD_NAME, LdapBindMethod.DEFAULT_FIELD_NAME],
+                    missingUseCasePath     : baseMsg + [LdapDirectorySettingsField.DEFAULT_FIELD_NAME, LdapUseCase.DEFAULT_FIELD_NAME],
+                    missingUserPath        : baseMsg + [LdapDirectorySettingsField.DEFAULT_FIELD_NAME, LdapDirectorySettingsField.BASE_USER_DN],
+                    missingGroupPath       : baseMsg + [LdapDirectorySettingsField.DEFAULT_FIELD_NAME, LdapDirectorySettingsField.BASE_GROUP_DN],
+                    missingUserNameAttrPath: baseMsg + [LdapDirectorySettingsField.DEFAULT_FIELD_NAME, LdapDirectorySettingsField.USER_NAME_ATTRIBUTE],
+                    missingGroupObjectPath : baseMsg + [LdapDirectorySettingsField.DEFAULT_FIELD_NAME, LdapDirectorySettingsField.GROUP_OBJECT_CLASS],
+                    missingGroupAttribPath : baseMsg + [LdapDirectorySettingsField.DEFAULT_FIELD_NAME, LdapDirectorySettingsField.GROUP_ATTRIBUTE_HOLDING_MEMBER],
+                    missingMemberAttribPath: baseMsg + [LdapDirectorySettingsField.DEFAULT_FIELD_NAME, LdapDirectorySettingsField.MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP],
+                    badUserDnPath          : baseMsg + [LdapDirectorySettingsField.DEFAULT_FIELD_NAME, LdapDirectorySettingsField.BASE_USER_DN],
+                    badGroupDnPath         : baseMsg + [LdapDirectorySettingsField.DEFAULT_FIELD_NAME, LdapDirectorySettingsField.BASE_GROUP_DN]
         ]
     }
 
     def 'fail on missing required fields'() {
         setup:
-        action = new LdapTestSettings()
+        action = new LdapTestDirectorySettings()
 
         when:
         FunctionReport report = action.getValue()
@@ -106,9 +103,9 @@ class LdapTestSettingsSpec extends Specification {
         setup:
         def ldapSettings = initLdapSettings(ATTRIBUTE_STORE)
 
-        args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue(),
-                (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue(),
-                (LdapSettingsField.DEFAULT_FIELD_NAME)  : ldapSettings.getValue()]
+        args = [(LdapConnectionField.DEFAULT_FIELD_NAME)       : noEncryptionLdapConnectionInfo().getValue(),
+                (LdapBindUserInfo.DEFAULT_FIELD_NAME)          : simpleBindInfo().getValue(),
+                (LdapDirectorySettingsField.DEFAULT_FIELD_NAME): ldapSettings.getValue()]
         action.setValue(args)
         action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
@@ -116,14 +113,13 @@ class LdapTestSettingsSpec extends Specification {
         FunctionReport report = action.getValue()
 
         then:
-        report.messages().size() == 4
+        report.messages().size() == 3
         report.messages().count {
             it.getCode() == DefaultMessages.MISSING_REQUIRED_FIELD
-        } == 4
+        } == 3
         report.messages()*.getPath() as Set == [badPaths.missingGroupObjectPath,
                                                 badPaths.missingGroupAttribPath,
-                                                badPaths.missingMemberAttribPath,
-                                                badPaths.missingAttribMappingPath] as Set
+                                                badPaths.missingMemberAttribPath] as Set
     }
 
     def 'fail with invalid user/group dn'() {
@@ -132,9 +128,9 @@ class LdapTestSettingsSpec extends Specification {
                 .baseUserDn('BAD')
                 .baseGroupDn('BAD')
 
-        args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue(),
-                (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue(),
-                (LdapSettingsField.DEFAULT_FIELD_NAME)  : ldapSettings.getValue()]
+        args = [(LdapConnectionField.DEFAULT_FIELD_NAME)       : noEncryptionLdapConnectionInfo().getValue(),
+                (LdapBindUserInfo.DEFAULT_FIELD_NAME)          : simpleBindInfo().getValue(),
+                (LdapDirectorySettingsField.DEFAULT_FIELD_NAME): ldapSettings.getValue()]
         action.setValue(args)
         action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
@@ -155,9 +151,9 @@ class LdapTestSettingsSpec extends Specification {
         setup:
         def ldapSettings = initLdapSettings(AUTHENTICATION)
 
-        args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().port(666).getValue(),
-                (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue(),
-                (LdapSettingsField.DEFAULT_FIELD_NAME)  : ldapSettings.getValue()]
+        args = [(LdapConnectionField.DEFAULT_FIELD_NAME)       : noEncryptionLdapConnectionInfo().port(666).getValue(),
+                (LdapBindUserInfo.DEFAULT_FIELD_NAME)          : simpleBindInfo().getValue(),
+                (LdapDirectorySettingsField.DEFAULT_FIELD_NAME): ldapSettings.getValue()]
         action.setValue(args)
         action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
@@ -175,9 +171,9 @@ class LdapTestSettingsSpec extends Specification {
         setup:
         def ldapSettings = initLdapSettings(AUTHENTICATION)
 
-        args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue(),
-                (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().password('badPassword').getValue(),
-                (LdapSettingsField.DEFAULT_FIELD_NAME)  : ldapSettings.getValue()]
+        args = [(LdapConnectionField.DEFAULT_FIELD_NAME)       : noEncryptionLdapConnectionInfo().getValue(),
+                (LdapBindUserInfo.DEFAULT_FIELD_NAME)          : simpleBindInfo().password('badPassword').getValue(),
+                (LdapDirectorySettingsField.DEFAULT_FIELD_NAME): ldapSettings.getValue()]
         action.setValue(args)
         action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
@@ -197,9 +193,9 @@ class LdapTestSettingsSpec extends Specification {
                 .baseUserDn('ou=users,dc=example,dc=BAD')
                 .baseGroupDn('ou=groups,dc=example,dc=BAD')
 
-        args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue(),
-                (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue(),
-                (LdapSettingsField.DEFAULT_FIELD_NAME)  : ldapSettings.getValue()]
+        args = [(LdapConnectionField.DEFAULT_FIELD_NAME)       : noEncryptionLdapConnectionInfo().getValue(),
+                (LdapBindUserInfo.DEFAULT_FIELD_NAME)          : simpleBindInfo().getValue(),
+                (LdapDirectorySettingsField.DEFAULT_FIELD_NAME): ldapSettings.getValue()]
         action.setValue(args)
         action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
@@ -221,9 +217,9 @@ class LdapTestSettingsSpec extends Specification {
         def ldapSettings = initLdapSettings(ATTRIBUTE_STORE, true)
                 .baseGroupDn('ou=emptygroups,dc=example,dc=com')
 
-        args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue(),
-                (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue(),
-                (LdapSettingsField.DEFAULT_FIELD_NAME)  : ldapSettings.getValue()]
+        args = [(LdapConnectionField.DEFAULT_FIELD_NAME)       : noEncryptionLdapConnectionInfo().getValue(),
+                (LdapBindUserInfo.DEFAULT_FIELD_NAME)          : simpleBindInfo().getValue(),
+                (LdapDirectorySettingsField.DEFAULT_FIELD_NAME): ldapSettings.getValue()]
         action.setValue(args)
         action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
@@ -245,9 +241,9 @@ class LdapTestSettingsSpec extends Specification {
         def ldapSettings = initLdapSettings(ATTRIBUTE_STORE, true)
                 .groupObjectClass('BADOBJECTCLASS')
 
-        args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue(),
-                (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue(),
-                (LdapSettingsField.DEFAULT_FIELD_NAME)  : ldapSettings.getValue()]
+        args = [(LdapConnectionField.DEFAULT_FIELD_NAME)       : noEncryptionLdapConnectionInfo().getValue(),
+                (LdapBindUserInfo.DEFAULT_FIELD_NAME)          : simpleBindInfo().getValue(),
+                (LdapDirectorySettingsField.DEFAULT_FIELD_NAME): ldapSettings.getValue()]
         action.setValue(args)
         action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
@@ -269,9 +265,9 @@ class LdapTestSettingsSpec extends Specification {
         def ldapSettings = initLdapSettings(ATTRIBUTE_STORE, true)
                 .baseUserDn('ou=emptyusers,dc=example,dc=com')
 
-        args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue(),
-                (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue(),
-                (LdapSettingsField.DEFAULT_FIELD_NAME)  : ldapSettings.getValue()]
+        args = [(LdapConnectionField.DEFAULT_FIELD_NAME)       : noEncryptionLdapConnectionInfo().getValue(),
+                (LdapBindUserInfo.DEFAULT_FIELD_NAME)          : simpleBindInfo().getValue(),
+                (LdapDirectorySettingsField.DEFAULT_FIELD_NAME): ldapSettings.getValue()]
         action.setValue(args)
         action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
@@ -284,7 +280,7 @@ class LdapTestSettingsSpec extends Specification {
             it.getCode() == LdapMessages.NO_USERS_IN_BASE_USER_DN
         } == 1
         report.messages().count {
-            it.getCode() == LdapMessages.USER_NAME_ATTRIBUTE_NOT_FOUND
+            it.getCode() == LdapMessages.USER_ATTRIBUTE_NOT_FOUND
         } == 1
 
         report.messages()*.getPath() as Set == [badPaths.badUserDnPath,
@@ -295,9 +291,9 @@ class LdapTestSettingsSpec extends Specification {
         setup:
         def ldapSettings = initLdapSettings(ATTRIBUTE_STORE, true)
 
-        args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue(),
-                (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue(),
-                (LdapSettingsField.DEFAULT_FIELD_NAME)  : ldapSettings.getValue()]
+        args = [(LdapConnectionField.DEFAULT_FIELD_NAME)       : noEncryptionLdapConnectionInfo().getValue(),
+                (LdapBindUserInfo.DEFAULT_FIELD_NAME)          : simpleBindInfo().getValue(),
+                (LdapDirectorySettingsField.DEFAULT_FIELD_NAME): ldapSettings.getValue()]
         action.setValue(args)
         action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 

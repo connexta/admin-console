@@ -15,6 +15,7 @@ package org.codice.ddf.admin.ldap.commons;
 
 import static org.codice.ddf.admin.common.report.message.DefaultMessages.cannotConnectError;
 import static org.codice.ddf.admin.common.report.message.DefaultMessages.failedTestSetup;
+import static org.codice.ddf.admin.ldap.commons.LdapMessages.dnDoesNotExistError;
 import static org.codice.ddf.admin.ldap.fields.connection.LdapBindMethod.DIGEST_MD5_SASL;
 import static org.codice.ddf.admin.ldap.fields.connection.LdapBindMethod.SIMPLE;
 import static org.codice.ddf.admin.ldap.fields.connection.LdapEncryptionMethodField.LDAPS;
@@ -27,9 +28,13 @@ import java.util.List;
 
 import javax.net.ssl.SSLContext;
 
+import org.codice.ddf.admin.api.report.Report;
+import org.codice.ddf.admin.common.report.ReportImpl;
+import org.codice.ddf.admin.ldap.fields.LdapDistinguishedName;
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindUserInfo;
 import org.codice.ddf.admin.ldap.fields.connection.LdapConnectionField;
 import org.forgerock.opendj.ldap.Connection;
+import org.forgerock.opendj.ldap.Filter;
 import org.forgerock.opendj.ldap.LDAPConnectionFactory;
 import org.forgerock.opendj.ldap.LDAPOptions;
 import org.forgerock.opendj.ldap.SearchScope;
@@ -221,5 +226,31 @@ public class LdapTestingUtils {
 
     public SSLContext getSslContext() throws NoSuchAlgorithmException {
         return SSLContext.getDefault();
+    }
+
+    /**
+     * Checks for the provided DN. If it does not exist, the {@code Optional} contains
+     * the path to the DN; else, an empty {@code Optional}.
+     *
+     * @param dirDn          the DN to check
+     * @param ldapConnection the connection to the LDAP server to use
+     * @return If the path does not exist, the {@code Optional} contains
+     * the path to the DN; else, an empty {@code Optional}.
+     */
+    public Report checkDirExists(LdapDistinguishedName dirDn,
+            Connection ldapConnection) {
+        ReportImpl report = new ReportImpl();
+        boolean dirExists = !getLdapQueryResults(ldapConnection,
+                dirDn.getValue(),
+                Filter.present("objectClass")
+                        .toString(),
+                SearchScope.BASE_OBJECT,
+                1).isEmpty();
+
+        if (!dirExists) {
+            report.addArgumentMessage(dnDoesNotExistError(dirDn.path()));
+        }
+
+        return report;
     }
 }

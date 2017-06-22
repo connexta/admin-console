@@ -13,9 +13,8 @@
  **/
 package org.codice.ddf.admin.sources.fields;
 
-import org.codice.ddf.admin.api.DataType;
+import org.codice.ddf.admin.api.fields.EnumValue;
 import org.codice.ddf.admin.common.fields.base.BaseEnumField;
-import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 
 import com.google.common.collect.ImmutableList;
 
@@ -28,18 +27,11 @@ public class CswProfile extends BaseEnumField<String> {
     public static final String DESCRIPTION =
             "CSW application profile specifying the capabilities of the CSW server when federating to other systems.";
 
-    public static final String CSW_SPEC_PROFILE_FEDERATED_SOURCE =
-            "CswFederatedSource";
-
-    public static final String CSW_FEDERATION_PROFILE_SOURCE = "DDFCswFederatedSource";
-
-    public static final String GMD_CSW_ISO_FEDERATED_SOURCE = "GmdCswFederatedSource";
-
     public CswProfile() {
         this(null);
     }
 
-    public CswProfile(DataType<String> cswProfile) {
+    public CswProfile(EnumValue<String> cswProfile) {
         super(DEFAULT_FIELD_NAME,
                 TYPE_NAME,
                 DESCRIPTION,
@@ -49,44 +41,69 @@ public class CswProfile extends BaseEnumField<String> {
                 cswProfile);
     }
 
-    protected static final class CswFederatedSource extends StringField {
+    public static final class CswFederatedSource implements EnumValue<String>{
 
         public static final String DESCRIPTION = "CSW Specification Profile Federated Source that should be used when federating to an external CSW service.";
 
-        public CswFederatedSource() {
-            super(CSW_SPEC_PROFILE_FEDERATED_SOURCE, CSW_SPEC_PROFILE_FEDERATED_SOURCE, DESCRIPTION);
+        public static final String CSW_SPEC_PROFILE_FEDERATED_SOURCE =
+                "CswFederatedSource";
+
+        @Override
+        public String enumTitle() {
+            return CSW_SPEC_PROFILE_FEDERATED_SOURCE;
         }
 
         @Override
-        public String getValue() {
+        public String description() {
+            return DESCRIPTION;
+        }
+
+        @Override
+        public String value() {
             return CSW_SPEC_PROFILE_FEDERATED_SOURCE;
         }
     }
 
-    protected static final class DDFCswFederatedSource extends StringField {
+    public static final class DDFCswFederatedSource implements EnumValue<String>{
 
         public static final String DESCRIPTION = "DDF's full fidelity CSW Federation Profile. Use this when federating to a DDF based system.";
 
-        public DDFCswFederatedSource() {
-            super(CSW_FEDERATION_PROFILE_SOURCE, CSW_FEDERATION_PROFILE_SOURCE, DESCRIPTION);
+        public static final String CSW_FEDERATION_PROFILE_SOURCE = "DDFCswFederatedSource";
+
+        @Override
+        public String enumTitle() {
+            return CSW_FEDERATION_PROFILE_SOURCE;
         }
 
         @Override
-        public String getValue() {
+        public String description() {
+            return DESCRIPTION;
+        }
+
+        @Override
+        public String value() {
             return CSW_FEDERATION_PROFILE_SOURCE;
         }
     }
 
-    protected static final class GmdCswFederatedSource extends StringField {
+    public static final class GmdCswFederatedSource implements EnumValue<String>{
 
         public static final String DESCRIPTION = "CSW Federated Source using the Geographic MetaData (GMD) format (ISO 19115:2003).";
 
-        public GmdCswFederatedSource() {
-            super(GMD_CSW_ISO_FEDERATED_SOURCE, GMD_CSW_ISO_FEDERATED_SOURCE, DESCRIPTION);
+        public static final String GMD_CSW_ISO_FEDERATED_SOURCE = "GmdCswFederatedSource";
+
+        @Override
+        public String enumTitle() {
+            return GMD_CSW_ISO_FEDERATED_SOURCE;
         }
 
         @Override
-        public String getValue() {
+        public String description() {
+            return DESCRIPTION;
+        }
+
+        @Override
+        public String value() {
             return GMD_CSW_ISO_FEDERATED_SOURCE;
         }
     }

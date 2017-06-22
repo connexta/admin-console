@@ -28,7 +28,7 @@ class BaseEnumFieldTest extends Specification {
 
     def 'Validation success'() {
         setup:
-        enumField.setValue(TestEnumField.ENUM_A)
+        enumField.setValue(TestEnumField.EnumA.ENUM_A)
 
         when:
         def validationmsgs = enumField.validate()

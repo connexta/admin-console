@@ -13,9 +13,8 @@
  */
 package org.codice.ddf.admin.sources.fields;
 
-import org.codice.ddf.admin.api.DataType;
+import org.codice.ddf.admin.api.fields.EnumValue;
 import org.codice.ddf.admin.common.fields.base.BaseEnumField;
-import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 
 import com.google.common.collect.ImmutableList;
 
@@ -32,7 +31,7 @@ public class CswSpatialOperator extends BaseEnumField<String> {
         this(new NoFilter());
     }
 
-    public CswSpatialOperator(DataType<String> spatialOperator) {
+    public CswSpatialOperator(EnumValue<String> spatialOperator) {
         super(DEFAULT_FIELD_NAME,
                 TYPE_NAME,
                 DESCRIPTION,
@@ -51,209 +50,281 @@ public class CswSpatialOperator extends BaseEnumField<String> {
                 spatialOperator);
     }
 
-    protected static final class NoFilter extends StringField {
+    public static final class NoFilter implements EnumValue<String> {
+
+        public static final String ENUM_TITLE = "None";
 
         public static final String OPERATOR = "NO_FILTER";
-
-        public static final String NO_FILTER_FIELD_NAME = "None";
 
         public static final String DESCRIPTION =
                 "Indicates that no spatial operators should be applied.";
 
-        public NoFilter() {
-            super(NO_FILTER_FIELD_NAME, NO_FILTER_FIELD_NAME, DESCRIPTION);
+        @Override
+        public String enumTitle() {
+            return ENUM_TITLE;
         }
 
         @Override
-        public String getValue() {
+        public String description() {
+            return DESCRIPTION;
+        }
+
+        @Override
+        public String value() {
             return OPERATOR;
         }
     }
 
-    protected static final class Bbox extends StringField {
+    public static final class Bbox implements EnumValue<String> {
 
-        public static final String BBOX_FIELD_NAME = "BBOX";
+        public static final String BBOX = "BBOX";
 
         public static final String DESCRIPTION =
                 "Identifies all geometries that spatially interact with a bounding box.";
 
-        public Bbox() {
-            super(BBOX_FIELD_NAME, BBOX_FIELD_NAME, DESCRIPTION);
+        @Override
+        public String enumTitle() {
+            return BBOX;
         }
 
         @Override
-        public String getValue() {
-            return BBOX_FIELD_NAME;
+        public String description() {
+            return DESCRIPTION;
+        }
+
+        @Override
+        public String value() {
+            return BBOX;
         }
     }
 
-    protected static final class Beyond extends StringField {
+    public static final class Beyond implements EnumValue<String> {
 
-        public static final String BEYOND_FIELD_NAME = "Beyond";
+        public static final String BEYOND = "Beyond";
 
         public static final String DESCRIPTION =
                 "Tests whether the value of a geometric property A is beyond a specified distance d of the specified literal geometric value B.";
 
-        public Beyond() {
-            super(BEYOND_FIELD_NAME, BEYOND_FIELD_NAME, DESCRIPTION);
+        @Override
+        public String enumTitle() {
+            return BEYOND;
         }
 
         @Override
-        public String getValue() {
-            return BEYOND_FIELD_NAME;
+        public String description() {
+            return DESCRIPTION;
+        }
+
+        @Override
+        public String value() {
+            return BEYOND;
         }
     }
 
-    protected static final class Contains extends StringField {
+    public static final class Contains implements EnumValue<String> {
 
-        public static final String CONTAINS_FIELD_NAME = "Contains";
+        public static final String CONTAINS = "Contains";
 
         public static final String DESCRIPTION =
                 "Determines whether the second geometry is completely within the first geometry. Contain tests the exact opposite result of within.";
 
-        public Contains() {
-            super(CONTAINS_FIELD_NAME, CONTAINS_FIELD_NAME, DESCRIPTION);
+        @Override
+        public String enumTitle() {
+            return CONTAINS;
         }
 
         @Override
-        public String getValue() {
-            return CONTAINS_FIELD_NAME;
+        public String description() {
+            return DESCRIPTION;
+        }
+
+        @Override
+        public String value() {
+            return CONTAINS;
         }
     }
 
-    protected static final class Crosses extends StringField {
+    public static final class Crosses implements EnumValue<String> {
 
-        public static final String CROSSES_FIELD_NAME = "Crosses";
+        public static final String CROSSES = "Crosses";
 
         public static final String DESCRIPTION =
                 "Determines whether two geometric properties cross each other.";
 
-        public Crosses() {
-            super(CROSSES_FIELD_NAME, CROSSES_FIELD_NAME, DESCRIPTION);
+        @Override
+        public String enumTitle() {
+            return CROSSES;
         }
 
         @Override
-        public String getValue() {
-            return CROSSES_FIELD_NAME;
+        public String description() {
+            return DESCRIPTION;
+        }
+
+        @Override
+        public String value() {
+            return CROSSES;
         }
     }
 
-    protected static final class Disjoint extends StringField {
+    public static final class Disjoint implements EnumValue<String> {
 
-        public static final String DISJOINT_FIELD_NAME = "Disjoint";
+        public static final String DISJOINT = "Disjoint";
 
         public static final String DESCRIPTION =
                 "Determines whether two geometric properties do not intersect.";
 
-        public Disjoint() {
-            super(DISJOINT_FIELD_NAME, DISJOINT_FIELD_NAME, DESCRIPTION);
+        @Override
+        public String enumTitle() {
+            return DISJOINT;
         }
 
         @Override
-        public String getValue() {
-            return DISJOINT_FIELD_NAME;
+        public String description() {
+            return DESCRIPTION;
+        }
+
+        @Override
+        public String value() {
+            return DISJOINT;
         }
     }
 
-    protected static final class DWithin extends StringField {
+    public static final class DWithin implements EnumValue<String> {
 
-        public static final String DWITHIN_FIELD_NAME = "DWithin";
+        public static final String DWITHIN = "DWithin";
 
         public static final String DESCRIPTION =
                 "Determines whether the value of a geometric property A is within a specified distance d of the specified literal geometric value B.";
 
-        public DWithin() {
-            super(DWITHIN_FIELD_NAME, DWITHIN_FIELD_NAME, DESCRIPTION);
+        @Override
+        public String enumTitle() {
+            return DWITHIN;
         }
 
         @Override
-        public String getValue() {
-            return DWITHIN_FIELD_NAME;
+        public String description() {
+            return DESCRIPTION;
+        }
+
+        @Override
+        public String value() {
+            return DWITHIN;
         }
     }
 
-    protected static final class Equals extends StringField {
+    public static final class Equals implements EnumValue<String> {
 
-        public static final String EQUALS_FIELD_NAME = "Equals";
+        public static final String EQUALS = "Equals";
 
         public static final String DESCRIPTION =
                 "Determines whether two geometric properties are identical.";
 
-        public Equals() {
-            super(EQUALS_FIELD_NAME, EQUALS_FIELD_NAME, DESCRIPTION);
+        @Override
+        public String enumTitle() {
+            return EQUALS;
         }
 
         @Override
-        public String getValue() {
-            return EQUALS_FIELD_NAME;
+        public String description() {
+            return DESCRIPTION;
+        }
+
+        @Override
+        public String value() {
+            return EQUALS;
         }
     }
 
-    protected static final class Intersects extends StringField {
+    public static final class Intersects implements EnumValue<String> {
 
-        public static final String INTERSECTS_FIELD_NAME = "Intersects";
+        public static final String INTERSECTS = "Intersects";
 
         public static final String DESCRIPTION =
                 "Determines whether two geometric properties intersect with each other.";
 
-        public Intersects() {
-            super(INTERSECTS_FIELD_NAME, INTERSECTS_FIELD_NAME, DESCRIPTION);
+        @Override
+        public String enumTitle() {
+            return INTERSECTS;
         }
 
         @Override
-        public String getValue() {
-            return INTERSECTS_FIELD_NAME;
+        public String description() {
+            return DESCRIPTION;
+        }
+
+        @Override
+        public String value() {
+            return INTERSECTS;
         }
     }
 
-    protected static final class Overlaps extends StringField {
+    public static final class Overlaps implements EnumValue<String> {
 
-        public static final String OVERLAPS_FIELD_NAME = "Overlaps";
+        public static final String OVERLAPS = "Overlaps";
 
         public static final String DESCRIPTION =
                 "Determines whether two geometries of the same dimensions overlap. If their intersection produces a geometry different from both and of the same dimension, they overlap.";
 
-        public Overlaps() {
-            super(OVERLAPS_FIELD_NAME, OVERLAPS_FIELD_NAME, DESCRIPTION);
+        @Override
+        public String enumTitle() {
+            return OVERLAPS;
         }
 
         @Override
-        public String getValue() {
-            return OVERLAPS_FIELD_NAME;
+        public String description() {
+            return DESCRIPTION;
+        }
+
+        @Override
+        public String value() {
+            return OVERLAPS;
         }
     }
 
-    protected static final class Touches extends StringField {
+    public static final class Touches implements EnumValue<String> {
 
-        public static final String TOUCHES_FIELD_NAME = "Touches";
+        public static final String TOUCHES = "Touches";
 
         public static final String DESCRIPTION =
                 "Determines if the points of two geometric properties touch, but do not intersect the interiors of each geometry.";
 
-        public Touches() {
-            super(TOUCHES_FIELD_NAME, TOUCHES_FIELD_NAME, DESCRIPTION);
+        @Override
+        public String enumTitle() {
+            return TOUCHES;
         }
 
         @Override
-        public String getValue() {
-            return TOUCHES_FIELD_NAME;
+        public String description() {
+            return DESCRIPTION;
+        }
+
+        @Override
+        public String value() {
+            return TOUCHES;
         }
     }
 
-    protected static final class Within extends StringField {
+    public static final class Within implements EnumValue<String> {
 
-        public static final String WITHIN_FIELD_NAME = "Within";
+        public static final String WITHIN = "Within";
 
         public static final String DESCRIPTION =
                 "Determines whether the first geometry is completely within the second geometry. Within tests the exact opposite result of contains.";
 
-        public Within() {
-            super(WITHIN_FIELD_NAME, WITHIN_FIELD_NAME, DESCRIPTION);
+        @Override
+        public String enumTitle() {
+            return WITHIN;
         }
 
         @Override
-        public String getValue() {
-            return WITHIN_FIELD_NAME;
+        public String description() {
+            return DESCRIPTION;
+        }
+
+        @Override
+        public String value() {
+            return WITHIN;
         }
     }
 }

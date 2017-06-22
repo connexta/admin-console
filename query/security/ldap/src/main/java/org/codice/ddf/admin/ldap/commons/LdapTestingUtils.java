@@ -16,10 +16,10 @@ package org.codice.ddf.admin.ldap.commons;
 import static org.codice.ddf.admin.common.report.message.DefaultMessages.cannotConnectError;
 import static org.codice.ddf.admin.common.report.message.DefaultMessages.failedTestSetup;
 import static org.codice.ddf.admin.ldap.commons.LdapMessages.dnDoesNotExistError;
-import static org.codice.ddf.admin.ldap.fields.connection.LdapBindMethod.DIGEST_MD5_SASL;
-import static org.codice.ddf.admin.ldap.fields.connection.LdapBindMethod.SIMPLE;
-import static org.codice.ddf.admin.ldap.fields.connection.LdapEncryptionMethodField.LDAPS;
-import static org.codice.ddf.admin.ldap.fields.connection.LdapEncryptionMethodField.START_TLS;
+import static org.codice.ddf.admin.ldap.fields.connection.LdapBindMethod.DigestMd5Sasl.DIGEST_MD5_SASL;
+import static org.codice.ddf.admin.ldap.fields.connection.LdapBindMethod.Simple.SIMPLE;
+import static org.codice.ddf.admin.ldap.fields.connection.LdapEncryptionMethodField.LdapsEncryption.LDAPS;
+import static org.codice.ddf.admin.ldap.fields.connection.LdapEncryptionMethodField.StartTlsEncryption.START_TLS;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;

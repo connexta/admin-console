@@ -45,7 +45,7 @@ public class TestObjectField extends BaseObjectField {
             "entry2",
             "entry3");
 
-    public static final String SAMPLE_ENUM = TestEnumField.ENUM_A;
+    public static final String SAMPLE_ENUM = TestEnumField.EnumA.ENUM_A;
 
     public static final String SUB_FIELD_OF_INNER_FIELD_NAME = "testSubField";
 

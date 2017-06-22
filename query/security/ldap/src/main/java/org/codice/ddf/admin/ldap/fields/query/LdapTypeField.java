@@ -13,9 +13,8 @@
  **/
 package org.codice.ddf.admin.ldap.fields.query;
 
-import org.codice.ddf.admin.api.DataType;
+import org.codice.ddf.admin.api.fields.EnumValue;
 import org.codice.ddf.admin.common.fields.base.BaseEnumField;
-import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 
 import com.google.common.collect.ImmutableList;
 
@@ -26,21 +25,11 @@ public class LdapTypeField extends BaseEnumField<String> {
 
     public static final String DESCRIPTION = "The type of LDAP being connected to.";
 
-    public static final String UNKNOWN = "unknown";
-
-    public static final String ACTIVE_DIRECTORY = "activeDirectory";
-
-    public static final String OPEN_LDAP = "openLdap";
-
-    public static final String OPEN_DJ = "openDj";
-
-    public static final String EMBEDDED = "embeddedLdap";
-
     public LdapTypeField() {
         this(null);
     }
 
-    private LdapTypeField(DataType<String> ldapType) {
+    private LdapTypeField(EnumValue<String> ldapType) {
         super(DEFAULT_FIELD_NAME,
                 FIELD_TYPE_NAME,
                 DESCRIPTION,
@@ -52,72 +41,112 @@ public class LdapTypeField extends BaseEnumField<String> {
                 ldapType);
     }
 
-    protected static final class Unknown extends StringField {
+    public static final class Unknown implements EnumValue<String> {
         public static final String DESCRIPTION =
                 "Use if the type of LDAP is unknown/is not listed in this enum set.";
 
-        Unknown() {
-            super(UNKNOWN, UNKNOWN, DESCRIPTION);
+        public static final String UNKNOWN = "unknown";
+
+        @Override
+        public String enumTitle() {
+            return UNKNOWN;
         }
 
         @Override
-        public String getValue() {
+        public String description() {
+            return DESCRIPTION;
+        }
+
+        @Override
+        public String value() {
             return UNKNOWN;
         }
     }
 
-    protected static final class ActiveDirectory extends StringField {
+    public static final class ActiveDirectory implements EnumValue<String>{
         public static final String DESCRIPTION =
                 "Active Directory (AD) is a directory service that Microsoft developed for Windows domain networks.";
 
-        ActiveDirectory() {
-            super(ACTIVE_DIRECTORY, ACTIVE_DIRECTORY, DESCRIPTION);
+        public static final String ACTIVE_DIRECTORY = "activeDirectory";
+
+        @Override
+        public String enumTitle() {
+            return ACTIVE_DIRECTORY;
         }
 
         @Override
-        public String getValue() {
+        public String description() {
+            return DESCRIPTION;
+        }
+
+        @Override
+        public String value() {
             return ACTIVE_DIRECTORY;
         }
     }
 
-    protected static final class OpenLdap extends StringField {
+    public static final class OpenLdap implements EnumValue<String>{
         public static final String DESCRIPTION =
                 "OpenLDAP is a free, open source implementation of the Lightweight Directory Access Protocol (LDAP) developed by the OpenLDAP Project.";
 
-        OpenLdap() {
-            super(OPEN_LDAP, OPEN_LDAP, DESCRIPTION);
+        public static final String OPEN_LDAP = "openLdap";
+
+        @Override
+        public String enumTitle() {
+            return OPEN_LDAP;
         }
 
         @Override
-        public String getValue() {
+        public String description() {
+            return DESCRIPTION;
+        }
+
+        @Override
+        public String value() {
             return OPEN_LDAP;
         }
     }
 
-    protected static final class OpenDJ extends StringField {
+    public static final class OpenDJ implements EnumValue<String>{
         public static final String DESCRIPTION =
                 "OpenDJ is a directory server which implements a wide range of Lightweight Directory Access Protocol and related standards, including full compliance with LDAPv3 but also support for Directory Service Markup Language (DSMLv2).";
 
-        OpenDJ() {
-            super(OPEN_DJ, OPEN_DJ, DESCRIPTION);
+        public static final String OPEN_DJ = "openDj";
+
+        @Override
+        public String enumTitle() {
+            return OPEN_DJ;
         }
 
         @Override
-        public String getValue() {
+        public String description() {
+            return DESCRIPTION;
+        }
+
+        @Override
+        public String value() {
             return OPEN_DJ;
         }
     }
 
-    protected static final class EmbeddedLdap extends StringField {
+    public static final class EmbeddedLdap implements EnumValue<String>{
         public static final String DESCRIPTION =
                 "The Embedded LDAP application is an internal LDAP server that has a default set of schemas and users loaded to help facilitate authentication and authorization testing.";
 
-        EmbeddedLdap() {
-            super(EMBEDDED, EMBEDDED, DESCRIPTION);
+        public static final String EMBEDDED = "embeddedLdap";
+
+        @Override
+        public String enumTitle() {
+            return EMBEDDED;
         }
 
         @Override
-        public String getValue() {
+        public String description() {
+            return DESCRIPTION;
+        }
+
+        @Override
+        public String value() {
             return EMBEDDED;
         }
     }

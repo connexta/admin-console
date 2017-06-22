@@ -38,11 +38,11 @@ public class LdapTestingCommons {
     public static LdapConnectionField noEncryptionLdapConnectionInfo() {
         return new LdapConnectionField().hostname(TestLdapServer.getHostname())
                 .port(TestLdapServer.getLdapPort())
-                .encryptionMethod(LdapEncryptionMethodField.NONE);
+                .encryptionMethod(LdapEncryptionMethodField.NoEncryption.NONE);
     }
 
     public static LdapBindUserInfo simpleBindInfo() {
-        return new LdapBindUserInfo().bindMethod(LdapBindMethod.SIMPLE)
+        return new LdapBindUserInfo().bindMethod(LdapBindMethod.Simple.SIMPLE)
                 .username(TestLdapServer.getBasicAuthDn())
                 .password(TestLdapServer.getBasicAuthPassword());
     }

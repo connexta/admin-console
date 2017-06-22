@@ -41,9 +41,9 @@ class GetWfsConfigsTest extends Specification {
 
     private ServiceReader serviceReader
 
-    static TEST_WFS_VERSION_1 = WfsVersion.WFS_VERSION_1
+    static TEST_WFS_VERSION_1 = WfsVersion.Wfs1.WFS_VERSION_1
 
-    static TEST_WFS_VERSION_2 = WfsVersion.WFS_VERSION_2
+    static TEST_WFS_VERSION_2 = WfsVersion.Wfs2.WFS_VERSION_2
 
     static TEST_FACTORY_PID_1 = WfsServiceProperties.WFS1_FACTORY_PID
 

@@ -233,10 +233,10 @@ class LdapQuerySpec extends Specification {
         return new LdapConnectionField()
                 .hostname(server.getHostname())
                 .port(server.getLdapSecurePort())
-                .encryptionMethod(LdapEncryptionMethodField.LDAPS)
+                .encryptionMethod(LdapEncryptionMethodField.LdapsEncryption.LDAPS)
     }
 
     LdapBindUserInfo digestBindInfo() {
-        return new LdapBindUserInfo().bindMethod(LdapBindMethod.DIGEST_MD5_SASL).username(server.getBasicAuthDn()).password(server.getBasicAuthPassword()).realm("testRealm")
+        return new LdapBindUserInfo().bindMethod(LdapBindMethod.DigestMd5Sasl.DIGEST_MD5_SASL).username(server.getBasicAuthDn()).password(server.getBasicAuthPassword()).realm("testRealm")
     }
 }

@@ -15,10 +15,9 @@ package org.codice.ddf.admin.security.common.fields.wcpm;
 
 import java.util.concurrent.Callable;
 
-import org.codice.ddf.admin.api.DataType;
+import org.codice.ddf.admin.api.fields.EnumValue;
 import org.codice.ddf.admin.common.fields.base.BaseEnumField;
 import org.codice.ddf.admin.common.fields.base.BaseListField;
-import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 
 import com.google.common.collect.ImmutableList;
 
@@ -39,7 +38,7 @@ public class Realm extends BaseEnumField<String> {
         this(null);
     }
 
-    protected Realm(DataType<String> realm) {
+    protected Realm(EnumValue<String> realm) {
         super(DEFAULT_FIELD_NAME,
                 FIELD_TYPE_NAME,
                 DESCRIPTION,
@@ -53,41 +52,53 @@ public class Realm extends BaseEnumField<String> {
         return this;
     }
 
-    protected static final class LdapRealm extends StringField {
+    public static final class LdapRealm implements EnumValue<String> {
         public static final String LDAP = "ldap";
 
         public static final String DESCRIPTION =
                 "An LDAP used for authentication of users within it's database.";
 
-        public LdapRealm() {
-            super(LDAP, LDAP, DESCRIPTION);
+        @Override
+        public String enumTitle() {
+            return LDAP;
         }
 
         @Override
-        public String getValue() {
+        public String description() {
+            return DESCRIPTION;
+        }
+
+        @Override
+        public String value() {
             return LDAP;
         }
     }
 
-    protected static final class KarafRealm extends StringField {
+    public static final class KarafRealm implements EnumValue<String> {
         public static final String KARAF = "karaf";
 
         public static final String DESCRIPTION =
                 "The default realm. The karaf realm authenticates against the users.properties file.";
 
-        public KarafRealm() {
-            super(KARAF, KARAF, DESCRIPTION);
+        @Override
+        public String enumTitle() {
+            return KARAF;
         }
 
         @Override
-        public String getValue() {
+        public String description() {
+            return DESCRIPTION;
+        }
+
+        @Override
+        public String value() {
             return KARAF;
         }
     }
 
     public static class Realms extends BaseListField<Realm> {
 
-        public static final String DEFAULT_FIELD_NAME = "realm";
+        public static final String DEFAULT_FIELD_NAME = "realms";
 
         public Realms() {
             super(DEFAULT_FIELD_NAME);

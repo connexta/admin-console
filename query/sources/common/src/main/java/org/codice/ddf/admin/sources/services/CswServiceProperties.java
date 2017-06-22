@@ -18,9 +18,9 @@ import static org.codice.ddf.admin.common.services.ServiceCommons.FACTORY_PID_KE
 import static org.codice.ddf.admin.common.services.ServiceCommons.FLAG_PASSWORD;
 import static org.codice.ddf.admin.common.services.ServiceCommons.SERVICE_PID_KEY;
 import static org.codice.ddf.admin.common.services.ServiceCommons.mapValue;
-import static org.codice.ddf.admin.sources.fields.CswProfile.CSW_FEDERATION_PROFILE_SOURCE;
-import static org.codice.ddf.admin.sources.fields.CswProfile.CSW_SPEC_PROFILE_FEDERATED_SOURCE;
-import static org.codice.ddf.admin.sources.fields.CswProfile.GMD_CSW_ISO_FEDERATED_SOURCE;
+import static org.codice.ddf.admin.sources.fields.CswProfile.CswFederatedSource.CSW_SPEC_PROFILE_FEDERATED_SOURCE;
+import static org.codice.ddf.admin.sources.fields.CswProfile.DDFCswFederatedSource.CSW_FEDERATION_PROFILE_SOURCE;
+import static org.codice.ddf.admin.sources.fields.CswProfile.GmdCswFederatedSource.GMD_CSW_ISO_FEDERATED_SOURCE;
 
 import java.util.List;
 import java.util.Map;

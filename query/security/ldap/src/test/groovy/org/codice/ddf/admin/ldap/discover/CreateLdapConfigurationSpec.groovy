@@ -94,7 +94,7 @@ class CreateLdapConfigurationSpec extends Specification {
         setup:
         createConfigFunc = new CreateLdapConfiguration(null, null, null, null)
 
-        def configArg = new LdapConfigurationField().settings(new LdapDirectorySettingsField().useCase(LdapUseCase.ATTRIBUTE_STORE))
+        def configArg = new LdapConfigurationField().settings(new LdapDirectorySettingsField().useCase(LdapUseCase.AttributeStore.ATTRIBUTE_STORE))
         def args = [
                 (LdapConfigurationField.DEFAULT_FIELD_NAME): configArg.getValue()
         ]

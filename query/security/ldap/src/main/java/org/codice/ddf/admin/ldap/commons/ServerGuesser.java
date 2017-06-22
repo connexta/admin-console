@@ -63,15 +63,15 @@ public abstract class ServerGuesser {
 
     @SuppressWarnings("StaticInitializerReferencesSubClass")
     private static final Map<String, Function<Connection, ServerGuesser>> GUESSER_LOOKUP =
-            ImmutableMap.of(LdapTypeField.ACTIVE_DIRECTORY,
+            ImmutableMap.of(LdapTypeField.ActiveDirectory.ACTIVE_DIRECTORY,
                     ServerGuesser.ADGuesser::new,
-                    LdapTypeField.EMBEDDED,
+                    LdapTypeField.EmbeddedLdap.EMBEDDED,
                     ServerGuesser.EmbeddedGuesser::new,
-                    LdapTypeField.OPEN_LDAP,
+                    LdapTypeField.OpenLdap.OPEN_LDAP,
                     ServerGuesser.OpenLdapGuesser::new,
-                    LdapTypeField.OPEN_DJ,
+                    LdapTypeField.OpenDJ.OPEN_DJ,
                     ServerGuesser.OpenDjGuesser::new,
-                    LdapTypeField.UNKNOWN, DefaultGuesser::new);
+                    LdapTypeField.Unknown.UNKNOWN, DefaultGuesser::new);
 
     protected final Connection connection;
 

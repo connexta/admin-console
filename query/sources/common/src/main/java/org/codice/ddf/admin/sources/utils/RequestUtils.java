@@ -60,19 +60,20 @@ public class RequestUtils {
      */
     public ReportWithResultImpl<ResponseField> discoverUrlFromHost(HostField hostField,
             List<String> urlFormats, CredentialsField creds, Map<String, String> queryParams) {
-        ReportWithResultImpl<ResponseField> responseReport = new ReportWithResultImpl<>();
         for (String formatUrl : urlFormats) {
             UrlField clientUrl = new UrlField();
             clientUrl.setValue(String.format(formatUrl, hostField.hostname(), hostField.port()));
 
-            responseReport = sendGetRequest(clientUrl, creds, queryParams);
+            ReportWithResultImpl<ResponseField> responseReport = sendGetRequest(clientUrl,
+                    creds,
+                    queryParams);
             if (!responseReport.containsErrorMsgs()) {
                 return responseReport;
             }
         }
 
-        responseReport.addResultMessage(cannotConnectError());
-        return responseReport;
+        return new ReportWithResultImpl<ResponseField>().addArgumentMessage(cannotConnectError(
+                hostField.path()));
     }
 
     /**

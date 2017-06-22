@@ -14,6 +14,7 @@
 package org.codice.ddf.admin.sources.wfs;
 
 import static java.net.HttpURLConnection.HTTP_OK;
+import static org.codice.ddf.admin.common.report.message.DefaultMessages.cannotConnectError;
 import static org.codice.ddf.admin.common.report.message.DefaultMessages.unknownEndpointError;
 import static org.codice.ddf.admin.common.services.ServiceCommons.FLAG_PASSWORD;
 import static org.codice.ddf.admin.sources.utils.SourceUtilCommons.SOURCES_NAMESPACE_CONTEXT;
@@ -83,10 +84,14 @@ public class WfsSourceUtils {
      */
     public ReportWithResultImpl<ResponseField> discoverWfsUrl(HostField hostField,
             CredentialsField creds) {
-        return requestUtils.discoverUrlFromHost(hostField,
+        ReportWithResultImpl<ResponseField> responseResult = requestUtils.discoverUrlFromHost(hostField,
                 URL_FORMATS,
                 creds,
                 GET_CAPABILITIES_PARAMS);
+        if(responseResult.containsErrorMsgs()) {
+            return new ReportWithResultImpl<ResponseField>().addArgumentMessage(cannotConnectError(hostField.path()));
+        }
+        return responseResult;
     }
 
     public ReportWithResultImpl<ResponseField> sendRequest(UrlField urlField,

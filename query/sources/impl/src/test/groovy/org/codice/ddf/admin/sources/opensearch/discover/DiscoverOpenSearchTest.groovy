@@ -14,19 +14,24 @@
 package org.codice.ddf.admin.sources.opensearch.discover
 
 import org.codice.ddf.admin.api.fields.FunctionField
-import org.codice.ddf.admin.common.fields.common.ResponseField
-import org.codice.ddf.admin.common.report.ReportWithResultImpl
+import org.codice.ddf.admin.common.fields.common.HostField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
-import org.codice.ddf.admin.common.report.message.ErrorMessageImpl
 import org.codice.ddf.admin.sources.fields.type.OpenSearchSourceConfigurationField
 import org.codice.ddf.admin.sources.opensearch.OpenSearchSourceUtils
 import org.codice.ddf.admin.sources.utils.RequestUtils
 import org.codice.ddf.admin.sources.utils.SourceUtilCommons
+import spock.lang.Shared
 import spock.lang.Specification
 
 import static org.codice.ddf.admin.sources.SourceTestCommons.*
 
 class DiscoverOpenSearchTest extends Specification {
+
+    @Shared
+    osResponseBody = this.getClass().getClassLoader().getResource('responses/opensearch/openSearchQueryResponse.xml').text
+
+    @Shared
+    badResponseBody = this.getClass().getClassLoader().getResource('responses/badResponse.xml').text
 
     DiscoverOpenSearchSource discoverOpenSearch
 
@@ -35,8 +40,6 @@ class DiscoverOpenSearchTest extends Specification {
     RequestUtils requestUtils
 
     static TEST_OPEN_SEARCH_URL = 'https://localhost:8993/services/catalog/query'
-
-    static OPEN_SEARCH_CAPABILITIES_FILE_PATH = 'responses/opensearch/openSearchQueryResponse.xml'
 
     static BASE_PATH = [DiscoverOpenSearchSource.FIELD_NAME, FunctionField.ARGUMENT]
 
@@ -59,7 +62,8 @@ class DiscoverOpenSearchTest extends Specification {
         def config = (OpenSearchSourceConfigurationField) report.result()
 
         then:
-        1 * requestUtils.sendGetRequest(_, _, _) >> createResponseFieldResult(false, OPEN_SEARCH_CAPABILITIES_FILE_PATH, 200, TEST_OPEN_SEARCH_URL)
+
+        1 * requestUtils.sendGetRequest(_, _, _) >> createResponseFieldResult(false, osResponseBody, 200, TEST_OPEN_SEARCH_URL)
         config.endpointUrl() == TEST_OPEN_SEARCH_URL
     }
 
@@ -72,7 +76,7 @@ class DiscoverOpenSearchTest extends Specification {
         def config = (OpenSearchSourceConfigurationField) report.result()
 
         then:
-        1 * requestUtils.discoverUrlFromHost(_, _, _, _) >> createResponseFieldResult(false, OPEN_SEARCH_CAPABILITIES_FILE_PATH, 200, TEST_OPEN_SEARCH_URL)
+        1 * requestUtils.discoverUrlFromHost(_, _, _, _) >> createResponseFieldResult(false, osResponseBody, 200, TEST_OPEN_SEARCH_URL)
         config.endpointUrl() == TEST_OPEN_SEARCH_URL
     }
 
@@ -84,7 +88,7 @@ class DiscoverOpenSearchTest extends Specification {
         def report = discoverOpenSearch.getValue()
 
         then:
-        1 * requestUtils.sendGetRequest(_, _, _) >> createResponseFieldResult(false, 'responses/badResponse.xml', 200, TEST_OPEN_SEARCH_URL)
+        1 * requestUtils.sendGetRequest(_, _, _) >> createResponseFieldResult(false, badResponseBody, 200, TEST_OPEN_SEARCH_URL)
         report.messages().size() == 1
         report.messages()[0].getCode() == DefaultMessages.UNKNOWN_ENDPOINT
         report.messages()[0].getPath() == [DiscoverOpenSearchSource.FIELD_NAME]
@@ -98,10 +102,24 @@ class DiscoverOpenSearchTest extends Specification {
         def report = discoverOpenSearch.getValue()
 
         then:
-        1 * requestUtils.sendGetRequest(_, _, _) >> createResponseFieldResult(false, OPEN_SEARCH_CAPABILITIES_FILE_PATH, 500, TEST_OPEN_SEARCH_URL)
+        1 * requestUtils.sendGetRequest(_, _, _) >> createResponseFieldResult(false, osResponseBody, 500, TEST_OPEN_SEARCH_URL)
         report.messages().size() == 1
         report.messages()[0].getCode() == DefaultMessages.UNKNOWN_ENDPOINT
         report.messages()[0].getPath() == [DiscoverOpenSearchSource.FIELD_NAME]
+    }
+
+    def 'Cannot connect if errors from discover url from host'() {
+        setup:
+        discoverOpenSearch.setValue(getBaseDiscoverByAddressArgs())
+
+        when:
+        def report = discoverOpenSearch.getValue()
+
+        then:
+        1 * requestUtils.discoverUrlFromHost(_, _, _, _) >> createResponseFieldResult(true, "", 0, "")
+        report.messages().size() == 1
+        report.messages()[0].getCode() == DefaultMessages.CANNOT_CONNECT
+        report.messages()[0].getPath() == [ADDRESS_FIELD_PATH, HostField.DEFAULT_FIELD_NAME].flatten()
     }
 
     def 'Fail when missing required fields'() {
@@ -115,20 +133,5 @@ class DiscoverOpenSearchTest extends Specification {
             it.getCode() == DefaultMessages.MISSING_REQUIRED_FIELD
         } == 1
         report.messages()*.getPath() == [URL_FIELD_PATH]
-    }
-
-    def createResponseFieldResult(boolean hasError, String filePath, int code, String requestUrl) {
-        def result = new ReportWithResultImpl<ResponseField>()
-        if (hasError) {
-            result.addArgumentMessage(new ErrorMessageImpl("code", []))
-        } else {
-            ResponseField responseField = new ResponseField()
-            responseField.responseBody(this.getClass().getClassLoader().getResource(filePath).text)
-            responseField.statusCode(code)
-            responseField.requestUrl(requestUrl)
-            result.result(responseField)
-        }
-
-        return result
     }
 }

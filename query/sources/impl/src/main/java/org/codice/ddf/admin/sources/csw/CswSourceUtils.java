@@ -14,6 +14,7 @@
 package org.codice.ddf.admin.sources.csw;
 
 import static java.net.HttpURLConnection.HTTP_OK;
+import static org.codice.ddf.admin.common.report.message.DefaultMessages.cannotConnectError;
 import static org.codice.ddf.admin.common.report.message.DefaultMessages.unknownEndpointError;
 import static org.codice.ddf.admin.common.services.ServiceCommons.FLAG_PASSWORD;
 import static org.codice.ddf.admin.sources.fields.CswProfile.CSW_FEDERATION_PROFILE_SOURCE;
@@ -96,10 +97,14 @@ public class CswSourceUtils {
      */
     public ReportWithResult<ResponseField> discoverCswUrl(HostField hostField,
             CredentialsField creds) {
-        return requestUtils.discoverUrlFromHost(hostField,
+        ReportWithResultImpl<ResponseField> responseResult = requestUtils.discoverUrlFromHost(hostField,
                 URL_FORMATS,
                 creds,
                 GET_CAPABILITIES_PARAMS);
+        if(responseResult.containsErrorMsgs()) {
+            return new ReportWithResultImpl<ResponseField>().addArgumentMessage(cannotConnectError(hostField.path()));
+        }
+        return responseResult;
     }
 
     public ReportWithResultImpl<ResponseField> sendRequest(UrlField urlField,

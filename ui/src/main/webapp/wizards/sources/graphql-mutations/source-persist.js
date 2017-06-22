@@ -3,17 +3,17 @@ import { gql } from 'react-apollo'
 const saveSourceMutations = {
   CSW: gql`
     mutation SaveCswSource($config: CswSourceConfiguration!){
-      saveCswSource(sourceConfig : $config)
+      saveCswSource(source : $config)
     }
   `,
   WFS: gql`
     mutation SaveWfsSource($config: WfsSourceConfiguration!){
-      saveWfsSource(sourceConfig : $config)
+      saveWfsSource(source : $config)
     }
   `,
   OpenSearch: gql`
     mutation SaveOpenSearchSource($config: OpenSearchConfiguration!){
-      saveOpenSearchSource(sourceConfig : $config)
+      saveOpenSearchSource(source : $config)
     }
   `
 }

@@ -50,10 +50,7 @@ export const queryFragments = {
           creds : $creds
         )
         {
-          isAvailable
-          sourceConfig {
-            ...openSearchConfigurationPayload
-          }
+          ...openSearchConfigurationPayload
         }
       }
     }
@@ -67,10 +64,7 @@ export const queryFragments = {
           creds : $creds
         )
         {
-          isAvailable
-          sourceConfig {
-            ...wfsConfigurationPayload
-          }
+          ...wfsConfigurationPayload
         }
       }
     }
@@ -84,10 +78,7 @@ export const queryFragments = {
           creds : $creds
         )
         {
-          isAvailable
-          sourceConfig {
-            ...cswSourceConfigurationPayload
-          }
+          ...cswSourceConfigurationPayload
         }
       }
     }
@@ -201,9 +192,9 @@ export const queryAllSources = (props) => {
 
   startSubmitting()
   return Promise.all([
-    dispatchQuery('CSW', (data) => (data.csw.discoverCsw.sourceConfig)),
-    dispatchQuery('WFS', (data) => (data.wfs.discoverWfs.sourceConfig)),
-    dispatchQuery('OpenSearch', (data) => (data.openSearch.discoverOpenSearch.sourceConfig))
+    dispatchQuery('CSW', (data) => (data.csw.discoverCsw)),
+    dispatchQuery('WFS', (data) => (data.wfs.discoverWfs)),
+    dispatchQuery('OpenSearch', (data) => (data.openSearch.discoverOpenSearch))
   ]).then((responses) => new Promise((resolve, reject) => {
     endSubmitting()
 

@@ -13,9 +13,8 @@
  **/
 package org.codice.ddf.admin.ldap.fields.connection;
 
-import org.codice.ddf.admin.api.DataType;
+import org.codice.ddf.admin.api.fields.EnumValue;
 import org.codice.ddf.admin.common.fields.base.BaseEnumField;
-import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 
 import com.google.common.collect.ImmutableList;
 
@@ -28,17 +27,11 @@ public class LdapEncryptionMethodField extends BaseEnumField<String> {
     public static final String DESCRIPTION =
             "All possible encryption methods supported to establish an LDAP connection.";
 
-    public static final String NONE = "none";
-
-    public static final String LDAPS = "ldaps";
-
-    public static final String START_TLS = "startTls";
-
     public LdapEncryptionMethodField() {
         this(null);
     }
 
-    protected LdapEncryptionMethodField(DataType<String> encryptionMethod) {
+    protected LdapEncryptionMethodField(EnumValue<String> encryptionMethod) {
         super(DEFAULT_FIELD_NAME,
                 FIELD_TYPE_NAME,
                 DESCRIPTION,
@@ -48,43 +41,67 @@ public class LdapEncryptionMethodField extends BaseEnumField<String> {
                 encryptionMethod);
     }
 
-    protected static final class NoEncryption extends StringField {
+    public static final class NoEncryption implements EnumValue<String> {
         public static final String DESCRIPTION = "No encryption enabled for LDAP connection";
 
-        NoEncryption() {
-            super(NONE, NONE, DESCRIPTION);
+        public static final String NONE = "none";
+
+        @Override
+        public String enumTitle() {
+            return NONE;
         }
 
         @Override
-        public String getValue() {
+        public String description() {
+            return DESCRIPTION;
+        }
+
+        @Override
+        public String value() {
             return NONE;
         }
     }
 
-    protected static final class LdapsEncryption extends StringField {
+    public static final class LdapsEncryption implements EnumValue<String> {
 
         public static final String DESCRIPTION = "Secure LDAPS encryption.";
 
-        LdapsEncryption() {
-            super(LDAPS, LDAPS, DESCRIPTION);
+        public static final String LDAPS = "ldaps";
+
+        @Override
+        public String enumTitle() {
+            return LDAPS;
         }
 
         @Override
-        public String getValue() {
+        public String description() {
+            return DESCRIPTION;
+        }
+
+        @Override
+        public String value() {
             return LDAPS;
         }
     }
 
-    protected static final class StartTlsEncryption extends StringField {
+    public static final class StartTlsEncryption implements EnumValue<String> {
         public static final String DESCRIPTION =
                 "Attempts to upgrade a non encrypted connection to LDAPS.";
 
-        StartTlsEncryption() {
-            super(START_TLS, START_TLS, DESCRIPTION);
+        public static final String START_TLS = "startTls";
+
+        @Override
+        public String enumTitle() {
+            return START_TLS;
         }
 
         @Override
-        public String getValue() {
+        public String description() {
+            return DESCRIPTION;
+        }
+
+        @Override
+        public String value() {
             return START_TLS;
         }
     }

@@ -232,7 +232,7 @@ public class TestFieldProvider extends BaseFieldProvider {
 
     public static class GetEnum extends GetFunctionField<TestEnumField> {
 
-        public static final String GET_ENUM_VALUE = TestEnumField.ENUM_A;
+        public static final String GET_ENUM_VALUE = TestEnumField.EnumA.ENUM_A;
 
         public GetEnum() {
             super(GET_ENUM_FUNCTION_NAME, "Returns a sample enumerated value.");

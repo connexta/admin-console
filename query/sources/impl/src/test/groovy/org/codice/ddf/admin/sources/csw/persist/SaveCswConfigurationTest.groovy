@@ -36,7 +36,7 @@ class SaveCswConfigurationTest extends Specification {
 
     static TEST_OUTPUT_SCHEMA = 'testOutputSchema'
 
-    static TEST_CSW_PROFILE = CswProfile.CSW_FEDERATION_PROFILE_SOURCE
+    static TEST_CSW_PROFILE = CswProfile.DDFCswFederatedSource.CSW_FEDERATION_PROFILE_SOURCE
 
     static CSW_PROFILE = CswProfile.DEFAULT_FIELD_NAME
 

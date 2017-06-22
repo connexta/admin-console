@@ -34,7 +34,7 @@ class GraphQLTransformationTest extends Specification {
 
     static LIST_ARG_VALUE = TestObjectField.SAMPLE_LIST_VALUE
 
-    static ENUM_ARG_VALUE = TestEnumField.ENUM_A
+    static ENUM_ARG_VALUE = TestEnumField.EnumA.ENUM_A
 
     static INNER_OBJECT_ARG_VALUE = [(TestObjectField.SUB_FIELD_OF_INNER_FIELD_NAME) : TestObjectField.InnerTestObjectField.TEST_VALUE]
 

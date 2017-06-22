@@ -13,9 +13,8 @@
  **/
 package org.codice.ddf.admin.ldap.fields.connection;
 
-import org.codice.ddf.admin.api.DataType;
+import org.codice.ddf.admin.api.fields.EnumValue;
 import org.codice.ddf.admin.common.fields.base.BaseEnumField;
-import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 
 import com.google.common.collect.ImmutableList;
 
@@ -26,15 +25,11 @@ public class LdapBindMethod extends BaseEnumField<String> {
 
     public static final String DESCRIPTION = "The method of binding a user to the LDAP connection.";
 
-    public static final String SIMPLE = "Simple";
-
-    public static final String DIGEST_MD5_SASL = "DigestMD5SASL";
-
     LdapBindMethod() {
         this(null);
     }
 
-    private LdapBindMethod(DataType<String> bindMethod) {
+    private LdapBindMethod(EnumValue<String> bindMethod) {
         super(DEFAULT_FIELD_NAME,
                 FIELD_TYPE_NAME,
                 DESCRIPTION,
@@ -42,38 +37,46 @@ public class LdapBindMethod extends BaseEnumField<String> {
                 bindMethod);
     }
 
-    protected static final class Simple extends StringField {
-        public static final String FIELD_NAME = SIMPLE;
+    public static final class Simple implements EnumValue<String> {
+        public static final String SIMPLE = "Simple";
 
         public static final String DESCRIPTION =
                 "Authenticates a client to a server, using a plaintext password";
 
-        static final String FIELD_TYPE = SIMPLE;
-
-        Simple() {
-            super(FIELD_NAME, FIELD_TYPE, DESCRIPTION);
+        @Override
+        public String enumTitle() {
+            return SIMPLE;
         }
 
         @Override
-        public String getValue() {
+        public String description() {
+            return DESCRIPTION;
+        }
+
+        @Override
+        public String value() {
             return SIMPLE;
         }
     }
 
-    protected static final class DigestMd5Sasl extends StringField {
-        public static final String FIELD_NAME = DIGEST_MD5_SASL;
+    public static final class DigestMd5Sasl implements EnumValue<String> {
+        public static final String DIGEST_MD5_SASL = "DigestMD5SASL";
 
         public static final String DESCRIPTION =
                 "Allows for password-based authentication without exposing the password in the clear (although it does require that both the client and the server have access to the clear-text password).";
 
-        static final String FIELD_TYPE = DIGEST_MD5_SASL;
-
-        DigestMd5Sasl() {
-            super(FIELD_NAME, FIELD_TYPE, DESCRIPTION);
+        @Override
+        public String enumTitle() {
+            return DIGEST_MD5_SASL;
         }
 
         @Override
-        public String getValue() {
+        public String description() {
+            return DESCRIPTION;
+        }
+
+        @Override
+        public String value() {
             return DIGEST_MD5_SASL;
         }
     }

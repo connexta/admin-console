@@ -47,7 +47,7 @@ class SaveWfsConfigurationTest extends Specification {
 
     static WFS_VERSION_PATH = [CONFIG_PATH, WFS_VERSION].flatten()
 
-    static TEST_WFS_VERSION = WfsVersion.WFS_VERSION_1
+    static TEST_WFS_VERSION = WfsVersion.Wfs1.WFS_VERSION_1
 
     SaveWfsConfiguration saveWfsConfiguration
 

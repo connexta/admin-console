@@ -13,9 +13,8 @@
  */
 package org.codice.ddf.admin.sources.fields;
 
-import org.codice.ddf.admin.api.DataType;
+import org.codice.ddf.admin.api.fields.EnumValue;
 import org.codice.ddf.admin.common.fields.base.BaseEnumField;
-import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 
 import com.google.common.collect.ImmutableList;
 
@@ -30,15 +29,11 @@ public class WfsVersion extends BaseEnumField<String> {
                     + " The version number contains three non-negative integers in the form \"x.y.z\" where y and z shall not exceed 99."
                     + " Refer to OGC 06-121r3 section 7.3.1 for more information.";
 
-    public static final String WFS_VERSION_1 = "1.0.0";
-
-    public static final String WFS_VERSION_2 = "2.0.0";
-
     public WfsVersion() {
         this(null);
     }
 
-    protected WfsVersion(DataType<String> wfsVersion) {
+    protected WfsVersion(EnumValue<String> wfsVersion) {
         super(DEFAULT_FIELD_NAME,
                 TYPE_NAME,
                 DESCRIPTION,
@@ -46,41 +41,53 @@ public class WfsVersion extends BaseEnumField<String> {
                 wfsVersion);
     }
 
-    protected static final class Wfs1 extends StringField {
+    public static final class Wfs1 implements EnumValue<String> {
 
-        public static final String VERSION = WFS_VERSION_1;
+        public static final String WFS_VERSION_1 = "1.0.0";
 
-        public static final String FIELD_NAME = "WFS_1";
+        public static final String ENUM_TITLE = "WFS_1";
 
         public static final String DESCRIPTION =
                 "Indicates a server implements version 1.0.0 of the WFS specification.";
 
-        public Wfs1() {
-            super(FIELD_NAME, FIELD_NAME, DESCRIPTION);
+        @Override
+        public String enumTitle() {
+            return ENUM_TITLE;
         }
 
         @Override
-        public String getValue() {
-            return VERSION;
+        public String description() {
+            return DESCRIPTION;
+        }
+
+        @Override
+        public String value() {
+            return WFS_VERSION_1;
         }
     }
 
-    protected static final class Wfs2 extends StringField {
+    public static final class Wfs2 implements EnumValue<String> {
 
-        public static final String VERSION = WFS_VERSION_2;
+        public static final String WFS_VERSION_2 = "2.0.0";
 
-        public static final String FIELD_NAME = "WFS_2";
+        public static final String ENUM_TITLE = "WFS_2";
 
         public static final String DESCRIPTION =
                 "Indicates a server implements version 2.0.0 of the WFS specification.";
 
-        public Wfs2() {
-            super(FIELD_NAME, FIELD_NAME, DESCRIPTION);
+        @Override
+        public String enumTitle() {
+            return ENUM_TITLE;
         }
 
         @Override
-        public String getValue() {
-            return VERSION;
+        public String description() {
+            return DESCRIPTION;
+        }
+
+        @Override
+        public String value() {
+            return WFS_VERSION_2;
         }
     }
 }

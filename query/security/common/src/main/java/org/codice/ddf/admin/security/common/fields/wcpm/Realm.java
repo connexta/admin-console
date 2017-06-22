@@ -13,13 +13,16 @@
  **/
 package org.codice.ddf.admin.security.common.fields.wcpm;
 
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
 
+import org.apache.karaf.jaas.config.JaasRealm;
 import org.codice.ddf.admin.api.fields.EnumValue;
 import org.codice.ddf.admin.common.fields.base.BaseEnumField;
 import org.codice.ddf.admin.common.fields.base.BaseListField;
-
-import com.google.common.collect.ImmutableList;
+import org.codice.ddf.internal.admin.configurator.actions.ServiceReader;
 
 public class Realm extends BaseEnumField<String> {
 
@@ -30,20 +33,34 @@ public class Realm extends BaseEnumField<String> {
     public static final String DESCRIPTION =
             "Authenticating Realms are used to authenticate an incoming authentication token and create a Subject on successful authentication.";
 
-    public static final Realm LDAP_REALM = new Realm(new LdapRealm());
+    private ServiceReader serviceReader;
 
-    public static final Realm KARAF_REALM = new Realm(new KarafRealm());
-
-    public Realm() {
-        this(null);
-    }
-
-    protected Realm(EnumValue<String> realm) {
+    public Realm(ServiceReader serviceReader) {
         super(DEFAULT_FIELD_NAME,
                 FIELD_TYPE_NAME,
-                DESCRIPTION,
-                ImmutableList.of(new LdapRealm(), new KarafRealm()),
-                realm);
+                DESCRIPTION);
+        this.serviceReader = serviceReader;
+    }
+
+    @Override
+    public List<EnumValue<String>> getEnumValues() {
+        Set<JaasRealm> realms = serviceReader.getServices(JaasRealm.class, null);
+        return realms.stream().map(realm -> new EnumValue<String>() {
+            @Override
+            public String enumTitle() {
+                return realm.getName();
+            }
+
+            @Override
+            public String description() {
+                return null;
+            }
+
+            @Override
+            public String value() {
+                return realm.getName();
+            }
+        }).collect(Collectors.toList());
     }
 
     @Override
@@ -52,61 +69,20 @@ public class Realm extends BaseEnumField<String> {
         return this;
     }
 
-    public static final class LdapRealm implements EnumValue<String> {
-        public static final String LDAP = "ldap";
-
-        public static final String DESCRIPTION =
-                "An LDAP used for authentication of users within it's database.";
-
-        @Override
-        public String enumTitle() {
-            return LDAP;
-        }
-
-        @Override
-        public String description() {
-            return DESCRIPTION;
-        }
-
-        @Override
-        public String value() {
-            return LDAP;
-        }
-    }
-
-    public static final class KarafRealm implements EnumValue<String> {
-        public static final String KARAF = "karaf";
-
-        public static final String DESCRIPTION =
-                "The default realm. The karaf realm authenticates against the users.properties file.";
-
-        @Override
-        public String enumTitle() {
-            return KARAF;
-        }
-
-        @Override
-        public String description() {
-            return DESCRIPTION;
-        }
-
-        @Override
-        public String value() {
-            return KARAF;
-        }
-    }
-
     public static class Realms extends BaseListField<Realm> {
 
         public static final String DEFAULT_FIELD_NAME = "realms";
 
-        public Realms() {
+        private ServiceReader serviceReader;
+
+        public Realms(ServiceReader serviceReader) {
             super(DEFAULT_FIELD_NAME);
+            this.serviceReader = serviceReader;
         }
 
         @Override
         public Callable<Realm> getCreateListEntryCallable() {
-            return Realm::new;
+            return () -> new Realm(serviceReader);
         }
     }
 }

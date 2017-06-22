@@ -36,6 +36,7 @@ import org.codice.ddf.admin.security.common.fields.wcpm.ContextPolicyBin;
 import org.codice.ddf.admin.security.common.services.PolicyManagerServiceProperties;
 import org.codice.ddf.admin.security.common.services.StsServiceProperties;
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
+import org.codice.ddf.internal.admin.configurator.actions.ServiceReader;
 
 import com.google.common.collect.ImmutableList;
 
@@ -46,24 +47,26 @@ public class SaveContextPolices extends BaseFunctionField<ContextPolicyBin.Conte
     public static final String DESCRIPTION =
             "Saves a list of policies to be applied to their corresponding context paths.";
 
-    public static final ContextPolicyBin.ContextPolicies RETURN_TYPE =
-            new ContextPolicyBin.ContextPolicies();
+    private ContextPolicyBin.ContextPolicies returnType;
 
     private ConfiguratorFactory configuratorFactory;
 
     private final ServiceActions serviceActions;
+
+    private ServiceReader serviceReader;
 
     private ContextPolicyBin.ContextPolicies contextPolicies;
 
     private StsServiceProperties stsServiceProps;
 
     public SaveContextPolices(ConfiguratorFactory configuratorFactory,
-            ServiceActions serviceActions) {
+            ServiceActions serviceActions, ServiceReader serviceReader) {
         super(FUNCTION_FIELD_NAME, DESCRIPTION);
         this.configuratorFactory = configuratorFactory;
         this.serviceActions = serviceActions;
-
-        contextPolicies = new ContextPolicyBin.ContextPolicies().useDefaultIsRequired();
+        this.serviceReader = serviceReader;
+        this.returnType = new ContextPolicyBin.ContextPolicies(serviceReader);
+        contextPolicies = new ContextPolicyBin.ContextPolicies(serviceReader).useDefaultIsRequired();
         updateArgumentPaths();
 
         stsServiceProps = new StsServiceProperties();
@@ -121,7 +124,7 @@ public class SaveContextPolices extends BaseFunctionField<ContextPolicyBin.Conte
 
     @Override
     public ContextPolicyBin.ContextPolicies getReturnType() {
-        return RETURN_TYPE;
+        return returnType;
     }
 
     @Override
@@ -131,6 +134,6 @@ public class SaveContextPolices extends BaseFunctionField<ContextPolicyBin.Conte
 
     @Override
     public FunctionField<ContextPolicyBin.ContextPolicies> newInstance() {
-        return new SaveContextPolices(configuratorFactory, serviceActions);
+        return new SaveContextPolices(configuratorFactory, serviceActions, serviceReader);
     }
 }

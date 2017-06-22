@@ -13,12 +13,11 @@
  **/
 package org.codice.ddf.admin.security.wcpm.discover;
 
-import java.util.Arrays;
-
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.function.GetFunctionField;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.security.common.fields.wcpm.AuthType;
+import org.codice.ddf.internal.admin.configurator.actions.ServiceReader;
 
 public class GetAuthTypes extends GetFunctionField<AuthType.AuthTypes> {
 
@@ -27,31 +26,30 @@ public class GetAuthTypes extends GetFunctionField<AuthType.AuthTypes> {
     public static final String DESCRIPTION =
             "Retrieves all currently configured authentication types.";
 
-    public static final AuthType.AuthTypes RETURN_TYPE = new AuthType.AuthTypes();
+    private AuthType.AuthTypes returnType;
 
     private ConfiguratorFactory configuratorFactory;
+    private ServiceReader serviceReader;
 
-    public GetAuthTypes(ConfiguratorFactory configuratorFactory) {
+    public GetAuthTypes(ConfiguratorFactory configuratorFactory, ServiceReader serviceReader) {
         super(FIELD_NAME, DESCRIPTION);
         this.configuratorFactory = configuratorFactory;
+        this.serviceReader = serviceReader;
+        this.returnType = new AuthType.AuthTypes(serviceReader);
     }
 
     @Override
     public AuthType.AuthTypes performFunction() {
-        return new AuthType.AuthTypes().addAll(Arrays.asList(AuthType.BASIC_AUTH,
-                AuthType.SAML_AUTH,
-                AuthType.PKI_AUTH,
-                AuthType.GUEST_AUTH,
-                AuthType.IDP_AUTH));
+        return new AuthType.AuthTypes(serviceReader);
     }
 
     @Override
     public AuthType.AuthTypes getReturnType() {
-        return RETURN_TYPE;
+        return returnType;
     }
 
     @Override
     public FunctionField<AuthType.AuthTypes> newInstance() {
-        return new GetAuthTypes(configuratorFactory);
+        return new GetAuthTypes(configuratorFactory, serviceReader);
     }
 }

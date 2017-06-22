@@ -40,6 +40,17 @@ public abstract class BaseEnumField<S> extends BaseDataType<S>
         this.enumValue = enumValue == null ? null : enumValue.value();
     }
 
+    /**
+     * When this constructor is used, make sure the getEnumValues is overridden
+     * @param fieldName
+     * @param fieldTypeName
+     * @param description
+     */
+    public BaseEnumField(String fieldName, String fieldTypeName, String description) {
+        super(fieldName, fieldTypeName, description);
+        this.enumValues = enumValues;
+    }
+
     @Override
     public List<EnumValue<S>> getEnumValues() {
         return enumValues;

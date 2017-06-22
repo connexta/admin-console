@@ -42,6 +42,9 @@ class DiscoverCswSourceTest extends Specification {
             unrecognizedCswResponse = this.getClass().getClassLoader().getResource('responses/csw/unrecognizedCswSchema.xml').text
 
     @Shared
+            noOutputSchemaCswResponse = this.getClass().getClassLoader().getResource('responses/csw/noOutputSchemaResponse.xml').text
+
+    @Shared
             badResponseBody = this.getClass().getClassLoader().getResource('responses/badResponse.xml').text
 
     static TEST_CSW_URL = 'https://localhost:8993/services/csw'
@@ -235,6 +238,21 @@ class DiscoverCswSourceTest extends Specification {
         config.cswProfile() == CswProfile.CSW_SPEC_PROFILE_FEDERATED_SOURCE
         config.outputSchema() == CswSourceUtils.CSW_2_0_2_OUTPUT_SCHEMA
         config.spatialOperator() == NO_FILTER
+    }
+
+    def 'Unknown endpoint error when there is no output schema'() {
+        setup:
+        discoverCsw.setValue(getBaseDiscoverByUrlArgs(TEST_CSW_URL))
+
+        when:
+        def report = discoverCsw.getValue()
+
+        then:
+        1 * requestUtils.sendGetRequest(_, _, _) >> createResponseFieldResult(false, noOutputSchemaCswResponse, 200, TEST_CSW_URL)
+        report.result() == null
+        report.messages().size() == 1
+        report.messages()[0].getCode() == DefaultMessages.UNKNOWN_ENDPOINT
+        report.messages()[0].getPath() == [DiscoverCswSource.FIELD_NAME]
     }
 
     def 'Fail when missing required fields'() {

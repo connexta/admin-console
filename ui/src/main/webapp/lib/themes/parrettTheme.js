@@ -20,7 +20,7 @@ export default fromJS(darkBaseTheme).mergeDeep({
     backdropColor: '#333333',
     canvasColor: '#1f1f1f',
     errorColor: '#6b2b3d',
-    primary1Color: '#757474',
+    primary1Color: '#A7A7A7',
     successColor: '#244824',
     textColor: '#f7d57d',
     warningColor: '#8b5300'

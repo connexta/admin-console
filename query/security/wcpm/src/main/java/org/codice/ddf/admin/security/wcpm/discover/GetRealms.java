@@ -21,6 +21,7 @@ import org.codice.ddf.admin.security.common.fields.wcpm.Realm;
 import org.codice.ddf.admin.security.common.services.LdapLoginServiceProperties;
 import org.codice.ddf.internal.admin.configurator.actions.BundleActions;
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
+import org.codice.ddf.internal.admin.configurator.actions.ServiceReader;
 
 public class GetRealms extends GetFunctionField<Realm.Realms> {
 
@@ -32,41 +33,31 @@ public class GetRealms extends GetFunctionField<Realm.Realms> {
 
     private final BundleActions bundleActions;
 
+    private ServiceReader serviceReader;
+
     LdapLoginServiceProperties serviceCommons;
 
-    public GetRealms(ManagedServiceActions managedServiceActions, BundleActions bundleActions) {
+    public GetRealms(ManagedServiceActions managedServiceActions, BundleActions bundleActions, ServiceReader serviceReader) {
         super(FIELD_NAME, DESCRIPTION);
         this.managedServiceActions = managedServiceActions;
         serviceCommons = new LdapLoginServiceProperties(managedServiceActions);
         this.bundleActions = bundleActions;
+        this.serviceReader = serviceReader;
     }
 
     @Override
     public Realm.Realms performFunction() {
-        Realm.Realms realms = new Realm.Realms();
-
-        realms.add(Realm.KARAF_REALM);
-
-        if (bundleActions.isStarted(IDP_SERVER_BUNDLE_NAME)) {
-            // TODO: 4/19/17 How are we going to treat/display IdP as an auth type
-        }
-
-        if (!serviceCommons.getLdapLoginManagedServices()
-                .keySet()
-                .isEmpty()) {
-            realms.add(Realm.LDAP_REALM);
-        }
-
+        Realm.Realms realms = new Realm.Realms(serviceReader);
         return realms;
     }
 
     @Override
     public Realm.Realms getReturnType() {
-        return new Realm.Realms();
+        return new Realm.Realms(serviceReader);
     }
 
     @Override
     public FunctionField<Realm.Realms> newInstance() {
-        return new GetRealms(managedServiceActions, bundleActions);
+        return new GetRealms(managedServiceActions, bundleActions, serviceReader);
     }
 }

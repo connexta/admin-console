@@ -58,12 +58,12 @@ public class WcpmFieldProvider extends BaseFieldProvider {
             BundleActions bundleActions, ManagedServiceActions managedServiceActions,
             ServiceReader serviceReader) {
         super(NAME, TYPE_NAME, DESCRIPTION);
-        getAuthTypes = new GetAuthTypes(configuratorFactory);
-        getRealms = new GetRealms(managedServiceActions, bundleActions);
+        getAuthTypes = new GetAuthTypes(configuratorFactory, serviceReader);
+        getRealms = new GetRealms(managedServiceActions, bundleActions, serviceReader);
         getWhiteListContexts = new GetWhiteListContexts(serviceActions);
         getContextPolicies = new GetContextPolicies(serviceReader);
 
-        saveContextPolices = new SaveContextPolices(configuratorFactory, serviceActions);
+        saveContextPolices = new SaveContextPolices(configuratorFactory, serviceActions, serviceReader);
         saveWhitelistContexts = new SaveWhitelistContexts(configuratorFactory, serviceActions);
         updateInnerFieldPaths();
     }
@@ -77,4 +77,5 @@ public class WcpmFieldProvider extends BaseFieldProvider {
     public List<FunctionField> getMutationFunctions() {
         return ImmutableList.of(saveContextPolices, saveWhitelistContexts);
     }
+
 }

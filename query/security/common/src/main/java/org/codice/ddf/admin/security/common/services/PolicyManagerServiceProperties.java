@@ -112,14 +112,14 @@ public class PolicyManagerServiceProperties {
             }
 
             if (!foundBin) {
-                policies.add(new ContextPolicyBin().realm(policy.getRealm())
+                policies.add(new ContextPolicyBin(serviceReader).realm(policy.getRealm())
                         .addClaimsMap(policyRequiredAttributes)
                         .authTypes(policy.getAuthenticationMethods())
                         .addContextPath(policy.getContextPath()));
             }
         }
 
-        return new ContextPolicyBin.ContextPolicies().addAll(policies);
+        return new ContextPolicyBin.ContextPolicies(serviceReader).addAll(policies);
     }
 
     private boolean hasSameRequiredAttributes(ContextPolicyBin bin,

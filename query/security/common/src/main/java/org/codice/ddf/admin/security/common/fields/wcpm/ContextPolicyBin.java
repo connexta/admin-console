@@ -25,6 +25,7 @@ import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.fields.base.BaseListField;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
 import org.codice.ddf.admin.common.fields.common.ContextPath;
+import org.codice.ddf.internal.admin.configurator.actions.ServiceReader;
 
 import com.google.common.collect.ImmutableList;
 
@@ -37,9 +38,6 @@ public class ContextPolicyBin extends BaseObjectField {
     public static final String DESCRIPTION =
             "Represents a policy being applied to a set of context paths.";
 
-    public static final String AUTH_TYPES_FIELD_NAME = "authTypes";
-
-
     private ContextPath.ContextPaths contexts;
 
     private AuthType.AuthTypes authTypes;
@@ -48,11 +46,15 @@ public class ContextPolicyBin extends BaseObjectField {
 
     private ClaimsMapEntry.ClaimsMap claimsMapping;
 
-    public ContextPolicyBin() {
+    private ServiceReader serviceReader;
+
+    public ContextPolicyBin(ServiceReader serviceReader) {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
+        this.serviceReader = serviceReader;
+
         contexts = new ContextPath.ContextPaths();
-        authTypes = new AuthType.AuthTypes();
-        realm = new Realm();
+        authTypes = new AuthType.AuthTypes(serviceReader);
+        realm = new Realm(serviceReader);
         claimsMapping = new ClaimsMapEntry.ClaimsMap();
         updateInnerFieldPaths();
     }
@@ -99,7 +101,7 @@ public class ContextPolicyBin extends BaseObjectField {
     }
 
     public ContextPolicyBin addAuthType(String authType) {
-        AuthType newAuthType = new AuthType();
+        AuthType newAuthType = new AuthType(serviceReader);
         newAuthType.setValue(authType);
         authTypes.add(newAuthType);
         return this;
@@ -158,9 +160,12 @@ public class ContextPolicyBin extends BaseObjectField {
 
         private Callable<ContextPolicyBin> newPolicy;
 
-        public ContextPolicies() {
+        private ServiceReader serviceReader;
+
+        public ContextPolicies(ServiceReader serviceReader) {
             super(DEFAULT_FIELD_NAME);
-            newPolicy = ContextPolicyBin::new;
+            this.serviceReader = serviceReader;
+            newPolicy = () -> new ContextPolicyBin(serviceReader);
         }
 
         @Override
@@ -176,7 +181,7 @@ public class ContextPolicyBin extends BaseObjectField {
 
         public ContextPolicies useDefaultIsRequired(){
             newPolicy = () -> {
-                ContextPolicyBin bin = new ContextPolicyBin();
+                ContextPolicyBin bin = new ContextPolicyBin(serviceReader);
                 bin.useDefaultRequiredFields();
                 return bin;
             };

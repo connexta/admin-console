@@ -26,8 +26,7 @@ public class GetContextPolicies extends GetFunctionField<ContextPolicyBin.Contex
     public static final String DESCRIPTION =
             "Returns all currently configured policies applied to context paths.";
 
-    public static final ContextPolicyBin.ContextPolicies RETURN_TYPE =
-            new ContextPolicyBin.ContextPolicies();
+    private ContextPolicyBin.ContextPolicies returnType;
 
     private final ServiceReader serviceReader;
 
@@ -36,6 +35,7 @@ public class GetContextPolicies extends GetFunctionField<ContextPolicyBin.Contex
     public GetContextPolicies(ServiceReader serviceReader) {
         super(DEFAULT_FIELD_NAME, DESCRIPTION);
         this.serviceReader = serviceReader;
+        this.returnType = new ContextPolicyBin.ContextPolicies(serviceReader);
     }
 
     @Override
@@ -45,7 +45,7 @@ public class GetContextPolicies extends GetFunctionField<ContextPolicyBin.Contex
 
     @Override
     public ContextPolicyBin.ContextPolicies getReturnType() {
-        return RETURN_TYPE;
+        return returnType;
     }
 
     @Override

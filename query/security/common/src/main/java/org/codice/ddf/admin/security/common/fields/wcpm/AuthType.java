@@ -13,14 +13,17 @@
  **/
 package org.codice.ddf.admin.security.common.fields.wcpm;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.api.fields.EnumValue;
 import org.codice.ddf.admin.common.fields.base.BaseEnumField;
 import org.codice.ddf.admin.common.fields.base.BaseListField;
-
-import com.google.common.collect.ImmutableList;
+import org.codice.ddf.internal.admin.configurator.actions.ServiceReader;
+import org.codice.ddf.security.handler.api.AuthenticationHandler;
 
 public class AuthType extends BaseEnumField<String> {
 
@@ -31,142 +34,33 @@ public class AuthType extends BaseEnumField<String> {
     public static final String DESCRIPTION =
             "Defines a specific type of authentication that should be performed.";
 
-    public static final AuthType BASIC_AUTH = new AuthType(new BasicAuth());
+    private ServiceReader serviceReader;
 
-    public static final AuthType SAML_AUTH = new AuthType(new SamlAuth());
-
-    public static final AuthType PKI_AUTH = new AuthType(new PkiAuth());
-
-    public static final AuthType IDP_AUTH = new AuthType(new IdpAuth());
-
-    public static final AuthType GUEST_AUTH = new AuthType(new GuestAuth());
-
-    // TODO: tbatie - 6/21/17 - Should only be once constructor when this is finished
-    public AuthType() {
-        this(null);
-    }
-
-    public AuthType(EnumValue<String> authType) {
+    public AuthType(ServiceReader serviceReader) {
         super(DEFAULT_FIELD_NAME,
                 FIELD_TYPE_NAME,
-                DESCRIPTION,
-                ImmutableList.of(new BasicAuth(),
-                        new SamlAuth(),
-                        new PkiAuth(),
-                        new IdpAuth(),
-                        new GuestAuth()),
-                authType);
+                DESCRIPTION);
+        this.serviceReader = serviceReader;
     }
 
-    public static final class BasicAuth implements EnumValue<String> {
-        public static final String BASIC = "basic";
+    @Override
+    public List<EnumValue<String>> getEnumValues() {
+        return serviceReader.getServices(AuthenticationHandler.class, null).stream().map(handler -> new EnumValue<String>() {
+            @Override
+            public String enumTitle() {
+                return handler.getAuthenticationType();
+            }
 
-        public static final String DESCRIPTION =
-                "Basic access authentication is a method for a HTTP user agent to provide a user name and password when making a request.";
+            @Override
+            public String description() {
+                return null;
+            }
 
-        @Override
-        public String enumTitle() {
-            return BASIC;
-        }
-
-        @Override
-        public String description() {
-            return DESCRIPTION;
-        }
-
-        @Override
-        public String value() {
-            return BASIC;
-        }
-    }
-
-    public static final class SamlAuth implements EnumValue<String> {
-
-        public static final String SAML = "SAML";
-
-        public static final String DESCRIPTION =
-                "Security Assertion Markup Language is an XML-based, open-standard data format for exchanging authentication and authorization data between parties, in particular, between an identity provider and a service provider.";
-
-        @Override
-        public String enumTitle() {
-            return SAML;
-        }
-
-        @Override
-        public String description() {
-            return DESCRIPTION;
-        }
-
-        @Override
-        public String value() {
-            return SAML;
-        }
-    }
-
-    public static final class PkiAuth implements EnumValue<String> {
-        public static final String PKI = "PKI";
-
-        public static final String DESCRIPTION =
-                "A public key infrastructure (PKI) is a set of roles, policies, and procedures needed to create, manage, distribute, use, store, and revoke digital certificates and manage public-key encryption.";
-
-        @Override
-        public String enumTitle() {
-            return PKI;
-        }
-
-        @Override
-        public String description() {
-            return DESCRIPTION;
-        }
-
-        @Override
-        public String value() {
-            return PKI;
-        }
-    }
-
-    public static final class IdpAuth implements EnumValue<String> {
-
-        public static final String IDP = "IdP";
-
-        public static final String DESCRIPTION =
-                "Identity provider (IdP), also known as Identity Assertion Provider. Activates SAML Web SSO authentication support.";
-
-        @Override
-        public String enumTitle() {
-            return IDP;
-        }
-
-        @Override
-        public String description() {
-            return DESCRIPTION;
-        }
-
-        @Override
-        public String value() {
-            return IDP;
-        }
-    }
-
-    public static final class GuestAuth implements EnumValue<String> {
-        public static final String GUEST = "guest";
-
-        public static final String DESCRIPTION = "Provides guest access.";
-
-        @Override
-        public String enumTitle() {
-            return GUEST;
-        }
-
-        @Override
-        public String description() {
-            return DESCRIPTION;
-        }
-
-        @Override
-        public String value() {
-            return GUEST;
-        }
+            @Override
+            public String value() {
+                return handler.getAuthenticationType();
+            }
+        }).collect(Collectors.toList());
     }
 
     public static class AuthTypes extends BaseListField<AuthType> {
@@ -175,9 +69,12 @@ public class AuthType extends BaseEnumField<String> {
 
         private Callable<AuthType> newAuthType;
 
-        public AuthTypes() {
+        private ServiceReader serviceReader;
+
+        public AuthTypes(ServiceReader serviceReader) {
             super(DEFAULT_FIELD_NAME);
-            newAuthType = AuthType::new;
+            this.serviceReader = serviceReader;
+            newAuthType = () -> new AuthType(serviceReader);
         }
 
         @Override
@@ -187,7 +84,7 @@ public class AuthType extends BaseEnumField<String> {
 
         public AuthTypes useDefaultIsRequired(){
             newAuthType =  () -> {
-                AuthType authType = new AuthType();
+                AuthType authType = new AuthType(serviceReader);
                 authType.isRequired(true);
                 return authType;
             };

@@ -1,4 +1,6 @@
 import isURL from 'validator/lib/isURL'
+import isFQDN from 'validator/lib/isFQDN'
+import isIP from 'validator/lib/isIP'
 
 export const isEmpty = (string) => {
   return !string
@@ -30,6 +32,10 @@ export const discoveryStageDisableNext = ({ configs, discoveryType }) => {
 
   return false
 }
+
+export const hostnameError = ({ sourceHostName }) =>
+  (!isBlank(sourceHostName) && !isFQDN(sourceHostName, { require_tld: false }) && !isIP(sourceHostName))
+    ? 'Not a valid hostname or IP.' : undefined
 
 export const urlError = ({ endpointUrl }) =>
   (!isBlank(endpointUrl) && !isURL(endpointUrl))

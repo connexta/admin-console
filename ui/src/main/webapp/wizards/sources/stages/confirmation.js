@@ -4,6 +4,7 @@ import { withApollo } from 'react-apollo'
 
 import { getAllConfig } from 'admin-wizard/reducer'
 import { Input } from 'admin-wizard/inputs'
+import { getFriendlyMessage } from 'graphql-errors'
 
 import Info from 'components/Information'
 import Title from 'components/Title'
@@ -69,8 +70,9 @@ const ConfirmationStageView = (props) => {
                 saveSource(props).then(() => {
                   changeStage('completedStage', currentStageId)
                   endSubmitting()
-                }).catch(() => {
-                  setErrors(currentStageId, ['Network Error'])
+                }).catch((e) => {
+                  setErrors(currentStageId, e.graphQLErrors.map((error) =>
+                    getFriendlyMessage(error.message)))
                   endSubmitting()
                 })
               }}

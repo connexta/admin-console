@@ -18,6 +18,7 @@ import {
 } from '../actions'
 import {
   discoveryStageDisableNext,
+  hostnameError,
   userNameError,
   passwordError,
   portError,
@@ -67,7 +68,9 @@ const DiscoveryStageView = (props) => {
             visible={discoveryType === 'hostnamePort'}
             id='sourceHostName'
             label='Host'
-            autoFocus />
+            errorText={hostnameError(configs)}
+            autoFocus
+          />
           <Port
             visible={discoveryType === 'hostnamePort'}
             id='sourcePort'

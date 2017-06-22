@@ -6,8 +6,6 @@ const currentStage = (state = 'welcomeStage', { type, stage }) => {
   switch (type) {
     case 'SOURCES/CHANGE_STAGE':
       return stage
-    case 'SOURCES/NAV_STAGE':
-      return stage
     case 'CLEAR_WIZARD': // also make clear config info
       return 'welcomeStage'
     default:
@@ -42,6 +40,7 @@ const errors = (state = Map(), { type, stageId, errorList }) => {
     case 'SOURCES/SET_ERRORS':
       return state.set(stageId, errorList)
     case 'SOURCES/CLEAR_ERRORS':
+    case 'SOURCES/CHANGE_STAGE':
     case 'CLEAR_WIZARD':
       return Map()
     default:

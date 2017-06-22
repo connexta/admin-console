@@ -35,7 +35,12 @@
         </dependency>
         <dependency>
             <groupId>org.codice.ddf.admin.beta</groupId>
-            <artifactId>admin-query-ldap</artifactId>
+            <artifactId>admin-query-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codice.ddf.admin.beta</groupId>
+            <artifactId>admin-query-security-common</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
@@ -48,37 +53,12 @@
                 <configuration>
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}-beta</Bundle-SymbolicName>
+                        <Embed-Dependency>
+                            admin-query-common,
+                            admin-query-security-common
+                        </Embed-Dependency>
                     </instructions>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-enforcer-plugin</artifactId>
-                <version>1.4.1</version>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.codice.ddf.admin.beta</groupId>
-                        <artifactId>artifact-size-enforcer</artifactId>
-                        <version>${project.version}</version>
-                    </dependency>
-                </dependencies>
-                <executions>
-                    <execution>
-                        <id>check-artifact-size</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>enforce</goal>
-                        </goals>
-                        <configuration>
-                            <rules>
-                                <ArtifactSizeEnforcerRule
-                                        implementation="org.codice.ddf.admin.beta.enforcer.ArtifactSizeEnforcerRule">
-                                    <maxArtifactSize>2.5_MB</maxArtifactSize>
-                                </ArtifactSizeEnforcerRule>
-                            </rules>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>org.jacoco</groupId>

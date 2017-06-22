@@ -18,8 +18,8 @@ import static org.codice.ddf.admin.ldap.commons.LdapMessages.noGroupsWithMembers
 import static org.codice.ddf.admin.ldap.commons.LdapMessages.noReferencedMemberError;
 import static org.codice.ddf.admin.ldap.commons.LdapMessages.noUsersInBaseUserDnError;
 import static org.codice.ddf.admin.ldap.commons.LdapMessages.userAttributeNotFoundError;
-import static org.codice.ddf.admin.ldap.fields.config.LdapUseCase.ATTRIBUTE_STORE;
-import static org.codice.ddf.admin.ldap.fields.config.LdapUseCase.AUTHENTICATION_AND_ATTRIBUTE_STORE;
+import static org.codice.ddf.admin.security.common.fields.ldap.LdapUseCase.ATTRIBUTE_STORE;
+import static org.codice.ddf.admin.security.common.fields.ldap.LdapUseCase.AUTHENTICATION_AND_ATTRIBUTE_STORE;
 
 import java.io.IOException;
 import java.util.Arrays;

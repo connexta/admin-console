@@ -20,7 +20,7 @@
 
     <service ref="installEmbeddedLdap" interface="org.codice.ddf.admin.api.fields.FunctionField">
         <service-properties>
-            <entry key="id" value="installEmbeddedLdap"/>
+            <entry key="fieldProviderId" value="mutation.ldap.installEmbeddedLdap"/>
         </service-properties>
     </service>
 

@@ -22,7 +22,7 @@ import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.ldap.TestLdapServer
 import org.codice.ddf.admin.ldap.commons.LdapMessages
 import org.codice.ddf.admin.ldap.fields.config.LdapDirectorySettingsField
-import org.codice.ddf.admin.ldap.fields.config.LdapUseCase
+import org.codice.ddf.admin.security.common.fields.ldap.LdapUseCase
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindMethod
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindUserInfo
 import org.codice.ddf.admin.ldap.fields.connection.LdapConnectionField
@@ -30,8 +30,8 @@ import org.codice.ddf.admin.ldap.fields.connection.LdapEncryptionMethodField
 import spock.lang.Specification
 
 import static org.codice.ddf.admin.ldap.LdapTestingCommons.*
-import static org.codice.ddf.admin.ldap.fields.config.LdapUseCase.ATTRIBUTE_STORE
-import static org.codice.ddf.admin.ldap.fields.config.LdapUseCase.AUTHENTICATION
+import static LdapUseCase.ATTRIBUTE_STORE
+import static LdapUseCase.AUTHENTICATION
 
 class LdapTestDirectorySettingsSpec extends Specification {
     static TestLdapServer server

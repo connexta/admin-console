@@ -20,6 +20,7 @@
              description="DDF Admin App (Beta) includes a source setup wizard, LDAP setup wizard and a new GUI for the web context policy manager. Go to /admin/beta to access the UI.">
         <feature>admin-beta-federation</feature>
         <feature>admin-beta-security</feature>
+        <feature>admin-beta-embeddedldap</feature>
         <feature>admin-beta-ldap</feature>
         <feature>admin-beta-utils</feature>
         <feature>admin-beta-ui</feature>
@@ -41,7 +42,6 @@
              description="DDF Admin Security (Beta)">
         <feature>admin-beta-core</feature>
         <feature>admin-beta-ldap</feature>
-        <feature>admin-beta-embeddedldap</feature>
         <feature>admin-beta-wcpm</feature>
         <bundle>mvn:org.codice.ddf.admin.beta/admin-query-sts/${project.version}</bundle>
     </feature>

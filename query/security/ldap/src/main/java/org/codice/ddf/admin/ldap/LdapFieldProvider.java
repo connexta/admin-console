@@ -13,6 +13,7 @@
  **/
 package org.codice.ddf.admin.ldap;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.codice.ddf.admin.api.Field;
@@ -65,7 +66,9 @@ public class LdapFieldProvider extends BaseFieldProvider {
 
     private DeleteLdapConfiguration deleteConfig;
 
-    private FunctionField installEmbeddedLdap;
+    private List<Field> ldapDiscoveryFields = Collections.emptyList();
+
+    private List<FunctionField> ldapMutationFields = Collections.emptyList();
 
     public LdapFieldProvider(ConfiguratorFactory configuratorFactory, FeatureActions featureActions,
             ManagedServiceActions managedServiceActions, PropertyActions propertyActions,
@@ -93,22 +96,33 @@ public class LdapFieldProvider extends BaseFieldProvider {
 
     @Override
     public List<Field> getDiscoveryFields() {
-        return ImmutableList.of(testConnection,
-                testBind,
-                testSettings,
-                recommendedSettings,
-                claimMappings,
-                ldapQuery,
-                getUserAttris,
-                getConfigs);
+        return new ImmutableList.Builder<Field>() //
+                .addAll(ldapDiscoveryFields)
+                .add(testConnection)
+                .add(testBind)
+                .add(testSettings)
+                .add(recommendedSettings)
+                .add(claimMappings)
+                .add(ldapQuery)
+                .add(getUserAttris)
+                .add(getConfigs)
+                .build();
     }
 
     @Override
     public List<FunctionField> getMutationFunctions() {
-        return ImmutableList.of(createConfig, deleteConfig, installEmbeddedLdap);
+        return new ImmutableList.Builder<FunctionField>() //
+                .addAll(ldapMutationFields)
+                .add(createConfig)
+                .add(deleteConfig)
+                .build();
     }
 
-    public void setInstallEmbeddedLdap(FunctionField installEmbeddedLdap) {
-        this.installEmbeddedLdap = installEmbeddedLdap;
+    public void setLdapDiscoveryFields(List<Field> ldapDiscoveryFields) {
+        this.ldapDiscoveryFields = ldapDiscoveryFields;
+    }
+
+    public void setLdapMutationFields(List<FunctionField> ldapMutationFields) {
+        this.ldapMutationFields = ldapMutationFields;
     }
 }

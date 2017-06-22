@@ -19,6 +19,7 @@ import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 import org.codice.ddf.admin.ldap.fields.LdapDistinguishedName;
+import org.codice.ddf.admin.security.common.fields.ldap.LdapUseCase;
 
 import com.google.common.collect.ImmutableList;
 

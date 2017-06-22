@@ -28,7 +28,8 @@ import {
 import Title from 'components/Title'
 import Description from 'components/Description'
 import Message from 'components/Message'
-import { Navigator, BackNav, NextNav } from 'components/WizardNavigator'
+import Body from 'components/wizard/Body'
+import Navigation, { Next, Back } from 'components/wizard/Navigation'
 
 import { getAllConfig } from 'admin-wizard/reducer'
 import { Input, Password, Hostname, Port } from 'admin-wizard/inputs'
@@ -63,7 +64,7 @@ const DiscoveryStageView = (props) => {
         <Description>
           Enter connection information to scan for available sources on a host.
         </Description>
-        <div style={{ maxWidth: '600px', margin: '0px auto' }}>
+        <Body>
           <Hostname
             visible={discoveryType === 'hostnamePort'}
             id='sourceHostName'
@@ -112,29 +113,23 @@ const DiscoveryStageView = (props) => {
             id='sourceUserPassword'
             label='Password'
             errorText={passwordError(configs)} />
+          <Navigation>
+            <Back onClick={() => changeStage('welcomeStage')} />
+            <Next disabled={discoveryStageDisableNext(props)}
+              onClick={() => {
+                queryAllSources(props)
+                      .then((endpoints) => {
+                        props.setDiscoveredEndpoints(endpoints)
+                        clearErrors()
+                        changeStage('sourceSelectionStage')
+                      })
+                      .catch((e) => {
+                        setErrors(currentStageId, e)
+                      })
+              }} />
+          </Navigation>
           { messages.map((msg, i) => <Message key={i} message={msg} type='FAILURE' />) }
-          <Navigator
-            max={3}
-            value={0}
-            left={
-              <BackNav onClick={() => changeStage('welcomeStage')} />
-            }
-            right={
-              <NextNav
-                onClick={() => {
-                  queryAllSources(props)
-                    .then((endpoints) => {
-                      props.setDiscoveredEndpoints(endpoints)
-                      clearErrors()
-                      changeStage('sourceSelectionStage')
-                    })
-                    .catch((e) => {
-                      setErrors(currentStageId, e)
-                    })
-                }}
-                disabled={discoveryStageDisableNext(props)} />
-            } />
-        </div>
+        </Body>
       </div>
     </Mount>
   )

@@ -2,6 +2,8 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { withApollo } from 'react-apollo'
 
+import Flexbox from 'flexbox-react'
+
 import { queryAllSources } from '../graphql-queries/source-discovery'
 import { SourceRadioButtons } from '../components'
 import {
@@ -20,14 +22,15 @@ import {
   clearErrors
 } from '../actions'
 
+import RaisedButton from 'material-ui/RaisedButton'
+
 import { getAllConfig } from 'admin-wizard/reducer'
 
 import Title from 'components/Title'
 import Description from 'components/Description'
-import ActionGroup from 'components/ActionGroup'
-import Action from 'components/Action'
 import Message from 'components/Message'
-import { Navigator, BackNav, NextNav } from 'components/WizardNavigator'
+import Body from 'components/wizard/Body'
+import Navigation, { Next, Back } from 'components/wizard/Navigation'
 
 const currentStageId = 'sourceSelectionStage'
 
@@ -51,20 +54,19 @@ const SourceSelectionStageView = (props) => {
         <Description>
           Choose which sources to add.
         </Description>
-        <div style={{ maxWidth: '600px', margin: '0px auto' }}>
+        <Body>
           <SourceRadioButtons
             options={discoveredEndpoints}
             valueSelected={chosenEndpoint}
             onChange={setChosenEndpoint}
           />
           {messages.map((msg, i) => <Message key={i} message={msg} type='FAILURE' />)}
-          <Navigator
-            max={3}
-            value={1}
-            left={<BackNav onClick={() => changeStage('discoveryStage')} />}
-            right={<NextNav onClick={() => changeStage('confirmationStage')} disabled={chosenEndpoint === ''} />}
-          />
-        </div>
+          <Navigation>
+            <Back onClick={() => changeStage('discoveryStage')} />
+            <Next disabled={chosenEndpoint === ''}
+              onClick={() => changeStage('confirmationStage')} />
+          </Navigation>
+        </Body>
       </div>
     )
   } else {
@@ -77,10 +79,12 @@ const SourceSelectionStageView = (props) => {
           No sources were found at the given location. Try again or go back to enter a different address.
           Make sure you entered a valid username and password if the source requires authentication.
         </Description>
-        <div style={{ maxWidth: '600px', margin: '0px auto' }}>
+        <Body>
           { messages.map((msg, i) => <Message key={i} {...msg} />) }
-          <ActionGroup>
-            <Action
+          <Flexbox
+            style={{ marginTop: 20 }}
+            justifyContent='center'>
+            <RaisedButton
               primary
               label='Refresh'
               onClick={() => {
@@ -93,14 +97,12 @@ const SourceSelectionStageView = (props) => {
                     setErrors(currentStageId, e)
                   })
               }} />
-          </ActionGroup>
-          <Navigator
-            max={3}
-            value={1}
-            left={<BackNav onClick={() => changeStage('discoveryStage')} />}
-            right={<NextNav disabled />}
-          />
-        </div>
+          </Flexbox>
+          <Navigation>
+            <Back onClick={() => changeStage('discoveryStage')} />
+            <Next disabled />
+          </Navigation>
+        </Body>
       </div>
     )
   }

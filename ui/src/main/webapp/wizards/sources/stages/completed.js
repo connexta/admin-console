@@ -3,17 +3,15 @@ import { connect } from 'react-redux'
 
 import { clearWizard } from 'admin-wizard/actions'
 
-import { Link } from 'react-router'
-
-import FlatButton from 'material-ui/FlatButton'
+import RaisedButton from 'material-ui/RaisedButton'
 
 import ReplayIcon from 'material-ui/svg-icons/av/replay'
-import HomeIcon from 'material-ui/svg-icons/action/home'
 
 import Title from 'components/Title'
 import Description from 'components/Description'
 import LargeStatusIndicator from 'components/LargeStatusIndicator'
-import { Navigator } from 'components/WizardNavigator'
+import Body from 'components/wizard/Body'
+import Navigation, { Home } from 'components/wizard/Navigation'
 
 const CompletedStageView = ({ messages, clearWizard }) => (
   <div>
@@ -24,20 +22,12 @@ const CompletedStageView = ({ messages, clearWizard }) => (
       Your source has been added successfully.
     </Description>
     <LargeStatusIndicator success />
-    <div style={{ maxWidth: 600, margin: '0 auto' }}>
-      <Navigator
-        max={3}
-        value={3}
-        left={
-          <FlatButton primary label='Add More' labelPosition='after' icon={<ReplayIcon />} onClick={clearWizard} />
-        }
-        right={
-          <Link to='/' >
-            <FlatButton primary label='Home' labelPosition='before' icon={<HomeIcon />} />
-          </Link>
-        }
-      />
-    </div>
+    <Body>
+      <Navigation>
+        <RaisedButton primary label='Add More' labelPosition='after' icon={<ReplayIcon />} onClick={clearWizard} />
+        <Home />
+      </Navigation>
+    </Body>
   </div>
 )
 export default connect(null, { clearWizard })(CompletedStageView)

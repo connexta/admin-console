@@ -12,20 +12,20 @@ export const isBlank = (string) => {
 
 export const discoveryStageDisableNext = ({ configs, discoveryType }) => {
   // checks that username & password are either both filled out or both empty (because it's optional)
-  if (isBlank(configs.sourceUserName) !== isEmpty(configs.sourceUserPassword)) {
+  if (userNameError(configs) || passwordError(configs)) {
     return true
   }
 
   // hostname & port discovery checks
   if (discoveryType === 'hostnamePort') {
-    if (isBlank(configs.sourceHostName) || configs.sourcePort < 0 || configs.sourcePort > 65535) {
+    if (isBlank(configs.sourceHostName) || hostnameError(configs) || portError(configs)) {
       return true
     }
   }
 
   // url discovery checks
   if (discoveryType === 'url') {
-    if (isBlank(configs.endpointUrl) || !isURL(configs.endpointUrl)) {
+    if (isBlank(configs.endpointUrl) || urlError(configs)) {
       return true
     }
   }

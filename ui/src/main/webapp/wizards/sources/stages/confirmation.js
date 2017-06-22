@@ -10,7 +10,8 @@ import Info from 'components/Information'
 import Title from 'components/Title'
 import Description from 'components/Description'
 import Message from 'components/Message'
-import { Navigator, BackNav, NextNav } from 'components/WizardNavigator'
+import Body from 'components/wizard/Body'
+import Navigation, { Finish, Back } from 'components/wizard/Navigation'
 
 import { saveSource } from '../graphql-mutations/source-persist'
 import {
@@ -50,36 +51,30 @@ const ConfirmationStageView = (props) => {
       <Description>
         Please give your source a unique name, confirm details, and press finish to create source.
       </Description>
-      <div style={{ maxWidth: 600, margin: '0px auto' }}>
+      <Body>
         <Input id='sourceName' label='Source Name' autoFocus />
         <Info label='Source Address' value={config.endpointUrl} />
         <Info label='Username' value={inputConfigs.sourceUserName || 'none'} />
         <Info label='Password' value={inputConfigs.sourceUserPassword ? '*****' : 'none'} />
         { messages.map((msg, i) => <Message key={i} message={msg} type='FAILURE' />) }
-        <Navigator
-          max={3}
-          value={2}
-          left={
-            <BackNav onClick={() => changeStage('sourceSelectionStage')} />
-          }
-          right={
-            <NextNav label='Finish'
-              onClick={() => {
-                clearErrors()
-                startSubmitting()
-                saveSource(props).then(() => {
-                  changeStage('completedStage', currentStageId)
-                  endSubmitting()
-                }).catch((e) => {
-                  setErrors(currentStageId, e.graphQLErrors.map((error) =>
-                    getFriendlyMessage(error.message)))
-                  endSubmitting()
-                })
-              }}
-              disabled={sourceName === undefined || sourceName.trim() === ''} />
-          }
-        />
-      </div>
+        <Navigation>
+          <Back onClick={() => changeStage('sourceSelectionStage')} />
+          <Finish
+            disabled={sourceName === undefined || sourceName.trim() === ''}
+            onClick={() => {
+              clearErrors()
+              startSubmitting()
+              saveSource(props).then(() => {
+                changeStage('completedStage', currentStageId)
+                endSubmitting()
+              }).catch((e) => {
+                setErrors(currentStageId, e.graphQLErrors.map((error) =>
+                  getFriendlyMessage(error.message)))
+                endSubmitting()
+              })
+            }} />
+        </Navigation>
+      </Body>
     </div>
   )
 }

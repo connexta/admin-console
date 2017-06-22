@@ -172,11 +172,13 @@ public class CswSourceUtils {
         }
 
         try {
-            xpath.compile(GET_FIRST_OUTPUT_SCHEMA)
-                    .evaluate(capabilitiesXml);
-            configResult.result(preferred.outputSchema(CSW_2_0_2_OUTPUT_SCHEMA)
-                    .cswProfile(CSW_SPEC_PROFILE_FEDERATED_SOURCE));
-            return configResult;
+            if (!xpath.compile(GET_FIRST_OUTPUT_SCHEMA)
+                    .evaluate(capabilitiesXml)
+                    .isEmpty()) {
+                configResult.result(preferred.outputSchema(CSW_2_0_2_OUTPUT_SCHEMA)
+                        .cswProfile(CSW_SPEC_PROFILE_FEDERATED_SOURCE));
+                return configResult;
+            }
         } catch (Exception e) {
             LOGGER.debug("Failed to compile generic CSW specification discovery XPath expression.");
         }

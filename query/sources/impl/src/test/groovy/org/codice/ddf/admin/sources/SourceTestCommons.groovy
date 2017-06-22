@@ -74,6 +74,10 @@ class SourceTestCommons {
 
     static TEST_SOURCENAME = "testSourceName"
 
+    static TEST_CODE = 'TEST_CODE'
+
+    static TEST_ERROR_PATH = ['some', 'path']
+
     static getBaseDiscoverByAddressArgs() {
         return [
             (ADDRESS) : new AddressField().hostname('localhost').port(8993).getValue(),
@@ -112,6 +116,21 @@ class SourceTestCommons {
         (SERVICE_PID_KEY)             : S_PID,
         (USERNAME)                    : TEST_USERNAME
     ]
+
+    static createResponseFieldResult(boolean hasError, String responseBody, int code, String requestUrl) {
+        def result = new ReportWithResultImpl<ResponseField>()
+        if (hasError) {
+            result.addArgumentMessage(new ErrorMessageImpl('TEST_CODE', ['some', 'path']))
+        } else {
+            ResponseField responseField = new ResponseField()
+            responseField.responseBody(responseBody)
+            responseField.statusCode(code)
+            responseField.requestUrl(requestUrl)
+            result.result(responseField)
+        }
+
+        return result
+    }
 
     /**
      * Needed to be able to successfully test the case where a Source is casted to a ConfiguredService

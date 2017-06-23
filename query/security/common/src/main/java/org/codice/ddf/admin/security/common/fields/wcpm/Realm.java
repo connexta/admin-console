@@ -13,13 +13,14 @@
  **/
 package org.codice.ddf.admin.security.common.fields.wcpm;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.stream.Collectors;
 
-import org.apache.karaf.jaas.config.JaasRealm;
 import org.codice.ddf.admin.api.fields.EnumValue;
+import org.codice.ddf.admin.api.poller.EnumValuePoller;
 import org.codice.ddf.admin.common.fields.base.BaseEnumField;
 import org.codice.ddf.admin.common.fields.base.BaseListField;
 import org.codice.ddf.internal.admin.configurator.actions.ServiceReader;
@@ -33,6 +34,8 @@ public class Realm extends BaseEnumField<String> {
     public static final String DESCRIPTION =
             "Authenticating Realms are used to authenticate an incoming authentication token and create a Subject on successful authentication.";
 
+    public static final String REALM_POLLER_FILTER = "(dataTypeId=enum.values.realms)";
+
     private ServiceReader serviceReader;
 
     public Realm(ServiceReader serviceReader) {
@@ -42,25 +45,26 @@ public class Realm extends BaseEnumField<String> {
         this.serviceReader = serviceReader;
     }
 
+    public Realm(ServiceReader serviceReader, EnumValue<String> value) {
+        super(DEFAULT_FIELD_NAME,
+                FIELD_TYPE_NAME,
+                DESCRIPTION);
+        this.serviceReader = serviceReader;
+        setValue(value.value());
+    }
+
     @Override
     public List<EnumValue<String>> getEnumValues() {
-        Set<JaasRealm> realms = serviceReader.getServices(JaasRealm.class, null);
-        return realms.stream().map(realm -> new EnumValue<String>() {
-            @Override
-            public String enumTitle() {
-                return realm.getName();
-            }
+        Set<EnumValuePoller> realms = serviceReader.getServices(EnumValuePoller.class, REALM_POLLER_FILTER);
 
-            @Override
-            public String description() {
-                return null;
-            }
+        if(realms.size() == 0) {
+            return new ArrayList<>();
+        }
 
-            @Override
-            public String value() {
-                return realm.getName();
-            }
-        }).collect(Collectors.toList());
+        return realms.stream()
+                .iterator()
+                .next()
+                .getEnumValues();
     }
 
     @Override
@@ -83,6 +87,12 @@ public class Realm extends BaseEnumField<String> {
         @Override
         public Callable<Realm> getCreateListEntryCallable() {
             return () -> new Realm(serviceReader);
+        }
+
+        @Override
+        public Realms addAll(Collection<Realm> values) {
+            super.addAll(values);
+            return this;
         }
     }
 }

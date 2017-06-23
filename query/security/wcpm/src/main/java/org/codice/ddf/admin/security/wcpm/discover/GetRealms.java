@@ -13,14 +13,12 @@
  **/
 package org.codice.ddf.admin.security.wcpm.discover;
 
-import static org.codice.ddf.admin.security.common.services.PolicyManagerServiceProperties.IDP_SERVER_BUNDLE_NAME;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.function.GetFunctionField;
 import org.codice.ddf.admin.security.common.fields.wcpm.Realm;
-import org.codice.ddf.admin.security.common.services.LdapLoginServiceProperties;
-import org.codice.ddf.internal.admin.configurator.actions.BundleActions;
-import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
 import org.codice.ddf.internal.admin.configurator.actions.ServiceReader;
 
 public class GetRealms extends GetFunctionField<Realm.Realms> {
@@ -29,26 +27,21 @@ public class GetRealms extends GetFunctionField<Realm.Realms> {
 
     public static final String DESCRIPTION = "Retrieves all currently configured realms.";
 
-    private final ManagedServiceActions managedServiceActions;
-
-    private final BundleActions bundleActions;
-
     private ServiceReader serviceReader;
 
-    LdapLoginServiceProperties serviceCommons;
-
-    public GetRealms(ManagedServiceActions managedServiceActions, BundleActions bundleActions, ServiceReader serviceReader) {
+    public GetRealms(ServiceReader serviceReader) {
         super(FIELD_NAME, DESCRIPTION);
-        this.managedServiceActions = managedServiceActions;
-        serviceCommons = new LdapLoginServiceProperties(managedServiceActions);
-        this.bundleActions = bundleActions;
         this.serviceReader = serviceReader;
     }
 
     @Override
     public Realm.Realms performFunction() {
-        Realm.Realms realms = new Realm.Realms(serviceReader);
-        return realms;
+        List<Realm> realms = new Realm(serviceReader).getEnumValues()
+                .stream()
+                .map(enumVal -> new Realm(serviceReader, enumVal))
+                .collect(Collectors.toList());
+
+        return new Realm.Realms(serviceReader).addAll(realms);
     }
 
     @Override
@@ -58,6 +51,6 @@ public class GetRealms extends GetFunctionField<Realm.Realms> {
 
     @Override
     public FunctionField<Realm.Realms> newInstance() {
-        return new GetRealms(managedServiceActions, bundleActions, serviceReader);
+        return new GetRealms(serviceReader);
     }
 }

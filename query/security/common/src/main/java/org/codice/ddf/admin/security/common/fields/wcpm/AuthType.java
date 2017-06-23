@@ -16,14 +16,14 @@ package org.codice.ddf.admin.security.common.fields.wcpm;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.api.fields.EnumValue;
+import org.codice.ddf.admin.api.poller.EnumValuePoller;
 import org.codice.ddf.admin.common.fields.base.BaseEnumField;
 import org.codice.ddf.admin.common.fields.base.BaseListField;
 import org.codice.ddf.internal.admin.configurator.actions.ServiceReader;
-import org.codice.ddf.security.handler.api.AuthenticationHandler;
 
 public class AuthType extends BaseEnumField<String> {
 
@@ -34,6 +34,8 @@ public class AuthType extends BaseEnumField<String> {
     public static final String DESCRIPTION =
             "Defines a specific type of authentication that should be performed.";
 
+    public static final String AUTH_TYPE_POLLER_FILTER = "(dataTypeId=enum.values.authTypes)";
+
     private ServiceReader serviceReader;
 
     public AuthType(ServiceReader serviceReader) {
@@ -43,24 +45,24 @@ public class AuthType extends BaseEnumField<String> {
         this.serviceReader = serviceReader;
     }
 
+    public AuthType(ServiceReader serviceReader, EnumValue<String> value) {
+        super(DEFAULT_FIELD_NAME,
+                FIELD_TYPE_NAME,
+                DESCRIPTION);
+        this.serviceReader = serviceReader;
+        setValue(value.value());
+    }
+
     @Override
     public List<EnumValue<String>> getEnumValues() {
-        return serviceReader.getServices(AuthenticationHandler.class, null).stream().map(handler -> new EnumValue<String>() {
-            @Override
-            public String enumTitle() {
-                return handler.getAuthenticationType();
-            }
+        Set<EnumValuePoller> enumValuePoller = serviceReader.getServices(EnumValuePoller.class, AUTH_TYPE_POLLER_FILTER);
+        if(enumValuePoller.size() == 0) {
+            return new ArrayList<>();
+        }
 
-            @Override
-            public String description() {
-                return null;
-            }
-
-            @Override
-            public String value() {
-                return handler.getAuthenticationType();
-            }
-        }).collect(Collectors.toList());
+        return enumValuePoller.iterator()
+                .next()
+                .getEnumValues();
     }
 
     public static class AuthTypes extends BaseListField<AuthType> {

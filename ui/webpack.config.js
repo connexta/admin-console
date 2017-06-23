@@ -4,7 +4,7 @@ var path = require('path')
 var fs = require('fs')
 var glob = require('glob')
 var HtmlWebpackPlugin = require('html-webpack-plugin')
-var ExtractTextPlugin = require("extract-text-webpack-plugin")
+var ExtractTextPlugin = require('extract-text-webpack-plugin')
 var StaticSiteGeneratorPlugin = require('static-site-generator-webpack-plugin')
 
 var config = {
@@ -25,7 +25,8 @@ var config = {
         ]
       },
       {
-        test: /\.less$/,
+        test: /\.(css|less)$/,
+        exclude: /node_modules/,
         use: [
           'style-loader',
           {
@@ -47,6 +48,7 @@ var config = {
       },
       {
         test: /\.css$/,
+        include: /node_modules/,
         use: [
           'style-loader',
           'css-loader'
@@ -82,10 +84,37 @@ if (process.env.NODE_ENV === 'production') {
     module: {
       rules: [
         {
-          test: /\.less$/,
+          test: /\.(css|less)$/,
+          exclude: /node_modules/,
           loader: ExtractTextPlugin.extract({
-            fallbackLoader: 'style-loader',
-            loader: 'css-loader?sourceMap&modules&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]!less-loader?sourceMap'
+            fallback: 'style-loader',
+            use: [
+              {
+                loader: 'css-loader',
+                options: {
+                  sourceMap: true,
+                  modules: true,
+                  importLoaders: 1,
+                  localIdentName: '[name]__[local]___[hash:base64:5]'
+                }
+              },
+              {
+                loader: 'less-loader',
+                options: {
+                  sourceMap: true,
+                }
+              }
+            ]
+          })
+        },
+        {
+          test: /\.css$/,
+          include: /node_modules/,
+          loader: ExtractTextPlugin.extract({
+            fallback: 'style-loader',
+            use: [
+              'css-loader'
+            ]
           })
         }
       ]

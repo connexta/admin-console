@@ -31,29 +31,26 @@ const stageMapping = {
   completedStage: CompletedStage
 }
 
-let StageRouter = ({ stage }) => {
-  return React.createElement(stageMapping[stage])
+export default (sources) => {
+  const StageRouter = connect(
+    (state) => ({ stage: getStage(state) })
+  )(({ stage }) => React.createElement(stageMapping[stage], { sources }))
+
+  const SourceApp = ({ isSubmitting = false, value = {}, setDefaults, messages }) => (
+    <Wizard id='sources'>
+      <Paper className={styles.main}>
+        {isSubmitting
+          ? <div className={styles.submitting}>
+            <Flexbox justifyContent='center' alignItems='center' width='100%'>
+              <CircularProgress size={60} thickness={7} />
+            </Flexbox>
+          </div>
+          : null}
+        <StageRouter />
+      </Paper>
+    </Wizard>
+  )
+  return connect((state) => ({
+    isSubmitting: getIsSubmitting(state)
+  }))(SourceApp)
 }
-StageRouter = connect((state) => ({
-  stage: getStage(state)
-}))(StageRouter)
-
-let SourceApp = ({ isSubmitting = false, value = {}, setDefaults, messages }) => (
-  <Wizard id='sources'>
-    <Paper className={styles.main}>
-      {isSubmitting
-        ? <div className={styles.submitting}>
-          <Flexbox justifyContent='center' alignItems='center' width='100%'>
-            <CircularProgress size={60} thickness={7} />
-          </Flexbox>
-        </div>
-        : null}
-      <StageRouter />
-    </Paper>
-  </Wizard>
-)
-SourceApp = connect((state) => ({
-  isSubmitting: getIsSubmitting(state)
-}))(SourceApp)
-
-export default SourceApp

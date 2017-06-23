@@ -6,13 +6,13 @@ import { Router, hashHistory } from 'react-router'
 
 import store from './store'
 import client from './client'
-
 import Exception from './containers/exceptions'
 import Ldap from './wizards/ldap'
 import Sources from './wizards/sources'
 import { Home } from './home'
 import Wcpm from './security/wcpm'
 
+import ddfSources from 'ddf-sources'
 import Banners from 'system-usage/Banners'
 import Modal from 'system-usage/Modal'
 import Backdrop from 'components/Backdrop'
@@ -82,7 +82,7 @@ export const routes = {
   indexRoute: { component: Home },
   childRoutes: [
     { path: 'ldap', component: Ldap },
-    { path: 'sources', component: Sources },
+    { path: 'sources', component: Sources(ddfSources) },
     { path: 'web-context-policy-manager', component: Wcpm },
     { path: 'graphiql', component: GraphiQL }
   ]

@@ -1,150 +1,32 @@
-import { gql } from 'react-apollo'
-import { getFriendlyMessage } from 'graphql-errors'
+import {getFriendlyMessage} from 'graphql-errors'
 
-export const payloadFragments = {
-  cswConfigurationPayload: gql`
-    fragment cswSourceConfigurationPayload on CswSourceConfigurationPayload {
-      cswProfile
-      sourceName
-      endpointUrl
-      cswOutputSchema
-      cswSpatialOperator
-      pid
-      creds {
-        username
-        password
-      }
-    }
-  `,
-  openSearchConfigurationPayload: gql`
-    fragment openSearchConfigurationPayload on OpenSearchConfigurationPayload {
-      sourceName
-      endpointUrl
-      pid
-      creds {
-        username
-        password
-      }
-    }
-  `,
-  wfsConfigurationPayload: gql`
-    fragment wfsConfigurationPayload on WfsSourceConfigurationPayload {
-      wfsVersion
-      sourceName
-      endpointUrl
-      pid
-      creds {
-        username
-        password
-      }
-    }
-  `
-}
-
-export const queryFragments = {
-  discoverOpenSearch: gql`
-    fragment discoverOpenSearch on Query {
-      openSearch {
-        discoverOpenSearch(
-          address : $address,
-          creds : $creds
-        )
-        {
-          ...openSearchConfigurationPayload
-        }
-      }
-    }
-    ${payloadFragments.openSearchConfigurationPayload}
-  `,
-  discoverWfs: gql`
-    fragment discoverWfs on Query {
-      wfs {
-        discoverWfs(
-          address : $address,
-          creds : $creds
-        )
-        {
-          ...wfsConfigurationPayload
-        }
-      }
-    }
-    ${payloadFragments.wfsConfigurationPayload}
-  `,
-  discoverCsw: gql`
-    fragment discoverCsw on Query {
-      csw {
-        discoverCsw(
-          address : $address,
-          creds : $creds
-        )
-        {
-          ...cswSourceConfigurationPayload
-        }
-      }
-    }
-    ${payloadFragments.cswConfigurationPayload}
-  `
-}
-
-export const queries = {
-  CSW: gql`
-    query discovercsw ($address: Address!, $creds: Credentials) {
-      ...discoverCsw
-    }
-    ${queryFragments.discoverCsw}
-  `,
-  OpenSearch: gql`
-    query discoverOpenSearch ($address: Address!, $creds: Credentials) {
-      ...discoverOpenSearch
-    }
-    ${queryFragments.discoverOpenSearch}
-  `,
-  WFS: gql`
-    query discoverWfs ($address: Address!, $creds: Credentials) {
-      ...discoverWfs
-    }
-    ${queryFragments.discoverWfs}
-  `,
-  all: gql`
-    query discoverAllSources ($address: Address!, $creds: Credentials) {
-      ...discoverOpenSearch
-      ...discoverWfs
-      ...discoverCsw
-    }
-    ${queryFragments.discoverOpenSearch}
-    ${queryFragments.discoverWfs}
-    ${queryFragments.discoverCsw}
-  `
-}
-
-export const discoverSources = ({ sourceType, configs, discoveryType }) => {
-  let query = {
-    query: queries[sourceType],
+const discoverSources = ({ query, configs, discoveryType }) => {
+  let queryObject = {
+    query,
     variables: {},
     fetchPolicy: 'network-only'
   }
 
   if (discoveryType === 'hostnamePort') {
-    query.variables.address = {
+    queryObject.variables.address = {
       host: {
         hostname: configs.sourceHostName,
         port: configs.sourcePort
       }
     }
   } else {
-    query.variables.address = {
+    queryObject.variables.address = {
       url: configs.endpointUrl
     }
   }
 
   if (configs.sourceUserName && configs.sourceUserPassword) {
-    query.variables.creds = {
+    queryObject.variables.creds = {
       username: configs.sourceUserName,
       password: configs.sourceUserPassword
     }
   }
-
-  return query
+  return queryObject
 }
 
 const nonFatalErrors = [
@@ -181,21 +63,20 @@ export const queryAllSources = (props) => {
     client,
     configs,
     discoveryType,
+    sources,
     startSubmitting,
     endSubmitting
   } = props
 
-  const dispatchQuery = (sourceType, extractConfig) =>
-    client.query(discoverSources({ sourceType, configs, discoveryType }))
-      .then(({ data }) => ({ type: 'SUCCESS', sourceType, value: extractConfig(data) }))
+  const dispatchQuery = (sourceType, query, selector) =>
+    client.query(discoverSources({ query, configs, discoveryType }))
+      .then(({ data }) => ({ type: 'SUCCESS', sourceType, value: selector(data) }))
       .catch((e) => ({ type: 'ERROR', sourceType, value: e.graphQLErrors }))
 
   startSubmitting()
-  return Promise.all([
-    dispatchQuery('CSW', (data) => (data.csw.discoverCsw)),
-    dispatchQuery('WFS', (data) => (data.wfs.discoverWfs)),
-    dispatchQuery('OpenSearch', (data) => (data.openSearch.discoverOpenSearch))
-  ]).then((responses) => new Promise((resolve, reject) => {
+  return Promise.all(Object.keys(sources).map((key) =>
+    dispatchQuery(key, sources[key].query, sources[key].selector)
+  )).then((responses) => new Promise((resolve, reject) => {
     endSubmitting()
 
     const { foundSources, uniqueErrors, fatalErrors } = groupResponses(responses)

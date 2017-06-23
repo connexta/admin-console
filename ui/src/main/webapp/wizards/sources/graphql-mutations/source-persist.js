@@ -1,24 +1,4 @@
-import { gql } from 'react-apollo'
-
-const saveSourceMutations = {
-  CSW: gql`
-    mutation SaveCswSource($config: CswSourceConfiguration!){
-      saveCswSource(source : $config)
-    }
-  `,
-  WFS: gql`
-    mutation SaveWfsSource($config: WfsSourceConfiguration!){
-      saveWfsSource(source : $config)
-    }
-  `,
-  OpenSearch: gql`
-    mutation SaveOpenSearchSource($config: OpenSearchConfiguration!){
-      saveOpenSearchSource(source : $config)
-    }
-  `
-}
-
-const getSourceMutation = ({ type, config, sourceName, creds }) => {
+const getSourceMutation = ({ mutation, config, sourceName, creds }) => {
   let finalConfig = {
     ...config,
     sourceName
@@ -29,24 +9,25 @@ const getSourceMutation = ({ type, config, sourceName, creds }) => {
   }
 
   return {
-    mutation: saveSourceMutations[type],
+    mutation: mutation,
     variables: {
       config: finalConfig
     }
   }
 }
 
-const saveSource = (props) => {
+export const saveSource = (props) => {
   const {
     client,
     type,
+    sources,
     config,
     sourceName,
     inputConfigs
   } = props
 
   return client.mutate(getSourceMutation({
-    type,
+    mutation: sources[type].mutation,
     config,
     sourceName,
     creds: {
@@ -55,4 +36,3 @@ const saveSource = (props) => {
     }}))
 }
 
-export { saveSourceMutations, saveSource }

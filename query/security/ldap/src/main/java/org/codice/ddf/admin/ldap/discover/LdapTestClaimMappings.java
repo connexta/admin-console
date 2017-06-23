@@ -16,10 +16,8 @@ package org.codice.ddf.admin.ldap.discover;
 import static org.codice.ddf.admin.ldap.commons.LdapMessages.userAttributeNotFoundError;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.stream.Collectors;
 
-import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.function.TestFunctionField;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
@@ -88,7 +86,7 @@ public class LdapTestClaimMappings extends TestFunctionField {
     }
 
     @Override
-    public List<DataType> getArguments() {
+    public java.util.List getArguments() {
         return ImmutableList.of(conn, bindInfo, usernameAttribute, baseUserDn, claimMappings);
     }
 
@@ -105,7 +103,7 @@ public class LdapTestClaimMappings extends TestFunctionField {
             return;
         }
 
-        List<StringField> claimArgs = claimMappings.getList()
+        java.util.List claimArgs = claimMappings.getList()
                 .stream()
                 .map(ClaimsMapEntry::claimField)
                 .collect(Collectors.toList());

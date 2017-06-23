@@ -13,12 +13,10 @@
  **/
 package org.codice.ddf.admin.ldap.fields.config;
 
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
-import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.fields.base.BaseListField;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
@@ -127,7 +125,7 @@ public class LdapConfigurationField extends BaseObjectField {
     }
 
     @Override
-    public List<Field> getFields() {
+    public java.util.List getFields() {
         return ImmutableList.of(pid, connection, bindUserInfo, settings, claimMappings);
     }
 

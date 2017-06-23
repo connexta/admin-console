@@ -16,9 +16,9 @@ package org.codice.ddf.admin.sources.csw;
 import static java.net.HttpURLConnection.HTTP_OK;
 import static org.codice.ddf.admin.common.report.message.DefaultMessages.unknownEndpointError;
 import static org.codice.ddf.admin.common.services.ServiceCommons.FLAG_PASSWORD;
-import static org.codice.ddf.admin.sources.fields.CswProfile.CSW_FEDERATION_PROFILE_SOURCE;
-import static org.codice.ddf.admin.sources.fields.CswProfile.CSW_SPEC_PROFILE_FEDERATED_SOURCE;
-import static org.codice.ddf.admin.sources.fields.CswProfile.GMD_CSW_ISO_FEDERATED_SOURCE;
+import static org.codice.ddf.admin.sources.fields.CswProfile.CswFederatedSource.CSW_SPEC_PROFILE_FEDERATED_SOURCE;
+import static org.codice.ddf.admin.sources.fields.CswProfile.DDFCswFederatedSource.CSW_FEDERATION_PROFILE_SOURCE;
+import static org.codice.ddf.admin.sources.fields.CswProfile.GmdCswFederatedSource.GMD_CSW_ISO_FEDERATED_SOURCE;
 import static org.codice.ddf.admin.sources.utils.SourceUtilCommons.SOURCES_NAMESPACE_CONTEXT;
 
 import java.util.List;

@@ -15,11 +15,8 @@ package org.codice.ddf.admin.security.common.fields.wcpm;
 
 import static org.codice.ddf.admin.common.report.message.DefaultMessages.missingKeyValue;
 
-import java.util.List;
 import java.util.concurrent.Callable;
 
-import org.codice.ddf.admin.api.Field;
-import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.codice.ddf.admin.common.fields.base.BaseListField;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
@@ -83,8 +80,8 @@ public class ClaimsMapEntry extends BaseObjectField {
     }
 
     @Override
-    public List<ErrorMessage> validate() {
-        List<ErrorMessage> validationMsgs = super.validate();
+    public java.util.List validate() {
+        java.util.List validationMsgs = super.validate();
         if (!validationMsgs.isEmpty()) {
             return validationMsgs;
         }
@@ -100,7 +97,7 @@ public class ClaimsMapEntry extends BaseObjectField {
     }
 
     @Override
-    public List<Field> getFields() {
+    public java.util.List getFields() {
         return ImmutableList.of(key, value);
     }
 

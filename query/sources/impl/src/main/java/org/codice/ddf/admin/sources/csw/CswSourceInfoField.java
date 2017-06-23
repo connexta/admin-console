@@ -69,21 +69,21 @@ public class CswSourceInfoField extends BaseObjectField {
     }
 
     @Override
-    public List<Field> getFields() {
+    public java.util.List<Field> getFields() {
         return ImmutableList.of(config, isAvailable);
     }
 
-    public static class SourceInfos extends BaseListField<SourceInfoField> {
+    public static class List extends BaseListField<CswSourceInfoField> {
 
         public static final String DEFAULT_FIELD_NAME = "sources";
 
-        public SourceInfos() {
+        public List() {
             super(DEFAULT_FIELD_NAME);
         }
 
         @Override
-        public Callable<SourceInfoField> getCreateListEntryCallable() {
-            return SourceInfoField::new;
+        public Callable<CswSourceInfoField> getCreateListEntryCallable() {
+            return CswSourceInfoField::new;
         }
     }
 

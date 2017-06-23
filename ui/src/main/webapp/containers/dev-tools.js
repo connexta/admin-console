@@ -7,8 +7,6 @@ import DockMonitor from 'redux-devtools-dock-monitor'
 import Dispatcher from 'redux-devtools-dispatch'
 import MultipleMonitors from 'redux-devtools-multiple-monitors'
 
-import * as actions from '../actions'
-
 const DevTools = createDevTools(
   <DockMonitor
     defaultIsVisible={false}
@@ -22,9 +20,7 @@ const DevTools = createDevTools(
         expandActionRoot={false}
         expandStateRoot={false}
         select={(state) => state} />
-      <Dispatcher
-        theme='solarized'
-        actionCreators={actions} />
+      <Dispatcher theme='solarized' />
     </MultipleMonitors>
   </DockMonitor>
 )

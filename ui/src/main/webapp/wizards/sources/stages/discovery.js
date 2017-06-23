@@ -5,7 +5,6 @@ import { withApollo } from 'react-apollo'
 
 import { getDiscoveryType, getErrors } from '../reducer'
 import { SideLines } from '../components'
-import { setDefaults } from '../../../actions'
 import { queryAllSources } from '../graphql-queries/source-discovery'
 import {
   setDiscoveryType,
@@ -32,6 +31,7 @@ import Body from 'components/wizard/Body'
 import Navigation, { Next, Back } from 'components/wizard/Navigation'
 
 import { getAllConfig } from 'admin-wizard/reducer'
+import { setDefaults } from 'admin-wizard/actions'
 import { Input, Password, Hostname, Port } from 'admin-wizard/inputs'
 
 import FlatButton from 'material-ui/FlatButton'

@@ -13,8 +13,6 @@ import { Home } from './home'
 import Wcpm from './security/wcpm'
 
 import ddfSources from 'ddf-sources'
-import Banners from 'system-usage/Banners'
-import Modal from 'system-usage/Modal'
 import Backdrop from 'components/Backdrop'
 import AdminAppBar from 'admin-app-bar'
 
@@ -62,15 +60,14 @@ const App = ({ children }) => (
   <Provider store={store}>
     <ApolloProvider client={client}>
       <ConnectedMuiThemeProvider>
-        <Banners>
-          <Modal />
+        <div>
           <Backdrop>
             <AdminAppBar />
             <div style={{ maxWidth: 960, margin: '0 auto', padding: '0 20px' }}>{children}</div>
             <Exception />
           </Backdrop>
           <DevTools />
-        </Banners>
+        </div>
       </ConnectedMuiThemeProvider>
     </ApolloProvider>
   </Provider>

@@ -16,6 +16,7 @@ package org.codice.ddf.admin.security.wcpm.persist
 import org.codice.ddf.admin.api.FieldProvider
 import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.api.fields.ListField
+import org.codice.ddf.admin.api.poller.EnumValuePoller
 import org.codice.ddf.admin.api.report.ReportWithResult
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
@@ -23,20 +24,24 @@ import org.codice.ddf.admin.configurator.Configurator
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.configurator.OperationReport
 import org.codice.ddf.admin.security.common.SecurityMessages
+import org.codice.ddf.admin.security.common.fields.wcpm.AuthType
 import org.codice.ddf.admin.security.common.fields.wcpm.ClaimsMapEntry
 import org.codice.ddf.admin.security.common.fields.wcpm.ContextPolicyBin
 import org.codice.ddf.admin.security.common.fields.wcpm.Realm
 import org.codice.ddf.admin.security.common.services.PolicyManagerServiceProperties
 import org.codice.ddf.admin.security.common.services.StsServiceProperties
+import org.codice.ddf.admin.security.wcpm.AuthTypesPoller
+import org.codice.ddf.admin.security.wcpm.RealmTypesPoller
 import org.codice.ddf.admin.security.wcpm.WcpmFieldProvider
-import org.codice.ddf.internal.admin.configurator.actions.BundleActions
-import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceReader
 import org.codice.ddf.security.policy.context.impl.PolicyManager
 import spock.lang.Specification
 
+import static groovy.org.codice.ddf.admin.security.wcpm.persist.WcpmTestingCommons.*
+
 class SaveContextPoliciesTest extends Specification {
+
     FieldProvider queryProvider
     ConfiguratorFactory configuratorFactory
     ServiceActions serviceActions
@@ -48,6 +53,9 @@ class SaveContextPoliciesTest extends Specification {
     Map<String, Object> stsConfig
 
     String[] testClaims
+    AuthTypesPoller authTypesPoller
+    RealmTypesPoller realmTypesPoller
+
     def testData
 
     def setup() {
@@ -63,8 +71,8 @@ class SaveContextPoliciesTest extends Specification {
                 policies: [
                         [
                                 paths        : ['/'],
-                                authTypes    : ['basic'],
-                                realm        : 'karaf',
+                                authTypes    : [BASIC],
+                                realm        :  KARAF,
                                 claimsMapping: [
                                         [
                                                 (ClaimsMapEntry.KEY_FIELD_NAME)  : 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role',
@@ -74,8 +82,8 @@ class SaveContextPoliciesTest extends Specification {
                         ],
                         [
                                 paths        : ['/test'],
-                                authTypes    : ['SAML', 'PKI'],
-                                realm        : 'karaf',
+                                authTypes    : [SAML, PKI],
+                                realm        : KARAF,
                                 claimsMapping: [
                                         [
                                                 (ClaimsMapEntry.KEY_FIELD_NAME)  : 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role',
@@ -86,6 +94,10 @@ class SaveContextPoliciesTest extends Specification {
                 ]
         ]
 
+        authTypesPoller = new AuthTypesPoller()
+        authTypesPoller.setAuthHandlers([BASIC_HANDLER, SAML_HANDLER, PKI_HANDLER])
+        realmTypesPoller = new RealmTypesPoller()
+        realmTypesPoller.setRealms([KARAF_REALM])
 
         operationReport = Mock(OperationReport)
         configuratorFactory = Mock(ConfiguratorFactory)
@@ -93,23 +105,20 @@ class SaveContextPoliciesTest extends Specification {
         serviceReader = Mock(ServiceReader)
         configurator = Mock(Configurator)
 
+        configurator.commit(_, _) >> operationReport
+        serviceReader.getServiceReference(_) >> policyManager
+        serviceReader.getServices(EnumValuePoller.class, AuthType.AUTH_TYPE_POLLER_FILTER) >> ([authTypesPoller] as Set)
+        serviceReader.getServices(EnumValuePoller.class, Realm.REALM_POLLER_FILTER) >> ([realmTypesPoller] as Set)
+        configuratorFactory.getConfigurator() >> configurator
         stsConfig = [(StsServiceProperties.STS_CLAIMS_PROPS_KEY_CLAIMS): testClaims]
         serviceActions.read(_) >> stsConfig
 
         policyManager = new PolicyManager()
-        ContextPolicyBin.ContextPolicies contextPolicies = new ContextPolicyBin.ContextPolicies()
+        ContextPolicyBin.ContextPolicies contextPolicies = new ContextPolicyBin.ContextPolicies(serviceReader)
         contextPolicies.setValue(testData.policies)
         policyManager.setPolicies(new PolicyManagerServiceProperties().contextPoliciesToPolicyManagerProps(contextPolicies.getList()))
 
-        configurator.commit(_, _) >> operationReport
-        serviceReader.getServiceReference(_) >> policyManager
-        configuratorFactory.getConfigurator() >> configurator
-
-        def bundleActions = Mock(BundleActions)
-        def managedServiceActions = Mock(ManagedServiceActions)
-
-        queryProvider = new WcpmFieldProvider(configuratorFactory, serviceActions, bundleActions,
-                managedServiceActions, serviceReader)
+        queryProvider = new WcpmFieldProvider(configuratorFactory, serviceActions, serviceReader)
         saveContextPoliciesFunction = queryProvider.getMutationFunction(SaveContextPolices.FUNCTION_FIELD_NAME)
     }
 
@@ -160,7 +169,7 @@ class SaveContextPoliciesTest extends Specification {
     def 'Fail if invalid authType'() {
         setup:
         operationReport.containsFailedResults() >> false
-        testData.policies[0].authTypes = ['PKI', 'COFFEE']
+        testData.policies[0].authTypes = [PKI, 'COFFEE']
 
         when:
         saveContextPoliciesFunction.setValue(testData)

@@ -13,9 +13,11 @@
  **/
 package org.codice.ddf.admin.security.wcpm.discover;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.function.GetFunctionField;
-import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.security.common.fields.wcpm.AuthType;
 import org.codice.ddf.internal.admin.configurator.actions.ServiceReader;
 
@@ -28,19 +30,22 @@ public class GetAuthTypes extends GetFunctionField<AuthType.AuthTypes> {
 
     private AuthType.AuthTypes returnType;
 
-    private ConfiguratorFactory configuratorFactory;
     private ServiceReader serviceReader;
 
-    public GetAuthTypes(ConfiguratorFactory configuratorFactory, ServiceReader serviceReader) {
+    public GetAuthTypes(ServiceReader serviceReader) {
         super(FIELD_NAME, DESCRIPTION);
-        this.configuratorFactory = configuratorFactory;
         this.serviceReader = serviceReader;
         this.returnType = new AuthType.AuthTypes(serviceReader);
     }
 
     @Override
     public AuthType.AuthTypes performFunction() {
-        return new AuthType.AuthTypes(serviceReader);
+        List<AuthType> authType = new AuthType(serviceReader).getEnumValues()
+                .stream()
+                .map(enumVal -> new AuthType(serviceReader, enumVal))
+                .collect(Collectors.toList());
+
+        return new AuthType.AuthTypes(serviceReader).addAll(authType);
     }
 
     @Override
@@ -50,6 +55,6 @@ public class GetAuthTypes extends GetFunctionField<AuthType.AuthTypes> {
 
     @Override
     public FunctionField<AuthType.AuthTypes> newInstance() {
-        return new GetAuthTypes(configuratorFactory, serviceReader);
+        return new GetAuthTypes(serviceReader);
     }
 }

@@ -1,9 +1,9 @@
 import inject from 'react-tap-event-plugin'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { createMemoryHistory, RouterContext, match } from 'react-router'
 import deepForceUpdate from 'react-deep-force-update'
 import { AppContainer } from 'react-hot-loader'
+import generator from 'static-site-generator'
 
 import App, { routes } from './app'
 
@@ -30,24 +30,4 @@ if (process.env.NODE_ENV !== 'production') {
   window.forceUpdateThemeing = () => setTimeout(() => deepForceUpdate(instance), 0)
 }
 
-export default ({ html, path }, done) => {
-  const ReactDOMServer = require('react-dom/server')
-  const history = createMemoryHistory({ basename: '#' })
-
-  match({ routes, location: path, history }, (err, redirectLocation, renderProps) => {
-    if (err) {
-      done(err)
-    } else {
-      let root = ReactDOMServer.renderToString(<RouterContext {...renderProps} />)
-
-      // fix issue with inline fallback styles and react
-      // https://github.com/facebook/react/issues/2020
-      root = root.replace(/(;|")([^":\n]+):([^";()]+);/g,
-        (match, _, key, values) =>
-          _ + values.split(',').map((v) => key + ':' + v).join(';') + ';')
-
-      const pattern = /.*{{{[\s\S]*}}}.*/
-      done(null, html.replace(pattern, root))
-    }
-  })
-}
+export default generator(routes)

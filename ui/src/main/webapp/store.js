@@ -22,7 +22,7 @@ const exceptionLoggger = (store) => (next) => (action) => {
 }
 
 if (process.env.NODE_ENV !== 'production') {
-  const DevTools = require('./containers/dev-tools').default
+  const DevTools = require('admin-redux-devtools/dev-tools').default
   const persistState = require('redux-devtools').persistState
   const debugSession =
     (window.location.href.match(/[?&]debug_session=([^&#]+)\b/) || [])[1]

@@ -22,7 +22,7 @@
   "scripts": {
     "start": "webpack-dev-server --progress --open",
     "start:test": "cross-env NODE_ENV=test webpack-dev-server --progress --open",
-    "pretest": "standard ./src/**/*.js && node ./node_modules/phantomjs-prebuilt/install.js && cross-env NODE_ENV=ci webpack --bail",
+    "pretest": "standard ./src/**/*.js && node ./node_modules/phantomjs-prebuilt/install.js && cross-env NODE_ENV=ci webpack --progress --bail",
     "test": "phantomjs ./node_modules/mocha-phantomjs-core/mocha-phantomjs-core.js target/ci/index.html spec \"{\\\"hooks\\\": \\\"mocha-phantomjs-istanbul\\\", \\\"coverageFile\\\": \\\"target/coverage.json\\\"}\"",
     "posttest": "istanbul check-coverage",
     "coverage:report": "istanbul report html && opn ./target/coverage/index.html",

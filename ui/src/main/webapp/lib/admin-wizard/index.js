@@ -14,11 +14,7 @@ import {
   clearWizard,
   clearMessages,
   prevStage,
-  nextStage,
-  // async
-  test,
-  probe,
-  persist
+  nextStage
 } from './actions'
 
 const WizardView = (props) => {
@@ -57,21 +53,6 @@ const mapDispatchToProps = (dispatch, { wizardId }) => ({
   clearWizard: () => dispatch(clearWizard()),
   prev: () => dispatch(prevStage()),
   next: (arg) => dispatch(nextStage(arg)),
-  test: (opts) => dispatch(test({
-    configHandlerId: wizardId,
-    configurationType: wizardId,
-    ...opts
-  })),
-  probe: (opts) => dispatch(probe({
-    configHandlerId: wizardId,
-    configurationType: wizardId,
-    ...opts
-  })),
-  persist: (opts) => dispatch(persist({
-    configHandlerId: wizardId,
-    configurationType: wizardId,
-    ...opts
-  })),
   onError: (messages) => dispatch((dispatch, getState) => {
     const stageId = getDisplayedLdapStage(getState())
     dispatch(setMessages(stageId, messages))
@@ -81,16 +62,7 @@ const mapDispatchToProps = (dispatch, { wizardId }) => ({
   onClearErrors: () => dispatch(clearMessages())
 })
 
-const mergeProps = (stateProps, { test, probe, persist, ...dispatchProps }, ownProps) => ({
-  ...ownProps,
-  ...stateProps,
-  ...dispatchProps,
-  test: (opts) => test({ stageId: stateProps.stageId, ...opts }),
-  probe: (opts) => probe({ stageId: stateProps.stageId, ...opts }),
-  persist: (opts) => persist({ stageId: stateProps.stageId, ...opts })
-})
-
-const Wizard = connect(mapStateToProps, mapDispatchToProps, mergeProps)(WizardView)
+const Wizard = connect(mapStateToProps, mapDispatchToProps)(WizardView)
 
 export const createWizard = (wizardId, stages) =>
   (props) => <Wizard wizardId={wizardId} stages={stages} {...props} />

@@ -43,7 +43,7 @@ public class GetCswConfigurations extends BaseFunctionField<ListField<CswSourceI
     public static final String DESCRIPTION =
             "Retrieves all currently configured CSW sources. If the pid argument is specified, only the source configuration with that pid will be returned.";
 
-    public static final SourceInfoField.SourceInfos RETURN_TYPE = new SourceInfoField.SourceInfos();
+    public static final ListField<CswSourceInfoField> RETURN_TYPE = new CswSourceInfoField.List();
 
     private PidField pid;
 
@@ -81,17 +81,14 @@ public class GetCswConfigurations extends BaseFunctionField<ListField<CswSourceI
 
     @Override
     public ListField<CswSourceInfoField> performFunction() {
-        ListField<CswSourceInfoField> cswSourceInfoFields = new ListFieldImpl<>(CSW_SOURCES,
-                CswSourceInfoField.class);
+        ListField<CswSourceInfoField> cswSourceInfoFields = new CswSourceInfoField.List();
 
         List<SourceConfigField> configs =
                 sourceUtilCommons.getSourceConfigurations(CSW_FACTORY_PIDS,
                         SERVICE_PROPS_TO_CSW_CONFIG,
                         pid.getValue());
 
-        configs.forEach(config -> {
-            cswSourceInfoFields.add(new CswSourceInfoField().config((CswSourceConfigurationField) config));
-        });
+        configs.forEach(config -> cswSourceInfoFields.add(new CswSourceInfoField().config((CswSourceConfigurationField) config)));
 
         for (CswSourceInfoField sourceInfoField : cswSourceInfoFields.getList()) {
             sourceUtilCommons.populateAvailability(sourceInfoField.isAvailableField(),

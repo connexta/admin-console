@@ -14,8 +14,10 @@
 package org.codice.ddf.admin.sources.wfs;
 
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.codice.ddf.admin.api.Field;
+import org.codice.ddf.admin.common.fields.base.BaseListField;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.sources.fields.type.WfsSourceConfigurationField;
@@ -67,7 +69,21 @@ public class WfsSourceInfoField extends BaseObjectField {
     }
 
     @Override
-    public List<Field> getFields() {
+    public java.util.List<Field> getFields() {
         return ImmutableList.of(config, isAvailable);
+    }
+
+    public static class List extends BaseListField<WfsSourceInfoField> {
+
+        public static final String DEFAULT_FIELD_NAME = "sources";
+
+        public List() {
+            super(DEFAULT_FIELD_NAME);
+        }
+
+        @Override
+        public Callable<WfsSourceInfoField> getCreateListEntryCallable() {
+            return WfsSourceInfoField::new;
+        }
     }
 }

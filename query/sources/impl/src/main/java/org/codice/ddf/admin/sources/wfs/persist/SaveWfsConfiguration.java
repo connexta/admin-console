@@ -97,11 +97,11 @@ public class SaveWfsConfiguration extends BaseFunctionField<BooleanField> {
         Configurator configurator = configuratorFactory.getConfigurator();
         OperationReport report = null;
         if (config.wfsVersion()
-                .equals(WfsVersion.WFS_VERSION_2)) {
+                .equals(WfsVersion.Wfs2.WFS_VERSION_2)) {
             configurator.add(featureActions.start(WFS2_FEATURE));
             report = configurator.commit("Starting feature [{}].", WFS2_FEATURE);
         } else if (config.wfsVersion()
-                .equals(WfsVersion.WFS_VERSION_1)) {
+                .equals(WfsVersion.Wfs1.WFS_VERSION_1)) {
             configurator.add(featureActions.start(WFS1_FEATURE));
             report = configurator.commit("Starting feature [{}].", WFS1_FEATURE);
         }

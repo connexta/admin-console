@@ -72,7 +72,7 @@ class DiscoverWfsSourcesTest extends Specification {
         then:
         1 * requestUtils.sendGetRequest(_, _, _) >> createResponseFieldResult(false, wfs10ResponseBody, 200, TEST_WFS_URL)
         config.endpointUrl() == TEST_WFS_URL
-        config.wfsVersion() == WfsVersion.WFS_VERSION_1
+        config.wfsVersion() == WfsVersion.Wfs1.WFS_VERSION_1
     }
 
     def 'Successfully discover WFS 2.0.0 configuration using URL'() {
@@ -86,7 +86,7 @@ class DiscoverWfsSourcesTest extends Specification {
         then:
         1 * requestUtils.sendGetRequest(_, _, _) >> createResponseFieldResult(false, wfs20ResponseBody, 200, TEST_WFS_URL)
         config.endpointUrl() == TEST_WFS_URL
-        config.wfsVersion() == WfsVersion.WFS_VERSION_2
+        config.wfsVersion() == WfsVersion.Wfs2.WFS_VERSION_2
     }
 
     def 'Successfully discover WFS 1.0.0 configuration using hostname and port'() {
@@ -100,7 +100,7 @@ class DiscoverWfsSourcesTest extends Specification {
         then:
         1 * requestUtils.discoverUrlFromHost(_, _, _, _) >> createResponseFieldResult(false, wfs10ResponseBody, 200, TEST_WFS_URL)
         config.endpointUrl() == TEST_WFS_URL
-        config.wfsVersion() == WfsVersion.WFS_VERSION_1
+        config.wfsVersion() == WfsVersion.Wfs1.WFS_VERSION_1
     }
 
     def 'Successfully discover WFS 2.0.0 configuration using hostname and port'() {
@@ -114,7 +114,7 @@ class DiscoverWfsSourcesTest extends Specification {
         then:
         1 * requestUtils.discoverUrlFromHost(_, _, _, _) >> createResponseFieldResult(false, wfs20ResponseBody, 200, TEST_WFS_URL)
         config.endpointUrl() == TEST_WFS_URL
-        config.wfsVersion() == WfsVersion.WFS_VERSION_2
+        config.wfsVersion() == WfsVersion.Wfs2.WFS_VERSION_2
     }
 
     def 'Unknown endpoint error when unrecognized WFS version is received'() {

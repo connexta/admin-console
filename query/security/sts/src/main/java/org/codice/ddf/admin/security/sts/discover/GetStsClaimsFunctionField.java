@@ -16,12 +16,13 @@ package org.codice.ddf.admin.security.sts.discover;
 import java.util.List;
 
 import org.codice.ddf.admin.api.fields.FunctionField;
+import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.fields.base.function.GetFunctionField;
 import org.codice.ddf.admin.security.common.fields.sts.StsClaimField;
 import org.codice.ddf.admin.security.common.services.StsServiceProperties;
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
 
-public class GetStsClaimsFunctionField extends GetFunctionField<StsClaimField.StsClaims> {
+public class GetStsClaimsFunctionField extends GetFunctionField<ListField<StsClaimField>> {
 
     public static final String NAME = "claims";
 
@@ -37,13 +38,13 @@ public class GetStsClaimsFunctionField extends GetFunctionField<StsClaimField.St
     }
 
     @Override
-    public StsClaimField.StsClaims performFunction() {
+    public ListField<StsClaimField> performFunction() {
         List<String> supportedClaims = new StsServiceProperties().getConfiguredStsClaims(
                 serviceActions);
 
-        StsClaimField.StsClaims claims = new StsClaimField.StsClaims();
+        ListField<StsClaimField> claims = new StsClaimField.StsClaims();
 
-        supportedClaims.stream()
+        supportedClaims
                 .forEach(claim -> {
                     StsClaimField claimField = new StsClaimField();
                     claimField.setValue(claim);
@@ -54,12 +55,12 @@ public class GetStsClaimsFunctionField extends GetFunctionField<StsClaimField.St
     }
 
     @Override
-    public StsClaimField.StsClaims getReturnType() {
+    public ListField<StsClaimField> getReturnType() {
         return RETURN_TYPE;
     }
 
     @Override
-    public FunctionField<StsClaimField.StsClaims> newInstance() {
+    public FunctionField<ListField<StsClaimField>> newInstance() {
         return new GetStsClaimsFunctionField(serviceActions);
     }
 }

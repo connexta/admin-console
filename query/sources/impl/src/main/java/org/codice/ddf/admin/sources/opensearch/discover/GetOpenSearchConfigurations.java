@@ -44,8 +44,8 @@ public class GetOpenSearchConfigurations
     public static final String DESCRIPTION =
             "Retrieves all currently configured OpenSearch sources. If a source pid is specified, only that source configuration will be returned.";
 
-    public static final SourceInfoField.SourceInfos RETURN_TYPE =
-            new SourceInfoField.SourceInfos();
+    public static final ListField<OpenSearchSourceInfoField> RETURN_TYPE =
+            new OpenSearchSourceInfoField.List();
 
     private PidField pid;
 
@@ -83,9 +83,7 @@ public class GetOpenSearchConfigurations
 
     @Override
     public ListField<OpenSearchSourceInfoField> performFunction() {
-        ListField<OpenSearchSourceInfoField> cswSourceInfoFields = new ListFieldImpl<>(
-                OPEN_SEARCH_SOURCES,
-                OpenSearchSourceInfoField.class);
+        ListField<OpenSearchSourceInfoField> cswSourceInfoFields = new OpenSearchSourceInfoField.List();
 
         List<SourceConfigField> configs = sourceUtilCommons.getSourceConfigurations(
                 OPENSEARCH_FACTORY_PIDS,

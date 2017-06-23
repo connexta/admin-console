@@ -19,14 +19,12 @@ import static org.codice.ddf.admin.sources.services.WfsServiceProperties.WFS_FAC
 
 import java.util.List;
 
-import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.common.services.ServiceCommons;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
-import org.codice.ddf.admin.sources.fields.type.SourceConfigField;
 import org.codice.ddf.admin.sources.fields.type.WfsSourceConfigurationField;
 import org.codice.ddf.admin.sources.utils.SourceUtilCommons;
 import org.codice.ddf.admin.sources.wfs.WfsSourceInfoField;
@@ -43,8 +41,8 @@ public class GetWfsConfigurations extends BaseFunctionField<ListField<WfsSourceI
     public static final String DESCRIPTION =
             "Retrieves all currently configured WFS sources. If a source pid is specified, only that source configuration will be returned.";
 
-    public static final SourceInfoField.SourceInfos RETURN_TYPE =
-            new SourceInfoField.SourceInfos();
+    public static final WfsSourceInfoField.List RETURN_TYPE =
+            new WfsSourceInfoField.List();
 
     private PidField pid;
 
@@ -81,10 +79,9 @@ public class GetWfsConfigurations extends BaseFunctionField<ListField<WfsSourceI
 
     @Override
     public ListField<WfsSourceInfoField> performFunction() {
-        ListField<WfsSourceInfoField> cswSourceInfoFields = new ListFieldImpl<>(WFS_SOURCES,
-                WfsSourceInfoField.class);
+        WfsSourceInfoField.List cswSourceInfoFields = new WfsSourceInfoField.List();
 
-        List<SourceConfigField> configs =
+        List configs =
                 sourceUtilCommons.getSourceConfigurations(WFS_FACTORY_PIDS,
                         SERVICE_PROPS_TO_WFS_CONFIG,
                         pid.getValue());
@@ -118,7 +115,7 @@ public class GetWfsConfigurations extends BaseFunctionField<ListField<WfsSourceI
     }
 
     @Override
-    public List<DataType> getArguments() {
+    public List getArguments() {
         return ImmutableList.of(pid);
     }
 

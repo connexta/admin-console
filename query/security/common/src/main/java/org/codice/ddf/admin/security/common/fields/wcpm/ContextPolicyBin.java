@@ -15,12 +15,10 @@ package org.codice.ddf.admin.security.common.fields.wcpm;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
-import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.fields.base.BaseListField;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
@@ -91,7 +89,7 @@ public class ContextPolicyBin extends BaseObjectField {
     }
 
     public ContextPolicyBin addClaimsMap(Map<String, String> claimsMap) {
-        List<ClaimsMapEntry> claims = claimsMap.entrySet()
+        java.util.List claims = claimsMap.entrySet()
                 .stream()
                 .map(entry -> new ClaimsMapEntry().key(entry.getKey())
                         .value(entry.getValue()))
@@ -112,11 +110,11 @@ public class ContextPolicyBin extends BaseObjectField {
         return this;
     }
 
-    public List<String> contexts() {
+    public java.util.List contexts() {
         return contexts.getValue();
     }
 
-    public List<String> authTypes() {
+    public java.util.List authTypes() {
         return authTypes.getValue();
     }
 
@@ -135,7 +133,7 @@ public class ContextPolicyBin extends BaseObjectField {
     }
 
     @Override
-    public List<Field> getFields() {
+    public java.util.List getFields() {
         return ImmutableList.of(contexts, authTypes, realm, claimsMapping);
     }
 

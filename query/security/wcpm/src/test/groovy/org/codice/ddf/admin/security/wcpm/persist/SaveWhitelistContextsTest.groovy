@@ -55,9 +55,8 @@ class SaveWhitelistContextsTest extends Specification {
 
         wcpmFieldProvider = new WcpmFieldProvider(configuratorFactory,
                 serviceActions,
-                Mock(BundleActions),
-                Mock(ManagedServiceActions),
                 Mock(ServiceReader))
+
         saveWhitelistContextsFunction = wcpmFieldProvider.getMutationFunction(SaveWhitelistContexts.FIELD_NAME)
     }
 

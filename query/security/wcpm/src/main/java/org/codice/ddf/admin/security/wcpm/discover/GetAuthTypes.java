@@ -40,7 +40,7 @@ public class GetAuthTypes extends GetFunctionField<AuthType.AuthTypes> {
 
     @Override
     public AuthType.AuthTypes performFunction() {
-        List<AuthType> authType = new AuthType(serviceReader).getEnumValues()
+        List authType = new AuthType(serviceReader).getEnumValues()
                 .stream()
                 .map(enumVal -> new AuthType(serviceReader, enumVal))
                 .collect(Collectors.toList());

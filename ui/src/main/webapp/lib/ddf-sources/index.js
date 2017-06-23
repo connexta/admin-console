@@ -88,4 +88,4 @@ const OpenSearch = {
   selector: (result) => result.openSearch.discoverOpenSearch
 }
 
-export { CSW, WFS, OpenSearch }
+export default { CSW, WFS, OpenSearch }

@@ -14,9 +14,9 @@
 package org.codice.ddf.admin.ldap.embedded;
 
 import static org.codice.ddf.admin.common.report.message.DefaultMessages.failedPersistError;
-import static org.codice.ddf.admin.ldap.fields.config.LdapUseCase.ATTRIBUTE_STORE;
-import static org.codice.ddf.admin.ldap.fields.config.LdapUseCase.AUTHENTICATION;
-import static org.codice.ddf.admin.ldap.fields.config.LdapUseCase.AUTHENTICATION_AND_ATTRIBUTE_STORE;
+import static org.codice.ddf.admin.security.common.fields.ldap.LdapUseCase.ATTRIBUTE_STORE;
+import static org.codice.ddf.admin.security.common.fields.ldap.LdapUseCase.AUTHENTICATION;
+import static org.codice.ddf.admin.security.common.fields.ldap.LdapUseCase.AUTHENTICATION_AND_ATTRIBUTE_STORE;
 import static org.codice.ddf.admin.security.common.services.LdapClaimsHandlerServiceProperties.LDAP_CLAIMS_HANDLER_FEATURE;
 import static org.codice.ddf.admin.security.common.services.LdapLoginServiceProperties.LDAP_LOGIN_FEATURE;
 
@@ -29,7 +29,7 @@ import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.configurator.Configurator;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.configurator.OperationReport;
-import org.codice.ddf.admin.ldap.fields.config.LdapUseCase;
+import org.codice.ddf.admin.security.common.fields.ldap.LdapUseCase;
 import org.codice.ddf.internal.admin.configurator.actions.FeatureActions;
 
 import com.google.common.collect.ImmutableList;

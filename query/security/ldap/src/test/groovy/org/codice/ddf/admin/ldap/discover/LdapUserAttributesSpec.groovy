@@ -31,7 +31,7 @@ import org.codice.ddf.admin.ldap.fields.connection.LdapEncryptionMethodField
 import spock.lang.Specification
 
 import static org.codice.ddf.admin.ldap.LdapTestingCommons.*
-import static org.codice.ddf.admin.ldap.fields.config.LdapUseCase.ATTRIBUTE_STORE
+import static org.codice.ddf.admin.security.common.fields.ldap.LdapUseCase.ATTRIBUTE_STORE
 
 class LdapUserAttributesSpec extends Specification {
     static TestLdapServer server

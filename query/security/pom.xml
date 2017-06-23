@@ -27,6 +27,7 @@
 
     <modules>
         <module>ldap</module>
+        <module>embeddedldap</module>
         <module>wcpm</module>
         <module>sts</module>
         <module>common</module>

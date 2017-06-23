@@ -12,16 +12,27 @@
  **/
 -->
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
-
     <service id="ldapFieldProvider" interface="org.codice.ddf.admin.api.FieldProvider">
         <bean class="org.codice.ddf.admin.ldap.LdapFieldProvider">
-            <argument ref="configuratorFactory" />
+            <argument ref="configuratorFactory"/>
             <argument ref="featureActions"/>
             <argument ref="managedServiceActions"/>
             <argument ref="propertyActions"/>
             <argument ref="serviceActions"/>
+            <property name="ldapDiscoveryFields" ref="ldapDiscoveryFields"/>
+            <property name="ldapMutationFields" ref="ldapMutationFields"/>
         </bean>
     </service>
+
+    <reference-list id="ldapDiscoveryFields"
+                    interface="org.codice.ddf.admin.api.Field"
+                    availability="optional"
+                    filter="(fieldProviderId=query.ldap.*)"/>
+
+    <reference-list id="ldapMutationFields"
+                    interface="org.codice.ddf.admin.api.fields.FunctionField"
+                    availability="optional"
+                    filter="(fieldProviderId=mutation.ldap.*)"/>
 
     <reference id="configuratorFactory"
                interface="org.codice.ddf.admin.configurator.ConfiguratorFactory"

@@ -46,7 +46,7 @@ class HostnameFieldTest extends Specification {
                  'as.uk',
                  'LoCaLhOsT.CoM',
                  'z.com',
-                 'im.an-example.host.enumTitle']
+                 'im.an-example.host.name']
     }
 
     def 'Invalid hostnames'() {

@@ -25,7 +25,7 @@ class BaseListFieldTest extends Specification {
 
     def 'The path of fields in ListFields are the ListFields path + their own'() {
         when:
-        StringField.Strings listField = new StringField.Strings(TEST_LIST_FIELD_NAME)
+        StringField.ListImpl listField = new StringField.ListImpl(TEST_LIST_FIELD_NAME)
         listField.add(new StringField())
         listField.add(new StringField())
 
@@ -37,7 +37,7 @@ class BaseListFieldTest extends Specification {
 
     def 'The path of ObjectFields and their inner fields in ListFields are correct'() {
         when:
-        TestObjectField.TestObjects listField = new TestObjectField.TestObjects(TEST_LIST_FIELD_NAME)
+        TestObjectField.ListImpl listField = new TestObjectField.ListImpl(TEST_LIST_FIELD_NAME)
         listField.add(new TestObjectField())
 
         def innerObjectField = listField.getList()[0].getFields().find {
@@ -58,7 +58,7 @@ class BaseListFieldTest extends Specification {
 
     def 'Newly added required elements match the requirement of the ListFields field type'() {
         setup:
-        StringField.Strings listField = new StringField.Strings(TEST_LIST_FIELD_NAME).useDefaultIsRequired()
+        StringField.ListImpl listField = new StringField.ListImpl(TEST_LIST_FIELD_NAME).useDefaultRequired()
 
         when:
         listField.add(new StringField())
@@ -69,7 +69,7 @@ class BaseListFieldTest extends Specification {
 
     def 'Validation fails when list elements fail to validate'() {
         setup:
-        StringField.Strings listField = new StringField.Strings(TEST_LIST_FIELD_NAME).useDefaultIsRequired()
+        StringField.ListImpl listField = new StringField.ListImpl(TEST_LIST_FIELD_NAME).useDefaultRequired()
         def element1 = new StringField('element1')
         element1.setValue('')
         def element2 = new StringField('element2')
@@ -92,7 +92,7 @@ class BaseListFieldTest extends Specification {
 
     def 'Setting null or empty list value clears the list'() {
         setup:
-        StringField.Strings listField = new StringField.Strings(TEST_LIST_FIELD_NAME)
+        StringField.ListImpl listField = new StringField.ListImpl(TEST_LIST_FIELD_NAME)
 
         when:
         listField.add(new StringField())
@@ -112,7 +112,7 @@ class BaseListFieldTest extends Specification {
 
     def 'Updating list field name updates list elements paths'() {
         setup:
-        StringField.Strings listField = new StringField.Strings(TEST_LIST_FIELD_NAME)
+        StringField.ListImpl listField = new StringField.ListImpl(TEST_LIST_FIELD_NAME)
         listField.add(new StringField())
 
         expect:
@@ -129,7 +129,7 @@ class BaseListFieldTest extends Specification {
 
     def 'Set list values'() {
         setup:
-        StringField.Strings listField = new StringField.Strings(TEST_LIST_FIELD_NAME)
+        StringField.ListImpl listField = new StringField.ListImpl(TEST_LIST_FIELD_NAME)
 
         when:
         listField.setValue(['string1', 'string2'])

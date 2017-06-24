@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableList;
 
-public class LdapQuery extends BaseFunctionField<MapField.Maps> {
+public class LdapQuery extends BaseFunctionField<MapField.ListImpl> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LdapQuery.class);
 
@@ -52,7 +52,7 @@ public class LdapQuery extends BaseFunctionField<MapField.Maps> {
 
     private static final int DEFAULT_MAX_QUERY_RESULTS = 25;
 
-    public static final MapField.Maps RETURN_TYPE = new MapField.Maps();
+    public static final MapField.ListImpl RETURN_TYPE = new MapField.ListImpl();
 
     private LdapConnectionField conn;
 
@@ -86,7 +86,7 @@ public class LdapQuery extends BaseFunctionField<MapField.Maps> {
     }
 
     @Override
-    public MapField.Maps performFunction() {
+    public MapField.ListImpl performFunction() {
         List<SearchResultEntry> searchResults;
         List<MapField> convertedSearchResults = new ArrayList<>();
         try (LdapConnectionAttempt connectionAttempt = utils.bindUserToLdapConnection(conn,
@@ -129,17 +129,17 @@ public class LdapQuery extends BaseFunctionField<MapField.Maps> {
             LOGGER.warn("Error closing LDAP connection", e);
         }
 
-        return new MapField.Maps().addAll(convertedSearchResults);
+        return new MapField.ListImpl().addAll(convertedSearchResults);
     }
 
     @Override
-    public FunctionField<MapField.Maps> newInstance() {
+    public FunctionField<MapField.ListImpl> newInstance() {
         return new LdapQuery();
     }
 
 
     @Override
-    public MapField.Maps getReturnType() {
+    public MapField.ListImpl getReturnType() {
         return RETURN_TYPE;
     }
 

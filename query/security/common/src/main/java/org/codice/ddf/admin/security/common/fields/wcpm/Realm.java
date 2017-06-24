@@ -36,7 +36,7 @@ public class Realm extends BaseEnumField<String> {
 
     public static final String REALM_POLLER_FILTER = "(dataTypeId=enum.values.realms)";
 
-    private ServiceReader serviceReader;
+    private final ServiceReader serviceReader;
 
     public Realm(ServiceReader serviceReader) {
         super(DEFAULT_FIELD_NAME,
@@ -57,14 +57,10 @@ public class Realm extends BaseEnumField<String> {
     public List<EnumValue<String>> getEnumValues() {
         Set<EnumValuePoller> realms = serviceReader.getServices(EnumValuePoller.class, REALM_POLLER_FILTER);
 
-        if(realms.size() == 0) {
-            return new ArrayList<>();
-        }
-
         return realms.stream()
-                .iterator()
-                .next()
-                .getEnumValues();
+                .findFirst()
+                .map(EnumValuePoller::getEnumValues)
+                .orElse(new ArrayList<>());
     }
 
     @Override
@@ -73,13 +69,13 @@ public class Realm extends BaseEnumField<String> {
         return this;
     }
 
-    public static class Realms extends BaseListField<Realm> {
+    public static class ListImpl extends BaseListField<Realm> {
 
         public static final String DEFAULT_FIELD_NAME = "realms";
 
-        private ServiceReader serviceReader;
+        private final ServiceReader serviceReader;
 
-        public Realms(ServiceReader serviceReader) {
+        public ListImpl(ServiceReader serviceReader) {
             super(DEFAULT_FIELD_NAME);
             this.serviceReader = serviceReader;
         }
@@ -90,7 +86,7 @@ public class Realm extends BaseEnumField<String> {
         }
 
         @Override
-        public Realms addAll(Collection<Realm> values) {
+        public ListImpl addAll(Collection<Realm> values) {
             super.addAll(values);
             return this;
         }

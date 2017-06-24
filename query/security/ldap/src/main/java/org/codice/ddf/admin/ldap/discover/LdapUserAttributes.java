@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableList;
 
-public class LdapUserAttributes extends BaseFunctionField<StringField.Strings> {
+public class LdapUserAttributes extends BaseFunctionField<StringField.ListImpl> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LdapUserAttributes.class);
 
@@ -47,8 +47,8 @@ public class LdapUserAttributes extends BaseFunctionField<StringField.Strings> {
 
     public static final String BASE_USER_DN = "baseUserDn";
 
-    public static final StringField.Strings RETURN_TYPE =
-            new StringField.Strings();
+    public static final StringField.ListImpl RETURN_TYPE =
+            new StringField.ListImpl();
 
     private LdapConnectionField conn;
 
@@ -75,8 +75,8 @@ public class LdapUserAttributes extends BaseFunctionField<StringField.Strings> {
     }
 
     @Override
-    public StringField.Strings performFunction() {
-        StringField.Strings entries = null;
+    public StringField.ListImpl performFunction() {
+        StringField.ListImpl entries = null;
         try (LdapConnectionAttempt connectionAttempt = utils.bindUserToLdapConnection(conn,
                 bindInfo)) {
             addMessages(connectionAttempt);
@@ -95,7 +95,7 @@ public class LdapUserAttributes extends BaseFunctionField<StringField.Strings> {
                         + "configuration issue with config.");
             }
 
-            entries = new StringField.Strings();
+            entries = new StringField.ListImpl();
             entries.setValue(Arrays.asList(ldapEntryAttributes.toArray()));
 
         } catch (IOException e) {
@@ -106,12 +106,12 @@ public class LdapUserAttributes extends BaseFunctionField<StringField.Strings> {
     }
 
     @Override
-    public StringField.Strings getReturnType() {
+    public StringField.ListImpl getReturnType() {
         return RETURN_TYPE;
     }
 
     @Override
-    public FunctionField<StringField.Strings> newInstance() {
+    public FunctionField<StringField.ListImpl> newInstance() {
         return new LdapUserAttributes();
     }
 

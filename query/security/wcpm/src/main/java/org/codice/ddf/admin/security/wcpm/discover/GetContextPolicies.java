@@ -19,14 +19,14 @@ import org.codice.ddf.admin.security.common.fields.wcpm.ContextPolicyBin;
 import org.codice.ddf.admin.security.common.services.PolicyManagerServiceProperties;
 import org.codice.ddf.internal.admin.configurator.actions.ServiceReader;
 
-public class GetContextPolicies extends GetFunctionField<ContextPolicyBin.ContextPolicies> {
+public class GetContextPolicies extends GetFunctionField<ContextPolicyBin.ListImpl> {
 
     public static final String DEFAULT_FIELD_NAME = "policies";
 
     public static final String DESCRIPTION =
             "Returns all currently configured policies applied to context paths.";
 
-    private ContextPolicyBin.ContextPolicies returnType;
+    private ContextPolicyBin.ListImpl returnType;
 
     private final ServiceReader serviceReader;
 
@@ -35,21 +35,21 @@ public class GetContextPolicies extends GetFunctionField<ContextPolicyBin.Contex
     public GetContextPolicies(ServiceReader serviceReader) {
         super(DEFAULT_FIELD_NAME, DESCRIPTION);
         this.serviceReader = serviceReader;
-        this.returnType = new ContextPolicyBin.ContextPolicies(serviceReader);
+        this.returnType = new ContextPolicyBin.ListImpl(serviceReader);
     }
 
     @Override
-    public ContextPolicyBin.ContextPolicies performFunction() {
+    public ContextPolicyBin.ListImpl performFunction() {
         return wcpmServiceProps.contextPolicyServiceToContextPolicyFields(serviceReader);
     }
 
     @Override
-    public ContextPolicyBin.ContextPolicies getReturnType() {
+    public ContextPolicyBin.ListImpl getReturnType() {
         return returnType;
     }
 
     @Override
-    public FunctionField<ContextPolicyBin.ContextPolicies> newInstance() {
+    public FunctionField<ContextPolicyBin.ListImpl> newInstance() {
         return new GetContextPolicies(serviceReader);
     }
 }

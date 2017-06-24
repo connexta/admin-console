@@ -31,23 +31,23 @@ public abstract class BaseListField<T extends DataType> extends BaseDataType<Lis
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseListField.class);
 
-    protected List<T> fields;
+    protected List<T> elements;
 
     public BaseListField(String fieldName) {
         super(fieldName, null, null);
-        this.fields = new ArrayList<>();
+        this.elements = new ArrayList<>();
     }
 
     public abstract Callable<T> getCreateListEntryCallable();
 
     @Override
     public List<T> getList() {
-        return fields;
+        return elements;
     }
 
     @Override
     public List getValue() {
-        return fields.stream()
+        return elements.stream()
                 .map(field -> field.getValue())
                 .collect(Collectors.toList());
     }
@@ -55,7 +55,7 @@ public abstract class BaseListField<T extends DataType> extends BaseDataType<Lis
     @Override
     public void setValue(List values) {
         if (values == null || values.isEmpty()) {
-            fields.clear();
+            elements.clear();
             return;
         }
 
@@ -79,9 +79,9 @@ public abstract class BaseListField<T extends DataType> extends BaseDataType<Lis
     public BaseListField<T> add(T value) {
         T newElem = createListEntry();
         newElem.setValue(value.getValue());
-        newElem.pathName(Integer.toString(fields.size()));
+        newElem.pathName(Integer.toString(elements.size()));
         newElem.updatePath(path());
-        fields.add(newElem);
+        elements.add(newElem);
         return this;
     }
 
@@ -122,5 +122,9 @@ public abstract class BaseListField<T extends DataType> extends BaseDataType<Lis
     public void pathName(String pathName) {
         super.pathName(pathName);
         getList().forEach(field -> field.updatePath(path()));
+    }
+
+    public BaseListField<T> useDefaultRequired() {
+        return this;
     }
 }

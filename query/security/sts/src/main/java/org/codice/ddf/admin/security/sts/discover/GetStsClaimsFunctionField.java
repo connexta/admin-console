@@ -28,7 +28,7 @@ public class GetStsClaimsFunctionField extends GetFunctionField<ListField<StsCla
 
     public static final String DESCRIPTION = "All currently configured claims the STS supports.";
 
-    public static final StsClaimField.StsClaims RETURN_TYPE = new StsClaimField.StsClaims();
+    public static final StsClaimField.ListImpl RETURN_TYPE = new StsClaimField.ListImpl();
 
     private final ServiceActions serviceActions;
 
@@ -42,7 +42,7 @@ public class GetStsClaimsFunctionField extends GetFunctionField<ListField<StsCla
         List<String> supportedClaims = new StsServiceProperties().getConfiguredStsClaims(
                 serviceActions);
 
-        ListField<StsClaimField> claims = new StsClaimField.StsClaims();
+        ListField<StsClaimField> claims = new StsClaimField.ListImpl();
 
         supportedClaims
                 .forEach(claim -> {

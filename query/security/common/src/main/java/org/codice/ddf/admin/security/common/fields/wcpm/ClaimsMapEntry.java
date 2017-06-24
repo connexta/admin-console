@@ -15,8 +15,11 @@ package org.codice.ddf.admin.security.common.fields.wcpm;
 
 import static org.codice.ddf.admin.common.report.message.DefaultMessages.missingKeyValue;
 
+import java.util.List;
 import java.util.concurrent.Callable;
 
+import org.codice.ddf.admin.api.Field;
+import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.codice.ddf.admin.common.fields.base.BaseListField;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
@@ -80,8 +83,8 @@ public class ClaimsMapEntry extends BaseObjectField {
     }
 
     @Override
-    public java.util.List validate() {
-        java.util.List validationMsgs = super.validate();
+    public List<ErrorMessage> validate() {
+        List validationMsgs = super.validate();
         if (!validationMsgs.isEmpty()) {
             return validationMsgs;
         }
@@ -97,22 +100,22 @@ public class ClaimsMapEntry extends BaseObjectField {
     }
 
     @Override
-    public java.util.List getFields() {
+    public List<Field> getFields() {
         return ImmutableList.of(key, value);
     }
 
-    public static class ClaimsMap extends BaseListField<ClaimsMapEntry> {
+    public static class ListImpl extends BaseListField<ClaimsMapEntry> {
 
         public static final String DEFAULT_FIELD_NAME = "claimsMapping";
 
         private Callable<ClaimsMapEntry> newClaimsEntry;
 
-        public ClaimsMap() {
+        public ListImpl() {
             super(DEFAULT_FIELD_NAME);
             newClaimsEntry = ClaimsMapEntry::new;
         }
 
-        public ClaimsMap(String fieldName) {
+        public ListImpl(String fieldName) {
             super(fieldName);
             newClaimsEntry = ClaimsMapEntry::new;
         }
@@ -122,7 +125,8 @@ public class ClaimsMapEntry extends BaseObjectField {
             return newClaimsEntry;
         }
 
-        public ClaimsMap useDefaultIsRequired() {
+        @Override
+        public ListImpl useDefaultRequired() {
             newClaimsEntry = () -> {
                 ClaimsMapEntry entry = new ClaimsMapEntry();
                 entry.claimField().isRequired(true);

@@ -36,7 +36,7 @@ public class AuthType extends BaseEnumField<String> {
 
     public static final String AUTH_TYPE_POLLER_FILTER = "(dataTypeId=enum.values.authTypes)";
 
-    private ServiceReader serviceReader;
+    private final ServiceReader serviceReader;
 
     public AuthType(ServiceReader serviceReader) {
         super(DEFAULT_FIELD_NAME,
@@ -46,26 +46,21 @@ public class AuthType extends BaseEnumField<String> {
     }
 
     public AuthType(ServiceReader serviceReader, EnumValue<String> value) {
-        super(DEFAULT_FIELD_NAME,
-                FIELD_TYPE_NAME,
-                DESCRIPTION);
-        this.serviceReader = serviceReader;
+        this(serviceReader);
         setValue(value.value());
     }
 
     @Override
     public List<EnumValue<String>> getEnumValues() {
-        Set<EnumValuePoller> enumValuePoller = serviceReader.getServices(EnumValuePoller.class, AUTH_TYPE_POLLER_FILTER);
-        if(enumValuePoller.size() == 0) {
-            return new ArrayList<>();
-        }
+        Set<EnumValuePoller> authTypes = serviceReader.getServices(EnumValuePoller.class, AUTH_TYPE_POLLER_FILTER);
 
-        return enumValuePoller.iterator()
-                .next()
-                .getEnumValues();
+        return authTypes.stream()
+                .findFirst()
+                .map(EnumValuePoller::getEnumValues)
+                .orElse(new ArrayList<>());
     }
 
-    public static class AuthTypes extends BaseListField<AuthType> {
+    public static class ListImpl extends BaseListField<AuthType> {
 
         public static final String DEFAULT_FIELD_NAME = "authTypes";
 
@@ -73,7 +68,7 @@ public class AuthType extends BaseEnumField<String> {
 
         private ServiceReader serviceReader;
 
-        public AuthTypes(ServiceReader serviceReader) {
+        public ListImpl(ServiceReader serviceReader) {
             super(DEFAULT_FIELD_NAME);
             this.serviceReader = serviceReader;
             newAuthType = () -> new AuthType(serviceReader);
@@ -84,7 +79,8 @@ public class AuthType extends BaseEnumField<String> {
             return newAuthType;
         }
 
-        public AuthTypes useDefaultIsRequired(){
+        @Override
+        public ListImpl useDefaultRequired(){
             newAuthType =  () -> {
                 AuthType authType = new AuthType(serviceReader);
                 authType.isRequired(true);
@@ -96,7 +92,7 @@ public class AuthType extends BaseEnumField<String> {
         }
 
         @Override
-        public AuthTypes addAll(Collection<AuthType> values) {
+        public ListImpl addAll(Collection<AuthType> values) {
             super.addAll(values);
             return this;
         }

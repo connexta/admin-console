@@ -205,8 +205,8 @@ public class TestFieldProvider extends BaseFieldProvider {
         public static final TestObjectField ENTRY_3_VALUE =
                 TestObjectField.createSampleTestObject();
 
-        public static final TestObjectField.TestObjects RETURN_TYPE =
-                new TestObjectField.TestObjects();
+        public static final TestObjectField.ListImpl RETURN_TYPE =
+                new TestObjectField.ListImpl();
 
         public GetList() {
             super(GET_LIST_FUNCTION_NAME, "Returns a sample list of sample objects.");
@@ -214,7 +214,7 @@ public class TestFieldProvider extends BaseFieldProvider {
 
         @Override
         public ListField performFunction() {
-            TestObjectField.TestObjects list = new TestObjectField.TestObjects();
+            TestObjectField.ListImpl list = new TestObjectField.ListImpl();
             list.addAll(Arrays.asList(ENTRY_1_VALUE, ENTRY_2_VALUE, ENTRY_3_VALUE));
             return list;
         }
@@ -303,7 +303,7 @@ public class TestFieldProvider extends BaseFieldProvider {
 
         private BooleanField booleanArg;
 
-        private StringField.Strings listArg;
+        private StringField.ListImpl listArg;
 
         private TestEnumField enumArg;
 
@@ -313,7 +313,7 @@ public class TestFieldProvider extends BaseFieldProvider {
             stringArg = new StringField();
             integerArg = new IntegerField();
             booleanArg = new BooleanField();
-            listArg = new StringField.Strings(LIST_FIELD_NAME);
+            listArg = new StringField.ListImpl(LIST_FIELD_NAME);
             enumArg = new TestEnumField();
             updateArgumentPaths();
         }

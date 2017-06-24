@@ -36,11 +36,11 @@ public class MapField extends BaseObjectField {
 
     public static final String DESCRIPTION = "A map containing a list of key value pairs.";
 
-    private PairField.Entries entries;
+    private PairField.ListImpl entries;
 
     public MapField() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
-        entries = new PairField.Entries();
+        entries = new PairField.ListImpl();
         updateInnerFieldPaths();
     }
 
@@ -114,12 +114,12 @@ public class MapField extends BaseObjectField {
         return validationMsgs;
     }
 
-    public static class Maps extends BaseListField<MapField> {
+    public static class ListImpl extends BaseListField<MapField> {
 
 
         public static final String DEFAULT_FIELD_NAME = "maps";
 
-        public Maps() {
+        public ListImpl() {
             super(DEFAULT_FIELD_NAME);
         }
 
@@ -129,7 +129,7 @@ public class MapField extends BaseObjectField {
         }
 
         @Override
-        public Maps addAll(Collection<MapField> values) {
+        public ListImpl addAll(Collection<MapField> values) {
             super.addAll(values);
             return this;
         }

@@ -21,7 +21,7 @@ class MapFieldTest extends Specification {
 
     MapField mapField
 
-    static ENTRIES = PairField.Entries.DEFAULT_FIELD_NAME
+    static ENTRIES = PairField.ListImpl.DEFAULT_FIELD_NAME
 
     def setup() {
         mapField = new MapField()

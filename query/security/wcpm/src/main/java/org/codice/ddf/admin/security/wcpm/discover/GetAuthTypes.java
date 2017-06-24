@@ -21,40 +21,40 @@ import org.codice.ddf.admin.common.fields.base.function.GetFunctionField;
 import org.codice.ddf.admin.security.common.fields.wcpm.AuthType;
 import org.codice.ddf.internal.admin.configurator.actions.ServiceReader;
 
-public class GetAuthTypes extends GetFunctionField<AuthType.AuthTypes> {
+public class GetAuthTypes extends GetFunctionField<AuthType.ListImpl> {
 
     public static final String FIELD_NAME = "authTypes";
 
     public static final String DESCRIPTION =
             "Retrieves all currently configured authentication types.";
 
-    private AuthType.AuthTypes returnType;
+    private AuthType.ListImpl returnType;
 
-    private ServiceReader serviceReader;
+    private final ServiceReader serviceReader;
 
     public GetAuthTypes(ServiceReader serviceReader) {
         super(FIELD_NAME, DESCRIPTION);
         this.serviceReader = serviceReader;
-        this.returnType = new AuthType.AuthTypes(serviceReader);
+        this.returnType = new AuthType.ListImpl(serviceReader);
     }
 
     @Override
-    public AuthType.AuthTypes performFunction() {
+    public AuthType.ListImpl performFunction() {
         List authType = new AuthType(serviceReader).getEnumValues()
                 .stream()
                 .map(enumVal -> new AuthType(serviceReader, enumVal))
                 .collect(Collectors.toList());
 
-        return new AuthType.AuthTypes(serviceReader).addAll(authType);
+        return new AuthType.ListImpl(serviceReader).addAll(authType);
     }
 
     @Override
-    public AuthType.AuthTypes getReturnType() {
+    public AuthType.ListImpl getReturnType() {
         return returnType;
     }
 
     @Override
-    public FunctionField<AuthType.AuthTypes> newInstance() {
+    public FunctionField<AuthType.ListImpl> newInstance() {
         return new GetAuthTypes(serviceReader);
     }
 }

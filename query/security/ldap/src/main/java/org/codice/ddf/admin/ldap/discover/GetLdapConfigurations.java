@@ -27,7 +27,8 @@ public class GetLdapConfigurations extends GetFunctionField<ListField<LdapConfig
 
     public static final String DESCRIPTION = "Retrieves all currently configured LDAP settings.";
 
-    public static final LdapConfigurationField.LdapConfigurations RETURN_TYPE = new LdapConfigurationField.LdapConfigurations();
+    public static final LdapConfigurationField.ListImpl
+            RETURN_TYPE = new LdapConfigurationField.ListImpl();
 
     private final ManagedServiceActions managedServiceActions;
 

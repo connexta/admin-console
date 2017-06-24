@@ -15,7 +15,6 @@ package org.codice.ddf.admin.security.wcpm.persist
 
 import org.codice.ddf.admin.api.FieldProvider
 import org.codice.ddf.admin.api.fields.FunctionField
-import org.codice.ddf.admin.api.fields.ListField
 import org.codice.ddf.admin.api.poller.EnumValuePoller
 import org.codice.ddf.admin.api.report.ReportWithResult
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField
@@ -114,7 +113,7 @@ class SaveContextPoliciesTest extends Specification {
         serviceActions.read(_) >> stsConfig
 
         policyManager = new PolicyManager()
-        ContextPolicyBin.ContextPolicies contextPolicies = new ContextPolicyBin.ContextPolicies(serviceReader)
+        ContextPolicyBin.ListImpl contextPolicies = new ContextPolicyBin.ListImpl(serviceReader)
         contextPolicies.setValue(testData.policies)
         policyManager.setPolicies(new PolicyManagerServiceProperties().contextPoliciesToPolicyManagerProps(contextPolicies.getList()))
 

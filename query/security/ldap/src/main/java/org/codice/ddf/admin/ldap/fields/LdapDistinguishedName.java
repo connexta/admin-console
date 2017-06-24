@@ -67,15 +67,15 @@ public class LdapDistinguishedName extends StringField {
         return true;
     }
 
-    public static class DistinguishedNames extends BaseListField<LdapDistinguishedName> {
+    public static class ListImpl extends BaseListField<LdapDistinguishedName> {
 
         public static final String DEFAULT_FIELD_NAME = "dns";
 
-        public DistinguishedNames() {
+        public ListImpl() {
             super(DEFAULT_FIELD_NAME);
         }
 
-        public DistinguishedNames(String fieldName) {
+        public ListImpl(String fieldName) {
             super(fieldName);
         }
 

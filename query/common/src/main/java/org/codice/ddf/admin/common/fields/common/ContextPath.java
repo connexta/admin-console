@@ -119,11 +119,11 @@ public class ContextPath extends StringField {
         }
     }
 
-    public static class ContextPaths extends BaseListField<ContextPath> {
+    public static class ListImpl extends BaseListField<ContextPath> {
 
         public static final String DEFAULT_NAME = "paths";
 
-        public ContextPaths() {
+        public ListImpl() {
             super(DEFAULT_NAME);
         }
 

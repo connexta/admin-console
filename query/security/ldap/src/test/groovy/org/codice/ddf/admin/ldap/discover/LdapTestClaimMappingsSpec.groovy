@@ -77,7 +77,7 @@ class LdapTestClaimMappingsSpec extends Specification {
         userAttribute.setValue('uid')
         baseDn = new LdapDistinguishedName()
         baseDn.setValue(LDAP_SERVER_BASE_USER_DN)
-        claimMappings = new ClaimsMapEntry.ClaimsMap()
+        claimMappings = new ClaimsMapEntry.ListImpl()
 
         // Initialize bad paths
         baseMsg = [LdapTestClaimMappings.FIELD_NAME, FunctionField.ARGUMENT]
@@ -276,8 +276,8 @@ class LdapTestClaimMappingsSpec extends Specification {
         report.result().getValue()
     }
 
-    private static ClaimsMapEntry.ClaimsMap createClaimsMapping(Map<String, String> claims) {
-        def claimMappings = new ClaimsMapEntry.ClaimsMap()
+    private static ClaimsMapEntry.ListImpl createClaimsMapping(Map<String, String> claims) {
+        def claimMappings = new ClaimsMapEntry.ListImpl()
         claims.each {
             claimMappings.add(new ClaimsMapEntry().key(it.key).value(it.value))
         }

@@ -16,8 +16,10 @@ package org.codice.ddf.admin.ldap.discover;
 import static org.codice.ddf.admin.ldap.commons.LdapMessages.userAttributeNotFoundError;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.stream.Collectors;
 
+import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.function.TestFunctionField;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
@@ -61,7 +63,7 @@ public class LdapTestClaimMappings extends TestFunctionField {
 
     private LdapDistinguishedName baseUserDn;
 
-    private ClaimsMapEntry.ClaimsMap claimMappings;
+    private ClaimsMapEntry.ListImpl claimMappings;
 
     private LdapTestingUtils utils;
 
@@ -76,7 +78,8 @@ public class LdapTestClaimMappings extends TestFunctionField {
         usernameAttribute = new StringField(USER_NAME_ATTRIBUTE).isRequired(true);
         baseUserDn = new LdapDistinguishedName(BASE_USER_DN);
         baseUserDn.isRequired(true);
-        claimMappings = new ClaimsMapEntry.ClaimsMap();
+        claimMappings = new ClaimsMapEntry.ListImpl();
+        claimMappings.useDefaultRequired();
         claimMappings.isRequired(true);
 
         updateArgumentPaths();
@@ -86,7 +89,7 @@ public class LdapTestClaimMappings extends TestFunctionField {
     }
 
     @Override
-    public java.util.List getArguments() {
+    public List<DataType> getArguments() {
         return ImmutableList.of(conn, bindInfo, usernameAttribute, baseUserDn, claimMappings);
     }
 
@@ -103,7 +106,7 @@ public class LdapTestClaimMappings extends TestFunctionField {
             return;
         }
 
-        java.util.List claimArgs = claimMappings.getList()
+        List<StringField> claimArgs = claimMappings.getList()
                 .stream()
                 .map(ClaimsMapEntry::claimField)
                 .collect(Collectors.toList());

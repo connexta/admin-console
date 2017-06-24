@@ -22,15 +22,15 @@ import org.codice.ddf.admin.common.fields.base.function.GetFunctionField;
 import org.codice.ddf.admin.common.fields.common.ContextPath;
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
 
-public class GetWhiteListContexts extends GetFunctionField<ContextPath.ContextPaths> {
+public class GetWhiteListContexts extends GetFunctionField<ContextPath.ListImpl> {
 
     public static final String DEFAULT_FIELD_NAME = "whitelisted";
 
     public static final String DESCRIPTION =
             "Returns all white listed contexts. Any contexts that are white listed have no security policy applied to them.";
 
-    public static final ContextPath.ContextPaths RETURN_TYPE =
-            new ContextPath.ContextPaths();
+    public static final ContextPath.ListImpl RETURN_TYPE =
+            new ContextPath.ListImpl();
 
     private final ServiceActions serviceActions;
 
@@ -41,9 +41,9 @@ public class GetWhiteListContexts extends GetFunctionField<ContextPath.ContextPa
     }
 
     @Override
-    public ContextPath.ContextPaths performFunction() {
+    public ContextPath.ListImpl performFunction() {
         List<String> whiteListStrs = getWhitelistContexts(serviceActions);
-        ContextPath.ContextPaths whiteListedField = new ContextPath.ContextPaths();
+        ContextPath.ListImpl whiteListedField = new ContextPath.ListImpl();
         for (String whiteListStr : whiteListStrs) {
             ContextPath newContextPath = new ContextPath();
             newContextPath.setValue(whiteListStr);
@@ -53,12 +53,12 @@ public class GetWhiteListContexts extends GetFunctionField<ContextPath.ContextPa
     }
 
     @Override
-    public ContextPath.ContextPaths getReturnType() {
+    public ContextPath.ListImpl getReturnType() {
         return RETURN_TYPE;
     }
 
     @Override
-    public FunctionField<ContextPath.ContextPaths> newInstance() {
+    public FunctionField<ContextPath.ListImpl> newInstance() {
         return new GetWhiteListContexts(serviceActions);
     }
 }

@@ -13,7 +13,7 @@
  **/
 package org.codice.ddf.admin.security.wcpm;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +26,7 @@ import org.codice.ddf.security.handler.api.AuthenticationHandler;
 
 public class AuthTypesPoller implements EnumValuePoller<String> {
 
-    private List<AuthenticationHandler> authHandlers = new ArrayList<>();
+    private List<AuthenticationHandler> authHandlers = Collections.emptyList();
     private Map<String, String> descriptionMap = new HashMap<>();
 
     @Override

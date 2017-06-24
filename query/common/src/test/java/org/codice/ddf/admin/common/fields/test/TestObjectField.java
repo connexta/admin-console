@@ -59,7 +59,7 @@ public class TestObjectField extends BaseObjectField {
 
     private StringField stringField;
 
-    private StringField.Strings listField;
+    private StringField.ListImpl listField;
 
     private TestEnumField enumField;
 
@@ -68,7 +68,7 @@ public class TestObjectField extends BaseObjectField {
         integerField = new IntegerField();
         booleanField = new BooleanField();
         stringField = new StringField();
-        listField = new StringField.Strings(LIST_FIELD_NAME).useDefaultIsRequired();
+        listField = new StringField.ListImpl(LIST_FIELD_NAME).useDefaultRequired();
         enumField = new TestEnumField();
         innerTestObjectField = new InnerTestObjectField();
         updateInnerFieldPaths();
@@ -86,7 +86,7 @@ public class TestObjectField extends BaseObjectField {
         return stringField;
     }
 
-    public StringField.Strings getListField() {
+    public StringField.ListImpl getListField() {
         return listField;
     }
 
@@ -180,13 +180,13 @@ public class TestObjectField extends BaseObjectField {
         }
     }
 
-    public static class TestObjects extends BaseListField<TestObjectField> {
+    public static class ListImpl extends BaseListField<TestObjectField> {
 
-        public TestObjects(String fieldName) {
+        public ListImpl(String fieldName) {
             super(fieldName);
         }
 
-        public TestObjects() {
+        public ListImpl() {
             this(LIST_FIELD_NAME);
         }
 

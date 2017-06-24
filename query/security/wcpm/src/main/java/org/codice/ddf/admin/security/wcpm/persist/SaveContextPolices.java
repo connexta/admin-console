@@ -40,22 +40,22 @@ import org.codice.ddf.internal.admin.configurator.actions.ServiceReader;
 
 import com.google.common.collect.ImmutableList;
 
-public class SaveContextPolices extends BaseFunctionField<ContextPolicyBin.ContextPolicies> {
+public class SaveContextPolices extends BaseFunctionField<ContextPolicyBin.ListImpl> {
 
     public static final String FUNCTION_FIELD_NAME = "saveContextPolicies";
 
     public static final String DESCRIPTION =
             "Saves a list of policies to be applied to their corresponding context paths.";
 
-    private ContextPolicyBin.ContextPolicies returnType;
+    private ContextPolicyBin.ListImpl returnType;
 
-    private ConfiguratorFactory configuratorFactory;
+    private final ConfiguratorFactory configuratorFactory;
 
     private final ServiceActions serviceActions;
 
-    private ServiceReader serviceReader;
+    private final ServiceReader serviceReader;
 
-    private ContextPolicyBin.ContextPolicies contextPolicies;
+    private ContextPolicyBin.ListImpl contextPolicies;
 
     private StsServiceProperties stsServiceProps;
 
@@ -65,15 +65,15 @@ public class SaveContextPolices extends BaseFunctionField<ContextPolicyBin.Conte
         this.configuratorFactory = configuratorFactory;
         this.serviceActions = serviceActions;
         this.serviceReader = serviceReader;
-        this.returnType = new ContextPolicyBin.ContextPolicies(serviceReader);
-        contextPolicies = new ContextPolicyBin.ContextPolicies(serviceReader).useDefaultIsRequired();
+        this.returnType = new ContextPolicyBin.ListImpl(serviceReader);
+        contextPolicies = new ContextPolicyBin.ListImpl(serviceReader).useDefaultRequired();
         updateArgumentPaths();
 
         stsServiceProps = new StsServiceProperties();
     }
 
     @Override
-    public ContextPolicyBin.ContextPolicies performFunction() {
+    public ContextPolicyBin.ListImpl performFunction() {
         Configurator configurator = configuratorFactory.getConfigurator();
         configurator.add(serviceActions.build(POLICY_MANAGER_PID,
                 new PolicyManagerServiceProperties().contextPoliciesToPolicyManagerProps(
@@ -123,7 +123,7 @@ public class SaveContextPolices extends BaseFunctionField<ContextPolicyBin.Conte
     }
 
     @Override
-    public ContextPolicyBin.ContextPolicies getReturnType() {
+    public ContextPolicyBin.ListImpl getReturnType() {
         return returnType;
     }
 
@@ -133,7 +133,7 @@ public class SaveContextPolices extends BaseFunctionField<ContextPolicyBin.Conte
     }
 
     @Override
-    public FunctionField<ContextPolicyBin.ContextPolicies> newInstance() {
+    public FunctionField<ContextPolicyBin.ListImpl> newInstance() {
         return new SaveContextPolices(configuratorFactory, serviceActions, serviceReader);
     }
 }

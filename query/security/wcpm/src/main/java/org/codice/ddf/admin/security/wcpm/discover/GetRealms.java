@@ -21,13 +21,13 @@ import org.codice.ddf.admin.common.fields.base.function.GetFunctionField;
 import org.codice.ddf.admin.security.common.fields.wcpm.Realm;
 import org.codice.ddf.internal.admin.configurator.actions.ServiceReader;
 
-public class GetRealms extends GetFunctionField<Realm.Realms> {
+public class GetRealms extends GetFunctionField<Realm.ListImpl> {
 
     public static final String FIELD_NAME = "realms";
 
     public static final String DESCRIPTION = "Retrieves all currently configured realms.";
 
-    private ServiceReader serviceReader;
+    private final ServiceReader serviceReader;
 
     public GetRealms(ServiceReader serviceReader) {
         super(FIELD_NAME, DESCRIPTION);
@@ -35,22 +35,22 @@ public class GetRealms extends GetFunctionField<Realm.Realms> {
     }
 
     @Override
-    public Realm.Realms performFunction() {
+    public Realm.ListImpl performFunction() {
         List<Realm> realms = new Realm(serviceReader).getEnumValues()
                 .stream()
                 .map(enumVal -> new Realm(serviceReader, enumVal))
                 .collect(Collectors.toList());
 
-        return new Realm.Realms(serviceReader).addAll(realms);
+        return new Realm.ListImpl(serviceReader).addAll(realms);
     }
 
     @Override
-    public Realm.Realms getReturnType() {
-        return new Realm.Realms(serviceReader);
+    public Realm.ListImpl getReturnType() {
+        return new Realm.ListImpl(serviceReader);
     }
 
     @Override
-    public FunctionField<Realm.Realms> newInstance() {
+    public FunctionField<Realm.ListImpl> newInstance() {
         return new GetRealms(serviceReader);
     }
 }

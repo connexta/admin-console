@@ -59,17 +59,17 @@ public class StringField extends BaseScalarField<String> {
         return this;
     }
 
-    public static class Strings extends BaseListField<StringField> {
+    public static class ListImpl extends BaseListField<StringField> {
 
         public static final String DEFAULT_FIELD_NAME = "strings";
         private Callable<StringField> newString;
 
-        public Strings(String fieldName) {
+        public ListImpl(String fieldName) {
             super(fieldName);
             newString = StringField::new;
         }
 
-        public Strings() {
+        public ListImpl() {
             this(DEFAULT_FIELD_NAME);
         }
 
@@ -78,7 +78,8 @@ public class StringField extends BaseScalarField<String> {
             return newString;
         }
 
-        public Strings useDefaultIsRequired() {
+        @Override
+        public ListImpl useDefaultRequired() {
             newString = () -> {
                 StringField newStringField = new StringField();
                 newStringField.isRequired(true);

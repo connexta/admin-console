@@ -69,15 +69,15 @@ public class WfsSourceInfoField extends BaseObjectField {
     }
 
     @Override
-    public java.util.List<Field> getFields() {
+    public List<Field> getFields() {
         return ImmutableList.of(config, isAvailable);
     }
 
-    public static class List extends BaseListField<WfsSourceInfoField> {
+    public static class ListImpl extends BaseListField<WfsSourceInfoField> {
 
         public static final String DEFAULT_FIELD_NAME = "sources";
 
-        public List() {
+        public ListImpl() {
             super(DEFAULT_FIELD_NAME);
         }
 

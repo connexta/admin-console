@@ -15,10 +15,12 @@ package org.codice.ddf.admin.security.common.fields.wcpm;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
+import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.fields.base.BaseListField;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
@@ -36,13 +38,13 @@ public class ContextPolicyBin extends BaseObjectField {
     public static final String DESCRIPTION =
             "Represents a policy being applied to a set of context paths.";
 
-    private ContextPath.ContextPaths contexts;
+    private ContextPath.ListImpl contexts;
 
-    private AuthType.AuthTypes authTypes;
+    private AuthType.ListImpl authTypes;
 
     private Realm realm;
 
-    private ClaimsMapEntry.ClaimsMap claimsMapping;
+    private ClaimsMapEntry.ListImpl claimsMapping;
 
     private ServiceReader serviceReader;
 
@@ -50,10 +52,10 @@ public class ContextPolicyBin extends BaseObjectField {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
         this.serviceReader = serviceReader;
 
-        contexts = new ContextPath.ContextPaths();
-        authTypes = new AuthType.AuthTypes(serviceReader);
+        contexts = new ContextPath.ListImpl();
+        authTypes = new AuthType.ListImpl(serviceReader);
         realm = new Realm(serviceReader);
-        claimsMapping = new ClaimsMapEntry.ClaimsMap();
+        claimsMapping = new ClaimsMapEntry.ListImpl();
         updateInnerFieldPaths();
     }
 
@@ -89,7 +91,7 @@ public class ContextPolicyBin extends BaseObjectField {
     }
 
     public ContextPolicyBin addClaimsMap(Map<String, String> claimsMap) {
-        java.util.List claims = claimsMap.entrySet()
+        List<ClaimsMapEntry> claims = claimsMap.entrySet()
                 .stream()
                 .map(entry -> new ClaimsMapEntry().key(entry.getKey())
                         .value(entry.getValue()))
@@ -110,11 +112,11 @@ public class ContextPolicyBin extends BaseObjectField {
         return this;
     }
 
-    public java.util.List contexts() {
+    public List<String> contexts() {
         return contexts.getValue();
     }
 
-    public java.util.List authTypes() {
+    public List<String> authTypes() {
         return authTypes.getValue();
     }
 
@@ -133,7 +135,7 @@ public class ContextPolicyBin extends BaseObjectField {
     }
 
     @Override
-    public java.util.List getFields() {
+    public List<Field> getFields() {
         return ImmutableList.of(contexts, authTypes, realm, claimsMapping);
     }
 
@@ -146,21 +148,21 @@ public class ContextPolicyBin extends BaseObjectField {
     public ContextPolicyBin useDefaultRequiredFields() {
         isRequired(true);
         contexts.isRequired(true);
-        authTypes.useDefaultIsRequired();
+        authTypes.useDefaultRequired();
         realm.isRequired(true);
-        claimsMapping.useDefaultIsRequired();
+        claimsMapping.useDefaultRequired();
         return this;
     }
 
-    public static class ContextPolicies extends BaseListField<ContextPolicyBin> {
+    public static class ListImpl extends BaseListField<ContextPolicyBin> {
 
         public static final String DEFAULT_FIELD_NAME = "policies";
 
         private Callable<ContextPolicyBin> newPolicy;
 
-        private ServiceReader serviceReader;
+        private final ServiceReader serviceReader;
 
-        public ContextPolicies(ServiceReader serviceReader) {
+        public ListImpl(ServiceReader serviceReader) {
             super(DEFAULT_FIELD_NAME);
             this.serviceReader = serviceReader;
             newPolicy = () -> new ContextPolicyBin(serviceReader);
@@ -172,12 +174,13 @@ public class ContextPolicyBin extends BaseObjectField {
         }
 
         @Override
-        public ContextPolicies addAll(Collection<ContextPolicyBin> values) {
+        public ListImpl addAll(Collection<ContextPolicyBin> values) {
             super.addAll(values);
             return this;
         }
 
-        public ContextPolicies useDefaultIsRequired(){
+        @Override
+        public ListImpl useDefaultRequired(){
             newPolicy = () -> {
                 ContextPolicyBin bin = new ContextPolicyBin(serviceReader);
                 bin.useDefaultRequiredFields();

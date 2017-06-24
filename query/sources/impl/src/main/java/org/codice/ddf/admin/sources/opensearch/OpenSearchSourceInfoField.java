@@ -13,6 +13,7 @@
  **/
 package org.codice.ddf.admin.sources.opensearch;
 
+import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.codice.ddf.admin.api.Field;
@@ -68,15 +69,15 @@ public class OpenSearchSourceInfoField extends BaseObjectField {
     }
 
     @Override
-    public java.util.List<Field> getFields() {
+    public List<Field> getFields() {
         return ImmutableList.of(config, isAvailable);
     }
 
-    public static class List extends BaseListField<OpenSearchSourceInfoField> {
+    public static class ListImpl extends BaseListField<OpenSearchSourceInfoField> {
 
         public static final String DEFAULT_FIELD_NAME = "sources";
 
-        public List() {
+        public ListImpl() {
             super(DEFAULT_FIELD_NAME);
         }
 

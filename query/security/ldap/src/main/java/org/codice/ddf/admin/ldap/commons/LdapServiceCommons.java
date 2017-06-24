@@ -84,7 +84,7 @@ public class LdapServiceCommons {
                 .forEach(config -> config.bindUserInfoField()
                         .password(FLAG_PASSWORD));
 
-        return new LdapConfigurationField.LdapConfigurations().addAll(configs);
+        return new LdapConfigurationField.ListImpl().addAll(configs);
     }
 
     public Map<String, Object> ldapConfigToLdapClaimsHandlerService(LdapConfigurationField config,

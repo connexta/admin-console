@@ -28,18 +28,6 @@ public abstract class BaseEnumField<S> extends BaseDataType<S>
 
     private List<EnumValue<S>> enumValues;
 
-    public BaseEnumField(String fieldName, String fieldTypeName, String description,
-            List<EnumValue<S>> enumValues) {
-        super(fieldName, fieldTypeName, description);
-        this.enumValues = enumValues;
-    }
-
-    public BaseEnumField(String fieldName, String fieldTypeName, String description,
-            List<EnumValue<S>> enumValues, EnumValue<S> enumValue) {
-        this(fieldName, fieldTypeName, description, enumValues);
-        this.enumValue = enumValue == null ? null : enumValue.value();
-    }
-
     /**
      * When this constructor is used, make sure the getEnumValues is overridden
      * @param fieldName
@@ -48,7 +36,18 @@ public abstract class BaseEnumField<S> extends BaseDataType<S>
      */
     public BaseEnumField(String fieldName, String fieldTypeName, String description) {
         super(fieldName, fieldTypeName, description);
+    }
+
+    public BaseEnumField(String fieldName, String fieldTypeName, String description,
+            List<EnumValue<S>> enumValues) {
+        this(fieldName, fieldTypeName, description);
         this.enumValues = enumValues;
+    }
+
+    public BaseEnumField(String fieldName, String fieldTypeName, String description,
+            List<EnumValue<S>> enumValues, EnumValue<S> enumValue) {
+        this(fieldName, fieldTypeName, description, enumValues);
+        setValue(enumValue == null ? null : enumValue.value());
     }
 
     @Override

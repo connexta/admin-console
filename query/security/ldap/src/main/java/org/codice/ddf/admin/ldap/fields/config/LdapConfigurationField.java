@@ -13,10 +13,12 @@
  **/
 package org.codice.ddf.admin.ldap.fields.config;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
+import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.fields.base.BaseListField;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
@@ -45,7 +47,7 @@ public class LdapConfigurationField extends BaseObjectField {
 
     private LdapDirectorySettingsField settings;
 
-    private ClaimsMapEntry.ClaimsMap claimMappings;
+    private ClaimsMapEntry.ListImpl claimMappings;
 
     public LdapConfigurationField() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
@@ -53,7 +55,7 @@ public class LdapConfigurationField extends BaseObjectField {
         connection = new LdapConnectionField();
         bindUserInfo = new LdapBindUserInfo();
         settings = new LdapDirectorySettingsField();
-        claimMappings = new ClaimsMapEntry.ClaimsMap();
+        claimMappings = new ClaimsMapEntry.ListImpl();
 
         updateInnerFieldPaths();
     }
@@ -125,7 +127,7 @@ public class LdapConfigurationField extends BaseObjectField {
     }
 
     @Override
-    public java.util.List getFields() {
+    public List<Field> getFields() {
         return ImmutableList.of(pid, connection, bindUserInfo, settings, claimMappings);
     }
 
@@ -143,11 +145,11 @@ public class LdapConfigurationField extends BaseObjectField {
         return this;
     }
 
-    public static class LdapConfigurations extends BaseListField<LdapConfigurationField> {
+    public static class ListImpl extends BaseListField<LdapConfigurationField> {
 
         public static final String DEFAULT_FIELD_NAME = "configs";
 
-        public LdapConfigurations() {
+        public ListImpl() {
             super(DEFAULT_FIELD_NAME);
         }
 

@@ -28,17 +28,17 @@ import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
 
 import com.google.common.collect.ImmutableList;
 
-public class SaveWhitelistContexts extends BaseFunctionField<ContextPath.ContextPaths> {
+public class SaveWhitelistContexts extends BaseFunctionField<ContextPath.ListImpl> {
 
     public static final String FIELD_NAME = "saveWhitelistContexts";
 
     public static final String DESCRIPTION =
             "Persists the given contexts paths as white listed contexts. White listing a context path will result in no security being applied to the given paths.";
 
-    public static final ContextPath.ContextPaths RETURN_TYPE =
-            new ContextPath.ContextPaths();
+    public static final ContextPath.ListImpl RETURN_TYPE =
+            new ContextPath.ListImpl();
 
-    private ContextPath.ContextPaths contexts;
+    private ContextPath.ListImpl contexts;
 
     private ConfiguratorFactory configuratorFactory;
 
@@ -50,12 +50,12 @@ public class SaveWhitelistContexts extends BaseFunctionField<ContextPath.Context
         this.configuratorFactory = configuratorFactory;
         this.serviceActions = serviceActions;
 
-        contexts = new ContextPath.ContextPaths();
+        contexts = new ContextPath.ListImpl();
         updateArgumentPaths();
     }
 
     @Override
-    public ContextPath.ContextPaths performFunction() {
+    public ContextPath.ListImpl performFunction() {
         Configurator configurator = configuratorFactory.getConfigurator();
         configurator.add(serviceActions.build(PolicyManagerServiceProperties.POLICY_MANAGER_PID,
                 new PolicyManagerServiceProperties().whiteListToPolicyManagerProps(contexts),
@@ -73,7 +73,7 @@ public class SaveWhitelistContexts extends BaseFunctionField<ContextPath.Context
     }
 
     @Override
-    public ContextPath.ContextPaths getReturnType() {
+    public ContextPath.ListImpl getReturnType() {
         return RETURN_TYPE;
     }
 

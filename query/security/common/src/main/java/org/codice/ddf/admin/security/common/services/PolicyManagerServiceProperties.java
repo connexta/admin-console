@@ -86,7 +86,7 @@ public class PolicyManagerServiceProperties {
                 reqAttrisProps.toArray(new String[0]));
     }
 
-    public ContextPolicyBin.ContextPolicies contextPolicyServiceToContextPolicyFields(
+    public ContextPolicyBin.ListImpl contextPolicyServiceToContextPolicyFields(
             ServiceReader serviceReader) {
         ContextPolicyManager policyManager =
                 serviceReader.getServiceReference(ContextPolicyManager.class);
@@ -119,7 +119,7 @@ public class PolicyManagerServiceProperties {
             }
         }
 
-        return new ContextPolicyBin.ContextPolicies(serviceReader).addAll(policies);
+        return new ContextPolicyBin.ListImpl(serviceReader).addAll(policies);
     }
 
     private boolean hasSameRequiredAttributes(ContextPolicyBin bin,
@@ -142,7 +142,7 @@ public class PolicyManagerServiceProperties {
                 .isPresent();
     }
 
-    public Map<String, Object> whiteListToPolicyManagerProps(ContextPath.ContextPaths contexts) {
+    public Map<String, Object> whiteListToPolicyManagerProps(ContextPath.ListImpl contexts) {
         List<String> serviceContexts =
                 contexts.getValue() == null ? new ArrayList<>() : contexts.getValue();
         return ImmutableMap.of(WHITE_LIST_CONTEXT, serviceContexts);

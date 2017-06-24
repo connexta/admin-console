@@ -41,8 +41,8 @@ public class GetWfsConfigurations extends BaseFunctionField<ListField<WfsSourceI
     public static final String DESCRIPTION =
             "Retrieves all currently configured WFS sources. If a source pid is specified, only that source configuration will be returned.";
 
-    public static final WfsSourceInfoField.List RETURN_TYPE =
-            new WfsSourceInfoField.List();
+    public static final WfsSourceInfoField.ListImpl RETURN_TYPE =
+            new WfsSourceInfoField.ListImpl();
 
     private PidField pid;
 
@@ -79,7 +79,7 @@ public class GetWfsConfigurations extends BaseFunctionField<ListField<WfsSourceI
 
     @Override
     public ListField<WfsSourceInfoField> performFunction() {
-        WfsSourceInfoField.List cswSourceInfoFields = new WfsSourceInfoField.List();
+        WfsSourceInfoField.ListImpl cswSourceInfoFields = new WfsSourceInfoField.ListImpl();
 
         List configs =
                 sourceUtilCommons.getSourceConfigurations(WFS_FACTORY_PIDS,

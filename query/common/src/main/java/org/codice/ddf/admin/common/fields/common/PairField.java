@@ -69,11 +69,11 @@ public class PairField extends BaseObjectField {
         return value.getValue();
     }
 
-    public static class Entries extends BaseListField<PairField> {
+    public static class ListImpl extends BaseListField<PairField> {
 
         public static final String DEFAULT_FIELD_NAME = "entries";
 
-        public Entries() {
+        public ListImpl() {
             super(DEFAULT_FIELD_NAME);
         }
 

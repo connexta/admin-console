@@ -41,11 +41,11 @@ public class StsClaimField extends StringField {
         return this;
     }
 
-    public static class StsClaims extends BaseListField<StsClaimField> {
+    public static class ListImpl extends BaseListField<StsClaimField> {
 
         public static final String DEFAULT_FIELD_NAME = "claims";
 
-        public StsClaims() {
+        public ListImpl() {
             super(DEFAULT_FIELD_NAME);
         }
 

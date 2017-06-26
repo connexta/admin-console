@@ -98,6 +98,7 @@ public class SaveOpenSearchConfiguration extends BaseFunctionField<BooleanField>
 
         if(report.containsFailedResults()) {
             addResultMessage(failedPersistError());
+            return new BooleanField(false);
         }
 
         addMessages(sourceUtilCommons.saveSource(pid,

@@ -202,6 +202,20 @@ class SaveWfsConfigurationTest extends Specification {
         report.messages().get(0).path == RESULT_ARGUMENT_PATH
     }
 
+    def 'Return false when wfs feature fails to start'() {
+        when:
+        saveWfsConfiguration.setValue(functionArgs)
+        serviceReader.getServices(_, _) >> []
+        def report = saveWfsConfiguration.getValue()
+
+        then:
+        1 * configurator.commit(_, _) >> mockReport(true)
+        !report.result().getValue()
+        report.messages().size() == 1
+        report.messages().get(0).path == RESULT_ARGUMENT_PATH
+        report.messages().get(0).code == DefaultMessages.FAILED_PERSIST
+    }
+
     def 'Fail due to missing required fields'() {
         when:
         def report = saveWfsConfiguration.getValue()

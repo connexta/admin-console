@@ -108,6 +108,7 @@ public class SaveWfsConfiguration extends BaseFunctionField<BooleanField> {
 
         if(report != null && report.containsFailedResults()) {
             addResultMessage(failedPersistError());
+            return new BooleanField(false);
         }
 
         addMessages(sourceUtilCommons.saveSource(pid,

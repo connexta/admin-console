@@ -51,10 +51,10 @@ const BindSettings = (props) => {
     setDefaults
   } = props
 
-  const { bindUserMethod, encryptionMethod } = configs
+  const { bindUserMethod, encryption } = configs
   let bindUserMethodOptions = ['Simple']
 
-  if (encryptionMethod === 'LDAPS' || encryptionMethod === 'StartTLS') {
+  if (encryption === 'ldaps' || encryption === 'startTls') {
     bindUserMethodOptions.push('Digest MD5 SASL')
   }
 

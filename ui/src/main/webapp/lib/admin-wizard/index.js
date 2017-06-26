@@ -53,7 +53,12 @@ const mapDispatchToProps = (dispatch, { wizardId, ids = [] }) => ({
   setDefaults: (arg) => dispatch(setDefaults(arg)),
   setOptions: (arg) => dispatch(setOptions(arg)),
   clearWizard: () => dispatch(clearWizard()),
-  prev: () => dispatch(prevStage()),
+  prev: (arg) => dispatch((dispatch, getState) => {
+    const stageId = getDisplayedLdapStage(getState())
+    dispatch(clearMessages())
+    dispatch(setMessages(stageId, []))
+    dispatch(prevStage())
+  }),
   next: (arg) => dispatch((dispatch, getState) => {
     const stageId = getDisplayedLdapStage(getState())
     dispatch(clearMessages())

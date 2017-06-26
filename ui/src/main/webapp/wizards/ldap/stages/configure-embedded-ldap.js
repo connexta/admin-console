@@ -10,17 +10,6 @@ import Message from 'components/Message'
 import Body from 'components/wizard/Body'
 import Navigation, { Back, Finish } from 'components/wizard/Navigation'
 
-const useCaseDescription = (ldapUseCase) => {
-  switch (ldapUseCase) {
-    case 'authenticationAndAttributeStore':
-      return 'authentication source & attribute store'
-    case 'authentication' :
-      return 'authentication source'
-    default:
-      return 'credential store'
-  }
-}
-
 const installEmbeddedLdap = (useCase) => ({
   mutation: gql`
     mutation InstallEmbeddedLdap($useCase: LdapUseCase!) {
@@ -56,10 +45,6 @@ const ConfigureEmbeddedLdap = (props) => {
         <p>
           The embedded LDAP server is used for testing purposes only and
           should not be used in a production environment.
-        </p>
-        <p>
-          Installing Embedded LDAP will start up the internal LDAP and
-          configure it as a {useCaseDescription(ldapUseCase)}.
         </p>
       </Description>
       <Body>

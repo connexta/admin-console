@@ -21,7 +21,7 @@ import org.codice.ddf.admin.common.fields.common.PortField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.ldap.fields.config.LdapConfigurationField
 import org.codice.ddf.admin.ldap.fields.config.LdapDirectorySettingsField
-import org.codice.ddf.admin.ldap.fields.config.LdapUseCase
+import org.codice.ddf.admin.security.common.fields.ldap.LdapUseCase
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindMethod
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindUserInfo
 import org.codice.ddf.admin.ldap.fields.connection.LdapConnectionField

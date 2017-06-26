@@ -13,6 +13,7 @@
  **/
 package org.codice.ddf.admin.ldap;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.codice.ddf.admin.api.Field;
@@ -27,7 +28,6 @@ import org.codice.ddf.admin.ldap.discover.LdapTestClaimMappings;
 import org.codice.ddf.admin.ldap.discover.LdapTestConnection;
 import org.codice.ddf.admin.ldap.discover.LdapTestDirectorySettings;
 import org.codice.ddf.admin.ldap.discover.LdapUserAttributes;
-import org.codice.ddf.admin.ldap.embedded.InstallEmbeddedLdap;
 import org.codice.ddf.admin.ldap.persist.CreateLdapConfiguration;
 import org.codice.ddf.admin.ldap.persist.DeleteLdapConfiguration;
 import org.codice.ddf.internal.admin.configurator.actions.FeatureActions;
@@ -66,7 +66,9 @@ public class LdapFieldProvider extends BaseFieldProvider {
 
     private DeleteLdapConfiguration deleteConfig;
 
-    private InstallEmbeddedLdap installEmbeddedLdap;
+    private List<Field> ldapDiscoveryFields = Collections.emptyList();
+
+    private List<FunctionField> ldapMutationFields = Collections.emptyList();
 
     public LdapFieldProvider(ConfiguratorFactory configuratorFactory, FeatureActions featureActions,
             ManagedServiceActions managedServiceActions, PropertyActions propertyActions,
@@ -90,20 +92,37 @@ public class LdapFieldProvider extends BaseFieldProvider {
                 managedServiceActions,
                 propertyActions,
                 serviceActions);
-        installEmbeddedLdap = new InstallEmbeddedLdap(configuratorFactory, featureActions);
     }
 
     @Override
     public List<Field> getDiscoveryFields() {
-        return ImmutableList.of(testConnection,
-                testBind, testSettings, recommendedSettings, claimMappings,
-                ldapQuery,
-                getUserAttris,
-                getConfigs);
+        return new ImmutableList.Builder<Field>() //
+                .addAll(ldapDiscoveryFields)
+                .add(testConnection)
+                .add(testBind)
+                .add(testSettings)
+                .add(recommendedSettings)
+                .add(claimMappings)
+                .add(ldapQuery)
+                .add(getUserAttris)
+                .add(getConfigs)
+                .build();
     }
 
     @Override
     public List<FunctionField> getMutationFunctions() {
-        return ImmutableList.of(createConfig, deleteConfig, installEmbeddedLdap);
+        return new ImmutableList.Builder<FunctionField>() //
+                .addAll(ldapMutationFields)
+                .add(createConfig)
+                .add(deleteConfig)
+                .build();
+    }
+
+    public void setLdapDiscoveryFields(List<Field> ldapDiscoveryFields) {
+        this.ldapDiscoveryFields = ldapDiscoveryFields;
+    }
+
+    public void setLdapMutationFields(List<FunctionField> ldapMutationFields) {
+        this.ldapMutationFields = ldapMutationFields;
     }
 }

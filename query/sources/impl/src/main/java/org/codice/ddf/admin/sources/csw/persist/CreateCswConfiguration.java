@@ -37,12 +37,12 @@ import org.codice.ddf.internal.admin.configurator.actions.ServiceReader;
 
 import com.google.common.collect.ImmutableList;
 
-public class SaveCswConfiguration extends BaseFunctionField<BooleanField> {
+public class CreateCswConfiguration extends BaseFunctionField<BooleanField> {
 
-    public static final String FIELD_NAME = "saveCswSource";
+    public static final String FIELD_NAME = "createCswSource";
 
     public static final String DESCRIPTION =
-            "Saves a CSW source configuration. If a pid is specified, the source configuration specified by the pid will be updated. Returns true on success and false on failure.";
+            "Creates a CSW source configuration. Returns true on success and false on failure.";
 
     private CswSourceConfigurationField config;
 
@@ -60,7 +60,7 @@ public class SaveCswConfiguration extends BaseFunctionField<BooleanField> {
 
     private final FeatureActions featureActions;
 
-    public SaveCswConfiguration(ConfiguratorFactory configuratorFactory,
+    public CreateCswConfiguration(ConfiguratorFactory configuratorFactory,
             ServiceActions serviceActions, ManagedServiceActions managedServiceActions,
             ServiceReader serviceReader, FeatureActions featureActions) {
         super(FIELD_NAME, DESCRIPTION, new BooleanField());
@@ -90,12 +90,11 @@ public class SaveCswConfiguration extends BaseFunctionField<BooleanField> {
         configurator.add(featureActions.start(CSW_FEATURE));
         OperationReport report = configurator.commit("Starting feature [{}]", CSW_FEATURE);
 
-        if(report.containsFailedResults()) {
+        if (report.containsFailedResults()) {
             addResultMessage(failedPersistError());
         }
 
-        addMessages(sourceUtilCommons.saveSource(
-                cswConfigToServiceProps(config),
+        addMessages(sourceUtilCommons.saveSource(cswConfigToServiceProps(config),
                 cswProfileToFactoryPid(config.cswProfile())));
         return new BooleanField(!containsErrorMsgs());
     }
@@ -116,7 +115,7 @@ public class SaveCswConfiguration extends BaseFunctionField<BooleanField> {
 
     @Override
     public FunctionField<BooleanField> newInstance() {
-        return new SaveCswConfiguration(configuratorFactory,
+        return new CreateCswConfiguration(configuratorFactory,
                 serviceActions,
                 managedServiceActions,
                 serviceReader,

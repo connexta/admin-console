@@ -11,13 +11,12 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  */
-package org.codice.ddf.admin.sources.wfs.persist;
+package org.codice.ddf.admin.sources.opensearch.persist;
 
 import static org.codice.ddf.admin.common.report.message.DefaultMessages.failedPersistError;
-import static org.codice.ddf.admin.sources.services.WfsServiceProperties.WFS1_FEATURE;
-import static org.codice.ddf.admin.sources.services.WfsServiceProperties.WFS2_FEATURE;
-import static org.codice.ddf.admin.sources.services.WfsServiceProperties.wfsConfigToServiceProps;
-import static org.codice.ddf.admin.sources.services.WfsServiceProperties.wfsVersionToFactoryPid;
+import static org.codice.ddf.admin.sources.services.OpenSearchServiceProperties.OPENSEARCH_FACTORY_PID;
+import static org.codice.ddf.admin.sources.services.OpenSearchServiceProperties.OPENSEARCH_FEATURE;
+import static org.codice.ddf.admin.sources.services.OpenSearchServiceProperties.openSearchConfigToServiceProps;
 
 import java.util.List;
 
@@ -28,8 +27,7 @@ import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.configurator.Configurator;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.configurator.OperationReport;
-import org.codice.ddf.admin.sources.fields.WfsVersion;
-import org.codice.ddf.admin.sources.fields.type.WfsSourceConfigurationField;
+import org.codice.ddf.admin.sources.fields.type.OpenSearchSourceConfigurationField;
 import org.codice.ddf.admin.sources.utils.SourceUtilCommons;
 import org.codice.ddf.admin.sources.utils.SourceValidationUtils;
 import org.codice.ddf.internal.admin.configurator.actions.FeatureActions;
@@ -39,14 +37,14 @@ import org.codice.ddf.internal.admin.configurator.actions.ServiceReader;
 
 import com.google.common.collect.ImmutableList;
 
-public class SaveWfsConfiguration extends BaseFunctionField<BooleanField> {
+public class CreateOpenSearchConfiguration extends BaseFunctionField<BooleanField> {
 
-    public static final String FIELD_NAME = "saveWfsSource";
+    public static final String FIELD_NAME = "createOpenSearchSource";
 
-    private static final String DESCRIPTION =
-            "Saves a WFS source configuration. Returns true on success and false on failure.";
+    public static final String DESCRIPTION =
+            "Creates an OpenSearch source configuration. Returns true on success and false on failure.";
 
-    private WfsSourceConfigurationField config;
+    private OpenSearchSourceConfigurationField config;
 
     private SourceValidationUtils sourceValidationUtils;
 
@@ -62,7 +60,7 @@ public class SaveWfsConfiguration extends BaseFunctionField<BooleanField> {
 
     private final FeatureActions featureActions;
 
-    public SaveWfsConfiguration(ConfiguratorFactory configuratorFactory,
+    public CreateOpenSearchConfiguration(ConfiguratorFactory configuratorFactory,
             ServiceActions serviceActions, ManagedServiceActions managedServiceActions,
             ServiceReader serviceReader, FeatureActions featureActions) {
         super(FIELD_NAME, DESCRIPTION, new BooleanField());
@@ -72,7 +70,7 @@ public class SaveWfsConfiguration extends BaseFunctionField<BooleanField> {
         this.serviceReader = serviceReader;
         this.featureActions = featureActions;
 
-        config = new WfsSourceConfigurationField();
+        config = new OpenSearchSourceConfigurationField();
         config.useDefaultRequired();
         updateArgumentPaths();
 
@@ -89,24 +87,15 @@ public class SaveWfsConfiguration extends BaseFunctionField<BooleanField> {
     @Override
     public BooleanField performFunction() {
         Configurator configurator = configuratorFactory.getConfigurator();
-        OperationReport report = null;
-        if (config.wfsVersion()
-                .equals(WfsVersion.WFS_VERSION_2)) {
-            configurator.add(featureActions.start(WFS2_FEATURE));
-            report = configurator.commit("Starting feature [{}].", WFS2_FEATURE);
-        } else if (config.wfsVersion()
-                .equals(WfsVersion.WFS_VERSION_1)) {
-            configurator.add(featureActions.start(WFS1_FEATURE));
-            report = configurator.commit("Starting feature [{}].", WFS1_FEATURE);
-        }
+        configurator.add(featureActions.start(OPENSEARCH_FEATURE));
+        OperationReport report = configurator.commit("Starting feature [{}]", OPENSEARCH_FEATURE);
 
-        if(report != null && report.containsFailedResults()) {
+        if (report.containsFailedResults()) {
             addResultMessage(failedPersistError());
         }
 
-        addMessages(sourceUtilCommons.saveSource(
-                wfsConfigToServiceProps(config),
-                wfsVersionToFactoryPid(config.wfsVersion())));
+        addMessages(sourceUtilCommons.saveSource(openSearchConfigToServiceProps(config),
+                OPENSEARCH_FACTORY_PID));
         return new BooleanField(!containsErrorMsgs());
     }
 
@@ -126,7 +115,7 @@ public class SaveWfsConfiguration extends BaseFunctionField<BooleanField> {
 
     @Override
     public FunctionField<BooleanField> newInstance() {
-        return new SaveWfsConfiguration(configuratorFactory,
+        return new CreateOpenSearchConfiguration(configuratorFactory,
                 serviceActions,
                 managedServiceActions,
                 serviceReader,

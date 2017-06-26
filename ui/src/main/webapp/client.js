@@ -1,12 +1,16 @@
-import { ApolloClient, createNetworkInterface } from 'react-apollo'
+import { ApolloClient } from 'react-apollo'
+import { createBatchingNetworkInterface } from 'apollo-client'
 
 const reduxRootSelector = (state) => state.get('apollo')
-const networkInterface = createNetworkInterface({
+const networkInterface = createBatchingNetworkInterface({
   uri: '/admin/beta/graphql',
+  batchInterval: 100,
   opts: {
     credentials: 'same-origin'
   }
 })
 
-export default new ApolloClient({ networkInterface, reduxRootSelector })
-
+export default new ApolloClient({
+  networkInterface,
+  reduxRootSelector
+})

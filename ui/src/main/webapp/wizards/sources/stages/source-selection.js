@@ -1,58 +1,127 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import { withApollo } from 'react-apollo'
 
-import { getSourceSelections, getConfigurationHandlerId, getDiscoveryType } from '../reducer'
-import { getMessages } from 'admin-wizard/reducer'
-import { changeStage, testSources } from '../actions'
+import Flexbox from 'flexbox-react'
+
+import { queryAllSources } from '../graphql-queries/source-discovery'
+import { SourceRadioButtons } from '../components'
+import {
+  getDiscoveryType,
+  getDiscoveredEndpoints,
+  getChosenEndpoint,
+  getErrors
+} from '../reducer'
+import {
+  changeStage,
+  setDiscoveredEndpoints,
+  setChosenEndpoint,
+  startSubmitting,
+  endSubmitting,
+  setErrors,
+  clearErrors
+} from '../actions'
+
+import RaisedButton from 'material-ui/RaisedButton'
+
+import { getAllConfig } from 'admin-wizard/reducer'
 
 import Title from 'components/Title'
 import Description from 'components/Description'
-import ActionGroup from 'components/ActionGroup'
-import Action from 'components/Action'
 import Message from 'components/Message'
+import Body from 'components/wizard/Body'
+import Navigation, { Next, Back } from 'components/wizard/Navigation'
 
-import { NavPanes, SourceRadioButtons } from '../components'
+const currentStageId = 'sourceSelectionStage'
 
-const SourceSelectionStageView = ({ messages, sourceSelections = [], selectedSourceConfigHandlerId, changeStage, testSources, discoveryType }) => {
-  if (sourceSelections.length !== 0) {
+const SourceSelectionStageView = (props) => {
+  const {
+    messages,
+    changeStage,
+    discoveredEndpoints = {},
+    chosenEndpoint,
+    setChosenEndpoint,
+    clearErrors,
+    setErrors
+  } = props
+
+  if (Object.keys(discoveredEndpoints).length !== 0) {
     return (
-      <NavPanes backClickTarget='discoveryStage' forwardClickTarget='confirmationStage'>
+      <div>
         <Title>
           Sources Found!
         </Title>
         <Description>
           Choose which sources to add.
         </Description>
-        <SourceRadioButtons options={sourceSelections} />
-        {messages.map((msg, i) => <Message key={i} {...msg} />)}
-        <ActionGroup>
-          <Action primary label='Next' disabled={selectedSourceConfigHandlerId === undefined} onClick={() => changeStage('confirmationStage')} />
-        </ActionGroup>
-      </NavPanes>
+        <Body>
+          <SourceRadioButtons
+            options={discoveredEndpoints}
+            valueSelected={chosenEndpoint}
+            onChange={setChosenEndpoint}
+          />
+          {messages.map((msg, i) => <Message key={i} message={msg} type='FAILURE' />)}
+          <Navigation>
+            <Back onClick={() => changeStage('discoveryStage')} />
+            <Next disabled={chosenEndpoint === ''}
+              onClick={() => changeStage('confirmationStage')} />
+          </Navigation>
+        </Body>
+      </div>
     )
   } else {
     return (
-      <NavPanes backClickTarget='discoveryStage' forwardClickTarget='manualEntryStage'>
+      <div>
         <Title>
           No Sources Found
         </Title>
         <Description>
           No sources were found at the given location. Try again or go back to enter a different address.
+          Make sure you entered a valid username and password if the source requires authentication.
         </Description>
-        {messages.map((msg, i) => <Message key={i} {...msg} />)}
-        <ActionGroup>
-          <Action primary label='Try Again' onClick={() => testSources('sources', 'sourceSelectionStage', 'discoveryStage', discoveryType)} />
-        </ActionGroup>
-      </NavPanes>
+        <Body>
+          { messages.map((msg, i) => <Message key={i} {...msg} />) }
+          <Flexbox
+            style={{ marginTop: 20 }}
+            justifyContent='center'>
+            <RaisedButton
+              primary
+              label='Refresh'
+              onClick={() => {
+                queryAllSources(props)
+                  .then((endpoints) => {
+                    props.setDiscoveredEndpoints(endpoints)
+                    clearErrors()
+                  })
+                  .catch((e) => {
+                    setErrors(currentStageId, e)
+                  })
+              }} />
+          </Flexbox>
+          <Navigation>
+            <Back onClick={() => changeStage('discoveryStage')} />
+            <Next disabled />
+          </Navigation>
+        </Body>
+      </div>
     )
   }
 }
-export default connect((state) => ({
-  sourceSelections: getSourceSelections(state),
-  selectedSourceConfigHandlerId: getConfigurationHandlerId(state),
-  messages: getMessages(state, 'sourceSelectionStage'),
-  discoveryType: getDiscoveryType(state)
+
+const SourceSelectionStage = connect((state) => ({
+  messages: getErrors(state, currentStageId),
+  discoveryType: getDiscoveryType(state),
+  discoveredEndpoints: getDiscoveredEndpoints(state),
+  configs: getAllConfig(state),
+  chosenEndpoint: getChosenEndpoint(state)
 }), {
   changeStage,
-  testSources
+  setDiscoveredEndpoints,
+  setChosenEndpoint,
+  startSubmitting,
+  endSubmitting,
+  setErrors,
+  clearErrors
 })(SourceSelectionStageView)
+
+export default withApollo(SourceSelectionStage)

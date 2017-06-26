@@ -1,20 +1,20 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { resetSourceWizardState } from '../actions'
+import { clearWizard } from 'admin-wizard/actions'
+
+import RaisedButton from 'material-ui/RaisedButton'
+
+import ReplayIcon from 'material-ui/svg-icons/av/replay'
 
 import Title from 'components/Title'
 import Description from 'components/Description'
-import ActionGroup from 'components/ActionGroup'
-import Action from 'components/Action'
 import LargeStatusIndicator from 'components/LargeStatusIndicator'
+import Body from 'components/wizard/Body'
+import Navigation, { Home } from 'components/wizard/Navigation'
 
-import Flexbox from 'flexbox-react'
-
-import { Link } from 'react-router'
-
-const CompletedStageView = ({ messages, resetSourceWizardState }) => (
-  <Flexbox justifyContent='center' flexDirection='column'>
+const CompletedStageView = ({ messages, clearWizard }) => (
+  <div>
     <Title>
       All Done!
     </Title>
@@ -22,12 +22,12 @@ const CompletedStageView = ({ messages, resetSourceWizardState }) => (
       Your source has been added successfully.
     </Description>
     <LargeStatusIndicator success />
-    <ActionGroup>
-      <Link to='/'>
-        <Action primary label='Go Home' onClick={resetSourceWizardState} />
-      </Link>
-      <Action primary label='Add Another Source' onClick={resetSourceWizardState} />
-    </ActionGroup>
-  </Flexbox>
+    <Body>
+      <Navigation>
+        <RaisedButton primary label='Add More' labelPosition='after' icon={<ReplayIcon />} onClick={clearWizard} />
+        <Home />
+      </Navigation>
+    </Body>
+  </div>
 )
-export default connect(null, { resetSourceWizardState })(CompletedStageView)
+export default connect(null, { clearWizard })(CompletedStageView)

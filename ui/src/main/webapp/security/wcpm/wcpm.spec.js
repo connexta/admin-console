@@ -35,7 +35,8 @@ describe('<WebContextPolicyManager />', () => {
     paths: [],
     authTypes: [],
     realm: 'random',
-    claimsMapping: []
+    claimsMapping: [],
+    __typename: 'ContextPolicyBinPayload'
   }
 
   const policies = [ policy, policy, policy ]
@@ -65,8 +66,18 @@ describe('<WebContextPolicyManager />', () => {
   const client = createClient((request, resolve) => {
     resolve({
       data: {
-        wcpm: { policies, whitelisted, realms: ['karaf'], authTypes: ['guest'] },
-        sts: { claims: ['a', 'b', 'c'] }
+        wcpm: {
+          policies,
+          whitelisted,
+          realms: ['karaf'],
+          authTypes: ['guest'],
+          __typename: 'WebContextPolicyManager'
+        },
+        sts: {
+          claims: ['a', 'b', 'c'],
+          __typename: 'SecurityTokenService'
+        },
+        __typename: 'Query'
       }
     })
   })

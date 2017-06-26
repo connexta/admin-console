@@ -23,6 +23,7 @@ import org.codice.ddf.admin.sources.wfs.discover.DiscoverWfsSource;
 import org.codice.ddf.admin.sources.wfs.discover.GetWfsConfigurations;
 import org.codice.ddf.admin.sources.wfs.persist.DeleteWfsConfiguration;
 import org.codice.ddf.admin.sources.wfs.persist.SaveWfsConfiguration;
+import org.codice.ddf.admin.sources.wfs.persist.UpdateWfsConfiguration;
 import org.codice.ddf.internal.admin.configurator.actions.FeatureActions;
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
@@ -46,6 +47,8 @@ public class WfsFieldProvider extends BaseFieldProvider {
 
     private SaveWfsConfiguration saveWfsConfig;
 
+    private UpdateWfsConfiguration updateWfsConfig;
+
     private DeleteWfsConfiguration deleteWfsConfig;
 
     public WfsFieldProvider(ConfiguratorFactory configuratorFactory, ServiceActions serviceActions,
@@ -63,6 +66,11 @@ public class WfsFieldProvider extends BaseFieldProvider {
                 managedServiceActions,
                 serviceReader,
                 featureActions);
+        updateWfsConfig = new UpdateWfsConfiguration(configuratorFactory,
+                serviceActions,
+                managedServiceActions,
+                serviceReader,
+                featureActions);
         deleteWfsConfig = new DeleteWfsConfiguration(configuratorFactory,
                 serviceActions,
                 managedServiceActions);
@@ -76,6 +84,6 @@ public class WfsFieldProvider extends BaseFieldProvider {
 
     @Override
     public List<FunctionField> getMutationFunctions() {
-        return ImmutableList.of(saveWfsConfig, deleteWfsConfig);
+        return ImmutableList.of(saveWfsConfig, updateWfsConfig, deleteWfsConfig);
     }
 }

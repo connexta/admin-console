@@ -23,6 +23,7 @@ import org.codice.ddf.admin.sources.opensearch.discover.DiscoverOpenSearchSource
 import org.codice.ddf.admin.sources.opensearch.discover.GetOpenSearchConfigurations;
 import org.codice.ddf.admin.sources.opensearch.persist.DeleteOpenSearchConfiguration;
 import org.codice.ddf.admin.sources.opensearch.persist.SaveOpenSearchConfiguration;
+import org.codice.ddf.admin.sources.opensearch.persist.UpdateOpenSearchConfiguration;
 import org.codice.ddf.internal.admin.configurator.actions.FeatureActions;
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
@@ -45,6 +46,8 @@ public class OpenSearchFieldProvider extends BaseFieldProvider {
 
     private SaveOpenSearchConfiguration saveOpenSearchConfigs;
 
+    private UpdateOpenSearchConfiguration updateOpenSearchConfigs;
+
     private DeleteOpenSearchConfiguration deleteOpenSearchConfig;
 
     public OpenSearchFieldProvider(ConfiguratorFactory configuratorFactory,
@@ -61,6 +64,10 @@ public class OpenSearchFieldProvider extends BaseFieldProvider {
                 serviceActions,
                 managedServiceActions,
                 serviceReader, featureActions);
+        updateOpenSearchConfigs = new UpdateOpenSearchConfiguration(configuratorFactory,
+                serviceActions,
+                managedServiceActions,
+                serviceReader, featureActions);
         deleteOpenSearchConfig = new DeleteOpenSearchConfiguration(configuratorFactory,
                 serviceActions,
                 managedServiceActions);
@@ -74,6 +81,6 @@ public class OpenSearchFieldProvider extends BaseFieldProvider {
 
     @Override
     public List<FunctionField> getMutationFunctions() {
-        return ImmutableList.of(saveOpenSearchConfigs, deleteOpenSearchConfig);
+        return ImmutableList.of(saveOpenSearchConfigs, updateOpenSearchConfigs, deleteOpenSearchConfig);
     }
 }

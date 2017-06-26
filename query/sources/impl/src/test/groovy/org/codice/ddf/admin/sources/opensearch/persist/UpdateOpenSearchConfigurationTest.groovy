@@ -11,17 +11,16 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  */
-package org.codice.ddf.admin.sources.csw.persist
+package org.codice.ddf.admin.sources.opensearch.persist
 
-import ddf.catalog.source.Source
+import ddf.catalog.source.FederatedSource
 import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.configurator.Configurator
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.configurator.OperationReport
 import org.codice.ddf.admin.sources.SourceMessages
-import org.codice.ddf.admin.sources.fields.CswProfile
-import org.codice.ddf.admin.sources.fields.type.CswSourceConfigurationField
+import org.codice.ddf.admin.sources.fields.type.OpenSearchSourceConfigurationField
 import org.codice.ddf.admin.sources.fields.type.SourceConfigField
 import org.codice.ddf.internal.admin.configurator.actions.FeatureActions
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions
@@ -31,79 +30,77 @@ import spock.lang.Specification
 
 import static org.codice.ddf.admin.sources.SourceTestCommons.*
 
-class SaveCswConfigurationTest extends Specification {
+class UpdateOpenSearchConfigurationTest extends Specification {
 
-    static TEST_OUTPUT_SCHEMA = 'testOutputSchema'
-
-    static TEST_CSW_PROFILE = CswProfile.CSW_FEDERATION_PROFILE_SOURCE
-
-    static CSW_PROFILE = CswProfile.DEFAULT_FIELD_NAME
-
-    static RESULT_ARGUMENT_PATH = [SaveCswConfiguration.FIELD_NAME]
+    static RESULT_ARGUMENT_PATH = [UpdateOpenSearchConfiguration.FIELD_NAME]
 
     static BASE_PATH = [RESULT_ARGUMENT_PATH, FunctionField.ARGUMENT].flatten()
 
-    static CONFIG_PATH = [BASE_PATH, CswSourceConfigurationField.DEFAULT_FIELD_NAME].flatten()
-
-    static ENDPOINT_URL_PATH = [CONFIG_PATH, ENDPOINT_URL].flatten()
+    static CONFIG_PATH = [BASE_PATH, OpenSearchSourceConfigurationField.DEFAULT_FIELD_NAME].flatten()
 
     static SOURCE_NAME_PATH = [CONFIG_PATH, SourceConfigField.SOURCE_NAME_FIELD_NAME].flatten()
 
-    static CSW_PROFILE_PATH = [CONFIG_PATH, CSW_PROFILE].flatten()
+    static ENDPOINT_URL_PATH = [CONFIG_PATH, ENDPOINT_URL].flatten()
 
-    SaveCswConfiguration saveCswConfiguration
+    static PID_PATH = [CONFIG_PATH, PID].flatten()
+
+    UpdateOpenSearchConfiguration updateOpenSearchConfiguration
 
     ConfiguratorFactory configuratorFactory
 
-    Configurator configurator
+    ServiceActions serviceActions
 
     ServiceReader serviceReader
 
-    ServiceActions serviceActions
+    FeatureActions featureActions
 
     ManagedServiceActions managedServiceActions
 
-    FeatureActions featureActions
+    Configurator configurator
 
-    Source federatedSource
-
-    def actionArgs
+    FederatedSource federatedSource
 
     def federatedSources = []
 
     def setup() {
-        actionArgs = createCswSaveArgs()
         configurator = Mock(Configurator)
-        configuratorFactory = Mock(ConfiguratorFactory)
         serviceActions = Mock(ServiceActions)
-        managedServiceActions = Mock(ManagedServiceActions)
         serviceReader = Mock(ServiceReader)
+        managedServiceActions = Mock(ManagedServiceActions)
         featureActions = Mock(FeatureActions)
 
-        federatedSource = new TestSource(S_PID, TEST_SOURCENAME, false)
+        federatedSource = Mock(FederatedSource)
+        federatedSource.getId() >> TEST_SOURCENAME
         federatedSources.add(federatedSource)
+        configuratorFactory = Mock(ConfiguratorFactory)
         configuratorFactory.getConfigurator() >> configurator
-        saveCswConfiguration = new SaveCswConfiguration(configuratorFactory, serviceActions,
+
+        updateOpenSearchConfiguration = new UpdateOpenSearchConfiguration(configuratorFactory, serviceActions,
                 managedServiceActions, serviceReader, featureActions)
     }
 
-    def 'Successfully save new CSW configuration'() {
-        when:
-        saveCswConfiguration.setValue(createCswSaveArgs())
+    def 'Successfully update existing OpenSearch configuration'() {
+        setup:
+        updateOpenSearchConfiguration.setValue(createUpdateFunctionArgs())
+        serviceActions.read(_) >> [(ID): TEST_SOURCENAME]
         serviceReader.getServices(_, _) >> []
         configurator.commit(_, _) >> mockReport(false)
-        def report = saveCswConfiguration.getValue()
+
+        when:
+        def report = updateOpenSearchConfiguration.getValue()
 
         then:
-        report.result() != null
         report.result().getValue()
     }
 
-    def 'Fail to save new CSW config due to duplicate source name'() {
+    def 'Fail to update config due to existing source name'() {
+        setup:
+        updateOpenSearchConfiguration.setValue(createUpdateFunctionArgs())
+        serviceActions.read(_) >> [(ID): 'updatedName']
+        serviceReader.getServices(_, _) >> [new TestSource(S_PID, 'updatedName', false), new TestSource("existingSource", TEST_SOURCENAME, false)]
+
         when:
-        saveCswConfiguration.setValue(actionArgs)
-        serviceReader.getServices(_, _) >> federatedSources
-        def report = saveCswConfiguration.getValue()
+        def report = updateOpenSearchConfiguration.getValue()
 
         then:
         report.result() == null
@@ -112,11 +109,15 @@ class SaveCswConfigurationTest extends Specification {
         report.messages().get(0).code == SourceMessages.DUPLICATE_SOURCE_NAME
     }
 
-    def 'Fail to save new CSW config due to failure to commit'() {
-        when:
-        saveCswConfiguration.setValue(actionArgs)
+    def 'Fail to update config due to failure to commit'() {
+        setup:
+        updateOpenSearchConfiguration.setValue(createUpdateFunctionArgs())
+        serviceActions.read(_) >> [(ID): TEST_SOURCENAME]
         serviceReader.getServices(_, _) >> []
-        def report = saveCswConfiguration.getValue()
+        configurator.commit(_, _) >> mockReport(true)
+
+        when:
+        def report = updateOpenSearchConfiguration.getValue()
 
         then:
         1 * configurator.commit(_, _) >> mockReport(false)
@@ -127,9 +128,24 @@ class SaveCswConfigurationTest extends Specification {
         report.messages().get(0).code == DefaultMessages.FAILED_PERSIST
     }
 
+    def 'Fail to update config due to no existing source specified by the pid'() {
+        setup:
+        updateOpenSearchConfiguration.setValue(createUpdateFunctionArgs())
+        serviceActions.read(S_PID) >> [:]
+
+        when:
+        def report = updateOpenSearchConfiguration.getValue()
+
+        then:
+        report.result() == null
+        report.messages().size() == 1
+        report.messages().get(0).code == DefaultMessages.NO_EXISTING_CONFIG
+        report.messages().get(0).path == RESULT_ARGUMENT_PATH
+    }
+
     def 'Fail when missing required fields'() {
         when:
-        def report = saveCswConfiguration.getValue()
+        def report = updateOpenSearchConfiguration.getValue()
 
         then:
         report.result() == null
@@ -137,7 +153,7 @@ class SaveCswConfigurationTest extends Specification {
         report.messages().count {
             it.getCode() == DefaultMessages.MISSING_REQUIRED_FIELD
         } == 3
-        report.messages()*.getPath() == [SOURCE_NAME_PATH, ENDPOINT_URL_PATH, CSW_PROFILE_PATH]
+        report.messages()*.getPath() == [PID_PATH, SOURCE_NAME_PATH, ENDPOINT_URL_PATH]
     }
 
     def mockReport(boolean hasError) {
@@ -146,12 +162,16 @@ class SaveCswConfigurationTest extends Specification {
         return report
     }
 
-    def createCswSaveArgs() {
-        def config = new CswSourceConfigurationField()
-                .outputSchema(TEST_OUTPUT_SCHEMA)
-                .cswProfile(TEST_CSW_PROFILE)
-                .endpointUrl('https://localhost:8993').sourceName(TEST_SOURCENAME)
+    def createUpdateFunctionArgs() {
+        def args = createFunctionArgs()
+        args.put(PID, S_PID)
+        return args
+    }
+
+    def createFunctionArgs() {
+        def config = new OpenSearchSourceConfigurationField().endpointUrl('https://localhost:8993').sourceName(TEST_SOURCENAME)
+                .pid(S_PID)
         config.credentials().username(TEST_USERNAME).password(TEST_PASSWORD)
-        return [(CswSourceConfigurationField.DEFAULT_FIELD_NAME): config.getValue()]
+        return [(OpenSearchSourceConfigurationField.DEFAULT_FIELD_NAME) : config.getValue()]
     }
 }

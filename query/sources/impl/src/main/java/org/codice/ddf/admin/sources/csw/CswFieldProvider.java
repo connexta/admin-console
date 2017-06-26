@@ -23,6 +23,7 @@ import org.codice.ddf.admin.sources.csw.discover.DiscoverCswSource;
 import org.codice.ddf.admin.sources.csw.discover.GetCswConfigurations;
 import org.codice.ddf.admin.sources.csw.persist.DeleteCswConfiguration;
 import org.codice.ddf.admin.sources.csw.persist.SaveCswConfiguration;
+import org.codice.ddf.admin.sources.csw.persist.UpdateCswConfiguration;
 import org.codice.ddf.internal.admin.configurator.actions.FeatureActions;
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
@@ -46,6 +47,8 @@ public class CswFieldProvider extends BaseFieldProvider {
 
     private SaveCswConfiguration saveCswConfiguration;
 
+    private UpdateCswConfiguration updateCswConfiguration;
+
     private DeleteCswConfiguration deleteCswConfiguration;
 
     public CswFieldProvider(ConfiguratorFactory configuratorFactory, ServiceActions serviceActions,
@@ -58,6 +61,11 @@ public class CswFieldProvider extends BaseFieldProvider {
                 managedServiceActions,
                 serviceReader);
         saveCswConfiguration = new SaveCswConfiguration(configuratorFactory,
+                serviceActions,
+                managedServiceActions,
+                serviceReader,
+                featureActions);
+        updateCswConfiguration = new UpdateCswConfiguration(configuratorFactory,
                 serviceActions,
                 managedServiceActions,
                 serviceReader,
@@ -75,6 +83,6 @@ public class CswFieldProvider extends BaseFieldProvider {
 
     @Override
     public List<FunctionField> getMutationFunctions() {
-        return ImmutableList.of(saveCswConfiguration, deleteCswConfiguration);
+        return ImmutableList.of(saveCswConfiguration, updateCswConfiguration, deleteCswConfiguration);
     }
 }

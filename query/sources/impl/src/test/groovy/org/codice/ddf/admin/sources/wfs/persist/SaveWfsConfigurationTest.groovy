@@ -22,7 +22,6 @@ import org.codice.ddf.admin.configurator.OperationReport
 import org.codice.ddf.admin.sources.SourceMessages
 import org.codice.ddf.admin.sources.fields.WfsVersion
 import org.codice.ddf.admin.sources.fields.type.WfsSourceConfigurationField
-import org.codice.ddf.admin.sources.wfs.WfsSourceInfoField
 import org.codice.ddf.internal.admin.configurator.actions.FeatureActions
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions
@@ -131,74 +130,6 @@ class SaveWfsConfigurationTest extends Specification {
         !report.result().getValue()
         report.messages().size() == 1
         report.messages().get(0).code == DefaultMessages.FAILED_PERSIST
-        report.messages().get(0).path == RESULT_ARGUMENT_PATH
-    }
-
-    def 'Successfully update WFS configuration'() {
-        setup:
-        functionArgs.put(PID, S_PID)
-        saveWfsConfiguration.setValue(functionArgs)
-        serviceActions.read(_ as String) >> [(ID): TEST_SOURCENAME]
-        serviceReader.getServices(_, _) >> []
-        configurator.commit(_, _) >> mockReport(false)
-
-        when:
-        def report = saveWfsConfiguration.getValue()
-
-        then:
-        report.result().getValue()
-    }
-
-    def 'Fail to update due to existing source name specified by pid'() {
-        setup:
-        functionArgs.put(PID, S_PID)
-        saveWfsConfiguration.setValue(functionArgs)
-        serviceActions.read(_) >> [(ID): 'updatedName']
-        serviceReader.getServices(_, _) >> [new TestSource(S_PID, 'updatedName', false),
-                                            new TestSource("existingSource", TEST_SOURCENAME, false)]
-
-        when:
-        def report = saveWfsConfiguration.getValue()
-
-        then:
-        report.result() == null
-        report.messages().size() == 1
-        report.messages().get(0).code == SourceMessages.DUPLICATE_SOURCE_NAME
-        report.messages().get(0).path == SOURCE_NAME_PATH
-    }
-
-    def 'Fail configuration update due to failure to commit'() {
-        setup:
-        functionArgs.put(PID, S_PID)
-        saveWfsConfiguration.setValue(functionArgs)
-        serviceActions.read(_) >> [(ID): TEST_SOURCENAME]
-        serviceReader.getServices(_, _) >> []
-
-        when:
-        def report = saveWfsConfiguration.getValue()
-
-        then:
-        1 * configurator.commit(_, _) >> mockReport(false)
-        1 * configurator.commit(_, _) >> mockReport(true)
-        !report.result().getValue()
-        report.messages().size() == 1
-        report.messages().get(0).path == RESULT_ARGUMENT_PATH
-        report.messages().get(0).code == DefaultMessages.FAILED_PERSIST
-    }
-
-    def 'Fail to update WFS config due to no existing config specified by pid'() {
-        setup:
-        functionArgs.put(PID, S_PID)
-        saveWfsConfiguration.setValue(functionArgs)
-        serviceActions.read(S_PID) >> [:]
-
-        when:
-        def report = saveWfsConfiguration.getValue()
-
-        then:
-        report.result() == null
-        report.messages().size() == 1
-        report.messages().get(0).code == DefaultMessages.NO_EXISTING_CONFIG
         report.messages().get(0).path == RESULT_ARGUMENT_PATH
     }
 

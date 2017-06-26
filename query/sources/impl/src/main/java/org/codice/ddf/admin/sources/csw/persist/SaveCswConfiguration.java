@@ -24,7 +24,6 @@ import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
-import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.configurator.Configurator;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.configurator.OperationReport;
@@ -46,8 +45,6 @@ public class SaveCswConfiguration extends BaseFunctionField<BooleanField> {
             "Saves a CSW source configuration. If a pid is specified, the source configuration specified by the pid will be updated. Returns true on success and false on failure.";
 
     private CswSourceConfigurationField config;
-
-    private PidField pid;
 
     private SourceValidationUtils sourceValidationUtils;
 
@@ -73,7 +70,6 @@ public class SaveCswConfiguration extends BaseFunctionField<BooleanField> {
         this.serviceReader = serviceReader;
         this.featureActions = featureActions;
 
-        pid = new PidField();
         config = new CswSourceConfigurationField();
         config.useDefaultRequired();
         updateArgumentPaths();
@@ -98,7 +94,7 @@ public class SaveCswConfiguration extends BaseFunctionField<BooleanField> {
             addResultMessage(failedPersistError());
         }
 
-        addMessages(sourceUtilCommons.saveSource(pid,
+        addMessages(sourceUtilCommons.saveSource(
                 cswConfigToServiceProps(config),
                 cswProfileToFactoryPid(config.cswProfile())));
         return new BooleanField(!containsErrorMsgs());
@@ -110,12 +106,12 @@ public class SaveCswConfiguration extends BaseFunctionField<BooleanField> {
         if (containsErrorMsgs()) {
             return;
         }
-        addMessages(sourceValidationUtils.validateSourceName(config.sourceNameField(), pid));
+        addMessages(sourceValidationUtils.sourceNameExists(config.sourceNameField()));
     }
 
     @Override
     public List<DataType> getArguments() {
-        return ImmutableList.of(config, pid);
+        return ImmutableList.of(config);
     }
 
     @Override

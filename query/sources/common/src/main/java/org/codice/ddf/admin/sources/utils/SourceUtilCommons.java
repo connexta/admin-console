@@ -191,6 +191,23 @@ public class SourceUtilCommons {
         return saveSourceReport;
     }
 
+    public Report saveSource(Map<String, Object> serviceProps, String factoryPid) {
+        ReportImpl saveSourceReport = new ReportImpl();
+        if (serviceCommons.createManagedService(serviceProps, factoryPid)
+                .containsErrorMsgs()) {
+            saveSourceReport.addResultMessage(failedPersistError());
+        }
+        return saveSourceReport;
+    }
+
+    public Report updateSource(PidField pid, Map<String, Object> serviceProps) {
+        ReportImpl updateSourceReport = new ReportImpl();
+        if (StringUtils.isNotEmpty(pid.getValue())) {
+            updateSourceReport.addMessages(serviceCommons.updateService(pid, serviceProps));
+        }
+        return updateSourceReport;
+    }
+
     public void populateAvailability(BooleanField availability, PidField pid) {
         for (Source source : getAllSourceReferences()) {
             if (source instanceof ConfiguredService) {

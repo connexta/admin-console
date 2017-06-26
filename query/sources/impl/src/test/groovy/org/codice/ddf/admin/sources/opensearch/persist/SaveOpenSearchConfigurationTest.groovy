@@ -187,6 +187,20 @@ class SaveOpenSearchConfigurationTest extends Specification {
         report.messages().get(0).path == RESULT_ARGUMENT_PATH
     }
 
+    def 'Return false when opensearch feature fails to start'() {
+        when:
+        saveOpenSearchConfiguration.setValue(createFunctionArgs())
+        serviceReader.getServices(_, _) >> []
+        def report = saveOpenSearchConfiguration.getValue()
+
+        then:
+        1 * configurator.commit(_, _) >> mockReport(true)
+        !report.result().getValue()
+        report.messages().size() == 1
+        report.messages().get(0).path == RESULT_ARGUMENT_PATH
+        report.messages().get(0).code == DefaultMessages.FAILED_PERSIST
+    }
+
     def 'Fail when missing required fields'() {
         when:
         def report = saveOpenSearchConfiguration.getValue()

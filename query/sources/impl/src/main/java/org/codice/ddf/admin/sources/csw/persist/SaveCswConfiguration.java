@@ -96,6 +96,7 @@ public class SaveCswConfiguration extends BaseFunctionField<BooleanField> {
 
         if(report.containsFailedResults()) {
             addResultMessage(failedPersistError());
+            return new BooleanField(false);
         }
 
         addMessages(sourceUtilCommons.saveSource(pid,

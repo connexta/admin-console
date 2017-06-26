@@ -73,7 +73,6 @@ const ConfigureEmbeddedLdap = (props) => {
               client.mutate(installEmbeddedLdap(ldapUseCase))
                 .then(() => {
                   onEndSubmit()
-                  onError([])
                   next({ nextStageId: 'final-stage' })
                 })
                 .catch((err) => {

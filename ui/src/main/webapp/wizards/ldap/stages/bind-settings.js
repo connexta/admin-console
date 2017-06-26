@@ -113,7 +113,6 @@ const BindSettings = (props) => {
               }))
                 .then(() => {
                   onEndSubmit()
-                  onError([])
                   next({ nextStageId: 'directory-settings' })
                 })
                 .catch((err) => {

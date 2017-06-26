@@ -66,16 +66,7 @@ const query = (conn, info, base, query) => ({
   variables: { conn, info, base, query }
 })
 
-const ids = [
-  'baseUserDn',
-  'userNameAttribute',
-  'memberAttributeReferencedInGroup',
-  'baseGroupDn',
-  'groupObjectClass',
-  'groupAttributeHoldingMember'
-]
-
-const LdapQueryToolView = ({ disabled, options = {}, client, conn, info, configs, state = [], setState }) => (
+const LdapQueryToolView = ({ disabled, options = {}, client, conn, info, configs, state = [], setState, onError }) => (
   <Card>
     <CardHeader style={{textAlign: 'center', fontSize: '1.1em'}}
       title='LDAP Query Tool'
@@ -94,7 +85,11 @@ const LdapQueryToolView = ({ disabled, options = {}, client, conn, info, configs
           disabled={disabled}
           onClick={() => {
             client.query(query(conn, info, configs.queryBase, configs.query))
-              .then(({ data }) => setState(data.ldap.query))
+              .then(({ data }) => {
+                onError([])
+                setState(data.ldap.query)
+              })
+              .catch((err) => onError(err.graphQLErrors))
           }} />
       </div>
 
@@ -136,7 +131,6 @@ const DirectorySettings = (props) => {
     onError,
     onStartSubmit,
     onEndSubmit,
-    onClearErrors,
     next,
 
     disabled,
@@ -242,7 +236,13 @@ const DirectorySettings = (props) => {
           disabled={disabled}
           options={options.groupAttributesHoldingMember} />
 
-        <LdapQueryTool options={options} conn={conn} info={info} configs={configs} disabled={disabled} />
+        <LdapQueryTool
+          options={options}
+          conn={conn}
+          info={info}
+          configs={configs}
+          disabled={disabled}
+          onError={onError} />
 
         <Navigation>
           <Back
@@ -254,20 +254,11 @@ const DirectorySettings = (props) => {
               client.query(testDirectorySettings(conn, info, settings))
                 .then(() => {
                   onEndSubmit()
-                  onError([])
-                  onClearErrors()
                   next({ nextStageId })
                 })
                 .catch((err) => {
                   onEndSubmit()
-                  onError(err.graphQLErrors.map(({ path, ...rest }) => {
-                    const id = path[path.length - 1]
-                    if (ids.includes(id)) {
-                      return { configFieldId: id, ...rest }
-                    } else {
-                      return { ...rest }
-                    }
-                  }))
+                  onError(err.graphQLErrors)
                 })
             }}
             disabled={disabled} />

@@ -6,6 +6,8 @@ import { isSubmitting, start, end } from 'redux-fetch'
 
 import { getDisplayedLdapStage, getAllConfig, getMessages, getAllowSkip } from './reducer'
 
+import { getFriendlyMessage } from 'graphql-errors'
+
 import {
   // sync
   setDefaults,
@@ -47,23 +49,42 @@ const mapStateToProps = (state, { wizardId }) => {
   }
 }
 
-const mapDispatchToProps = (dispatch, { wizardId }) => ({
+const mapDispatchToProps = (dispatch, { wizardId, ids = [] }) => ({
   setDefaults: (arg) => dispatch(setDefaults(arg)),
   setOptions: (arg) => dispatch(setOptions(arg)),
   clearWizard: () => dispatch(clearWizard()),
   prev: () => dispatch(prevStage()),
-  next: (arg) => dispatch(nextStage(arg)),
-  onError: (messages) => dispatch((dispatch, getState) => {
+  next: (arg) => dispatch((dispatch, getState) => {
     const stageId = getDisplayedLdapStage(getState())
-    dispatch(setMessages(stageId, messages))
+    dispatch(clearMessages())
+    dispatch(setMessages(stageId, []))
+    dispatch(nextStage(arg))
+  }),
+  onError: (messages) => dispatch((dispatch, getState) => {
+    dispatch(clearMessages())
+
+    const stageId = getDisplayedLdapStage(getState())
+
+    const errors = messages.map(({ path, ...rest }) => {
+      const id = path[path.length - 1]
+      if (ids.includes(id)) {
+        return { configFieldId: id, ...rest }
+      } else {
+        return { ...rest }
+      }
+    }).map(({ message: code, ...rest }) => ({
+      message: getFriendlyMessage(code),
+      ...rest
+    }))
+
+    dispatch(setMessages(stageId, errors))
   }),
   onStartSubmit: () => dispatch(start(wizardId)),
-  onEndSubmit: () => dispatch(end(wizardId)),
-  onClearErrors: () => dispatch(clearMessages())
+  onEndSubmit: () => dispatch(end(wizardId))
 })
 
 const Wizard = connect(mapStateToProps, mapDispatchToProps)(WizardView)
 
-export const createWizard = (wizardId, stages) =>
-  (props) => <Wizard wizardId={wizardId} stages={stages} {...props} />
+export const createWizard = (wizardId, stages, ids) =>
+  (props) => <Wizard wizardId={wizardId} stages={stages} ids={ids} {...props} />
 

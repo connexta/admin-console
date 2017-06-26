@@ -130,7 +130,6 @@ const ConfirmStage = (props) => {
               client.mutate(createLdapConfig(conn, info, settings, mapping))
                 .then(() => {
                   onEndSubmit()
-                  onError([])
                   next({ nextStageId: 'final-stage' })
                 })
                 .catch((err) => {

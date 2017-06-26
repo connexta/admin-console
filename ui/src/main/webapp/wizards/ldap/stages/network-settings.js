@@ -81,7 +81,6 @@ const NetworkSettings = (props) => {
               }))
                 .then(() => {
                   onEndSubmit()
-                  onError([])
                   next({ nextStageId: 'bind-settings' })
                 })
                 .catch((err) => {

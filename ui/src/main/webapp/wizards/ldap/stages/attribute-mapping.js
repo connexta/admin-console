@@ -218,7 +218,6 @@ const LdapAttributeMappingStage = (props) => {
               client.query(testClaimMappings(conn, info, userNameAttribute, dn, mapping))
                 .then(() => {
                   onEndSubmit()
-                  onError([])
                   next({ nextStageId: 'confirm' })
                 })
                 .catch((err) => {

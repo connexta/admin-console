@@ -70,7 +70,7 @@ const mapDispatchToProps = (dispatch, { wizardId, ids = [] }) => ({
 
     const stageId = getDisplayedLdapStage(getState())
 
-    const errors = messages.map(({ path, ...rest }) => {
+    const errors = messages.map(({ path = [], ...rest }) => {
       const id = path[path.length - 1]
       if (ids.includes(id)) {
         return { configFieldId: id, ...rest }

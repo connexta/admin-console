@@ -285,6 +285,7 @@ export default graphql(gql`
   }
 `, {
   options: ({ configs }) => ({
+    fetchPolicy: 'network-only',
     variables: {
       conn: {
         hostname: configs.hostname,

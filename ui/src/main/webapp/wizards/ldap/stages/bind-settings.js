@@ -55,7 +55,7 @@ const BindSettings = (props) => {
   let bindUserMethodOptions = ['Simple']
 
   if (encryption === 'ldaps' || encryption === 'startTls') {
-    bindUserMethodOptions.push('Digest MD5 SASL')
+    bindUserMethodOptions.push('DigestMD5SASL')
   }
 
   return (
@@ -89,7 +89,7 @@ const BindSettings = (props) => {
         {/* <Input id='bindKdcAddress' disabled={disabled} label='KDC Address (for Kerberos authentication)' /> */}
         {/* TODO GSSAPI and Digest MD5 SASL only */}
         {/* Realm is needed for Kerberos and MD5 auth, currently only MD5 is supported by the wizard */}
-        <Input visible={bindUserMethod === 'Digest MD5 SASL'} id='bindRealm'
+        <Input visible={bindUserMethod === 'DigestMD5SASL'} id='bindRealm'
           disabled={disabled} label='Realm (for Digest MD5 authentication)' />
 
         <Navigation>

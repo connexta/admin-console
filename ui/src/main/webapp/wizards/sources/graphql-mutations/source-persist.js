@@ -31,8 +31,8 @@ export const saveSource = (props) => {
     config,
     sourceName,
     creds: {
-      username: inputConfigs.sourceUserName,
-      password: inputConfigs.sourceUserPassword
+      username: (inputConfigs.sourceUserName || undefined),
+      password: (inputConfigs.sourceUserPassword || undefined)
     }}))
 }
 

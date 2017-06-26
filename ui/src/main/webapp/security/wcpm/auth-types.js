@@ -57,7 +57,7 @@ const AuthTypes = ({ wcpm, authTypes, errors, onUpdate }) => {
         onChange={onUpdate}
         onSortEnd={({oldIndex, newIndex}) => {
           const temp = authTypes.get(oldIndex)
-          onUpdate(authTypes.set(oldIndex, authTypes.get(newIndex)).set(newIndex, temp))
+          onUpdate(authTypes.delete(oldIndex).insert(newIndex, temp))
         }}
       />
       <EditItem>

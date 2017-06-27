@@ -14,7 +14,6 @@
 package org.codice.ddf.admin.ldap.discover;
 
 import static org.codice.ddf.admin.ldap.commons.LdapMessages.userAttributeNotFoundError;
-import static org.codice.ddf.admin.ldap.fields.config.LdapConfigurationField.CLAIMS_MAPPING;
 
 import java.io.IOException;
 import java.util.List;
@@ -22,8 +21,6 @@ import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
-import org.codice.ddf.admin.api.fields.ListField;
-import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.fields.base.function.TestFunctionField;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
@@ -66,7 +63,7 @@ public class LdapTestClaimMappings extends TestFunctionField {
 
     private LdapDistinguishedName baseUserDn;
 
-    private ListField<ClaimsMapEntry> claimMappings;
+    private ClaimsMapEntry.ListImpl claimMappings;
 
     private LdapTestingUtils utils;
 
@@ -81,7 +78,8 @@ public class LdapTestClaimMappings extends TestFunctionField {
         usernameAttribute = new StringField(USER_NAME_ATTRIBUTE).isRequired(true);
         baseUserDn = new LdapDistinguishedName(BASE_USER_DN);
         baseUserDn.isRequired(true);
-        claimMappings = new ListFieldImpl<>(CLAIMS_MAPPING, ClaimsMapEntry.class);
+        claimMappings = new ClaimsMapEntry.ListImpl();
+        claimMappings.useDefaultRequired();
         claimMappings.isRequired(true);
 
         updateArgumentPaths();

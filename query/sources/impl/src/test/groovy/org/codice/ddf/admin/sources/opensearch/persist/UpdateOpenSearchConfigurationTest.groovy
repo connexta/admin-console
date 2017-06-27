@@ -143,6 +143,23 @@ class UpdateOpenSearchConfigurationTest extends Specification {
         report.messages().get(0).path == RESULT_ARGUMENT_PATH
     }
 
+    def 'Return false when opensearch feature fails to start'() {
+        setup:
+        updateOpenSearchConfiguration.setValue(createUpdateFunctionArgs())
+        serviceReader.getServices(_, _) >> []
+        serviceActions.read(_) >> [(ID): TEST_SOURCENAME]
+
+        when:
+        def report = updateOpenSearchConfiguration.getValue()
+
+        then:
+        1 * configurator.commit(_, _) >> mockReport(true)
+        !report.result().getValue()
+        report.messages().size() == 1
+        report.messages().get(0).path == RESULT_ARGUMENT_PATH
+        report.messages().get(0).code == DefaultMessages.FAILED_PERSIST
+    }
+
     def 'Fail when missing required fields'() {
         when:
         def report = updateOpenSearchConfiguration.getValue()
@@ -163,12 +180,6 @@ class UpdateOpenSearchConfigurationTest extends Specification {
     }
 
     def createUpdateFunctionArgs() {
-        def args = createFunctionArgs()
-        args.put(PID, S_PID)
-        return args
-    }
-
-    def createFunctionArgs() {
         def config = new OpenSearchSourceConfigurationField().endpointUrl('https://localhost:8993').sourceName(TEST_SOURCENAME)
                 .pid(S_PID)
         config.credentials().username(TEST_USERNAME).password(TEST_PASSWORD)

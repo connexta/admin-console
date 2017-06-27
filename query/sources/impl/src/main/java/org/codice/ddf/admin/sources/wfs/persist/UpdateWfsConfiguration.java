@@ -45,6 +45,8 @@ public class UpdateWfsConfiguration extends BaseFunctionField<BooleanField> {
     private static final String DESCRIPTION =
             "Updates a WFS source configuration specified by the pid. Returns true on success and false on failure.";
 
+    public static final BooleanField RETURN_TYPE = new BooleanField();
+
     private WfsSourceConfigurationField config;
 
     private SourceValidationUtils sourceValidationUtils;
@@ -65,7 +67,7 @@ public class UpdateWfsConfiguration extends BaseFunctionField<BooleanField> {
             ServiceActions serviceActions, ManagedServiceActions managedServiceActions,
             ServiceReader serviceReader, FeatureActions featureActions) {
 
-        super(FIELD_NAME, DESCRIPTION, new BooleanField());
+        super(FIELD_NAME, DESCRIPTION);
         this.configuratorFactory = configuratorFactory;
         this.serviceActions = serviceActions;
         this.managedServiceActions = managedServiceActions;
@@ -93,17 +95,18 @@ public class UpdateWfsConfiguration extends BaseFunctionField<BooleanField> {
         Configurator configurator = configuratorFactory.getConfigurator();
         OperationReport report = null;
         if (config.wfsVersion()
-                .equals(WfsVersion.WFS_VERSION_2)) {
+                .equals(WfsVersion.Wfs2.WFS_VERSION_2)) {
             configurator.add(featureActions.start(WFS2_FEATURE));
             report = configurator.commit("Starting feature [{}].", WFS2_FEATURE);
         } else if (config.wfsVersion()
-                .equals(WfsVersion.WFS_VERSION_1)) {
+                .equals(WfsVersion.Wfs1.WFS_VERSION_1)) {
             configurator.add(featureActions.start(WFS1_FEATURE));
             report = configurator.commit("Starting feature [{}].", WFS1_FEATURE);
         }
 
-        if (report != null && report.containsFailedResults()) {
+        if(report != null && report.containsFailedResults()) {
             addResultMessage(failedPersistError());
+            return new BooleanField(false);
         }
 
         addMessages(sourceUtilCommons.updateSource(config.pidField(),
@@ -119,6 +122,11 @@ public class UpdateWfsConfiguration extends BaseFunctionField<BooleanField> {
         }
         addMessages(sourceValidationUtils.validateSourceName(config.sourceNameField(),
                 config.pidField()));
+    }
+
+    @Override
+    public BooleanField getReturnType() {
+        return RETURN_TYPE;
     }
 
     @Override

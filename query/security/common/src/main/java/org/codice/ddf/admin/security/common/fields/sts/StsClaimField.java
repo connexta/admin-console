@@ -13,6 +13,9 @@
  **/
 package org.codice.ddf.admin.security.common.fields.sts;
 
+import java.util.concurrent.Callable;
+
+import org.codice.ddf.admin.common.fields.base.BaseListField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 
 public class StsClaimField extends StringField {
@@ -36,5 +39,19 @@ public class StsClaimField extends StringField {
     public StsClaimField isRequired(boolean required) {
         super.isRequired(required);
         return this;
+    }
+
+    public static class ListImpl extends BaseListField<StsClaimField> {
+
+        public static final String DEFAULT_FIELD_NAME = "claims";
+
+        public ListImpl() {
+            super(DEFAULT_FIELD_NAME);
+        }
+
+        @Override
+        public Callable<StsClaimField> getCreateListEntryCallable() {
+            return StsClaimField::new;
+        }
     }
 }

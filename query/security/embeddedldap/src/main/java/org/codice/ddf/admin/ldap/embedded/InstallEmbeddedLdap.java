@@ -14,9 +14,9 @@
 package org.codice.ddf.admin.ldap.embedded;
 
 import static org.codice.ddf.admin.common.report.message.DefaultMessages.failedPersistError;
-import static org.codice.ddf.admin.security.common.fields.ldap.LdapUseCase.ATTRIBUTE_STORE;
-import static org.codice.ddf.admin.security.common.fields.ldap.LdapUseCase.AUTHENTICATION;
-import static org.codice.ddf.admin.security.common.fields.ldap.LdapUseCase.AUTHENTICATION_AND_ATTRIBUTE_STORE;
+import static org.codice.ddf.admin.security.common.fields.ldap.LdapUseCase.AttributeStore.ATTRIBUTE_STORE;
+import static org.codice.ddf.admin.security.common.fields.ldap.LdapUseCase.Authentication.AUTHENTICATION;
+import static org.codice.ddf.admin.security.common.fields.ldap.LdapUseCase.AuthenticationAndAttributeStore.AUTHENTICATION_AND_ATTRIBUTE_STORE;
 import static org.codice.ddf.admin.security.common.services.LdapClaimsHandlerServiceProperties.LDAP_CLAIMS_HANDLER_FEATURE;
 import static org.codice.ddf.admin.security.common.services.LdapLoginServiceProperties.LDAP_LOGIN_FEATURE;
 
@@ -40,6 +40,8 @@ public class InstallEmbeddedLdap extends BaseFunctionField<BooleanField> {
     public static final String DESCRIPTION =
             "Installs the internal embedded LDAP. Used for testing purposes only. LDAP port: 1389, LDAPS port: 1636, ADMIN port: 4444";
 
+    public static final BooleanField RETURN_TYPE = new BooleanField();
+
     private LdapUseCase useCase;
 
     private final ConfiguratorFactory configuratorFactory;
@@ -48,7 +50,7 @@ public class InstallEmbeddedLdap extends BaseFunctionField<BooleanField> {
 
     public InstallEmbeddedLdap(ConfiguratorFactory configuratorFactory,
             FeatureActions featureActions) {
-        super(FIELD_NAME, DESCRIPTION, new BooleanField());
+        super(FIELD_NAME, DESCRIPTION);
         this.configuratorFactory = configuratorFactory;
         this.featureActions = featureActions;
         useCase = new LdapUseCase();
@@ -89,6 +91,11 @@ public class InstallEmbeddedLdap extends BaseFunctionField<BooleanField> {
         }
 
         return new BooleanField(!containsErrorMsgs());
+    }
+
+    @Override
+    public BooleanField getReturnType() {
+        return RETURN_TYPE;
     }
 
     @Override

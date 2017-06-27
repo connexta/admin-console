@@ -35,7 +35,7 @@ class CreateCswConfigurationTest extends Specification {
 
     static TEST_OUTPUT_SCHEMA = 'testOutputSchema'
 
-    static TEST_CSW_PROFILE = CswProfile.CSW_FEDERATION_PROFILE_SOURCE
+    static TEST_CSW_PROFILE = CswProfile.DDFCswFederatedSource.CSW_FEDERATION_PROFILE_SOURCE
 
     static CSW_PROFILE = CswProfile.DEFAULT_FIELD_NAME
 
@@ -67,12 +67,9 @@ class CreateCswConfigurationTest extends Specification {
 
     Source federatedSource
 
-    def actionArgs
-
     def federatedSources = []
 
     def setup() {
-        actionArgs = createCswArgs()
         configurator = Mock(Configurator)
         configuratorFactory = Mock(ConfiguratorFactory)
         serviceActions = Mock(ServiceActions)
@@ -101,7 +98,7 @@ class CreateCswConfigurationTest extends Specification {
 
     def 'Fail to create new CSW config due to duplicate source name'() {
         when:
-        createCswConfiguration.setValue(actionArgs)
+        createCswConfiguration.setValue(createCswArgs())
         serviceReader.getServices(_, _) >> federatedSources
         def report = createCswConfiguration.getValue()
 
@@ -114,12 +111,26 @@ class CreateCswConfigurationTest extends Specification {
 
     def 'Fail to create new CSW config due to failure to commit'() {
         when:
-        createCswConfiguration.setValue(actionArgs)
+        createCswConfiguration.setValue(createCswArgs())
         serviceReader.getServices(_, _) >> []
         def report = createCswConfiguration.getValue()
 
         then:
         1 * configurator.commit(_, _) >> mockReport(false)
+        1 * configurator.commit(_, _) >> mockReport(true)
+        !report.result().getValue()
+        report.messages().size() == 1
+        report.messages().get(0).path == RESULT_ARGUMENT_PATH
+        report.messages().get(0).code == DefaultMessages.FAILED_PERSIST
+    }
+
+    def 'Return false when csw feature fails to start'() {
+        when:
+        createCswConfiguration.setValue(createCswArgs())
+        serviceReader.getServices(_, _) >> []
+        def report = createCswConfiguration.getValue()
+
+        then:
         1 * configurator.commit(_, _) >> mockReport(true)
         !report.result().getValue()
         report.messages().size() == 1

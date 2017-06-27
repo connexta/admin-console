@@ -25,9 +25,7 @@ import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
-import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
-import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 import org.codice.ddf.admin.configurator.Configurator;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
@@ -38,39 +36,44 @@ import org.codice.ddf.admin.security.common.fields.wcpm.ContextPolicyBin;
 import org.codice.ddf.admin.security.common.services.PolicyManagerServiceProperties;
 import org.codice.ddf.admin.security.common.services.StsServiceProperties;
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
+import org.codice.ddf.internal.admin.configurator.actions.ServiceReader;
 
 import com.google.common.collect.ImmutableList;
 
-public class SaveContextPolices extends BaseFunctionField<ListField<ContextPolicyBin>> {
+public class SaveContextPolices extends BaseFunctionField<ContextPolicyBin.ListImpl> {
 
     public static final String FUNCTION_FIELD_NAME = "saveContextPolicies";
 
     public static final String DESCRIPTION =
             "Saves a list of policies to be applied to their corresponding context paths.";
 
-    private ConfiguratorFactory configuratorFactory;
+    private ContextPolicyBin.ListImpl returnType;
+
+    private final ConfiguratorFactory configuratorFactory;
 
     private final ServiceActions serviceActions;
 
-    private ListField<ContextPolicyBin> contextPolicies;
+    private final ServiceReader serviceReader;
+
+    private ContextPolicyBin.ListImpl contextPolicies;
 
     private StsServiceProperties stsServiceProps;
 
     public SaveContextPolices(ConfiguratorFactory configuratorFactory,
-            ServiceActions serviceActions) {
-        super(FUNCTION_FIELD_NAME, DESCRIPTION, new ListFieldImpl<>(ContextPolicyBin.class));
+            ServiceActions serviceActions, ServiceReader serviceReader) {
+        super(FUNCTION_FIELD_NAME, DESCRIPTION);
         this.configuratorFactory = configuratorFactory;
         this.serviceActions = serviceActions;
-
-        contextPolicies = new ListFieldImpl<>("policies",
-                new ContextPolicyBin().useDefaultRequiredFields()).isRequired(true);
+        this.serviceReader = serviceReader;
+        this.returnType = new ContextPolicyBin.ListImpl(serviceReader);
+        contextPolicies = new ContextPolicyBin.ListImpl(serviceReader).useDefaultRequired();
         updateArgumentPaths();
 
         stsServiceProps = new StsServiceProperties();
     }
 
     @Override
-    public ListField<ContextPolicyBin> performFunction() {
+    public ContextPolicyBin.ListImpl performFunction() {
         Configurator configurator = configuratorFactory.getConfigurator();
         configurator.add(serviceActions.build(POLICY_MANAGER_PID,
                 new PolicyManagerServiceProperties().contextPoliciesToPolicyManagerProps(
@@ -120,12 +123,17 @@ public class SaveContextPolices extends BaseFunctionField<ListField<ContextPolic
     }
 
     @Override
+    public ContextPolicyBin.ListImpl getReturnType() {
+        return returnType;
+    }
+
+    @Override
     public List<DataType> getArguments() {
         return ImmutableList.of(contextPolicies);
     }
 
     @Override
-    public FunctionField<ListField<ContextPolicyBin>> newInstance() {
-        return new SaveContextPolices(configuratorFactory, serviceActions);
+    public FunctionField<ContextPolicyBin.ListImpl> newInstance() {
+        return new SaveContextPolices(configuratorFactory, serviceActions, serviceReader);
     }
 }

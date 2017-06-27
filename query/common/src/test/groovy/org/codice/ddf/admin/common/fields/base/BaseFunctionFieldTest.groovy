@@ -105,6 +105,8 @@ class BaseFunctionFieldTest extends Specification {
 
         static String ARG_VALUE = 'valid'
 
+        public static final StringField RETURN_TYPE = new StringField()
+
         StringField stringArg
 
         TestObjectField testObjectField
@@ -114,7 +116,7 @@ class BaseFunctionFieldTest extends Specification {
         }
 
         TestBaseFunctionField(String functionName, boolean failValidation) {
-            super(functionName, 'description', new StringField())
+            super(functionName, 'description')
             stringArg = new StringField()
             testObjectField = new TestObjectField()
             if (failValidation) {
@@ -123,6 +125,11 @@ class BaseFunctionFieldTest extends Specification {
                 stringArg.setValue(ARG_VALUE)
             }
             updateArgumentPaths()
+        }
+
+        @Override
+        StringField getReturnType() {
+            return RETURN_TYPE
         }
 
         @Override

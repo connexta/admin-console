@@ -16,9 +16,11 @@ package org.codice.ddf.admin.security.common.fields.wcpm;
 import static org.codice.ddf.admin.common.report.message.DefaultMessages.missingKeyValue;
 
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.api.report.ErrorMessage;
+import org.codice.ddf.admin.common.fields.base.BaseListField;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 
@@ -82,7 +84,7 @@ public class ClaimsMapEntry extends BaseObjectField {
 
     @Override
     public List<ErrorMessage> validate() {
-        List<ErrorMessage> validationMsgs = super.validate();
+        List validationMsgs = super.validate();
         if (!validationMsgs.isEmpty()) {
             return validationMsgs;
         }
@@ -100,5 +102,39 @@ public class ClaimsMapEntry extends BaseObjectField {
     @Override
     public List<Field> getFields() {
         return ImmutableList.of(key, value);
+    }
+
+    public static class ListImpl extends BaseListField<ClaimsMapEntry> {
+
+        public static final String DEFAULT_FIELD_NAME = "claimsMapping";
+
+        private Callable<ClaimsMapEntry> newClaimsEntry;
+
+        public ListImpl() {
+            super(DEFAULT_FIELD_NAME);
+            newClaimsEntry = ClaimsMapEntry::new;
+        }
+
+        public ListImpl(String fieldName) {
+            super(fieldName);
+            newClaimsEntry = ClaimsMapEntry::new;
+        }
+
+        @Override
+        public Callable<ClaimsMapEntry> getCreateListEntryCallable() {
+            return newClaimsEntry;
+        }
+
+        @Override
+        public ListImpl useDefaultRequired() {
+            newClaimsEntry = () -> {
+                ClaimsMapEntry entry = new ClaimsMapEntry();
+                entry.claimField().isRequired(true);
+                entry.claimValueField().isRequired(true);
+                return entry;
+            };
+
+            return this;
+        }
     }
 }

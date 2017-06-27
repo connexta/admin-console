@@ -44,6 +44,8 @@ public class CreateOpenSearchConfiguration extends BaseFunctionField<BooleanFiel
     public static final String DESCRIPTION =
             "Creates an OpenSearch source configuration. Returns true on success and false on failure.";
 
+    public static final BooleanField RETURN_TYPE = new BooleanField();
+
     private OpenSearchSourceConfigurationField config;
 
     private SourceValidationUtils sourceValidationUtils;
@@ -63,7 +65,7 @@ public class CreateOpenSearchConfiguration extends BaseFunctionField<BooleanFiel
     public CreateOpenSearchConfiguration(ConfiguratorFactory configuratorFactory,
             ServiceActions serviceActions, ManagedServiceActions managedServiceActions,
             ServiceReader serviceReader, FeatureActions featureActions) {
-        super(FIELD_NAME, DESCRIPTION, new BooleanField());
+        super(FIELD_NAME, DESCRIPTION);
         this.configuratorFactory = configuratorFactory;
         this.serviceActions = serviceActions;
         this.managedServiceActions = managedServiceActions;
@@ -92,6 +94,7 @@ public class CreateOpenSearchConfiguration extends BaseFunctionField<BooleanFiel
 
         if (report.containsFailedResults()) {
             addResultMessage(failedPersistError());
+            return new BooleanField(false);
         }
 
         addMessages(sourceUtilCommons.saveSource(openSearchConfigToServiceProps(config),
@@ -106,6 +109,11 @@ public class CreateOpenSearchConfiguration extends BaseFunctionField<BooleanFiel
             return;
         }
         addMessages(sourceValidationUtils.sourceNameExists(config.sourceNameField()));
+    }
+
+    @Override
+    public BooleanField getReturnType() {
+        return RETURN_TYPE;
     }
 
     @Override

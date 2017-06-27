@@ -14,8 +14,10 @@
 package org.codice.ddf.admin.common.fields.common;
 
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.codice.ddf.admin.api.Field;
+import org.codice.ddf.admin.common.fields.base.BaseListField;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 
@@ -65,5 +67,19 @@ public class PairField extends BaseObjectField {
 
     public String value() {
         return value.getValue();
+    }
+
+    public static class ListImpl extends BaseListField<PairField> {
+
+        public static final String DEFAULT_FIELD_NAME = "entries";
+
+        public ListImpl() {
+            super(DEFAULT_FIELD_NAME);
+        }
+
+        @Override
+        public Callable<PairField> getCreateListEntryCallable() {
+            return PairField::new;
+        }
     }
 }

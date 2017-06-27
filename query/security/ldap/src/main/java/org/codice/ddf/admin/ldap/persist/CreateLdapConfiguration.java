@@ -14,9 +14,9 @@
 package org.codice.ddf.admin.ldap.persist;
 
 import static org.codice.ddf.admin.common.report.message.DefaultMessages.failedPersistError;
-import static org.codice.ddf.admin.security.common.fields.ldap.LdapUseCase.ATTRIBUTE_STORE;
-import static org.codice.ddf.admin.security.common.fields.ldap.LdapUseCase.AUTHENTICATION;
-import static org.codice.ddf.admin.security.common.fields.ldap.LdapUseCase.AUTHENTICATION_AND_ATTRIBUTE_STORE;
+import static org.codice.ddf.admin.security.common.fields.ldap.LdapUseCase.AttributeStore.ATTRIBUTE_STORE;
+import static org.codice.ddf.admin.security.common.fields.ldap.LdapUseCase.Authentication.AUTHENTICATION;
+import static org.codice.ddf.admin.security.common.fields.ldap.LdapUseCase.AuthenticationAndAttributeStore.AUTHENTICATION_AND_ATTRIBUTE_STORE;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -47,6 +47,8 @@ public class CreateLdapConfiguration extends BaseFunctionField<BooleanField> {
 
     public static final String DESCRIPTION = "Creates a LDAP configuration.";
 
+    public static final BooleanField RETURN_TYPE = new BooleanField();
+
     private LdapConfigurationField config;
 
     private final ConfiguratorFactory configuratorFactory;
@@ -62,7 +64,7 @@ public class CreateLdapConfiguration extends BaseFunctionField<BooleanField> {
     public CreateLdapConfiguration(ConfiguratorFactory configuratorFactory,
             FeatureActions featureActions, ManagedServiceActions managedServiceActions,
             PropertyActions propertyActions) {
-        super(FIELD_NAME, DESCRIPTION, new BooleanField());
+        super(FIELD_NAME, DESCRIPTION);
         this.configuratorFactory = configuratorFactory;
         this.featureActions = featureActions;
         this.managedServiceActions = managedServiceActions;
@@ -73,6 +75,11 @@ public class CreateLdapConfiguration extends BaseFunctionField<BooleanField> {
 
         this.ldapServiceCommons = new LdapServiceCommons(this.propertyActions,
                 this.managedServiceActions);
+    }
+
+    @Override
+    public BooleanField getReturnType() {
+        return RETURN_TYPE;
     }
 
     @Override

@@ -35,7 +35,7 @@ class UpdateCswConfigurationTest extends Specification {
 
     static TEST_OUTPUT_SCHEMA = 'testOutputSchema'
 
-    static TEST_CSW_PROFILE = CswProfile.CSW_FEDERATION_PROFILE_SOURCE
+    static TEST_CSW_PROFILE = CswProfile.DDFCswFederatedSource.CSW_FEDERATION_PROFILE_SOURCE
 
     static CSW_PROFILE = CswProfile.DEFAULT_FIELD_NAME
 
@@ -69,12 +69,9 @@ class UpdateCswConfigurationTest extends Specification {
 
     Source federatedSource
 
-    def actionArgs
-
     def federatedSources = []
 
     def setup() {
-        actionArgs = createCswUpdateArgs()
         configurator = Mock(Configurator)
         configuratorFactory = Mock(ConfiguratorFactory)
         serviceActions = Mock(ServiceActions)
@@ -91,8 +88,7 @@ class UpdateCswConfigurationTest extends Specification {
 
     def 'Successfully update CSW configuration'() {
         setup:
-        actionArgs.put(PID, S_PID)
-        updateCswConfiguration.setValue(actionArgs)
+        updateCswConfiguration.setValue(createCswUpdateArgs())
         serviceActions.read(_) >> [(ID): TEST_SOURCENAME]
         serviceReader.getServices(_, _) >> []
         configurator.commit(_, _) >> mockReport(false)
@@ -107,8 +103,7 @@ class UpdateCswConfigurationTest extends Specification {
 
     def 'Fail CSW configuration update due to existing source name'() {
         setup:
-        actionArgs.put(PID, S_PID)
-        updateCswConfiguration.setValue(actionArgs)
+        updateCswConfiguration.setValue(createCswUpdateArgs())
         serviceActions.read(_) >> [(ID): 'updatedName']
         serviceReader.getServices(_, _) >>
                 [new TestSource(S_PID, 'updatedName', false),
@@ -126,8 +121,7 @@ class UpdateCswConfigurationTest extends Specification {
 
     def 'Fail to update CSW config due to failure to commit'() {
         setup:
-        actionArgs.put(PID, S_PID)
-        updateCswConfiguration.setValue(actionArgs)
+        updateCswConfiguration.setValue(createCswUpdateArgs())
         serviceActions.read(_) >> [(ID): TEST_SOURCENAME]
         serviceReader.getServices(_, _) >> []
 
@@ -145,8 +139,7 @@ class UpdateCswConfigurationTest extends Specification {
 
     def 'Fail to update CSW Configuration due to no existing source config'() {
         setup:
-        actionArgs.put(PID, S_PID)
-        updateCswConfiguration.setValue(actionArgs)
+        updateCswConfiguration.setValue(createCswUpdateArgs())
         serviceActions.read(S_PID) >> [:]
 
         when:
@@ -157,6 +150,23 @@ class UpdateCswConfigurationTest extends Specification {
         report.messages().size() == 1
         report.messages().get(0).path == RESULT_ARGUMENT_PATH
         report.messages().get(0).code == DefaultMessages.NO_EXISTING_CONFIG
+    }
+
+    def 'Return false when csw feature fails to start'() {
+        setup:
+        updateCswConfiguration.setValue(createCswUpdateArgs())
+        serviceReader.getServices(_, _) >> []
+        serviceActions.read(_ as String) >> [(ID): TEST_SOURCENAME]
+
+        when:
+        def report = updateCswConfiguration.getValue()
+
+        then:
+        1 * configurator.commit(_, _) >> mockReport(true)
+        !report.result().getValue()
+        report.messages().size() == 1
+        report.messages().get(0).path == RESULT_ARGUMENT_PATH
+        report.messages().get(0).code == DefaultMessages.FAILED_PERSIST
     }
 
     def 'Fail when missing required fields'() {

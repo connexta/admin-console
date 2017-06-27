@@ -46,6 +46,8 @@ public class CreateWfsConfiguration extends BaseFunctionField<BooleanField> {
     private static final String DESCRIPTION =
             "Creates a WFS source configuration. Returns true on success and false on failure.";
 
+    public static final BooleanField RETURN_TYPE = new BooleanField();
+
     private WfsSourceConfigurationField config;
 
     private SourceValidationUtils sourceValidationUtils;
@@ -65,7 +67,7 @@ public class CreateWfsConfiguration extends BaseFunctionField<BooleanField> {
     public CreateWfsConfiguration(ConfiguratorFactory configuratorFactory,
             ServiceActions serviceActions, ManagedServiceActions managedServiceActions,
             ServiceReader serviceReader, FeatureActions featureActions) {
-        super(FIELD_NAME, DESCRIPTION, new BooleanField());
+        super(FIELD_NAME, DESCRIPTION);
         this.configuratorFactory = configuratorFactory;
         this.serviceActions = serviceActions;
         this.managedServiceActions = managedServiceActions;
@@ -91,17 +93,18 @@ public class CreateWfsConfiguration extends BaseFunctionField<BooleanField> {
         Configurator configurator = configuratorFactory.getConfigurator();
         OperationReport report = null;
         if (config.wfsVersion()
-                .equals(WfsVersion.WFS_VERSION_2)) {
+                .equals(WfsVersion.Wfs2.WFS_VERSION_2)) {
             configurator.add(featureActions.start(WFS2_FEATURE));
             report = configurator.commit("Starting feature [{}].", WFS2_FEATURE);
         } else if (config.wfsVersion()
-                .equals(WfsVersion.WFS_VERSION_1)) {
+                .equals(WfsVersion.Wfs1.WFS_VERSION_1)) {
             configurator.add(featureActions.start(WFS1_FEATURE));
             report = configurator.commit("Starting feature [{}].", WFS1_FEATURE);
         }
 
         if(report != null && report.containsFailedResults()) {
             addResultMessage(failedPersistError());
+            return new BooleanField(false);
         }
 
         addMessages(sourceUtilCommons.saveSource(
@@ -122,6 +125,11 @@ public class CreateWfsConfiguration extends BaseFunctionField<BooleanField> {
     @Override
     public List<DataType> getArguments() {
         return ImmutableList.of(config);
+    }
+
+    @Override
+    public BooleanField getReturnType() {
+        return RETURN_TYPE;
     }
 
     @Override

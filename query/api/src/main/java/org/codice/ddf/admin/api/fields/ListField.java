@@ -20,7 +20,7 @@ import org.codice.ddf.admin.api.DataType;
 
 public interface ListField<T extends DataType> extends DataType<List> {
 
-    T getListFieldType();
+    T createListEntry();
 
     List<T> getList();
 

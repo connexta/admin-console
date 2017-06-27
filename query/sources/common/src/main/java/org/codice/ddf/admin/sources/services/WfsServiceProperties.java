@@ -58,9 +58,9 @@ public class WfsServiceProperties {
             SERVICE_PROPS_TO_WFS_CONFIG = WfsServiceProperties::servicePropsToWfsConfig;
 
     private static final BiMap<String, String> WFS_VERSION_MAPPING =
-            ImmutableBiMap.of(WfsVersion.WFS_VERSION_1,
+            ImmutableBiMap.of(WfsVersion.Wfs2.WFS_VERSION_2,
                     WFS1_FACTORY_PID,
-                    WfsVersion.WFS_VERSION_2,
+                    WfsVersion.Wfs1.WFS_VERSION_1,
                     WFS2_FACTORY_PID);
 
     public static WfsSourceConfigurationField servicePropsToWfsConfig(Map<String, Object> props) {

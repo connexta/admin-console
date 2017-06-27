@@ -15,12 +15,13 @@ package org.codice.ddf.admin.ldap.fields.config;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.api.fields.ListField;
+import org.codice.ddf.admin.common.fields.base.BaseListField;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
-import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindUserInfo;
 import org.codice.ddf.admin.ldap.fields.connection.LdapConnectionField;
@@ -46,7 +47,7 @@ public class LdapConfigurationField extends BaseObjectField {
 
     private LdapDirectorySettingsField settings;
 
-    private ListField<ClaimsMapEntry> claimMappings;
+    private ClaimsMapEntry.ListImpl claimMappings;
 
     public LdapConfigurationField() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
@@ -54,7 +55,7 @@ public class LdapConfigurationField extends BaseObjectField {
         connection = new LdapConnectionField();
         bindUserInfo = new LdapBindUserInfo();
         settings = new LdapDirectorySettingsField();
-        claimMappings = new ListFieldImpl<>(CLAIMS_MAPPING, ClaimsMapEntry.class);
+        claimMappings = new ClaimsMapEntry.ListImpl();
 
         updateInnerFieldPaths();
     }
@@ -142,5 +143,19 @@ public class LdapConfigurationField extends BaseObjectField {
         settings.useDefaultRequiredForAuthentication();
         isRequired(true);
         return this;
+    }
+
+    public static class ListImpl extends BaseListField<LdapConfigurationField> {
+
+        public static final String DEFAULT_FIELD_NAME = "configs";
+
+        public ListImpl() {
+            super(DEFAULT_FIELD_NAME);
+        }
+
+        @Override
+        public Callable<LdapConfigurationField> getCreateListEntryCallable() {
+            return LdapConfigurationField::new;
+        }
     }
 }

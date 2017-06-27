@@ -20,8 +20,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections.ListUtils;
-import org.codice.ddf.admin.api.fields.ListField;
-import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.fields.common.ContextPath;
 import org.codice.ddf.admin.common.services.ServiceCommons;
 import org.codice.ddf.admin.security.common.fields.wcpm.ContextPolicyBin;
@@ -88,7 +86,7 @@ public class PolicyManagerServiceProperties {
                 reqAttrisProps.toArray(new String[0]));
     }
 
-    public ListField<ContextPolicyBin> contextPolicyServiceToContextPolicyFields(
+    public ContextPolicyBin.ListImpl contextPolicyServiceToContextPolicyFields(
             ServiceReader serviceReader) {
         ContextPolicyManager policyManager =
                 serviceReader.getServiceReference(ContextPolicyManager.class);
@@ -114,16 +112,14 @@ public class PolicyManagerServiceProperties {
             }
 
             if (!foundBin) {
-                policies.add(new ContextPolicyBin().realm(policy.getRealm())
+                policies.add(new ContextPolicyBin(serviceReader).realm(policy.getRealm())
                         .addClaimsMap(policyRequiredAttributes)
                         .authTypes(policy.getAuthenticationMethods())
                         .addContextPath(policy.getContextPath()));
             }
         }
 
-        ListField<ContextPolicyBin> policiesField = new ListFieldImpl<>(ContextPolicyBin.class);
-        policiesField.addAll(policies);
-        return policiesField;
+        return new ContextPolicyBin.ListImpl(serviceReader).addAll(policies);
     }
 
     private boolean hasSameRequiredAttributes(ContextPolicyBin bin,
@@ -146,7 +142,7 @@ public class PolicyManagerServiceProperties {
                 .isPresent();
     }
 
-    public Map<String, Object> whiteListToPolicyManagerProps(ListField<ContextPath> contexts) {
+    public Map<String, Object> whiteListToPolicyManagerProps(ContextPath.ListImpl contexts) {
         List<String> serviceContexts =
                 contexts.getValue() == null ? new ArrayList<>() : contexts.getValue();
         return ImmutableMap.of(WHITE_LIST_CONTEXT, serviceContexts);

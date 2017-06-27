@@ -17,31 +17,41 @@ import static org.codice.ddf.admin.common.report.message.DefaultMessages.unsuppo
 
 import java.util.List;
 
-import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.EnumField;
+import org.codice.ddf.admin.api.fields.EnumValue;
 import org.codice.ddf.admin.api.report.ErrorMessage;
 
 public abstract class BaseEnumField<S> extends BaseDataType<S>
-        implements EnumField<S, DataType<S>> {
+        implements EnumField<S, EnumValue<S>> {
 
     private S enumValue;
 
-    private List<DataType<S>> enumValues;
+    private List<EnumValue<S>> enumValues;
+
+    /**
+     * When this constructor is used, make sure the getEnumValues is overridden
+     * @param fieldName
+     * @param fieldTypeName
+     * @param description
+     */
+    public BaseEnumField(String fieldName, String fieldTypeName, String description) {
+        super(fieldName, fieldTypeName, description);
+    }
 
     public BaseEnumField(String fieldName, String fieldTypeName, String description,
-            List<DataType<S>> enumValues) {
-        super(fieldName, fieldTypeName, description);
+            List<EnumValue<S>> enumValues) {
+        this(fieldName, fieldTypeName, description);
         this.enumValues = enumValues;
     }
 
     public BaseEnumField(String fieldName, String fieldTypeName, String description,
-            List<DataType<S>> enumValues, DataType<S> enumValue) {
+            List<EnumValue<S>> enumValues, EnumValue<S> enumValue) {
         this(fieldName, fieldTypeName, description, enumValues);
-        this.enumValue = enumValue == null ? null : enumValue.getValue();
+        setValue(enumValue == null ? null : enumValue.value());
     }
 
     @Override
-    public List<DataType<S>> getEnumValues() {
+    public List<EnumValue<S>> getEnumValues() {
         return enumValues;
     }
 
@@ -54,7 +64,7 @@ public abstract class BaseEnumField<S> extends BaseDataType<S>
     public void setValue(S value) {
         if(value != null) {
             enumValue = getEnumValues().stream()
-                    .map(DataType::getValue)
+                    .map(EnumValue::value)
                     .filter(o -> o.equals(value) || (o instanceof String && o.toString()
                             .equalsIgnoreCase(value.toString())))
                     .findFirst()
@@ -68,7 +78,7 @@ public abstract class BaseEnumField<S> extends BaseDataType<S>
 
         if(validationMsgs.isEmpty() && getValue() != null) {
             if (getEnumValues().stream()
-                    .map(DataType::getValue)
+                    .map(EnumValue::value)
                     .noneMatch(v -> v.equals(getValue()))) {
                 validationMsgs.add(unsupportedEnum(path()));
             }

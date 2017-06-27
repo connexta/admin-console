@@ -33,6 +33,8 @@ public class DeleteOpenSearchConfiguration extends BaseFunctionField<BooleanFiel
     public static final String DESCRIPTION =
             "Deletes an OpenSearch source configuration specified by the pid and returns true on success and false on failure.";
 
+    public static final BooleanField RETURN_TYPE = new BooleanField();
+
     private PidField pid;
 
     private ServiceCommons serviceCommons;
@@ -45,7 +47,7 @@ public class DeleteOpenSearchConfiguration extends BaseFunctionField<BooleanFiel
 
     public DeleteOpenSearchConfiguration(ConfiguratorFactory configuratorFactory,
             ServiceActions serviceActions, ManagedServiceActions managedServiceActions) {
-        super(FIELD_NAME, DESCRIPTION, new BooleanField());
+        super(FIELD_NAME, DESCRIPTION);
         this.configuratorFactory = configuratorFactory;
         this.serviceActions = serviceActions;
         this.managedServiceActions = managedServiceActions;
@@ -73,6 +75,11 @@ public class DeleteOpenSearchConfiguration extends BaseFunctionField<BooleanFiel
             return;
         }
         addMessages(serviceCommons.serviceConfigurationExists(pid));
+    }
+
+    @Override
+    public BooleanField getReturnType() {
+        return RETURN_TYPE;
     }
 
     @Override

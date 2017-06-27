@@ -23,7 +23,6 @@ import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
-import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.common.services.ServiceCommons;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
@@ -45,7 +44,8 @@ public class GetOpenSearchConfigurations
     public static final String DESCRIPTION =
             "Retrieves all currently configured OpenSearch sources. If a source pid is specified, only that source configuration will be returned.";
 
-    public static final String OPEN_SEARCH_SOURCES = "openSearchSource";
+    public static final ListField<OpenSearchSourceInfoField> RETURN_TYPE =
+            new OpenSearchSourceInfoField.ListImpl();
 
     private PidField pid;
 
@@ -64,7 +64,7 @@ public class GetOpenSearchConfigurations
     public GetOpenSearchConfigurations(ConfiguratorFactory configuratorFactory,
             ServiceActions serviceActions, ManagedServiceActions managedServiceActions,
             ServiceReader serviceReader) {
-        super(FIELD_NAME, DESCRIPTION, new ListFieldImpl<>(OpenSearchSourceInfoField.class));
+        super(FIELD_NAME, DESCRIPTION);
         this.configuratorFactory = configuratorFactory;
         this.serviceActions = serviceActions;
         this.managedServiceActions = managedServiceActions;
@@ -83,9 +83,7 @@ public class GetOpenSearchConfigurations
 
     @Override
     public ListField<OpenSearchSourceInfoField> performFunction() {
-        ListField<OpenSearchSourceInfoField> cswSourceInfoFields = new ListFieldImpl<>(
-                OPEN_SEARCH_SOURCES,
-                OpenSearchSourceInfoField.class);
+        ListField<OpenSearchSourceInfoField> cswSourceInfoFields = new OpenSearchSourceInfoField.ListImpl();
 
         List<SourceConfigField> configs = sourceUtilCommons.getSourceConfigurations(
                 OPENSEARCH_FACTORY_PIDS,
@@ -118,6 +116,11 @@ public class GetOpenSearchConfigurations
         if (pid.getValue() != null) {
             addMessages(serviceCommons.serviceConfigurationExists(pid));
         }
+    }
+
+    @Override
+    public ListField<OpenSearchSourceInfoField> getReturnType() {
+        return RETURN_TYPE;
     }
 
     @Override

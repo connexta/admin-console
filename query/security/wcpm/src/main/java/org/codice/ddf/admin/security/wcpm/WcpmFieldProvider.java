@@ -25,8 +25,6 @@ import org.codice.ddf.admin.security.wcpm.discover.GetRealms;
 import org.codice.ddf.admin.security.wcpm.discover.GetWhiteListContexts;
 import org.codice.ddf.admin.security.wcpm.persist.SaveContextPolices;
 import org.codice.ddf.admin.security.wcpm.persist.SaveWhitelistContexts;
-import org.codice.ddf.internal.admin.configurator.actions.BundleActions;
-import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
 import org.codice.ddf.internal.admin.configurator.actions.ServiceReader;
 
@@ -55,15 +53,14 @@ public class WcpmFieldProvider extends BaseFieldProvider {
     private SaveWhitelistContexts saveWhitelistContexts;
 
     public WcpmFieldProvider(ConfiguratorFactory configuratorFactory, ServiceActions serviceActions,
-            BundleActions bundleActions, ManagedServiceActions managedServiceActions,
             ServiceReader serviceReader) {
         super(NAME, TYPE_NAME, DESCRIPTION);
-        getAuthTypes = new GetAuthTypes(configuratorFactory);
-        getRealms = new GetRealms(managedServiceActions, bundleActions);
+        getAuthTypes = new GetAuthTypes(serviceReader);
+        getRealms = new GetRealms(serviceReader);
         getWhiteListContexts = new GetWhiteListContexts(serviceActions);
         getContextPolicies = new GetContextPolicies(serviceReader);
 
-        saveContextPolices = new SaveContextPolices(configuratorFactory, serviceActions);
+        saveContextPolices = new SaveContextPolices(configuratorFactory, serviceActions, serviceReader);
         saveWhitelistContexts = new SaveWhitelistContexts(configuratorFactory, serviceActions);
         updateInnerFieldPaths();
     }
@@ -77,4 +74,5 @@ public class WcpmFieldProvider extends BaseFieldProvider {
     public List<FunctionField> getMutationFunctions() {
         return ImmutableList.of(saveContextPolices, saveWhitelistContexts);
     }
+
 }

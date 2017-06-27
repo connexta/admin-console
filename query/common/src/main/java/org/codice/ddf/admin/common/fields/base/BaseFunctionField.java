@@ -30,30 +30,12 @@ public abstract class BaseFunctionField<T extends DataType> extends BaseField<Ma
 
     private FunctionReportImpl<T> report;
 
-    private T returnType;
-
-    public BaseFunctionField(String functionName, String description, T returnType) {
+    public BaseFunctionField(String functionName, String description) {
         super(functionName, description);
-        this.returnType = returnType;
-        report = new FunctionReportImpl<>();
-    }
-
-    public BaseFunctionField(String functionName, String description, Class<T> returnType) {
-        super(functionName, description);
-        try {
-            this.returnType = returnType.newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
-            throw new RuntimeException(String.format("Unable to create new instance of class [%s]. Ensure there is a default constructor for the BaseFunctionField to initialize.", returnType.getClass()));
-        }
         report = new FunctionReportImpl<>();
     }
 
     public abstract T performFunction();
-
-    @Override
-    public T getReturnType() {
-        return returnType;
-    }
 
     @Override
     public void setValue(Map<String, Object> args) {

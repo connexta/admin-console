@@ -13,7 +13,7 @@
  **/
 package org.codice.ddf.admin.ldap.fields.connection;
 
-import static org.codice.ddf.admin.ldap.fields.connection.LdapBindMethod.DIGEST_MD5_SASL;
+import static org.codice.ddf.admin.ldap.fields.connection.LdapBindMethod.DigestMd5Sasl.DIGEST_MD5_SASL;
 
 import java.util.List;
 

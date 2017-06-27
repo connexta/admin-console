@@ -93,7 +93,7 @@ class LdapRecommendedSettingsSpec extends Specification {
 
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().port(666).getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue(),
-                (LdapTypeField.DEFAULT_FIELD_NAME)      : LdapTypeField.UNKNOWN]
+                (LdapTypeField.DEFAULT_FIELD_NAME)      : LdapTypeField.Unknown.UNKNOWN]
         action.setValue(args)
         action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
@@ -111,7 +111,7 @@ class LdapRecommendedSettingsSpec extends Specification {
 
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().password('badPassword').getValue(),
-                (LdapTypeField.DEFAULT_FIELD_NAME)      : LdapTypeField.UNKNOWN]
+                (LdapTypeField.DEFAULT_FIELD_NAME)      : LdapTypeField.Unknown.UNKNOWN]
         action.setValue(args)
         action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
@@ -129,7 +129,7 @@ class LdapRecommendedSettingsSpec extends Specification {
 
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue(),
-                (LdapTypeField.DEFAULT_FIELD_NAME)      : LdapTypeField.UNKNOWN]
+                (LdapTypeField.DEFAULT_FIELD_NAME)      : LdapTypeField.Unknown.UNKNOWN]
         action.setValue(args)
         action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 

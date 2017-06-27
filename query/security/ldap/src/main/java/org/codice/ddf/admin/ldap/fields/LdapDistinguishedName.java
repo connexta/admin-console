@@ -16,8 +16,10 @@ package org.codice.ddf.admin.ldap.fields;
 import static org.codice.ddf.admin.ldap.commons.LdapMessages.invalidDnFormatError;
 
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.codice.ddf.admin.api.report.ErrorMessage;
+import org.codice.ddf.admin.common.fields.base.BaseListField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 import org.forgerock.opendj.ldap.DN;
 
@@ -63,5 +65,23 @@ public class LdapDistinguishedName extends StringField {
             return false;
         }
         return true;
+    }
+
+    public static class ListImpl extends BaseListField<LdapDistinguishedName> {
+
+        public static final String DEFAULT_FIELD_NAME = "dns";
+
+        public ListImpl() {
+            super(DEFAULT_FIELD_NAME);
+        }
+
+        public ListImpl(String fieldName) {
+            super(fieldName);
+        }
+
+        @Override
+        public Callable<LdapDistinguishedName> getCreateListEntryCallable() {
+            return LdapDistinguishedName::new;
+        }
     }
 }

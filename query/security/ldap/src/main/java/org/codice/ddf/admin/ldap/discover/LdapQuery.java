@@ -20,9 +20,7 @@ import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
-import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
-import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.fields.base.scalar.IntegerField;
 import org.codice.ddf.admin.common.fields.common.MapField;
 import org.codice.ddf.admin.ldap.commons.LdapConnectionAttempt;
@@ -40,7 +38,8 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableList;
 
-public class LdapQuery extends BaseFunctionField<ListField<MapField>> {
+public class LdapQuery extends BaseFunctionField<MapField.ListImpl> {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(LdapQuery.class);
 
     public static final String FIELD_NAME = "query";
@@ -52,6 +51,8 @@ public class LdapQuery extends BaseFunctionField<ListField<MapField>> {
     public static final String QUERY_BASE_FIELD_NAME = "queryBase";
 
     private static final int DEFAULT_MAX_QUERY_RESULTS = 25;
+
+    public static final MapField.ListImpl RETURN_TYPE = new MapField.ListImpl();
 
     private LdapConnectionField conn;
 
@@ -66,7 +67,7 @@ public class LdapQuery extends BaseFunctionField<ListField<MapField>> {
     private LdapTestingUtils utils;
 
     public LdapQuery() {
-        super(FIELD_NAME, DESCRIPTION, new ListFieldImpl<>(MapField.class));
+        super(FIELD_NAME, DESCRIPTION);
         conn = new LdapConnectionField().useDefaultRequired();
         creds = new LdapBindUserInfo().useDefaultRequired();
         maxQueryResults = new IntegerField(MAX_QUERY_FIELD_NAME);
@@ -85,10 +86,9 @@ public class LdapQuery extends BaseFunctionField<ListField<MapField>> {
     }
 
     @Override
-    public ListField<MapField> performFunction() {
+    public MapField.ListImpl performFunction() {
         List<SearchResultEntry> searchResults;
         List<MapField> convertedSearchResults = new ArrayList<>();
-        ListField<MapField> entries;
         try (LdapConnectionAttempt connectionAttempt = utils.bindUserToLdapConnection(conn,
                 creds)) {
             addMessages(connectionAttempt);
@@ -129,12 +129,18 @@ public class LdapQuery extends BaseFunctionField<ListField<MapField>> {
             LOGGER.warn("Error closing LDAP connection", e);
         }
 
-        return new ListFieldImpl<>(MapField.class).addAll(convertedSearchResults);
+        return new MapField.ListImpl().addAll(convertedSearchResults);
     }
 
     @Override
-    public FunctionField<ListField<MapField>> newInstance() {
+    public FunctionField<MapField.ListImpl> newInstance() {
         return new LdapQuery();
+    }
+
+
+    @Override
+    public MapField.ListImpl getReturnType() {
+        return RETURN_TYPE;
     }
 
     /**

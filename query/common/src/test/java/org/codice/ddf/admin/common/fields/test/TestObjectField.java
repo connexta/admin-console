@@ -13,14 +13,17 @@
  **/
 package org.codice.ddf.admin.common.fields.test;
 
+import static org.codice.ddf.admin.common.fields.test.TestFieldProvider.LIST_FIELD_NAME;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.api.fields.ObjectField;
+import org.codice.ddf.admin.common.fields.base.BaseListField;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
-import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.common.fields.base.scalar.IntegerField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
@@ -42,7 +45,7 @@ public class TestObjectField extends BaseObjectField {
             "entry2",
             "entry3");
 
-    public static final String SAMPLE_ENUM = TestEnumField.ENUM_A;
+    public static final String SAMPLE_ENUM = TestEnumField.EnumA.ENUM_A;
 
     public static final String SUB_FIELD_OF_INNER_FIELD_NAME = "testSubField";
 
@@ -56,7 +59,7 @@ public class TestObjectField extends BaseObjectField {
 
     private StringField stringField;
 
-    private ListFieldImpl<StringField> listField;
+    private StringField.ListImpl listField;
 
     private TestEnumField enumField;
 
@@ -65,7 +68,7 @@ public class TestObjectField extends BaseObjectField {
         integerField = new IntegerField();
         booleanField = new BooleanField();
         stringField = new StringField();
-        listField = new ListFieldImpl<>(new StringField().isRequired(true));
+        listField = new StringField.ListImpl(LIST_FIELD_NAME).useDefaultRequired();
         enumField = new TestEnumField();
         innerTestObjectField = new InnerTestObjectField();
         updateInnerFieldPaths();
@@ -83,7 +86,7 @@ public class TestObjectField extends BaseObjectField {
         return stringField;
     }
 
-    public ListFieldImpl<StringField> getListField() {
+    public StringField.ListImpl getListField() {
         return listField;
     }
 
@@ -174,6 +177,22 @@ public class TestObjectField extends BaseObjectField {
         @Override
         public List<Field> getFields() {
             return ImmutableList.of(subFieldOfInnerField);
+        }
+    }
+
+    public static class ListImpl extends BaseListField<TestObjectField> {
+
+        public ListImpl(String fieldName) {
+            super(fieldName);
+        }
+
+        public ListImpl() {
+            this(LIST_FIELD_NAME);
+        }
+
+        @Override
+        public Callable<TestObjectField> getCreateListEntryCallable() {
+            return TestObjectField::new;
         }
     }
 }

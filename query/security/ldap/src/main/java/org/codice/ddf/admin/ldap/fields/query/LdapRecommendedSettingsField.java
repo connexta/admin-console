@@ -18,7 +18,6 @@ import java.util.List;
 import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
-import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 import org.codice.ddf.admin.ldap.fields.LdapDistinguishedName;
 
@@ -47,32 +46,29 @@ public class LdapRecommendedSettingsField extends BaseObjectField {
 
     private static final String QUERY_BASES = "queryBases";
 
-    private ListField<LdapDistinguishedName> userDns;
+    private LdapDistinguishedName.ListImpl userDns;
 
-    private ListField<LdapDistinguishedName> groupDns;
+    private LdapDistinguishedName.ListImpl groupDns;
 
-    private ListField<StringField> userNameAttributes;
+    private StringField.ListImpl userNameAttributes;
 
-    private ListField<StringField> groupObjectClasses;
+    private StringField.ListImpl groupObjectClasses;
 
-    private ListField<StringField> groupAttributesHoldingMember;
+    private StringField.ListImpl groupAttributesHoldingMember;
 
-    private ListField<StringField> memberAttributesReferencedInGroup;
+    private StringField.ListImpl memberAttributesReferencedInGroup;
 
-    private ListField<LdapDistinguishedName> queryBases;
+    private LdapDistinguishedName.ListImpl queryBases;
 
     public LdapRecommendedSettingsField() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
-        userDns = new ListFieldImpl<>(USER_DNS, LdapDistinguishedName.class);
-        groupDns = new ListFieldImpl<>(GROUPS_DNS, LdapDistinguishedName.class);
-        userNameAttributes = new ListFieldImpl<>(USER_NAME_ATTRIBUTES, StringField.class);
-        groupObjectClasses = new ListFieldImpl<>(GROUP_OBJECT_CLASSES, StringField.class);
-        groupAttributesHoldingMember = new ListFieldImpl<>(GROUP_ATTRIBUTES_HOLDING_MEMBER,
-                StringField.class);
-        memberAttributesReferencedInGroup = new ListFieldImpl<>(
-                MEMBER_ATTRIBUTES_REFERENCED_IN_GROUP,
-                StringField.class);
-        queryBases = new ListFieldImpl<>(QUERY_BASES, LdapDistinguishedName.class);
+        userDns = new LdapDistinguishedName.ListImpl(USER_DNS);
+        groupDns = new LdapDistinguishedName.ListImpl(GROUPS_DNS);
+        userNameAttributes = new StringField.ListImpl(USER_NAME_ATTRIBUTES);
+        groupObjectClasses = new StringField.ListImpl(GROUP_OBJECT_CLASSES);
+        groupAttributesHoldingMember = new StringField.ListImpl(GROUP_ATTRIBUTES_HOLDING_MEMBER);
+        memberAttributesReferencedInGroup = new StringField.ListImpl(MEMBER_ATTRIBUTES_REFERENCED_IN_GROUP);
+        queryBases = new LdapDistinguishedName.ListImpl(QUERY_BASES);
         updateInnerFieldPaths();
     }
 

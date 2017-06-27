@@ -35,6 +35,8 @@ public class DiscoverWfsSource extends BaseFunctionField<WfsSourceConfigurationF
             "Attempts to discover a WFS source using the given hostname and port or URL. If a URL"
                     + " is provided, it will take precedence over a hostname and port.";
 
+    public static final WfsSourceConfigurationField RETURN_TYPE = new WfsSourceConfigurationField();
+
     private CredentialsField credentials;
 
     private AddressField address;
@@ -42,7 +44,7 @@ public class DiscoverWfsSource extends BaseFunctionField<WfsSourceConfigurationF
     private WfsSourceUtils wfsSourceUtils;
 
     public DiscoverWfsSource() {
-        super(FIELD_NAME, DESCRIPTION, new WfsSourceConfigurationField());
+        super(FIELD_NAME, DESCRIPTION);
         credentials = new CredentialsField();
         address = new AddressField();
         address.isRequired(true);
@@ -76,6 +78,11 @@ public class DiscoverWfsSource extends BaseFunctionField<WfsSourceConfigurationF
 
         addMessages(configResult);
         return configResult.isResultPresent() ? configResult.result() : null;
+    }
+
+    @Override
+    public WfsSourceConfigurationField getReturnType() {
+        return RETURN_TYPE;
     }
 
     @Override

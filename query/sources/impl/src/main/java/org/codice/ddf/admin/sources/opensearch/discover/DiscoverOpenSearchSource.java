@@ -37,6 +37,8 @@ public class DiscoverOpenSearchSource
             "Attempts to discover an OpenSearch source using the given hostname and port or URL. If a URL "
                     + "is provided, it will take precedence over a hostname and port.";
 
+    public static final OpenSearchSourceConfigurationField RETURN_TYPE = new OpenSearchSourceConfigurationField();
+
     private CredentialsField credentials;
 
     private AddressField address;
@@ -44,7 +46,7 @@ public class DiscoverOpenSearchSource
     private OpenSearchSourceUtils openSearchSourceUtils;
 
     public DiscoverOpenSearchSource() {
-        super(FIELD_NAME, DESCRIPTION, new OpenSearchSourceConfigurationField());
+        super(FIELD_NAME, DESCRIPTION);
         credentials = new CredentialsField();
         address = new AddressField();
         address.isRequired(true);
@@ -56,6 +58,11 @@ public class DiscoverOpenSearchSource
     public DiscoverOpenSearchSource(OpenSearchSourceUtils openSearchSourceUtils) {
         this();
         this.openSearchSourceUtils = openSearchSourceUtils;
+    }
+
+    @Override
+    public List<DataType> getArguments() {
+        return ImmutableList.of(credentials, address);
     }
 
     @Override
@@ -81,8 +88,8 @@ public class DiscoverOpenSearchSource
     }
 
     @Override
-    public List<DataType> getArguments() {
-        return ImmutableList.of(credentials, address);
+    public OpenSearchSourceConfigurationField getReturnType() {
+        return RETURN_TYPE;
     }
 
     @Override

@@ -15,15 +15,16 @@ package org.codice.ddf.admin.common.fields.common;
 
 import static org.codice.ddf.admin.common.report.message.DefaultMessages.duplicateMapKeyError;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.api.Field;
-import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.api.report.ErrorMessage;
+import org.codice.ddf.admin.common.fields.base.BaseListField;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
-import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 
 import com.google.common.collect.ImmutableList;
 
@@ -35,13 +36,11 @@ public class MapField extends BaseObjectField {
 
     public static final String DESCRIPTION = "A map containing a list of key value pairs.";
 
-    public static final String ENTRIES_FIELD_NAME = "entries";
-
-    private ListField<PairField> entries;
+    private PairField.ListImpl entries;
 
     public MapField() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
-        entries = new ListFieldImpl<>(ENTRIES_FIELD_NAME, PairField.class);
+        entries = new PairField.ListImpl();
         updateInnerFieldPaths();
     }
 
@@ -113,5 +112,26 @@ public class MapField extends BaseObjectField {
             }
         }
         return validationMsgs;
+    }
+
+    public static class ListImpl extends BaseListField<MapField> {
+
+
+        public static final String DEFAULT_FIELD_NAME = "maps";
+
+        public ListImpl() {
+            super(DEFAULT_FIELD_NAME);
+        }
+
+        @Override
+        public Callable<MapField> getCreateListEntryCallable() {
+            return MapField::new;
+        }
+
+        @Override
+        public ListImpl addAll(Collection<MapField> values) {
+            super.addAll(values);
+            return this;
+        }
     }
 }

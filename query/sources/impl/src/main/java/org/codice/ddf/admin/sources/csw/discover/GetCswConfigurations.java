@@ -23,7 +23,6 @@ import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
-import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.common.services.ServiceCommons;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
@@ -44,7 +43,7 @@ public class GetCswConfigurations extends BaseFunctionField<ListField<CswSourceI
     public static final String DESCRIPTION =
             "Retrieves all currently configured CSW sources. If the pid argument is specified, only the source configuration with that pid will be returned.";
 
-    public static final String CSW_SOURCES = "cswSources";
+    public static final ListField<CswSourceInfoField> RETURN_TYPE = new CswSourceInfoField.ListImpl();
 
     private PidField pid;
 
@@ -63,7 +62,7 @@ public class GetCswConfigurations extends BaseFunctionField<ListField<CswSourceI
     public GetCswConfigurations(ConfiguratorFactory configuratorFactory,
             ServiceActions serviceActions, ManagedServiceActions managedServiceActions,
             ServiceReader serviceReader) {
-        super(FIELD_NAME, DESCRIPTION, new ListFieldImpl<>(CswSourceInfoField.class));
+        super(FIELD_NAME, DESCRIPTION);
         this.configuratorFactory = configuratorFactory;
         this.serviceActions = serviceActions;
         this.managedServiceActions = managedServiceActions;
@@ -82,17 +81,14 @@ public class GetCswConfigurations extends BaseFunctionField<ListField<CswSourceI
 
     @Override
     public ListField<CswSourceInfoField> performFunction() {
-        ListField<CswSourceInfoField> cswSourceInfoFields = new ListFieldImpl<>(CSW_SOURCES,
-                CswSourceInfoField.class);
+        ListField<CswSourceInfoField> cswSourceInfoFields = new CswSourceInfoField.ListImpl();
 
         List<SourceConfigField> configs =
                 sourceUtilCommons.getSourceConfigurations(CSW_FACTORY_PIDS,
                         SERVICE_PROPS_TO_CSW_CONFIG,
                         pid.getValue());
 
-        configs.forEach(config -> {
-            cswSourceInfoFields.add(new CswSourceInfoField().config((CswSourceConfigurationField) config));
-        });
+        configs.forEach(config -> cswSourceInfoFields.add(new CswSourceInfoField().config((CswSourceConfigurationField) config)));
 
         for (CswSourceInfoField sourceInfoField : cswSourceInfoFields.getList()) {
             sourceUtilCommons.populateAvailability(sourceInfoField.isAvailableField(),
@@ -116,6 +112,11 @@ public class GetCswConfigurations extends BaseFunctionField<ListField<CswSourceI
         if (pid.getValue() != null) {
             addMessages(serviceCommons.serviceConfigurationExists(pid));
         }
+    }
+
+    @Override
+    public ListField<CswSourceInfoField> getReturnType() {
+        return RETURN_TYPE;
     }
 
     @Override

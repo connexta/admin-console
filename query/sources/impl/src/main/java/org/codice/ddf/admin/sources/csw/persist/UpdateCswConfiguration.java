@@ -43,6 +43,8 @@ public class UpdateCswConfiguration extends BaseFunctionField<BooleanField> {
     public static final String DESCRIPTION =
             "Updates a CSW source configuration specified by the pid. Returns true on success and false on failure.";
 
+    public static final BooleanField RETURN_TYPE = new BooleanField();
+
     private CswSourceConfigurationField config;
 
     private SourceValidationUtils sourceValidationUtils;
@@ -63,7 +65,7 @@ public class UpdateCswConfiguration extends BaseFunctionField<BooleanField> {
             ServiceActions serviceActions, ManagedServiceActions managedServiceActions,
             ServiceReader serviceReader, FeatureActions featureActions) {
 
-        super(FIELD_NAME, DESCRIPTION, new BooleanField());
+        super(FIELD_NAME, DESCRIPTION);
         this.configuratorFactory = configuratorFactory;
         this.serviceActions = serviceActions;
         this.managedServiceActions = managedServiceActions;
@@ -94,6 +96,7 @@ public class UpdateCswConfiguration extends BaseFunctionField<BooleanField> {
 
         if (report.containsFailedResults()) {
             addResultMessage(failedPersistError());
+            return new BooleanField(false);
         }
 
         addMessages(sourceUtilCommons.updateSource(config.pidField(),
@@ -109,6 +112,11 @@ public class UpdateCswConfiguration extends BaseFunctionField<BooleanField> {
         }
         addMessages(sourceValidationUtils.validateSourceName(config.sourceNameField(),
                 config.pidField()));
+    }
+
+    @Override
+    public BooleanField getReturnType() {
+        return RETURN_TYPE;
     }
 
     @Override

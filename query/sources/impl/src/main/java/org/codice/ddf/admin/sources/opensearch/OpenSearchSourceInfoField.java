@@ -14,8 +14,10 @@
 package org.codice.ddf.admin.sources.opensearch;
 
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.codice.ddf.admin.api.Field;
+import org.codice.ddf.admin.common.fields.base.BaseListField;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.sources.fields.type.OpenSearchSourceConfigurationField;
@@ -69,5 +71,19 @@ public class OpenSearchSourceInfoField extends BaseObjectField {
     @Override
     public List<Field> getFields() {
         return ImmutableList.of(config, isAvailable);
+    }
+
+    public static class ListImpl extends BaseListField<OpenSearchSourceInfoField> {
+
+        public static final String DEFAULT_FIELD_NAME = "sources";
+
+        public ListImpl() {
+            super(DEFAULT_FIELD_NAME);
+        }
+
+        @Override
+        public Callable<OpenSearchSourceInfoField> getCreateListEntryCallable() {
+            return OpenSearchSourceInfoField::new;
+        }
     }
 }

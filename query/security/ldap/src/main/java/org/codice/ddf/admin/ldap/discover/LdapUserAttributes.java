@@ -21,9 +21,7 @@ import java.util.Set;
 
 import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
-import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
-import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 import org.codice.ddf.admin.ldap.commons.LdapConnectionAttempt;
 import org.codice.ddf.admin.ldap.commons.LdapTestingUtils;
@@ -38,7 +36,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableList;
 
-public class LdapUserAttributes extends BaseFunctionField<ListField<StringField>> {
+public class LdapUserAttributes extends BaseFunctionField<StringField.ListImpl> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LdapUserAttributes.class);
 
@@ -49,6 +47,9 @@ public class LdapUserAttributes extends BaseFunctionField<ListField<StringField>
 
     public static final String BASE_USER_DN = "baseUserDn";
 
+    public static final StringField.ListImpl RETURN_TYPE =
+            new StringField.ListImpl();
+
     private LdapConnectionField conn;
 
     private LdapBindUserInfo bindInfo;
@@ -58,7 +59,7 @@ public class LdapUserAttributes extends BaseFunctionField<ListField<StringField>
     private LdapTestingUtils utils;
 
     public LdapUserAttributes() {
-        super(FIELD_NAME, DESCRIPTION, new ListFieldImpl<>(StringField.class));
+        super(FIELD_NAME, DESCRIPTION);
         conn = new LdapConnectionField().useDefaultRequired();
         bindInfo = new LdapBindUserInfo().useDefaultRequired();
         baseUserDn = new LdapDistinguishedName(BASE_USER_DN);
@@ -74,8 +75,8 @@ public class LdapUserAttributes extends BaseFunctionField<ListField<StringField>
     }
 
     @Override
-    public ListField<StringField> performFunction() {
-        ListFieldImpl<StringField> entries = null;
+    public StringField.ListImpl performFunction() {
+        StringField.ListImpl entries = null;
         try (LdapConnectionAttempt connectionAttempt = utils.bindUserToLdapConnection(conn,
                 bindInfo)) {
             addMessages(connectionAttempt);
@@ -94,7 +95,7 @@ public class LdapUserAttributes extends BaseFunctionField<ListField<StringField>
                         + "configuration issue with config.");
             }
 
-            entries = new ListFieldImpl<>(StringField.class);
+            entries = new StringField.ListImpl();
             entries.setValue(Arrays.asList(ldapEntryAttributes.toArray()));
 
         } catch (IOException e) {
@@ -105,7 +106,12 @@ public class LdapUserAttributes extends BaseFunctionField<ListField<StringField>
     }
 
     @Override
-    public FunctionField<ListField<StringField>> newInstance() {
+    public StringField.ListImpl getReturnType() {
+        return RETURN_TYPE;
+    }
+
+    @Override
+    public FunctionField<StringField.ListImpl> newInstance() {
         return new LdapUserAttributes();
     }
 

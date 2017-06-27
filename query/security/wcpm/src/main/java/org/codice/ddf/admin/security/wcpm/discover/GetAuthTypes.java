@@ -13,42 +13,48 @@
  **/
 package org.codice.ddf.admin.security.wcpm.discover;
 
-import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.api.fields.FunctionField;
-import org.codice.ddf.admin.api.fields.ListField;
-import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.fields.base.function.GetFunctionField;
-import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.security.common.fields.wcpm.AuthType;
+import org.codice.ddf.internal.admin.configurator.actions.ServiceReader;
 
-public class GetAuthTypes extends GetFunctionField<ListField<AuthType>> {
+public class GetAuthTypes extends GetFunctionField<AuthType.ListImpl> {
 
     public static final String FIELD_NAME = "authTypes";
 
     public static final String DESCRIPTION =
             "Retrieves all currently configured authentication types.";
 
-    private ConfiguratorFactory configuratorFactory;
+    private AuthType.ListImpl returnType;
 
-    public GetAuthTypes(ConfiguratorFactory configuratorFactory) {
-        super(FIELD_NAME, DESCRIPTION, new ListFieldImpl<>(AuthType.class));
-        this.configuratorFactory = configuratorFactory;
+    private final ServiceReader serviceReader;
+
+    public GetAuthTypes(ServiceReader serviceReader) {
+        super(FIELD_NAME, DESCRIPTION);
+        this.serviceReader = serviceReader;
+        this.returnType = new AuthType.ListImpl(serviceReader);
     }
 
     @Override
-    public ListField<AuthType> performFunction() {
-        ListField<AuthType> authTypes = new ListFieldImpl<>(AuthType.class).addAll(Arrays.asList(AuthType.BASIC_AUTH,
-                AuthType.SAML_AUTH,
-                AuthType.PKI_AUTH,
-                AuthType.GUEST_AUTH,
-                AuthType.IDP_AUTH));
+    public AuthType.ListImpl performFunction() {
+        List authType = new AuthType(serviceReader).getEnumValues()
+                .stream()
+                .map(enumVal -> new AuthType(serviceReader, enumVal))
+                .collect(Collectors.toList());
 
-        return authTypes;
+        return new AuthType.ListImpl(serviceReader).addAll(authType);
     }
 
     @Override
-    public FunctionField<ListField<AuthType>> newInstance() {
-        return new GetAuthTypes(configuratorFactory);
+    public AuthType.ListImpl getReturnType() {
+        return returnType;
+    }
+
+    @Override
+    public FunctionField<AuthType.ListImpl> newInstance() {
+        return new GetAuthTypes(serviceReader);
     }
 }

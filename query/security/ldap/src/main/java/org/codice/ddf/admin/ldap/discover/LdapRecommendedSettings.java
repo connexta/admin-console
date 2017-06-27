@@ -32,12 +32,16 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.ImmutableList;
 
 public class LdapRecommendedSettings extends BaseFunctionField<LdapRecommendedSettingsField> {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(LdapRecommendedSettings.class);
 
     public static final String FIELD_NAME = "recommendedSettings";
 
     public static final String DESCRIPTION =
             "Attempts to retrieve recommended settings from the LDAP connection.";
+
+    public static final LdapRecommendedSettingsField RETURN_TYPE =
+            new LdapRecommendedSettingsField();
 
     private LdapConnectionField conn;
 
@@ -48,7 +52,7 @@ public class LdapRecommendedSettings extends BaseFunctionField<LdapRecommendedSe
     private LdapTestingUtils utils;
 
     public LdapRecommendedSettings() {
-        super(FIELD_NAME, DESCRIPTION, new LdapRecommendedSettingsField());
+        super(FIELD_NAME, DESCRIPTION);
         conn = new LdapConnectionField().useDefaultRequired();
         creds = new LdapBindUserInfo().useDefaultRequired();
         ldapType = new LdapTypeField();
@@ -92,6 +96,11 @@ public class LdapRecommendedSettings extends BaseFunctionField<LdapRecommendedSe
     @Override
     public FunctionField<LdapRecommendedSettingsField> newInstance() {
         return new LdapRecommendedSettings();
+    }
+
+    @Override
+    public LdapRecommendedSettingsField getReturnType() {
+        return RETURN_TYPE;
     }
 
     /**

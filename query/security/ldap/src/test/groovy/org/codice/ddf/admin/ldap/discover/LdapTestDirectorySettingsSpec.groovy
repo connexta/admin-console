@@ -30,8 +30,8 @@ import org.codice.ddf.admin.ldap.fields.connection.LdapEncryptionMethodField
 import spock.lang.Specification
 
 import static org.codice.ddf.admin.ldap.LdapTestingCommons.*
-import static LdapUseCase.ATTRIBUTE_STORE
-import static LdapUseCase.AUTHENTICATION
+import static org.codice.ddf.admin.security.common.fields.ldap.LdapUseCase.AttributeStore.ATTRIBUTE_STORE
+import static org.codice.ddf.admin.security.common.fields.ldap.LdapUseCase.Authentication.AUTHENTICATION
 
 class LdapTestDirectorySettingsSpec extends Specification {
     static TestLdapServer server

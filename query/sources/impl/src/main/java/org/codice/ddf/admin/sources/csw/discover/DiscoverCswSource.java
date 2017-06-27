@@ -35,14 +35,17 @@ public class DiscoverCswSource extends BaseFunctionField<CswSourceConfigurationF
             "Attempts to discover a CSW source using the given hostname and port or URL. If a URL is provided, "
                     + "it will take precedence over a hostname and port.";
 
+    public static final CswSourceConfigurationField RETURN_TYPE = new CswSourceConfigurationField();
+
     private CredentialsField credentials;
+
 
     private AddressField address;
 
     private CswSourceUtils cswSourceUtils;
 
     public DiscoverCswSource() {
-        super(FIELD_NAME, DESCRIPTION, new CswSourceConfigurationField());
+        super(FIELD_NAME, DESCRIPTION);
         credentials = new CredentialsField();
         address = new AddressField();
         address.isRequired(true);
@@ -75,6 +78,11 @@ public class DiscoverCswSource extends BaseFunctionField<CswSourceConfigurationF
 
         addMessages(configResult);
         return configResult.isResultPresent() ? configResult.result() : null;
+    }
+
+    @Override
+    public CswSourceConfigurationField getReturnType() {
+        return RETURN_TYPE;
     }
 
     @Override

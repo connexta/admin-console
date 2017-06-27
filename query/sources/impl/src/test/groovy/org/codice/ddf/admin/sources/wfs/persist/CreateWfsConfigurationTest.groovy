@@ -46,7 +46,7 @@ class CreateWfsConfigurationTest extends Specification {
 
     static WFS_VERSION_PATH = [CONFIG_PATH, WFS_VERSION].flatten()
 
-    static TEST_WFS_VERSION = WfsVersion.WFS_VERSION_1
+    static TEST_WFS_VERSION = WfsVersion.Wfs1.WFS_VERSION_1
 
     CreateWfsConfiguration createWfsConfiguration
 
@@ -64,12 +64,9 @@ class CreateWfsConfigurationTest extends Specification {
 
     FederatedSource federatedSource
 
-    def functionArgs
-
     def federatedSources = []
 
     def setup() {
-        functionArgs = createWfsArgs()
         configurator = Mock(Configurator)
         serviceActions = Mock(ServiceActions)
         serviceReader = Mock(ServiceReader)
@@ -89,7 +86,7 @@ class CreateWfsConfigurationTest extends Specification {
 
     def 'Successfully create new WFS configuration'() {
         setup:
-        createWfsConfiguration.setValue(functionArgs)
+        createWfsConfiguration.setValue(createWfsArgs())
         serviceReader.getServices(_, _) >> []
         configurator.commit(_, _) >> mockReport(false)
 
@@ -103,7 +100,7 @@ class CreateWfsConfigurationTest extends Specification {
 
     def 'Fail to create new WFS config due to duplicate source name'() {
         setup:
-        createWfsConfiguration.setValue(functionArgs)
+        createWfsConfiguration.setValue(createWfsArgs())
         serviceReader.getServices(_, _) >> federatedSources
 
         when:
@@ -118,7 +115,7 @@ class CreateWfsConfigurationTest extends Specification {
 
     def 'Fail to create new WFS config due to failure to commit'() {
         setup:
-        createWfsConfiguration.setValue(functionArgs)
+        createWfsConfiguration.setValue(createWfsArgs())
         serviceReader.getServices(_, _) >> []
 
         when:
@@ -131,6 +128,20 @@ class CreateWfsConfigurationTest extends Specification {
         report.messages().size() == 1
         report.messages().get(0).code == DefaultMessages.FAILED_PERSIST
         report.messages().get(0).path == RESULT_ARGUMENT_PATH
+    }
+
+    def 'Return false when wfs feature fails to start'() {
+        when:
+        createWfsConfiguration.setValue(createWfsArgs())
+        serviceReader.getServices(_, _) >> []
+        def report = createWfsConfiguration.getValue()
+
+        then:
+        1 * configurator.commit(_, _) >> mockReport(true)
+        !report.result().getValue()
+        report.messages().size() == 1
+        report.messages().get(0).path == RESULT_ARGUMENT_PATH
+        report.messages().get(0).code == DefaultMessages.FAILED_PERSIST
     }
 
     def 'Fail due to missing required fields'() {

@@ -172,14 +172,14 @@ class LdapTestConnectionSpec extends Specification {
         return new LdapConnectionField()
                 .hostname(server.getHostname())
                 .port(server.getLdapSecurePort())
-                .encryptionMethod(LdapEncryptionMethodField.LDAPS)
+                .encryptionMethod(LdapEncryptionMethodField.LdapsEncryption.LDAPS)
     }
 
     LdapConnectionField startTlsLdapConnectionInfo(int port) {
         return new LdapConnectionField()
                 .hostname(server.getHostname())
                 .port(port)
-                .encryptionMethod(LdapEncryptionMethodField.START_TLS)
+                .encryptionMethod(LdapEncryptionMethodField.StartTlsEncryption.START_TLS)
     }
 
     /**

@@ -13,56 +13,44 @@
  **/
 package org.codice.ddf.admin.security.wcpm.discover;
 
-import static org.codice.ddf.admin.security.common.services.PolicyManagerServiceProperties.IDP_SERVER_BUNDLE_NAME;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.api.fields.FunctionField;
-import org.codice.ddf.admin.api.fields.ListField;
-import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.fields.base.function.GetFunctionField;
 import org.codice.ddf.admin.security.common.fields.wcpm.Realm;
-import org.codice.ddf.admin.security.common.services.LdapLoginServiceProperties;
-import org.codice.ddf.internal.admin.configurator.actions.BundleActions;
-import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
+import org.codice.ddf.internal.admin.configurator.actions.ServiceReader;
 
-public class GetRealms extends GetFunctionField<ListField<Realm>> {
+public class GetRealms extends GetFunctionField<Realm.ListImpl> {
 
     public static final String FIELD_NAME = "realms";
 
     public static final String DESCRIPTION = "Retrieves all currently configured realms.";
 
-    private final ManagedServiceActions managedServiceActions;
+    private final ServiceReader serviceReader;
 
-    private final BundleActions bundleActions;
-
-    LdapLoginServiceProperties serviceCommons;
-
-    public GetRealms(ManagedServiceActions managedServiceActions, BundleActions bundleActions) {
-        super(FIELD_NAME, DESCRIPTION, new ListFieldImpl<>(Realm.class));
-        this.managedServiceActions = managedServiceActions;
-        serviceCommons = new LdapLoginServiceProperties(managedServiceActions);
-        this.bundleActions = bundleActions;
+    public GetRealms(ServiceReader serviceReader) {
+        super(FIELD_NAME, DESCRIPTION);
+        this.serviceReader = serviceReader;
     }
 
     @Override
-    public ListField<Realm> performFunction() {
-        ListField<Realm> realms = new ListFieldImpl<>(Realm.class);
-        realms.add(Realm.KARAF_REALM);
+    public Realm.ListImpl performFunction() {
+        List<Realm> realms = new Realm(serviceReader).getEnumValues()
+                .stream()
+                .map(enumVal -> new Realm(serviceReader, enumVal))
+                .collect(Collectors.toList());
 
-        if (bundleActions.isStarted(IDP_SERVER_BUNDLE_NAME)) {
-            // TODO: 4/19/17 How are we going to treat/display IdP as an auth type
-        }
-
-        if (!serviceCommons.getLdapLoginManagedServices()
-                .keySet()
-                .isEmpty()) {
-            realms.add(Realm.LDAP_REALM);
-        }
-
-        return realms;
+        return new Realm.ListImpl(serviceReader).addAll(realms);
     }
 
     @Override
-    public FunctionField<ListField<Realm>> newInstance() {
-        return new GetRealms(managedServiceActions, bundleActions);
+    public Realm.ListImpl getReturnType() {
+        return new Realm.ListImpl(serviceReader);
+    }
+
+    @Override
+    public FunctionField<Realm.ListImpl> newInstance() {
+        return new GetRealms(serviceReader);
     }
 }

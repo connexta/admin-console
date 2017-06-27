@@ -18,31 +18,32 @@ import static org.codice.ddf.admin.security.common.services.PolicyManagerService
 import java.util.List;
 
 import org.codice.ddf.admin.api.fields.FunctionField;
-import org.codice.ddf.admin.api.fields.ListField;
-import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.fields.base.function.GetFunctionField;
 import org.codice.ddf.admin.common.fields.common.ContextPath;
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
 
-public class GetWhiteListContexts extends GetFunctionField<ListField<ContextPath>> {
+public class GetWhiteListContexts extends GetFunctionField<ContextPath.ListImpl> {
 
     public static final String DEFAULT_FIELD_NAME = "whitelisted";
 
     public static final String DESCRIPTION =
             "Returns all white listed contexts. Any contexts that are white listed have no security policy applied to them.";
 
+    public static final ContextPath.ListImpl RETURN_TYPE =
+            new ContextPath.ListImpl();
+
     private final ServiceActions serviceActions;
 
     public GetWhiteListContexts(ServiceActions serviceActions) {
-        super(DEFAULT_FIELD_NAME, DESCRIPTION, new ListFieldImpl<>(ContextPath.class));
+        super(DEFAULT_FIELD_NAME, DESCRIPTION);
 
         this.serviceActions = serviceActions;
     }
 
     @Override
-    public ListField<ContextPath> performFunction() {
+    public ContextPath.ListImpl performFunction() {
         List<String> whiteListStrs = getWhitelistContexts(serviceActions);
-        ListField<ContextPath> whiteListedField = new ListFieldImpl<>(ContextPath.class);
+        ContextPath.ListImpl whiteListedField = new ContextPath.ListImpl();
         for (String whiteListStr : whiteListStrs) {
             ContextPath newContextPath = new ContextPath();
             newContextPath.setValue(whiteListStr);
@@ -52,7 +53,12 @@ public class GetWhiteListContexts extends GetFunctionField<ListField<ContextPath
     }
 
     @Override
-    public FunctionField<ListField<ContextPath>> newInstance() {
+    public ContextPath.ListImpl getReturnType() {
+        return RETURN_TYPE;
+    }
+
+    @Override
+    public FunctionField<ContextPath.ListImpl> newInstance() {
         return new GetWhiteListContexts(serviceActions);
     }
 }

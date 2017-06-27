@@ -17,8 +17,10 @@ import static org.codice.ddf.admin.api.fields.ScalarField.ScalarType.STRING;
 import static org.codice.ddf.admin.common.report.message.DefaultMessages.emptyFieldError;
 
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.codice.ddf.admin.api.report.ErrorMessage;
+import org.codice.ddf.admin.common.fields.base.BaseListField;
 
 public class StringField extends BaseScalarField<String> {
 
@@ -55,5 +57,36 @@ public class StringField extends BaseScalarField<String> {
     public StringField isRequired(boolean required) {
         super.isRequired(required);
         return this;
+    }
+
+    public static class ListImpl extends BaseListField<StringField> {
+
+        public static final String DEFAULT_FIELD_NAME = "strings";
+        private Callable<StringField> newString;
+
+        public ListImpl(String fieldName) {
+            super(fieldName);
+            newString = StringField::new;
+        }
+
+        public ListImpl() {
+            this(DEFAULT_FIELD_NAME);
+        }
+
+        @Override
+        public Callable<StringField> getCreateListEntryCallable() {
+            return newString;
+        }
+
+        @Override
+        public ListImpl useDefaultRequired() {
+            newString = () -> {
+                StringField newStringField = new StringField();
+                newStringField.isRequired(true);
+                return newStringField;
+            };
+
+            return this;
+        }
     }
 }

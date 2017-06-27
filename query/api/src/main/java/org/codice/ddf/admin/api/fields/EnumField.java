@@ -17,7 +17,7 @@ import java.util.List;
 
 import org.codice.ddf.admin.api.DataType;
 
-public interface EnumField<S, T extends DataType<S>> extends DataType<S> {
+public interface EnumField<S, T extends EnumValue<S>> extends DataType<S> {
 
     List<T> getEnumValues();
 }

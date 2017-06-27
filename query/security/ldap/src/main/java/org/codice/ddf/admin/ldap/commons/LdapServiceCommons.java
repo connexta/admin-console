@@ -16,9 +16,9 @@ package org.codice.ddf.admin.ldap.commons;
 import static org.codice.ddf.admin.common.services.ServiceCommons.FLAG_PASSWORD;
 import static org.codice.ddf.admin.common.services.ServiceCommons.SERVICE_PID_KEY;
 import static org.codice.ddf.admin.common.services.ServiceCommons.mapValue;
-import static org.codice.ddf.admin.ldap.fields.connection.LdapEncryptionMethodField.LDAPS;
-import static org.codice.ddf.admin.security.common.fields.ldap.LdapUseCase.ATTRIBUTE_STORE;
-import static org.codice.ddf.admin.security.common.fields.ldap.LdapUseCase.AUTHENTICATION;
+import static org.codice.ddf.admin.ldap.fields.connection.LdapEncryptionMethodField.LdapsEncryption.LDAPS;
+import static org.codice.ddf.admin.security.common.fields.ldap.LdapUseCase.AttributeStore.ATTRIBUTE_STORE;
+import static org.codice.ddf.admin.security.common.fields.ldap.LdapUseCase.Authentication.AUTHENTICATION;
 import static org.codice.ddf.admin.security.common.services.LdapClaimsHandlerServiceProperties.PROPERTY_FILE_LOCATION;
 
 import java.net.URI;
@@ -35,7 +35,6 @@ import java.util.stream.Stream;
 import org.apache.commons.lang.StringUtils;
 import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.api.report.Report;
-import org.codice.ddf.admin.common.fields.base.ListFieldImpl;
 import org.codice.ddf.admin.common.report.ReportImpl;
 import org.codice.ddf.admin.common.report.message.DefaultMessages;
 import org.codice.ddf.admin.common.services.ServiceCommons;
@@ -85,7 +84,7 @@ public class LdapServiceCommons {
                 .forEach(config -> config.bindUserInfoField()
                         .password(FLAG_PASSWORD));
 
-        return new ListFieldImpl<>(LdapConfigurationField.class).addAll(configs);
+        return new LdapConfigurationField.ListImpl().addAll(configs);
     }
 
     public Map<String, Object> ldapConfigToLdapClaimsHandlerService(LdapConfigurationField config,

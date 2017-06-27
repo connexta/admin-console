@@ -2,9 +2,13 @@ import React from 'react'
 
 import { connect } from 'react-redux'
 import Mount from 'react-mount'
-import { isSubmitting, start, end } from 'redux-fetch'
 
-import { getDisplayedLdapStage, getAllConfig, getMessages, getAllowSkip } from './reducer'
+import {
+  getDisplayedLdapStage,
+  getAllConfig,
+  getMessages,
+  isSubmitting
+} from './reducer'
 
 import { getFriendlyMessage } from 'graphql-errors'
 
@@ -16,7 +20,9 @@ import {
   clearWizard,
   clearMessages,
   prevStage,
-  nextStage
+  nextStage,
+  start,
+  end
 } from './actions'
 
 const WizardView = (props) => {
@@ -44,8 +50,7 @@ const mapStateToProps = (state, { wizardId }) => {
     stageId,
     configs: getAllConfig(state),
     submitting: isSubmitting(state, wizardId),
-    messages: getMessages(state, stageId),
-    allowSkip: getAllowSkip(state, stageId)
+    messages: getMessages(state, stageId)
   }
 }
 

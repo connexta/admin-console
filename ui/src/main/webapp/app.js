@@ -5,7 +5,6 @@ import { Router, hashHistory } from 'react-router'
 
 import store from './store'
 import client from './client'
-import Exception from './containers/exceptions'
 import Ldap from './wizards/ldap'
 import Sources from './wizards/sources'
 import { Home } from './home'
@@ -26,7 +25,6 @@ const App = ({ children }) => (
           <Backdrop>
             <AdminAppBar />
             <div style={{ maxWidth: 960, margin: '0 auto', padding: '0 20px' }}>{children}</div>
-            <Exception />
           </Backdrop>
           <DevTools />
         </div>

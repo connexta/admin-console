@@ -10,7 +10,7 @@ export const getMessages = (state, id) => submarine(state).getIn(['messages', id
 export const getProbeValue = (state) => submarine(state).getIn(['probeValue'])
 export const setProbeValue = (value) => ({ type: 'SET_PROBE_VALUE', value })
 export const getDisplayedLdapStage = (state) => submarine(state).getIn(['ldapDisplayedStages']).last()
-export const getAllowSkip = (state, stageId) => submarine(state).getIn(['allowSkip', stageId])
+export const isSubmitting = (state, id) => submarine(state).get('submitting').has(id)
 
 // TODO: add reducer checks for the wizardClear action to reset the state to defaults
 const config = (state = Map(), { type, id, value, values, messages, options }) => {
@@ -80,15 +80,12 @@ const ldapDisplayedStages = (state = List.of('introduction-stage'), { type, stag
   }
 }
 
-const allowSkip = (state = Map(), { type, stageId }) => {
+const submitting = (state = Map(), { type, id } = {}) => {
   switch (type) {
-    case 'ALLOW_SKIP':
-      return state.set(stageId, true)
-    case 'DONT_ALLOW_SKIP':
-    case 'EDIT_CONFIG':
-    case 'LDAP_ADD_STAGE':
-    case 'LDAP_REMOVE_STAGE':
-      return Map()
+    case 'fetch/START':
+      return state.set(id, true)
+    case 'fetch/END':
+      return state.delete(id)
     default:
       return state
   }
@@ -99,6 +96,6 @@ export default combineReducers({
   probeValue,
   messages,
   ldapDisplayedStages,
-  allowSkip
+  submitting
 })
 

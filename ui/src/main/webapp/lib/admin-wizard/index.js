@@ -2,20 +2,21 @@ import React from 'react'
 
 import { connect } from 'react-redux'
 import Mount from 'react-mount'
-import { isSubmitting } from 'redux-fetch'
+import { isSubmitting, start, end } from 'redux-fetch'
 
 import { getDisplayedLdapStage, getAllConfig, getMessages, getAllowSkip } from './reducer'
+
+import { getFriendlyMessage } from 'graphql-errors'
 
 import {
   // sync
   setDefaults,
+  setOptions,
+  setMessages,
   clearWizard,
+  clearMessages,
   prevStage,
-  nextStage,
-  // async
-  test,
-  probe,
-  persist
+  nextStage
 } from './actions'
 
 const WizardView = (props) => {
@@ -42,45 +43,53 @@ const mapStateToProps = (state, { wizardId }) => {
   return {
     stageId,
     configs: getAllConfig(state),
-    submitting: isSubmitting(state, stageId),
+    submitting: isSubmitting(state, wizardId),
     messages: getMessages(state, stageId),
     allowSkip: getAllowSkip(state, stageId)
   }
 }
 
-const mapDispatchToProps = (dispatch, { wizardId }) => ({
+const mapDispatchToProps = (dispatch, { wizardId, ids = [] }) => ({
   setDefaults: (arg) => dispatch(setDefaults(arg)),
+  setOptions: (arg) => dispatch(setOptions(arg)),
   clearWizard: () => dispatch(clearWizard()),
-  prev: () => dispatch(prevStage()),
-  next: (arg) => dispatch(nextStage(arg)),
-  test: (opts) => dispatch(test({
-    configHandlerId: wizardId,
-    configurationType: wizardId,
-    ...opts
-  })),
-  probe: (opts) => dispatch(probe({
-    configHandlerId: wizardId,
-    configurationType: wizardId,
-    ...opts
-  })),
-  persist: (opts) => dispatch(persist({
-    configHandlerId: wizardId,
-    configurationType: wizardId,
-    ...opts
-  }))
+  prev: (arg) => dispatch((dispatch, getState) => {
+    const stageId = getDisplayedLdapStage(getState())
+    dispatch(clearMessages())
+    dispatch(setMessages(stageId, []))
+    dispatch(prevStage())
+  }),
+  next: (arg) => dispatch((dispatch, getState) => {
+    const stageId = getDisplayedLdapStage(getState())
+    dispatch(clearMessages())
+    dispatch(setMessages(stageId, []))
+    dispatch(nextStage(arg))
+  }),
+  onError: (messages) => dispatch((dispatch, getState) => {
+    dispatch(clearMessages())
+
+    const stageId = getDisplayedLdapStage(getState())
+
+    const errors = messages.map(({ path = [], ...rest }) => {
+      const id = path[path.length - 1]
+      if (ids.includes(id)) {
+        return { configFieldId: id, ...rest }
+      } else {
+        return { ...rest }
+      }
+    }).map(({ message: code, ...rest }) => ({
+      message: getFriendlyMessage(code),
+      ...rest
+    }))
+
+    dispatch(setMessages(stageId, errors))
+  }),
+  onStartSubmit: () => dispatch(start(wizardId)),
+  onEndSubmit: () => dispatch(end(wizardId))
 })
 
-const mergeProps = (stateProps, { test, probe, persist, ...dispatchProps }, ownProps) => ({
-  ...ownProps,
-  ...stateProps,
-  ...dispatchProps,
-  test: (opts) => test({ stageId: stateProps.stageId, ...opts }),
-  probe: (opts) => probe({ stageId: stateProps.stageId, ...opts }),
-  persist: (opts) => persist({ stageId: stateProps.stageId, ...opts })
-})
+const Wizard = connect(mapStateToProps, mapDispatchToProps)(WizardView)
 
-const Wizard = connect(mapStateToProps, mapDispatchToProps, mergeProps)(WizardView)
-
-export const createWizard = (wizardId, stages) =>
-  (props) => <Wizard wizardId={wizardId} stages={stages} {...props} />
+export const createWizard = (wizardId, stages, ids) =>
+  (props) => <Wizard wizardId={wizardId} stages={stages} ids={ids} {...props} />
 

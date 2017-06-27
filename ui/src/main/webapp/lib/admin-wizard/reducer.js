@@ -8,6 +8,7 @@ export const getConfig = (state, id) => submarine(state).getIn(['config'].concat
 export const getAllConfig = (state) => submarine(state).get('config').map((config) => config.get('value')).toJS()
 export const getMessages = (state, id) => submarine(state).getIn(['messages', id], List()).toJS()
 export const getProbeValue = (state) => submarine(state).getIn(['probeValue'])
+export const setProbeValue = (value) => ({ type: 'SET_PROBE_VALUE', value })
 export const getDisplayedLdapStage = (state) => submarine(state).getIn(['ldapDisplayedStages']).last()
 export const getAllowSkip = (state, stageId) => submarine(state).getIn(['allowSkip', stageId])
 
@@ -45,7 +46,7 @@ const messages = (state = Map(), { type, id, messages }) => {
       const msgs = fromJS(messages)
         .filter((m) => !m.has('configFieldId'))
 
-      return state.updateIn([id], List(), m => m.concat(msgs))
+      return state.setIn([id], msgs)
     case 'CLEAR_MESSAGES':
       return state.delete(id)
     case 'CLEAR_WIZARD':

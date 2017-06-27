@@ -80,7 +80,6 @@ const SourceSelectionStageView = (props) => {
           Make sure you entered a valid username and password if the source requires authentication.
         </Description>
         <Body>
-          { messages.map((msg, i) => <Message key={i} {...msg} />) }
           <Flexbox
             style={{ marginTop: 20 }}
             justifyContent='center'>
@@ -102,6 +101,7 @@ const SourceSelectionStageView = (props) => {
             <Back onClick={() => changeStage('discoveryStage')} />
             <Next disabled />
           </Navigation>
+          { messages.map((msg, i) => <Message key={i} {...msg} />) }
         </Body>
       </div>
     )

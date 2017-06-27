@@ -24,4 +24,27 @@ export const stages = {
   'final-stage': FinalStage
 }
 
-export default createWizard('ldap', stages)
+const configIds = [
+  'baseGroupDn',
+  'baseUserDn',
+  'bindKdcAddress',
+  'bindRealm',
+  'bindUser',
+  'bindUserMethod',
+  'bindUserPassword',
+  'encryption',
+  'groupAttributeHoldingMember',
+  'groupObjectClass',
+  'hostname',
+  'ldapType',
+  'ldapUseCase',
+  'memberAttributeReferencedInGroup',
+  'port',
+  'query',
+  'queryBase',
+  'subjectClaims',
+  'userAttributes',
+  'userNameAttribute'
+]
+
+export default createWizard('ldap', stages, configIds)

@@ -3,8 +3,8 @@ import React from 'react'
 import Stage from 'components/Stage'
 import Title from 'components/Title'
 import Description from 'components/Description'
-import Action from 'components/Action'
-import ActionGroup from 'components/ActionGroup'
+
+import Navigation, { Begin } from 'components/wizard/Navigation'
 
 const IntroductionStage = ({ disabled, next, configs: { ldapUseCase } = {} }) => (
   <Stage>
@@ -14,14 +14,12 @@ const IntroductionStage = ({ disabled, next, configs: { ldapUseCase } = {} }) =>
       as an authentication source for users to log in and/or it can be setup as an attribute
       store to provide user attributes to a different authentication source.
     </Description>
-    <ActionGroup>
-      <Action
-        primary
-        label='begin ldap wizard'
-        onClick={next}
-        nextStageId='use-case-stage'
-        disabled={disabled} />
-    </ActionGroup>
+    <Navigation>
+      <Begin
+        name='ldap'
+        disabled={disabled}
+        onClick={() => next({ nextStageId: 'use-case-stage' })} />
+    </Navigation>
   </Stage>
 )
 

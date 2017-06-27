@@ -3,23 +3,24 @@ import React from 'react'
 import Stage from 'components/Stage'
 import Title from 'components/Title'
 import Description from 'components/Description'
-import Action from 'components/Action'
-import ActionGroup from 'components/ActionGroup'
+
+import Body from 'components/wizard/Body'
+import Navigation, { Back, Next } from 'components/wizard/Navigation'
 
 import { RadioSelection } from 'admin-wizard/inputs'
 
 const LdapUseCases = [
   {
-    value: 'authentication',
+    value: 'Authentication',
     label: 'Authentication'
   },
   {
-    value: 'attributeStore',
-    label: 'Attribute store'
+    value: 'AttributeStore',
+    label: 'Attribute Store'
   },
   {
-    value: 'authenticationAndAttributeStore',
-    label: 'Authentication and attribute store'
+    value: 'AuthenticationAndAttributeStore',
+    label: 'Authentication and Attribute Store'
   }
 ]
 
@@ -33,24 +34,21 @@ const UseCaseStage = ({ disabled, next, prev, configs: { ldapUseCase } = {} }) =
       can be setup as an attribute store to provide user attributes to a different
       authentication source.
     </Description>
-    <RadioSelection
-      id='ldapUseCase'
-      options={LdapUseCases}
-      name='LDAP Use Cases'
-      disabled={disabled} />
-    <ActionGroup>
-      <Action
-        secondary
-        label='back'
-        onClick={prev}
+    <Body>
+      <RadioSelection
+        id='ldapUseCase'
+        options={LdapUseCases}
+        name='LDAP Use Cases'
         disabled={disabled} />
-      <Action
-        primary
-        label='next'
-        onClick={next}
-        nextStageId='ldap-type-selection'
-        disabled={disabled || !ldapUseCase} />
-    </ActionGroup>
+      <Navigation>
+        <Back
+          onClick={prev}
+          disabled={disabled} />
+        <Next
+          onClick={() => next({ nextStageId: 'ldap-type-selection' })}
+          disabled={disabled || !ldapUseCase} />
+      </Navigation>
+    </Body>
   </Stage>
 )
 

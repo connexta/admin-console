@@ -2,8 +2,8 @@ reporting:
     dir: ./target/coverage
 check:
     global:
-        statements: 53
-        branches: 41
-        lines: 56
-        functions: 37
+        statements: 50
+        branches: 40
+        lines: 50
+        functions: 30
         excludes: []

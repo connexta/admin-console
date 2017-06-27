@@ -2,15 +2,18 @@ import React, { Component } from 'react'
 
 import { connect } from 'react-redux'
 
-import { editConfig } from 'admin-wizard/actions'
+import { gql, graphql, withApollo } from 'react-apollo'
 
-import Mount from 'react-mount'
+import { editConfig } from 'admin-wizard/actions'
 
 import Stage from 'components/Stage'
 import Title from 'components/Title'
 import Description from 'components/Description'
-import Action from 'components/Action'
-import ActionGroup from 'components/ActionGroup'
+
+import Body from 'components/wizard/Body'
+import Navigation, { Back, Next } from 'components/wizard/Navigation'
+
+import Message from 'components/Message'
 
 import {Select, InputAuto} from 'admin-wizard/inputs'
 
@@ -57,6 +60,8 @@ class AttributeMapperView extends Component {
   render () {
     const {
       editConfig,
+      claims,
+      attributes,
       configs: {
         attributeMappings = {},
         subjectClaims,
@@ -67,9 +72,11 @@ class AttributeMapperView extends Component {
     return (
       <div>
         <Select
+          options={claims}
           id='subjectClaims'
           label='STS Claim' />
         <InputAuto
+          options={attributes}
           id='userAttributes'
           label='LDAP User Attribute' />
 
@@ -120,8 +127,38 @@ class AttributeMapperView extends Component {
 
 const AttributeMapper = connect(null, { editConfig })(AttributeMapperView)
 
+const testClaimMappings = (conn, info, userNameAttribute, dn, mapping) => ({
+  fetchPolicy: 'network-only',
+  query: gql`
+    query TestClaimMappings(
+      $conn: LdapConnection!,
+      $info: BindUserInfo!,
+      $userNameAttribute: String!,
+      $dn: DistinguishedName!
+      $mapping: [ClaimsMapEntry]!
+    ) {
+      ldap {
+        testClaimMappings(
+          connection: $conn,
+          bindInfo: $info,
+          userNameAttribute: $userNameAttribute,
+          baseUserDn: $dn,
+          claimsMapping: $mapping
+        )
+      }
+    }
+  `,
+  variables: { conn, info, userNameAttribute, dn, mapping }
+})
+
 const LdapAttributeMappingStage = (props) => {
   const {
+    client,
+    onError,
+    onStartSubmit,
+    onEndSubmit,
+    next,
+
     disabled,
     submitting,
     configs,
@@ -129,14 +166,34 @@ const LdapAttributeMappingStage = (props) => {
       attributeMappings = {}
     } = {},
 
-    prev,
-    probe,
-    test
+    messages = [],
+
+    data: { sts = {}, ldap = {} },
+
+    prev
   } = props
+
+  const conn = {
+    hostname: configs.hostname,
+    port: configs.port,
+    encryption: configs.encryption
+  }
+
+  const info = {
+    creds: {
+      username: configs.bindUser,
+      password: configs.bindUserPassword
+    },
+    bindMethod: configs.bindUserMethod,
+    realm: configs.bindRealm
+  }
+
+  const userNameAttribute = configs.userNameAttribute
+  const dn = configs.baseUserDn
+  const mapping = Object.keys(attributeMappings).map((key) => ({ key, value: attributeMappings[key] }))
 
   return (
     <Stage submitting={submitting}>
-      <Mount probeId='subject-attributes' on={probe} />
       <Title>LDAP User Attribute Mapping</Title>
       <Description>
         In order to authorize users, their attributes must be mapped to the Security Token
@@ -144,24 +201,65 @@ const LdapAttributeMappingStage = (props) => {
         will not be used for authorization.
       </Description>
 
-      <AttributeMapper disabled={disabled} configs={configs} />
+      <AttributeMapper
+        claims={sts.claims}
+        attributes={ldap.userAttributes}
+        disabled={disabled}
+        configs={configs} />
 
-      <ActionGroup>
-        <Action
-          secondary
-          label='back'
-          onClick={prev}
-          disabled={disabled} />
-        <Action
-          primary
-          label='next'
-          onClick={test}
-          disabled={disabled || Object.keys(attributeMappings).length === 0}
-          testId='attribute-mapping'
-          nextStageId='confirm' />
-      </ActionGroup>
+      <Body>
+        <Navigation>
+          <Back
+            onClick={prev}
+            disabled={disabled} />
+          <Next
+            onClick={() => {
+              onStartSubmit()
+              client.query(testClaimMappings(conn, info, userNameAttribute, dn, mapping))
+                .then(() => {
+                  onEndSubmit()
+                  next({ nextStageId: 'confirm' })
+                })
+                .catch((err) => {
+                  onEndSubmit()
+                  onError(err.graphQLErrors)
+                })
+            }}
+            disabled={disabled || Object.keys(attributeMappings).length === 0} />
+        </Navigation>
+        {messages.map((msg, i) => <Message key={i} {...msg} />)}
+      </Body>
     </Stage>
   )
 }
 
-export default LdapAttributeMappingStage
+export default graphql(gql`
+  query Settings($conn: LdapConnection!, $info: BindUserInfo!, $dn: DistinguishedName!) {
+    sts {
+      claims
+    }
+    ldap {
+      userAttributes(connection: $conn, bindInfo: $info, baseUserDn: $dn)
+    }
+  }
+`, {
+  options: ({ configs }) => ({
+    fetchPolicy: 'network-only',
+    variables: {
+      conn: {
+        hostname: configs.hostname,
+        port: configs.port,
+        encryption: configs.encryption
+      },
+      info: {
+        creds: {
+          username: configs.bindUser,
+          password: configs.bindUserPassword
+        },
+        bindMethod: configs.bindUserMethod,
+        realm: configs.bindRealm
+      },
+      dn: configs.baseUserDn
+    }
+  })
+})(withApollo(LdapAttributeMappingStage))

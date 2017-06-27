@@ -3,8 +3,9 @@ import React from 'react'
 import Stage from 'components/Stage'
 import Title from 'components/Title'
 import Description from 'components/Description'
-import Action from 'components/Action'
-import ActionGroup from 'components/ActionGroup'
+
+import Body from 'components/wizard/Body'
+import Navigation, { Back, Next } from 'components/wizard/Navigation'
 
 import { RadioSelection } from 'admin-wizard/inputs'
 
@@ -39,24 +40,23 @@ const LdapTypeSelection = ({ disabled, prev, next, configs: { ldapType } = {} })
       If you are unsure, choose 'Not Sure/None of the Above' and we will do our best to
       determine the connection type.
     </Description>
-    <RadioSelection
-      id='ldapType'
-      options={LdapTypes}
-      name='LDAP Type Selections'
-      disabled={disabled} />
-    <ActionGroup>
-      <Action
-        secondary
-        label='back'
-        onClick={prev}
+    <Body>
+      <RadioSelection
+        id='ldapType'
+        options={LdapTypes}
+        name='LDAP Type Selections'
         disabled={disabled} />
-      <Action
-        primary
-        label='next'
-        onClick={next}
-        disabled={disabled || !ldapType}
-        nextStageId={ldapType === 'embeddedLdap' ? 'configure-embedded-ldap' : 'network-settings'} />
-    </ActionGroup>
+      <Navigation>
+        <Back
+          onClick={prev}
+          disabled={disabled} />
+        <Next
+          onClick={() => next({
+            nextStageId: ldapType === 'embeddedLdap' ? 'configure-embedded-ldap' : 'network-settings'
+          })}
+          disabled={disabled || !ldapType} />
+      </Navigation>
+    </Body>
   </Stage>
 )
 

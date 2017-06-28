@@ -13,8 +13,6 @@
  */
 package org.codice.ddf.admin.sources.utils;
 
-import static org.codice.ddf.admin.common.report.message.DefaultMessages.failedPersistError;
-
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -29,10 +27,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang.StringUtils;
-import org.codice.ddf.admin.api.report.Report;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.common.fields.common.PidField;
-import org.codice.ddf.admin.common.report.ReportImpl;
 import org.codice.ddf.admin.common.services.ServiceCommons;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.sources.fields.type.SourceConfigField;
@@ -176,36 +172,6 @@ public class SourceUtilCommons {
                 .forEach(sourceInfoListField::add);
 
         return sourceInfoListField;
-    }
-
-    public Report saveSource(PidField pid, Map<String, Object> serviceProps, String factoryPid) {
-        ReportImpl saveSourceReport = new ReportImpl();
-        if (StringUtils.isNotEmpty(pid.getValue())) {
-            saveSourceReport.addMessages(serviceCommons.updateService(pid, serviceProps));
-        } else {
-            if (serviceCommons.createManagedService(serviceProps, factoryPid)
-                    .containsErrorMsgs()) {
-                saveSourceReport.addResultMessage(failedPersistError());
-            }
-        }
-        return saveSourceReport;
-    }
-
-    public Report saveSource(Map<String, Object> serviceProps, String factoryPid) {
-        ReportImpl saveSourceReport = new ReportImpl();
-        if (serviceCommons.createManagedService(serviceProps, factoryPid)
-                .containsErrorMsgs()) {
-            saveSourceReport.addResultMessage(failedPersistError());
-        }
-        return saveSourceReport;
-    }
-
-    public Report updateSource(PidField pid, Map<String, Object> serviceProps) {
-        ReportImpl updateSourceReport = new ReportImpl();
-        if (StringUtils.isNotEmpty(pid.getValue())) {
-            updateSourceReport.addMessages(serviceCommons.updateService(pid, serviceProps));
-        }
-        return updateSourceReport;
     }
 
     public void populateAvailability(BooleanField availability, PidField pid) {

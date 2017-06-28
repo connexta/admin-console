@@ -23,7 +23,7 @@ const CSW = {
     }
   `,
   mutation: gql`
-    mutation SaveCswSource($config: CswSourceConfiguration!){
+    mutation CreateCswSource($config: CswSourceConfiguration!){
       createCswSource(source : $config)
     }
   `,
@@ -51,7 +51,7 @@ const WFS = {
     }
   `,
   mutation: gql`
-    mutation SaveWfsSource($config: WfsSourceConfiguration!){
+    mutation CreateWfsSource($config: WfsSourceConfiguration!){
       createWfsSource(source : $config)
     }
   `,
@@ -78,7 +78,7 @@ const OpenSearch = {
     }
   `,
   mutation: gql`
-    mutation SaveOpenSearchSource($config: OpenSearchConfiguration!){
+    mutation CreateOpenSearchSource($config: OpenSearchConfiguration!){
       createOpenSearchSource(source : $config)
     }
   `,

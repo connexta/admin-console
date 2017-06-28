@@ -23,11 +23,11 @@ import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
+import org.codice.ddf.admin.common.services.ServiceCommons;
 import org.codice.ddf.admin.configurator.Configurator;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.configurator.OperationReport;
 import org.codice.ddf.admin.sources.fields.type.CswSourceConfigurationField;
-import org.codice.ddf.admin.sources.utils.SourceUtilCommons;
 import org.codice.ddf.admin.sources.utils.SourceValidationUtils;
 import org.codice.ddf.internal.admin.configurator.actions.FeatureActions;
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
@@ -49,7 +49,7 @@ public class UpdateCswConfiguration extends BaseFunctionField<BooleanField> {
 
     private SourceValidationUtils sourceValidationUtils;
 
-    private SourceUtilCommons sourceUtilCommons;
+    private ServiceCommons serviceCommons;
 
     private final ConfiguratorFactory configuratorFactory;
 
@@ -82,7 +82,7 @@ public class UpdateCswConfiguration extends BaseFunctionField<BooleanField> {
                 managedServiceActions,
                 configuratorFactory,
                 serviceActions);
-        sourceUtilCommons = new SourceUtilCommons(managedServiceActions,
+        serviceCommons = new ServiceCommons(managedServiceActions,
                 serviceActions,
                 serviceReader,
                 configuratorFactory);
@@ -99,7 +99,7 @@ public class UpdateCswConfiguration extends BaseFunctionField<BooleanField> {
             return new BooleanField(false);
         }
 
-        addMessages(sourceUtilCommons.updateSource(config.pidField(),
+        addMessages(serviceCommons.updateService(config.pidField(),
                 cswConfigToServiceProps(config)));
         return new BooleanField(!containsErrorMsgs());
     }

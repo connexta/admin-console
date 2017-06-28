@@ -75,8 +75,7 @@ public class GetOpenSearchConfigurations
 
         sourceUtilCommons = new SourceUtilCommons(managedServiceActions,
                 serviceActions,
-                serviceReader,
-                configuratorFactory);
+                serviceReader);
         serviceCommons = new ServiceCommons(null, serviceActions, null, null);
 
     }

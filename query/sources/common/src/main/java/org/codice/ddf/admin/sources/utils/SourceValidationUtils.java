@@ -41,8 +41,7 @@ public class SourceValidationUtils {
             ServiceActions serviceActions) {
         sourceUtilCommons = new SourceUtilCommons(managedServiceActions,
                 serviceActions,
-                serviceReader,
-                configuratorFactory);
+                serviceReader);
 
         serviceCommons = new ServiceCommons(managedServiceActions,
                 serviceActions,

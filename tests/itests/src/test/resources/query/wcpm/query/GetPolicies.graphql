@@ -1,0 +1,13 @@
+query GetPolicies {
+   wcpm {
+    policies {
+      paths
+      authTypes
+      realm
+      claimsMapping {
+        key
+        value
+      }
+    }
+  }
+}

@@ -116,6 +116,10 @@ public class ContextPolicyBin extends BaseObjectField {
         return contexts.getValue();
     }
 
+    public ContextPath.ListImpl contextFields() {
+        return contexts;
+    }
+
     public List<String> authTypes() {
         return authTypes.getValue();
     }

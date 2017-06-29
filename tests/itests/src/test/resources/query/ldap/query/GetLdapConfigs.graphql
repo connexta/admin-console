@@ -1,0 +1,33 @@
+query {
+  ldap {
+    configs {
+      pid
+      connection {
+        hostname
+        port
+        encryption
+      }
+			bindInfo {
+        creds {
+          username
+          password
+        }
+        bindMethod
+        realm
+      }
+      directorySettings {
+        userNameAttribute
+        baseUserDn
+        baseGroupDn
+        groupObjectClass
+        groupAttributeHoldingMember
+        memberAttributeReferencedInGroup
+        useCase
+      }
+      claimsMapping {
+        key
+        value
+      }
+    }
+  }
+}

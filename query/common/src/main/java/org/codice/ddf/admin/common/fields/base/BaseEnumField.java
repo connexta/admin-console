@@ -15,6 +15,7 @@ package org.codice.ddf.admin.common.fields.base;
 
 import static org.codice.ddf.admin.common.report.message.DefaultMessages.unsupportedEnum;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -40,6 +41,7 @@ public abstract class BaseEnumField<S> extends BaseField<S>
      */
     public BaseEnumField(String fieldName, String fieldTypeName, String description) {
         super(fieldName, fieldTypeName, description);
+        this.enumValues = new ArrayList<>();
     }
 
     public BaseEnumField(String fieldName, String fieldTypeName, String description,

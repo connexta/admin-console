@@ -94,52 +94,45 @@ public class PolicyManagerServiceProperties {
 
         Collection<ContextPolicy> allPolicies = policyManager.getAllContextPolicies();
         for (ContextPolicy policy : allPolicies) {
-            boolean foundBin = false;
             Map<String, String> policyRequiredAttributes = policy.getAllowedAttributes()
                     .stream()
                     .collect(Collectors.toMap(ContextAttributeMapping::getAttributeName,
                             ContextAttributeMapping::getAttributeValue));
 
-            //Check if bin containing an identical context policy exists already, if so add the context path to it
-            for (ContextPolicyBin bin : policies) {
+            policies.add(new ContextPolicyBin(serviceReader).realm(policy.getRealm())
+                    .addClaimsMap(policyRequiredAttributes)
+                    .authTypes(policy.getAuthenticationMethods())
+                    .addContextPath(policy.getContextPath()));
+        }
+
+        //Check if bin containing an identical context policy exists already, if so add the context path to it
+        //Do this after pulling the configuration so that values are matched to their appropriate enums
+        List<ContextPolicyBin> collapsedBins = new ArrayList<>();
+
+        for (ContextPolicyBin bin : policies) {
+            boolean foundBin = false;
+
+            for (ContextPolicyBin collapsedBin : collapsedBins) {
                 if (bin.realm()
-                        .equals(policy.getRealm()) && ListUtils.isEqualList(bin.authTypes(),
-                        policy.getAuthenticationMethods()) && hasSameRequiredAttributes(bin,
-                        policyRequiredAttributes)) {
-                    bin.addContextPath(policy.getContextPath());
+                        .equals(collapsedBin.realm()) && ListUtils.isEqualList(bin.authTypes(),
+                        collapsedBin.authTypes()) && bin.claimsMapping()
+                        .equals(collapsedBin.claimsMapping())) {
+                    for (ContextPath contextPath : bin.contextFields()
+                            .getList()) {
+                        collapsedBin.addContextPath(contextPath);
+                    }
                     foundBin = true;
+                    break;
                 }
             }
 
             if (!foundBin) {
-                policies.add(new ContextPolicyBin(serviceReader).realm(policy.getRealm())
-                        .addClaimsMap(policyRequiredAttributes)
-                        .authTypes(policy.getAuthenticationMethods())
-                        .addContextPath(policy.getContextPath()));
+                collapsedBins.add(bin);
             }
+
         }
 
-        return new ContextPolicyBin.ListImpl(serviceReader).addAll(policies);
-    }
-
-    private boolean hasSameRequiredAttributes(ContextPolicyBin bin,
-            Map<String, String> mappingsToCheck) {
-
-        if (!(bin.claimsMapping()
-                .keySet()
-                .containsAll(mappingsToCheck.keySet()) && mappingsToCheck.keySet()
-                .containsAll(bin.claimsMapping()
-                        .keySet()))) {
-            return false;
-        }
-
-        return !bin.claimsMapping()
-                .entrySet()
-                .stream()
-                .filter(binMapping -> !mappingsToCheck.get(binMapping.getKey())
-                        .equals(binMapping.getValue()))
-                .findFirst()
-                .isPresent();
+        return new ContextPolicyBin.ListImpl(serviceReader).addAll(collapsedBins);
     }
 
     public Map<String, Object> whiteListToPolicyManagerProps(ContextPath.ListImpl contexts) {

@@ -1,0 +1,3 @@
+mutation DeleteLdapConfig($pid: Pid!) {
+  deleteLdapConfig(pid: $pid)
+}

@@ -1,0 +1,8 @@
+mutation CreateLdapConfig($connection: LdapConnection, $bindInfo: BindUserInfo, $settings: LdapDirectorySettings, $claimsMapping: [ClaimsMapEntry]) {
+  createLdapConfig(config: {
+    connection: $connection,
+    bindInfo: $bindInfo,
+    directorySettings: $settings,
+    claimsMapping: $claimsMapping
+  })
+}

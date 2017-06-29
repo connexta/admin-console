@@ -15,8 +15,8 @@ package org.codice.ddf.admin.security.common.fields.wcpm;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.Callable;
 
 import org.codice.ddf.admin.api.fields.EnumValue;
@@ -55,12 +55,8 @@ public class Realm extends BaseEnumField<String> {
 
     @Override
     public List<EnumValue<String>> getEnumValues() {
-        Set<EnumValuePoller> realms = serviceReader.getServices(EnumValuePoller.class, REALM_POLLER_FILTER);
-
-        return realms.stream()
-                .findFirst()
-                .map(EnumValuePoller::getEnumValues)
-                .orElse(new ArrayList<>());
+        Iterator<EnumValuePoller> poller = serviceReader.getServices(EnumValuePoller.class, REALM_POLLER_FILTER).iterator();
+        return poller.hasNext() ? poller.next().getEnumValues() : new ArrayList<>();
     }
 
     @Override

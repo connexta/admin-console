@@ -28,7 +28,7 @@
 
     <!--TODO - tbatie - replace with ddf karaf version-->
     <properties>
-        <karaf.version>4.0.7</karaf.version>
+        <karaf.version>4.1.1</karaf.version>
     </properties>
 
     <dependencies>

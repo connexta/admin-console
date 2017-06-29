@@ -13,8 +13,8 @@
         "/security-config"
       ],
       "authTypes": [
-        "IdP",
-        "guest"
+        "IDP",
+        "GUEST"
       ],
       "realm": "karaf",
       "claimsMapping": [
@@ -29,8 +29,8 @@
         "/admin"
       ],
       "authTypes": [
-        "IdP",
-        "guest"
+        "IDP",
+        "GUEST"
       ],
       "realm": "karaf",
       "claimsMapping": [
@@ -47,7 +47,7 @@
       "authTypes": [
         "SAML",
         "PKI",
-        "basic"
+        "BASIC"
       ],
       "realm": "karaf",
       "claimsMapping": [
@@ -62,8 +62,8 @@
         "/"
       ],
       "authTypes": [
-        "IdP",
-        "guest"
+        "IDP",
+        "GUEST"
       ],
       "realm": "karaf",
       "claimsMapping": []
@@ -73,8 +73,8 @@
         "/system"
       ],
       "authTypes": [
-        "IdP",
-        "guest"
+        "IDP",
+        "GUEST"
       ],
       "realm": "karaf",
       "claimsMapping": [

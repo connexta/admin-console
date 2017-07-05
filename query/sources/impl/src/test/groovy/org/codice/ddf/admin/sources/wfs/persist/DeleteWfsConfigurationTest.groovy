@@ -22,7 +22,7 @@ import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions
 import spock.lang.Specification
 
-import static org.codice.ddf.admin.sources.SourceTestCommons.*
+import static org.codice.ddf.admin.sources.test.SourceTestCommons.*
 
 class DeleteWfsConfigurationTest extends Specification {
 

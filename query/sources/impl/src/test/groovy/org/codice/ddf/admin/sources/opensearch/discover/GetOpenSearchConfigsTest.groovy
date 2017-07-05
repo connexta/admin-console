@@ -25,7 +25,7 @@ import org.codice.ddf.internal.admin.configurator.actions.ServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceReader
 import spock.lang.Specification
 
-import static org.codice.ddf.admin.sources.SourceTestCommons.*
+import static org.codice.ddf.admin.sources.test.SourceTestCommons.*
 
 class GetOpenSearchConfigsTest extends Specification {
 

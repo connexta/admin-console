@@ -26,7 +26,7 @@ import spock.lang.Specification
 
 import javax.ws.rs.core.Response
 
-import static org.codice.ddf.admin.sources.SourceTestCommons.*
+import static org.codice.ddf.admin.sources.test.SourceTestCommons.*
 
 class DiscoverWfsSourcesTest extends Specification {
 

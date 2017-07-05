@@ -11,7 +11,7 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.sources
+package org.codice.ddf.admin.sources.test
 
 import ddf.catalog.data.ContentType
 import ddf.catalog.operation.QueryRequest

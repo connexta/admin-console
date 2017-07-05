@@ -24,18 +24,13 @@ import org.apache.cxf.jaxrs.client.WebClient
 import org.codice.ddf.admin.common.fields.common.AddressField
 import org.codice.ddf.admin.common.fields.common.CredentialsField
 import org.codice.ddf.admin.common.fields.common.PidField
-import org.codice.ddf.admin.common.fields.common.ResponseField
 import org.codice.ddf.admin.common.fields.common.UrlField
 import org.codice.ddf.admin.common.report.ReportImpl
-import org.codice.ddf.admin.common.report.ReportWithResultImpl
 import org.codice.ddf.admin.common.report.message.ErrorMessageImpl
 import org.codice.ddf.admin.common.services.ServiceCommons
 import org.codice.ddf.admin.sources.fields.type.SourceConfigField
 import org.codice.ddf.admin.sources.utils.RequestUtils
 import org.codice.ddf.cxf.SecureCxfClientFactory
-import spock.lang.Specification
-
-import javax.ws.rs.core.Response
 
 class SourceTestCommons {
 
@@ -83,57 +78,42 @@ class SourceTestCommons {
 
     static getBaseDiscoverByAddressArgs() {
         return [
-            (ADDRESS) : new AddressField().hostname('localhost').port(8993).getValue(),
-            (CREDENTIALS) : new CredentialsField().username(TEST_USERNAME).password(TEST_PASSWORD).getValue()
+                (ADDRESS)    : new AddressField().hostname('localhost').port(8993).getValue(),
+                (CREDENTIALS): new CredentialsField().username(TEST_USERNAME).password(TEST_PASSWORD).getValue()
         ]
     }
 
     static getBaseDiscoverByUrlArgs(String url) {
         return [
-            (ADDRESS) : new AddressField().url(url).getValue(),
-            (CREDENTIALS) : new CredentialsField().username(TEST_USERNAME).password(TEST_PASSWORD).getValue()
+                (ADDRESS)    : new AddressField().url(url).getValue(),
+                (CREDENTIALS): new CredentialsField().username(TEST_USERNAME).password(TEST_PASSWORD).getValue()
         ]
     }
 
     static baseManagedServiceConfigs = [
-        (S_PID_1): [
-            (PASSWORD)       : TEST_PASSWORD,
-            (ID)             : SOURCE_ID_1,
-            (FACTORY_PID_KEY): F_PID,
-            (SERVICE_PID_KEY): S_PID_1,
-            (USERNAME)       : TEST_USERNAME
-        ],
-        (S_PID_2): [
-            (PASSWORD)       : TEST_PASSWORD,
-            (ID)             : SOURCE_ID_2,
-            (FACTORY_PID_KEY): F_PID,
-            (SERVICE_PID_KEY): S_PID_2,
-            (USERNAME)       : TEST_USERNAME
-        ]
+            (S_PID_1): [
+                    (PASSWORD)       : TEST_PASSWORD,
+                    (ID)             : SOURCE_ID_1,
+                    (FACTORY_PID_KEY): F_PID,
+                    (SERVICE_PID_KEY): S_PID_1,
+                    (USERNAME)       : TEST_USERNAME
+            ],
+            (S_PID_2): [
+                    (PASSWORD)       : TEST_PASSWORD,
+                    (ID)             : SOURCE_ID_2,
+                    (FACTORY_PID_KEY): F_PID,
+                    (SERVICE_PID_KEY): S_PID_2,
+                    (USERNAME)       : TEST_USERNAME
+            ]
     ]
 
     static configToBeDeleted = [
-        (PASSWORD)                    : TEST_PASSWORD,
-        (ID)                          : SOURCE_ID_1,
-        (FACTORY_PID_KEY)             : F_PID,
-        (SERVICE_PID_KEY)             : S_PID,
-        (USERNAME)                    : TEST_USERNAME
+            (PASSWORD)       : TEST_PASSWORD,
+            (ID)             : SOURCE_ID_1,
+            (FACTORY_PID_KEY): F_PID,
+            (SERVICE_PID_KEY): S_PID,
+            (USERNAME)       : TEST_USERNAME
     ]
-
-    static createResponseFieldResult(boolean hasError, String responseBody, int code, String requestUrl) {
-        def result = new ReportWithResultImpl<ResponseField>()
-        if (hasError) {
-            result.addArgumentMessage(new ErrorMessageImpl('TEST_CODE', ['some', 'path']))
-        } else {
-            ResponseField responseField = new ResponseField()
-            responseField.responseBody(responseBody)
-            responseField.statusCode(code)
-            responseField.requestUrl(requestUrl)
-            result.result(responseField)
-        }
-
-        return result
-    }
 
     /**
      * Needed to mock out the SecureCxfClientFactory. Since it is an embedded class we are just going to override
@@ -159,7 +139,7 @@ class SourceTestCommons {
         @Override
         public ReportImpl endpointIsReachable(UrlField urlField) {
             def report = new ReportImpl()
-            if(!endpointIsReachable) {
+            if (!endpointIsReachable) {
                 report.addArgumentMessage(new ErrorMessageImpl("some code"))
             }
             return report

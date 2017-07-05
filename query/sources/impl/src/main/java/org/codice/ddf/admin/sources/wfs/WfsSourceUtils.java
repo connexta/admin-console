@@ -58,17 +58,13 @@ public class WfsSourceUtils {
 
     private static final String WFS_VERSION_EXP = "/wfs:WFS_Capabilities/attribute::version";
 
-    private final RequestUtils requestUtils;
+    private SourceUtilCommons sourceUtilCommons;
 
-    private final SourceUtilCommons sourceUtilCommons;
+    private RequestUtils requestUtils;
 
     public WfsSourceUtils() {
-        this(new RequestUtils(), new SourceUtilCommons());
-    }
-
-    public WfsSourceUtils(RequestUtils requestUtils, SourceUtilCommons sourceUtilCommons) {
-        this.requestUtils = requestUtils;
-        this.sourceUtilCommons = sourceUtilCommons;
+        this.requestUtils = new RequestUtils();
+        this.sourceUtilCommons = new SourceUtilCommons();
     }
 
     /**
@@ -152,5 +148,12 @@ public class WfsSourceUtils {
         }
 
         return configResult;
+    }
+
+    /**
+     * For testing purposes only. Groovy can access private methods
+     */
+    private void setRequestUtils(RequestUtils requestUtils) {
+        this.requestUtils = requestUtils;
     }
 }

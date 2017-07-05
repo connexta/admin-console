@@ -13,17 +13,18 @@
  **/
 package org.codice.ddf.admin.sources.wfs.discover
 
+import org.apache.cxf.jaxrs.client.WebClient
 import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.common.fields.common.HostField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.sources.fields.WfsVersion
 import org.codice.ddf.admin.sources.fields.type.WfsSourceConfigurationField
-import org.codice.ddf.admin.sources.utils.RequestUtils
-import org.codice.ddf.admin.sources.utils.SourceUtilCommons
 import org.codice.ddf.admin.sources.wfs.WfsSourceUtils
-import spock.lang.Ignore
+import org.codice.ddf.cxf.SecureCxfClientFactory
 import spock.lang.Shared
 import spock.lang.Specification
+
+import javax.ws.rs.core.Response
 
 import static org.codice.ddf.admin.sources.SourceTestCommons.*
 
@@ -43,11 +44,7 @@ class DiscoverWfsSourcesTest extends Specification {
 
     DiscoverWfsSource discoverWfs
 
-    WfsSourceUtils wfsSourceUtils
-
-    RequestUtils requestUtils
-
-    static TEST_WFS_URL = 'http://localhost:8080/geoserver/wfs'
+    static TEST_WFS_URL = 'https://localhost:8993/services/wfs'
 
     static BASE_PATH = [DiscoverWfsSource.FIELD_NAME, FunctionField.ARGUMENT]
 
@@ -56,13 +53,12 @@ class DiscoverWfsSourcesTest extends Specification {
     static URL_FIELD_PATH = [ADDRESS_FIELD_PATH, URL_NAME].flatten()
 
     def setup() {
-        requestUtils = Mock(RequestUtils)
-        wfsSourceUtils = new WfsSourceUtils(requestUtils, new SourceUtilCommons())
-        discoverWfs = new DiscoverWfsSource(wfsSourceUtils)
+        discoverWfs = new DiscoverWfsSource()
     }
 
     def 'Successfully discover WFS 1.0.0 configuration using URL'() {
         setup:
+        discoverWfs.setWfsSourceUtils(prepareOpenSearchSourceUtils(200, wfs10ResponseBody, true))
         discoverWfs.setValue(getBaseDiscoverByUrlArgs(TEST_WFS_URL))
 
         when:
@@ -70,13 +66,14 @@ class DiscoverWfsSourcesTest extends Specification {
         def config = (WfsSourceConfigurationField) report.result()
 
         then:
-        1 * requestUtils.sendGetRequest(_, _, _) >> createResponseFieldResult(false, wfs10ResponseBody, 200, TEST_WFS_URL)
         config.endpointUrl() == TEST_WFS_URL
         config.wfsVersion() == WfsVersion.Wfs1.WFS_VERSION_1
+        config.credentials().password() == FLAG_PASSWORD
     }
 
     def 'Successfully discover WFS 2.0.0 configuration using URL'() {
         setup:
+        discoverWfs.setWfsSourceUtils(prepareOpenSearchSourceUtils(200, wfs20ResponseBody, true))
         discoverWfs.setValue(getBaseDiscoverByUrlArgs(TEST_WFS_URL))
 
         when:
@@ -84,13 +81,14 @@ class DiscoverWfsSourcesTest extends Specification {
         def config = (WfsSourceConfigurationField) report.result()
 
         then:
-        1 * requestUtils.sendGetRequest(_, _, _) >> createResponseFieldResult(false, wfs20ResponseBody, 200, TEST_WFS_URL)
         config.endpointUrl() == TEST_WFS_URL
         config.wfsVersion() == WfsVersion.Wfs2.WFS_VERSION_2
+        config.credentials().password() == FLAG_PASSWORD
     }
 
     def 'Successfully discover WFS 1.0.0 configuration using hostname and port'() {
         setup:
+        discoverWfs.setWfsSourceUtils(prepareOpenSearchSourceUtils(200, wfs10ResponseBody, true))
         discoverWfs.setValue(getBaseDiscoverByAddressArgs())
 
         when:
@@ -98,13 +96,14 @@ class DiscoverWfsSourcesTest extends Specification {
         def config = (WfsSourceConfigurationField) report.result()
 
         then:
-        1 * requestUtils.discoverUrlFromHost(_, _, _, _) >> createResponseFieldResult(false, wfs10ResponseBody, 200, TEST_WFS_URL)
         config.endpointUrl() == TEST_WFS_URL
         config.wfsVersion() == WfsVersion.Wfs1.WFS_VERSION_1
+        config.credentials().password() == FLAG_PASSWORD
     }
 
     def 'Successfully discover WFS 2.0.0 configuration using hostname and port'() {
         setup:
+        discoverWfs.setWfsSourceUtils(prepareOpenSearchSourceUtils(200, wfs20ResponseBody, true))
         discoverWfs.setValue(getBaseDiscoverByAddressArgs())
 
         when:
@@ -112,20 +111,20 @@ class DiscoverWfsSourcesTest extends Specification {
         def config = (WfsSourceConfigurationField) report.result()
 
         then:
-        1 * requestUtils.discoverUrlFromHost(_, _, _, _) >> createResponseFieldResult(false, wfs20ResponseBody, 200, TEST_WFS_URL)
         config.endpointUrl() == TEST_WFS_URL
         config.wfsVersion() == WfsVersion.Wfs2.WFS_VERSION_2
+        config.credentials().password() == FLAG_PASSWORD
     }
 
     def 'Unknown endpoint error when unrecognized WFS version is received'() {
         setup:
+        discoverWfs.setWfsSourceUtils(prepareOpenSearchSourceUtils(200, wfsUnrecognizedResponseBody, true))
         discoverWfs.setValue(getBaseDiscoverByUrlArgs(TEST_WFS_URL))
 
         when:
         def report = discoverWfs.getValue()
 
         then:
-        1 * requestUtils.sendGetRequest(_, _, _) >> createResponseFieldResult(false, wfsUnrecognizedResponseBody, 200, TEST_WFS_URL)
         report.messages().size() == 1
         report.messages()[0].getCode() == DefaultMessages.UNKNOWN_ENDPOINT
         report.messages()[0].getPath() == [DiscoverWfsSource.FIELD_NAME]
@@ -133,13 +132,13 @@ class DiscoverWfsSourcesTest extends Specification {
 
     def 'Unknown endpoint error when bad HTTP code received'() {
         setup:
+        discoverWfs.setWfsSourceUtils(prepareOpenSearchSourceUtils(500, wfs20ResponseBody, true))
         discoverWfs.setValue(getBaseDiscoverByUrlArgs(TEST_WFS_URL))
 
         when:
         def report = discoverWfs.getValue()
 
         then:
-        1 * requestUtils.sendGetRequest(_, _, _) >> createResponseFieldResult(false, wfs20ResponseBody, 500, TEST_WFS_URL)
         report.messages().size() == 1
         report.messages()[0].getCode() == DefaultMessages.UNKNOWN_ENDPOINT
         report.messages()[0].getPath() == [DiscoverWfsSource.FIELD_NAME]
@@ -147,29 +146,27 @@ class DiscoverWfsSourcesTest extends Specification {
 
     def 'Unknown endpoint error when unrecognized response received'() {
         setup:
+        discoverWfs.setWfsSourceUtils(prepareOpenSearchSourceUtils(200, badResponseBody, true))
         discoverWfs.setValue(getBaseDiscoverByUrlArgs(TEST_WFS_URL))
 
         when:
         def report = discoverWfs.getValue()
 
         then:
-        1 * requestUtils.sendGetRequest(_, _, _) >> createResponseFieldResult(false, badResponseBody, 200, TEST_WFS_URL)
         report.messages().size() == 1
         report.messages()[0].getCode() == DefaultMessages.UNKNOWN_ENDPOINT
         report.messages()[0].getPath() == [DiscoverWfsSource.FIELD_NAME]
     }
 
-    @Ignore
-    // TODO: 6/22/17 phuffer - Fix this test and the way we are mocking out RequestUtils
     def 'Cannot connect if errors from discover url from host'() {
         setup:
+        discoverWfs.setWfsSourceUtils(prepareOpenSearchSourceUtils(200, badResponseBody, false))
         discoverWfs.setValue(getBaseDiscoverByAddressArgs())
 
         when:
         def report = discoverWfs.getValue()
 
         then:
-        1 * requestUtils.discoverUrlFromHost(_, _, _, _) >> createResponseFieldResult(true, "", 0, "")
         report.messages().size() == 1
         report.messages()[0].getCode() == DefaultMessages.CANNOT_CONNECT
         report.messages()[0].getPath() == [ADDRESS_FIELD_PATH, HostField.DEFAULT_FIELD_NAME].flatten()
@@ -186,5 +183,26 @@ class DiscoverWfsSourcesTest extends Specification {
             it.getCode() == DefaultMessages.MISSING_REQUIRED_FIELD
         } == 1
         report.messages()*.getPath() == [URL_FIELD_PATH]
+    }
+
+    def prepareOpenSearchSourceUtils(int statusCode, String responseBody, boolean endpointIsReachable) {
+        def requestUtils = new TestRequestUtils(createMockFactory(statusCode, responseBody), endpointIsReachable)
+        def wfsUtils = new WfsSourceUtils()
+        wfsUtils.setRequestUtils(requestUtils)
+        return wfsUtils
+    }
+
+    def createMockFactory(int statusCode, String responseBody) {
+        def mockResponse = Mock(Response)
+        mockResponse.getStatus() >> statusCode
+        mockResponse.readEntity(String.class) >> responseBody
+
+        def mockWebClient = Mock(WebClient)
+        mockWebClient.get() >> mockResponse
+
+        def mockFactory = Mock(SecureCxfClientFactory)
+        mockFactory.getClient() >> mockWebClient
+
+        return mockFactory
     }
 }

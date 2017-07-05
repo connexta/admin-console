@@ -20,15 +20,22 @@ import ddf.catalog.service.ConfiguredService
 import ddf.catalog.source.Source
 import ddf.catalog.source.SourceMonitor
 import ddf.catalog.source.UnsupportedQueryException
+import org.apache.cxf.jaxrs.client.WebClient
 import org.codice.ddf.admin.common.fields.common.AddressField
 import org.codice.ddf.admin.common.fields.common.CredentialsField
 import org.codice.ddf.admin.common.fields.common.PidField
 import org.codice.ddf.admin.common.fields.common.ResponseField
 import org.codice.ddf.admin.common.fields.common.UrlField
+import org.codice.ddf.admin.common.report.ReportImpl
 import org.codice.ddf.admin.common.report.ReportWithResultImpl
 import org.codice.ddf.admin.common.report.message.ErrorMessageImpl
 import org.codice.ddf.admin.common.services.ServiceCommons
 import org.codice.ddf.admin.sources.fields.type.SourceConfigField
+import org.codice.ddf.admin.sources.utils.RequestUtils
+import org.codice.ddf.cxf.SecureCxfClientFactory
+import spock.lang.Specification
+
+import javax.ws.rs.core.Response
 
 class SourceTestCommons {
 
@@ -73,10 +80,6 @@ class SourceTestCommons {
     static TEST_PASSWORD = "admin"
 
     static TEST_SOURCENAME = "testSourceName"
-
-    static TEST_CODE = 'TEST_CODE'
-
-    static TEST_ERROR_PATH = ['some', 'path']
 
     static getBaseDiscoverByAddressArgs() {
         return [
@@ -130,6 +133,37 @@ class SourceTestCommons {
         }
 
         return result
+    }
+
+    /**
+     * Needed to mock out the SecureCxfClientFactory. Since it is an embedded class we are just going to override
+     * the method used to create the factory and substitute our own. We also need to mock out the endpointIsReachable
+     * method since it tries to make network requests.
+     */
+    static class TestRequestUtils extends RequestUtils {
+
+        SecureCxfClientFactory factory
+
+        boolean endpointIsReachable
+
+        TestRequestUtils(SecureCxfClientFactory mockFactory, boolean isReachable) {
+            factory = mockFactory
+            endpointIsReachable = isReachable
+        }
+
+        @Override
+        protected SecureCxfClientFactory<WebClient> createFactory(String url, CredentialsField creds) {
+            return factory
+        }
+
+        @Override
+        public ReportImpl endpointIsReachable(UrlField urlField) {
+            def report = new ReportImpl()
+            if(!endpointIsReachable) {
+                report.addArgumentMessage(new ErrorMessageImpl("some code"))
+            }
+            return report
+        }
     }
 
     /**

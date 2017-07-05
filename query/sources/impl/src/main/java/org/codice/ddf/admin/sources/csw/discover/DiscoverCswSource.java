@@ -54,11 +54,6 @@ public class DiscoverCswSource extends BaseFunctionField<CswSourceConfigurationF
         cswSourceUtils = new CswSourceUtils();
     }
 
-    public DiscoverCswSource(CswSourceUtils cswSourceUtils) {
-        this();
-        this.cswSourceUtils = cswSourceUtils;
-    }
-
     @Override
     public CswSourceConfigurationField performFunction() {
         ReportWithResult<ResponseField> responseResult;
@@ -93,5 +88,12 @@ public class DiscoverCswSource extends BaseFunctionField<CswSourceConfigurationF
     @Override
     public FunctionField<CswSourceConfigurationField> newInstance() {
         return new DiscoverCswSource();
+    }
+
+    /**
+     * For testing purposes only. Groovy can access private methods
+     */
+    private void setCswSourceUtils(CswSourceUtils cswSourceUtils) {
+        this.cswSourceUtils = cswSourceUtils;
     }
 }

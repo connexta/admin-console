@@ -20,7 +20,6 @@ import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.sources.csw.CswSourceUtils
 import org.codice.ddf.admin.sources.fields.CswProfile
 import org.codice.ddf.admin.sources.fields.type.CswSourceConfigurationField
-import org.codice.ddf.admin.sources.utils.RequestUtils
 import org.codice.ddf.cxf.SecureCxfClientFactory
 import spock.lang.Shared
 import spock.lang.Specification
@@ -54,10 +53,6 @@ class DiscoverCswSourceTest extends Specification {
     static NO_FILTER = 'NO_FILTER'
 
     DiscoverCswSource discoverCsw
-
-    CswSourceUtils cswSourceUtils
-
-    RequestUtils requestUtils
 
     static BASE_PATH = [DiscoverCswSource.FIELD_NAME, FunctionField.ARGUMENT]
 

@@ -55,11 +55,6 @@ public class DiscoverOpenSearchSource
         openSearchSourceUtils = new OpenSearchSourceUtils();
     }
 
-    public DiscoverOpenSearchSource(OpenSearchSourceUtils openSearchSourceUtils) {
-        this();
-        this.openSearchSourceUtils = openSearchSourceUtils;
-    }
-
     @Override
     public List<DataType> getArguments() {
         return ImmutableList.of(credentials, address);
@@ -95,5 +90,12 @@ public class DiscoverOpenSearchSource
     @Override
     public FunctionField<OpenSearchSourceConfigurationField> newInstance() {
         return new DiscoverOpenSearchSource();
+    }
+
+    /**
+     * For testing purposes only. Groovy can access private methods
+     */
+    private void setOpenSearchSourceUtils(OpenSearchSourceUtils openSearchSourceUtils) {
+        this.openSearchSourceUtils = openSearchSourceUtils;
     }
 }

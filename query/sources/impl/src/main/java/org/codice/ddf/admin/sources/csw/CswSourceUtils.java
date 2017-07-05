@@ -71,9 +71,9 @@ public class CswSourceUtils {
     private static final String GET_FIRST_OUTPUT_SCHEMA =
             "//ows:OperationsMetadata/ows:Operation[@name='GetRecords']/ows:Parameter[@name='OutputSchema' or @name='outputSchema']/ows:Value[1]/text()";
 
-    private RequestUtils requestUtils;
+    private final SourceUtilCommons sourceUtilCommons;
 
-    private SourceUtilCommons sourceUtilCommons;
+    private RequestUtils requestUtils;
 
     public CswSourceUtils() {
         this.requestUtils = new RequestUtils();

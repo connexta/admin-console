@@ -43,7 +43,7 @@ public class UpdateWfsConfiguration extends BaseFunctionField<BooleanField> {
     public static final String FIELD_NAME = "updateWfsSource";
 
     private static final String DESCRIPTION =
-            "Updates a WFS source configuration specified by the pid. Returns true on success and false on failure.";
+            "Updates a WFS source configuration specified by the pid.";
 
     public static final BooleanField RETURN_TYPE = new BooleanField();
 
@@ -119,7 +119,7 @@ public class UpdateWfsConfiguration extends BaseFunctionField<BooleanField> {
         if (containsErrorMsgs()) {
             return;
         }
-        addMessages(sourceValidationUtils.validateSourceName(config.sourceNameField(),
+        addMessages(sourceValidationUtils.duplicateSourceNameExists(config.sourceNameField(),
                 config.pidField()));
     }
 

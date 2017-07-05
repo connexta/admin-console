@@ -42,7 +42,7 @@ public class CreateOpenSearchConfiguration extends BaseFunctionField<BooleanFiel
     public static final String FIELD_NAME = "createOpenSearchSource";
 
     public static final String DESCRIPTION =
-            "Creates an OpenSearch source configuration. Returns true on success and false on failure.";
+            "Creates an OpenSearch source configuration.";
 
     public static final BooleanField RETURN_TYPE = new BooleanField();
 
@@ -107,7 +107,7 @@ public class CreateOpenSearchConfiguration extends BaseFunctionField<BooleanFiel
         if (containsErrorMsgs()) {
             return;
         }
-        addMessages(sourceValidationUtils.sourceNameExists(config.sourceNameField()));
+        addMessages(sourceValidationUtils.duplicateSourceNameExists(config.sourceNameField()));
     }
 
     @Override

@@ -31,7 +31,7 @@ public class DeleteOpenSearchConfiguration extends BaseFunctionField<BooleanFiel
     public static final String FIELD_NAME = "deleteOpenSearchSource";
 
     public static final String DESCRIPTION =
-            "Deletes an OpenSearch source configuration specified by the pid and returns true on success and false on failure.";
+            "Deletes an OpenSearch source configuration specified by the pid.";
 
     public static final BooleanField RETURN_TYPE = new BooleanField();
 

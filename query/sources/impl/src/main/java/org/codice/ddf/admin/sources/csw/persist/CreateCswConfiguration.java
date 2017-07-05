@@ -42,7 +42,7 @@ public class CreateCswConfiguration extends BaseFunctionField<BooleanField> {
     public static final String FIELD_NAME = "createCswSource";
 
     public static final String DESCRIPTION =
-            "Creates a CSW source configuration. Returns true on success and false on failure.";
+            "Creates a CSW source configuration.";
 
     public static final BooleanField RETURN_TYPE = new BooleanField();
 
@@ -108,7 +108,7 @@ public class CreateCswConfiguration extends BaseFunctionField<BooleanField> {
         if (containsErrorMsgs()) {
             return;
         }
-        addMessages(sourceValidationUtils.sourceNameExists(config.sourceNameField()));
+        addMessages(sourceValidationUtils.duplicateSourceNameExists(config.sourceNameField()));
     }
 
     @Override

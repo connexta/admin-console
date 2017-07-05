@@ -49,14 +49,7 @@ public class SourceValidationUtils {
                 configuratorFactory);
     }
 
-    /**
-     * Determines whether the service configuration identified by the service pid has the same name as sourceName.
-     *
-     * @param servicePid service pid of the service configuration
-     * @param sourceName source name to check against existing source name
-     * @return {@code true} if the sourceName matches the existing configuration's id, {@code false} otherwise
-     */
-    public boolean hasSourceName(String servicePid, String sourceName) {
+    private boolean findSourceNameMatch(String servicePid, String sourceName) {
         Source source = sourceUtilCommons.getAllSourceReferences()
                 .stream()
                 .map(ConfiguredService.class::cast)
@@ -74,9 +67,9 @@ public class SourceValidationUtils {
      * Validates the {@code sourceName} against the existing source names in the system.
      *
      * @param sourceName source name to validate
-     * @return a {@link Report} containing a {@link SourceMessages#DUPLICATE_SOURCE_NAME} error.
+     * @return a {@link Report} containing a {@link SourceMessages#DUPLICATE_SOURCE_NAME} on failure.
      */
-    public Report sourceNameExists(StringField sourceName) {
+    public Report duplicateSourceNameExists(StringField sourceName) {
         List<Source> sources = sourceUtilCommons.getAllSourceReferences();
         boolean matchFound = sources.stream()
                 .map(Describable::getId)
@@ -90,27 +83,27 @@ public class SourceValidationUtils {
     }
 
     /**
-     * Validates that the validates whether the existing service properties identified by the {@code pid}
+     * Validates whether the existing service properties identified by the {@code pid}
      * has the {@code sourceName}.
-     *
+     * <p>
      * Possible error codes
      * {@link org.codice.ddf.admin.common.report.message.DefaultMessages#NO_EXISTING_CONFIG}
      * {@link SourceMessages#DUPLICATE_SOURCE_NAME}
      *
      * @param sourceName source name to validate
-     * @param pid service pid of the service properties
-     * @return a {@link Report} containing an {@link org.codice.ddf.admin.api.report.ErrorMessage}s on failure
+     * @param pid        service pid of the service properties
+     * @return a {@link Report} containing an {@link org.codice.ddf.admin.api.report.ErrorMessage}s on failure.
      */
-    public Report validateSourceName(StringField sourceName, PidField pid) {
+    public Report duplicateSourceNameExists(StringField sourceName, PidField pid) {
         ReportImpl sourceNameReport = new ReportImpl();
         if (pid.getValue() != null) {
             sourceNameReport = serviceCommons.serviceConfigurationExists(pid);
-            if (!sourceNameReport.containsErrorMsgs() && !hasSourceName(pid.getValue(),
+            if (!sourceNameReport.containsErrorMsgs() && !findSourceNameMatch(pid.getValue(),
                     sourceName.getValue())) {
-                sourceNameReport.addMessages(sourceNameExists(sourceName));
+                sourceNameReport.addMessages(duplicateSourceNameExists(sourceName));
             }
         } else {
-            sourceNameReport.addMessages(sourceNameExists(sourceName));
+            sourceNameReport.addMessages(duplicateSourceNameExists(sourceName));
         }
         return sourceNameReport;
     }

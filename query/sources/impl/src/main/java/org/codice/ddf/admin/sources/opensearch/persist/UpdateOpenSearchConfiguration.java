@@ -41,7 +41,7 @@ public class UpdateOpenSearchConfiguration extends BaseFunctionField<BooleanFiel
     public static final String FIELD_NAME = "updateOpenSearchSource";
 
     public static final String DESCRIPTION =
-            "Updates an OpenSearch source configuration specified by the pid. Returns true on success and false on failure.";
+            "Updates an OpenSearch source configuration specified by the pid.";
 
     public static final BooleanField RETURN_TYPE = new BooleanField();
 
@@ -109,7 +109,7 @@ public class UpdateOpenSearchConfiguration extends BaseFunctionField<BooleanFiel
         if (containsErrorMsgs()) {
             return;
         }
-        addMessages(sourceValidationUtils.validateSourceName(config.sourceNameField(),
+        addMessages(sourceValidationUtils.duplicateSourceNameExists(config.sourceNameField(),
                 config.pidField()));
     }
 

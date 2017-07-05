@@ -44,7 +44,7 @@ public class CreateWfsConfiguration extends BaseFunctionField<BooleanField> {
     public static final String FIELD_NAME = "createWfsSource";
 
     private static final String DESCRIPTION =
-            "Creates a WFS source configuration. Returns true on success and false on failure.";
+            "Creates a WFS source configuration.";
 
     public static final BooleanField RETURN_TYPE = new BooleanField();
 
@@ -118,7 +118,7 @@ public class CreateWfsConfiguration extends BaseFunctionField<BooleanField> {
         if (containsErrorMsgs()) {
             return;
         }
-        addMessages(sourceValidationUtils.sourceNameExists(config.sourceNameField()));
+        addMessages(sourceValidationUtils.duplicateSourceNameExists(config.sourceNameField()));
     }
 
     @Override

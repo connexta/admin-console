@@ -41,7 +41,7 @@ public class UpdateCswConfiguration extends BaseFunctionField<BooleanField> {
     public static final String FIELD_NAME = "updateCswSource";
 
     public static final String DESCRIPTION =
-            "Updates a CSW source configuration specified by the pid. Returns true on success and false on failure.";
+            "Updates a CSW source configuration specified by the pid.";
 
     public static final BooleanField RETURN_TYPE = new BooleanField();
 
@@ -110,7 +110,7 @@ public class UpdateCswConfiguration extends BaseFunctionField<BooleanField> {
         if (containsErrorMsgs()) {
             return;
         }
-        addMessages(sourceValidationUtils.validateSourceName(config.sourceNameField(),
+        addMessages(sourceValidationUtils.duplicateSourceNameExists(config.sourceNameField(),
                 config.pidField()));
     }
 

@@ -103,14 +103,9 @@ class LdapTestConnectionSpec extends Specification {
         report.result().getValue()
     }
 
-    // TODO: tbatie - 5/4/17 - need to figure out a way to check if the connection was successfully upgraded to TLS or has no encryption. This information should be relayed back to the user.
-    @Ignore
-    def 'Successfully connect using startTls on insecure port (Should not upgrade)'() {
-    }
-
-    def 'Successfully connect using startTls on LDAPS port (Should upgrade)'() {
+    def 'Successfully connect using startTls on standard port'() {
         setup:
-        args = [(LdapConnectionField.DEFAULT_FIELD_NAME): startTlsLdapConnectionInfo(server.getLdapSecurePort()).getValue()]
+        args = [(LdapConnectionField.DEFAULT_FIELD_NAME): startTlsLdapConnectionInfo(server.getLdapPort()).getValue()]
         ldapConnectFunction.setValue(args)
         ldapConnectFunction.setTestingUtils(new LdapTestingUtilsMock())
 
@@ -120,6 +115,22 @@ class LdapTestConnectionSpec extends Specification {
         then:
         report.messages().isEmpty()
         report.result().getValue()
+    }
+
+    def 'Fail to startTls over LDAPS port'() {
+        setup:
+        args = [(LdapConnectionField.DEFAULT_FIELD_NAME): startTlsLdapConnectionInfo(server.getLdapSecurePort()).getValue()]
+        ldapConnectFunction.setValue(args)
+        ldapConnectFunction.setTestingUtils(new LdapTestingUtilsMock())
+
+        when:
+        FunctionReport report = ldapConnectFunction.getValue()
+
+        then:
+        report.messages().size() == 1
+        !report.result().getValue()
+        report.messages().get(0).getCode() == DefaultMessages.CANNOT_CONNECT
+        report.messages().get(0).getPath() == [LdapTestConnection.FIELD_NAME, FunctionField.ARGUMENT, LdapConnectionField.DEFAULT_FIELD_NAME]
     }
 
     def 'Fail to connect to LDAP (Bad hostname)'() {

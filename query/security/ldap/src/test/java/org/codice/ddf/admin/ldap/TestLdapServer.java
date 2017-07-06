@@ -60,9 +60,11 @@ public class TestLdapServer {
         try {
             InMemoryListenerConfig ldapConfig = InMemoryListenerConfig.createLDAPConfig(
                     getBaseDistinguishedName(),
-                    getLdapPort());
-            InMemoryListenerConfig ldapsConfig = InMemoryListenerConfig.createLDAPSConfig(
-                    "ldaps",
+                    null,
+                    getLdapPort(),
+                    object.getServerSSLContext()
+                            .getSocketFactory());
+            InMemoryListenerConfig ldapsConfig = InMemoryListenerConfig.createLDAPSConfig("ldaps",
                     getLdapSecurePort(),
                     object.getServerSSLContext()
                             .getServerSocketFactory());
@@ -82,7 +84,6 @@ public class TestLdapServer {
     public static String getBasicAuthDn() {
         return "cn=admin";
     }
-
 
     public static int getLdapPort() {
         // return server.getListenPort("ldap");
@@ -185,7 +186,7 @@ public class TestLdapServer {
         }
     }
 
-    public class Testing extends             InMemorySASLBindHandler {
+    public class Testing extends InMemorySASLBindHandler {
 
         @Override
         public String getSASLMechanismName() {

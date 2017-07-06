@@ -21,8 +21,9 @@ import org.codice.ddf.admin.common.fields.base.function.BaseFieldProvider;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.sources.opensearch.discover.DiscoverOpenSearchSource;
 import org.codice.ddf.admin.sources.opensearch.discover.GetOpenSearchConfigurations;
+import org.codice.ddf.admin.sources.opensearch.persist.CreateOpenSearchConfiguration;
 import org.codice.ddf.admin.sources.opensearch.persist.DeleteOpenSearchConfiguration;
-import org.codice.ddf.admin.sources.opensearch.persist.SaveOpenSearchConfiguration;
+import org.codice.ddf.admin.sources.opensearch.persist.UpdateOpenSearchConfiguration;
 import org.codice.ddf.internal.admin.configurator.actions.FeatureActions;
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
@@ -43,7 +44,9 @@ public class OpenSearchFieldProvider extends BaseFieldProvider {
 
     private GetOpenSearchConfigurations getOpenSearchConfigs;
 
-    private SaveOpenSearchConfiguration saveOpenSearchConfigs;
+    private CreateOpenSearchConfiguration createOpenSearchConfigs;
+
+    private UpdateOpenSearchConfiguration updateOpenSearchConfigs;
 
     private DeleteOpenSearchConfiguration deleteOpenSearchConfig;
 
@@ -57,10 +60,16 @@ public class OpenSearchFieldProvider extends BaseFieldProvider {
                 managedServiceActions,
                 serviceReader);
 
-        saveOpenSearchConfigs = new SaveOpenSearchConfiguration(configuratorFactory,
+        createOpenSearchConfigs = new CreateOpenSearchConfiguration(configuratorFactory,
                 serviceActions,
                 managedServiceActions,
-                serviceReader, featureActions);
+                serviceReader,
+                featureActions);
+        updateOpenSearchConfigs = new UpdateOpenSearchConfiguration(configuratorFactory,
+                serviceActions,
+                managedServiceActions,
+                serviceReader,
+                featureActions);
         deleteOpenSearchConfig = new DeleteOpenSearchConfiguration(configuratorFactory,
                 serviceActions,
                 managedServiceActions);
@@ -74,6 +83,8 @@ public class OpenSearchFieldProvider extends BaseFieldProvider {
 
     @Override
     public List<FunctionField> getMutationFunctions() {
-        return ImmutableList.of(saveOpenSearchConfigs, deleteOpenSearchConfig);
+        return ImmutableList.of(createOpenSearchConfigs,
+                updateOpenSearchConfigs,
+                deleteOpenSearchConfig);
     }
 }

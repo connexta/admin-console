@@ -32,7 +32,7 @@ public class DeleteCswConfiguration extends BaseFunctionField<BooleanField> {
     public static final String FIELD_NAME = "deleteCswSource";
 
     public static final String DESCRIPTION =
-            "Deletes a CSW source configuration provided by the pid and returns true on success and false on failure.";
+            "Deletes a CSW source configuration provided by the pid.";
 
     public static final BooleanField RETURN_TYPE = new BooleanField();
 

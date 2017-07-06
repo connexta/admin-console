@@ -14,7 +14,6 @@
 package org.codice.ddf.admin.sources.opensearch.persist;
 
 import static org.codice.ddf.admin.common.report.message.DefaultMessages.failedPersistError;
-import static org.codice.ddf.admin.sources.services.OpenSearchServiceProperties.OPENSEARCH_FACTORY_PID;
 import static org.codice.ddf.admin.sources.services.OpenSearchServiceProperties.OPENSEARCH_FEATURE;
 import static org.codice.ddf.admin.sources.services.OpenSearchServiceProperties.openSearchConfigToServiceProps;
 
@@ -24,12 +23,11 @@ import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
-import org.codice.ddf.admin.common.fields.common.PidField;
+import org.codice.ddf.admin.common.services.ServiceCommons;
 import org.codice.ddf.admin.configurator.Configurator;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.configurator.OperationReport;
 import org.codice.ddf.admin.sources.fields.type.OpenSearchSourceConfigurationField;
-import org.codice.ddf.admin.sources.utils.SourceUtilCommons;
 import org.codice.ddf.admin.sources.utils.SourceValidationUtils;
 import org.codice.ddf.internal.admin.configurator.actions.FeatureActions;
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
@@ -38,22 +36,20 @@ import org.codice.ddf.internal.admin.configurator.actions.ServiceReader;
 
 import com.google.common.collect.ImmutableList;
 
-public class SaveOpenSearchConfiguration extends BaseFunctionField<BooleanField> {
+public class UpdateOpenSearchConfiguration extends BaseFunctionField<BooleanField> {
 
-    public static final String FIELD_NAME = "saveOpenSearchSource";
+    public static final String FIELD_NAME = "updateOpenSearchSource";
 
     public static final String DESCRIPTION =
-            "Saves an OpenSearch source configuration. If a pid is specified, the source configuration specified by the pid will be updated. Returns true on success and false on failure.";
+            "Updates an OpenSearch source configuration specified by the pid.";
 
     public static final BooleanField RETURN_TYPE = new BooleanField();
 
     private OpenSearchSourceConfigurationField config;
 
-    private PidField pid;
-
     private SourceValidationUtils sourceValidationUtils;
 
-    private SourceUtilCommons sourceUtilCommons;
+    private ServiceCommons serviceCommons;
 
     private final ConfiguratorFactory configuratorFactory;
 
@@ -65,9 +61,10 @@ public class SaveOpenSearchConfiguration extends BaseFunctionField<BooleanField>
 
     private final FeatureActions featureActions;
 
-    public SaveOpenSearchConfiguration(ConfiguratorFactory configuratorFactory,
+    public UpdateOpenSearchConfiguration(ConfiguratorFactory configuratorFactory,
             ServiceActions serviceActions, ManagedServiceActions managedServiceActions,
             ServiceReader serviceReader, FeatureActions featureActions) {
+
         super(FIELD_NAME, DESCRIPTION);
         this.configuratorFactory = configuratorFactory;
         this.serviceActions = serviceActions;
@@ -75,16 +72,17 @@ public class SaveOpenSearchConfiguration extends BaseFunctionField<BooleanField>
         this.serviceReader = serviceReader;
         this.featureActions = featureActions;
 
-        pid = new PidField();
         config = new OpenSearchSourceConfigurationField();
         config.useDefaultRequired();
+        config.pidField()
+                .isRequired(true);
         updateArgumentPaths();
 
         sourceValidationUtils = new SourceValidationUtils(serviceReader,
                 managedServiceActions,
                 configuratorFactory,
                 serviceActions);
-        sourceUtilCommons = new SourceUtilCommons(managedServiceActions,
+        serviceCommons = new ServiceCommons(managedServiceActions,
                 serviceActions,
                 serviceReader,
                 configuratorFactory);
@@ -96,14 +94,12 @@ public class SaveOpenSearchConfiguration extends BaseFunctionField<BooleanField>
         configurator.add(featureActions.start(OPENSEARCH_FEATURE));
         OperationReport report = configurator.commit("Starting feature [{}]", OPENSEARCH_FEATURE);
 
-        if(report.containsFailedResults()) {
+        if (report.containsFailedResults()) {
             addResultMessage(failedPersistError());
             return new BooleanField(false);
         }
-
-        addMessages(sourceUtilCommons.saveSource(pid,
-                openSearchConfigToServiceProps(config),
-                OPENSEARCH_FACTORY_PID));
+        addMessages(serviceCommons.updateService(config.pidField(),
+                openSearchConfigToServiceProps(config)));
         return new BooleanField(!containsErrorMsgs());
     }
 
@@ -113,7 +109,8 @@ public class SaveOpenSearchConfiguration extends BaseFunctionField<BooleanField>
         if (containsErrorMsgs()) {
             return;
         }
-        addMessages(sourceValidationUtils.validateSourceName(config.sourceNameField(), pid));
+        addMessages(sourceValidationUtils.duplicateSourceNameExists(config.sourceNameField(),
+                config.pidField()));
     }
 
     @Override
@@ -123,14 +120,15 @@ public class SaveOpenSearchConfiguration extends BaseFunctionField<BooleanField>
 
     @Override
     public List<DataType> getArguments() {
-        return ImmutableList.of(config, pid);
+        return ImmutableList.of(config);
     }
 
     @Override
     public FunctionField<BooleanField> newInstance() {
-        return new SaveOpenSearchConfiguration(configuratorFactory,
+        return new UpdateOpenSearchConfiguration(configuratorFactory,
                 serviceActions,
                 managedServiceActions,
-                serviceReader, featureActions);
+                serviceReader,
+                featureActions);
     }
 }

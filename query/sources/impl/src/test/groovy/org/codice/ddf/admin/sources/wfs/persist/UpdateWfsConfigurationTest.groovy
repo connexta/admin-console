@@ -22,7 +22,6 @@ import org.codice.ddf.admin.configurator.OperationReport
 import org.codice.ddf.admin.sources.SourceMessages
 import org.codice.ddf.admin.sources.fields.WfsVersion
 import org.codice.ddf.admin.sources.fields.type.WfsSourceConfigurationField
-import org.codice.ddf.admin.sources.wfs.WfsSourceInfoField
 import org.codice.ddf.internal.admin.configurator.actions.FeatureActions
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions
@@ -31,9 +30,9 @@ import spock.lang.Specification
 
 import static org.codice.ddf.admin.sources.SourceTestCommons.*
 
-class SaveWfsConfigurationTest extends Specification {
+class UpdateWfsConfigurationTest extends Specification {
 
-    static RESULT_ARGUMENT_PATH = [SaveWfsConfiguration.FIELD_NAME]
+    static RESULT_ARGUMENT_PATH = [UpdateWfsConfiguration.FIELD_NAME]
 
     static BASE_PATH = [RESULT_ARGUMENT_PATH, FunctionField.ARGUMENT].flatten()
 
@@ -43,13 +42,15 @@ class SaveWfsConfigurationTest extends Specification {
 
     static ENDPOINT_URL_PATH = [CONFIG_PATH, ENDPOINT_URL].flatten()
 
+    static PID_PATH = [CONFIG_PATH, PID].flatten()
+
     static WFS_VERSION = WfsVersion.DEFAULT_FIELD_NAME;
 
     static WFS_VERSION_PATH = [CONFIG_PATH, WFS_VERSION].flatten()
 
     static TEST_WFS_VERSION = WfsVersion.Wfs1.WFS_VERSION_1
 
-    SaveWfsConfiguration saveWfsConfiguration
+    UpdateWfsConfiguration updateWfsConfiguration
 
     ConfiguratorFactory configuratorFactory
 
@@ -65,12 +66,9 @@ class SaveWfsConfigurationTest extends Specification {
 
     FederatedSource federatedSource
 
-    def functionArgs
-
     def federatedSources = []
 
     def setup() {
-        functionArgs = createWfsSaveArgs()
         configurator = Mock(Configurator)
         serviceActions = Mock(ServiceActions)
         serviceReader = Mock(ServiceReader)
@@ -84,66 +82,19 @@ class SaveWfsConfigurationTest extends Specification {
             getConfigurator() >> configurator
         }
 
-        saveWfsConfiguration = new SaveWfsConfiguration(configuratorFactory, serviceActions,
+        updateWfsConfiguration = new UpdateWfsConfiguration(configuratorFactory, serviceActions,
                 managedServiceActions, serviceReader, featureActions)
-    }
-
-    def 'Successfully save new WFS configuration'() {
-        setup:
-        saveWfsConfiguration.setValue(functionArgs)
-        serviceReader.getServices(_, _) >> []
-        configurator.commit(_, _) >> mockReport(false)
-
-        when:
-        def report = saveWfsConfiguration.getValue()
-
-        then:
-        report.result() != null
-        report.result().getValue()
-    }
-
-    def 'Fail to save new WFS config due to duplicate source name'() {
-        setup:
-        saveWfsConfiguration.setValue(functionArgs)
-        serviceReader.getServices(_, _) >> federatedSources
-
-        when:
-        def report = saveWfsConfiguration.getValue()
-
-        then:
-        report.result() == null
-        report.messages().size() == 1
-        report.messages().get(0).code == SourceMessages.DUPLICATE_SOURCE_NAME
-        report.messages().get(0).path == SOURCE_NAME_PATH
-    }
-
-    def 'Fail to save new WFS config due to failure to commit'() {
-        setup:
-        saveWfsConfiguration.setValue(functionArgs)
-        serviceReader.getServices(_, _) >> []
-
-        when:
-        def report = saveWfsConfiguration.getValue()
-
-        then:
-        1 * configurator.commit(_, _) >> mockReport(false)
-        1 * configurator.commit(_, _) >> mockReport(true)
-        !report.result().getValue()
-        report.messages().size() == 1
-        report.messages().get(0).code == DefaultMessages.FAILED_PERSIST
-        report.messages().get(0).path == RESULT_ARGUMENT_PATH
     }
 
     def 'Successfully update WFS configuration'() {
         setup:
-        functionArgs.put(PID, S_PID)
-        saveWfsConfiguration.setValue(functionArgs)
+        updateWfsConfiguration.setValue(createWfsUpdateArgs())
         serviceActions.read(_ as String) >> [(ID): TEST_SOURCENAME]
         serviceReader.getServices(_, _) >> []
         configurator.commit(_, _) >> mockReport(false)
 
         when:
-        def report = saveWfsConfiguration.getValue()
+        def report = updateWfsConfiguration.getValue()
 
         then:
         report.result().getValue()
@@ -151,14 +102,13 @@ class SaveWfsConfigurationTest extends Specification {
 
     def 'Fail to update due to existing source name specified by pid'() {
         setup:
-        functionArgs.put(PID, S_PID)
-        saveWfsConfiguration.setValue(functionArgs)
+        updateWfsConfiguration.setValue(createWfsUpdateArgs())
         serviceActions.read(_) >> [(ID): 'updatedName']
         serviceReader.getServices(_, _) >> [new TestSource(S_PID, 'updatedName', false),
                                             new TestSource("existingSource", TEST_SOURCENAME, false)]
 
         when:
-        def report = saveWfsConfiguration.getValue()
+        def report = updateWfsConfiguration.getValue()
 
         then:
         report.result() == null
@@ -169,13 +119,12 @@ class SaveWfsConfigurationTest extends Specification {
 
     def 'Fail configuration update due to failure to commit'() {
         setup:
-        functionArgs.put(PID, S_PID)
-        saveWfsConfiguration.setValue(functionArgs)
+        updateWfsConfiguration.setValue(createWfsUpdateArgs())
         serviceActions.read(_) >> [(ID): TEST_SOURCENAME]
         serviceReader.getServices(_, _) >> []
 
         when:
-        def report = saveWfsConfiguration.getValue()
+        def report = updateWfsConfiguration.getValue()
 
         then:
         1 * configurator.commit(_, _) >> mockReport(false)
@@ -188,12 +137,11 @@ class SaveWfsConfigurationTest extends Specification {
 
     def 'Fail to update WFS config due to no existing config specified by pid'() {
         setup:
-        functionArgs.put(PID, S_PID)
-        saveWfsConfiguration.setValue(functionArgs)
+        updateWfsConfiguration.setValue(createWfsUpdateArgs())
         serviceActions.read(S_PID) >> [:]
 
         when:
-        def report = saveWfsConfiguration.getValue()
+        def report = updateWfsConfiguration.getValue()
 
         then:
         report.result() == null
@@ -203,10 +151,13 @@ class SaveWfsConfigurationTest extends Specification {
     }
 
     def 'Return false when wfs feature fails to start'() {
-        when:
-        saveWfsConfiguration.setValue(functionArgs)
+        setup:
+        updateWfsConfiguration.setValue(createWfsUpdateArgs())
         serviceReader.getServices(_, _) >> []
-        def report = saveWfsConfiguration.getValue()
+        serviceActions.read(_) >> [(ID): TEST_SOURCENAME]
+
+        when:
+        def report = updateWfsConfiguration.getValue()
 
         then:
         1 * configurator.commit(_, _) >> mockReport(true)
@@ -218,20 +169,21 @@ class SaveWfsConfigurationTest extends Specification {
 
     def 'Fail due to missing required fields'() {
         when:
-        def report = saveWfsConfiguration.getValue()
+        def report = updateWfsConfiguration.getValue()
 
         then:
         report.result() == null
-        report.messages().size() == 3
+        report.messages().size() == 4
         report.messages().count {
             it.getCode() == DefaultMessages.MISSING_REQUIRED_FIELD
-        } == 3
-        report.messages()*.getPath() == [SOURCE_NAME_PATH, ENDPOINT_URL_PATH, WFS_VERSION_PATH]
+        } == 4
+        report.messages()*.getPath() == [PID_PATH, SOURCE_NAME_PATH, ENDPOINT_URL_PATH, WFS_VERSION_PATH]
     }
 
-    def createWfsSaveArgs() {
+    def createWfsUpdateArgs() {
         def config = new WfsSourceConfigurationField().wfsVersion(TEST_WFS_VERSION)
                 .endpointUrl('https://localhost:8993/geoserver/wfs').sourceName(TEST_SOURCENAME)
+                .pid(S_PID)
         config.credentials().username(TEST_USERNAME).password(TEST_PASSWORD)
         return [(WfsSourceConfigurationField.DEFAULT_FIELD_NAME): config.getValue()]
     }

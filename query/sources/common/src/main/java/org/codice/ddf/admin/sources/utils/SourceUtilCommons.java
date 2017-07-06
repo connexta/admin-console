@@ -13,8 +13,6 @@
  */
 package org.codice.ddf.admin.sources.utils;
 
-import static org.codice.ddf.admin.common.report.message.DefaultMessages.failedPersistError;
-
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -29,12 +27,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang.StringUtils;
-import org.codice.ddf.admin.api.report.Report;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.common.fields.common.PidField;
-import org.codice.ddf.admin.common.report.ReportImpl;
-import org.codice.ddf.admin.common.services.ServiceCommons;
-import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.sources.fields.type.SourceConfigField;
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
@@ -54,15 +48,11 @@ public class SourceUtilCommons {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SourceUtilCommons.class);
 
-    private ServiceCommons serviceCommons;
-
     private ManagedServiceActions managedServiceActions;
 
     private ServiceActions serviceActions;
 
     private ServiceReader serviceReader;
-
-    private ConfiguratorFactory configuratorFactory;
 
     public SourceUtilCommons() {
     }
@@ -71,20 +61,12 @@ public class SourceUtilCommons {
      * @param managedServiceActions service to interact with managed service configurations
      * @param serviceActions        service to interact with admin configurations
      * @param serviceReader         service to query service state
-     * @param configuratorFactory   service to create {@link org.codice.ddf.admin.configurator.Configurator}s
      */
     public SourceUtilCommons(ManagedServiceActions managedServiceActions,
-            ServiceActions serviceActions, ServiceReader serviceReader,
-            ConfiguratorFactory configuratorFactory) {
+            ServiceActions serviceActions, ServiceReader serviceReader) {
         this.managedServiceActions = managedServiceActions;
         this.serviceActions = serviceActions;
         this.serviceReader = serviceReader;
-        this.configuratorFactory = configuratorFactory;
-
-        serviceCommons = new ServiceCommons(managedServiceActions,
-                serviceActions,
-                serviceReader,
-                configuratorFactory);
     }
 
     public static final NamespaceContext SOURCES_NAMESPACE_CONTEXT = new NamespaceContext() {
@@ -178,19 +160,6 @@ public class SourceUtilCommons {
         return sourceInfoListField;
     }
 
-    public Report saveSource(PidField pid, Map<String, Object> serviceProps, String factoryPid) {
-        ReportImpl saveSourceReport = new ReportImpl();
-        if (StringUtils.isNotEmpty(pid.getValue())) {
-            saveSourceReport.addMessages(serviceCommons.updateService(pid, serviceProps));
-        } else {
-            if (serviceCommons.createManagedService(serviceProps, factoryPid)
-                    .containsErrorMsgs()) {
-                saveSourceReport.addResultMessage(failedPersistError());
-            }
-        }
-        return saveSourceReport;
-    }
-
     public void populateAvailability(BooleanField availability, PidField pid) {
         for (Source source : getAllSourceReferences()) {
             if (source instanceof ConfiguredService) {
@@ -214,9 +183,5 @@ public class SourceUtilCommons {
 
     public void setServiceReader(ServiceReader serviceReader) {
         this.serviceReader = serviceReader;
-    }
-
-    public void setConfiguratorFactory(ConfiguratorFactory configuratorFactory) {
-        this.configuratorFactory = configuratorFactory;
     }
 }

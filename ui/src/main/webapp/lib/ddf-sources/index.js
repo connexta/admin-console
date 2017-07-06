@@ -14,7 +14,6 @@ const CSW = {
           endpointUrl
           cswOutputSchema
           cswSpatialOperator
-          pid
           creds {
             username
             password
@@ -24,8 +23,8 @@ const CSW = {
     }
   `,
   mutation: gql`
-    mutation SaveCswSource($config: CswSourceConfiguration!){
-      saveCswSource(source : $config)
+    mutation CreateCswSource($config: CswSourceConfiguration!){
+      createCswSource(source : $config)
     }
   `,
   selector: (result) => result.csw.discoverCsw
@@ -43,7 +42,6 @@ const WFS = {
           wfsVersion
           sourceName
           endpointUrl
-          pid
           creds {
             username
             password
@@ -53,8 +51,8 @@ const WFS = {
     }
   `,
   mutation: gql`
-    mutation SaveWfsSource($config: WfsSourceConfiguration!){
-      saveWfsSource(source : $config)
+    mutation CreateWfsSource($config: WfsSourceConfiguration!){
+      createWfsSource(source : $config)
     }
   `,
   selector: (result) => result.wfs.discoverWfs
@@ -71,7 +69,6 @@ const OpenSearch = {
         {
           sourceName
           endpointUrl
-          pid
           creds {
             username
             password
@@ -81,8 +78,8 @@ const OpenSearch = {
     }
   `,
   mutation: gql`
-    mutation SaveOpenSearchSource($config: OpenSearchConfiguration!){
-      saveOpenSearchSource(source : $config)
+    mutation CreateOpenSearchSource($config: OpenSearchConfiguration!){
+      createOpenSearchSource(source : $config)
     }
   `,
   selector: (result) => result.openSearch.discoverOpenSearch

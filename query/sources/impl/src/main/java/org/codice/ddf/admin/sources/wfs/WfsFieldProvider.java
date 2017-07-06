@@ -21,8 +21,9 @@ import org.codice.ddf.admin.common.fields.base.function.BaseFieldProvider;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.sources.wfs.discover.DiscoverWfsSource;
 import org.codice.ddf.admin.sources.wfs.discover.GetWfsConfigurations;
+import org.codice.ddf.admin.sources.wfs.persist.CreateWfsConfiguration;
 import org.codice.ddf.admin.sources.wfs.persist.DeleteWfsConfiguration;
-import org.codice.ddf.admin.sources.wfs.persist.SaveWfsConfiguration;
+import org.codice.ddf.admin.sources.wfs.persist.UpdateWfsConfiguration;
 import org.codice.ddf.internal.admin.configurator.actions.FeatureActions;
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
@@ -44,7 +45,9 @@ public class WfsFieldProvider extends BaseFieldProvider {
 
     private GetWfsConfigurations getWfsConfigs;
 
-    private SaveWfsConfiguration saveWfsConfig;
+    private CreateWfsConfiguration createWfsConfig;
+
+    private UpdateWfsConfiguration updateWfsConfig;
 
     private DeleteWfsConfiguration deleteWfsConfig;
 
@@ -58,7 +61,12 @@ public class WfsFieldProvider extends BaseFieldProvider {
                 managedServiceActions,
                 serviceReader);
 
-        saveWfsConfig = new SaveWfsConfiguration(configuratorFactory,
+        createWfsConfig = new CreateWfsConfiguration(configuratorFactory,
+                serviceActions,
+                managedServiceActions,
+                serviceReader,
+                featureActions);
+        updateWfsConfig = new UpdateWfsConfiguration(configuratorFactory,
                 serviceActions,
                 managedServiceActions,
                 serviceReader,
@@ -76,6 +84,6 @@ public class WfsFieldProvider extends BaseFieldProvider {
 
     @Override
     public List<FunctionField> getMutationFunctions() {
-        return ImmutableList.of(saveWfsConfig, deleteWfsConfig);
+        return ImmutableList.of(createWfsConfig, updateWfsConfig, deleteWfsConfig);
     }
 }

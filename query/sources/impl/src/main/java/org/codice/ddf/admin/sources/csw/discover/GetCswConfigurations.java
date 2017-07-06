@@ -73,8 +73,7 @@ public class GetCswConfigurations extends BaseFunctionField<ListField<CswSourceI
 
         sourceUtilCommons = new SourceUtilCommons(managedServiceActions,
                 serviceActions,
-                serviceReader,
-                configuratorFactory);
+                serviceReader);
 
         serviceCommons = new ServiceCommons(null, serviceActions, null, null);
     }

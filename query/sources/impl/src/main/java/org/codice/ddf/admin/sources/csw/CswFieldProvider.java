@@ -21,8 +21,9 @@ import org.codice.ddf.admin.common.fields.base.function.BaseFieldProvider;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.sources.csw.discover.DiscoverCswSource;
 import org.codice.ddf.admin.sources.csw.discover.GetCswConfigurations;
+import org.codice.ddf.admin.sources.csw.persist.CreateCswConfiguration;
 import org.codice.ddf.admin.sources.csw.persist.DeleteCswConfiguration;
-import org.codice.ddf.admin.sources.csw.persist.SaveCswConfiguration;
+import org.codice.ddf.admin.sources.csw.persist.UpdateCswConfiguration;
 import org.codice.ddf.internal.admin.configurator.actions.FeatureActions;
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
@@ -44,7 +45,9 @@ public class CswFieldProvider extends BaseFieldProvider {
 
     private DiscoverCswSource discoverCswSource;
 
-    private SaveCswConfiguration saveCswConfiguration;
+    private CreateCswConfiguration createCswConfiguration;
+
+    private UpdateCswConfiguration updateCswConfiguration;
 
     private DeleteCswConfiguration deleteCswConfiguration;
 
@@ -57,7 +60,12 @@ public class CswFieldProvider extends BaseFieldProvider {
                 serviceActions,
                 managedServiceActions,
                 serviceReader);
-        saveCswConfiguration = new SaveCswConfiguration(configuratorFactory,
+        createCswConfiguration = new CreateCswConfiguration(configuratorFactory,
+                serviceActions,
+                managedServiceActions,
+                serviceReader,
+                featureActions);
+        updateCswConfiguration = new UpdateCswConfiguration(configuratorFactory,
                 serviceActions,
                 managedServiceActions,
                 serviceReader,
@@ -75,6 +83,8 @@ public class CswFieldProvider extends BaseFieldProvider {
 
     @Override
     public List<FunctionField> getMutationFunctions() {
-        return ImmutableList.of(saveCswConfiguration, deleteCswConfiguration);
+        return ImmutableList.of(createCswConfiguration,
+                updateCswConfiguration,
+                deleteCswConfiguration);
     }
 }

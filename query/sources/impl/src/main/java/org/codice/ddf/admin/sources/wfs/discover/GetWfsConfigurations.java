@@ -72,8 +72,7 @@ public class GetWfsConfigurations extends BaseFunctionField<ListField<WfsSourceI
 
         sourceUtilCommons = new SourceUtilCommons(managedServiceActions,
                 serviceActions,
-                serviceReader,
-                configuratorFactory);
+                serviceReader);
         serviceCommons = new ServiceCommons(null, serviceActions, null, null);
     }
 

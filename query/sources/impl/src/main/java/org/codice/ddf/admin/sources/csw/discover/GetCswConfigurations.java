@@ -13,7 +13,6 @@
  */
 package org.codice.ddf.admin.sources.csw.discover;
 
-import static org.codice.ddf.admin.common.services.ServiceCommons.FLAG_PASSWORD;
 import static org.codice.ddf.admin.sources.services.CswServiceProperties.CSW_FACTORY_PIDS;
 import static org.codice.ddf.admin.sources.services.CswServiceProperties.SERVICE_PROPS_TO_CSW_CONFIG;
 
@@ -43,7 +42,8 @@ public class GetCswConfigurations extends BaseFunctionField<ListField<CswSourceI
     public static final String DESCRIPTION =
             "Retrieves all currently configured CSW sources. If the pid argument is specified, only the source configuration with that pid will be returned.";
 
-    public static final ListField<CswSourceInfoField> RETURN_TYPE = new CswSourceInfoField.ListImpl();
+    public static final ListField<CswSourceInfoField> RETURN_TYPE =
+            new CswSourceInfoField.ListImpl();
 
     private PidField pid;
 
@@ -93,9 +93,6 @@ public class GetCswConfigurations extends BaseFunctionField<ListField<CswSourceI
             sourceUtilCommons.populateAvailability(sourceInfoField.isAvailableField(),
                     sourceInfoField.config()
                             .pidField());
-            sourceInfoField.config()
-                    .credentials()
-                    .password(FLAG_PASSWORD);
         }
 
         return cswSourceInfoFields;

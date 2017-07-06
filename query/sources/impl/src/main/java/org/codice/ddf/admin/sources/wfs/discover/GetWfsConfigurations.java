@@ -13,7 +13,6 @@
  */
 package org.codice.ddf.admin.sources.wfs.discover;
 
-import static org.codice.ddf.admin.common.services.ServiceCommons.FLAG_PASSWORD;
 import static org.codice.ddf.admin.sources.services.WfsServiceProperties.SERVICE_PROPS_TO_WFS_CONFIG;
 import static org.codice.ddf.admin.sources.services.WfsServiceProperties.WFS_FACTORY_PIDS;
 
@@ -25,6 +24,7 @@ import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.common.services.ServiceCommons;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
+import org.codice.ddf.admin.sources.fields.type.SourceConfigField;
 import org.codice.ddf.admin.sources.fields.type.WfsSourceConfigurationField;
 import org.codice.ddf.admin.sources.utils.SourceUtilCommons;
 import org.codice.ddf.admin.sources.wfs.WfsSourceInfoField;
@@ -41,8 +41,7 @@ public class GetWfsConfigurations extends BaseFunctionField<ListField<WfsSourceI
     public static final String DESCRIPTION =
             "Retrieves all currently configured WFS sources. If a source pid is specified, only that source configuration will be returned.";
 
-    public static final WfsSourceInfoField.ListImpl RETURN_TYPE =
-            new WfsSourceInfoField.ListImpl();
+    public static final WfsSourceInfoField.ListImpl RETURN_TYPE = new WfsSourceInfoField.ListImpl();
 
     private PidField pid;
 
@@ -80,7 +79,7 @@ public class GetWfsConfigurations extends BaseFunctionField<ListField<WfsSourceI
     public ListField<WfsSourceInfoField> performFunction() {
         WfsSourceInfoField.ListImpl cswSourceInfoFields = new WfsSourceInfoField.ListImpl();
 
-        List configs =
+        List<SourceConfigField> configs =
                 sourceUtilCommons.getSourceConfigurations(WFS_FACTORY_PIDS,
                         SERVICE_PROPS_TO_WFS_CONFIG,
                         pid.getValue());
@@ -93,9 +92,6 @@ public class GetWfsConfigurations extends BaseFunctionField<ListField<WfsSourceI
             sourceUtilCommons.populateAvailability(sourceInfoField.isAvailableField(),
                     sourceInfoField.config()
                             .pidField());
-            sourceInfoField.config()
-                    .credentials()
-                    .password(FLAG_PASSWORD);
         }
 
         return cswSourceInfoFields;

@@ -6,7 +6,6 @@ import com.google.common.io.Resources
 import graphql.validation.ValidationErrorType
 import groovy.json.JsonBuilder
 import org.codice.ddf.admin.api.fields.FunctionField
-import org.codice.ddf.admin.api.fields.ListField
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField
 import org.codice.ddf.admin.common.fields.base.scalar.IntegerField
 import org.codice.ddf.admin.common.fields.base.scalar.StringField

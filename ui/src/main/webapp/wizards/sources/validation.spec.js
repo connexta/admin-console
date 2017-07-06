@@ -4,6 +4,7 @@ import {
   isBlank,
   discoveryStageDisableNext,
   portError,
+  urlError,
   userNameError,
   passwordError
 } from './validation'
@@ -249,6 +250,45 @@ describe('Sources Validation', () => {
         configs,
         discoveryType
       }), 'Next button should be enabled').to.equal(false)
+    })
+  })
+
+  describe('Valid URLs', () => {
+    const runs = [
+        {it: 'http://foo.com/blah_blah'},
+        {it: 'http://www.example.com/wpstyle/?p=364'},
+        {it: 'http://142.42.1.1/'},
+        {it: 'http://code.google.com/events/#&product=browser'},
+        {it: 'http://j.mp'},
+        {it: 'http://localhost:8993'},
+        {it: 'http://foo.bar/?q=Test%20URL-encoded%20stuff'},
+        {it: 'https://localhost:8993'}
+    ]
+
+    runs.forEach((run) => {
+      it(run.it + ' is valid URL', () => {
+        expect(urlError({
+          endpointUrl: run.it
+        }), 'URL should be valid').to.equal(undefined)
+      })
+    })
+  })
+
+  describe('Invalid URLs', () => {
+    const runs = [
+        {it: 'http://'},
+        {it: 'http://  test.com'},
+        {it: 'htp://test.com'},
+        {it: 'htps://test.com'},
+        {it: '://google.com'}
+    ]
+
+    runs.forEach((run) => {
+      it(run.it + ' is invalid URL', () => {
+        expect(urlError({
+          endpointUrl: run.it
+        }), 'URL should be invalid').to.equal('Not a valid url.')
+      })
     })
   })
 })

@@ -14,6 +14,7 @@
 package org.codice.ddf.admin.sources.csw.persist;
 
 import static org.codice.ddf.admin.common.report.message.DefaultMessages.failedPersistError;
+import static org.codice.ddf.admin.common.services.ServiceCommons.FLAG_PASSWORD;
 import static org.codice.ddf.admin.sources.services.CswServiceProperties.CSW_FEATURE;
 import static org.codice.ddf.admin.sources.services.CswServiceProperties.cswConfigToServiceProps;
 
@@ -40,8 +41,9 @@ public class UpdateCswConfiguration extends BaseFunctionField<BooleanField> {
 
     public static final String FIELD_NAME = "updateCswSource";
 
-    public static final String DESCRIPTION =
-            "Updates a CSW source configuration specified by the pid.";
+    public static final String DESCRIPTION = String.format(
+            "Updates a CSW source configuration specified by the pid. A password of {%s} acts as a flag to not update the password.",
+            FLAG_PASSWORD);
 
     public static final BooleanField RETURN_TYPE = new BooleanField();
 

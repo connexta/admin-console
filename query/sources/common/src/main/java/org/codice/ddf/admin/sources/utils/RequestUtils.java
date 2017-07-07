@@ -218,9 +218,8 @@ public class RequestUtils {
     }
 
     private ResponseField responseFieldFromResponse(Response response, UrlField requestUrl) {
-        // Check if we received a content type, if not leave it blank since we don't know what it is
         String contentType = response.getMediaType() == null ?
-                "" :
+                null :
                 response.getMediaType()
                         .toString();
 

@@ -13,7 +13,7 @@
  **/
 package org.codice.ddf.admin.common.fields.base.function;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.codice.ddf.admin.api.DataType;
@@ -27,6 +27,6 @@ public abstract class GetFunctionField<T extends DataType> extends BaseFunctionF
 
     @Override
     public List<DataType> getArguments() {
-        return new ArrayList<>();
+        return Collections.emptyList();
     }
 }

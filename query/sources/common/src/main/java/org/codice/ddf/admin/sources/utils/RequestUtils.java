@@ -104,15 +104,8 @@ public class RequestUtils {
             return responseResult;
         }
 
-        Response response = httpResponse.result();
-        ResponseField responseField =
-                new ResponseField().responseBody(response.readEntity(String.class))
-                        .statusCode(response.getStatus())
-                        .requestUrlField(requestUrl);
-
-        ReportWithResultImpl<ResponseField> result = new ReportWithResultImpl<>();
-        result.result(responseField);
-        return result;
+        return new ReportWithResultImpl<>(responseFieldFromResponse(httpResponse.result(),
+                requestUrl));
     }
 
     /**
@@ -166,9 +159,7 @@ public class RequestUtils {
         Response response = client.type(contentType)
                 .post(content);
 
-        ResponseField responseField = new ResponseField().statusCode(response.getStatus())
-                .responseBody(response.readEntity(String.class))
-                .requestUrlField(urlField);
+        ResponseField responseField = responseFieldFromResponse(response, urlField);
 
         responseResult.result(responseField);
         return responseResult;
@@ -224,5 +215,17 @@ public class RequestUtils {
                     .forEach(entry -> client.query(entry.getKey(), entry.getValue()));
         }
         return client;
+    }
+
+    private ResponseField responseFieldFromResponse(Response response, UrlField requestUrl) {
+        String contentType = response.getMediaType() == null ?
+                null :
+                response.getMediaType()
+                        .toString();
+
+        return new ResponseField().responseBody(response.readEntity(String.class))
+                .statusCode(response.getStatus())
+                .requestUrlField(requestUrl)
+                .contentType(contentType);
     }
 }

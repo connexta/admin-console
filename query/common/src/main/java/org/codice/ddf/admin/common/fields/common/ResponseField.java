@@ -37,17 +37,22 @@ public class ResponseField extends BaseObjectField {
 
     public static final String REQUEST_URL_FIELD_NAME = "requestUrl";
 
+    public static final String CONTENT_TYPE_FIELD_NAME = "contentType";
+
     private IntegerField statusCode;
 
     private StringField responseBody;
 
     private UrlField requestUrl;
 
+    private StringField contentType;
+
     public ResponseField() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
         statusCode = new IntegerField(STATUS_CODE_FIELD_NAME);
         responseBody = new StringField(RESPONSE_BODY_FIELD_NAME);
         requestUrl = new UrlField(REQUEST_URL_FIELD_NAME);
+        contentType = new StringField(CONTENT_TYPE_FIELD_NAME);
         updateInnerFieldPaths();
     }
 
@@ -66,6 +71,11 @@ public class ResponseField extends BaseObjectField {
         return this;
     }
 
+    public ResponseField contentType(String contentType) {
+        this.contentType.setValue(contentType);
+        return this;
+    }
+
     public Integer statusCode() {
         return statusCode.getValue();
     }
@@ -76,6 +86,10 @@ public class ResponseField extends BaseObjectField {
 
     public String requestUrl() {
         return requestUrl.getValue();
+    }
+
+    public String contentType() {
+        return contentType.getValue();
     }
 
     public IntegerField statusCodeField() {
@@ -90,6 +104,10 @@ public class ResponseField extends BaseObjectField {
         return requestUrl;
     }
 
+    public StringField contentTypeField() {
+        return contentType;
+    }
+
     public ResponseField requestUrlField(UrlField requestUrl) {
         this.requestUrl = requestUrl;
         return this;
@@ -97,6 +115,6 @@ public class ResponseField extends BaseObjectField {
 
     @Override
     public List<Field> getFields() {
-        return ImmutableList.of(statusCode, responseBody, requestUrl);
+        return ImmutableList.of(statusCode, responseBody, requestUrl, contentType);
     }
 }

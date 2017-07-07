@@ -10,98 +10,100 @@
  * Lesser General Public License for more details. A copy of the GNU Lesser General Public License
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
- **/
-package org.codice.ddf.admin.sources.wfs.persist
+ */
+package org.codice.ddf.admin.sources.csw.persist
 
 import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.configurator.Configurator
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.configurator.OperationReport
+import org.codice.ddf.admin.sources.services.CswServiceProperties
+import org.codice.ddf.admin.sources.test.SourceCommonsSpec
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions
-import spock.lang.Specification
 
-import static org.codice.ddf.admin.sources.test.SourceTestCommons.*
+class DeleteCswConfigurationSpec extends SourceCommonsSpec {
 
-class DeleteWfsConfigurationTest extends Specification {
-
-    DeleteWfsConfiguration deleteWfsConfiguration
+    DeleteCswConfiguration deleteCswConfiguration
 
     ConfiguratorFactory configuratorFactory
 
     Configurator configurator
 
-    private ServiceActions serviceActions
+    ServiceActions serviceActions
 
-    static RESULT_ARGUMENT_PATH = [DeleteWfsConfiguration.FIELD_NAME]
+    static TEST_CSW_URL = "testCswUrl"
 
-    static BASE_PATH = [RESULT_ARGUMENT_PATH, FunctionField.ARGUMENT].flatten()
+    static EVENT_SERVICE_ADDRESS = "eventServiceAddress"
 
-    static PID_PATH = [BASE_PATH, PID].flatten()
+    static TEST_EVENT_SERVICE_ADDRESS = "testEventServiceAddress"
+
+    static RESULT_ARGUMENT_PATH = [DeleteCswConfiguration.FIELD_NAME]
+
+    static BASE_PATH = [DeleteCswConfiguration.FIELD_NAME, FunctionField.ARGUMENT]
+
+    static SERVICE_PID_PATH = [BASE_PATH, PID].flatten()
 
     def functionArgs = [
             (PID): S_PID
     ]
 
+    def configToDelete = createCswConfigToDelete()
+
     def setup() {
         configurator = Mock(Configurator)
-        configuratorFactory = Mock(ConfiguratorFactory) {
-            getConfigurator() >> getConfigurator()
-        }
         serviceActions = Mock(ServiceActions)
         def managedServiceActions = Mock(ManagedServiceActions)
 
-        deleteWfsConfiguration = new DeleteWfsConfiguration(configuratorFactory, serviceActions,
-                managedServiceActions)
+        configuratorFactory = Mock(ConfiguratorFactory) {
+            getConfigurator() >> configurator
+        }
+        deleteCswConfiguration = new DeleteCswConfiguration(configuratorFactory, this.serviceActions, managedServiceActions)
     }
 
-    def 'Successfully delete WFS configuration'() {
-        setup:
-        serviceActions.read(S_PID) >> configToBeDeleted
-        configurator.commit(_, _) >> mockReport(false)
-        deleteWfsConfiguration.setValue(functionArgs)
-
+    def 'Successfully deleting CSW configuration returns true'() {
         when:
-        def report = deleteWfsConfiguration.getValue()
+        serviceActions.read(S_PID) >> configToDelete
+        configurator.commit(_, _) >> mockReport(false)
+        deleteCswConfiguration.setValue(functionArgs)
+        def report = deleteCswConfiguration.getValue()
 
         then:
         report.result() != null
         report.result().getValue()
     }
 
-    def 'Fail to discover WFS config when no existing config found with provided pid'() {
-        setup:
-        serviceActions.read(S_PID) >> [:]
-        deleteWfsConfiguration.setValue(functionArgs)
-
+    def 'Fail with no existing config found with provided pid'() {
         when:
-        def report = deleteWfsConfiguration.getValue()
+        serviceActions.read(_ as String) >> [:]
+        deleteCswConfiguration.setValue(functionArgs)
+        def report = deleteCswConfiguration.getValue()
 
         then:
         report.result() == null
         report.messages().size() == 1
-        report.messages().get(0).code == DefaultMessages.NO_EXISTING_CONFIG
         report.messages().get(0).path == RESULT_ARGUMENT_PATH
+        report.messages().get(0).code == DefaultMessages.NO_EXISTING_CONFIG
     }
 
-    def 'Error while committing delete configuration with given pid'() {
+    def 'Error while committing deleted configuration with the given servicePid'() {
         when:
-        serviceActions.read(S_PID) >> configToBeDeleted
+        serviceActions.read(S_PID) >> configToDelete
         configurator.commit(_, _) >> mockReport(true)
-        deleteWfsConfiguration.setValue(functionArgs)
-        def report = deleteWfsConfiguration.getValue()
+        deleteCswConfiguration.setValue(functionArgs)
+        def report = deleteCswConfiguration.getValue()
 
         then:
         !report.result().getValue()
         report.messages().size() == 1
-        report.messages().get(0).code == DefaultMessages.FAILED_PERSIST
         report.messages().get(0).path == RESULT_ARGUMENT_PATH
+        report.messages().get(0).code == DefaultMessages.FAILED_PERSIST
     }
 
     def 'Fail when missing required fields'() {
         when:
-        def report = deleteWfsConfiguration.getValue()
+        def report = deleteCswConfiguration.getValue()
 
         then:
         report.result() == null
@@ -109,12 +111,19 @@ class DeleteWfsConfigurationTest extends Specification {
         report.messages().count {
             it.getCode() == DefaultMessages.MISSING_REQUIRED_FIELD
         } == 1
-        report.messages()*.getPath() == [PID_PATH]
+        report.messages()*.getPath() == [SERVICE_PID_PATH]
     }
 
     private def mockReport(boolean hasError) {
         def report = Mock(OperationReport)
         report.containsFailedResults() >> hasError
         return report
+    }
+
+    private def createCswConfigToDelete() {
+        configToDelete = configToBeDeleted
+        configToDelete.put(EVENT_SERVICE_ADDRESS, TEST_EVENT_SERVICE_ADDRESS)
+        configToDelete.put(CswServiceProperties.CSW_URL, TEST_CSW_URL)
+        return configToDelete;
     }
 }

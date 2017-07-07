@@ -5,13 +5,11 @@ import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.configurator.Configurator
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.configurator.OperationReport
+import org.codice.ddf.admin.sources.test.SourceCommonsSpec
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions
-import spock.lang.Specification
 
-import static org.codice.ddf.admin.sources.test.SourceTestCommons.*
-
-class DeleteOpenSearchConfigurationTest extends Specification {
+class DeleteOpenSearchConfigurationSpec extends SourceCommonsSpec {
 
     DeleteOpenSearchConfiguration deleteOpenSearchConfigurationFunction
 

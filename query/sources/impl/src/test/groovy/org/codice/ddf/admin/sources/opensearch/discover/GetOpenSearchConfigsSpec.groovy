@@ -11,46 +11,39 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.sources.wfs.discover
+package org.codice.ddf.admin.sources.opensearch.discover
 
 import org.codice.ddf.admin.api.Field
 import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.api.fields.ListField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
-import org.codice.ddf.admin.sources.fields.WfsVersion
-import org.codice.ddf.admin.sources.services.WfsServiceProperties
-import org.codice.ddf.admin.sources.wfs.WfsSourceInfoField
+import org.codice.ddf.admin.sources.opensearch.OpenSearchSourceInfoField
+import org.codice.ddf.admin.sources.services.OpenSearchServiceProperties
+import org.codice.ddf.admin.sources.test.SourceCommonsSpec
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceReader
-import spock.lang.Specification
 
-import static org.codice.ddf.admin.sources.test.SourceTestCommons.*
+class GetOpenSearchConfigsSpec extends SourceCommonsSpec {
 
-class GetWfsConfigsTest extends Specification {
+    static SHORT_NAME = OpenSearchServiceProperties.SHORTNAME
 
-    GetWfsConfigurations getWfsConfigsFunction
+    static TEST_SHORT_NAME = "openSearchSource"
+
+    static RESULT_ARGUMENT_PATH = [GetOpenSearchConfigurations.FIELD_NAME]
+
+    static BASE_PATH = [RESULT_ARGUMENT_PATH, FunctionField.ARGUMENT].flatten()
+
+    GetOpenSearchConfigurations getOpenSearchConfigsFunction
 
     ConfiguratorFactory configuratorFactory
 
-    private ServiceActions serviceActions
+    ManagedServiceActions managedServiceActions
 
-    private ManagedServiceActions managedServiceActions
+    ServiceActions serviceActions
 
-    private ServiceReader serviceReader
-
-    static TEST_WFS_VERSION_1 = WfsVersion.Wfs1.WFS_VERSION_1
-
-    static TEST_WFS_VERSION_2 = WfsVersion.Wfs2.WFS_VERSION_2
-
-    static TEST_FACTORY_PID_1 = WfsServiceProperties.WFS1_FACTORY_PID
-
-    static TEST_FACTORY_PID_2 = WfsServiceProperties.WFS2_FACTORY_PID
-
-    static RESULT_ARGUMENT_PATH = [GetWfsConfigurations.FIELD_NAME]
-
-    static BASE_PATH = [RESULT_ARGUMENT_PATH, FunctionField.ARGUMENT].flatten()
+    ServiceReader serviceReader
 
     def managedServiceConfigs
 
@@ -59,60 +52,55 @@ class GetWfsConfigsTest extends Specification {
     ]
 
     def setup() {
-        managedServiceConfigs = createWfsManagedServiceConfigs()
+        managedServiceConfigs = createOpenSearchManagedServiceConfigs()
         configuratorFactory = Mock(ConfiguratorFactory)
         serviceActions = Mock(ServiceActions)
-        managedServiceActions = Mock(ManagedServiceActions)
         serviceReader = Mock(ServiceReader)
-
-        getWfsConfigsFunction = new GetWfsConfigurations(configuratorFactory, serviceActions,
-                managedServiceActions, serviceReader)
+        managedServiceActions = Mock(ManagedServiceActions)
+        getOpenSearchConfigsFunction = new GetOpenSearchConfigurations(configuratorFactory, serviceActions,
+                this.managedServiceActions, serviceReader)
     }
 
     def 'No pid argument returns all configs'() {
-        setup:
-        serviceReader.getServices(_, _) >> []
-
         when:
-        def report = getWfsConfigsFunction.getValue()
+        def report = getOpenSearchConfigsFunction.getValue()
         def list = ((ListField) report.result())
 
         then:
-        1 * managedServiceActions.read(_ as String) >> managedServiceConfigs
-        1 * managedServiceActions.read(_ as String) >> [:]
+        1 * managedServiceActions.read(_ as String) >> baseManagedServiceConfigs
         2 * serviceReader.getServices(_, _) >> [new TestSource(S_PID_1, true)]
         2 * serviceReader.getServices(_, _) >> [new TestSource(S_PID_2, false)]
         report.result() != null
         list.getList().size() == 2
-        assertConfig(list.getList().get(0), 0, SOURCE_ID_1, S_PID_1, true, TEST_WFS_VERSION_1)
-        assertConfig(list.getList().get(1), 1, SOURCE_ID_2, S_PID_2, false, TEST_WFS_VERSION_2)
+        assertConfig(list.getList().get(0), 0, TEST_SHORT_NAME, S_PID_1, true)
+        assertConfig(list.getList().get(1), 1, TEST_SHORT_NAME, S_PID_2, false)
     }
 
     def 'Pid filter returns 1 result'() {
         setup:
-        getWfsConfigsFunction.setValue(functionArgs)
+        getOpenSearchConfigsFunction.setValue(functionArgs)
 
         when:
-        def report = getWfsConfigsFunction.getValue()
+        def report = getOpenSearchConfigsFunction.getValue()
         def list = ((ListField) report.result())
 
         then:
         1 * serviceReader.getServices(_, _) >> [new TestSource(S_PID_2, false)]
         1 * serviceReader.getServices(_, _) >> []
-        serviceActions.read(S_PID_2) >> managedServiceConfigs.get(S_PID_2)
+        serviceActions.read(S_PID_2) >> baseManagedServiceConfigs.get(S_PID_2)
         report.result() != null
         list.getList().size() == 1
-        assertConfig(list.getList().get(0), 0, SOURCE_ID_2, S_PID_2, false, TEST_WFS_VERSION_2)
+        assertConfig(list.getList().get(0), 0, TEST_SHORT_NAME, S_PID_2, false)
     }
 
     def 'Fail due to no existing config with specified pid'() {
         setup:
         functionArgs.put(PID, S_PID)
-        getWfsConfigsFunction.setValue(functionArgs)
+        getOpenSearchConfigsFunction.setValue(functionArgs)
         serviceActions.read(S_PID) >> [:]
 
         when:
-        def report = getWfsConfigsFunction.getValue()
+        def report = getOpenSearchConfigsFunction.getValue()
 
         then:
         report.result() == null
@@ -121,22 +109,21 @@ class GetWfsConfigsTest extends Specification {
         report.messages().get(0).path == RESULT_ARGUMENT_PATH
     }
 
-    def assertConfig(Field field, int index, String sourceName, String pid, boolean availability, String wfsVersion) {
-        def sourceInfo = (WfsSourceInfoField) field
+    def createOpenSearchManagedServiceConfigs() {
+        managedServiceConfigs = baseManagedServiceConfigs
+        managedServiceConfigs.get(S_PID_1).put(SHORT_NAME, TEST_SHORT_NAME)
+        managedServiceConfigs.get(S_PID_2).put(SHORT_NAME, TEST_SHORT_NAME)
+        return managedServiceConfigs
+    }
+
+    def assertConfig(Field field, int index, String sourceName, String pid, boolean availability) {
+        def sourceInfo = (OpenSearchSourceInfoField) field
         assert sourceInfo.path()[-1] == index.toString()
         assert sourceInfo.isAvailable() == availability
         assert sourceInfo.config().credentials().password() == FLAG_PASSWORD
         assert sourceInfo.config().credentials().username() == TEST_USERNAME
         assert sourceInfo.config().sourceName() == sourceName
         assert sourceInfo.config().pid() == pid
-        assert sourceInfo.config().wfsVersion() == wfsVersion
         return true
-    }
-
-    def createWfsManagedServiceConfigs() {
-        managedServiceConfigs = baseManagedServiceConfigs
-        managedServiceConfigs.get(S_PID_1).put(FACTORY_PID_KEY, TEST_FACTORY_PID_1)
-        managedServiceConfigs.get(S_PID_2).put(FACTORY_PID_KEY, TEST_FACTORY_PID_2)
-        return managedServiceConfigs
     }
 }

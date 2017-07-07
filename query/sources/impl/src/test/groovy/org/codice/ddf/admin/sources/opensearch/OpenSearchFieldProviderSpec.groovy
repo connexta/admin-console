@@ -21,7 +21,7 @@ import org.codice.ddf.internal.admin.configurator.actions.ServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceReader
 import spock.lang.Specification
 
-class OpenSearchFieldProviderTest extends Specification {
+class OpenSearchFieldProviderSpec extends Specification {
 
     OpenSearchFieldProvider openSearchFieldProvider
 

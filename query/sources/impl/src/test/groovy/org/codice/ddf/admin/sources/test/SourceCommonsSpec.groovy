@@ -31,50 +31,55 @@ import org.codice.ddf.admin.common.services.ServiceCommons
 import org.codice.ddf.admin.sources.fields.type.SourceConfigField
 import org.codice.ddf.admin.sources.utils.RequestUtils
 import org.codice.ddf.cxf.SecureCxfClientFactory
+import spock.lang.Specification
 
-class SourceTestCommons {
+import javax.ws.rs.core.Response
 
-    static final ENDPOINT_URL = SourceConfigField.ENDPOINT_URL_FIELD_NAME
+class SourceCommonsSpec extends Specification {
 
-    static final CREDENTIALS = CredentialsField.DEFAULT_FIELD_NAME
+    public static final ENDPOINT_URL = SourceConfigField.ENDPOINT_URL_FIELD_NAME
 
-    static final USERNAME = CredentialsField.USERNAME_FIELD_NAME
+    public static final CREDENTIALS = CredentialsField.DEFAULT_FIELD_NAME
 
-    static final PASSWORD = CredentialsField.PASSWORD_FIELD_NAME
+    public static final USERNAME = CredentialsField.USERNAME_FIELD_NAME
 
-    static final ADDRESS = AddressField.DEFAULT_FIELD_NAME
+    public static final PASSWORD = CredentialsField.PASSWORD_FIELD_NAME
 
-    static final URL_NAME = UrlField.DEFAULT_FIELD_NAME
+    public static final ADDRESS = AddressField.DEFAULT_FIELD_NAME
 
-    static final PID = PidField.DEFAULT_FIELD_NAME
+    public static final URL_NAME = UrlField.DEFAULT_FIELD_NAME
 
-    static final FACTORY_PID_KEY = ServiceCommons.FACTORY_PID_KEY
+    public static final PID = PidField.DEFAULT_FIELD_NAME
 
-    static final SERVICE_PID_KEY = ServiceCommons.SERVICE_PID_KEY
+    public static final FACTORY_PID_KEY = ServiceCommons.FACTORY_PID_KEY
 
-    static final SOURCE_NAME = SourceConfigField.SOURCE_NAME_FIELD_NAME
+    public static final SERVICE_PID_KEY = ServiceCommons.SERVICE_PID_KEY
 
-    static final ID = 'id'
+    public static final SOURCE_NAME = SourceConfigField.SOURCE_NAME_FIELD_NAME
 
-    static final FLAG_PASSWORD = ServiceCommons.FLAG_PASSWORD
+    public static final ID = 'id'
 
-    static F_PID = "testFactoryPid"
+    public static final FLAG_PASSWORD = ServiceCommons.FLAG_PASSWORD
 
-    static S_PID = "testServicePid"
+    public static final TEST_ERROR_CODE = "testErrorCode"
 
-    static S_PID_1 = "testServicePid1"
+    public static final F_PID = "testFactoryPid"
 
-    static S_PID_2 = "testServicePid2"
+    public static final S_PID = "testServicePid"
 
-    static SOURCE_ID_1 = "testId1"
+    public static final S_PID_1 = "testServicePid1"
 
-    static SOURCE_ID_2 = "testId2"
+    public static final S_PID_2 = "testServicePid2"
 
-    static TEST_USERNAME = "admin"
+    public static final SOURCE_ID_1 = "testId1"
 
-    static TEST_PASSWORD = "admin"
+    public static final SOURCE_ID_2 = "testId2"
 
-    static TEST_SOURCENAME = "testSourceName"
+    public static final TEST_USERNAME = "admin"
+
+    public static final TEST_PASSWORD = "admin"
+
+    public static final TEST_SOURCENAME = "testSourceName"
 
     static getBaseDiscoverByAddressArgs() {
         return [
@@ -115,11 +120,6 @@ class SourceTestCommons {
             (USERNAME)       : TEST_USERNAME
     ]
 
-    /**
-     * Needed to mock out the SecureCxfClientFactory. Since it is an embedded class we are just going to override
-     * the method used to create the factory and substitute our own. We also need to mock out the endpointIsReachable
-     * method since it tries to make network requests.
-     */
     static class TestRequestUtils extends RequestUtils {
 
         SecureCxfClientFactory factory
@@ -140,10 +140,24 @@ class SourceTestCommons {
         public ReportImpl endpointIsReachable(UrlField urlField) {
             def report = new ReportImpl()
             if (!endpointIsReachable) {
-                report.addArgumentMessage(new ErrorMessageImpl("some code"))
+                report.addArgumentMessage(new ErrorMessageImpl(TEST_ERROR_CODE))
             }
             return report
         }
+    }
+
+    def createMockFactory(int statusCode, String responseBody) {
+        def mockResponse = Mock(Response)
+        mockResponse.getStatus() >> statusCode
+        mockResponse.readEntity(String.class) >> responseBody
+
+        def mockWebClient = Mock(WebClient)
+        mockWebClient.get() >> mockResponse
+
+        def mockFactory = Mock(SecureCxfClientFactory)
+        mockFactory.getClient() >> mockWebClient
+
+        return mockFactory
     }
 
     /**

@@ -13,22 +13,16 @@
  **/
 package org.codice.ddf.admin.sources.wfs.discover
 
-import org.apache.cxf.jaxrs.client.WebClient
 import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.common.fields.common.HostField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.sources.fields.WfsVersion
 import org.codice.ddf.admin.sources.fields.type.WfsSourceConfigurationField
+import org.codice.ddf.admin.sources.test.SourceCommonsSpec
 import org.codice.ddf.admin.sources.wfs.WfsSourceUtils
-import org.codice.ddf.cxf.SecureCxfClientFactory
 import spock.lang.Shared
-import spock.lang.Specification
 
-import javax.ws.rs.core.Response
-
-import static org.codice.ddf.admin.sources.test.SourceTestCommons.*
-
-class DiscoverWfsSourcesTest extends Specification {
+class DiscoverWfsSourcesSpec extends SourceCommonsSpec {
 
     @Shared
             wfs10ResponseBody = this.getClass().getClassLoader().getResource('responses/wfs/wfs10GetCapabilities.xml').text
@@ -190,19 +184,5 @@ class DiscoverWfsSourcesTest extends Specification {
         def wfsUtils = new WfsSourceUtils()
         wfsUtils.setRequestUtils(requestUtils)
         return wfsUtils
-    }
-
-    def createMockFactory(int statusCode, String responseBody) {
-        def mockResponse = Mock(Response)
-        mockResponse.getStatus() >> statusCode
-        mockResponse.readEntity(String.class) >> responseBody
-
-        def mockWebClient = Mock(WebClient)
-        mockWebClient.get() >> mockResponse
-
-        def mockFactory = Mock(SecureCxfClientFactory)
-        mockFactory.getClient() >> mockWebClient
-
-        return mockFactory
     }
 }

@@ -21,14 +21,12 @@ import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.sources.csw.CswSourceInfoField
 import org.codice.ddf.admin.sources.fields.CswProfile
 import org.codice.ddf.admin.sources.services.CswServiceProperties
+import org.codice.ddf.admin.sources.test.SourceCommonsSpec
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceReader
-import spock.lang.Specification
 
-import static org.codice.ddf.admin.sources.test.SourceTestCommons.*
-
-class GetCswConfigsTest extends Specification {
+class GetCswConfigsSpec extends SourceCommonsSpec {
 
     static EVENT_SERVICE_ADDRESS = 'eventServiceAddress'
 

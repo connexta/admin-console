@@ -13,21 +13,15 @@
  **/
 package org.codice.ddf.admin.sources.opensearch.discover
 
-import org.apache.cxf.jaxrs.client.WebClient
 import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.common.fields.common.HostField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.sources.fields.type.OpenSearchSourceConfigurationField
 import org.codice.ddf.admin.sources.opensearch.OpenSearchSourceUtils
-import org.codice.ddf.cxf.SecureCxfClientFactory
+import org.codice.ddf.admin.sources.test.SourceCommonsSpec
 import spock.lang.Shared
-import spock.lang.Specification
 
-import javax.ws.rs.core.Response
-
-import static org.codice.ddf.admin.sources.test.SourceTestCommons.*
-
-class DiscoverOpenSearchTest extends Specification {
+class DiscoverOpenSearchSpec extends SourceCommonsSpec {
 
     @Shared
             osResponseBody = this.getClass().getClassLoader().getResource('responses/opensearch/openSearchQueryResponse.xml').text
@@ -137,19 +131,5 @@ class DiscoverOpenSearchTest extends Specification {
         def openSearchUtils = new OpenSearchSourceUtils()
         openSearchUtils.setRequestUtils(requestUtils)
         return openSearchUtils
-    }
-
-    def createMockFactory(int statusCode, String responseBody) {
-        def mockResponse = Mock(Response)
-        mockResponse.getStatus() >> statusCode
-        mockResponse.readEntity(String.class) >> responseBody
-
-        def mockWebClient = Mock(WebClient)
-        mockWebClient.get() >> mockResponse
-
-        def mockFactory = Mock(SecureCxfClientFactory)
-        mockFactory.getClient() >> mockWebClient
-
-        return mockFactory
     }
 }

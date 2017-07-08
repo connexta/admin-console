@@ -39,6 +39,8 @@ public class LdapMessages {
 
     public static final String USER_ATTRIBUTE_NOT_FOUND = "USER_ATTRIBUTE_NOT_FOUND";
 
+    public static final String INVALID_USER_ATTRIBUTE = "INVALID_USER_ATTRIBUTE";
+
     public static ErrorMessage invalidDnFormatError(List<String> path) {
         return new ErrorMessageImpl(INVALID_DN, path);
     }
@@ -73,6 +75,10 @@ public class LdapMessages {
 
     public static ErrorMessage md5NeedsEncryptedError(List<String> path) {
         return new ErrorMessageImpl(MD5_NEEDS_ENCRYPTED, path);
+    }
+
+    public static ErrorMessage invalidUserAttribute(List<String> path) {
+        return new ErrorMessageImpl(INVALID_USER_ATTRIBUTE, path);
     }
 
     static ErrorMessage cannotBindError(List<String> path) {

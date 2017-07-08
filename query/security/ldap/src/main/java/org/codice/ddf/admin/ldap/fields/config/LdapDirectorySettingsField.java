@@ -18,6 +18,7 @@ import java.util.List;
 import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
+import org.codice.ddf.admin.ldap.fields.LdapAttributeName;
 import org.codice.ddf.admin.ldap.fields.LdapDistinguishedName;
 import org.codice.ddf.admin.security.common.fields.ldap.LdapUseCase;
 
@@ -41,9 +42,10 @@ public class LdapDirectorySettingsField extends BaseObjectField {
 
     public static final String GROUP_ATTRIBUTE_HOLDING_MEMBER = "groupAttributeHoldingMember";
 
-    public static final String MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP = "memberAttributeReferencedInGroup";
+    public static final String MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP =
+            "memberAttributeReferencedInGroup";
 
-    private StringField usernameAttribute;
+    private LdapAttributeName usernameAttribute;
 
     private LdapDistinguishedName baseUserDn;
 
@@ -51,21 +53,22 @@ public class LdapDirectorySettingsField extends BaseObjectField {
 
     private StringField groupObjectClass;
 
-    private StringField groupAttributeHoldingMember;
+    private LdapAttributeName groupAttributeHoldingMember;
 
-    private StringField memberAttributeReferencedInGroup;
+    private LdapAttributeName memberAttributeReferencedInGroup;
 
     private LdapUseCase useCase;
 
     public LdapDirectorySettingsField() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
 
-        this.usernameAttribute = new StringField(USER_NAME_ATTRIBUTE);
+        this.usernameAttribute = new LdapAttributeName(USER_NAME_ATTRIBUTE);
         this.baseUserDn = new LdapDistinguishedName(BASE_USER_DN);
         this.baseGroupDn = new LdapDistinguishedName(BASE_GROUP_DN);
         this.groupObjectClass = new StringField(GROUP_OBJECT_CLASS);
-        this.groupAttributeHoldingMember = new StringField(GROUP_ATTRIBUTE_HOLDING_MEMBER);
-        this.memberAttributeReferencedInGroup = new StringField(MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP);
+        this.groupAttributeHoldingMember = new LdapAttributeName(GROUP_ATTRIBUTE_HOLDING_MEMBER);
+        this.memberAttributeReferencedInGroup = new LdapAttributeName(
+                MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP);
         this.useCase = new LdapUseCase();
 
         updateInnerFieldPaths();
@@ -83,7 +86,7 @@ public class LdapDirectorySettingsField extends BaseObjectField {
     }
 
     //Field getters
-    public StringField usernameAttributeField() {
+    public LdapAttributeName usernameAttributeField() {
         return usernameAttribute;
     }
 
@@ -103,11 +106,11 @@ public class LdapDirectorySettingsField extends BaseObjectField {
         return groupObjectClass;
     }
 
-    public StringField groupAttributeHoldingMemberField() {
+    public LdapAttributeName groupAttributeHoldingMemberField() {
         return groupAttributeHoldingMember;
     }
 
-    public StringField memberAttributeReferencedInGroupField() {
+    public LdapAttributeName memberAttributeReferencedInGroupField() {
         return memberAttributeReferencedInGroup;
     }
 

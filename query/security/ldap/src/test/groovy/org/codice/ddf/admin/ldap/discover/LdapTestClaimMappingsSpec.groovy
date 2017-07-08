@@ -67,7 +67,7 @@ class LdapTestClaimMappingsSpec extends Specification {
 
         serviceActions = Mock(ServiceActions)
         stsServiceProperties = Mock(StsServiceProperties)
-        stsServiceProperties.getConfiguredStsClaims(_) >> ['claim1', 'claim2', 'claim3', 'claim4']
+        stsServiceProperties.getConfiguredStsClaims(_) >> ['claim1', 'claim2', 'claim3', 'claim4', 'claim5']
 
         action = new LdapTestClaimMappings(serviceActions)
         action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
@@ -81,15 +81,15 @@ class LdapTestClaimMappingsSpec extends Specification {
 
         // Initialize bad paths
         baseMsg = [LdapTestClaimMappings.FIELD_NAME, FunctionField.ARGUMENT]
-        badPaths = [missingUserNameAttrPath: baseMsg + [LdapDirectorySettingsField.USER_NAME_ATTRIBUTE],
-                    missingUserPath        : baseMsg + [LdapDirectorySettingsField.BASE_USER_DN],
-                    missingHostPath        : baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME, HostnameField.DEFAULT_FIELD_NAME],
-                    missingPortPath        : baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME, PortField.DEFAULT_FIELD_NAME],
-                    missingEncryptPath     : baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME, LdapEncryptionMethodField.DEFAULT_FIELD_NAME],
-                    missingUsernamePath    : baseMsg + [LdapBindUserInfo.DEFAULT_FIELD_NAME, CredentialsField.DEFAULT_FIELD_NAME, CredentialsField.USERNAME_FIELD_NAME],
-                    missingUserpasswordPath: baseMsg + [LdapBindUserInfo.DEFAULT_FIELD_NAME, CredentialsField.DEFAULT_FIELD_NAME, CredentialsField.PASSWORD_FIELD_NAME],
-                    missingBindMethodPath  : baseMsg + [LdapBindUserInfo.DEFAULT_FIELD_NAME, LdapBindMethod.DEFAULT_FIELD_NAME],
-                    badClaimMappingPath    : baseMsg + [CLAIMS_MAPPING]
+        badPaths = [badOrMissingUserNameAttrPath: baseMsg + [LdapDirectorySettingsField.USER_NAME_ATTRIBUTE],
+                    missingUserPath             : baseMsg + [LdapDirectorySettingsField.BASE_USER_DN],
+                    missingHostPath             : baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME, HostnameField.DEFAULT_FIELD_NAME],
+                    missingPortPath             : baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME, PortField.DEFAULT_FIELD_NAME],
+                    missingEncryptPath          : baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME, LdapEncryptionMethodField.DEFAULT_FIELD_NAME],
+                    missingUsernamePath         : baseMsg + [LdapBindUserInfo.DEFAULT_FIELD_NAME, CredentialsField.DEFAULT_FIELD_NAME, CredentialsField.USERNAME_FIELD_NAME],
+                    missingUserpasswordPath     : baseMsg + [LdapBindUserInfo.DEFAULT_FIELD_NAME, CredentialsField.DEFAULT_FIELD_NAME, CredentialsField.PASSWORD_FIELD_NAME],
+                    missingBindMethodPath       : baseMsg + [LdapBindUserInfo.DEFAULT_FIELD_NAME, LdapBindMethod.DEFAULT_FIELD_NAME],
+                    badClaimMappingPath         : baseMsg + [CLAIMS_MAPPING]
         ]
     }
 
@@ -250,6 +250,69 @@ class LdapTestClaimMappingsSpec extends Specification {
         report.messages().count {
             it.getCode() == LdapMessages.USER_ATTRIBUTE_NOT_FOUND
         } == 2
+
+        report.messages()*.path as Set == failedPaths
+    }
+
+
+    def 'fail when claimsMapping value formats are incorrect'() {
+        setup:
+        def failedPaths = [badPaths.badClaimMappingPath + '0' + ClaimsMapEntry.VALUE_FIELD_NAME,
+                           badPaths.badClaimMappingPath + '2' + ClaimsMapEntry.VALUE_FIELD_NAME,
+                           badPaths.badClaimMappingPath + '3' + ClaimsMapEntry.VALUE_FIELD_NAME] as Set
+
+        def claimsMapping = createClaimsMapping(ImmutableMap.of("claim1", "space in between",
+                "claim2", "correct-format",
+                "claim3", "2017",
+                "claim4", "Speci@!Ch&recter#s",
+                "claim5", "correctFormat"))
+
+        args = [(LdapConnectionField.DEFAULT_FIELD_NAME)   : noEncryptionLdapConnectionInfo().getValue(),
+                (LdapBindUserInfo.DEFAULT_FIELD_NAME)      : simpleBindInfo().getValue(),
+                (LdapTestClaimMappings.USER_NAME_ATTRIBUTE): userAttribute.getValue(),
+                (LdapTestClaimMappings.BASE_USER_DN)       : baseDn.getValue(),
+                (CLAIMS_MAPPING)                           : claimsMapping.getValue()]
+
+        action.setValue(args)
+
+        when:
+        FunctionReport report = action.getValue()
+
+        then:
+        report.messages().size() == 3
+        report.messages().count {
+            it.getCode() == LdapMessages.INVALID_USER_ATTRIBUTE
+        } == 3
+
+        report.messages()*.path as Set == failedPaths
+    }
+
+    def 'fail when usernameAttribute format is incorrect'() {
+        setup:
+        def failedPaths = [badPaths.badOrMissingUserNameAttrPath] as Set
+
+        def claimsMapping = createClaimsMapping(ImmutableMap.of("claim1", "sn",
+                "claim2", "cn",
+                "claim3", "employeetype"))
+
+        def userAttribute = "bad form@t"
+
+        args = [(LdapConnectionField.DEFAULT_FIELD_NAME)   : noEncryptionLdapConnectionInfo().getValue(),
+                (LdapBindUserInfo.DEFAULT_FIELD_NAME)      : simpleBindInfo().getValue(),
+                (LdapTestClaimMappings.USER_NAME_ATTRIBUTE): userAttribute,
+                (LdapTestClaimMappings.BASE_USER_DN)       : baseDn.getValue(),
+                (CLAIMS_MAPPING)                           : claimsMapping.getValue()]
+
+        action.setValue(args)
+
+        when:
+        FunctionReport report = action.getValue()
+
+        then:
+        report.messages().size() == 1
+        report.messages().count {
+            it.getCode() == LdapMessages.INVALID_USER_ATTRIBUTE
+        } == 1
 
         report.messages()*.path as Set == failedPaths
     }

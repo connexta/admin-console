@@ -26,6 +26,7 @@ import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 import org.codice.ddf.admin.ldap.commons.LdapConnectionAttempt;
 import org.codice.ddf.admin.ldap.commons.LdapTestingUtils;
+import org.codice.ddf.admin.ldap.fields.LdapAttributeName;
 import org.codice.ddf.admin.ldap.fields.LdapDistinguishedName;
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindUserInfo;
 import org.codice.ddf.admin.ldap.fields.connection.LdapConnectionField;
@@ -59,7 +60,7 @@ public class LdapTestClaimMappings extends TestFunctionField {
 
     private LdapBindUserInfo bindInfo;
 
-    private StringField usernameAttribute;
+    private LdapAttributeName usernameAttribute;
 
     private LdapDistinguishedName baseUserDn;
 
@@ -75,7 +76,7 @@ public class LdapTestClaimMappings extends TestFunctionField {
 
         conn = new LdapConnectionField().useDefaultRequired();
         bindInfo = new LdapBindUserInfo().useDefaultRequired();
-        usernameAttribute = new StringField(USER_NAME_ATTRIBUTE).isRequired(true);
+        usernameAttribute = new LdapAttributeName(USER_NAME_ATTRIBUTE).isRequired(true);
         baseUserDn = new LdapDistinguishedName(BASE_USER_DN);
         baseUserDn.isRequired(true);
         claimMappings = new ClaimsMapEntry.ListImpl();
@@ -114,6 +115,14 @@ public class LdapTestClaimMappings extends TestFunctionField {
         addMessages(SecurityValidation.validateStsClaimsExist(claimArgs,
                 serviceActions,
                 stsServiceProperties));
+
+        // TODO: 7/7/17 - tbatie - Currently the ClaimsMapEntry contains a StringField as a value. It really should be a LdapAttributeName. Fix this once there is a generic way to create MapField objects that contain different value field.
+
+        claimMappings.getList()
+                .stream()
+                .map(ClaimsMapEntry::claimValueField)
+                .map(claim -> LdapAttributeName.validate(claim.getValue(), claim.path()))
+                .forEach(this::addArgumentMessages);
     }
 
     @Override

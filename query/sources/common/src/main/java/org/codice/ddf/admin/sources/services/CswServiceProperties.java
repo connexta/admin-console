@@ -68,9 +68,12 @@ public class CswServiceProperties {
             SERVICE_PROPS_TO_CSW_CONFIG = CswServiceProperties::servicePropsToCswConfig;
 
     private static final BiMap<String, String> CSW_PROFILE_MAPPING = ImmutableBiMap.of(
-            CSW_FEDERATION_PROFILE_SOURCE, CSW_PROFILE_FACTORY_PID,
-            GMD_CSW_ISO_FEDERATED_SOURCE, CSW_GMD_FACTORY_PID,
-            CSW_SPEC_PROFILE_FEDERATED_SOURCE, CSW_SPEC_FACTORY_PID);
+            CSW_FEDERATION_PROFILE_SOURCE,
+            CSW_PROFILE_FACTORY_PID,
+            GMD_CSW_ISO_FEDERATED_SOURCE,
+            CSW_GMD_FACTORY_PID,
+            CSW_SPEC_PROFILE_FEDERATED_SOURCE,
+            CSW_SPEC_FACTORY_PID);
 
     public static final CswSourceConfigurationField servicePropsToCswConfig(
             Map<String, Object> props) {
@@ -78,8 +81,10 @@ public class CswServiceProperties {
         cswConfig.pid(mapValue(props, SERVICE_PID_KEY));
         cswConfig.sourceName(mapValue(props, ID));
         cswConfig.endpointUrl(mapValue(props, CSW_URL));
-        cswConfig.credentials().username(mapValue(props, USERNAME));
-        cswConfig.credentials().password(FLAG_PASSWORD);
+        cswConfig.credentials()
+                .username(mapValue(props, USERNAME));
+        cswConfig.credentials()
+                .password(FLAG_PASSWORD);
         cswConfig.outputSchema(mapValue(props, OUTPUT_SCHEMA));
         cswConfig.spatialOperator(mapValue(props, FORCE_SPATIAL_FILTER));
         cswConfig.cswProfile(factoryPidToCswProfile(mapValue(props, FACTORY_PID_KEY)));
@@ -93,16 +98,21 @@ public class CswServiceProperties {
                         config.sourceNameField())
                         .putPropertyIfNotNull(CSW_URL, config.endpointUrlField())
                         .putPropertyIfNotNull(USERNAME,
-                                config.credentials().usernameField())
+                                config.credentials()
+                                        .usernameField())
                         .putPropertyIfNotNull(OUTPUT_SCHEMA, config.outputSchemaField())
                         .putPropertyIfNotNull(FORCE_SPATIAL_FILTER, config.spatialOperatorField());
 
-        String password = config.credentials().password();
-        if(password != null && !password.equals(FLAG_PASSWORD)) {
-            builder.put(PASSWORD, config.credentials().password());
+        String password = config.credentials()
+                .password();
+        if (password != null && !password.equals(FLAG_PASSWORD)) {
+            builder.put(PASSWORD,
+                    config.credentials()
+                            .password());
         }
 
-        if(config.endpointUrl() != null && config.cswProfile().equals(CSW_FEDERATION_PROFILE_SOURCE)) {
+        if (config.endpointUrl() != null && config.cswProfile()
+                .equals(CSW_FEDERATION_PROFILE_SOURCE)) {
             builder.put(EVENT_SERVICE_ADDRESS, config.endpointUrl() + "/subscription");
         }
         return builder.build();
@@ -113,6 +123,7 @@ public class CswServiceProperties {
     }
 
     public static String factoryPidToCswProfile(String factoryPid) {
-        return CSW_PROFILE_MAPPING.inverse().get(factoryPid);
+        return CSW_PROFILE_MAPPING.inverse()
+                .get(factoryPid);
     }
 }

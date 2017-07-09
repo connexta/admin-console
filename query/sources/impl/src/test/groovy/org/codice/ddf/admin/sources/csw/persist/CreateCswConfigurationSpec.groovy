@@ -18,7 +18,6 @@ import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.configurator.Configurator
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
-import org.codice.ddf.admin.configurator.OperationReport
 import org.codice.ddf.admin.sources.SourceMessages
 import org.codice.ddf.admin.sources.fields.CswProfile
 import org.codice.ddf.admin.sources.fields.type.CswSourceConfigurationField
@@ -147,12 +146,6 @@ class CreateCswConfigurationSpec extends SourceCommonsSpec {
             it.getCode() == DefaultMessages.MISSING_REQUIRED_FIELD
         } == 3
         report.messages()*.getPath() == [SOURCE_NAME_PATH, ENDPOINT_URL_PATH, CSW_PROFILE_PATH]
-    }
-
-    def mockReport(boolean hasError) {
-        def report = Mock(OperationReport)
-        report.containsFailedResults() >> hasError
-        return report
     }
 
     def createCswArgs() {

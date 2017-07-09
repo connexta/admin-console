@@ -55,8 +55,10 @@ public class OpenSearchServiceProperties {
         config.pid(mapValue(props, SERVICE_PID_KEY));
         config.sourceName(mapValue(props, SHORTNAME));
         config.endpointUrl(mapValue(props, ENDPOINT_URL));
-        config.credentials().username(mapValue(props, USERNAME));
-        config.credentials().password(FLAG_PASSWORD);
+        config.credentials()
+                .username(mapValue(props, USERNAME));
+        config.credentials()
+                .password(FLAG_PASSWORD);
         return config;
     }
 
@@ -66,11 +68,16 @@ public class OpenSearchServiceProperties {
                 new ServiceCommons.ServicePropertyBuilder().putPropertyIfNotNull(SHORTNAME,
                         config.sourceNameField())
                         .putPropertyIfNotNull(ENDPOINT_URL, config.endpointUrlField())
-                        .putPropertyIfNotNull(USERNAME, config.credentials().usernameField());
+                        .putPropertyIfNotNull(USERNAME,
+                                config.credentials()
+                                        .usernameField());
 
-        String password = config.credentials().password();
-        if(password != null && !password.equals(FLAG_PASSWORD)) {
-            builder.put(PASSWORD, config.credentials().password());
+        String password = config.credentials()
+                .password();
+        if (password != null && !password.equals(FLAG_PASSWORD)) {
+            builder.put(PASSWORD,
+                    config.credentials()
+                            .password());
         }
         return builder.build();
     }

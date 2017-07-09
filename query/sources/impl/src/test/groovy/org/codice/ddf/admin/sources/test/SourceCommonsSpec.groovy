@@ -28,6 +28,7 @@ import org.codice.ddf.admin.common.fields.common.UrlField
 import org.codice.ddf.admin.common.report.ReportImpl
 import org.codice.ddf.admin.common.report.message.ErrorMessageImpl
 import org.codice.ddf.admin.common.services.ServiceCommons
+import org.codice.ddf.admin.configurator.OperationReport
 import org.codice.ddf.admin.sources.fields.type.SourceConfigField
 import org.codice.ddf.admin.sources.utils.RequestUtils
 import org.codice.ddf.cxf.SecureCxfClientFactory
@@ -144,6 +145,12 @@ class SourceCommonsSpec extends Specification {
             }
             return report
         }
+    }
+
+    def mockReport(boolean hasError) {
+        def report = Mock(OperationReport)
+        report.containsFailedResults() >> hasError
+        return report
     }
 
     def createMockFactory(int statusCode, String responseBody) {

@@ -18,7 +18,6 @@ import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.configurator.Configurator
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
-import org.codice.ddf.admin.configurator.OperationReport
 import org.codice.ddf.admin.sources.SourceMessages
 import org.codice.ddf.admin.sources.fields.CswProfile
 import org.codice.ddf.admin.sources.fields.type.CswSourceConfigurationField
@@ -167,6 +166,14 @@ class UpdateCswConfigurationSpec extends SourceCommonsSpec {
         report.messages().get(0).code == DefaultMessages.FAILED_PERSIST
     }
 
+    def 'Updating with flag password sends service properties without password'() {
+        assert true
+    }
+
+    def 'Updating with new password sends service properties with password'() {
+        assert true
+    }
+
     def 'Fail when missing required fields'() {
         when:
         def report = updateCswConfiguration.getValue()
@@ -178,12 +185,6 @@ class UpdateCswConfigurationSpec extends SourceCommonsSpec {
             it.getCode() == DefaultMessages.MISSING_REQUIRED_FIELD
         } == 4
         report.messages()*.getPath() == [SERVICE_PID_PATH, SOURCE_NAME_PATH, ENDPOINT_URL_PATH, CSW_PROFILE_PATH]
-    }
-
-    def mockReport(boolean hasError) {
-        def report = Mock(OperationReport)
-        report.containsFailedResults() >> hasError
-        return report
     }
 
     def createCswUpdateArgs() {

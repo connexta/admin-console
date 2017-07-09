@@ -18,7 +18,6 @@ import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.configurator.Configurator
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
-import org.codice.ddf.admin.configurator.OperationReport
 import org.codice.ddf.admin.sources.SourceMessages
 import org.codice.ddf.admin.sources.fields.WfsVersion
 import org.codice.ddf.admin.sources.fields.type.WfsSourceConfigurationField
@@ -184,11 +183,5 @@ class UpdateWfsConfigurationSpec extends SourceCommonsSpec {
                 .pid(S_PID)
         config.credentials().username(TEST_USERNAME).password(TEST_PASSWORD)
         return [(WfsSourceConfigurationField.DEFAULT_FIELD_NAME): config.getValue()]
-    }
-
-    def mockReport(boolean hasError) {
-        def report = Mock(OperationReport)
-        report.containsFailedResults() >> hasError
-        return report
     }
 }

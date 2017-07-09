@@ -4,7 +4,6 @@ import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.configurator.Configurator
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
-import org.codice.ddf.admin.configurator.OperationReport
 import org.codice.ddf.admin.sources.test.SourceCommonsSpec
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions
@@ -90,11 +89,5 @@ class DeleteOpenSearchConfigurationSpec extends SourceCommonsSpec {
             it.getCode() == DefaultMessages.MISSING_REQUIRED_FIELD
         } == 1
         report.messages()*.getPath() == [PID_PATH]
-    }
-
-    private def mockReport(boolean hasError) {
-        def report = Mock(OperationReport)
-        report.containsFailedResults() >> hasError
-        return report
     }
 }

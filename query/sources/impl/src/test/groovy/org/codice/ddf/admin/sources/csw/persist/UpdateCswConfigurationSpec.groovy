@@ -176,7 +176,7 @@ class UpdateCswConfigurationSpec extends SourceCommonsSpec {
         serviceReader.getServices(_, _) >> []
         configurator.commit(_, _) >> mockReport(false)
 
-        def expectedUpdateConfig = getUpdateCswProps(FLAG_PASSWORD)
+        def expectedUpdateConfig = CswServiceProperties.cswConfigToServiceProps(createCswSourceConfig(FLAG_PASSWORD))
 
         when:
         updateCswConfiguration.getValue()
@@ -192,7 +192,7 @@ class UpdateCswConfigurationSpec extends SourceCommonsSpec {
         serviceReader.getServices(_, _) >> []
         configurator.commit(_, _) >> mockReport(false)
 
-        def expectedUpdateConfig = getUpdateCswProps('notFlagPassword')
+        def expectedUpdateConfig = CswServiceProperties.cswConfigToServiceProps(createCswSourceConfig('notFlagPassword'))
 
         when:
         updateCswConfiguration.getValue()
@@ -216,10 +216,6 @@ class UpdateCswConfigurationSpec extends SourceCommonsSpec {
 
     def createCswUpdateArgs(String password) {
         return [(CswSourceConfigurationField.DEFAULT_FIELD_NAME): createCswSourceConfig(password).getValue()]
-    }
-
-    def getUpdateCswProps(String password) {
-        return CswServiceProperties.cswConfigToServiceProps(createCswSourceConfig(password))
     }
 
     def createCswSourceConfig(String password) {

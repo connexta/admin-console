@@ -214,7 +214,7 @@ public class RequestUtils {
      * This is broken out for testing purposes so that the SecureCxfClientFactory can be mocked out.
      */
     protected SecureCxfClientFactory<WebClient> createFactory(String url, CredentialsField creds) {
-        return creds.username() == null && creds.password() == null ? new SecureCxfClientFactory<>(
+        return creds.username() == null || creds.password() == null ? new SecureCxfClientFactory<>(
                 url,
                 WebClient.class) : new SecureCxfClientFactory<>(url,
                 WebClient.class,

@@ -172,7 +172,7 @@ class UpdateWfsConfigurationSpec extends SourceCommonsSpec {
         serviceReader.getServices(_, _) >> []
         configurator.commit(_, _) >> mockReport(false)
 
-        def expectedUpdateConfig = getUpdateWfsProps(FLAG_PASSWORD)
+        def expectedUpdateConfig = WfsServiceProperties.wfsConfigToServiceProps(createWfsSourceConfig(FLAG_PASSWORD))
 
         when:
         updateWfsConfiguration.getValue()
@@ -188,7 +188,7 @@ class UpdateWfsConfigurationSpec extends SourceCommonsSpec {
         serviceReader.getServices(_, _) >> []
         configurator.commit(_, _) >> mockReport(false)
 
-        def expectedUpdateConfig = getUpdateWfsProps('notFlagPassword')
+        def expectedUpdateConfig = WfsServiceProperties.wfsConfigToServiceProps(createWfsSourceConfig('notFlagPassword'))
 
         when:
         updateWfsConfiguration.getValue()
@@ -212,10 +212,6 @@ class UpdateWfsConfigurationSpec extends SourceCommonsSpec {
 
     def createWfsUpdateArgs(String password) {
         return [(WfsSourceConfigurationField.DEFAULT_FIELD_NAME): createWfsSourceConfig(password).getValue()]
-    }
-
-    def getUpdateWfsProps(String password) {
-        return WfsServiceProperties.wfsConfigToServiceProps(createWfsSourceConfig(password))
     }
 
     def createWfsSourceConfig(String password) {

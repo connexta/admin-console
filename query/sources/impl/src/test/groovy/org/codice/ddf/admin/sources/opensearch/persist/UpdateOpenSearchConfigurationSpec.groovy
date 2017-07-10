@@ -165,7 +165,7 @@ class UpdateOpenSearchConfigurationSpec extends SourceCommonsSpec {
         serviceReader.getServices(_, _) >> []
         configurator.commit(_, _) >> mockReport(false)
 
-        def expectedUpdateConfig = getUpdateOpenSearchProps(null)
+        def expectedUpdateConfig = OpenSearchServiceProperties.openSearchConfigToServiceProps(createOpenSearchSourceConfig(FLAG_PASSWORD))
 
         when:
         updateOpenSearchConfiguration.getValue()
@@ -181,7 +181,7 @@ class UpdateOpenSearchConfigurationSpec extends SourceCommonsSpec {
         serviceReader.getServices(_, _) >> []
         configurator.commit(_, _) >> mockReport(false)
 
-        def expectedUpdateConfig = getUpdateOpenSearchProps('notFlagPassword')
+        def expectedUpdateConfig = OpenSearchServiceProperties.openSearchConfigToServiceProps(createOpenSearchSourceConfig('notFlagPassword'))
 
         when:
         updateOpenSearchConfiguration.getValue()
@@ -205,10 +205,6 @@ class UpdateOpenSearchConfigurationSpec extends SourceCommonsSpec {
 
     def createUpdateFunctionArgs(String password) {
         return [(OpenSearchSourceConfigurationField.DEFAULT_FIELD_NAME): createOpenSearchSourceConfig(password).getValue()]
-    }
-
-    def getUpdateOpenSearchProps(String password) {
-        return OpenSearchServiceProperties.openSearchConfigToServiceProps(createOpenSearchSourceConfig(password))
     }
 
     def createOpenSearchSourceConfig(String password) {

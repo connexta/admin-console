@@ -24,6 +24,7 @@ import static org.codice.ddf.admin.ldap.fields.connection.LdapEncryptionMethodFi
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.net.ssl.SSLContext;
@@ -36,13 +37,13 @@ import org.codice.ddf.admin.ldap.fields.connection.LdapConnectionField;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.Filter;
 import org.forgerock.opendj.ldap.LDAPConnectionFactory;
-import org.forgerock.opendj.ldap.LDAPOptions;
 import org.forgerock.opendj.ldap.SearchScope;
 import org.forgerock.opendj.ldap.requests.BindRequest;
 import org.forgerock.opendj.ldap.requests.DigestMD5SASLBindRequest;
 import org.forgerock.opendj.ldap.requests.Requests;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
 import org.forgerock.opendj.ldif.ConnectionEntryReader;
+import org.forgerock.util.Options;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,25 +62,31 @@ public class LdapTestingUtils {
      * @return connection attempt wrapper object
      */
     public LdapConnectionAttempt getLdapConnection(LdapConnectionField connection) {
-        LDAPOptions ldapOptions = new LDAPOptions();
+        Options ldapOptions = Options.defaultOptions();
 
         try {
             if (connection.encryptionMethod()
-                    .equals(LDAPS)) {
-                ldapOptions.setSSLContext(getSslContext());
-            } else if (connection.encryptionMethod()
+                    .equals(LDAPS) //
+                    || connection.encryptionMethod()
                     .equals(START_TLS)) {
-                ldapOptions.setUseStartTLS(true);
+                ldapOptions.set(LDAPConnectionFactory.SSL_CONTEXT, getSslContext());
+
+                if (connection.encryptionMethod()
+                        .equals(START_TLS)) {
+                    ldapOptions.set(LDAPConnectionFactory.SSL_USE_STARTTLS, true);
+                }
             }
 
-            ldapOptions.addEnabledCipherSuite(System.getProperty(CIPHER_SUITES_SYS_PROP)
-                    .split(","));
-            ldapOptions.addEnabledProtocol(System.getProperty(HTTP_PROTOCOLS_SYS_PROP)
-                    .split(","));
+            ldapOptions.set(LDAPConnectionFactory.SSL_ENABLED_CIPHER_SUITES,
+                    Arrays.asList(System.getProperty(CIPHER_SUITES_SYS_PROP)
+                            .split(",")));
+            ldapOptions.set(LDAPConnectionFactory.SSL_ENABLED_PROTOCOLS,
+                    Arrays.asList(System.getProperty(HTTP_PROTOCOLS_SYS_PROP)
+                            .split(",")));
 
             //sets the classloader so it can find the grizzly protocol handler class
-            ldapOptions.setProviderClassLoader(LdapTestingUtils.class.getClassLoader());
-
+            ldapOptions.set(LDAPConnectionFactory.TRANSPORT_PROVIDER_CLASS_LOADER,
+                    LdapTestingUtils.class.getClassLoader());
         } catch (Exception e) {
             LOGGER.debug("Error prepping LDAP connection", e);
             return new LdapConnectionAttempt().addResultMessage(failedTestSetup());
@@ -237,8 +244,7 @@ public class LdapTestingUtils {
      * @return If the path does not exist, the {@code Optional} contains
      * the path to the DN; else, an empty {@code Optional}.
      */
-    public Report checkDirExists(LdapDistinguishedName dirDn,
-            Connection ldapConnection) {
+    public Report checkDirExists(LdapDistinguishedName dirDn, Connection ldapConnection) {
         ReportImpl report = new ReportImpl();
         boolean dirExists = !getLdapQueryResults(ldapConnection,
                 dirDn.getValue(),

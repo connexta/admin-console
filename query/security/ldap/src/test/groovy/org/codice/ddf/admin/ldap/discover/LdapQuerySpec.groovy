@@ -135,6 +135,27 @@ class LdapQuerySpec extends Specification {
         entries*.getEntry('employeeType')*.get()*.value() as Set == ['ironman', 'hulk'] as Set
     }
 
+    def 'Successfully query with entries found (startTLS) '() {
+        setup:
+        args = [(LdapConnectionField.DEFAULT_FIELD_NAME): startTlsLdapConnectionInfo().getValue(),
+                (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().password("secret").getValue(),
+                (LdapQuery.QUERY_BASE_FIELD_NAME)       : exampleQueryBase().getValue(),
+                (LdapQueryField.DEFAULT_FIELD_NAME)     : ldapQuery("(objectClass=person)").getValue()]
+
+        ldapQueryFunction.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
+        ldapQueryFunction.setValue(args)
+
+        when:
+        FunctionReport report = ldapQueryFunction.getValue()
+
+        then:
+        def entries = report.result().getList()
+        entries.size() == 2
+        entries*.getEntry('name')*.get()*.value() as Set ==
+                ['uid=tstark,ou=users,dc=example,dc=com', 'uid=bbanner,ou=users,dc=example,dc=com'] as Set
+        entries*.getEntry('employeeType')*.get()*.value() as Set == ['ironman', 'hulk'] as Set
+    }
+
     def 'Successfully query with entries found (LDAPS) '() {
         setup:
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): ldapsLdapConnectionInfo().getValue(),
@@ -227,6 +248,13 @@ class LdapQuerySpec extends Specification {
 
     LdapQueryField ldapQuery(String query) {
         return new LdapQueryField().query(query)
+    }
+
+    LdapConnectionField startTlsLdapConnectionInfo() {
+        return new LdapConnectionField()
+                .hostname(server.getHostname())
+                .port(server.getLdapPort())
+                .encryptionMethod(LdapEncryptionMethodField.StartTlsEncryption.START_TLS)
     }
 
     LdapConnectionField ldapsLdapConnectionInfo() {

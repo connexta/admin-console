@@ -133,20 +133,20 @@ class LdapTestBindSpec extends Specification {
         report.result().getValue()
     }
 
-    @Ignore
-    // TODO: tbatie - 5/4/17 - Need to make in memory ldap support DigestMD5
-    def 'Successfully bind user with no encryption using bind method "DigestMD5SASL"'() {
+    def 'Fail to bind user with no encryption using bind method "DigestMD5SASL"'() {
         setup:
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue(),
-                (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue()]
+                (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : digestBindInfo().getValue()]
         ldapBindFunction.setValue(args)
 
         when:
         FunctionReport report = ldapBindFunction.getValue()
 
         then:
-        report.messages().empty
-        report.result().getValue()
+        report.messages().size() == 1
+        report.messages().get(0).getCode() == LdapMessages.MD5_NEEDS_ENCRYPTED
+        report.messages().get(0).getPath() == [LdapTestBind.FIELD_NAME, FunctionField.ARGUMENT,
+                                               LdapBindUserInfo.DEFAULT_FIELD_NAME, LdapBindMethod.DEFAULT_FIELD_NAME]
     }
 
     @Ignore
@@ -154,7 +154,7 @@ class LdapTestBindSpec extends Specification {
     def 'Successfully bind user with LDAPS encryption using bind method "DigestMD5SASL"'() {
         setup:
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): ldapsLdapConnectionInfo().getValue(),
-                (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue()]
+                (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : digestBindInfo().getValue()]
         ldapBindFunction.setValue(args)
         ldapBindFunction.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
@@ -166,12 +166,14 @@ class LdapTestBindSpec extends Specification {
         report.result().getValue()
     }
 
-
+    @Ignore
+    // TODO RAP 10 Jul 17: Need o make in-memory ldap support DigestMD5
     def 'Fail to bind user using bind method "DigestMD5SASL" with bad realm'() {
         setup:
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : digestBindInfo().getValue()]
         ldapBindFunction.setValue(args)
+        ldapBindFunction.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
         when:
         FunctionReport report = ldapBindFunction.getValue()

@@ -19,6 +19,7 @@ import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.codice.ddf.admin.common.report.message.ErrorMessageImpl;
 
 public class LdapMessages {
+    public static final String MD5_NEEDS_ENCRYPTED = "MD5_NEEDS_ENCRYPTED";
 
     public static final String CANNOT_BIND = "CANNOT_BIND";
 
@@ -68,6 +69,10 @@ public class LdapMessages {
 
     public static ErrorMessage userAttributeNotFoundError(List<String> path) {
         return new ErrorMessageImpl(USER_ATTRIBUTE_NOT_FOUND, path);
+    }
+
+    public static ErrorMessage md5NeedsEncryptedError(List<String> path) {
+        return new ErrorMessageImpl(MD5_NEEDS_ENCRYPTED, path);
     }
 
     static ErrorMessage cannotBindError(List<String> path) {

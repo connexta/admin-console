@@ -71,6 +71,10 @@ public class LdapBindUserInfo extends BaseObjectField {
         return creds;
     }
 
+    public LdapBindMethod bindMethodField() {
+        return bindMethod;
+    }
+
     // Value getters
     public String bindMethod() {
         return bindMethod.getValue();

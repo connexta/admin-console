@@ -11,7 +11,7 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.sources.wfs
+package org.codice.ddf.admin.sources.csw
 
 import org.codice.ddf.admin.api.FieldProvider
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
@@ -21,12 +21,12 @@ import org.codice.ddf.internal.admin.configurator.actions.ServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceReader
 import spock.lang.Specification
 
-class WfsFieldProviderTest extends Specification {
+class CswFieldProviderSpec extends Specification {
 
-    WfsFieldProvider wfsFieldProvider
+    CswFieldProvider cswFieldProvider
 
     def setup() {
-        wfsFieldProvider = new WfsFieldProvider(Mock(ConfiguratorFactory),
+        cswFieldProvider = new CswFieldProvider(Mock(ConfiguratorFactory),
                 Mock(ServiceActions),
                 Mock(ManagedServiceActions),
                 Mock(ServiceReader),
@@ -35,7 +35,7 @@ class WfsFieldProviderTest extends Specification {
 
     def 'Verify discovery fields immutability'() {
         when:
-        wfsFieldProvider.getDiscoveryFields().add(Mock(FieldProvider))
+        cswFieldProvider.getDiscoveryFields().add(Mock(FieldProvider))
 
         then:
         thrown(UnsupportedOperationException)
@@ -43,7 +43,7 @@ class WfsFieldProviderTest extends Specification {
 
     def 'Verify persist functions immutability'() {
         when:
-        wfsFieldProvider.getMutationFunctions().add(Mock(FieldProvider))
+        cswFieldProvider.getMutationFunctions().add(Mock(FieldProvider))
 
         then:
         thrown(UnsupportedOperationException)

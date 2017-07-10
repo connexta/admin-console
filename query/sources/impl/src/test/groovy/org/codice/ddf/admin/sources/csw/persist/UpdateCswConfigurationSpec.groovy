@@ -18,28 +18,28 @@ import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.configurator.Configurator
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
-import org.codice.ddf.admin.configurator.OperationReport
 import org.codice.ddf.admin.sources.SourceMessages
 import org.codice.ddf.admin.sources.fields.CswProfile
 import org.codice.ddf.admin.sources.fields.type.CswSourceConfigurationField
 import org.codice.ddf.admin.sources.fields.type.SourceConfigField
+import org.codice.ddf.admin.sources.services.CswServiceProperties
+import org.codice.ddf.admin.sources.test.SourceCommonsSpec
 import org.codice.ddf.internal.admin.configurator.actions.FeatureActions
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceReader
-import spock.lang.Specification
 
-import static org.codice.ddf.admin.sources.SourceTestCommons.*
-
-class CreateCswConfigurationTest extends Specification {
+class UpdateCswConfigurationSpec extends SourceCommonsSpec {
 
     static TEST_OUTPUT_SCHEMA = 'testOutputSchema'
+
+    static TEST_URL = 'https://localhost:8993'
 
     static TEST_CSW_PROFILE = CswProfile.DDFCswFederatedSource.CSW_FEDERATION_PROFILE_SOURCE
 
     static CSW_PROFILE = CswProfile.DEFAULT_FIELD_NAME
 
-    static RESULT_ARGUMENT_PATH = [CreateCswConfiguration.FIELD_NAME]
+    static RESULT_ARGUMENT_PATH = [UpdateCswConfiguration.FIELD_NAME]
 
     static BASE_PATH = [RESULT_ARGUMENT_PATH, FunctionField.ARGUMENT].flatten()
 
@@ -47,11 +47,13 @@ class CreateCswConfigurationTest extends Specification {
 
     static ENDPOINT_URL_PATH = [CONFIG_PATH, ENDPOINT_URL].flatten()
 
+    static SERVICE_PID_PATH = [CONFIG_PATH, PID].flatten()
+
     static SOURCE_NAME_PATH = [CONFIG_PATH, SourceConfigField.SOURCE_NAME_FIELD_NAME].flatten()
 
     static CSW_PROFILE_PATH = [CONFIG_PATH, CSW_PROFILE].flatten()
 
-    CreateCswConfiguration createCswConfiguration
+    UpdateCswConfiguration updateCswConfiguration
 
     ConfiguratorFactory configuratorFactory
 
@@ -80,27 +82,35 @@ class CreateCswConfigurationTest extends Specification {
         federatedSource = new TestSource(S_PID, TEST_SOURCENAME, false)
         federatedSources.add(federatedSource)
         configuratorFactory.getConfigurator() >> configurator
-        createCswConfiguration = new CreateCswConfiguration(configuratorFactory, serviceActions,
+        updateCswConfiguration = new UpdateCswConfiguration(configuratorFactory, serviceActions,
                 managedServiceActions, serviceReader, featureActions)
     }
 
-    def 'Successfully create new CSW configuration'() {
-        when:
-        createCswConfiguration.setValue(createCswArgs())
+    def 'Successfully update CSW configuration'() {
+        setup:
+        updateCswConfiguration.setValue(createCswUpdateArgs(TEST_PASSWORD))
+        serviceActions.read(_) >> [(ID): TEST_SOURCENAME]
         serviceReader.getServices(_, _) >> []
         configurator.commit(_, _) >> mockReport(false)
-        def report = createCswConfiguration.getValue()
+
+        when:
+        def report = updateCswConfiguration.getValue()
 
         then:
         report.result() != null
         report.result().getValue()
     }
 
-    def 'Fail to create new CSW config due to duplicate source name'() {
+    def 'Fail CSW configuration update due to existing source name'() {
+        setup:
+        updateCswConfiguration.setValue(createCswUpdateArgs(TEST_PASSWORD))
+        serviceActions.read(_) >> [(ID): 'updatedName']
+        serviceReader.getServices(_, _) >>
+                [new TestSource(S_PID, 'updatedName', false),
+                 new TestSource("existingSource", TEST_SOURCENAME, false)]
+
         when:
-        createCswConfiguration.setValue(createCswArgs())
-        serviceReader.getServices(_, _) >> federatedSources
-        def report = createCswConfiguration.getValue()
+        def report = updateCswConfiguration.getValue()
 
         then:
         report.result() == null
@@ -109,11 +119,14 @@ class CreateCswConfigurationTest extends Specification {
         report.messages().get(0).code == SourceMessages.DUPLICATE_SOURCE_NAME
     }
 
-    def 'Fail to create new CSW config due to failure to commit'() {
-        when:
-        createCswConfiguration.setValue(createCswArgs())
+    def 'Fail to update CSW config due to failure to commit'() {
+        setup:
+        updateCswConfiguration.setValue(createCswUpdateArgs(TEST_PASSWORD))
+        serviceActions.read(_) >> [(ID): TEST_SOURCENAME]
         serviceReader.getServices(_, _) >> []
-        def report = createCswConfiguration.getValue()
+
+        when:
+        def report = updateCswConfiguration.getValue()
 
         then:
         1 * configurator.commit(_, _) >> mockReport(false)
@@ -124,11 +137,29 @@ class CreateCswConfigurationTest extends Specification {
         report.messages().get(0).code == DefaultMessages.FAILED_PERSIST
     }
 
-    def 'Return false when csw feature fails to start'() {
+    def 'Fail to update CSW Configuration due to no existing source config'() {
+        setup:
+        updateCswConfiguration.setValue(createCswUpdateArgs(TEST_PASSWORD))
+        serviceActions.read(S_PID) >> [:]
+
         when:
-        createCswConfiguration.setValue(createCswArgs())
+        def report = updateCswConfiguration.getValue()
+
+        then:
+        report.result() == null
+        report.messages().size() == 1
+        report.messages().get(0).path == RESULT_ARGUMENT_PATH
+        report.messages().get(0).code == DefaultMessages.NO_EXISTING_CONFIG
+    }
+
+    def 'Return false when csw feature fails to start'() {
+        setup:
+        updateCswConfiguration.setValue(createCswUpdateArgs(TEST_PASSWORD))
         serviceReader.getServices(_, _) >> []
-        def report = createCswConfiguration.getValue()
+        serviceActions.read(_ as String) >> [(ID): TEST_SOURCENAME]
+
+        when:
+        def report = updateCswConfiguration.getValue()
 
         then:
         1 * configurator.commit(_, _) >> mockReport(true)
@@ -138,31 +169,62 @@ class CreateCswConfigurationTest extends Specification {
         report.messages().get(0).code == DefaultMessages.FAILED_PERSIST
     }
 
+    def 'Updating with flag password sends service properties without password'() {
+        setup:
+        updateCswConfiguration.setValue(createCswUpdateArgs(FLAG_PASSWORD))
+        serviceActions.read(_ as String) >> [(ID): TEST_SOURCENAME]
+        serviceReader.getServices(_, _) >> []
+        configurator.commit(_, _) >> mockReport(false)
+
+        def expectedUpdateConfig = CswServiceProperties.cswConfigToServiceProps(createCswSourceConfig(FLAG_PASSWORD))
+
+        when:
+        updateCswConfiguration.getValue()
+
+        then:
+        1 * serviceActions.build(S_PID, expectedUpdateConfig, true)
+    }
+
+    def 'Updating with new password sends service properties with password'() {
+        setup:
+        updateCswConfiguration.setValue(createCswUpdateArgs('notFlagPassword'))
+        serviceActions.read(_ as String) >> [(ID): TEST_SOURCENAME]
+        serviceReader.getServices(_, _) >> []
+        configurator.commit(_, _) >> mockReport(false)
+
+        def expectedUpdateConfig = CswServiceProperties.cswConfigToServiceProps(createCswSourceConfig('notFlagPassword'))
+
+        when:
+        updateCswConfiguration.getValue()
+
+        then:
+        1 * serviceActions.build(S_PID, expectedUpdateConfig, true)
+    }
+
     def 'Fail when missing required fields'() {
         when:
-        def report = createCswConfiguration.getValue()
+        def report = updateCswConfiguration.getValue()
 
         then:
         report.result() == null
-        report.messages().size() == 3
+        report.messages().size() == 4
         report.messages().count {
             it.getCode() == DefaultMessages.MISSING_REQUIRED_FIELD
-        } == 3
-        report.messages()*.getPath() == [SOURCE_NAME_PATH, ENDPOINT_URL_PATH, CSW_PROFILE_PATH]
+        } == 4
+        report.messages()*.getPath() == [SERVICE_PID_PATH, SOURCE_NAME_PATH, ENDPOINT_URL_PATH, CSW_PROFILE_PATH]
     }
 
-    def mockReport(boolean hasError) {
-        def report = Mock(OperationReport)
-        report.containsFailedResults() >> hasError
-        return report
+    def createCswUpdateArgs(String password) {
+        return [(CswSourceConfigurationField.DEFAULT_FIELD_NAME): createCswSourceConfig(password).getValue()]
     }
 
-    def createCswArgs() {
+    def createCswSourceConfig(String password) {
         def config = new CswSourceConfigurationField()
                 .outputSchema(TEST_OUTPUT_SCHEMA)
                 .cswProfile(TEST_CSW_PROFILE)
-                .endpointUrl('https://localhost:8993').sourceName(TEST_SOURCENAME)
-        config.credentials().username(TEST_USERNAME).password(TEST_PASSWORD)
-        return [(CswSourceConfigurationField.DEFAULT_FIELD_NAME): config.getValue()]
+        config.endpointUrl(TEST_URL).sourceName(TEST_SOURCENAME)
+                .pid(S_PID)
+        config.credentials().username(TEST_USERNAME).password(password)
+        return config
     }
 }

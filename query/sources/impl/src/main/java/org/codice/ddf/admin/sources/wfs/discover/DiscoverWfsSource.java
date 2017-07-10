@@ -53,11 +53,6 @@ public class DiscoverWfsSource extends BaseFunctionField<WfsSourceConfigurationF
         wfsSourceUtils = new WfsSourceUtils();
     }
 
-    public DiscoverWfsSource(WfsSourceUtils wfsSourceUtils) {
-        this();
-        this.wfsSourceUtils = wfsSourceUtils;
-    }
-
     @Override
     public WfsSourceConfigurationField performFunction() {
         ReportWithResultImpl<ResponseField> responseResult;
@@ -93,5 +88,12 @@ public class DiscoverWfsSource extends BaseFunctionField<WfsSourceConfigurationF
     @Override
     public FunctionField<WfsSourceConfigurationField> newInstance() {
         return new DiscoverWfsSource();
+    }
+
+    /**
+     * For testing purposes only. Groovy can access private methods
+     */
+    private void setWfsSourceUtils(WfsSourceUtils wfsSourceUtils) {
+        this.wfsSourceUtils = wfsSourceUtils;
     }
 }

@@ -20,14 +20,12 @@ import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.sources.opensearch.OpenSearchSourceInfoField
 import org.codice.ddf.admin.sources.services.OpenSearchServiceProperties
+import org.codice.ddf.admin.sources.test.SourceCommonsSpec
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceReader
-import spock.lang.Specification
 
-import static org.codice.ddf.admin.sources.SourceTestCommons.*
-
-class GetOpenSearchConfigsTest extends Specification {
+class GetOpenSearchConfigsSpec extends SourceCommonsSpec {
 
     static SHORT_NAME = OpenSearchServiceProperties.SHORTNAME
 

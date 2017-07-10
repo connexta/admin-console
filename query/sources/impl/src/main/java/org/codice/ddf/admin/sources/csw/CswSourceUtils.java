@@ -71,17 +71,13 @@ public class CswSourceUtils {
     private static final String GET_FIRST_OUTPUT_SCHEMA =
             "//ows:OperationsMetadata/ows:Operation[@name='GetRecords']/ows:Parameter[@name='OutputSchema' or @name='outputSchema']/ows:Value[1]/text()";
 
-    private final RequestUtils requestUtils;
-
     private final SourceUtilCommons sourceUtilCommons;
 
-    public CswSourceUtils() {
-        this(new RequestUtils(), new SourceUtilCommons());
-    }
+    private RequestUtils requestUtils;
 
-    public CswSourceUtils(RequestUtils requestUtils, SourceUtilCommons sourceUtilCommons) {
-        this.requestUtils = requestUtils;
-        this.sourceUtilCommons = sourceUtilCommons;
+    public CswSourceUtils() {
+        this.requestUtils = new RequestUtils();
+        this.sourceUtilCommons = new SourceUtilCommons();
     }
 
     /**
@@ -187,5 +183,12 @@ public class CswSourceUtils {
                 requestUrl);
         configResult.addResultMessage(unknownEndpointError());
         return configResult;
+    }
+
+    /**
+     * For testing purposes only. Groovy can access private methods
+     */
+    private void setRequestUtils(RequestUtils requestUtils) {
+        this.requestUtils = requestUtils;
     }
 }

@@ -21,15 +21,12 @@ import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.sources.csw.CswSourceInfoField
 import org.codice.ddf.admin.sources.fields.CswProfile
 import org.codice.ddf.admin.sources.services.CswServiceProperties
+import org.codice.ddf.admin.sources.test.SourceCommonsSpec
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceReader
-import spock.lang.Ignore
-import spock.lang.Specification
 
-import static org.codice.ddf.admin.sources.SourceTestCommons.*
-
-class GetCswConfigsTest extends Specification {
+class GetCswConfigsSpec extends SourceCommonsSpec {
 
     static EVENT_SERVICE_ADDRESS = 'eventServiceAddress'
 
@@ -67,8 +64,6 @@ class GetCswConfigsTest extends Specification {
                 managedServiceActions, serviceReader)
     }
 
-    // TODO: tbatie - 6/20/17 - Fix on merge
-    @Ignore
     def 'No pid argument returns all configs'() {
         when:
         def report = getCswConfigsFunction.getValue()
@@ -85,8 +80,6 @@ class GetCswConfigsTest extends Specification {
         assertConfig(list.getList().get(1), 1, managedServiceConfigs.get(S_PID_2), SOURCE_ID_2, S_PID_2, false)
     }
 
-    // TODO: tbatie - 6/20/17 - Fix on merge
-    @Ignore
     def 'Sending pid filter returns 1 result'() {
         when:
         getCswConfigsFunction.setValue(functionArgs)
@@ -127,7 +120,7 @@ class GetCswConfigsTest extends Specification {
         assert sourceInfo.config().credentials().username() == TEST_USERNAME
         assert sourceInfo.config().sourceName() == sourceName
         assert sourceInfo.config().pid() == pid
-        assert sourceInfo.config().cswProfile() == CswProfile.CSW_FEDERATION_PROFILE_SOURCE
+        assert sourceInfo.config().cswProfile() == CswProfile.DDFCswFederatedSource.CSW_FEDERATION_PROFILE_SOURCE
         return true
     }
 

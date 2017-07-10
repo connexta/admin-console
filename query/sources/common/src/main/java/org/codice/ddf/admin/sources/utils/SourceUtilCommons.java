@@ -13,6 +13,8 @@
  */
 package org.codice.ddf.admin.sources.utils;
 
+import static org.codice.ddf.admin.common.services.ServiceCommons.FLAG_PASSWORD;
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -146,6 +148,7 @@ public class SourceUtilCommons {
         List<SourceConfigField> sourceInfoListField = new ArrayList<>();
         if (StringUtils.isNotEmpty(pid)) {
             SourceConfigField config = mapper.apply(serviceActions.read(pid));
+            config.credentials().password(FLAG_PASSWORD);
             sourceInfoListField.add(config);
             return sourceInfoListField;
         }
@@ -157,6 +160,7 @@ public class SourceUtilCommons {
                 .map(mapper)
                 .forEach(sourceInfoListField::add);
 
+        sourceInfoListField.forEach(config -> config.credentials().password(FLAG_PASSWORD));
         return sourceInfoListField;
     }
 

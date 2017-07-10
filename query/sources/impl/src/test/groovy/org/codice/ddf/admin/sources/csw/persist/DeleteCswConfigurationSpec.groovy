@@ -17,15 +17,12 @@ import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.configurator.Configurator
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
-import org.codice.ddf.admin.configurator.OperationReport
 import org.codice.ddf.admin.sources.services.CswServiceProperties
+import org.codice.ddf.admin.sources.test.SourceCommonsSpec
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions
-import spock.lang.Specification
 
-import static org.codice.ddf.admin.sources.SourceTestCommons.*
-
-class DeleteCswConfigurationTest extends Specification {
+class DeleteCswConfigurationSpec extends SourceCommonsSpec {
 
     DeleteCswConfiguration deleteCswConfiguration
 
@@ -116,13 +113,7 @@ class DeleteCswConfigurationTest extends Specification {
         report.messages()*.getPath() == [SERVICE_PID_PATH]
     }
 
-    private def mockReport(boolean hasError) {
-        def report = Mock(OperationReport)
-        report.containsFailedResults() >> hasError
-        return report
-    }
-
-    private def createCswConfigToDelete() {
+    def createCswConfigToDelete() {
         configToDelete = configToBeDeleted
         configToDelete.put(EVENT_SERVICE_ADDRESS, TEST_EVENT_SERVICE_ADDRESS)
         configToDelete.put(CswServiceProperties.CSW_URL, TEST_CSW_URL)

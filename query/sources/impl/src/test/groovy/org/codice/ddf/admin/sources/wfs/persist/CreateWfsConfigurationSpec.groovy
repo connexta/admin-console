@@ -11,38 +11,41 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  */
-package org.codice.ddf.admin.sources.opensearch.persist
+package org.codice.ddf.admin.sources.wfs.persist
 
 import ddf.catalog.source.FederatedSource
 import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.configurator.Configurator
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
-import org.codice.ddf.admin.configurator.OperationReport
 import org.codice.ddf.admin.sources.SourceMessages
-import org.codice.ddf.admin.sources.fields.type.OpenSearchSourceConfigurationField
-import org.codice.ddf.admin.sources.fields.type.SourceConfigField
+import org.codice.ddf.admin.sources.fields.WfsVersion
+import org.codice.ddf.admin.sources.fields.type.WfsSourceConfigurationField
+import org.codice.ddf.admin.sources.test.SourceCommonsSpec
 import org.codice.ddf.internal.admin.configurator.actions.FeatureActions
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceReader
-import spock.lang.Specification
 
-import static org.codice.ddf.admin.sources.SourceTestCommons.*
+class CreateWfsConfigurationSpec extends SourceCommonsSpec {
 
-class CreateOpenSearchConfigurationTest extends Specification {
-
-    static RESULT_ARGUMENT_PATH = [CreateOpenSearchConfiguration.FIELD_NAME]
+    static RESULT_ARGUMENT_PATH = [CreateWfsConfiguration.FIELD_NAME]
 
     static BASE_PATH = [RESULT_ARGUMENT_PATH, FunctionField.ARGUMENT].flatten()
 
-    static CONFIG_PATH = [BASE_PATH, OpenSearchSourceConfigurationField.DEFAULT_FIELD_NAME].flatten()
+    static CONFIG_PATH = [BASE_PATH, WfsSourceConfigurationField.DEFAULT_FIELD_NAME].flatten()
 
-    static SOURCE_NAME_PATH = [CONFIG_PATH, SourceConfigField.SOURCE_NAME_FIELD_NAME].flatten()
+    static SOURCE_NAME_PATH = [CONFIG_PATH, SOURCE_NAME].flatten()
 
     static ENDPOINT_URL_PATH = [CONFIG_PATH, ENDPOINT_URL].flatten()
 
-    CreateOpenSearchConfiguration createOpenSearchConfiguration
+    static WFS_VERSION = WfsVersion.DEFAULT_FIELD_NAME;
+
+    static WFS_VERSION_PATH = [CONFIG_PATH, WFS_VERSION].flatten()
+
+    static TEST_WFS_VERSION = WfsVersion.Wfs1.WFS_VERSION_1
+
+    CreateWfsConfiguration createWfsConfiguration
 
     ConfiguratorFactory configuratorFactory
 
@@ -50,11 +53,11 @@ class CreateOpenSearchConfigurationTest extends Specification {
 
     ServiceReader serviceReader
 
-    FeatureActions featureActions
+    Configurator configurator
 
     ManagedServiceActions managedServiceActions
 
-    Configurator configurator
+    FeatureActions featureActions
 
     FederatedSource federatedSource
 
@@ -70,33 +73,35 @@ class CreateOpenSearchConfigurationTest extends Specification {
         federatedSource = Mock(FederatedSource)
         federatedSource.getId() >> TEST_SOURCENAME
         federatedSources.add(federatedSource)
-        configuratorFactory = Mock(ConfiguratorFactory)
-        configuratorFactory.getConfigurator() >> configurator
+        configuratorFactory = Mock(ConfiguratorFactory) {
+            getConfigurator() >> configurator
+        }
 
-        createOpenSearchConfiguration = new CreateOpenSearchConfiguration(configuratorFactory, serviceActions,
+        createWfsConfiguration = new CreateWfsConfiguration(configuratorFactory, serviceActions,
                 managedServiceActions, serviceReader, featureActions)
     }
 
-    def 'Successfully create new OpenSearch configuration'() {
+    def 'Successfully create new WFS configuration'() {
         setup:
-        createOpenSearchConfiguration.setValue(createFunctionArgs())
+        createWfsConfiguration.setValue(createWfsArgs())
         serviceReader.getServices(_, _) >> []
         configurator.commit(_, _) >> mockReport(false)
 
         when:
-        def report = createOpenSearchConfiguration.getValue()
+        def report = createWfsConfiguration.getValue()
 
         then:
+        report.result() != null
         report.result().getValue()
     }
 
-    def 'Fail to create new OpenSearch config due to duplicate source name'() {
+    def 'Fail to create new WFS config due to duplicate source name'() {
         setup:
-        createOpenSearchConfiguration.setValue(createFunctionArgs())
+        createWfsConfiguration.setValue(createWfsArgs())
         serviceReader.getServices(_, _) >> federatedSources
 
         when:
-        def report = createOpenSearchConfiguration.getValue()
+        def report = createWfsConfiguration.getValue()
 
         then:
         report.result() == null
@@ -105,28 +110,28 @@ class CreateOpenSearchConfigurationTest extends Specification {
         report.messages().get(0).path == SOURCE_NAME_PATH
     }
 
-    def 'Fail to create new OpenSearch config due to failure to commit'() {
+    def 'Fail to create new WFS config due to failure to commit'() {
         setup:
-        createOpenSearchConfiguration.setValue(createFunctionArgs())
+        createWfsConfiguration.setValue(createWfsArgs())
         serviceReader.getServices(_, _) >> []
 
         when:
-        def report = createOpenSearchConfiguration.getValue()
+        def report = createWfsConfiguration.getValue()
 
         then:
         1 * configurator.commit(_, _) >> mockReport(false)
         1 * configurator.commit(_, _) >> mockReport(true)
         !report.result().getValue()
         report.messages().size() == 1
-        report.messages().get(0).path == RESULT_ARGUMENT_PATH
         report.messages().get(0).code == DefaultMessages.FAILED_PERSIST
+        report.messages().get(0).path == RESULT_ARGUMENT_PATH
     }
 
-    def 'Return false when opensearch feature fails to start'() {
+    def 'Return false when wfs feature fails to start'() {
         when:
-        createOpenSearchConfiguration.setValue(createFunctionArgs())
+        createWfsConfiguration.setValue(createWfsArgs())
         serviceReader.getServices(_, _) >> []
-        def report = createOpenSearchConfiguration.getValue()
+        def report = createWfsConfiguration.getValue()
 
         then:
         1 * configurator.commit(_, _) >> mockReport(true)
@@ -136,28 +141,23 @@ class CreateOpenSearchConfigurationTest extends Specification {
         report.messages().get(0).code == DefaultMessages.FAILED_PERSIST
     }
 
-    def 'Fail when missing required fields'() {
+    def 'Fail due to missing required fields'() {
         when:
-        def report = createOpenSearchConfiguration.getValue()
+        def report = createWfsConfiguration.getValue()
 
         then:
         report.result() == null
-        report.messages().size() == 2
+        report.messages().size() == 3
         report.messages().count {
             it.getCode() == DefaultMessages.MISSING_REQUIRED_FIELD
-        } == 2
-        report.messages()*.getPath() == [SOURCE_NAME_PATH, ENDPOINT_URL_PATH]
+        } == 3
+        report.messages()*.getPath() == [SOURCE_NAME_PATH, ENDPOINT_URL_PATH, WFS_VERSION_PATH]
     }
 
-    def mockReport(boolean hasError) {
-        def report = Mock(OperationReport)
-        report.containsFailedResults() >> hasError
-        return report
-    }
-
-    def createFunctionArgs() {
-        def config = new OpenSearchSourceConfigurationField().endpointUrl('https://localhost:8993').sourceName(TEST_SOURCENAME)
+    def createWfsArgs() {
+        def config = new WfsSourceConfigurationField().wfsVersion(TEST_WFS_VERSION)
+                .endpointUrl('https://localhost:8993/geoserver/wfs').sourceName(TEST_SOURCENAME)
         config.credentials().username(TEST_USERNAME).password(TEST_PASSWORD)
-        return [(OpenSearchSourceConfigurationField.DEFAULT_FIELD_NAME): config.getValue()]
+        return [(WfsSourceConfigurationField.DEFAULT_FIELD_NAME): config.getValue()]
     }
 }

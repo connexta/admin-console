@@ -41,12 +41,12 @@ public class CswProfile extends BaseEnumField<String> {
                 cswProfile);
     }
 
-    public static final class CswFederatedSource implements EnumValue<String>{
+    public static final class CswFederatedSource implements EnumValue<String> {
 
-        public static final String DESCRIPTION = "CSW Specification Profile Federated Source that should be used when federating to an external CSW service.";
+        public static final String DESCRIPTION =
+                "CSW Specification Profile Federated Source that should be used when federating to an external CSW service.";
 
-        public static final String CSW_SPEC_PROFILE_FEDERATED_SOURCE =
-                "CswFederatedSource";
+        public static final String CSW_SPEC_PROFILE_FEDERATED_SOURCE = "CswFederatedSource";
 
         @Override
         public String enumTitle() {
@@ -64,9 +64,10 @@ public class CswProfile extends BaseEnumField<String> {
         }
     }
 
-    public static final class DDFCswFederatedSource implements EnumValue<String>{
+    public static final class DDFCswFederatedSource implements EnumValue<String> {
 
-        public static final String DESCRIPTION = "DDF's full fidelity CSW Federation Profile. Use this when federating to a DDF based system.";
+        public static final String DESCRIPTION =
+                "DDF's full fidelity CSW Federation Profile. Use this when federating to a DDF based system.";
 
         public static final String CSW_FEDERATION_PROFILE_SOURCE = "DDFCswFederatedSource";
 
@@ -86,9 +87,10 @@ public class CswProfile extends BaseEnumField<String> {
         }
     }
 
-    public static final class GmdCswFederatedSource implements EnumValue<String>{
+    public static final class GmdCswFederatedSource implements EnumValue<String> {
 
-        public static final String DESCRIPTION = "CSW Federated Source using the Geographic MetaData (GMD) format (ISO 19115:2003).";
+        public static final String DESCRIPTION =
+                "CSW Federated Source using the Geographic MetaData (GMD) format (ISO 19115:2003).";
 
         public static final String GMD_CSW_ISO_FEDERATED_SOURCE = "GmdCswFederatedSource";
 

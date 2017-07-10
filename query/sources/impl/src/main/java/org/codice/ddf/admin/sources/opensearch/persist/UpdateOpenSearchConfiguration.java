@@ -14,6 +14,7 @@
 package org.codice.ddf.admin.sources.opensearch.persist;
 
 import static org.codice.ddf.admin.common.report.message.DefaultMessages.failedPersistError;
+import static org.codice.ddf.admin.common.services.ServiceCommons.FLAG_PASSWORD;
 import static org.codice.ddf.admin.sources.services.OpenSearchServiceProperties.OPENSEARCH_FEATURE;
 import static org.codice.ddf.admin.sources.services.OpenSearchServiceProperties.openSearchConfigToServiceProps;
 
@@ -40,8 +41,9 @@ public class UpdateOpenSearchConfiguration extends BaseFunctionField<BooleanFiel
 
     public static final String FIELD_NAME = "updateOpenSearchSource";
 
-    public static final String DESCRIPTION =
-            "Updates an OpenSearch source configuration specified by the pid.";
+    public static final String DESCRIPTION = String.format(
+            "Updates a OpenSearch source configuration specified by the pid. A password of {%s} acts as a flag to not update the password.",
+            FLAG_PASSWORD);
 
     public static final BooleanField RETURN_TYPE = new BooleanField();
 

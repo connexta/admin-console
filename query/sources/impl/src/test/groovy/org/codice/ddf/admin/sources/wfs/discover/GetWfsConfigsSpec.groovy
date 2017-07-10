@@ -20,16 +20,13 @@ import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.sources.fields.WfsVersion
 import org.codice.ddf.admin.sources.services.WfsServiceProperties
+import org.codice.ddf.admin.sources.test.SourceCommonsSpec
 import org.codice.ddf.admin.sources.wfs.WfsSourceInfoField
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceReader
-import spock.lang.Ignore
-import spock.lang.Specification
 
-import static org.codice.ddf.admin.sources.SourceTestCommons.*
-
-class GetWfsConfigsTest extends Specification {
+class GetWfsConfigsSpec extends SourceCommonsSpec {
 
     GetWfsConfigurations getWfsConfigsFunction
 
@@ -70,8 +67,6 @@ class GetWfsConfigsTest extends Specification {
                 managedServiceActions, serviceReader)
     }
 
-    // TODO: tbatie - 6/20/17 - Fix on merge
-    @Ignore
     def 'No pid argument returns all configs'() {
         setup:
         serviceReader.getServices(_, _) >> []
@@ -91,8 +86,6 @@ class GetWfsConfigsTest extends Specification {
         assertConfig(list.getList().get(1), 1, SOURCE_ID_2, S_PID_2, false, TEST_WFS_VERSION_2)
     }
 
-    // TODO: tbatie - 6/20/17 - Fix on merge
-    @Ignore
     def 'Pid filter returns 1 result'() {
         setup:
         getWfsConfigsFunction.setValue(functionArgs)

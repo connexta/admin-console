@@ -200,14 +200,7 @@ public class RequestUtils {
 
     private WebClient generateClient(String url, CredentialsField creds,
             Map<String, String> queryParams) {
-        String username = creds == null ? null : creds.username();
-        String password = creds == null ? null : creds.password();
-        SecureCxfClientFactory<WebClient> clientFactory =
-                username == null && password == null ? new SecureCxfClientFactory<>(url,
-                        WebClient.class) : new SecureCxfClientFactory<>(url,
-                        WebClient.class,
-                        username,
-                        password);
+        SecureCxfClientFactory<WebClient> clientFactory = createFactory(url, creds);
 
         WebClient client = clientFactory.getClient();
         if (queryParams != null) {
@@ -215,6 +208,18 @@ public class RequestUtils {
                     .forEach(entry -> client.query(entry.getKey(), entry.getValue()));
         }
         return client;
+    }
+
+    /**
+     * This is broken out for testing purposes so that the SecureCxfClientFactory can be mocked out.
+     */
+    protected SecureCxfClientFactory<WebClient> createFactory(String url, CredentialsField creds) {
+        return creds.username() == null || creds.password() == null ? new SecureCxfClientFactory<>(
+                url,
+                WebClient.class) : new SecureCxfClientFactory<>(url,
+                WebClient.class,
+                creds.username(),
+                creds.password());
     }
 
     private ResponseField responseFieldFromResponse(Response response, UrlField requestUrl) {

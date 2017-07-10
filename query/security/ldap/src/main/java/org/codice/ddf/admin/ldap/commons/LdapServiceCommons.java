@@ -25,6 +25,7 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -220,7 +221,7 @@ public class LdapServiceCommons {
                         LdapClaimsHandlerServiceProperties.MEMBER_NAME_ATTRIBUTE))
                 .useCase(ATTRIBUTE_STORE);
 
-        Map<String, String> claimMappings = null;
+        Map<String, String> claimMappings = Collections.emptyMap();
         String attributeMappingsPath = mapValue(props, PROPERTY_FILE_LOCATION);
         if (StringUtils.isNotEmpty(attributeMappingsPath)) {
             Path path = Paths.get(attributeMappingsPath)

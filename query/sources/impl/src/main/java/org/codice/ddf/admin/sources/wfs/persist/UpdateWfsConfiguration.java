@@ -14,6 +14,7 @@
 package org.codice.ddf.admin.sources.wfs.persist;
 
 import static org.codice.ddf.admin.common.report.message.DefaultMessages.failedPersistError;
+import static org.codice.ddf.admin.common.services.ServiceCommons.FLAG_PASSWORD;
 import static org.codice.ddf.admin.sources.services.WfsServiceProperties.WFS1_FEATURE;
 import static org.codice.ddf.admin.sources.services.WfsServiceProperties.WFS2_FEATURE;
 import static org.codice.ddf.admin.sources.services.WfsServiceProperties.wfsConfigToServiceProps;
@@ -42,8 +43,9 @@ public class UpdateWfsConfiguration extends BaseFunctionField<BooleanField> {
 
     public static final String FIELD_NAME = "updateWfsSource";
 
-    private static final String DESCRIPTION =
-            "Updates a WFS source configuration specified by the pid.";
+    private static final String DESCRIPTION = String.format(
+            "Updates a WFS source configuration specified by the pid. A password of {%s} acts as a flag to not update the password.",
+            FLAG_PASSWORD);
 
     public static final BooleanField RETURN_TYPE = new BooleanField();
 

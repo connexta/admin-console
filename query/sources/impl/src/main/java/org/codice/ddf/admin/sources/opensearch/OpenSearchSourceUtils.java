@@ -58,17 +58,13 @@ public class OpenSearchSourceUtils {
 
     private static final String TOTAL_RESULTS_XPATH = "//os:totalResults|//opensearch:totalResults";
 
-    private final RequestUtils requestUtils;
-
     private final SourceUtilCommons sourceUtilCommons;
 
-    public OpenSearchSourceUtils() {
-        this(new RequestUtils(), new SourceUtilCommons());
-    }
+    private RequestUtils requestUtils;
 
-    public OpenSearchSourceUtils(RequestUtils requestUtils, SourceUtilCommons sourceUtilCommons) {
-        this.requestUtils = requestUtils;
-        this.sourceUtilCommons = sourceUtilCommons;
+    public OpenSearchSourceUtils() {
+        this.requestUtils = new RequestUtils();
+        this.sourceUtilCommons = new SourceUtilCommons();
     }
 
     /**
@@ -150,5 +146,12 @@ public class OpenSearchSourceUtils {
         }
 
         return configResult;
+    }
+
+    /**
+     * For testing purposes only. Groovy can access private methods
+     */
+    private void setRequestUtils(RequestUtils requestUtils) {
+        this.requestUtils = requestUtils;
     }
 }

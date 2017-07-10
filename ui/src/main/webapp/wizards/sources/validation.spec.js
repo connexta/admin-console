@@ -254,40 +254,40 @@ describe('Sources Validation', () => {
   })
 
   describe('Valid URLs', () => {
-    const runs = [
-        {it: 'http://foo.com/blah_blah'},
-        {it: 'http://www.example.com/wpstyle/?p=364'},
-        {it: 'http://142.42.1.1/'},
-        {it: 'http://code.google.com/events/#&product=browser'},
-        {it: 'http://j.mp'},
-        {it: 'http://localhost:8993'},
-        {it: 'http://foo.bar/?q=Test%20URL-encoded%20stuff'},
-        {it: 'https://localhost:8993'}
+    const validUrls = [
+      'http://foo.com/blah_blah',
+      'http://www.example.com/wpstyle/?p=364',
+      'http://142.42.1.1/',
+      'http://code.google.com/events/#&product=browser',
+      'http://j.mp',
+      'http://localhost:8993',
+      'http://foo.bar/?q=Test%20URL-encoded%20stuff',
+      'https://localhost:8993'
     ]
 
-    runs.forEach((run) => {
-      it(run.it + ' is valid URL', () => {
+    it('should be a valid url', () => {
+      validUrls.forEach((validUrl) => {
         expect(urlError({
-          endpointUrl: run.it
-        }), 'URL should be valid').to.equal(undefined)
+          endpointUrl: validUrl
+        }), validUrl + ' URL should be valid').to.equal(undefined)
       })
     })
   })
 
   describe('Invalid URLs', () => {
-    const runs = [
-        {it: 'http://'},
-        {it: 'http://  test.com'},
-        {it: 'htp://test.com'},
-        {it: 'htps://test.com'},
-        {it: '://google.com'}
+    const invalidUrls = [
+      'http://',
+      'http://  test.com',
+      'htp://test.com',
+      'htps://test.com',
+      '://google.com'
     ]
 
-    runs.forEach((run) => {
-      it(run.it + ' is invalid URL', () => {
+    it('should be an invalid url', () => {
+      invalidUrls.forEach((invalidUrl) => {
         expect(urlError({
-          endpointUrl: run.it
-        }), 'URL should be invalid').to.equal('Not a valid url.')
+          endpointUrl: invalidUrl
+        }), invalidUrl + ' URL should be invalid').to.equal('Not a valid url.')
       })
     })
   })

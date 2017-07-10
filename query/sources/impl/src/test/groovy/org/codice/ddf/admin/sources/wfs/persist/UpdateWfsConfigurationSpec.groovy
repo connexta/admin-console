@@ -21,6 +21,7 @@ import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.sources.SourceMessages
 import org.codice.ddf.admin.sources.fields.WfsVersion
 import org.codice.ddf.admin.sources.fields.type.WfsSourceConfigurationField
+import org.codice.ddf.admin.sources.services.WfsServiceProperties
 import org.codice.ddf.admin.sources.test.SourceCommonsSpec
 import org.codice.ddf.internal.admin.configurator.actions.FeatureActions
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions
@@ -85,7 +86,7 @@ class UpdateWfsConfigurationSpec extends SourceCommonsSpec {
 
     def 'Successfully update WFS configuration'() {
         setup:
-        updateWfsConfiguration.setValue(createWfsUpdateArgs())
+        updateWfsConfiguration.setValue(createWfsUpdateArgs(FLAG_PASSWORD))
         serviceActions.read(_ as String) >> [(ID): TEST_SOURCENAME]
         serviceReader.getServices(_, _) >> []
         configurator.commit(_, _) >> mockReport(false)
@@ -99,7 +100,7 @@ class UpdateWfsConfigurationSpec extends SourceCommonsSpec {
 
     def 'Fail to update due to existing source name specified by pid'() {
         setup:
-        updateWfsConfiguration.setValue(createWfsUpdateArgs())
+        updateWfsConfiguration.setValue(createWfsUpdateArgs(FLAG_PASSWORD))
         serviceActions.read(_) >> [(ID): 'updatedName']
         serviceReader.getServices(_, _) >> [new TestSource(S_PID, 'updatedName', false),
                                             new TestSource("existingSource", TEST_SOURCENAME, false)]
@@ -116,7 +117,7 @@ class UpdateWfsConfigurationSpec extends SourceCommonsSpec {
 
     def 'Fail configuration update due to failure to commit'() {
         setup:
-        updateWfsConfiguration.setValue(createWfsUpdateArgs())
+        updateWfsConfiguration.setValue(createWfsUpdateArgs(FLAG_PASSWORD))
         serviceActions.read(_) >> [(ID): TEST_SOURCENAME]
         serviceReader.getServices(_, _) >> []
 
@@ -134,7 +135,7 @@ class UpdateWfsConfigurationSpec extends SourceCommonsSpec {
 
     def 'Fail to update WFS config due to no existing config specified by pid'() {
         setup:
-        updateWfsConfiguration.setValue(createWfsUpdateArgs())
+        updateWfsConfiguration.setValue(createWfsUpdateArgs(FLAG_PASSWORD))
         serviceActions.read(S_PID) >> [:]
 
         when:
@@ -149,7 +150,7 @@ class UpdateWfsConfigurationSpec extends SourceCommonsSpec {
 
     def 'Return false when wfs feature fails to start'() {
         setup:
-        updateWfsConfiguration.setValue(createWfsUpdateArgs())
+        updateWfsConfiguration.setValue(createWfsUpdateArgs(FLAG_PASSWORD))
         serviceReader.getServices(_, _) >> []
         serviceActions.read(_) >> [(ID): TEST_SOURCENAME]
 
@@ -162,6 +163,38 @@ class UpdateWfsConfigurationSpec extends SourceCommonsSpec {
         report.messages().size() == 1
         report.messages().get(0).path == RESULT_ARGUMENT_PATH
         report.messages().get(0).code == DefaultMessages.FAILED_PERSIST
+    }
+
+    def 'Updating with flag password sends service properties without password'() {
+        setup:
+        updateWfsConfiguration.setValue(createWfsUpdateArgs(FLAG_PASSWORD))
+        serviceActions.read(_ as String) >> [(ID): TEST_SOURCENAME]
+        serviceReader.getServices(_, _) >> []
+        configurator.commit(_, _) >> mockReport(false)
+
+        def expectedUpdateConfig = getUpdateWfsProps(FLAG_PASSWORD)
+
+        when:
+        updateWfsConfiguration.getValue()
+
+        then:
+        1 * serviceActions.build(S_PID, expectedUpdateConfig, true)
+    }
+
+    def 'Updating with new password sends service properties with password'() {
+        setup:
+        updateWfsConfiguration.setValue(createWfsUpdateArgs('notFlagPassword'))
+        serviceActions.read(_ as String) >> [(ID): TEST_SOURCENAME]
+        serviceReader.getServices(_, _) >> []
+        configurator.commit(_, _) >> mockReport(false)
+
+        def expectedUpdateConfig = getUpdateWfsProps('notFlagPassword')
+
+        when:
+        updateWfsConfiguration.getValue()
+
+        then:
+        1 * serviceActions.build(S_PID, expectedUpdateConfig, true)
     }
 
     def 'Fail due to missing required fields'() {
@@ -177,11 +210,20 @@ class UpdateWfsConfigurationSpec extends SourceCommonsSpec {
         report.messages()*.getPath() == [PID_PATH, SOURCE_NAME_PATH, ENDPOINT_URL_PATH, WFS_VERSION_PATH]
     }
 
-    def createWfsUpdateArgs() {
-        def config = new WfsSourceConfigurationField().wfsVersion(TEST_WFS_VERSION)
+    def createWfsUpdateArgs(String password) {
+        return [(WfsSourceConfigurationField.DEFAULT_FIELD_NAME): createWfsSourceConfig(password).getValue()]
+    }
+
+    def getUpdateWfsProps(String password) {
+        return WfsServiceProperties.wfsConfigToServiceProps(createWfsSourceConfig(password))
+    }
+
+    def createWfsSourceConfig(String password) {
+        def config = new WfsSourceConfigurationField()
+        config.wfsVersion(TEST_WFS_VERSION)
                 .endpointUrl('https://localhost:8993/geoserver/wfs').sourceName(TEST_SOURCENAME)
                 .pid(S_PID)
-        config.credentials().username(TEST_USERNAME).password(TEST_PASSWORD)
-        return [(WfsSourceConfigurationField.DEFAULT_FIELD_NAME): config.getValue()]
+                .credentials().username(TEST_USERNAME).password(password)
+        return config
     }
 }

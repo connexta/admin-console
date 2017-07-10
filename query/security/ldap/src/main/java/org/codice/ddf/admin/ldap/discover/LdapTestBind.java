@@ -13,6 +13,11 @@
  **/
 package org.codice.ddf.admin.ldap.discover;
 
+import static org.codice.ddf.admin.ldap.commons.LdapMessages.md5NeedsEncryptedError;
+import static org.codice.ddf.admin.ldap.fields.connection.LdapBindMethod.DigestMd5Sasl.DIGEST_MD5_SASL;
+import static org.codice.ddf.admin.ldap.fields.connection.LdapEncryptionMethodField.LdapsEncryption.LDAPS;
+import static org.codice.ddf.admin.ldap.fields.connection.LdapEncryptionMethodField.StartTlsEncryption.START_TLS;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -72,6 +77,24 @@ public class LdapTestBind extends TestFunctionField {
     @Override
     public FunctionField<BooleanField> newInstance() {
         return new LdapTestBind();
+    }
+
+    @Override
+    public void validate() {
+        super.validate();
+
+        if (containsErrorMsgs()) {
+            return;
+        }
+
+        if (DIGEST_MD5_SASL.equals(creds.bindMethod())) {
+            // To use MD5, we require an encrypted connection
+            if (!(START_TLS.equals(conn.encryptionMethod()) //
+                    || LDAPS.equals(conn.encryptionMethod()))) {
+                addArgumentMessage(md5NeedsEncryptedError(creds.bindMethodField()
+                        .path()));
+            }
+        }
     }
 
     /**

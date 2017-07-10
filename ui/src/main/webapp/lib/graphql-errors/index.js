@@ -16,6 +16,7 @@ const friendlyMessage = {
   NO_EXISTING_CONFIG: 'The configuration does not exist on the server.',
   INVALID_URI_ERROR: 'Invalid URI.',
   UNAUTHORIZED: 'Unauthorized. A valid username & password may be required to connect.',
+  MD5_NEEDS_ENCRYPTED: 'Cannot bind using MD5 over an unencrypted connection.',
   CANNOT_BIND: 'Cannot authenticate user.',
   INVALID_DN: 'The distinguished name has an invalid format.',
   INVALID_QUERY: 'The provided query is invalid.',

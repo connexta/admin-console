@@ -38,7 +38,7 @@ export const hostnameError = ({ sourceHostName }) =>
     ? 'Not a valid hostname or IP.' : undefined
 
 export const urlError = ({ endpointUrl }) =>
-  (!isBlank(endpointUrl) && !isURL(endpointUrl))
+  (!isBlank(endpointUrl) && !isURL(endpointUrl, { require_tld: false }))
     ? 'Not a valid url.' : undefined
 
 export const portError = ({ sourcePort }) =>

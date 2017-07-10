@@ -21,10 +21,10 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.api.fields.EnumValue;
-import org.codice.ddf.admin.api.poller.EnumValuePoller;
+import org.codice.ddf.admin.common.poller.BaseEnumValuePoller;
 import org.codice.ddf.security.handler.api.AuthenticationHandler;
 
-public class AuthTypesPoller implements EnumValuePoller<String> {
+public class AuthTypesPoller extends BaseEnumValuePoller<AuthenticationHandler, String> {
 
     private List<AuthenticationHandler> authHandlers = Collections.emptyList();
     private Map<String, String> descriptionMap = new HashMap<>();

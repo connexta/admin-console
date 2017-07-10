@@ -16,9 +16,9 @@ package org.codice.ddf.admin.graphql.servlet;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -26,12 +26,15 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
+import org.codice.ddf.admin.api.Events;
 import org.codice.ddf.admin.api.FieldProvider;
 import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.codice.ddf.admin.graphql.servlet.request.DelegateRequest;
 import org.codice.ddf.admin.graphql.servlet.request.DelegateResponse;
 import org.codice.ddf.admin.graphql.transform.FunctionDataFetcherException;
 import org.codice.ddf.admin.graphql.transform.GraphQLTransformCommons;
+import org.osgi.service.event.Event;
+import org.osgi.service.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,26 +49,32 @@ import graphql.schema.GraphQLFieldDefinition;
 import graphql.servlet.ExecutionStrategyProvider;
 import graphql.servlet.GraphQLMutationProvider;
 import graphql.servlet.GraphQLQueryProvider;
+import graphql.servlet.GraphQLTypesProvider;
 import graphql.servlet.OsgiGraphQLServlet;
 
-public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet {
+public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet implements EventHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExtendedOsgiGraphQLServlet.class);
 
-    private GraphQLTransformCommons transformCommons;
-
+    private List<FieldProvider> fieldProviders;
+    private List<GraphQlProvider> transformedProviders;
+    private List<GraphQLTypesProvider> typesProviders;
     private ExecutionStrategyProvider execStrategy;
-
-    private Map<String, GraphQLMutationProvider> graphQLMutationProviders;
-
-    private Map<String, GraphQLQueryProvider> graphQLQueryProviders;
 
     public ExtendedOsgiGraphQLServlet() {
         super();
-        transformCommons = new GraphQLTransformCommons();
+        fieldProviders = new ArrayList<>();
+        transformedProviders = new ArrayList<>();
+        typesProviders = new ArrayList<>();
         execStrategy = new ExecutionStrategyProviderImpl();
-        graphQLMutationProviders = new HashMap<>();
-        graphQLQueryProviders = new HashMap<>();
+
+    }
+
+    @Override
+    public void handleEvent(Event event) {
+        if(Events.REFRESH_SCHEMA.equals(event.getTopic())) {
+            refreshSchema();
+        }
     }
 
     @Override
@@ -123,95 +132,74 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet {
                 .isArray();
     }
 
-    public void bindFieldProvider(FieldProvider fieldProvider) {
+    public void refreshSchema() {
+        LOGGER.debug("Refreshing GraphQL schema.");
 
-        if (CollectionUtils.isNotEmpty(fieldProvider.getDiscoveryFields())) {
-            LOGGER.debug("Binding queries of field provider {} to graphql servlet.",
-                    fieldProvider.fieldName());
-            try {
-                GraphQLQueryProvider queryProvider = new GraphQLQueryProviderImpl(fieldProvider,
-                        transformCommons);
-                bindQueryProvider(queryProvider);
-                graphQLQueryProviders.put(fieldProvider.fieldTypeName(), queryProvider);
-            } catch (Exception e) {
-                LOGGER.error("Unable to bind queries of field provider {} to graphql servlet.",
-                        fieldProvider.fieldName(),
-                        e);
-            }
-        }
+        unbindProviders();
 
-        if (CollectionUtils.isNotEmpty(fieldProvider.getMutationFunctions())) {
-            LOGGER.debug("Binding mutations of field provider {} to graphql servlet.",
-                    fieldProvider.fieldName());
-            try {
-                GraphQLMutationProvider mutationProvider = new GraphQLMutationProviderImpl(
-                        fieldProvider,
-                        transformCommons);
-                bindMutationProvider(mutationProvider);
-                graphQLMutationProviders.put(fieldProvider.fieldTypeName(), mutationProvider);
-            } catch (Exception e) {
-                LOGGER.error("Unable to bind mutations of field provider {} to graphql servlet.",
-                        fieldProvider.fieldName(),
-                        e);
-            }
-        }
+        GraphQLTransformCommons transformer = new GraphQLTransformCommons();
+        transformedProviders = fieldProviders.stream()
+                .map(fieldProvider -> new GraphQlProvider(fieldProvider, transformer))
+                .collect(Collectors.toList());
+
+        typesProviders = transformer.getGraphQlTypeProviders();
+
+        bindProviders();
+
+        LOGGER.debug("Finished refreshing GraphQL schema.");
     }
 
-    public void unbindFieldProvider(FieldProvider fieldProvider) {
-        if (CollectionUtils.isNotEmpty(fieldProvider.getDiscoveryFields())) {
-            LOGGER.debug("Unbinding queries of field provider {} to graphql servlet.",
-                    fieldProvider.fieldName());
-            try {
-                unbindQueryProvider(graphQLQueryProviders.get(fieldProvider.fieldTypeName()));
-                graphQLQueryProviders.remove(fieldProvider.fieldTypeName());
-            } catch (Exception e) {
-                LOGGER.error("Unable to unbind queries of field provider {} from graphql servlet.",
-                        fieldProvider.fieldName(),
-                        e);
-            }
-        }
+    public void unbindProviders() {
+        LOGGER.debug("Unbinding GraphQL providers.");
 
-        if (CollectionUtils.isNotEmpty(fieldProvider.getMutationFunctions())) {
-            LOGGER.debug("Unbinding mutations of field provider {} to graphql servlet.",
-                    fieldProvider.fieldName());
-            try {
-                unbindMutationProvider(graphQLMutationProviders.get(fieldProvider.fieldTypeName()));
-                graphQLMutationProviders.remove(fieldProvider.fieldTypeName());
-            } catch (Exception e) {
-                LOGGER.error("Unable to unbind mutations of field provider {} from graphql servlet.",
-                        fieldProvider.fieldName(),
-                        e);
-            }
-        }
+        transformedProviders.stream()
+                .filter(provider -> CollectionUtils.isNotEmpty(provider.getMutations()))
+                .forEach(this::unbindMutationProvider);
+
+        transformedProviders.stream()
+                .filter(provider -> CollectionUtils.isNotEmpty(provider.getQueries()))
+                .forEach(this::unbindQueryProvider);
+
+        typesProviders.stream()
+                .filter(provider -> CollectionUtils.isNotEmpty(provider.getTypes()))
+                .forEach(this::unbindTypesProvider);
     }
 
-    public class GraphQLQueryProviderImpl implements GraphQLQueryProvider {
+    public void bindProviders() {
+        LOGGER.debug("Binding GraphQL providers.");
+
+        typesProviders.stream()
+                .filter(provider -> CollectionUtils.isNotEmpty(provider.getTypes()))
+                .forEach(this::typesProviders);
+
+        transformedProviders.stream()
+                .filter(provider -> CollectionUtils.isNotEmpty(provider.getMutations()))
+                .forEach(this::bindMutationProvider);
+
+        transformedProviders.stream()
+                .filter(provider -> CollectionUtils.isNotEmpty(provider.getQueries()))
+                .forEach(this::bindQueryProvider);
+    }
+
+    public class GraphQlProvider implements GraphQLQueryProvider, GraphQLMutationProvider {
 
         private List<GraphQLFieldDefinition> queries;
-
-        public GraphQLQueryProviderImpl(FieldProvider provider,
-                GraphQLTransformCommons transformCommons) {
-            queries = transformCommons.fieldProviderToQueries(provider);
-        }
-
-        @Override
-        public Collection<GraphQLFieldDefinition> getQueries() {
-            return queries;
-        }
-    }
-
-    public class GraphQLMutationProviderImpl implements GraphQLMutationProvider {
-
         private List<GraphQLFieldDefinition> mutations;
 
-        public GraphQLMutationProviderImpl(FieldProvider provider,
+        public GraphQlProvider(FieldProvider provider,
                 GraphQLTransformCommons transformCommons) {
+            queries = transformCommons.fieldProviderToQueries(provider);
             mutations = transformCommons.fieldProviderToMutations(provider);
         }
 
         @Override
         public Collection<GraphQLFieldDefinition> getMutations() {
             return mutations;
+        }
+
+        @Override
+        public Collection<GraphQLFieldDefinition> getQueries() {
+            return queries;
         }
     }
 
@@ -252,5 +240,17 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet {
         public ExecutionStrategy getSubscriptionExecutionStrategy() {
             return strategy;
         }
+    }
+
+    public void bindFieldProvider(FieldProvider fieldProvider) {
+        refreshSchema();
+    }
+
+    public void unbindFieldProvider(FieldProvider fieldProvider) {
+        refreshSchema();
+    }
+
+    public void setFieldProviders(List<FieldProvider> fieldProviders) {
+        this.fieldProviders = fieldProviders;
     }
 }

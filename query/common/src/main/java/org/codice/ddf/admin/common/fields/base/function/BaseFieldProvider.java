@@ -22,6 +22,7 @@ import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.api.FieldProvider;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
+import org.codice.ddf.admin.common.services.ServiceCommons;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +43,6 @@ public abstract class BaseFieldProvider extends BaseObjectField implements Field
                 .collect(Collectors.toList());
     }
 
-
     public Field getDiscoveryField(String fieldName) {
         return getDiscoveryFields().stream()
                 .filter(field -> field.fieldName()
@@ -57,5 +57,13 @@ public abstract class BaseFieldProvider extends BaseObjectField implements Field
                         .equals(fieldName))
                 .findFirst()
                 .orElse(null);
+    }
+
+    public void bindField(Field field) {
+        ServiceCommons.updateGraphQLSchema(getClass());
+    }
+
+    public void unbindField(Field field) {
+        ServiceCommons.updateGraphQLSchema(getClass());
     }
 }

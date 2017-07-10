@@ -11,17 +11,20 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.api.poller;
+package org.codice.ddf.admin.common.poller;
 
-import java.util.List;
+import org.codice.ddf.admin.api.poller.EnumValuePoller;
+import org.codice.ddf.admin.common.services.ServiceCommons;
 
-import org.codice.ddf.admin.api.fields.EnumValue;
+public abstract class BaseEnumValuePoller<V, T> implements EnumValuePoller<V, T> {
 
-public interface EnumValuePoller<V, T> {
+    @Override
+    public void bindValue(V value) {
+        ServiceCommons.updateGraphQLSchema(getClass());
+    }
 
-    List<EnumValue<T>> getEnumValues();
-
-    void bindValue(V value);
-
-    void unbindValue(V value);
+    @Override
+    public void unbindValue(V value) {
+        ServiceCommons.updateGraphQLSchema(getClass());
+    }
 }

@@ -20,6 +20,7 @@ import org.apache.commons.lang.StringUtils;
 import org.codice.ddf.admin.api.FieldProvider;
 
 import graphql.schema.GraphQLFieldDefinition;
+import graphql.servlet.GraphQLTypesProvider;
 
 public class GraphQLTransformCommons {
 
@@ -28,7 +29,6 @@ public class GraphQLTransformCommons {
     public GraphQLTransformCommons() {
         transformOutput = new GraphQLTransformOutput();
     }
-
 
     public List<GraphQLFieldDefinition> fieldProviderToMutations(FieldProvider provider){
         return transformOutput.fieldsToGraphQLFieldDefinition(provider.getMutationFunctions());
@@ -42,4 +42,7 @@ public class GraphQLTransformCommons {
         return StringUtils.capitalize(str);
     }
 
+    public List<GraphQLTypesProvider> getGraphQlTypeProviders() {
+        return transformOutput.getTypeProviders();
+    }
 }

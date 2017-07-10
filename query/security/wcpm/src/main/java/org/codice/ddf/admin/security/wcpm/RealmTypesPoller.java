@@ -22,9 +22,9 @@ import java.util.stream.Collectors;
 
 import org.apache.karaf.jaas.config.JaasRealm;
 import org.codice.ddf.admin.api.fields.EnumValue;
-import org.codice.ddf.admin.api.poller.EnumValuePoller;
+import org.codice.ddf.admin.common.poller.BaseEnumValuePoller;
 
-public class RealmTypesPoller implements EnumValuePoller<String> {
+public class RealmTypesPoller extends BaseEnumValuePoller<JaasRealm, String> {
 
     private Map<String, String> descriptionMap = new HashMap<>();
 

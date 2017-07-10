@@ -13,25 +13,25 @@
  **/
 package org.codice.ddf.admin.graphql.transform;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.codice.ddf.admin.api.fields.EnumField;
 import org.codice.ddf.admin.api.fields.EnumValue;
+import org.codice.ddf.admin.graphql.GraphQLTypesProviderImpl;
 
 import graphql.schema.GraphQLEnumType;
+import graphql.servlet.GraphQLTypesProvider;
 
 public class GraphQLTransformEnum {
-    private Map<String, GraphQLEnumType> predefinedEnums;
+
+    private GraphQLTypesProviderImpl enumTypeProvider;
 
     public GraphQLTransformEnum() {
-        this.predefinedEnums = new HashMap<>();
+        this.enumTypeProvider = new GraphQLTypesProviderImpl();
     }
 
     public GraphQLEnumType enumFieldToGraphQLEnumType(EnumField<Object, EnumValue<Object>> field) {
 
-        if(predefinedEnums.containsKey(field.fieldTypeName())) {
-            return predefinedEnums.get(field.fieldTypeName());
+        if(enumTypeProvider.isTypePresent(field.fieldTypeName())) {
+            return enumTypeProvider.getType(field.fieldTypeName());
         }
 
         GraphQLEnumType.Builder builder = GraphQLEnumType.newEnum()
@@ -42,7 +42,11 @@ public class GraphQLTransformEnum {
                 .forEach(val -> builder.value(val.enumTitle(), val.value(), val.description()));
 
         GraphQLEnumType newEnum = builder.build();
-        predefinedEnums.put(field.fieldTypeName(), newEnum);
+        enumTypeProvider.addType(field.fieldTypeName(), newEnum);
         return newEnum;
+    }
+
+    public GraphQLTypesProvider getEnumTypeProvider() {
+        return enumTypeProvider;
     }
 }

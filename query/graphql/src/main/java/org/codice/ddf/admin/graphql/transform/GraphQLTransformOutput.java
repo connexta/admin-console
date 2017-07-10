@@ -28,9 +28,11 @@ import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.api.fields.ObjectField;
 import org.codice.ddf.admin.api.fields.ScalarField;
 import org.codice.ddf.admin.api.report.FunctionReport;
+import org.codice.ddf.admin.graphql.GraphQLTypesProviderImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 import graphql.schema.DataFetchingEnvironment;
@@ -40,6 +42,7 @@ import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLTypeReference;
+import graphql.servlet.GraphQLTypesProvider;
 
 public class GraphQLTransformOutput {
 
@@ -47,24 +50,30 @@ public class GraphQLTransformOutput {
     private GraphQLTransformInput inputTransformer;
     private GraphQLTransformScalar transformScalar;
     private GraphQLTransformEnum transformEnum;
-
-    private Map<String, GraphQLOutputType> predefinedOutputTypes;
+    private GraphQLTypesProviderImpl outputTypeProvider;
+    private GraphQLTypesProviderImpl referenceTypeProvider;
 
     public GraphQLTransformOutput() {
         transformScalar = new GraphQLTransformScalar();
         transformEnum = new GraphQLTransformEnum();
         inputTransformer = new GraphQLTransformInput(transformScalar, transformEnum);
-        predefinedOutputTypes = new HashMap<>();
+        outputTypeProvider = new GraphQLTypesProviderImpl();
+        referenceTypeProvider = new GraphQLTypesProviderImpl();
     }
 
     public GraphQLOutputType fieldToGraphQLOutputType(DataType field) {
-        if (field.fieldTypeName() != null && predefinedOutputTypes.containsKey(field.fieldTypeName())) {
-            return predefinedOutputTypes.get(field.fieldTypeName());
+        if (outputTypeProvider.isTypePresent(field.fieldTypeName())) {
+            return outputTypeProvider.getType(field.fieldTypeName());
         }
 
         GraphQLOutputType type = null;
 
         if (field instanceof ObjectField) {
+            //Check if the objectField is recursive, if so bail early
+            if(referenceTypeProvider.isTypePresent(field.fieldTypeName())) {
+                return referenceTypeProvider.getType(field.fieldTypeName());
+            }
+
             type = fieldToGraphQLObjectType((ObjectField)field);
         } else if (field instanceof EnumField) {
             type = transformEnum.enumFieldToGraphQLEnumType((EnumField) field);
@@ -84,8 +93,8 @@ public class GraphQLTransformOutput {
                             + field.getClass());
         }
 
-        if (field.fieldTypeName() != null && !predefinedOutputTypes.containsKey(field.fieldTypeName())) {
-            predefinedOutputTypes.put(field.fieldTypeName(), type);
+        if (!outputTypeProvider.isTypePresent(field.fieldTypeName())) {
+            outputTypeProvider.addType(field.fieldTypeName(), type);
         }
 
         return type;
@@ -103,7 +112,7 @@ public class GraphQLTransformOutput {
                 field.getFields();
 
         //Add a GraphQLTypeReference to support recursion
-        predefinedOutputTypes.put(field.fieldTypeName(), new GraphQLTypeReference(typeName));
+        referenceTypeProvider.addType(field.fieldTypeName(), new GraphQLTypeReference(typeName));
         return GraphQLObjectType.newObject()
                 .name(typeName)
                 .description(field.description())
@@ -117,11 +126,9 @@ public class GraphQLTransformOutput {
             return new ArrayList<>();
         }
         return fields.stream()
-                .map(field -> fieldToGraphQLFieldDefinition(field))
-
+                .map(this::fieldToGraphQLFieldDefinition)
                 .collect(Collectors.toList());
     }
-
 
     public GraphQLFieldDefinition fieldToGraphQLFieldDefinition(Field field) {
         List<GraphQLArgument> graphQLArgs = new ArrayList<>();
@@ -187,5 +194,13 @@ public class GraphQLTransformOutput {
     //Add on Payload to avoid collision between an input and output field type name;
     public String createOutputObjectFieldTypeName(String fieldTypeName) {
         return GraphQLTransformCommons.capitalize(fieldTypeName) + "Payload";
+    }
+
+    //Omit the referenceTypeProvider intentionally since all the types should already be defined by the other providers
+    public List<GraphQLTypesProvider> getTypeProviders() {
+        return ImmutableList.of(inputTransformer.getInputTypeProvider(),
+                transformScalar.getScalarTypesProvider(),
+                transformEnum.getEnumTypeProvider(),
+                outputTypeProvider);
     }
 }

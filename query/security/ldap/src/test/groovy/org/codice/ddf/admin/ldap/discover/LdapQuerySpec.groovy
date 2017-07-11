@@ -22,6 +22,7 @@ import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.ldap.LdapTestingCommons
 import org.codice.ddf.admin.ldap.TestLdapServer
 import org.codice.ddf.admin.ldap.commons.LdapMessages
+import org.codice.ddf.admin.ldap.commons.LdapTestingUtils
 import org.codice.ddf.admin.ldap.fields.LdapDistinguishedName
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindMethod
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindUserInfo
@@ -37,6 +38,8 @@ class LdapQuerySpec extends Specification {
     static TestLdapServer server
     Map<String, Object> args
     LdapQuery ldapQueryFunction
+    LdapTestingUtils utilsMock
+    boolean ldapConnectionIsClosed
 
     def setupSpec() {
         server = TestLdapServer.getInstance().useSimpleAuth()
@@ -49,8 +52,13 @@ class LdapQuerySpec extends Specification {
     }
 
     def setup() {
+        utilsMock = new LdapTestConnectionSpec.LdapTestingUtilsMock()
         LdapTestingCommons.loadLdapTestProperties()
         ldapQueryFunction = new LdapQuery()
+    }
+
+    def cleanup() {
+        ldapConnectionIsClosed = false
     }
 
     def 'Fail on missing required fields'() {
@@ -123,9 +131,11 @@ class LdapQuerySpec extends Specification {
                 (LdapQueryField.DEFAULT_FIELD_NAME)     : ldapQuery("(objectClass=person)").getValue()]
 
         ldapQueryFunction.setValue(args)
+        ldapQueryFunction.setTestingUtils(utilsMock)
 
         when:
         FunctionReport report = ldapQueryFunction.getValue()
+        ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().result().isClosed()
 
         then:
         def entries = report.result().getList()
@@ -133,6 +143,7 @@ class LdapQuerySpec extends Specification {
         entries*.getEntry('name')*.get()*.value() as Set ==
                 ['uid=tstark,ou=users,dc=example,dc=com', 'uid=bbanner,ou=users,dc=example,dc=com'] as Set
         entries*.getEntry('employeeType')*.get()*.value() as Set == ['ironman', 'hulk'] as Set
+        ldapConnectionIsClosed
     }
 
     def 'Successfully query with entries found (startTLS) '() {
@@ -142,11 +153,12 @@ class LdapQuerySpec extends Specification {
                 (LdapQuery.QUERY_BASE_FIELD_NAME)       : exampleQueryBase().getValue(),
                 (LdapQueryField.DEFAULT_FIELD_NAME)     : ldapQuery("(objectClass=person)").getValue()]
 
-        ldapQueryFunction.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
         ldapQueryFunction.setValue(args)
+        ldapQueryFunction.setTestingUtils(utilsMock)
 
         when:
         FunctionReport report = ldapQueryFunction.getValue()
+        ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().result().isClosed()
 
         then:
         def entries = report.result().getList()
@@ -154,6 +166,7 @@ class LdapQuerySpec extends Specification {
         entries*.getEntry('name')*.get()*.value() as Set ==
                 ['uid=tstark,ou=users,dc=example,dc=com', 'uid=bbanner,ou=users,dc=example,dc=com'] as Set
         entries*.getEntry('employeeType')*.get()*.value() as Set == ['ironman', 'hulk'] as Set
+        ldapConnectionIsClosed
     }
 
     def 'Successfully query with entries found (LDAPS) '() {
@@ -163,11 +176,12 @@ class LdapQuerySpec extends Specification {
                 (LdapQuery.QUERY_BASE_FIELD_NAME)       : exampleQueryBase().getValue(),
                 (LdapQueryField.DEFAULT_FIELD_NAME)     : ldapQuery("(objectClass=person)").getValue()]
 
-        ldapQueryFunction.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
         ldapQueryFunction.setValue(args)
+        ldapQueryFunction.setTestingUtils(utilsMock)
 
         when:
         FunctionReport report = ldapQueryFunction.getValue()
+        ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().result().isClosed()
 
         then:
         def entries = report.result().getList()
@@ -175,6 +189,7 @@ class LdapQuerySpec extends Specification {
         entries*.getEntry('name')*.get()*.value() as Set ==
                 ['uid=tstark,ou=users,dc=example,dc=com', 'uid=bbanner,ou=users,dc=example,dc=com'] as Set
         entries*.getEntry('employeeType')*.get()*.value() as Set == ['ironman', 'hulk'] as Set
+        ldapConnectionIsClosed
     }
 
     def 'Successfully query with no entries found'() {
@@ -185,13 +200,16 @@ class LdapQuerySpec extends Specification {
                 (LdapQueryField.DEFAULT_FIELD_NAME)     : ldapQuery("(uid=NOT_REAL)").getValue()]
 
         ldapQueryFunction.setValue(args)
+        ldapQueryFunction.setTestingUtils(utilsMock)
 
         when:
         FunctionReport report = ldapQueryFunction.getValue()
+        ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().result().isClosed()
 
         then:
         def entries = report.result().getList()
         entries.size() == 0
+        ldapConnectionIsClosed
     }
 
     def 'Successfully query with specified max entry results'() {
@@ -203,9 +221,11 @@ class LdapQuerySpec extends Specification {
                 (LdapQueryField.DEFAULT_FIELD_NAME)     : ldapQuery("(objectClass=person)").getValue()]
 
         ldapQueryFunction.setValue(args)
+        ldapQueryFunction.setTestingUtils(utilsMock)
 
         when:
         FunctionReport report = ldapQueryFunction.getValue()
+        ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().result().isClosed()
 
         then:
         def entries = report.result().getList()
@@ -213,6 +233,7 @@ class LdapQuerySpec extends Specification {
         entries.first().getEntry('name').get().value() in
                 ['uid=tstark,ou=users,dc=example,dc=com', 'uid=bbanner,ou=users,dc=example,dc=com']
         entries.first().getEntry('employeeType').get().value() in ['ironman', 'hulk']
+        ldapConnectionIsClosed
     }
 
     def 'Successfully filter password fields'() {
@@ -223,9 +244,11 @@ class LdapQuerySpec extends Specification {
                 (LdapQueryField.DEFAULT_FIELD_NAME)     : ldapQuery("(objectClass=person)").getValue()]
 
         ldapQueryFunction.setValue(args)
+        ldapQueryFunction.setTestingUtils(utilsMock)
 
         when:
         FunctionReport report = ldapQueryFunction.getValue()
+        ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().result().isClosed()
 
         then:
         def entries = report.result().getList()
@@ -236,6 +259,7 @@ class LdapQuerySpec extends Specification {
 
         then: 'ensure no password data returned'
         entries*.getEntry('password') == [Optional.empty(), Optional.empty()]
+        ldapConnectionIsClosed
     }
 
     LdapDistinguishedName exampleQueryBase() {

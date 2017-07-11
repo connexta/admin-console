@@ -22,6 +22,7 @@ import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.ldap.LdapTestingCommons
 import org.codice.ddf.admin.ldap.TestLdapServer
 import org.codice.ddf.admin.ldap.commons.LdapMessages
+import org.codice.ddf.admin.ldap.commons.LdapTestingUtils
 import org.codice.ddf.admin.ldap.fields.connection.*
 import spock.lang.Ignore
 import spock.lang.Specification
@@ -33,6 +34,8 @@ class LdapTestBindSpec extends Specification {
     static TestLdapServer server
     Map<String, Object> args
     LdapTestBind ldapBindFunction
+    LdapTestingUtils utilsMock
+    boolean ldapConnectionIsClosed
 
     def setupSpec() {
         server = TestLdapServer.getInstance().useSimpleAuth()
@@ -45,8 +48,13 @@ class LdapTestBindSpec extends Specification {
     }
 
     def setup() {
+        utilsMock = new LdapTestConnectionSpec.LdapTestingUtilsMock()
         LdapTestingCommons.loadLdapTestProperties()
         ldapBindFunction = new LdapTestBind()
+    }
+
+    def cleanup() {
+        ldapConnectionIsClosed = false
     }
 
     def 'Fail on missing required fields'() {
@@ -108,14 +116,16 @@ class LdapTestBindSpec extends Specification {
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue()]
         ldapBindFunction.setValue(args)
-        ldapBindFunction.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
+        ldapBindFunction.setTestingUtils(utilsMock)
 
         when:
         FunctionReport report = ldapBindFunction.getValue()
+        ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().result().isClosed()
 
         then:
         report.messages().empty
         report.result().getValue()
+        ldapConnectionIsClosed
     }
 
     def 'Successfully bind user with LDAPS encryption using bind method "Simple"'() {
@@ -123,14 +133,16 @@ class LdapTestBindSpec extends Specification {
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): ldapsLdapConnectionInfo().getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue()]
         ldapBindFunction.setValue(args)
-        ldapBindFunction.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
+        ldapBindFunction.setTestingUtils(utilsMock)
 
         when:
         FunctionReport report = ldapBindFunction.getValue()
+        ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().result().isClosed()
 
         then:
         report.messages().empty
         report.result().getValue()
+        ldapConnectionIsClosed
     }
 
     def 'Fail to bind user with no encryption using bind method "DigestMD5SASL"'() {
@@ -156,14 +168,16 @@ class LdapTestBindSpec extends Specification {
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): ldapsLdapConnectionInfo().getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : digestBindInfo().getValue()]
         ldapBindFunction.setValue(args)
-        ldapBindFunction.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
+        ldapBindFunction.setTestingUtils(utilsMock)
 
         when:
         FunctionReport report = ldapBindFunction.getValue()
+        ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().result().isClosed()
 
         then:
         report.messages().empty
         report.result().getValue()
+        ldapConnectionIsClosed
     }
 
     @Ignore

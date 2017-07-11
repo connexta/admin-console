@@ -22,6 +22,7 @@ import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.ldap.LdapTestingCommons
 import org.codice.ddf.admin.ldap.TestLdapServer
 import org.codice.ddf.admin.ldap.commons.LdapMessages
+import org.codice.ddf.admin.ldap.commons.LdapTestingUtils
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindMethod
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindUserInfo
 import org.codice.ddf.admin.ldap.fields.connection.LdapConnectionField
@@ -39,6 +40,8 @@ class LdapRecommendedSettingsSpec extends Specification {
     Map<String, Object> args
     def badPaths
     def baseMsg
+    LdapTestingUtils utilsMock
+    boolean ldapConnectionIsClosed
 
     def setupSpec() {
         server = TestLdapServer.getInstance().useSimpleAuth()
@@ -51,6 +54,7 @@ class LdapRecommendedSettingsSpec extends Specification {
     }
 
     def setup() {
+        utilsMock = new LdapTestConnectionSpec.LdapTestingUtilsMock()
         LdapTestingCommons.loadLdapTestProperties()
         action = new LdapRecommendedSettings()
 
@@ -64,6 +68,10 @@ class LdapRecommendedSettingsSpec extends Specification {
                     missingBindMethodPath  : baseMsg + [LdapBindUserInfo.DEFAULT_FIELD_NAME, LdapBindMethod.DEFAULT_FIELD_NAME],
                     missingLdapTypePath    : baseMsg + [LdapTypeField.DEFAULT_FIELD_NAME]
         ]
+    }
+
+    def cleanup() {
+        ldapConnectionIsClosed = false
     }
 
     def 'Fail on missing required fields'() {
@@ -90,7 +98,6 @@ class LdapRecommendedSettingsSpec extends Specification {
 
     def 'fail to connect to LDAP'() {
         setup:
-
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().port(666).getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue(),
                 (LdapTypeField.DEFAULT_FIELD_NAME)      : LdapTypeField.Unknown.UNKNOWN]
@@ -108,7 +115,6 @@ class LdapRecommendedSettingsSpec extends Specification {
 
     def 'fail to bind to LDAP'() {
         setup:
-
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().password('badPassword').getValue(),
                 (LdapTypeField.DEFAULT_FIELD_NAME)      : LdapTypeField.Unknown.UNKNOWN]
@@ -126,15 +132,15 @@ class LdapRecommendedSettingsSpec extends Specification {
 
     def 'validate settings successfully'() {
         setup:
-
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue(),
                 (LdapTypeField.DEFAULT_FIELD_NAME)      : LdapTypeField.Unknown.UNKNOWN]
         action.setValue(args)
-        action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
+        action.setTestingUtils(utilsMock)
 
         when:
         LdapRecommendedSettingsField recSettings = action.getValue().result()
+        ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().result().isClosed()
 
         then:
         recSettings.userDnsField().value.size() == 1
@@ -159,5 +165,7 @@ class LdapRecommendedSettingsSpec extends Specification {
         recSettings.memberAttributesReferencedInGroupField().value == ['uid']
 
         recSettings.queryBasesField().value == [TestLdapServer.getBaseDistinguishedName()]
+
+        ldapConnectionIsClosed
     }
 }

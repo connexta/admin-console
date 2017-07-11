@@ -22,10 +22,10 @@ import graphql.servlet.GraphQLTypesProvider;
 
 public class GraphQLTransformEnum {
 
-    private GraphQLTypesProviderImpl enumTypeProvider;
+    private GraphQLTypesProviderImpl<GraphQLEnumType> enumTypeProvider;
 
     public GraphQLTransformEnum() {
-        this.enumTypeProvider = new GraphQLTypesProviderImpl();
+        this.enumTypeProvider = new GraphQLTypesProviderImpl<>();
     }
 
     public GraphQLEnumType enumFieldToGraphQLEnumType(EnumField<Object, EnumValue<Object>> field) {

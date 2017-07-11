@@ -50,15 +50,15 @@ public class GraphQLTransformOutput {
     private GraphQLTransformInput inputTransformer;
     private GraphQLTransformScalar transformScalar;
     private GraphQLTransformEnum transformEnum;
-    private GraphQLTypesProviderImpl outputTypeProvider;
-    private GraphQLTypesProviderImpl referenceTypeProvider;
+    private GraphQLTypesProviderImpl<GraphQLOutputType> outputTypeProvider;
+    private GraphQLTypesProviderImpl<GraphQLTypeReference> referenceTypeProvider;
 
     public GraphQLTransformOutput() {
         transformScalar = new GraphQLTransformScalar();
         transformEnum = new GraphQLTransformEnum();
         inputTransformer = new GraphQLTransformInput(transformScalar, transformEnum);
-        outputTypeProvider = new GraphQLTypesProviderImpl();
-        referenceTypeProvider = new GraphQLTypesProviderImpl();
+        outputTypeProvider = new GraphQLTypesProviderImpl<>();
+        referenceTypeProvider = new GraphQLTypesProviderImpl<>();
     }
 
     public GraphQLOutputType fieldToGraphQLOutputType(DataType field) {
@@ -69,11 +69,6 @@ public class GraphQLTransformOutput {
         GraphQLOutputType type = null;
 
         if (field instanceof ObjectField) {
-            //Check if the objectField is recursive, if so bail early
-            if(referenceTypeProvider.isTypePresent(field.fieldTypeName())) {
-                return referenceTypeProvider.getType(field.fieldTypeName());
-            }
-
             type = fieldToGraphQLObjectType((ObjectField)field);
         } else if (field instanceof EnumField) {
             type = transformEnum.enumFieldToGraphQLEnumType((EnumField) field);
@@ -93,14 +88,16 @@ public class GraphQLTransformOutput {
                             + field.getClass());
         }
 
-        if (!outputTypeProvider.isTypePresent(field.fieldTypeName())) {
-            outputTypeProvider.addType(field.fieldTypeName(), type);
-        }
-
+        outputTypeProvider.addType(field.fieldTypeName(), type);
         return type;
     }
 
     public GraphQLOutputType fieldToGraphQLObjectType(ObjectField field) {
+        //Check if the objectField is recursive, if so bail early
+        if(referenceTypeProvider.isTypePresent(field.fieldTypeName())) {
+            return referenceTypeProvider.getType(field.fieldTypeName());
+        }
+
         //Field provider names should be unique and looks pretty without "Payload" added to the name
         String typeName = field instanceof FieldProvider ?
                 field.fieldTypeName() :

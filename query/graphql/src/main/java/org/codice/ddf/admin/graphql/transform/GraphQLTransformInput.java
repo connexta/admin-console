@@ -41,10 +41,10 @@ public class GraphQLTransformInput {
 
     private GraphQLTransformScalar transformScalars;
     private GraphQLTransformEnum transformEnum;
-    private GraphQLTypesProviderImpl inputTypesProvider;
+    private GraphQLTypesProviderImpl<GraphQLInputType> inputTypesProvider;
 
     public GraphQLTransformInput(GraphQLTransformScalar transformScalars, GraphQLTransformEnum transformEnum) {
-        inputTypesProvider = new GraphQLTypesProviderImpl();
+        inputTypesProvider = new GraphQLTypesProviderImpl<>();
         this.transformScalars = transformScalars;
         this.transformEnum = transformEnum;
     }
@@ -87,9 +87,7 @@ public class GraphQLTransformInput {
                             + field.getClass());
         }
 
-        if(field.fieldTypeName() != null) {
-            inputTypesProvider.addType(field.fieldTypeName(), type);
-        }
+        inputTypesProvider.addType(field.fieldTypeName(), type);
         return type;
     }
 

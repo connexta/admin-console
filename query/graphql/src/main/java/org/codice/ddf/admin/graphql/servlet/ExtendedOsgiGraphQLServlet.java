@@ -57,7 +57,7 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet implements Ev
     private static final Logger LOGGER = LoggerFactory.getLogger(ExtendedOsgiGraphQLServlet.class);
 
     private List<FieldProvider> fieldProviders;
-    private List<GraphQlProvider> transformedProviders;
+    private List<GraphQLProvider> transformedProviders;
     private List<GraphQLTypesProvider> typesProviders;
     private ExecutionStrategyProvider execStrategy;
 
@@ -115,7 +115,7 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet implements Ev
         }
     }
 
-    public List<String> splitQueries(String requestContent) throws Exception {
+    private List<String> splitQueries(String requestContent) throws Exception {
         List<String> splitElements = new ArrayList<>();
         JsonNode jsonNode = new ObjectMapper().readTree(requestContent);
         if (jsonNode.isArray()) {
@@ -127,7 +127,7 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet implements Ev
         return splitElements;
     }
 
-    public boolean isBatchRequest(String requestContent) throws IOException {
+    private boolean isBatchRequest(String requestContent) throws IOException {
         return new ObjectMapper().readTree(requestContent)
                 .isArray();
     }
@@ -139,7 +139,7 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet implements Ev
 
         GraphQLTransformCommons transformer = new GraphQLTransformCommons();
         transformedProviders = fieldProviders.stream()
-                .map(fieldProvider -> new GraphQlProvider(fieldProvider, transformer))
+                .map(fieldProvider -> new GraphQLProvider(fieldProvider, transformer))
                 .collect(Collectors.toList());
 
         typesProviders = transformer.getGraphQlTypeProviders();
@@ -149,7 +149,7 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet implements Ev
         LOGGER.debug("Finished refreshing GraphQL schema.");
     }
 
-    public void unbindProviders() {
+    private void unbindProviders() {
         LOGGER.debug("Unbinding GraphQL providers.");
 
         transformedProviders.stream()
@@ -165,7 +165,7 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet implements Ev
                 .forEach(this::unbindTypesProvider);
     }
 
-    public void bindProviders() {
+    private void bindProviders() {
         LOGGER.debug("Binding GraphQL providers.");
 
         typesProviders.stream()
@@ -181,12 +181,12 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet implements Ev
                 .forEach(this::bindQueryProvider);
     }
 
-    public class GraphQlProvider implements GraphQLQueryProvider, GraphQLMutationProvider {
+    private class GraphQLProvider implements GraphQLQueryProvider, GraphQLMutationProvider {
 
         private List<GraphQLFieldDefinition> queries;
         private List<GraphQLFieldDefinition> mutations;
 
-        public GraphQlProvider(FieldProvider provider,
+        public GraphQLProvider(FieldProvider provider,
                 GraphQLTransformCommons transformCommons) {
             queries = transformCommons.fieldProviderToQueries(provider);
             mutations = transformCommons.fieldProviderToMutations(provider);
@@ -203,13 +203,14 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet implements Ev
         }
     }
 
-    public class ExtendedEnhancedExecutionStrategy extends EnhancedExecutionStrategy {
+    private class ExtendedEnhancedExecutionStrategy extends EnhancedExecutionStrategy {
 
         @Override
         protected void handleDataFetchingException(ExecutionContext executionContext,
                 GraphQLFieldDefinition fieldDef, Map<String, Object> argumentValues, Exception e) {
             if (e instanceof FunctionDataFetcherException) {
                 for (ErrorMessage msg : ((FunctionDataFetcherException) e).getCustomMessages()) {
+                    LOGGER.debug("Unsuccessful GraphQL request:\n", e.toString());
                     executionContext.addError(new DataFetchingGraphQLError(msg));
                 }
             } else {
@@ -218,7 +219,7 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet implements Ev
         }
     }
 
-    public class ExecutionStrategyProviderImpl implements ExecutionStrategyProvider {
+    private class ExecutionStrategyProviderImpl implements ExecutionStrategyProvider {
 
         private ExtendedEnhancedExecutionStrategy strategy;
 

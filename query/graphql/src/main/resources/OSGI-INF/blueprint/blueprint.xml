@@ -32,7 +32,7 @@
             <entry key="urlPatterns" value="/admin/beta/graphql/*" />
             <entry key="event.topics">
                 <array value-type="java.lang.String">
-                    <value>graphql/servlet/UPDATE_SCHEMA</value>
+                    <value>graphql/servlet/REFRESH_SCHEMA</value>
                 </array>
             </entry>
         </service-properties>

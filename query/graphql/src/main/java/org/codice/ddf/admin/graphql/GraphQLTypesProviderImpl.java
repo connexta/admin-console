@@ -13,35 +13,38 @@
  **/
 package org.codice.ddf.admin.graphql;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import graphql.schema.GraphQLType;
 import graphql.servlet.GraphQLTypesProvider;
 
-public class GraphQLTypesProviderImpl implements GraphQLTypesProvider {
+public class GraphQLTypesProviderImpl<T extends GraphQLType> implements GraphQLTypesProvider {
 
-    private Map<String, GraphQLType> types;
+    private Map<String, T> types;
 
     public GraphQLTypesProviderImpl() {
-        types = new HashMap<>();
+        types = new ConcurrentHashMap<>();
     }
 
     @Override
     public Collection<GraphQLType> getTypes() {
-        return types.values();
+        return new ArrayList<>(types.values());
     }
 
-    public void addType(String typeName, GraphQLType type) {
-        types.put(typeName, type);
+    public void addType(String typeName, T type) {
+        if(typeName != null && type != null) {
+            types.put(typeName, type);
+        }
     }
 
     public boolean isTypePresent(String typeName) {
         return typeName != null && types.containsKey(typeName);
     }
 
-    public <T extends GraphQLType> T getType(String typeName) {
-        return (T) types.get(typeName);
+    public T getType(String typeName) {
+        return types.get(typeName);
     }
 }

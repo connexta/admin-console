@@ -13,9 +13,6 @@
  **/
 package org.codice.ddf.admin.graphql.transform;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.codice.ddf.admin.api.fields.ScalarField;
 import org.codice.ddf.admin.graphql.GraphQLTypesProviderImpl;
 
@@ -24,13 +21,10 @@ import graphql.schema.GraphQLScalarType;
 
 public class GraphQLTransformScalar {
 
-    GraphQLTypesProviderImpl scalarTypesProvider;
-
-    Map<String, GraphQLScalarType> predefinedScalars;
+    GraphQLTypesProviderImpl<GraphQLScalarType> scalarTypesProvider;
 
     public GraphQLTransformScalar() {
-        predefinedScalars = new HashMap<>();
-        scalarTypesProvider = new GraphQLTypesProviderImpl();
+        scalarTypesProvider = new GraphQLTypesProviderImpl<>();
     }
 
     public GraphQLScalarType resolveScalarType(ScalarField field) {
@@ -62,10 +56,7 @@ public class GraphQLTransformScalar {
                     new GraphQLScalarType(field.fieldTypeName(), field.description(), Scalars.GraphQLFloat.getCoercing());
         }
 
-        if(field.fieldTypeName() != null && type != null) {
-            scalarTypesProvider.addType(field.fieldTypeName(), type);
-        }
-
+        scalarTypesProvider.addType(field.fieldTypeName(), type);
         return type;
     }
 

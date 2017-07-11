@@ -142,7 +142,7 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet implements Ev
                 .map(fieldProvider -> new GraphQLProvider(fieldProvider, transformer))
                 .collect(Collectors.toList());
 
-        typesProviders = transformer.getGraphQlTypeProviders();
+        typesProviders = new ArrayList<>(transformer.getGraphQlTypeProviders());
 
         bindProviders();
 
@@ -160,9 +160,13 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet implements Ev
                 .filter(provider -> CollectionUtils.isNotEmpty(provider.getQueries()))
                 .forEach(this::unbindQueryProvider);
 
+        transformedProviders.clear();
+
         typesProviders.stream()
                 .filter(provider -> CollectionUtils.isNotEmpty(provider.getTypes()))
                 .forEach(this::unbindTypesProvider);
+
+        typesProviders.clear();
     }
 
     private void bindProviders() {

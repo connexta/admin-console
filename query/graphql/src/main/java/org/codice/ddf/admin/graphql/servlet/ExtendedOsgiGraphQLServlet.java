@@ -24,7 +24,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.codice.ddf.admin.api.Events;
 import org.codice.ddf.admin.api.FieldProvider;
@@ -46,10 +45,12 @@ import graphql.annotations.EnhancedExecutionStrategy;
 import graphql.execution.ExecutionContext;
 import graphql.execution.ExecutionStrategy;
 import graphql.schema.GraphQLFieldDefinition;
+import graphql.servlet.DefaultGraphQLErrorHandler;
 import graphql.servlet.ExecutionStrategyProvider;
+import graphql.servlet.GraphQLErrorHandler;
 import graphql.servlet.GraphQLMutationProvider;
+import graphql.servlet.GraphQLProvider;
 import graphql.servlet.GraphQLQueryProvider;
-import graphql.servlet.GraphQLTypesProvider;
 import graphql.servlet.OsgiGraphQLServlet;
 
 public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet implements EventHandler {
@@ -57,17 +58,16 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet implements Ev
     private static final Logger LOGGER = LoggerFactory.getLogger(ExtendedOsgiGraphQLServlet.class);
 
     private List<FieldProvider> fieldProviders;
-    private List<GraphQLProvider> transformedProviders;
-    private List<GraphQLTypesProvider> typesProviders;
+    private List<GraphQLProviderImpl> transformedProviders;
     private ExecutionStrategyProvider execStrategy;
+    private GraphQLErrorHandler errorHandler;
 
     public ExtendedOsgiGraphQLServlet() {
         super();
         fieldProviders = new ArrayList<>();
         transformedProviders = new ArrayList<>();
-        typesProviders = new ArrayList<>();
         execStrategy = new ExecutionStrategyProviderImpl();
-
+        errorHandler = new GraphQLErrorHandlerImpl();
     }
 
     @Override
@@ -83,8 +83,8 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet implements Ev
     }
 
     @Override
-    protected boolean isClientError(GraphQLError error) {
-        return error instanceof DataFetchingGraphQLError || super.isClientError(error);
+    protected GraphQLErrorHandler getGraphQLErrorHandler() {
+        return errorHandler;
     }
 
     @Override
@@ -132,65 +132,28 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet implements Ev
                 .isArray();
     }
 
-    public void refreshSchema() {
+    public synchronized void refreshSchema() {
         LOGGER.debug("Refreshing GraphQL schema.");
 
-        unbindProviders();
+        transformedProviders.forEach(this::unbindProvider);
 
         GraphQLTransformCommons transformer = new GraphQLTransformCommons();
+
         transformedProviders = fieldProviders.stream()
-                .map(fieldProvider -> new GraphQLProvider(fieldProvider, transformer))
+                .map(fieldProvider -> new GraphQLProviderImpl(fieldProvider, transformer))
                 .collect(Collectors.toList());
 
-        typesProviders = new ArrayList<>(transformer.getGraphQlTypeProviders());
-
-        bindProviders();
+        transformedProviders.forEach(this::bindProvider);
 
         LOGGER.debug("Finished refreshing GraphQL schema.");
     }
 
-    private void unbindProviders() {
-        LOGGER.debug("Unbinding GraphQL providers.");
-
-        transformedProviders.stream()
-                .filter(provider -> CollectionUtils.isNotEmpty(provider.getMutations()))
-                .forEach(this::unbindMutationProvider);
-
-        transformedProviders.stream()
-                .filter(provider -> CollectionUtils.isNotEmpty(provider.getQueries()))
-                .forEach(this::unbindQueryProvider);
-
-        transformedProviders.clear();
-
-        typesProviders.stream()
-                .filter(provider -> CollectionUtils.isNotEmpty(provider.getTypes()))
-                .forEach(this::unbindTypesProvider);
-
-        typesProviders.clear();
-    }
-
-    private void bindProviders() {
-        LOGGER.debug("Binding GraphQL providers.");
-
-        typesProviders.stream()
-                .filter(provider -> CollectionUtils.isNotEmpty(provider.getTypes()))
-                .forEach(this::typesProviders);
-
-        transformedProviders.stream()
-                .filter(provider -> CollectionUtils.isNotEmpty(provider.getMutations()))
-                .forEach(this::bindMutationProvider);
-
-        transformedProviders.stream()
-                .filter(provider -> CollectionUtils.isNotEmpty(provider.getQueries()))
-                .forEach(this::bindQueryProvider);
-    }
-
-    private class GraphQLProvider implements GraphQLQueryProvider, GraphQLMutationProvider {
+    private static class GraphQLProviderImpl implements GraphQLProvider, GraphQLQueryProvider, GraphQLMutationProvider {
 
         private List<GraphQLFieldDefinition> queries;
         private List<GraphQLFieldDefinition> mutations;
 
-        public GraphQLProvider(FieldProvider provider,
+        public GraphQLProviderImpl(FieldProvider provider,
                 GraphQLTransformCommons transformCommons) {
             queries = transformCommons.fieldProviderToQueries(provider);
             mutations = transformCommons.fieldProviderToMutations(provider);
@@ -207,7 +170,7 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet implements Ev
         }
     }
 
-    private class ExtendedEnhancedExecutionStrategy extends EnhancedExecutionStrategy {
+    private static class ExtendedEnhancedExecutionStrategy extends EnhancedExecutionStrategy {
 
         @Override
         protected void handleDataFetchingException(ExecutionContext executionContext,
@@ -223,7 +186,7 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet implements Ev
         }
     }
 
-    private class ExecutionStrategyProviderImpl implements ExecutionStrategyProvider {
+    private static class ExecutionStrategyProviderImpl implements ExecutionStrategyProvider {
 
         private ExtendedEnhancedExecutionStrategy strategy;
 
@@ -244,6 +207,14 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet implements Ev
         @Override
         public ExecutionStrategy getSubscriptionExecutionStrategy() {
             return strategy;
+        }
+    }
+
+    public static class GraphQLErrorHandlerImpl extends DefaultGraphQLErrorHandler {
+
+        @Override
+        protected boolean isClientError(GraphQLError error) {
+            return error instanceof DataFetchingGraphQLError || super.isClientError(error);
         }
     }
 

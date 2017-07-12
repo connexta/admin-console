@@ -24,6 +24,7 @@ import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.ldap.LdapTestingCommons
 import org.codice.ddf.admin.ldap.TestLdapServer
 import org.codice.ddf.admin.ldap.commons.LdapMessages
+import org.codice.ddf.admin.ldap.commons.LdapTestingUtils
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindMethod
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindUserInfo
 import org.codice.ddf.admin.ldap.fields.connection.LdapConnectionField
@@ -39,6 +40,8 @@ class LdapUserAttributesSpec extends Specification {
     Map<String, Object> args
     def badPaths
     def baseMsg
+    LdapTestingUtils utilsMock
+    boolean ldapConnectionIsClosed
 
     def setupSpec() {
         server = TestLdapServer.getInstance().useSimpleAuth()
@@ -51,6 +54,7 @@ class LdapUserAttributesSpec extends Specification {
     }
 
     def setup() {
+        utilsMock = new LdapTestConnectionSpec.LdapTestingUtilsMock()
         LdapTestingCommons.loadLdapTestProperties()
         action = new LdapUserAttributes()
 
@@ -64,6 +68,10 @@ class LdapUserAttributesSpec extends Specification {
                     missingBindMethodPath               : baseMsg + [LdapBindUserInfo.DEFAULT_FIELD_NAME, LdapBindMethod.DEFAULT_FIELD_NAME],
                     baseUserDnPath                      : baseMsg + [LdapUserAttributes.BASE_USER_DN],
         ]
+    }
+
+    def cleanup() {
+        ldapConnectionIsClosed = false
     }
 
     def 'fail on missing required fields'() {
@@ -84,7 +92,6 @@ class LdapUserAttributesSpec extends Specification {
 
     def 'fail to connect to LDAP'() {
         setup:
-
         def ldapSettings = initLdapSettings(ATTRIBUTE_STORE, true)
 
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().port(666).getValue(),
@@ -127,16 +134,18 @@ class LdapUserAttributesSpec extends Specification {
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue(),
                 (LdapUserAttributes.BASE_USER_DN)  : LdapTestingCommons.LDAP_SERVER_BASE_GROUP_DN]
         action.setValue(args)
-        action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
+        action.setTestingUtils(utilsMock)
 
         when:
         ListField<StringField> report = action.getValue().result()
+        ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().result().isClosed()
 
         then:
         !report.list.empty
         report.list.any {
             it.value == 'cn'
         }
+        ldapConnectionIsClosed
     }
 
 }

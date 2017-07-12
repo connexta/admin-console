@@ -21,6 +21,7 @@ import org.codice.ddf.admin.common.fields.common.PortField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.ldap.TestLdapServer
 import org.codice.ddf.admin.ldap.commons.LdapMessages
+import org.codice.ddf.admin.ldap.commons.LdapTestingUtils
 import org.codice.ddf.admin.ldap.fields.config.LdapDirectorySettingsField
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindMethod
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindUserInfo
@@ -39,6 +40,8 @@ class LdapTestDirectorySettingsSpec extends Specification {
     LdapTestDirectorySettings action
     def badPaths
     def baseMsg
+    LdapTestingUtils utilsMock
+    boolean ldapConnectionIsClosed
 
     def setupSpec() {
         server = TestLdapServer.getInstance().useSimpleAuth()
@@ -51,6 +54,7 @@ class LdapTestDirectorySettingsSpec extends Specification {
     }
 
     def setup() {
+        utilsMock = new LdapTestConnectionSpec.LdapTestingUtilsMock()
         loadLdapTestProperties()
         action = new LdapTestDirectorySettings()
 
@@ -75,6 +79,10 @@ class LdapTestDirectorySettingsSpec extends Specification {
                     badGroupAttribFormatPath   : baseMsg + [LdapDirectorySettingsField.DEFAULT_FIELD_NAME, LdapDirectorySettingsField.GROUP_ATTRIBUTE_HOLDING_MEMBER],
                     badMemberAttribFormatPath  : baseMsg + [LdapDirectorySettingsField.DEFAULT_FIELD_NAME, LdapDirectorySettingsField.MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP]
         ]
+    }
+
+    def cleanup() {
+        ldapConnectionIsClosed = false
     }
 
     def 'fail on missing required fields'() {
@@ -224,10 +232,11 @@ class LdapTestDirectorySettingsSpec extends Specification {
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)          : simpleBindInfo().getValue(),
                 (LdapDirectorySettingsField.DEFAULT_FIELD_NAME): ldapSettings.getValue()]
         action.setValue(args)
-        action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
+        action.setTestingUtils(utilsMock)
 
         when:
         FunctionReport report = action.getValue()
+        ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().result().isClosed()
 
         then:
         report.messages().size() == 2
@@ -237,6 +246,7 @@ class LdapTestDirectorySettingsSpec extends Specification {
 
         report.messages()*.getPath() as Set == [badPaths.badGroupDnPath,
                                                 badPaths.missingGroupObjectPath] as Set
+        ldapConnectionIsClosed
     }
 
     def 'fail to find specified groupObjectClass in groups'() {
@@ -248,10 +258,11 @@ class LdapTestDirectorySettingsSpec extends Specification {
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)          : simpleBindInfo().getValue(),
                 (LdapDirectorySettingsField.DEFAULT_FIELD_NAME): ldapSettings.getValue()]
         action.setValue(args)
-        action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
+        action.setTestingUtils(utilsMock)
 
         when:
         FunctionReport report = action.getValue()
+        ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().result().isClosed()
 
         then:
         report.messages().size() == 2
@@ -261,6 +272,7 @@ class LdapTestDirectorySettingsSpec extends Specification {
 
         report.messages()*.getPath() as Set == [badPaths.badGroupDnPath,
                                                 badPaths.missingGroupObjectPath] as Set
+        ldapConnectionIsClosed
     }
 
     def 'fail to find entries in baseUserDN'() {
@@ -272,10 +284,11 @@ class LdapTestDirectorySettingsSpec extends Specification {
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)          : simpleBindInfo().getValue(),
                 (LdapDirectorySettingsField.DEFAULT_FIELD_NAME): ldapSettings.getValue()]
         action.setValue(args)
-        action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
+        action.setTestingUtils(utilsMock)
 
         when:
         FunctionReport report = action.getValue()
+        ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().result().isClosed()
 
         then:
         report.messages().size() == 2
@@ -288,6 +301,7 @@ class LdapTestDirectorySettingsSpec extends Specification {
 
         report.messages()*.getPath() as Set == [badPaths.badUserDnPath,
                                                 badPaths.missingUserNameAttrPath] as Set
+        ldapConnectionIsClosed
     }
 
     def 'fail when the usernameAttribute format is incorrect'() {
@@ -367,13 +381,15 @@ class LdapTestDirectorySettingsSpec extends Specification {
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)          : simpleBindInfo().getValue(),
                 (LdapDirectorySettingsField.DEFAULT_FIELD_NAME): ldapSettings.getValue()]
         action.setValue(args)
-        action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
+        action.setTestingUtils(utilsMock)
 
         when:
         FunctionReport report = action.getValue()
+        ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().result().isClosed()
 
         then:
         report.messages().empty
         report.result().getValue()
+        ldapConnectionIsClosed
     }
 }

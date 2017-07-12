@@ -24,6 +24,7 @@ import org.codice.ddf.admin.common.fields.common.PortField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.ldap.TestLdapServer
 import org.codice.ddf.admin.ldap.commons.LdapMessages
+import org.codice.ddf.admin.ldap.commons.LdapTestingUtils
 import org.codice.ddf.admin.ldap.fields.LdapDistinguishedName
 import org.codice.ddf.admin.ldap.fields.config.LdapDirectorySettingsField
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindMethod
@@ -50,6 +51,8 @@ class LdapTestClaimMappingsSpec extends Specification {
     private StringField userAttribute
     private LdapDistinguishedName baseDn
     private ListField<ClaimsMapEntry> claimMappings
+    LdapTestingUtils utilsMock
+    boolean ldapConnectionIsClosed
 
 
     def setupSpec() {
@@ -63,6 +66,7 @@ class LdapTestClaimMappingsSpec extends Specification {
     }
 
     def setup() {
+        utilsMock = new LdapTestConnectionSpec.LdapTestingUtilsMock()
         loadLdapTestProperties()
 
         serviceActions = Mock(ServiceActions)
@@ -91,6 +95,10 @@ class LdapTestClaimMappingsSpec extends Specification {
                     missingBindMethodPath       : baseMsg + [LdapBindUserInfo.DEFAULT_FIELD_NAME, LdapBindMethod.DEFAULT_FIELD_NAME],
                     badClaimMappingPath         : baseMsg + [CLAIMS_MAPPING]
         ]
+    }
+
+    def cleanup() {
+        ldapConnectionIsClosed = false
     }
 
     def 'fail on missing required fields'() {
@@ -330,13 +338,16 @@ class LdapTestClaimMappingsSpec extends Specification {
                 (CLAIMS_MAPPING)                           : claimsMapping.getValue()]
 
         action.setValue(args)
+        action.setTestingUtils(utilsMock)
 
         when:
         FunctionReport report = action.getValue()
+        ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().result().isClosed()
 
         then:
         report.messages().empty
         report.result().getValue()
+        ldapConnectionIsClosed
     }
 
     private static ClaimsMapEntry.ListImpl createClaimsMapping(Map<String, String> claims) {

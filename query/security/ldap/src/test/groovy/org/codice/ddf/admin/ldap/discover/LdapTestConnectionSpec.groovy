@@ -20,12 +20,12 @@ import org.codice.ddf.admin.common.fields.common.PortField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.ldap.LdapTestingCommons
 import org.codice.ddf.admin.ldap.TestLdapServer
+import org.codice.ddf.admin.ldap.commons.LdapConnectionAttempt
 import org.codice.ddf.admin.ldap.commons.LdapTestingUtils
 import org.codice.ddf.admin.ldap.fields.connection.LdapConnectionField
 import org.codice.ddf.admin.ldap.fields.connection.LdapEncryptionMethodField
 import org.forgerock.opendj.ldap.SSLContextBuilder
 import org.forgerock.opendj.ldap.TrustManagers
-import org.junit.Ignore
 import spock.lang.Specification
 
 import javax.net.ssl.SSLContext
@@ -39,6 +39,8 @@ class LdapTestConnectionSpec extends Specification {
     static TestLdapServer server
     Map<String, Object> args
     LdapTestConnection ldapConnectFunction
+    LdapTestingUtils utilsMock
+    boolean ldapConnectionIsClosed
 
     def setupSpec() {
         server = TestLdapServer.getInstance()
@@ -51,8 +53,13 @@ class LdapTestConnectionSpec extends Specification {
     }
 
     def setup() {
+        utilsMock = new LdapTestingUtilsMock()
         LdapTestingCommons.loadLdapTestProperties()
         ldapConnectFunction = new LdapTestConnection()
+    }
+
+    def cleanup() {
+        ldapConnectionIsClosed = false
     }
 
     def 'Fail on missing required connection info fields'() {
@@ -78,43 +85,53 @@ class LdapTestConnectionSpec extends Specification {
 
     def 'Successfully connect without encryption'() {
         setup:
+        utilsMock = new LdapTestingUtilsMock()
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue()]
         ldapConnectFunction.setValue(args)
+        ldapConnectFunction.setTestingUtils(utilsMock)
 
         when:
         FunctionReport report = ldapConnectFunction.getValue()
+        ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().result().isClosed()
 
         then:
         report.messages().empty
         report.result().getValue()
+        ldapConnectionIsClosed
     }
 
     def 'Successfully connect using LDAPS protocol'() {
         setup:
+        utilsMock = new LdapTestingUtilsMock()
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): ldapsLdapConnectionInfo().getValue()]
         ldapConnectFunction.setValue(args)
-        ldapConnectFunction.setTestingUtils(new LdapTestingUtilsMock())
+        ldapConnectFunction.setTestingUtils(utilsMock)
 
         when:
         FunctionReport report = ldapConnectFunction.getValue()
+        ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().result().isClosed()
 
         then:
         report.messages().empty
         report.result().getValue()
+        ldapConnectionIsClosed
     }
 
     def 'Successfully connect using startTls on standard port'() {
         setup:
+        utilsMock = new LdapTestingUtilsMock()
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): startTlsLdapConnectionInfo(server.getLdapPort()).getValue()]
         ldapConnectFunction.setValue(args)
-        ldapConnectFunction.setTestingUtils(new LdapTestingUtilsMock())
+        ldapConnectFunction.setTestingUtils(utilsMock)
 
         when:
         FunctionReport report = ldapConnectFunction.getValue()
+        ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().result().isClosed()
 
         then:
         report.messages().isEmpty()
         report.result().getValue()
+        ldapConnectionIsClosed
     }
 
     def 'Fail to startTls over LDAPS port'() {
@@ -198,6 +215,8 @@ class LdapTestConnectionSpec extends Specification {
      */
     static class LdapTestingUtilsMock extends LdapTestingUtils {
 
+        def connectionAttempt
+
         private boolean throwException
 
         LdapTestingUtilsMock(boolean throwSSLContextExcp) {
@@ -207,6 +226,12 @@ class LdapTestConnectionSpec extends Specification {
 
         LdapTestingUtilsMock() {
             this(false)
+        }
+
+        @Override
+        LdapConnectionAttempt getLdapConnection(LdapConnectionField connection) {
+            connectionAttempt = super.getLdapConnection(connection)
+            return connectionAttempt
         }
 
         @Override
@@ -221,6 +246,10 @@ class LdapTestConnectionSpec extends Specification {
                 fail(e.getMessage())
                 return null
             }
+        }
+
+        LdapConnectionAttempt getLdapConnectionAttempt() {
+            return connectionAttempt
         }
     }
 }

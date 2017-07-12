@@ -17,4 +17,5 @@ public interface Events {
 
     String REFRESH_SCHEMA = "graphql/servlet/REFRESH_SCHEMA";
 
+    String EVENT_REASON = "EVENT_REASON";
 }

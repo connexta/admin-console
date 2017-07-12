@@ -18,6 +18,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
@@ -39,6 +42,10 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.RemovalCause;
+import com.google.common.cache.RemovalNotification;
 
 import graphql.GraphQLError;
 import graphql.annotations.EnhancedExecutionStrategy;
@@ -56,7 +63,14 @@ import graphql.servlet.OsgiGraphQLServlet;
 public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet implements EventHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExtendedOsgiGraphQLServlet.class);
+    private static final long CACHE_EXPIRATION_IN_SECONDS = 1;
+    private static final long CACHE_CLEANUP_INVOCATION_IN_SECONDS = 1;
 
+    private static final String BINDING_FIELD_PROVIDER = "GraphQL servlet binding field provider ";
+    private static final String UNBINDING_FIELD_PROVIDER = "GraphQL servlet unbinding field provider ";
+
+    private Cache<String, Object> cache;
+    private ScheduledExecutorService scheduler;
     private List<FieldProvider> fieldProviders;
     private List<GraphQLProviderImpl> transformedProviders;
     private ExecutionStrategyProvider execStrategy;
@@ -64,6 +78,17 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet implements Ev
 
     public ExtendedOsgiGraphQLServlet() {
         super();
+        cache = CacheBuilder.newBuilder()
+                .expireAfterWrite(CACHE_EXPIRATION_IN_SECONDS, TimeUnit.SECONDS)
+                .removalListener(this::refreshSchemaOnExpire)
+                .build();
+
+        scheduler = Executors.newScheduledThreadPool(1);
+        scheduler.scheduleAtFixedRate(() -> cache.cleanUp(),
+                CACHE_CLEANUP_INVOCATION_IN_SECONDS,
+                CACHE_CLEANUP_INVOCATION_IN_SECONDS,
+                TimeUnit.SECONDS);
+
         fieldProviders = new ArrayList<>();
         transformedProviders = new ArrayList<>();
         execStrategy = new ExecutionStrategyProviderImpl();
@@ -71,9 +96,14 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet implements Ev
     }
 
     @Override
+    public void destroy() {
+        scheduler.shutdownNow();
+    }
+
+    @Override
     public void handleEvent(Event event) {
         if(Events.REFRESH_SCHEMA.equals(event.getTopic())) {
-            refreshSchema();
+            triggerSchemaRefresh((String) event.getProperty(Events.EVENT_REASON));
         }
     }
 
@@ -132,7 +162,25 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet implements Ev
                 .isArray();
     }
 
-    public synchronized void refreshSchema() {
+    private void triggerSchemaRefresh(String refreshReason) {
+        LOGGER.debug("GraphQL schema refresh requested. Cause: {}", refreshReason);
+        cache.put(Events.REFRESH_SCHEMA, true);
+    }
+
+    /**
+     * Refreshes the schema periodically once the cache invalidates if a REFRESH_SCHEMA event was added to the cache.
+     * This allows multiple threads to ask for a schema refresh while only refreshing the schema once.
+     * @param notification
+     */
+    private void refreshSchemaOnExpire(RemovalNotification notification) {
+        if (notification.getCause() == RemovalCause.EXPIRED) {
+            refreshSchema();
+        }
+    }
+
+    //Synchronized just in case the schema is still updating when another refresh is called
+    //The performance decrease by the `synchronized` is negligible because of the periodic cache invalidation implementation
+    private synchronized void refreshSchema() {
         LOGGER.debug("Refreshing GraphQL schema.");
 
         transformedProviders.forEach(this::unbindProvider);
@@ -146,6 +194,18 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet implements Ev
         transformedProviders.forEach(this::bindProvider);
 
         LOGGER.debug("Finished refreshing GraphQL schema.");
+    }
+
+    public void bindFieldProvider(FieldProvider fieldProvider) {
+        triggerSchemaRefresh(BINDING_FIELD_PROVIDER + fieldProvider.fieldTypeName());
+    }
+
+    public void unbindFieldProvider(FieldProvider fieldProvider) {
+        triggerSchemaRefresh(UNBINDING_FIELD_PROVIDER + fieldProvider.fieldTypeName());
+    }
+
+    public void setFieldProviders(List<FieldProvider> fieldProviders) {
+        this.fieldProviders = fieldProviders;
     }
 
     private static class GraphQLProviderImpl implements GraphQLProvider, GraphQLQueryProvider, GraphQLMutationProvider {
@@ -216,17 +276,5 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet implements Ev
         protected boolean isClientError(GraphQLError error) {
             return error instanceof DataFetchingGraphQLError || super.isClientError(error);
         }
-    }
-
-    public void bindFieldProvider(FieldProvider fieldProvider) {
-        refreshSchema();
-    }
-
-    public void unbindFieldProvider(FieldProvider fieldProvider) {
-        refreshSchema();
-    }
-
-    public void setFieldProviders(List<FieldProvider> fieldProviders) {
-        this.fieldProviders = fieldProviders;
     }
 }

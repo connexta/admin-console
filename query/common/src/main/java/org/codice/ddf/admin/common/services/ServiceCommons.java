@@ -17,7 +17,6 @@ import static org.codice.ddf.admin.common.report.message.DefaultMessages.failedP
 import static org.codice.ddf.admin.common.report.message.DefaultMessages.noExistingConfigError;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +40,8 @@ import org.osgi.service.event.EventAdmin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.ImmutableMap;
+
 public class ServiceCommons {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ServiceCommons.class);
@@ -52,8 +53,6 @@ public class ServiceCommons {
     // A flag to indicate if a service being updated has a password of "secret". If so, the
     // password will not be updated.
     public static final String FLAG_PASSWORD = "secret";
-
-    public static final Event UPDATE_SCHEMA_EVENT = new Event(Events.REFRESH_SCHEMA, Collections.emptyMap());
 
     private ManagedServiceActions managedServiceActions;
 
@@ -222,8 +221,12 @@ public class ServiceCommons {
         this.configuratorFactory = configuratorFactory;
     }
 
-    public static void updateGraphQLSchema(Class clazz) {
-        getEventAdmin(clazz).postEvent(UPDATE_SCHEMA_EVENT);
+    public static void updateGraphQLSchema(Class clazz, String eventReason) {
+        getEventAdmin(clazz).postEvent(getUpdateSchemaEvent(eventReason));
+    }
+
+    public static Event getUpdateSchemaEvent(String eventReason){
+        return new Event(Events.REFRESH_SCHEMA, ImmutableMap.of(Events.EVENT_REASON, eventReason));
     }
 
     public static EventAdmin getEventAdmin(Class clazz) {

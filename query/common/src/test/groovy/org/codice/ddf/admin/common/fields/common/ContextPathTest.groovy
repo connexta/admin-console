@@ -67,4 +67,27 @@ class ContextPathTest extends Specification {
         validationMsgs.get(0).getCode() == DefaultMessages.EMPTY_FIELD
         validationMsgs.get(0).getPath() == [ContextPath.DEFAULT_FIELD_NAME]
     }
+
+    def 'Returns all the possible error codes correctly'(){
+        setup:
+        ContextPath emptyContextPath = new ContextPath()
+        emptyContextPath.setValue('')
+
+        ContextPath missingContextPath = new ContextPath().isRequired(true)
+
+        ContextPath invalidContextPath = new ContextPath()
+        invalidContextPath.setValue('/..')
+
+        when:
+        def errorCodes = contextPath.getErrorCodes()
+        def emptyContextPathValidation = emptyContextPath.validate()
+        def missingContextPathValidation = missingContextPath.validate()
+        def invalidContextPathValidation = invalidContextPath.validate()
+
+        then:
+        errorCodes.size() == 3
+        errorCodes.contains(emptyContextPathValidation.get(0).getCode())
+        errorCodes.contains(missingContextPathValidation.get(0).getCode())
+        errorCodes.contains(invalidContextPathValidation.get(0).getCode())
+    }
 }

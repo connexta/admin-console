@@ -16,9 +16,11 @@ package org.codice.ddf.admin.ldap.fields.query;
 import static org.codice.ddf.admin.ldap.commons.LdapMessages.invalidQueryError;
 
 import java.util.List;
+import java.util.Set;
 
 import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
+import org.codice.ddf.admin.ldap.commons.LdapMessages;
 import org.forgerock.opendj.ldap.Filter;
 
 public class LdapQueryField extends StringField {
@@ -59,5 +61,12 @@ public class LdapQueryField extends StringField {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public Set<String> getErrorCodes() {
+        Set<String> errors = super.getErrorCodes();
+        errors.add(LdapMessages.INVALID_QUERY);
+        return errors;
     }
 }

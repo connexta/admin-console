@@ -15,11 +15,13 @@ package org.codice.ddf.admin.ldap.discover;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.function.TestFunctionField;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
+import org.codice.ddf.admin.common.report.message.DefaultMessages;
 import org.codice.ddf.admin.ldap.commons.LdapConnectionAttempt;
 import org.codice.ddf.admin.ldap.commons.LdapTestingUtils;
 import org.codice.ddf.admin.ldap.fields.connection.LdapConnectionField;
@@ -67,6 +69,14 @@ public class LdapTestConnection extends TestFunctionField {
     @Override
     public FunctionField<BooleanField> newInstance() {
         return new LdapTestConnection();
+    }
+
+    @Override
+    public Set<String> getFunctionErrorCodes() {
+        Set<String> errorMessages = super.getFunctionErrorCodes();
+        errorMessages.add(DefaultMessages.FAILED_TEST_SETUP);
+        errorMessages.add(DefaultMessages.CANNOT_CONNECT);
+        return errorMessages;
     }
 
     /**

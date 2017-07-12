@@ -17,6 +17,8 @@ class DeleteOpenSearchConfigurationSpec extends SourceCommonsSpec {
 
     Configurator configurator
 
+    ConfiguratorSuite configuratorSuite
+
     static RESULT_ARGUMENT_PATH = [DeleteOpenSearchConfiguration.FIELD_NAME]
 
     static BASE_PATH = [RESULT_ARGUMENT_PATH, FunctionField.ARGUMENT].flatten()
@@ -36,7 +38,7 @@ class DeleteOpenSearchConfigurationSpec extends SourceCommonsSpec {
         serviceActions = Mock(ServiceActions)
         def managedServiceActions = Mock(ManagedServiceActions)
 
-        def configuratorSuite = Mock(ConfiguratorSuite)
+        configuratorSuite = Mock(ConfiguratorSuite)
         configuratorSuite.configuratorFactory >> configuratorFactory
         configuratorSuite.serviceActions >> serviceActions
         configuratorSuite.managedServiceActions >> managedServiceActions
@@ -94,5 +96,31 @@ class DeleteOpenSearchConfigurationSpec extends SourceCommonsSpec {
             it.getCode() == DefaultMessages.MISSING_REQUIRED_FIELD
         } == 1
         report.messages()*.getPath() == [PID_PATH]
+    }
+
+    def 'Returns all the possible error codes correctly'(){
+        setup:
+        DeleteOpenSearchConfiguration deleteOpenSearchNoExistingConfig = new DeleteOpenSearchConfiguration(configuratorSuite)
+        serviceActions.read(S_PID) >> [:]
+        deleteOpenSearchNoExistingConfig.setValue(functionArgs)
+
+        DeleteOpenSearchConfiguration deleteOpenSearchFailPersist = new DeleteOpenSearchConfiguration(configuratorSuite)
+        serviceActions.read(S_PID) >> configToBeDeleted
+        configurator.commit(_, _) >> mockReport(true)
+        deleteOpenSearchFailPersist.setValue(functionArgs)
+
+        DeleteOpenSearchConfiguration deleteOpenSearchMissingField = new DeleteOpenSearchConfiguration(configuratorSuite)
+
+        when:
+        def errorCodes = deleteOpenSearchConfigurationFunction.getFunctionErrorCodes()
+        def noExistingConfigReport = deleteOpenSearchNoExistingConfig.getValue()
+        def failedPersistReport = deleteOpenSearchFailPersist.getValue()
+        def missingFieldReport = deleteOpenSearchMissingField.getValue()
+
+        then:
+        errorCodes.size() == 3
+        errorCodes.contains(noExistingConfigReport.messages().get(0).getCode())
+        errorCodes.contains(failedPersistReport.messages().get(0).getCode())
+        errorCodes.contains(missingFieldReport.messages().get(0).getCode())
     }
 }

@@ -132,4 +132,20 @@ class GetOpenSearchConfigsSpec extends SourceCommonsSpec {
         assert sourceInfo.config().pid() == pid
         return true
     }
+
+    def 'Returns all the possible error codes correctly'(){
+        setup:
+        functionArgs.put(PID, S_PID)
+        getOpenSearchConfigsFunction.setValue(functionArgs)
+        serviceActions.read(S_PID) >> [:]
+
+        when:
+        def errorCodes = getOpenSearchConfigsFunction.getFunctionErrorCodes()
+        def noExistingConfigReport = getOpenSearchConfigsFunction.getValue()
+
+        then:
+        errorCodes.size() == 2
+        errorCodes.contains(noExistingConfigReport.messages().get(0).code)
+        errorCodes.contains(DefaultMessages.MISSING_REQUIRED_FIELD)
+    }
 }

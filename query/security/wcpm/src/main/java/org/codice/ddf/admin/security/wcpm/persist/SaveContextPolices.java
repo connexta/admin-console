@@ -21,6 +21,7 @@ import static org.codice.ddf.admin.security.common.services.PolicyManagerService
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.api.ConfiguratorSuite;
@@ -28,8 +29,10 @@ import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
+import org.codice.ddf.admin.common.report.message.DefaultMessages;
 import org.codice.ddf.admin.configurator.Configurator;
 import org.codice.ddf.admin.configurator.OperationReport;
+import org.codice.ddf.admin.security.common.SecurityMessages;
 import org.codice.ddf.admin.security.common.SecurityValidation;
 import org.codice.ddf.admin.security.common.fields.wcpm.ClaimsMapEntry;
 import org.codice.ddf.admin.security.common.fields.wcpm.ContextPolicyBin;
@@ -132,5 +135,14 @@ public class SaveContextPolices extends BaseFunctionField<ContextPolicyBin.ListI
     @Override
     public FunctionField<ContextPolicyBin.ListImpl> newInstance() {
         return new SaveContextPolices(configuratorSuite);
+    }
+
+    @Override
+    public Set<String> getFunctionErrorCodes() {
+        Set<String> errorMessages = super.getFunctionErrorCodes();
+        errorMessages.add(DefaultMessages.FAILED_PERSIST);
+        errorMessages.add(SecurityMessages.INVALID_CLAIM_TYPE);
+        errorMessages.add(SecurityMessages.NO_ROOT_CONTEXT);
+        return errorMessages;
     }
 }

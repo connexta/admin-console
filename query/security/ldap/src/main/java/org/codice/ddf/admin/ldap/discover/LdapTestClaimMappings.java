@@ -17,6 +17,7 @@ import static org.codice.ddf.admin.ldap.commons.LdapMessages.userAttributeNotFou
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.api.ConfiguratorSuite;
@@ -25,12 +26,15 @@ import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.function.TestFunctionField;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
+import org.codice.ddf.admin.common.report.message.DefaultMessages;
 import org.codice.ddf.admin.ldap.commons.LdapConnectionAttempt;
+import org.codice.ddf.admin.ldap.commons.LdapMessages;
 import org.codice.ddf.admin.ldap.commons.LdapTestingUtils;
 import org.codice.ddf.admin.ldap.fields.LdapAttributeName;
 import org.codice.ddf.admin.ldap.fields.LdapDistinguishedName;
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindUserInfo;
 import org.codice.ddf.admin.ldap.fields.connection.LdapConnectionField;
+import org.codice.ddf.admin.security.common.SecurityMessages;
 import org.codice.ddf.admin.security.common.SecurityValidation;
 import org.codice.ddf.admin.security.common.fields.wcpm.ClaimsMapEntry;
 import org.codice.ddf.admin.security.common.services.StsServiceProperties;
@@ -154,6 +158,18 @@ public class LdapTestClaimMappings extends TestFunctionField {
         }
 
         return new BooleanField(!containsErrorMsgs());
+    }
+
+    @Override
+    public Set<String> getFunctionErrorCodes() {
+        Set<String> errorMessages = super.getFunctionErrorCodes();
+        errorMessages.add(SecurityMessages.INVALID_CLAIM_TYPE);
+        errorMessages.add(LdapMessages.CANNOT_BIND);
+        errorMessages.add(LdapMessages.DN_DOES_NOT_EXIST);
+        errorMessages.add(LdapMessages.USER_ATTRIBUTE_NOT_FOUND);
+        errorMessages.add(DefaultMessages.FAILED_TEST_SETUP);
+        errorMessages.add(DefaultMessages.CANNOT_CONNECT);
+        return errorMessages;
     }
 
     /**

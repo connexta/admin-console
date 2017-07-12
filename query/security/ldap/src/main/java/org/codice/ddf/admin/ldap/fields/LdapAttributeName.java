@@ -17,10 +17,12 @@ import static org.codice.ddf.admin.ldap.commons.LdapMessages.invalidUserAttribut
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
+import org.codice.ddf.admin.ldap.commons.LdapMessages;
 
 /**
  * The description of an attribute names and the logic for validating them are defined in RFC 4512.
@@ -75,5 +77,12 @@ public class LdapAttributeName extends StringField {
     public LdapAttributeName isRequired(boolean required) {
         super.isRequired(required);
         return this;
+    }
+
+    @Override
+    public Set<String> getErrorCodes() {
+        Set<String> errors = super.getErrorCodes();
+        errors.add(LdapMessages.INVALID_USER_ATTRIBUTE);
+        return errors;
     }
 }

@@ -241,4 +241,38 @@ class LdapTestBindSpec extends Specification {
     LdapBindUserInfo digestBindInfo() {
         return new LdapBindUserInfo().bindMethod(LdapBindMethod.DigestMd5Sasl.DIGEST_MD5_SASL).username(server.getBasicAuthDn()).password(server.getBasicAuthPassword()).realm("testRealm")
     }
+
+    def 'Returns all the possible error codes correctly'(){
+        setup:
+        LdapTestBind cannotConnectBindFunc = new LdapTestBind()
+        Map<String, Object> cannotConnectArgs = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().port(666).getValue(),
+                (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue()]
+        cannotConnectBindFunc.setValue(cannotConnectArgs)
+
+        LdapTestBind cannotBindFunc = new LdapTestBind()
+        Map<String, Object> cannotBindArgs = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue(),
+                (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : digestBindInfo().getValue()]
+        cannotBindFunc.setValue(cannotBindArgs)
+
+        LdapTestBind md5NeededBindFunc = new LdapTestBind()
+        md5NeededBindFunc.setValue(cannotBindArgs)
+        md5NeededBindFunc.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
+
+        LdapTestBind missingFieldBindFunc = new LdapTestBind()
+
+        when:
+        def errorCodes = ldapBindFunction.getFunctionErrorCodes()
+        def cannotConnectReport = cannotConnectBindFunc.getValue()
+        def cannotBindReport = cannotBindFunc.getValue()
+        def md5NeededReport = md5NeededBindFunc.getValue()
+        def missingFieldReport = missingFieldBindFunc.getValue()
+
+        then:
+        errorCodes.size() == 5
+        errorCodes.contains(cannotConnectReport.messages().get(0).getCode())
+        errorCodes.contains(cannotBindReport.messages().get(0).getCode())
+        errorCodes.contains(md5NeededReport.messages().get(0).getCode())
+        errorCodes.contains(missingFieldReport.messages().get(0).getCode())
+        errorCodes.contains(DefaultMessages.FAILED_TEST_SETUP)
+    }
 }

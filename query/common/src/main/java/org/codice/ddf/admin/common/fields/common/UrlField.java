@@ -19,9 +19,11 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Set;
 
 import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
+import org.codice.ddf.admin.common.report.message.DefaultMessages;
 
 public class UrlField extends StringField {
 
@@ -60,5 +62,12 @@ public class UrlField extends StringField {
             }
         }
         return validationMsgs;
+    }
+
+    @Override
+    public Set<String> getErrorCodes() {
+        Set<String> errors = super.getErrorCodes();
+        errors.add(DefaultMessages.INVALID_URL);
+        return errors;
     }
 }

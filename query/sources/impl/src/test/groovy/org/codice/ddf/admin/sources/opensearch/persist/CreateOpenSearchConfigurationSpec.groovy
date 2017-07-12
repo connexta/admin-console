@@ -54,6 +54,8 @@ class CreateOpenSearchConfigurationSpec extends SourceCommonsSpec {
 
     Configurator configurator
 
+    ConfiguratorSuite configuratorSuite
+
     FederatedSource federatedSource
 
     def federatedSources = []
@@ -71,7 +73,7 @@ class CreateOpenSearchConfigurationSpec extends SourceCommonsSpec {
         configuratorFactory = Mock(ConfiguratorFactory)
         configuratorFactory.getConfigurator() >> configurator
 
-        ConfiguratorSuite configuratorSuite = Mock(ConfiguratorSuite)
+        configuratorSuite = Mock(ConfiguratorSuite)
         configuratorSuite.configuratorFactory >> configuratorFactory
         configuratorSuite.serviceActions >> serviceActions
         configuratorSuite.serviceReader >> serviceReader
@@ -151,6 +153,31 @@ class CreateOpenSearchConfigurationSpec extends SourceCommonsSpec {
             it.getCode() == DefaultMessages.MISSING_REQUIRED_FIELD
         } == 2
         report.messages()*.getPath() == [SOURCE_NAME_PATH, ENDPOINT_URL_PATH]
+    }
+
+    def 'Returns all the possible error codes correctly'(){
+        setup:
+        CreateOpenSearchConfiguration createDuplicateNameConfig = new CreateOpenSearchConfiguration(configuratorSuite)
+        createDuplicateNameConfig.setValue(createFunctionArgs())
+        serviceReader.getServices(_, _) >> federatedSources
+
+        CreateOpenSearchConfiguration createFailPersistConfig = new CreateOpenSearchConfiguration(configuratorSuite)
+        createFailPersistConfig.setValue(createFunctionArgs())
+        serviceReader.getServices(_, _) >> []
+
+        CreateOpenSearchConfiguration createMissingFieldConfig = new CreateOpenSearchConfiguration(configuratorSuite)
+
+        when:
+        def errorCodes = createOpenSearchConfiguration.getFunctionErrorCodes()
+        def duplicateNameReport = createDuplicateNameConfig.getValue()
+        def createFailPersistReport = createFailPersistConfig.getValue()
+        def createMissingFieldReport = createMissingFieldConfig.getValue()
+
+        then:
+        errorCodes.size() == 3
+        errorCodes.contains(duplicateNameReport.messages().get(0).getCode())
+        errorCodes.contains(createFailPersistReport.messages().get(0).getCode())
+        errorCodes.contains(createMissingFieldReport.messages().get(0).getCode())
     }
 
     def createFunctionArgs() {

@@ -71,4 +71,27 @@ class UrlFieldTest extends Specification {
         'http://localhost:8993  ' | DefaultMessages.INVALID_URL
         '  '                      | DefaultMessages.INVALID_URL
     }
+
+    def 'Returns all the possible error codes correctly'(){
+        setup:
+        UrlField invalidUrlField = new UrlField()
+        invalidUrlField.setValue('http://')
+
+        UrlField emptyUrlField = new UrlField()
+        emptyUrlField.setValue('')
+
+        UrlField missingUrlField = new UrlField().isRequired(true)
+
+        when:
+        def errorCodes = urlField.getErrorCodes()
+        def invalidUrlValidation = invalidUrlField.validate()
+        def emptyUrlValidation = emptyUrlField.validate()
+        def missingUrlValidation = missingUrlField.validate()
+
+        then:
+        errorCodes.size() == 3
+        errorCodes.contains(invalidUrlValidation.get(0).getCode())
+        errorCodes.contains(emptyUrlValidation.get(0).getCode())
+        errorCodes.contains(missingUrlValidation.get(0).getCode())
+    }
 }

@@ -262,6 +262,39 @@ class LdapQuerySpec extends Specification {
         ldapConnectionIsClosed
     }
 
+    def 'Returns all the possible error codes correctly'(){
+        setup:
+        Map<String, Object> cannotConnectArgs = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().port(666).getValue(),
+                (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue(),
+                (LdapQuery.QUERY_BASE_FIELD_NAME)       : exampleQueryBase().getValue(),
+                (LdapQueryField.DEFAULT_FIELD_NAME)     : exampleLdapQuery().getValue()]
+        LdapQuery cannotConnectQuery = new LdapQuery()
+        cannotConnectQuery.setValue(cannotConnectArgs)
+
+
+        Map<String, Object> cannotBindArgs = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue(),
+                (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().password("badPassword").getValue(),
+                (LdapQuery.QUERY_BASE_FIELD_NAME)       : exampleQueryBase().getValue(),
+                (LdapQueryField.DEFAULT_FIELD_NAME)     : exampleLdapQuery().getValue()]
+        LdapQuery cannotBindQuery = new LdapQuery()
+        cannotBindQuery.setValue(cannotBindArgs)
+
+        LdapQuery missingFieldsQuery = new LdapQuery()
+
+        when:
+        def errorCodes = ldapQueryFunction.getFunctionErrorCodes()
+        def cannotConnectReport = cannotConnectQuery.getValue()
+        def cannotBindReport = cannotBindQuery.getValue()
+        def missingFieldReport = missingFieldsQuery.getValue()
+
+        then:
+        errorCodes.size() == 4
+        errorCodes.contains(cannotConnectReport.messages().get(0).getCode())
+        errorCodes.contains(cannotBindReport.messages().get(0).getCode())
+        errorCodes.contains(missingFieldReport.messages().get(0).getCode())
+        errorCodes.contains(DefaultMessages.FAILED_TEST_SETUP)
+    }
+
     LdapDistinguishedName exampleQueryBase() {
         return new LdapDistinguishedName().dn(server.getBaseDistinguishedName())
     }

@@ -17,6 +17,7 @@ import static org.codice.ddf.admin.sources.services.CswServiceProperties.CSW_FAC
 import static org.codice.ddf.admin.sources.services.CswServiceProperties.SERVICE_PROPS_TO_CSW_CONFIG;
 
 import java.util.List;
+import java.util.Set;
 
 import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.api.DataType;
@@ -24,6 +25,7 @@ import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.common.PidField;
+import org.codice.ddf.admin.common.report.message.DefaultMessages;
 import org.codice.ddf.admin.common.services.ServiceCommons;
 import org.codice.ddf.admin.sources.csw.CswSourceInfoField;
 import org.codice.ddf.admin.sources.fields.type.CswSourceConfigurationField;
@@ -107,5 +109,12 @@ public class GetCswConfigurations extends BaseFunctionField<ListField<CswSourceI
     @Override
     public FunctionField<ListField<CswSourceInfoField>> newInstance() {
         return new GetCswConfigurations(configuratorSuite);
+    }
+
+    @Override
+    public Set<String> getFunctionErrorCodes() {
+        Set<String> errorMessages = super.getFunctionErrorCodes();
+        errorMessages.add(DefaultMessages.NO_EXISTING_CONFIG);
+        return errorMessages;
     }
 }

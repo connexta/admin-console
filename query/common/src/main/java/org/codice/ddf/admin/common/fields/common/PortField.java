@@ -16,9 +16,11 @@ package org.codice.ddf.admin.common.fields.common;
 import static org.codice.ddf.admin.common.report.message.DefaultMessages.invalidPortRangeError;
 
 import java.util.List;
+import java.util.Set;
 
 import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.codice.ddf.admin.common.fields.base.scalar.IntegerField;
+import org.codice.ddf.admin.common.report.message.DefaultMessages;
 
 public class PortField extends IntegerField {
 
@@ -46,6 +48,13 @@ public class PortField extends IntegerField {
         }
 
         return validationMsgs;
+    }
+
+    @Override
+    public Set<String> getErrorCodes() {
+        Set<String> errors = super.getErrorCodes();
+        errors.add(DefaultMessages.INVALID_PORT_RANGE);
+        return errors;
     }
 
     public boolean validPortRange(int port) {

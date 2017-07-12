@@ -20,15 +20,18 @@ import static org.codice.ddf.admin.sources.services.WfsServiceProperties.wfsConf
 import static org.codice.ddf.admin.sources.services.WfsServiceProperties.wfsVersionToFactoryPid;
 
 import java.util.List;
+import java.util.Set;
 
 import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
+import org.codice.ddf.admin.common.report.message.DefaultMessages;
 import org.codice.ddf.admin.common.services.ServiceCommons;
 import org.codice.ddf.admin.configurator.Configurator;
 import org.codice.ddf.admin.configurator.OperationReport;
+import org.codice.ddf.admin.sources.SourceMessages;
 import org.codice.ddf.admin.sources.fields.WfsVersion;
 import org.codice.ddf.admin.sources.fields.type.WfsSourceConfigurationField;
 import org.codice.ddf.admin.sources.utils.SourceValidationUtils;
@@ -112,5 +115,13 @@ public class CreateWfsConfiguration extends BaseFunctionField<BooleanField> {
     @Override
     public FunctionField<BooleanField> newInstance() {
         return new CreateWfsConfiguration(configuratorSuite);
+    }
+
+    @Override
+    public Set<String> getFunctionErrorCodes() {
+        Set<String> errorMessages = super.getFunctionErrorCodes();
+        errorMessages.add(DefaultMessages.FAILED_PERSIST);
+        errorMessages.add(SourceMessages.DUPLICATE_SOURCE_NAME);
+        return errorMessages;
     }
 }

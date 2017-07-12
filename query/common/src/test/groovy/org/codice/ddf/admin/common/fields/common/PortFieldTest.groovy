@@ -54,4 +54,21 @@ class PortFieldTest extends Specification {
         port << [0, 65536]
 
     }
+
+    def 'Returns all the possible error codes correctly'(){
+        PortField invalidPortField = new PortField()
+        invalidPortField.setValue(0)
+
+        PortField missingPortField = new PortField().isRequired(true)
+
+        when:
+        def errorCodes = invalidPortField.getErrorCodes()
+        def invalidPortFieldValidation = invalidPortField.validate()
+        def missingPortFieldValidation = missingPortField.validate()
+
+        then:
+        errorCodes.size() == 2
+        errorCodes.contains(invalidPortFieldValidation.get(0).getCode())
+        errorCodes.contains(missingPortFieldValidation.get(0).getCode())
+    }
 }

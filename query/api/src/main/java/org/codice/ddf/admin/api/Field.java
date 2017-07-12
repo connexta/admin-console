@@ -14,6 +14,7 @@
 package org.codice.ddf.admin.api;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Defines a container for setting and retrieving values.
@@ -66,4 +67,10 @@ public interface Field<S, G> {
      */
     void updatePath(List<String> subPath);
 
+    /**
+     * Returns the possible errors that could aries while validating the {@code Field}.
+     *
+     * @return a {@code Set} of Strings containing the errors.
+     */
+    Set<String> getErrorCodes();
 }

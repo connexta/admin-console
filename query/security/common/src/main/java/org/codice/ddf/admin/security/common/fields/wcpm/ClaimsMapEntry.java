@@ -16,6 +16,7 @@ package org.codice.ddf.admin.security.common.fields.wcpm;
 import static org.codice.ddf.admin.common.report.message.DefaultMessages.missingKeyValue;
 
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
 
 import org.codice.ddf.admin.api.Field;
@@ -23,6 +24,7 @@ import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.codice.ddf.admin.common.fields.base.BaseListField;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
+import org.codice.ddf.admin.common.report.message.DefaultMessages;
 
 import com.google.common.collect.ImmutableList;
 
@@ -97,6 +99,13 @@ public class ClaimsMapEntry extends BaseObjectField {
         }
 
         return validationMsgs;
+    }
+
+    @Override
+    public Set<String> getErrorCodes() {
+        Set<String> errors = super.getErrorCodes();
+        errors.add(DefaultMessages.MISSING_KEY_VALUE);
+        return errors;
     }
 
     @Override

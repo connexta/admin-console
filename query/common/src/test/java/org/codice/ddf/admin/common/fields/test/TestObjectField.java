@@ -18,6 +18,7 @@ import static org.codice.ddf.admin.common.fields.test.TestFieldProvider.LIST_FIE
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
 
 import org.codice.ddf.admin.api.Field;
@@ -50,6 +51,8 @@ public class TestObjectField extends BaseObjectField {
     public static final String SUB_FIELD_OF_INNER_FIELD_NAME = "testSubField";
 
     public static final String INNER_OBJECT_FIELD_NAME = "innerObjectField";
+
+    public static final String OBJECT_FIELD_TEST_ERROR = "OBJECT_FIELD_TEST_ERROR";
 
     private InnerTestObjectField innerTestObjectField;
 
@@ -149,6 +152,13 @@ public class TestObjectField extends BaseObjectField {
                 innerTestObjectField);
     }
 
+    @Override
+    public Set<String> getErrorCodes() {
+        Set<String> errorCodes = super.getErrorCodes();
+        errorCodes.add(OBJECT_FIELD_TEST_ERROR);
+        return errorCodes;
+    }
+
     public class InnerTestObjectField extends BaseObjectField {
 
         public static final String FIELD_TYPE_NAME = "InnerTestObjectField";
@@ -156,6 +166,8 @@ public class TestObjectField extends BaseObjectField {
         public static final String DESCRIPTION = "InnerTestObjectField Description";
 
         public static final String TEST_VALUE = "testValue";
+
+        public static final String INNER_OBJECT_FIELD_TEST_ERROR = "INNER_OBJECT_FIELD_TEST_ERROR";
 
         public StringField subFieldOfInnerField;
 
@@ -177,6 +189,13 @@ public class TestObjectField extends BaseObjectField {
         @Override
         public List<Field> getFields() {
             return ImmutableList.of(subFieldOfInnerField);
+        }
+
+        @Override
+        public Set<String> getErrorCodes() {
+            Set<String> errorCodes = super.getErrorCodes();
+            errorCodes.add(INNER_OBJECT_FIELD_TEST_ERROR);
+            return errorCodes;
         }
     }
 

@@ -339,6 +339,18 @@ class GraphQLTransformationTest extends Specification {
         ]
     }
 
+    def 'successfully retrieve error codes without any errors'() {
+        setup:
+        request.addParameter(GRAPHQL_QUERY, getQuery('GetErrorCodes'))
+
+        when:
+        servlet.doGet(request, response)
+
+        then:
+        response.getStatus() == STATUS_OK
+        getResponseContentAsMap().errors == null
+    }
+
     def getResponseContentAsMap() {
         mapper.readValue(response.getContentAsByteArray(), Map)
     }

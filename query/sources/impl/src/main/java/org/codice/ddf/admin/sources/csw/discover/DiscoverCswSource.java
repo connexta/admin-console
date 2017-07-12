@@ -14,6 +14,7 @@
 package org.codice.ddf.admin.sources.csw.discover;
 
 import java.util.List;
+import java.util.Set;
 
 import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.api.DataType;
@@ -23,6 +24,7 @@ import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.common.AddressField;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
 import org.codice.ddf.admin.common.fields.common.ResponseField;
+import org.codice.ddf.admin.common.report.message.DefaultMessages;
 import org.codice.ddf.admin.sources.csw.CswSourceUtils;
 import org.codice.ddf.admin.sources.fields.type.CswSourceConfigurationField;
 
@@ -93,6 +95,14 @@ public class DiscoverCswSource extends BaseFunctionField<CswSourceConfigurationF
     @Override
     public FunctionField<CswSourceConfigurationField> newInstance() {
         return new DiscoverCswSource(configuratorSuite);
+    }
+
+    @Override
+    public Set<String> getFunctionErrorCodes() {
+        Set<String> errorMessages = super.getFunctionErrorCodes();
+        errorMessages.add(DefaultMessages.CANNOT_CONNECT);
+        errorMessages.add(DefaultMessages.UNKNOWN_ENDPOINT);
+        return errorMessages;
     }
 
     /**

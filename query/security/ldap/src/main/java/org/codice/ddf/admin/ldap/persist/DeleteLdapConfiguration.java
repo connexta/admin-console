@@ -14,6 +14,7 @@
 package org.codice.ddf.admin.ldap.persist;
 
 import java.util.List;
+import java.util.Set;
 
 import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.api.DataType;
@@ -21,6 +22,7 @@ import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.common.fields.common.PidField;
+import org.codice.ddf.admin.common.report.message.DefaultMessages;
 import org.codice.ddf.admin.common.services.ServiceCommons;
 
 import com.google.common.collect.ImmutableList;
@@ -78,5 +80,13 @@ public class DeleteLdapConfiguration extends BaseFunctionField<BooleanField> {
     @Override
     public FunctionField<BooleanField> newInstance() {
         return new DeleteLdapConfiguration(configuratorSuite);
+    }
+
+    @Override
+    public Set<String> getFunctionErrorCodes() {
+        Set<String> errorMessages = super.getFunctionErrorCodes();
+        errorMessages.add(DefaultMessages.FAILED_PERSIST);
+        errorMessages.add(DefaultMessages.NO_EXISTING_CONFIG);
+        return errorMessages;
     }
 }

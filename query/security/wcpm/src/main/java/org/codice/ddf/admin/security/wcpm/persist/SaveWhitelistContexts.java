@@ -16,11 +16,13 @@ package org.codice.ddf.admin.security.wcpm.persist;
 import static org.codice.ddf.admin.common.report.message.DefaultMessages.failedPersistError;
 
 import java.util.List;
+import java.util.Set;
 
 import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.common.ContextPath;
+import org.codice.ddf.admin.common.report.message.DefaultMessages;
 import org.codice.ddf.admin.configurator.Configurator;
 import org.codice.ddf.admin.configurator.OperationReport;
 import org.codice.ddf.admin.security.common.services.PolicyManagerServiceProperties;
@@ -81,5 +83,12 @@ public class SaveWhitelistContexts extends BaseFunctionField<ContextPath.ListImp
     @Override
     public SaveWhitelistContexts newInstance() {
         return new SaveWhitelistContexts(configuratorSuite);
+    }
+
+    @Override
+    public Set<String> getFunctionErrorCodes() {
+        Set<String> errorMessages = super.getFunctionErrorCodes();
+        errorMessages.add(DefaultMessages.FAILED_PERSIST);
+        return errorMessages;
     }
 }

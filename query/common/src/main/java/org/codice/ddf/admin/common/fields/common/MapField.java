@@ -18,6 +18,7 @@ import static org.codice.ddf.admin.common.report.message.DefaultMessages.duplica
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
@@ -25,6 +26,7 @@ import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.codice.ddf.admin.common.fields.base.BaseListField;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
+import org.codice.ddf.admin.common.report.message.DefaultMessages;
 
 import com.google.common.collect.ImmutableList;
 
@@ -112,6 +114,13 @@ public class MapField extends BaseObjectField {
             }
         }
         return validationMsgs;
+    }
+
+    @Override
+    public Set<String> getErrorCodes() {
+        Set<String> errors = super.getErrorCodes();
+        errors.add(DefaultMessages.DUPLICATE_MAP_KEY);
+        return errors;
     }
 
     public static class ListImpl extends BaseListField<MapField> {

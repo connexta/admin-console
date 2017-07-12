@@ -18,12 +18,14 @@ import static org.codice.ddf.admin.common.report.message.DefaultMessages.invalid
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.regex.Pattern;
 
 import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.codice.ddf.admin.common.fields.base.BaseListField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
+import org.codice.ddf.admin.common.report.message.DefaultMessages;
 
 public class ContextPath extends StringField {
 
@@ -67,6 +69,13 @@ public class ContextPath extends StringField {
     public ContextPath isRequired(boolean required) {
         super.isRequired(required);
         return this;
+    }
+
+    @Override
+    public Set<String> getErrorCodes() {
+        Set<String> errors = super.getErrorCodes();
+        errors.add(DefaultMessages.INVALID_CONTEXT_PATH);
+        return errors;
     }
 
     private static class UriPathValidator {

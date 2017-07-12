@@ -118,4 +118,25 @@ class BaseObjectFieldTest extends Specification {
         then:
         subFieldOfInnerField.getValue() == 'valueChange'
     }
+
+    def 'Returns all the possible error codes correctly from inner fields'(){
+        when:
+        def errorCodes = topLevelField.getErrorCodes()
+        def field1 = topLevelField.getFields()[0].getErrorCodes()
+        def field2 = topLevelField.getFields()[1].getErrorCodes()
+        def field3 = topLevelField.getFields()[2].getErrorCodes()
+        def field4 = topLevelField.getFields()[3].getErrorCodes()
+        def field5 = topLevelField.getFields()[4].getErrorCodes()
+        def field6 = topLevelField.getFields()[5].getErrorCodes()
+
+        then:
+        errorCodes.size() == 5
+        errorCodes.containsAll(field1)
+        errorCodes.containsAll(field2)
+        errorCodes.containsAll(field3)
+        errorCodes.containsAll(field4)
+        errorCodes.containsAll(field5)
+        errorCodes.containsAll(field6)
+        errorCodes.contains(topLevelField.OBJECT_FIELD_TEST_ERROR)
+    }
 }

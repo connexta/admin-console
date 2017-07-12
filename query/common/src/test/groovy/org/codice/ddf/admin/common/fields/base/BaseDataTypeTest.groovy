@@ -64,4 +64,19 @@ class BaseDataTypeTest extends Specification {
         then:
         testField.path() == ['updatedName']
     }
+
+    def 'Returns all the possible error codes correctly'(){
+        setup:
+        TestDataType missingTestField = new TestDataType<String>()
+        missingTestField.isRequired(true)
+        missingTestField.setValue([])
+
+        when:
+        def errorCodes = missingTestField.getErrorCodes()
+        def validationMsgs = missingTestField.validate()
+
+        then:
+        errorCodes.size() == 1
+        errorCodes.contains(validationMsgs.get(0).getCode())
+    }
 }

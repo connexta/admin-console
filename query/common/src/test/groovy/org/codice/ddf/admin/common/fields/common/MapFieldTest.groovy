@@ -80,6 +80,34 @@ class MapFieldTest extends Specification {
         validationMsgs.get(0).getPath() == [MapField.DEFAULT_FIELD_NAME, ENTRIES, '2']
     }
 
+    def 'Returns all the possible error codes correctly'(){
+        setup:
+        def duplicateValue = [(ENTRIES): [createEntry('key1', 'value1'),
+                                          createEntry('key1', 'value2')]]
+        MapField duplicateValueMapField = new MapField()
+        duplicateValueMapField.setValue(duplicateValue)
+
+        def emptyValue = [(ENTRIES): [createEntry('', '')]]
+        MapField emptyValueMapField = new MapField()
+        emptyValueMapField.setValue(emptyValue)
+
+        def missingValue = [(ENTRIES): [createEntry('', null)]]
+        MapField missingValueMapField = new MapField().isRequired(true)
+        missingValueMapField.setValue(missingValue)
+
+        when:
+        def errorCodes = mapField.getErrorCodes()
+        def duplicateValueValidation = duplicateValueMapField.validate()
+        def emptyValueValidation = emptyValueMapField.validate()
+        def missingValueValidation = missingValueMapField.validate()
+
+        then:
+        errorCodes.size() == 3
+        errorCodes.contains(duplicateValueValidation.get(0).getCode())
+        errorCodes.contains(emptyValueValidation.get(0).getCode())
+        errorCodes.contains(missingValueValidation.get(0).getCode())
+    }
+
     def createEntry(String key, String value) {
         return [(PairField.KEY_FIELD_NAME): key, (PairField.VALUE_FIELD_NAME): value]
     }

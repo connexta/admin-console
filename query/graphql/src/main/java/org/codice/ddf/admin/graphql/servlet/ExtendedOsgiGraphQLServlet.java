@@ -75,6 +75,7 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet implements Ev
     private List<GraphQLProviderImpl> transformedProviders;
     private ExecutionStrategyProvider execStrategy;
     private GraphQLErrorHandler errorHandler;
+    private GraphQLQueryProvider errorCodeProvider;
 
     public ExtendedOsgiGraphQLServlet() {
         super();
@@ -185,13 +186,21 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet implements Ev
 
         transformedProviders.forEach(this::unbindProvider);
 
+        if(errorCodeProvider != null){
+            unbindProvider(errorCodeProvider);
+        }
+
         GraphQLTransformCommons transformer = new GraphQLTransformCommons();
 
         transformedProviders = fieldProviders.stream()
                 .map(fieldProvider -> new GraphQLProviderImpl(fieldProvider, transformer))
                 .collect(Collectors.toList());
 
+        errorCodeProvider = transformer.getErrorCodesQueryProvider(fieldProviders);
+
         transformedProviders.forEach(this::bindProvider);
+
+        bindProvider(errorCodeProvider);
 
         LOGGER.debug("Finished refreshing GraphQL schema.");
     }

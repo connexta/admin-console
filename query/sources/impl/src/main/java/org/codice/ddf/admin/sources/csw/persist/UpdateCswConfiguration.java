@@ -19,15 +19,18 @@ import static org.codice.ddf.admin.sources.services.CswServiceProperties.CSW_FEA
 import static org.codice.ddf.admin.sources.services.CswServiceProperties.cswConfigToServiceProps;
 
 import java.util.List;
+import java.util.Set;
 
 import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
+import org.codice.ddf.admin.common.report.message.DefaultMessages;
 import org.codice.ddf.admin.common.services.ServiceCommons;
 import org.codice.ddf.admin.configurator.Configurator;
 import org.codice.ddf.admin.configurator.OperationReport;
+import org.codice.ddf.admin.sources.SourceMessages;
 import org.codice.ddf.admin.sources.fields.type.CswSourceConfigurationField;
 import org.codice.ddf.admin.sources.utils.SourceValidationUtils;
 
@@ -106,5 +109,14 @@ public class UpdateCswConfiguration extends BaseFunctionField<BooleanField> {
     @Override
     public FunctionField<BooleanField> newInstance() {
         return new UpdateCswConfiguration(configuratorSuite);
+    }
+
+    @Override
+    public Set<String> getFunctionErrorCodes() {
+        Set<String> errorMessages = super.getFunctionErrorCodes();
+        errorMessages.add(DefaultMessages.FAILED_PERSIST);
+        errorMessages.add(DefaultMessages.NO_EXISTING_CONFIG);
+        errorMessages.add(SourceMessages.DUPLICATE_SOURCE_NAME);
+        return errorMessages;
     }
 }

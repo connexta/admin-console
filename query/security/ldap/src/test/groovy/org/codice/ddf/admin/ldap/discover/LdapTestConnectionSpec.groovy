@@ -196,6 +196,32 @@ class LdapTestConnectionSpec extends Specification {
         report.messages().get(0).getPath() == [LdapTestConnection.FIELD_NAME]
     }
 
+    def 'Returns all the possible error codes correctly'(){
+        setup:
+        LdapTestConnection cannotConnectLdapFunc = new LdapTestConnection()
+        Map<String, Object> cannotConnectArgs = [(LdapConnectionField.DEFAULT_FIELD_NAME): ldapsLdapConnectionInfo().hostname("badHostname").getValue()]
+        cannotConnectLdapFunc.setValue(cannotConnectArgs)
+
+        LdapTestConnection failedSetupLdapFunc = new LdapTestConnection()
+        Map<String, Object> failedSetupArgs = [(LdapConnectionField.DEFAULT_FIELD_NAME): ldapsLdapConnectionInfo().getValue()]
+        failedSetupLdapFunc.setValue(failedSetupArgs)
+        failedSetupLdapFunc.setTestingUtils(new LdapTestingUtilsMock(true))
+
+        LdapTestConnection missingFieldLdapFunc = new LdapTestConnection()
+
+        when:
+        def errorCodes = ldapConnectFunction.getFunctionErrorCodes()
+        def cannotConnectReport = cannotConnectLdapFunc.getValue()
+        def failedSetupReport = failedSetupLdapFunc.getValue()
+        def missingFieldReport = missingFieldLdapFunc.getValue()
+
+        then:
+        errorCodes.size() == 3
+        errorCodes.contains(cannotConnectReport.messages().get(0).getCode())
+        errorCodes.contains(failedSetupReport.messages().get(0).getCode())
+        errorCodes.contains(missingFieldReport.messages().get(0).getCode())
+    }
+
     LdapConnectionField ldapsLdapConnectionInfo() {
         return new LdapConnectionField()
                 .hostname(server.getHostname())

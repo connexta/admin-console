@@ -180,6 +180,31 @@ class DiscoverWfsSourcesSpec extends SourceCommonsSpec {
         report.messages()*.getPath() == [URL_FIELD_PATH]
     }
 
+    def 'Returns all the possible error codes correctly'(){
+        setup:
+        DiscoverWfsSource cannotConnectWfs = new DiscoverWfsSource(Mock(ConfiguratorSuite))
+        cannotConnectWfs.setWfsSourceUtils(prepareOpenSearchSourceUtils(200, badResponseBody, false))
+        cannotConnectWfs.setValue(getBaseDiscoverByAddressArgs())
+
+        DiscoverWfsSource unknownEndpointWfs = new DiscoverWfsSource(Mock(ConfiguratorSuite))
+        unknownEndpointWfs.setWfsSourceUtils(prepareOpenSearchSourceUtils(200, badResponseBody, true))
+        unknownEndpointWfs.setValue(getBaseDiscoverByUrlArgs(TEST_WFS_URL))
+
+        DiscoverWfsSource missingFieldWfs = new DiscoverWfsSource(Mock(ConfiguratorSuite))
+
+        when:
+        def errorCodes = discoverWfs.getFunctionErrorCodes()
+        def cannotConnectReport = cannotConnectWfs.getValue()
+        def unknownEndpointReport = unknownEndpointWfs.getValue()
+        def missingFieldReport = missingFieldWfs.getValue()
+
+        then:
+        errorCodes.size() == 3
+        errorCodes.contains(cannotConnectReport.messages()[0].getCode())
+        errorCodes.contains(unknownEndpointReport.messages()[0].getCode())
+        errorCodes.contains(missingFieldReport.messages()[0].getCode())
+    }
+
     def prepareOpenSearchSourceUtils(int statusCode, String responseBody, boolean endpointIsReachable) {
         def requestUtils = new TestRequestUtils(createMockFactory(statusCode, responseBody), endpointIsReachable)
         def wfsUtils = new WfsSourceUtils()

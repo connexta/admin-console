@@ -56,6 +56,8 @@ class CreateWfsConfigurationSpec extends SourceCommonsSpec {
 
     Configurator configurator
 
+    ConfiguratorSuite configuratorSuite
+
     ManagedServiceActions managedServiceActions
 
     FeatureActions featureActions
@@ -78,7 +80,7 @@ class CreateWfsConfigurationSpec extends SourceCommonsSpec {
             getConfigurator() >> configurator
         }
 
-        def configuratorSuite = Mock(ConfiguratorSuite)
+        configuratorSuite = Mock(ConfiguratorSuite)
         configuratorSuite.configuratorFactory >> configuratorFactory
         configuratorSuite.serviceActions >> serviceActions
         configuratorSuite.serviceReader >> serviceReader
@@ -158,6 +160,31 @@ class CreateWfsConfigurationSpec extends SourceCommonsSpec {
             it.getCode() == DefaultMessages.MISSING_REQUIRED_FIELD
         } == 3
         report.messages()*.getPath() == [SOURCE_NAME_PATH, ENDPOINT_URL_PATH, WFS_VERSION_PATH]
+    }
+
+    def 'Returns all the possible error codes correctly'(){
+        setup:
+        CreateWfsConfiguration createDuplicateNameConfig = new CreateWfsConfiguration(configuratorSuite)
+        createDuplicateNameConfig.setValue(createWfsArgs())
+        serviceReader.getServices(_, _) >> federatedSources
+
+        CreateWfsConfiguration createFailPersistConfig = new CreateWfsConfiguration(configuratorSuite)
+        createFailPersistConfig.setValue(createWfsArgs())
+        serviceReader.getServices(_, _) >> []
+
+        CreateWfsConfiguration createMissingFieldConfig = new CreateWfsConfiguration(configuratorSuite)
+
+        when:
+        def errorCodes = createWfsConfiguration.getFunctionErrorCodes()
+        def duplicateNameReport = createDuplicateNameConfig.getValue()
+        def createFailPersistReport = createFailPersistConfig.getValue()
+        def createMissingFieldReport = createMissingFieldConfig.getValue()
+
+        then:
+        errorCodes.size() == 3
+        errorCodes.contains(duplicateNameReport.messages().get(0).getCode())
+        errorCodes.contains(createFailPersistReport.messages().get(0).getCode())
+        errorCodes.contains(createMissingFieldReport.messages().get(0).getCode())
     }
 
     def createWfsArgs() {

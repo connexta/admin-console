@@ -17,6 +17,7 @@ package org.codice.ddf.admin.common.fields.base;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
@@ -122,6 +123,13 @@ public abstract class BaseListField<T extends DataType> extends BaseDataType<Lis
     public void pathName(String pathName) {
         super.pathName(pathName);
         getList().forEach(field -> field.updatePath(path()));
+    }
+
+    @Override
+    public Set<String> getErrorCodes() {
+        Set<String> errors = super.getErrorCodes();
+        errors.addAll(createListEntry().getErrorCodes());
+        return errors;
     }
 
     public BaseListField<T> useDefaultRequired() {

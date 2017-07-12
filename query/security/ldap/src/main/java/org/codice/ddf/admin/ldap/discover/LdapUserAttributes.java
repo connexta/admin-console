@@ -23,7 +23,9 @@ import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
+import org.codice.ddf.admin.common.report.message.DefaultMessages;
 import org.codice.ddf.admin.ldap.commons.LdapConnectionAttempt;
+import org.codice.ddf.admin.ldap.commons.LdapMessages;
 import org.codice.ddf.admin.ldap.commons.LdapTestingUtils;
 import org.codice.ddf.admin.ldap.commons.ServerGuesser;
 import org.codice.ddf.admin.ldap.fields.LdapDistinguishedName;
@@ -113,6 +115,15 @@ public class LdapUserAttributes extends BaseFunctionField<StringField.ListImpl> 
     @Override
     public FunctionField<StringField.ListImpl> newInstance() {
         return new LdapUserAttributes();
+    }
+
+    @Override
+    public Set<String> getFunctionErrorCodes() {
+        Set<String> errorMessages = super.getFunctionErrorCodes();
+        errorMessages.add(LdapMessages.CANNOT_BIND);
+        errorMessages.add(DefaultMessages.FAILED_TEST_SETUP);
+        errorMessages.add(DefaultMessages.CANNOT_CONNECT);
+        return errorMessages;
     }
 
     /**

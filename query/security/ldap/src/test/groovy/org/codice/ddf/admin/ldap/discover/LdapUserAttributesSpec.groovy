@@ -148,4 +148,36 @@ class LdapUserAttributesSpec extends Specification {
         ldapConnectionIsClosed
     }
 
+    def 'Returns all the possible error codes correctly'(){
+        setup:
+        LdapUserAttributes cannotConnectAction = new LdapUserAttributes()
+        Map<String, Object> cannotConnectArgs = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().port(666).getValue(),
+                (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue(),
+                (LdapUserAttributes.BASE_USER_DN)  : LdapTestingCommons.LDAP_SERVER_BASE_GROUP_DN]
+        cannotConnectAction.setValue(cannotConnectArgs)
+        cannotConnectAction.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
+
+        LdapUserAttributes cannotBindAction = new LdapUserAttributes()
+        Map<String, Object> cannotBindArgs = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue(),
+                (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().password('badPassword').getValue(),
+                (LdapUserAttributes.BASE_USER_DN)  : LdapTestingCommons.LDAP_SERVER_BASE_GROUP_DN]
+        cannotBindAction.setValue(cannotBindArgs)
+        cannotBindAction.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
+
+        LdapUserAttributes missingFieldAction = new LdapUserAttributes()
+
+        when:
+        def errorCodes = action.getFunctionErrorCodes()
+        def cannotConnectReport = cannotConnectAction.getValue()
+        def cannotBindReport = cannotBindAction.getValue()
+        def missingFieldReport = missingFieldAction.getValue()
+
+        then:
+        errorCodes.size() == 4
+        errorCodes.contains(cannotConnectReport.messages().get(0).getCode())
+        errorCodes.contains(cannotBindReport.messages().get(0).getCode())
+        errorCodes.contains(missingFieldReport.messages().get(0).getCode())
+        errorCodes.contains(DefaultMessages.FAILED_TEST_SETUP)
+    }
+
 }

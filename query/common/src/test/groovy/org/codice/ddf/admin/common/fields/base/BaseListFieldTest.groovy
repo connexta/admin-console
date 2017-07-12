@@ -140,4 +140,24 @@ class BaseListFieldTest extends Specification {
         listField.getList()[1].getValue() == 'string2'
         listField.getList()[1].path() == [TEST_LIST_FIELD_NAME, '1']
     }
+
+    def 'Returns all the possible error codes correctly'(){
+        setup:
+        def emptyFieldElement = new StringField('emptyFieldElement')
+        emptyFieldElement.setValue('')
+
+        def missingFieldElement = new StringField('missingFieldElement')
+
+        StringField.ListImpl listField = new StringField.ListImpl(TEST_LIST_FIELD_NAME).useDefaultRequired()
+        listField.addAll([emptyFieldElement, missingFieldElement])
+
+        when:
+        def errorCodes = listField.getErrorCodes()
+        def validationMsgs = listField.validate()
+
+        then:
+        errorCodes.size() == 2
+        errorCodes.contains(validationMsgs[0].getCode())
+        errorCodes.contains(validationMsgs[1].getCode())
+    }
 }

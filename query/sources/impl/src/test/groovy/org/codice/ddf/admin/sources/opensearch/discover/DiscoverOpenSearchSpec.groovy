@@ -127,6 +127,31 @@ class DiscoverOpenSearchSpec extends SourceCommonsSpec {
         report.messages()*.getPath() == [URL_FIELD_PATH]
     }
 
+    def 'Returns all the possible error codes correctly'(){
+        setup:
+        DiscoverOpenSearchSource cannotConnectOpenSearch = new DiscoverOpenSearchSource(Mock(ConfiguratorSuite))
+        cannotConnectOpenSearch.setOpenSearchSourceUtils(prepareOpenSearchSourceUtils(200, osResponseBody, false))
+        cannotConnectOpenSearch.setValue(getBaseDiscoverByAddressArgs())
+
+        DiscoverOpenSearchSource unknownEndpointOpenSearch = new DiscoverOpenSearchSource(Mock(ConfiguratorSuite))
+        unknownEndpointOpenSearch.setOpenSearchSourceUtils(prepareOpenSearchSourceUtils(200, badResponseBody, true))
+        unknownEndpointOpenSearch.setValue(getBaseDiscoverByUrlArgs(TEST_OPEN_SEARCH_URL))
+
+        DiscoverOpenSearchSource missingFieldOpenSearch = new DiscoverOpenSearchSource(Mock(ConfiguratorSuite))
+
+        when:
+        def errorCodes = discoverOpenSearch.getFunctionErrorCodes()
+        def cannotConnectReport = cannotConnectOpenSearch.getValue()
+        def unknownEndpointReport = unknownEndpointOpenSearch.getValue()
+        def missingFieldReport = missingFieldOpenSearch.getValue()
+
+        then:
+        errorCodes.size() == 3
+        errorCodes.contains(cannotConnectReport.messages()[0].getCode())
+        errorCodes.contains(unknownEndpointReport.messages()[0].getCode())
+        errorCodes.contains(missingFieldReport.messages()[0].getCode())
+    }
+
     def prepareOpenSearchSourceUtils(int statusCode, String responseBody, boolean endpointIsReachable) {
         def requestUtils = new TestRequestUtils(createMockFactory(statusCode, responseBody), endpointIsReachable)
         def openSearchUtils = new OpenSearchSourceUtils()

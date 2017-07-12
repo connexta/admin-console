@@ -13,9 +13,14 @@
  **/
 package org.codice.ddf.admin.common.fields.base;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Stream;
 
 import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
@@ -23,6 +28,7 @@ import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.codice.ddf.admin.api.report.FunctionReport;
 import org.codice.ddf.admin.api.report.Report;
 import org.codice.ddf.admin.common.report.FunctionReportImpl;
+import org.codice.ddf.admin.common.report.message.DefaultMessages;
 
 import com.google.common.collect.ImmutableList;
 
@@ -30,12 +36,42 @@ public abstract class BaseFunctionField<T extends DataType> extends BaseField<Ma
 
     private FunctionReportImpl<T> report;
 
+    private String description;
+
     public BaseFunctionField(String functionName, String description) {
         super(functionName, description);
+        this.description = description;
         report = new FunctionReportImpl<>();
     }
 
+    @Override
+    public String description() {
+        if (this.getErrorCodes() != null) {
+            return String.format("%s The possible errors are:    \r\n %s.",
+                    description,
+                    formatErrorCodes(getErrorCodes()));
+        }
+        return super.description();
+    }
+
     public abstract T performFunction();
+
+    public Set<String> getFunctionErrorCodes() {
+        Set<String> errors = new HashSet<>();
+        errors.add(DefaultMessages.MISSING_REQUIRED_FIELD);
+        return errors;
+    }
+
+    public Set<String> getErrorCodes() {
+        Set<String> allErrorCodes = new HashSet<>();
+        for (DataType arg : getArguments()) {
+            Stream.of(allErrorCodes, arg.getErrorCodes())
+                    .forEach(allErrorCodes::addAll);
+        }
+
+        allErrorCodes.addAll(getFunctionErrorCodes());
+        return allErrorCodes;
+    }
 
     @Override
     public void setValue(Map<String, Object> args) {
@@ -128,5 +164,11 @@ public abstract class BaseFunctionField<T extends DataType> extends BaseField<Ma
     protected BaseFunctionField addMessages(Report report) {
         return addArgumentMessages(report.argumentMessages()).
                 addResultMessages(report.resultMessages());
+    }
+
+    private String formatErrorCodes(Set<String> errorCodes) {
+        List sortedErrors = new ArrayList<>(errorCodes);
+        Collections.sort(sortedErrors);
+        return String.join(",    \r\n", sortedErrors);
     }
 }

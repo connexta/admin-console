@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.api.DataType;
@@ -98,6 +99,17 @@ public abstract class BaseObjectField extends BaseDataType<Map<String, Object>>
     public void pathName(String pathName) {
         super.pathName(pathName);
         updateInnerFieldPaths();
+    }
+
+    @Override
+    public Set<String> getErrorCodes() {
+        Set<String> errors = super.getErrorCodes();
+        errors.addAll(getFields().stream()
+                .filter(field -> field instanceof DataType)
+                .map(field -> field.getErrorCodes())
+                .flatMap(Collection<String>::stream)
+                .collect(Collectors.toList()));
+        return errors;
     }
 
     public void updateInnerFieldPaths() {

@@ -23,7 +23,8 @@ const friendlyMessage = {
   NO_GROUPS_IN_BASE_GROUP_DN: 'Could not find any groups in the base group dn.',
   NO_GROUPS_WITH_MEMBERS: 'No groups were found containing any members.',
   NO_REFERENCED_MEMBER: 'Unable to find a user with the member attribute specified for groups.',
-  USER_ATTRIBUTE_NOT_FOUND: 'Could not find attribute on any users.'
+  USER_ATTRIBUTE_NOT_FOUND: 'Could not find attribute on any users.',
+  INVALID_USER_ATTRIBUTE: 'Invalid LDAP user attribute.'
 }
 
 export const genericMessage = (code) => `There was a problem with the request to the server: ${code}`

@@ -133,7 +133,7 @@ const testClaimMappings = (conn, info, userNameAttribute, dn, mapping) => ({
     query TestClaimMappings(
       $conn: LdapConnection!,
       $info: BindUserInfo!,
-      $userNameAttribute: String!,
+      $userNameAttribute: LdapAttributeName!,
       $dn: DistinguishedName!
       $mapping: [ClaimsMapEntry]!
     ) {

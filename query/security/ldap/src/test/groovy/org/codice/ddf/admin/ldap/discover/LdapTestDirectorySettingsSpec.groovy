@@ -392,4 +392,44 @@ class LdapTestDirectorySettingsSpec extends Specification {
         report.result().getValue()
         ldapConnectionIsClosed
     }
+
+    def 'When useCase = AttributeStore, checkGroupObjectClass, checkGroup, and checkReferencedUser should be applied'() {
+        setup:
+        def ldapSettings = initLdapSettings(ATTRIBUTE_STORE, true)
+        args = [(LdapConnectionField.DEFAULT_FIELD_NAME)       : noEncryptionLdapConnectionInfo().getValue(),
+                (LdapBindUserInfo.DEFAULT_FIELD_NAME)          : simpleBindInfo().getValue(),
+                (LdapDirectorySettingsField.DEFAULT_FIELD_NAME): ldapSettings.getValue()]
+        def action = Spy(LdapTestDirectorySettings)
+        action.setValue(args)
+        action.setTestingUtils(utilsMock)
+
+        when:
+        FunctionReport report = action.getValue()
+
+        then:
+        1 * action.checkUsersInDir(_)
+        1 * action.checkGroupObjectClass(_)
+        1 * action.checkGroup(_)
+        1 * action.checkReferencedUser(_, _)
+    }
+
+    def 'When useCase = Authentication, checkGroupObjectClass, checkGroup, and checkReferencedUser should be applied'() {
+        setup:
+        def ldapSettings = initLdapSettings(AUTHENTICATION, true)
+        args = [(LdapConnectionField.DEFAULT_FIELD_NAME)       : noEncryptionLdapConnectionInfo().getValue(),
+                (LdapBindUserInfo.DEFAULT_FIELD_NAME)          : simpleBindInfo().getValue(),
+                (LdapDirectorySettingsField.DEFAULT_FIELD_NAME): ldapSettings.getValue()]
+        def action = Spy(LdapTestDirectorySettings)
+        action.setValue(args)
+        action.setTestingUtils(utilsMock)
+
+        when:
+        action.getValue()
+
+        then:
+        1 * action.checkUsersInDir(_)
+        0 * action.checkGroupObjectClass(_)
+        0 * action.checkGroup(_)
+        0 * action.checkReferencedUser(_, _)
+    }
 }

@@ -201,7 +201,7 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet implements Ev
     }
 
     public void unbindFieldProvider(FieldProvider fieldProvider) {
-        triggerSchemaRefresh(String.format(UNBINDING_FIELD_PROVIDER, fieldProvider.fieldTypeName()));
+        triggerSchemaRefresh(String.format(UNBINDING_FIELD_PROVIDER, fieldProvider == null ? "" : fieldProvider.fieldTypeName()));
     }
 
     public void setFieldProviders(List<FieldProvider> fieldProviders) {

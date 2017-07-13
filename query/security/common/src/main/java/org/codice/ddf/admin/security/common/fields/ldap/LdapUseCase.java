@@ -39,6 +39,18 @@ public class LdapUseCase extends BaseEnumField<String> {
                 bindMethod);
     }
 
+    public boolean isAuthentication() {
+        return Authentication.AUTHENTICATION.equals(getValue())
+                || AuthenticationAndAttributeStore.AUTHENTICATION_AND_ATTRIBUTE_STORE.equals(
+                getValue());
+    }
+
+    public boolean isAttributeStore() {
+        return AttributeStore.ATTRIBUTE_STORE.equals(getValue())
+                || AuthenticationAndAttributeStore.AUTHENTICATION_AND_ATTRIBUTE_STORE.equals(
+                getValue());
+    }
+
     public static final class Authentication implements EnumValue<String> {
 
         public static final String DESCRIPTION =

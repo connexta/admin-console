@@ -18,8 +18,6 @@ import static org.codice.ddf.admin.ldap.commons.LdapMessages.noGroupsWithMembers
 import static org.codice.ddf.admin.ldap.commons.LdapMessages.noReferencedMemberError;
 import static org.codice.ddf.admin.ldap.commons.LdapMessages.noUsersInBaseUserDnError;
 import static org.codice.ddf.admin.ldap.commons.LdapMessages.userAttributeNotFoundError;
-import static org.codice.ddf.admin.security.common.fields.ldap.LdapUseCase.AttributeStore.ATTRIBUTE_STORE;
-import static org.codice.ddf.admin.security.common.fields.ldap.LdapUseCase.AuthenticationAndAttributeStore.AUTHENTICATION_AND_ATTRIBUTE_STORE;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -101,11 +99,15 @@ public class LdapTestDirectorySettings extends TestFunctionField {
                 return new BooleanField(false);
             }
 
-            // Check if group objectClass is on at least one entry in the directory
-            checkGroupObjectClass(ldapConnection);
+            if (settings.useCaseField().isAttributeStore()) {
+                // Check if group objectClass is on at least one entry in the directory
+                checkGroupObjectClass(ldapConnection);
 
-            // Don't check the group if there is no entry with the correct objectClass
-            if (!containsErrorMsgs()) {
+                // Don't check the group if there is no entry with the correct objectClass
+                if (containsErrorMsgs()) {
+                    return new BooleanField(false);
+                }
+
                 // Then, check that there is a group entry (of the correct objectClass) that has
                 // any member references
                 checkGroup(ldapConnection);
@@ -119,9 +121,7 @@ public class LdapTestDirectorySettings extends TestFunctionField {
 
     @Override
     public void validate() {
-        if (settings.useCase() != null && (settings.useCase()
-                .equals(ATTRIBUTE_STORE) || settings.useCase()
-                .equals(AUTHENTICATION_AND_ATTRIBUTE_STORE))) {
+        if (settings.useCaseField().isAttributeStore()) {
             settings.useDefaultRequiredForAttributeStore();
         }
 
@@ -138,7 +138,7 @@ public class LdapTestDirectorySettings extends TestFunctionField {
      *
      * @param ldapConnection
      */
-    private void checkUsersInDir(Connection ldapConnection) {
+    void checkUsersInDir(Connection ldapConnection) {
         List<SearchResultEntry> baseUsersResults = utils.getLdapQueryResults(ldapConnection,
                 settings.baseUserDn(),
                 Filter.present(settings.usernameAttribute())
@@ -159,7 +159,7 @@ public class LdapTestDirectorySettings extends TestFunctionField {
      *
      * @param ldapConnection
      */
-    private void checkGroupObjectClass(Connection ldapConnection) {
+    void checkGroupObjectClass(Connection ldapConnection) {
         List<SearchResultEntry> baseGroupResults = utils.getLdapQueryResults(ldapConnection,
                 settings.baseGroupDn(),
                 Filter.equality("objectClass", settings.groupObjectClass())
@@ -175,7 +175,7 @@ public class LdapTestDirectorySettings extends TestFunctionField {
         }
     }
 
-    private void checkGroup(Connection ldapConnection) {
+    void checkGroup(Connection ldapConnection) {
         List<SearchResultEntry> groups = utils.getLdapQueryResults(ldapConnection,
                 settings.baseGroupDn(),
                 Filter.and(Filter.equality("objectClass", settings.groupObjectClass()),
@@ -192,7 +192,7 @@ public class LdapTestDirectorySettings extends TestFunctionField {
         }
     }
 
-    private void checkReferencedUser(Connection ldapConnection, SearchResultEntry group) {
+    void checkReferencedUser(Connection ldapConnection, SearchResultEntry group) {
         String memberRef = group.getAttribute(settings.groupAttributeHoldingMember())
                 .firstValueAsString();
         // This memberRef will be in the format:
@@ -224,14 +224,14 @@ public class LdapTestDirectorySettings extends TestFunctionField {
     }
 
     /**
-     * Intentionally scoped as private.
+     * Intentionally scoped as package private.
      * This is a test support method to be invoked by Spock tests which will elevate scope as needed
      * in order to execute. If Java-based unit tests are ever needed, this scope will need to be
      * updated to package-private.
      *
      * @param utils Ldap support utilities
      */
-    private void setTestingUtils(LdapTestingUtils utils) {
+    void setTestingUtils(LdapTestingUtils utils) {
         this.utils = utils;
     }
 }

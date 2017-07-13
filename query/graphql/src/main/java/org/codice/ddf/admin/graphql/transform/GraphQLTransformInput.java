@@ -14,9 +14,7 @@
 package org.codice.ddf.admin.graphql.transform;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.api.DataType;
@@ -25,6 +23,7 @@ import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.api.fields.ObjectField;
 import org.codice.ddf.admin.api.fields.ScalarField;
+import org.codice.ddf.admin.graphql.GraphQLTypesProviderImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,6 +33,7 @@ import graphql.schema.GraphQLInputObjectType;
 import graphql.schema.GraphQLInputType;
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
+import graphql.servlet.GraphQLTypesProvider;
 
 public class GraphQLTransformInput {
 
@@ -41,10 +41,10 @@ public class GraphQLTransformInput {
 
     private GraphQLTransformScalar transformScalars;
     private GraphQLTransformEnum transformEnum;
-    private Map<String, GraphQLInputType> predefinedInputTypes;
+    private GraphQLTypesProviderImpl<GraphQLInputType> inputTypesProvider;
 
     public GraphQLTransformInput(GraphQLTransformScalar transformScalars, GraphQLTransformEnum transformEnum) {
-        predefinedInputTypes = new HashMap<>();
+        inputTypesProvider = new GraphQLTypesProviderImpl<>();
         this.transformScalars = transformScalars;
         this.transformEnum = transformEnum;
     }
@@ -61,8 +61,8 @@ public class GraphQLTransformInput {
     }
 
     public GraphQLInputType fieldTypeToGraphQLInputType(DataType field) {
-        if(field.fieldTypeName() != null && predefinedInputTypes.containsKey(field.fieldTypeName())) {
-            return predefinedInputTypes.get(field.fieldTypeName());
+        if(inputTypesProvider.isTypePresent(field.fieldTypeName())) {
+            return inputTypesProvider.getType(field.fieldTypeName());
         }
 
         GraphQLInputType type = null;
@@ -87,9 +87,7 @@ public class GraphQLTransformInput {
                             + field.getClass());
         }
 
-        if(field.fieldTypeName() != null) {
-            predefinedInputTypes.put(field.fieldTypeName(), type);
-        }
+        inputTypesProvider.addType(field.fieldTypeName(), type);
         return type;
     }
 
@@ -117,5 +115,9 @@ public class GraphQLTransformInput {
                 .description(field.description())
                 .type(fieldTypeToGraphQLInputType(field))
                 .build();
+    }
+
+    public GraphQLTypesProvider getInputTypeProvider() {
+        return inputTypesProvider;
     }
 }

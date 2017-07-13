@@ -19,11 +19,22 @@
         <reference-listener bind-method="bindFieldProvider" unbind-method="unbindFieldProvider" ref="graphQLServlet"/>
     </reference-list>
 
-    <bean id="graphQLServlet" class="org.codice.ddf.admin.graphql.servlet.ExtendedOsgiGraphQLServlet" />
+    <bean id="graphQLServlet" class="org.codice.ddf.admin.graphql.servlet.ExtendedOsgiGraphQLServlet" >
+        <property name="fieldProviders" ref="fieldProviders" />
+    </bean>
 
-    <service ref="graphQLServlet" interface="javax.servlet.Servlet" >
+    <service ref="graphQLServlet">
+        <interfaces>
+            <value>javax.servlet.Servlet</value>
+            <value>org.osgi.service.event.EventHandler</value>
+        </interfaces>
         <service-properties>
             <entry key="urlPatterns" value="/admin/beta/graphql/*" />
+            <entry key="event.topics">
+                <array value-type="java.lang.String">
+                    <value>graphql/servlet/REFRESH_SCHEMA</value>
+                </array>
+            </entry>
         </service-properties>
     </service>
 </blueprint>

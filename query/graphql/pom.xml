@@ -57,7 +57,7 @@
         <dependency>
             <groupId>com.graphql-java</groupId>
             <artifactId>graphql-java-servlet</artifactId>
-            <version>4.0.0</version>
+            <version>4.1.0</version>
         </dependency>
         <dependency>
             <groupId>com.graphql-java</groupId>
@@ -119,6 +119,12 @@
             <groupId>io.fastjson</groupId>
             <artifactId>boon</artifactId>
             <version>0.34</version>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.compendium</artifactId>
+            <version>${osgi.compendium.version}</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 

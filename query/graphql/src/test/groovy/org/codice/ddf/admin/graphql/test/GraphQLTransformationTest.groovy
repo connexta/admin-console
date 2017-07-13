@@ -81,7 +81,8 @@ class GraphQLTransformationTest extends Specification {
 
     def setup() {
         servlet = new ExtendedOsgiGraphQLServlet()
-        servlet.bindFieldProvider(new TestFieldProvider())
+        servlet.setFieldProviders([ new TestFieldProvider()])
+        servlet.refreshSchema()
         request = new MockHttpServletRequest()
         response = new MockHttpServletResponse()
     }

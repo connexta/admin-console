@@ -15,87 +15,90 @@
 
     <reference-list id="authHandlers"
                     interface="org.codice.ddf.security.handler.api.AuthenticationHandler"
-                    availability="optional"/>
+                    availability="optional">
+        <reference-listener bind-method="bindValue" unbind-method="unbindValue" ref="authTypePoller"/>
+    </reference-list>
 
     <reference-list id="realms"
                     interface="org.apache.karaf.jaas.config.JaasRealm"
-                    availability="optional"/>
+                    availability="optional">
+         <reference-listener bind-method="bindValue" unbind-method="unbindValue" ref="realmPoller"/>
+    </reference-list>
 
+    <bean id="authTypePoller" class="org.codice.ddf.admin.security.wcpm.AuthTypesPoller">
+        <property name="authHandlers" ref="authHandlers"/>
+        <property name="descriptionMap">
+            <map>
+                <entry>
+                    <key>
+                        <value>BASIC</value>
+                    </key>
+                    <value>Basic access authentication is a method for a HTTP user agent to provide a user name and password when making a request.</value>
+                </entry>
+                <entry>
+                    <key>
+                        <value>SAML</value>
+                    </key>
+                    <value>Security Assertion Markup Language is an XML-based, open-standard data format for exchanging authentication and authorization data between parties, in particular, between an identity provider and a service provider.</value>
+                </entry>
+                <entry>
+                    <key>
+                        <value>PKI</value>
+                    </key>
+                    <value>A public key infrastructure (PKI) is a set of roles, policies, and procedures needed to create, manage, distribute, use, store, and revoke digital certificates and manage public-key encryption.</value>
+                </entry>
+                <entry>
+                    <key>
+                        <value>GUEST</value>
+                    </key>
+                    <value>Provides guest access.</value>
+                </entry>
+            </map>
+        </property>
+    </bean>
 
-    <service id="authTypePoller" interface="org.codice.ddf.admin.api.poller.EnumValuePoller">
+    <service ref="authTypePoller" interface="org.codice.ddf.admin.api.poller.EnumValuePoller">
         <service-properties>
             <entry key="dataTypeId" value="enum.values.authTypes"/>
         </service-properties>
-
-        <bean class="org.codice.ddf.admin.security.wcpm.AuthTypesPoller">
-            <property name="authHandlers" ref="authHandlers"/>
-            <property name="descriptionMap">
-                <map>
-                    <entry>
-                        <key>
-                            <value>BASIC</value>
-                        </key>
-                        <value>Basic access authentication is a method for a HTTP user agent to provide a user name and password when making a request.</value>
-                    </entry>
-                    <entry>
-                        <key>
-                            <value>SAML</value>
-                        </key>
-                        <value>Security Assertion Markup Language is an XML-based, open-standard data format for exchanging authentication and authorization data between parties, in particular, between an identity provider and a service provider.</value>
-                    </entry>
-                    <entry>
-                        <key>
-                            <value>PKI</value>
-                        </key>
-                        <value>A public key infrastructure (PKI) is a set of roles, policies, and procedures needed to create, manage, distribute, use, store, and revoke digital certificates and manage public-key encryption.</value>
-                    </entry>
-                    <entry>
-                        <key>
-                            <value>GUEST</value>
-                        </key>
-                        <value>Provides guest access.</value>
-                    </entry>
-                </map>
-            </property>
-        </bean>
     </service>
 
-    <service id="realmPoller" interface="org.codice.ddf.admin.api.poller.EnumValuePoller">
+    <bean id="realmPoller" class="org.codice.ddf.admin.security.wcpm.RealmTypesPoller">
+        <property name="realms" ref="realms"/>
+        <property name="descriptionMap">
+            <map>
+                <entry>
+                    <key>
+                        <value>KARAF</value>
+                    </key>
+                    <value>Basic access authentication is a method for a HTTP user agent to provide a user name and password when making a request.</value>
+                </entry>
+                <entry>
+                    <key>
+                        <value>LDAP</value>
+                    </key>
+                    <value>Security Assertion Markup Language is an XML-based, open-standard data format for exchanging authentication and authorization data between parties, in particular, between an identity provider and a service provider.</value>
+                </entry>
+                <entry>
+                    <key>
+                        <value>IDP</value>
+                    </key>
+                    <value>A public key infrastructure (PKI) is a set of roles, policies, and procedures needed to create, manage, distribute, use, store, and revoke digital certificates and manage public-key encryption.</value>
+                </entry>
+                <entry>
+                    <key>
+                        <value>GUEST</value>
+                    </key>
+                    <value>Provides guest access.</value>
+                </entry>
+            </map>
+        </property>
+    </bean>
+
+    <service ref="realmPoller" interface="org.codice.ddf.admin.api.poller.EnumValuePoller">
         <service-properties>
             <entry key="dataTypeId" value="enum.values.realms"/>
         </service-properties>
-
-        <bean class="org.codice.ddf.admin.security.wcpm.RealmTypesPoller">
-            <property name="realms" ref="realms"/>
-            <property name="descriptionMap">
-                <map>
-                    <entry>
-                        <key>
-                            <value>KARAF</value>
-                        </key>
-                        <value>Basic access authentication is a method for a HTTP user agent to provide a user name and password when making a request.</value>
-                    </entry>
-                    <entry>
-                        <key>
-                            <value>LDAP</value>
-                        </key>
-                        <value>Security Assertion Markup Language is an XML-based, open-standard data format for exchanging authentication and authorization data between parties, in particular, between an identity provider and a service provider.</value>
-                    </entry>
-                    <entry>
-                        <key>
-                            <value>IDP</value>
-                        </key>
-                        <value>A public key infrastructure (PKI) is a set of roles, policies, and procedures needed to create, manage, distribute, use, store, and revoke digital certificates and manage public-key encryption.</value>
-                    </entry>
-                    <entry>
-                        <key>
-                            <value>GUEST</value>
-                        </key>
-                        <value>Provides guest access.</value>
-                    </entry>
-                </map>
-            </property>
-        </bean>
     </service>
     
     <service id="wcpmFieldProvider" interface="org.codice.ddf.admin.api.FieldProvider">

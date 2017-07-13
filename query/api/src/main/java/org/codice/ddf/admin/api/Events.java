@@ -11,17 +11,11 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.api.poller;
+package org.codice.ddf.admin.api;
 
-import java.util.List;
+public interface Events {
 
-import org.codice.ddf.admin.api.fields.EnumValue;
+    String REFRESH_SCHEMA = "graphql/servlet/REFRESH_SCHEMA";
 
-public interface EnumValuePoller<V, T> {
-
-    List<EnumValue<T>> getEnumValues();
-
-    void bindValue(V value);
-
-    void unbindValue(V value);
+    String EVENT_REASON = "EVENT_REASON";
 }

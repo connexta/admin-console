@@ -16,56 +16,95 @@ package org.codice.ddf.admin.graphql.servlet;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
+import org.codice.ddf.admin.api.Events;
 import org.codice.ddf.admin.api.FieldProvider;
 import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.codice.ddf.admin.graphql.servlet.request.DelegateRequest;
 import org.codice.ddf.admin.graphql.servlet.request.DelegateResponse;
 import org.codice.ddf.admin.graphql.transform.FunctionDataFetcherException;
 import org.codice.ddf.admin.graphql.transform.GraphQLTransformCommons;
+import org.osgi.service.event.Event;
+import org.osgi.service.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.RemovalCause;
+import com.google.common.cache.RemovalNotification;
 
 import graphql.GraphQLError;
 import graphql.annotations.EnhancedExecutionStrategy;
 import graphql.execution.ExecutionContext;
 import graphql.execution.ExecutionStrategy;
 import graphql.schema.GraphQLFieldDefinition;
+import graphql.servlet.DefaultGraphQLErrorHandler;
 import graphql.servlet.ExecutionStrategyProvider;
+import graphql.servlet.GraphQLErrorHandler;
 import graphql.servlet.GraphQLMutationProvider;
+import graphql.servlet.GraphQLProvider;
 import graphql.servlet.GraphQLQueryProvider;
 import graphql.servlet.OsgiGraphQLServlet;
 
-public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet {
+public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet implements EventHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExtendedOsgiGraphQLServlet.class);
+    private static final long CACHE_EXPIRATION_IN_SECONDS = 1;
+    private static final long CACHE_CLEANUP_INVOCATION_IN_SECONDS = 1;
 
-    private GraphQLTransformCommons transformCommons;
+    private static final String BINDING_FIELD_PROVIDER = "GraphQL servlet binding field provider %s";
+    private static final String UNBINDING_FIELD_PROVIDER = "GraphQL servlet unbinding field provider %s";
 
+    private Cache<String, Object> cache;
+    private ScheduledExecutorService scheduler;
+    private List<FieldProvider> fieldProviders;
+    private List<GraphQLProviderImpl> transformedProviders;
     private ExecutionStrategyProvider execStrategy;
-
-    private Map<String, GraphQLMutationProvider> graphQLMutationProviders;
-
-    private Map<String, GraphQLQueryProvider> graphQLQueryProviders;
+    private GraphQLErrorHandler errorHandler;
 
     public ExtendedOsgiGraphQLServlet() {
         super();
-        transformCommons = new GraphQLTransformCommons();
+        cache = CacheBuilder.newBuilder()
+                .expireAfterWrite(CACHE_EXPIRATION_IN_SECONDS, TimeUnit.SECONDS)
+                .removalListener(this::refreshSchemaOnExpire)
+                .build();
+
+        scheduler = Executors.newScheduledThreadPool(1);
+        scheduler.scheduleAtFixedRate(() -> cache.cleanUp(),
+                CACHE_CLEANUP_INVOCATION_IN_SECONDS,
+                CACHE_CLEANUP_INVOCATION_IN_SECONDS,
+                TimeUnit.SECONDS);
+
+        fieldProviders = new ArrayList<>();
+        transformedProviders = new ArrayList<>();
         execStrategy = new ExecutionStrategyProviderImpl();
-        graphQLMutationProviders = new HashMap<>();
-        graphQLQueryProviders = new HashMap<>();
+        errorHandler = new GraphQLErrorHandlerImpl();
+    }
+
+    @Override
+    public void destroy() {
+        scheduler.shutdownNow();
+    }
+
+    @Override
+    public void handleEvent(Event event) {
+        if(Events.REFRESH_SCHEMA.equals(event.getTopic())) {
+            triggerSchemaRefresh((String) event.getProperty(Events.EVENT_REASON));
+        }
     }
 
     @Override
@@ -74,8 +113,8 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet {
     }
 
     @Override
-    protected boolean isClientError(GraphQLError error) {
-        return error instanceof DataFetchingGraphQLError || super.isClientError(error);
+    protected GraphQLErrorHandler getGraphQLErrorHandler() {
+        return errorHandler;
     }
 
     @Override
@@ -106,7 +145,7 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet {
         }
     }
 
-    public List<String> splitQueries(String requestContent) throws Exception {
+    private List<String> splitQueries(String requestContent) throws Exception {
         List<String> splitElements = new ArrayList<>();
         JsonNode jsonNode = new ObjectMapper().readTree(requestContent);
         if (jsonNode.isArray()) {
@@ -118,80 +157,73 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet {
         return splitElements;
     }
 
-    public boolean isBatchRequest(String requestContent) throws IOException {
+    private boolean isBatchRequest(String requestContent) throws IOException {
         return new ObjectMapper().readTree(requestContent)
                 .isArray();
     }
 
+    private void triggerSchemaRefresh(String refreshReason) {
+        LOGGER.debug("GraphQL schema refresh requested. Cause: {}", refreshReason);
+        cache.put(Events.REFRESH_SCHEMA, true);
+    }
+
+    /**
+     * Refreshes the schema periodically once the cache invalidates if a REFRESH_SCHEMA event was added to the cache.
+     * This allows multiple threads to ask for a schema refresh while only refreshing the schema once.
+     * @param notification
+     */
+    private void refreshSchemaOnExpire(RemovalNotification notification) {
+        if (notification.getCause() == RemovalCause.EXPIRED) {
+            refreshSchema();
+        }
+    }
+
+    //Synchronized just in case the schema is still updating when another refresh is called
+    //The performance decrease by the `synchronized` is negligible because of the periodic cache invalidation implementation
+    private synchronized void refreshSchema() {
+        LOGGER.debug("Refreshing GraphQL schema.");
+
+        transformedProviders.forEach(this::unbindProvider);
+
+        GraphQLTransformCommons transformer = new GraphQLTransformCommons();
+
+        transformedProviders = fieldProviders.stream()
+                .map(fieldProvider -> new GraphQLProviderImpl(fieldProvider, transformer))
+                .collect(Collectors.toList());
+
+        transformedProviders.forEach(this::bindProvider);
+
+        LOGGER.debug("Finished refreshing GraphQL schema.");
+    }
+
     public void bindFieldProvider(FieldProvider fieldProvider) {
-
-        if (CollectionUtils.isNotEmpty(fieldProvider.getDiscoveryFields())) {
-            LOGGER.debug("Binding queries of field provider {} to graphql servlet.",
-                    fieldProvider.fieldName());
-            try {
-                GraphQLQueryProvider queryProvider = new GraphQLQueryProviderImpl(fieldProvider,
-                        transformCommons);
-                bindQueryProvider(queryProvider);
-                graphQLQueryProviders.put(fieldProvider.fieldTypeName(), queryProvider);
-            } catch (Exception e) {
-                LOGGER.error("Unable to bind queries of field provider {} to graphql servlet.",
-                        fieldProvider.fieldName(),
-                        e);
-            }
-        }
-
-        if (CollectionUtils.isNotEmpty(fieldProvider.getMutationFunctions())) {
-            LOGGER.debug("Binding mutations of field provider {} to graphql servlet.",
-                    fieldProvider.fieldName());
-            try {
-                GraphQLMutationProvider mutationProvider = new GraphQLMutationProviderImpl(
-                        fieldProvider,
-                        transformCommons);
-                bindMutationProvider(mutationProvider);
-                graphQLMutationProviders.put(fieldProvider.fieldTypeName(), mutationProvider);
-            } catch (Exception e) {
-                LOGGER.error("Unable to bind mutations of field provider {} to graphql servlet.",
-                        fieldProvider.fieldName(),
-                        e);
-            }
-        }
+        triggerSchemaRefresh(String.format(BINDING_FIELD_PROVIDER, fieldProvider.fieldTypeName()));
     }
 
     public void unbindFieldProvider(FieldProvider fieldProvider) {
-        if (CollectionUtils.isNotEmpty(fieldProvider.getDiscoveryFields())) {
-            LOGGER.debug("Unbinding queries of field provider {} to graphql servlet.",
-                    fieldProvider.fieldName());
-            try {
-                unbindQueryProvider(graphQLQueryProviders.get(fieldProvider.fieldTypeName()));
-                graphQLQueryProviders.remove(fieldProvider.fieldTypeName());
-            } catch (Exception e) {
-                LOGGER.error("Unable to unbind queries of field provider {} from graphql servlet.",
-                        fieldProvider.fieldName(),
-                        e);
-            }
-        }
-
-        if (CollectionUtils.isNotEmpty(fieldProvider.getMutationFunctions())) {
-            LOGGER.debug("Unbinding mutations of field provider {} to graphql servlet.",
-                    fieldProvider.fieldName());
-            try {
-                unbindMutationProvider(graphQLMutationProviders.get(fieldProvider.fieldTypeName()));
-                graphQLMutationProviders.remove(fieldProvider.fieldTypeName());
-            } catch (Exception e) {
-                LOGGER.error("Unable to unbind mutations of field provider {} from graphql servlet.",
-                        fieldProvider.fieldName(),
-                        e);
-            }
-        }
+        triggerSchemaRefresh(String.format(UNBINDING_FIELD_PROVIDER, fieldProvider.fieldTypeName()));
     }
 
-    public class GraphQLQueryProviderImpl implements GraphQLQueryProvider {
+    public void setFieldProviders(List<FieldProvider> fieldProviders) {
+        this.fieldProviders = fieldProviders;
+    }
+
+    private static class GraphQLProviderImpl
+            implements GraphQLProvider, GraphQLQueryProvider, GraphQLMutationProvider {
 
         private List<GraphQLFieldDefinition> queries;
 
-        public GraphQLQueryProviderImpl(FieldProvider provider,
+        private List<GraphQLFieldDefinition> mutations;
+
+        public GraphQLProviderImpl(FieldProvider provider,
                 GraphQLTransformCommons transformCommons) {
             queries = transformCommons.fieldProviderToQueries(provider);
+            mutations = transformCommons.fieldProviderToMutations(provider);
+        }
+
+        @Override
+        public Collection<GraphQLFieldDefinition> getMutations() {
+            return mutations;
         }
 
         @Override
@@ -200,28 +232,14 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet {
         }
     }
 
-    public class GraphQLMutationProviderImpl implements GraphQLMutationProvider {
-
-        private List<GraphQLFieldDefinition> mutations;
-
-        public GraphQLMutationProviderImpl(FieldProvider provider,
-                GraphQLTransformCommons transformCommons) {
-            mutations = transformCommons.fieldProviderToMutations(provider);
-        }
-
-        @Override
-        public Collection<GraphQLFieldDefinition> getMutations() {
-            return mutations;
-        }
-    }
-
-    public class ExtendedEnhancedExecutionStrategy extends EnhancedExecutionStrategy {
+    private static class ExtendedEnhancedExecutionStrategy extends EnhancedExecutionStrategy {
 
         @Override
         protected void handleDataFetchingException(ExecutionContext executionContext,
                 GraphQLFieldDefinition fieldDef, Map<String, Object> argumentValues, Exception e) {
             if (e instanceof FunctionDataFetcherException) {
                 for (ErrorMessage msg : ((FunctionDataFetcherException) e).getCustomMessages()) {
+                    LOGGER.debug("Unsuccessful GraphQL request:\n", e.toString());
                     executionContext.addError(new DataFetchingGraphQLError(msg));
                 }
             } else {
@@ -230,7 +248,7 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet {
         }
     }
 
-    public class ExecutionStrategyProviderImpl implements ExecutionStrategyProvider {
+    private static class ExecutionStrategyProviderImpl implements ExecutionStrategyProvider {
 
         private ExtendedEnhancedExecutionStrategy strategy;
 
@@ -251,6 +269,14 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet {
         @Override
         public ExecutionStrategy getSubscriptionExecutionStrategy() {
             return strategy;
+        }
+    }
+
+    public static class GraphQLErrorHandlerImpl extends DefaultGraphQLErrorHandler {
+
+        @Override
+        protected boolean isClientError(GraphQLError error) {
+            return error instanceof DataFetchingGraphQLError || super.isClientError(error);
         }
     }
 }

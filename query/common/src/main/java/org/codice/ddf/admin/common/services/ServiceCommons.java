@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.text.StrSubstitutor;
+import org.codice.ddf.admin.api.Events;
 import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.common.report.ReportImpl;
@@ -32,10 +33,15 @@ import org.codice.ddf.admin.configurator.OperationReport;
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
 import org.codice.ddf.internal.admin.configurator.actions.ServiceReader;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.service.event.Event;
+import org.osgi.service.event.EventAdmin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-// TODO: 6/21/17 phuffer - Make this back into static methods
+import com.google.common.collect.ImmutableMap;
+
 public class ServiceCommons {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ServiceCommons.class);
@@ -213,5 +219,23 @@ public class ServiceCommons {
 
     public void setConfiguratorFactory(ConfiguratorFactory configuratorFactory) {
         this.configuratorFactory = configuratorFactory;
+    }
+
+    public static void updateGraphQLSchema(Class clazz, String eventReason) {
+        getEventAdmin(clazz).postEvent(getUpdateSchemaEvent(eventReason));
+    }
+
+    public static Event getUpdateSchemaEvent(String eventReason) {
+        return new Event(Events.REFRESH_SCHEMA, ImmutableMap.of(Events.EVENT_REASON, eventReason));
+    }
+
+    public static EventAdmin getEventAdmin(Class clazz) {
+        return getBundleContext(clazz).getService(getBundleContext(clazz).getServiceReference(
+                EventAdmin.class));
+    }
+
+    public static BundleContext getBundleContext(Class clazz) {
+        return FrameworkUtil.getBundle(clazz)
+                .getBundleContext();
     }
 }

@@ -13,24 +13,23 @@
  **/
 package org.codice.ddf.admin.graphql.transform;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.codice.ddf.admin.api.fields.ScalarField;
+import org.codice.ddf.admin.graphql.GraphQLTypesProviderImpl;
 
 import graphql.Scalars;
 import graphql.schema.GraphQLScalarType;
 
 public class GraphQLTransformScalar {
-    Map<String, GraphQLScalarType> predefinedScalars;
+
+    GraphQLTypesProviderImpl<GraphQLScalarType> scalarTypesProvider;
 
     public GraphQLTransformScalar() {
-        predefinedScalars = new HashMap<>();
+        scalarTypesProvider = new GraphQLTypesProviderImpl<>();
     }
 
     public GraphQLScalarType resolveScalarType(ScalarField field) {
-        if(predefinedScalars.containsKey(field.fieldTypeName())) {
-            return predefinedScalars.get(field.fieldTypeName());
+        if(scalarTypesProvider.isTypePresent(field.fieldTypeName())) {
+            return scalarTypesProvider.getType(field.fieldTypeName());
         }
 
         GraphQLScalarType type = null;
@@ -57,10 +56,11 @@ public class GraphQLTransformScalar {
                     new GraphQLScalarType(field.fieldTypeName(), field.description(), Scalars.GraphQLFloat.getCoercing());
         }
 
-        if(field.fieldTypeName() != null && type != null) {
-            predefinedScalars.put(field.fieldTypeName(), type);
-        }
-
+        scalarTypesProvider.addType(field.fieldTypeName(), type);
         return type;
+    }
+
+    public GraphQLTypesProviderImpl getScalarTypesProvider() {
+        return scalarTypesProvider;
     }
 }

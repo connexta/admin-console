@@ -18,20 +18,17 @@ import static org.codice.ddf.admin.sources.services.CswServiceProperties.SERVICE
 
 import java.util.List;
 
+import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.common.services.ServiceCommons;
-import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.sources.csw.CswSourceInfoField;
 import org.codice.ddf.admin.sources.fields.type.CswSourceConfigurationField;
 import org.codice.ddf.admin.sources.fields.type.SourceConfigField;
 import org.codice.ddf.admin.sources.utils.SourceUtilCommons;
-import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
-import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
-import org.codice.ddf.internal.admin.configurator.actions.ServiceReader;
 
 import com.google.common.collect.ImmutableList;
 
@@ -51,31 +48,18 @@ public class GetCswConfigurations extends BaseFunctionField<ListField<CswSourceI
 
     private ServiceCommons serviceCommons;
 
-    private final ConfiguratorFactory configuratorFactory;
+    private final ConfiguratorSuite configuratorSuite;
 
-    private final ServiceActions serviceActions;
-
-    private final ManagedServiceActions managedServiceActions;
-
-    private final ServiceReader serviceReader;
-
-    public GetCswConfigurations(ConfiguratorFactory configuratorFactory,
-            ServiceActions serviceActions, ManagedServiceActions managedServiceActions,
-            ServiceReader serviceReader) {
+    public GetCswConfigurations(ConfiguratorSuite configuratorSuite) {
         super(FIELD_NAME, DESCRIPTION);
-        this.configuratorFactory = configuratorFactory;
-        this.serviceActions = serviceActions;
-        this.managedServiceActions = managedServiceActions;
-        this.serviceReader = serviceReader;
+        this.configuratorSuite = configuratorSuite;
 
         pid = new PidField();
         updateArgumentPaths();
 
-        sourceUtilCommons = new SourceUtilCommons(managedServiceActions,
-                serviceActions,
-                serviceReader);
+        sourceUtilCommons = new SourceUtilCommons(configuratorSuite);
 
-        serviceCommons = new ServiceCommons(null, serviceActions, null, null);
+        serviceCommons = new ServiceCommons(configuratorSuite);
     }
 
     @Override
@@ -122,9 +106,6 @@ public class GetCswConfigurations extends BaseFunctionField<ListField<CswSourceI
 
     @Override
     public FunctionField<ListField<CswSourceInfoField>> newInstance() {
-        return new GetCswConfigurations(configuratorFactory,
-                serviceActions,
-                managedServiceActions,
-                serviceReader);
+        return new GetCswConfigurations(configuratorSuite);
     }
 }

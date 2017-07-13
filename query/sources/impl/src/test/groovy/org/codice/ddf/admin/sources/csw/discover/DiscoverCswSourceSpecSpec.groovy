@@ -13,6 +13,7 @@
  **/
 package org.codice.ddf.admin.sources.csw.discover
 
+import org.codice.ddf.admin.api.ConfiguratorSuite
 import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.common.fields.common.HostField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
@@ -55,7 +56,7 @@ class DiscoverCswSourceSpecSpec extends SourceCommonsSpec {
     static URL_FIELD_PATH = [ADDRESS_FIELD_PATH, URL_NAME].flatten()
 
     def setup() {
-        discoverCsw = new DiscoverCswSource()
+        discoverCsw = new DiscoverCswSource(Mock(ConfiguratorSuite))
     }
 
     def 'Successfully discover DDF federation profile with URL'() {

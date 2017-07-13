@@ -23,20 +23,18 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 import org.codice.ddf.admin.configurator.Configurator;
-import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.configurator.OperationReport;
 import org.codice.ddf.admin.security.common.SecurityValidation;
 import org.codice.ddf.admin.security.common.fields.wcpm.ClaimsMapEntry;
 import org.codice.ddf.admin.security.common.fields.wcpm.ContextPolicyBin;
 import org.codice.ddf.admin.security.common.services.PolicyManagerServiceProperties;
 import org.codice.ddf.admin.security.common.services.StsServiceProperties;
-import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
-import org.codice.ddf.internal.admin.configurator.actions.ServiceReader;
 
 import com.google.common.collect.ImmutableList;
 
@@ -49,24 +47,19 @@ public class SaveContextPolices extends BaseFunctionField<ContextPolicyBin.ListI
 
     private ContextPolicyBin.ListImpl returnType;
 
-    private final ConfiguratorFactory configuratorFactory;
-
-    private final ServiceActions serviceActions;
-
-    private final ServiceReader serviceReader;
+    private final ConfiguratorSuite configuratorSuite;
 
     private ContextPolicyBin.ListImpl contextPolicies;
 
     private StsServiceProperties stsServiceProps;
 
-    public SaveContextPolices(ConfiguratorFactory configuratorFactory,
-            ServiceActions serviceActions, ServiceReader serviceReader) {
+    public SaveContextPolices(ConfiguratorSuite configuratorSuite) {
         super(FUNCTION_FIELD_NAME, DESCRIPTION);
-        this.configuratorFactory = configuratorFactory;
-        this.serviceActions = serviceActions;
-        this.serviceReader = serviceReader;
-        this.returnType = new ContextPolicyBin.ListImpl(serviceReader);
-        contextPolicies = new ContextPolicyBin.ListImpl(serviceReader).useDefaultRequired();
+        this.configuratorSuite = configuratorSuite;
+
+        this.returnType = new ContextPolicyBin.ListImpl(configuratorSuite.getServiceReader());
+        contextPolicies =
+                new ContextPolicyBin.ListImpl(configuratorSuite.getServiceReader()).useDefaultRequired();
         updateArgumentPaths();
 
         stsServiceProps = new StsServiceProperties();
@@ -74,11 +67,13 @@ public class SaveContextPolices extends BaseFunctionField<ContextPolicyBin.ListI
 
     @Override
     public ContextPolicyBin.ListImpl performFunction() {
-        Configurator configurator = configuratorFactory.getConfigurator();
-        configurator.add(serviceActions.build(POLICY_MANAGER_PID,
-                new PolicyManagerServiceProperties().contextPoliciesToPolicyManagerProps(
-                        contextPolicies.getList()),
-                true));
+        Configurator configurator = configuratorSuite.getConfiguratorFactory()
+                .getConfigurator();
+        configurator.add(configuratorSuite.getServiceActions()
+                .build(POLICY_MANAGER_PID,
+                        new PolicyManagerServiceProperties().contextPoliciesToPolicyManagerProps(
+                                contextPolicies.getList()),
+                        true));
 
         OperationReport configReport = configurator.commit(
                 "Web Context Policy saved with details: {}",
@@ -96,7 +91,7 @@ public class SaveContextPolices extends BaseFunctionField<ContextPolicyBin.ListI
         super.validate();
         checkRootPathExists();
 
-        if(containsErrorMsgs()) {
+        if (containsErrorMsgs()) {
             return;
         }
 
@@ -109,7 +104,9 @@ public class SaveContextPolices extends BaseFunctionField<ContextPolicyBin.ListI
                     .collect(Collectors.toList()));
         }
 
-        addMessages(SecurityValidation.validateStsClaimsExist(claimArgs, serviceActions, stsServiceProps));
+        addMessages(SecurityValidation.validateStsClaimsExist(claimArgs,
+                configuratorSuite.getServiceActions(),
+                stsServiceProps));
     }
 
     private void checkRootPathExists() {
@@ -134,6 +131,6 @@ public class SaveContextPolices extends BaseFunctionField<ContextPolicyBin.ListI
 
     @Override
     public FunctionField<ContextPolicyBin.ListImpl> newInstance() {
-        return new SaveContextPolices(configuratorFactory, serviceActions, serviceReader);
+        return new SaveContextPolices(configuratorSuite);
     }
 }

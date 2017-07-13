@@ -29,35 +29,15 @@
     </reference-list>
 
     <bean id="ldapFieldProvider" class="org.codice.ddf.admin.ldap.LdapFieldProvider">
-        <argument ref="configuratorFactory"/>
-        <argument ref="featureActions"/>
-        <argument ref="managedServiceActions"/>
-        <argument ref="propertyActions"/>
-        <argument ref="serviceActions"/>
+        <argument ref="configuratorSuite"/>
         <property name="ldapDiscoveryFields" ref="ldapDiscoveryFields"/>
         <property name="ldapMutationFields" ref="ldapMutationFields"/>
     </bean>
 
     <service ref="ldapFieldProvider" interface="org.codice.ddf.admin.api.FieldProvider" />
 
-    <reference id="configuratorFactory"
-               interface="org.codice.ddf.admin.configurator.ConfiguratorFactory"
-               availability="mandatory" filter="(type=txact)"/>
-
-    <reference id="featureActions"
-               interface="org.codice.ddf.internal.admin.configurator.actions.FeatureActions"
-               availability="mandatory"/>
-
-    <reference id="managedServiceActions"
-               interface="org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions"
-               availability="mandatory"/>
-
-    <reference id="propertyActions"
-               interface="org.codice.ddf.internal.admin.configurator.actions.PropertyActions"
-               availability="mandatory"/>
-
-    <reference id="serviceActions"
-               interface="org.codice.ddf.internal.admin.configurator.actions.ServiceActions"
+    <reference id="configuratorSuite"
+               interface="org.codice.ddf.admin.api.ConfiguratorSuite"
                availability="mandatory"/>
 
 </blueprint>

@@ -15,6 +15,7 @@ package org.codice.ddf.admin.sources.wfs.discover;
 
 import java.util.List;
 
+import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
@@ -43,14 +44,18 @@ public class DiscoverWfsSource extends BaseFunctionField<WfsSourceConfigurationF
 
     private WfsSourceUtils wfsSourceUtils;
 
-    public DiscoverWfsSource() {
+    private final ConfiguratorSuite configuratorSuite;
+
+    public DiscoverWfsSource(ConfiguratorSuite configuratorSuite) {
         super(FIELD_NAME, DESCRIPTION);
+        this.configuratorSuite = configuratorSuite;
+
         credentials = new CredentialsField();
         address = new AddressField();
         address.isRequired(true);
         updateArgumentPaths();
 
-        wfsSourceUtils = new WfsSourceUtils();
+        wfsSourceUtils = new WfsSourceUtils(configuratorSuite);
     }
 
     @Override
@@ -68,8 +73,7 @@ public class DiscoverWfsSource extends BaseFunctionField<WfsSourceConfigurationF
         }
 
         ReportWithResultImpl<WfsSourceConfigurationField> configResult =
-                wfsSourceUtils.getPreferredWfsConfig(responseResult.result(),
-                        credentials);
+                wfsSourceUtils.getPreferredWfsConfig(responseResult.result(), credentials);
 
         addMessages(configResult);
         return configResult.isResultPresent() ? configResult.result() : null;
@@ -87,7 +91,7 @@ public class DiscoverWfsSource extends BaseFunctionField<WfsSourceConfigurationF
 
     @Override
     public FunctionField<WfsSourceConfigurationField> newInstance() {
-        return new DiscoverWfsSource();
+        return new DiscoverWfsSource(configuratorSuite);
     }
 
     /**

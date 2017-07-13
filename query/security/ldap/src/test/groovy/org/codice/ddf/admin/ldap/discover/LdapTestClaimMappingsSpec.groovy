@@ -14,6 +14,7 @@
 package org.codice.ddf.admin.ldap.discover
 
 import com.google.common.collect.ImmutableMap
+import org.codice.ddf.admin.api.ConfiguratorSuite
 import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.api.fields.ListField
 import org.codice.ddf.admin.api.report.FunctionReport
@@ -72,8 +73,10 @@ class LdapTestClaimMappingsSpec extends Specification {
         serviceActions = Mock(ServiceActions)
         stsServiceProperties = Mock(StsServiceProperties)
         stsServiceProperties.getConfiguredStsClaims(_) >> ['claim1', 'claim2', 'claim3', 'claim4', 'claim5']
+        def configuratorSuite = Mock(ConfiguratorSuite)
+        configuratorSuite.serviceActions >> serviceActions
 
-        action = new LdapTestClaimMappings(serviceActions)
+        action = new LdapTestClaimMappings(configuratorSuite)
         action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
         action.setStsServiceProperties(stsServiceProperties)
 

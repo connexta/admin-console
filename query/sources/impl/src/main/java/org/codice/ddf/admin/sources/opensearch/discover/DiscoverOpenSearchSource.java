@@ -15,6 +15,7 @@ package org.codice.ddf.admin.sources.opensearch.discover;
 
 import java.util.List;
 
+import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.api.report.ReportWithResult;
@@ -45,14 +46,18 @@ public class DiscoverOpenSearchSource
 
     private OpenSearchSourceUtils openSearchSourceUtils;
 
-    public DiscoverOpenSearchSource() {
+    private final ConfiguratorSuite configuratorSuite;
+
+    public DiscoverOpenSearchSource(ConfiguratorSuite configuratorSuite) {
         super(FIELD_NAME, DESCRIPTION);
+        this.configuratorSuite = configuratorSuite;
+
         credentials = new CredentialsField();
         address = new AddressField();
         address.isRequired(true);
         updateArgumentPaths();
 
-        openSearchSourceUtils = new OpenSearchSourceUtils();
+        openSearchSourceUtils = new OpenSearchSourceUtils(configuratorSuite);
     }
 
     @Override
@@ -89,7 +94,7 @@ public class DiscoverOpenSearchSource
 
     @Override
     public FunctionField<OpenSearchSourceConfigurationField> newInstance() {
-        return new DiscoverOpenSearchSource();
+        return new DiscoverOpenSearchSource(configuratorSuite);
     }
 
     /**

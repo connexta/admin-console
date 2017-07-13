@@ -15,7 +15,7 @@ package org.codice.ddf.admin.security.common.services;
 
 import java.util.Map;
 
-import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
+import org.codice.ddf.admin.api.ConfiguratorSuite;
 
 public class LdapLoginServiceProperties {
 
@@ -44,13 +44,14 @@ public class LdapLoginServiceProperties {
     public static final String START_TLS = "startTls";
     // ---
 
-    private ManagedServiceActions managedServiceActions;
+    private final ConfiguratorSuite configuratorSuite;
 
-    public LdapLoginServiceProperties(ManagedServiceActions configuratorFactory) {
-        this.managedServiceActions = configuratorFactory;
+    public LdapLoginServiceProperties(ConfiguratorSuite configuratorSuite) {
+        this.configuratorSuite = configuratorSuite;
     }
 
     public Map<String, Map<String, Object>> getLdapLoginManagedServices() {
-        return managedServiceActions.read(LDAP_LOGIN_MANAGED_SERVICE_FACTORY_PID);
+        return configuratorSuite.getManagedServiceActions()
+                .read(LDAP_LOGIN_MANAGED_SERVICE_FACTORY_PID);
     }
 }

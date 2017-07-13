@@ -15,19 +15,15 @@ package org.codice.ddf.admin.sources.csw;
 
 import java.util.List;
 
+import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.function.BaseFieldProvider;
-import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.sources.csw.discover.DiscoverCswSource;
 import org.codice.ddf.admin.sources.csw.discover.GetCswConfigurations;
 import org.codice.ddf.admin.sources.csw.persist.CreateCswConfiguration;
 import org.codice.ddf.admin.sources.csw.persist.DeleteCswConfiguration;
 import org.codice.ddf.admin.sources.csw.persist.UpdateCswConfiguration;
-import org.codice.ddf.internal.admin.configurator.actions.FeatureActions;
-import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
-import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
-import org.codice.ddf.internal.admin.configurator.actions.ServiceReader;
 
 import com.google.common.collect.ImmutableList;
 
@@ -51,28 +47,13 @@ public class CswFieldProvider extends BaseFieldProvider {
 
     private DeleteCswConfiguration deleteCswConfiguration;
 
-    public CswFieldProvider(ConfiguratorFactory configuratorFactory, ServiceActions serviceActions,
-            ManagedServiceActions managedServiceActions, ServiceReader serviceReader,
-            FeatureActions featureActions) {
+    public CswFieldProvider(ConfiguratorSuite configuratorSuite) {
         super(ID, TYPE_NAME, DESCRIPTION);
-        discoverCswSource = new DiscoverCswSource();
-        getCswConfigurations = new GetCswConfigurations(configuratorFactory,
-                serviceActions,
-                managedServiceActions,
-                serviceReader);
-        createCswConfiguration = new CreateCswConfiguration(configuratorFactory,
-                serviceActions,
-                managedServiceActions,
-                serviceReader,
-                featureActions);
-        updateCswConfiguration = new UpdateCswConfiguration(configuratorFactory,
-                serviceActions,
-                managedServiceActions,
-                serviceReader,
-                featureActions);
-        deleteCswConfiguration = new DeleteCswConfiguration(configuratorFactory,
-                serviceActions,
-                managedServiceActions);
+        discoverCswSource = new DiscoverCswSource(configuratorSuite);
+        getCswConfigurations = new GetCswConfigurations(configuratorSuite);
+        createCswConfiguration = new CreateCswConfiguration(configuratorSuite);
+        updateCswConfiguration = new UpdateCswConfiguration(configuratorSuite);
+        deleteCswConfiguration = new DeleteCswConfiguration(configuratorSuite);
         updateInnerFieldPaths();
     }
 

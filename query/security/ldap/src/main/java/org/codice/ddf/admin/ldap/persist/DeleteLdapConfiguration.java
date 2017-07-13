@@ -15,16 +15,13 @@ package org.codice.ddf.admin.ldap.persist;
 
 import java.util.List;
 
+import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.common.services.ServiceCommons;
-import org.codice.ddf.admin.configurator.ConfiguratorFactory;
-import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
-import org.codice.ddf.internal.admin.configurator.actions.PropertyActions;
-import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
 
 import com.google.common.collect.ImmutableList;
 
@@ -37,33 +34,19 @@ public class DeleteLdapConfiguration extends BaseFunctionField<BooleanField> {
 
     private PidField pid;
 
-    private final ConfiguratorFactory configuratorFactory;
-
-    private final ManagedServiceActions managedServiceActions;
-
-    private final PropertyActions propertyActions;
-
-    private final ServiceActions serviceActions;
+    private final ConfiguratorSuite configuratorSuite;
 
     private ServiceCommons serviceCommons;
 
-    public DeleteLdapConfiguration(ConfiguratorFactory configuratorFactory,
-            ManagedServiceActions managedServiceActions, PropertyActions propertyActions,
-            ServiceActions serviceActions) {
+    public DeleteLdapConfiguration(ConfiguratorSuite configuratorSuite) {
         super(FIELD_NAME, DESCRIPTION);
-        this.configuratorFactory = configuratorFactory;
-        this.managedServiceActions = managedServiceActions;
-        this.propertyActions = propertyActions;
-        this.serviceActions = serviceActions;
+        this.configuratorSuite = configuratorSuite;
 
         pid = new PidField();
         pid.isRequired(true);
 
         updateArgumentPaths();
-        serviceCommons = new ServiceCommons(managedServiceActions,
-                serviceActions,
-                null,
-                configuratorFactory);
+        serviceCommons = new ServiceCommons(configuratorSuite);
     }
 
     @Override
@@ -94,9 +77,6 @@ public class DeleteLdapConfiguration extends BaseFunctionField<BooleanField> {
 
     @Override
     public FunctionField<BooleanField> newInstance() {
-        return new DeleteLdapConfiguration(configuratorFactory,
-                managedServiceActions,
-                propertyActions,
-                serviceActions);
+        return new DeleteLdapConfiguration(configuratorSuite);
     }
 }

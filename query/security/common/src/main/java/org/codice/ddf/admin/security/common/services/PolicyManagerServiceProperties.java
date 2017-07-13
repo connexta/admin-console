@@ -20,10 +20,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections.ListUtils;
+import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.common.fields.common.ContextPath;
 import org.codice.ddf.admin.common.services.ServiceCommons;
 import org.codice.ddf.admin.security.common.fields.wcpm.ContextPolicyBin;
-import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
 import org.codice.ddf.internal.admin.configurator.actions.ServiceReader;
 import org.codice.ddf.security.policy.context.ContextPolicy;
 import org.codice.ddf.security.policy.context.ContextPolicyManager;
@@ -148,12 +148,13 @@ public class PolicyManagerServiceProperties {
         return ImmutableMap.of(WHITE_LIST_CONTEXT, serviceContexts);
     }
 
-    public static List<String> getWhitelistContexts(ServiceActions serviceActions) {
-        Object whitelistProp = serviceActions.read(POLICY_MANAGER_PID)
+    public static List<String> getWhitelistContexts(ConfiguratorSuite configuratorSuite) {
+        Object whitelistProp = configuratorSuite.getServiceActions()
+                .read(POLICY_MANAGER_PID)
                 .get(WHITE_LIST_CONTEXT);
 
         if (whitelistProp != null && whitelistProp instanceof String[]) {
-            return new ServiceCommons().resolveProperties((String[]) whitelistProp);
+            return new ServiceCommons(configuratorSuite).resolveProperties((String[]) whitelistProp);
         }
 
         return new ArrayList<>();

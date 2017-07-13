@@ -13,6 +13,7 @@
  */
 package org.codice.ddf.admin.sources.csw.discover
 
+import org.codice.ddf.admin.api.ConfiguratorSuite
 import org.codice.ddf.admin.api.Field
 import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.api.fields.ListField
@@ -48,6 +49,8 @@ class GetCswConfigsSpec extends SourceCommonsSpec {
 
     ManagedServiceActions managedServiceActions
 
+    ConfiguratorSuite configuratorSuite
+
     def functionArgs = [
             (PID): S_PID_2
     ]
@@ -60,8 +63,13 @@ class GetCswConfigsSpec extends SourceCommonsSpec {
         managedServiceActions = Mock(ManagedServiceActions)
         serviceReader = Mock(ServiceReader)
 
-        getCswConfigsFunction = new GetCswConfigurations(configuratorFactory, serviceActions,
-                managedServiceActions, serviceReader)
+        configuratorSuite = Mock(ConfiguratorSuite)
+        configuratorSuite.configuratorFactory >> configuratorFactory
+        configuratorSuite.serviceActions >> serviceActions
+        configuratorSuite.serviceReader >> serviceReader
+        configuratorSuite.managedServiceActions >> managedServiceActions
+
+        getCswConfigsFunction = new GetCswConfigurations(configuratorSuite)
     }
 
     def 'No pid argument returns all configs'() {

@@ -15,16 +15,13 @@ package org.codice.ddf.admin.sources.utils;
 
 import java.util.List;
 
+import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.api.report.Report;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.common.report.ReportImpl;
 import org.codice.ddf.admin.common.services.ServiceCommons;
-import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.sources.SourceMessages;
-import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
-import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
-import org.codice.ddf.internal.admin.configurator.actions.ServiceReader;
 
 import ddf.catalog.service.ConfiguredService;
 import ddf.catalog.source.Source;
@@ -36,17 +33,9 @@ public class SourceValidationUtils {
 
     private ServiceCommons serviceCommons;
 
-    public SourceValidationUtils(ServiceReader serviceReader,
-            ManagedServiceActions managedServiceActions, ConfiguratorFactory configuratorFactory,
-            ServiceActions serviceActions) {
-        sourceUtilCommons = new SourceUtilCommons(managedServiceActions,
-                serviceActions,
-                serviceReader);
-
-        serviceCommons = new ServiceCommons(managedServiceActions,
-                serviceActions,
-                serviceReader,
-                configuratorFactory);
+    public SourceValidationUtils(ConfiguratorSuite configuratorSuite) {
+        sourceUtilCommons = new SourceUtilCommons(configuratorSuite);
+        serviceCommons = new ServiceCommons(configuratorSuite);
     }
 
     private boolean findSourceNameMatch(String servicePid, String sourceName) {

@@ -15,19 +15,15 @@ package org.codice.ddf.admin.sources.opensearch;
 
 import java.util.List;
 
+import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.function.BaseFieldProvider;
-import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.sources.opensearch.discover.DiscoverOpenSearchSource;
 import org.codice.ddf.admin.sources.opensearch.discover.GetOpenSearchConfigurations;
 import org.codice.ddf.admin.sources.opensearch.persist.CreateOpenSearchConfiguration;
 import org.codice.ddf.admin.sources.opensearch.persist.DeleteOpenSearchConfiguration;
 import org.codice.ddf.admin.sources.opensearch.persist.UpdateOpenSearchConfiguration;
-import org.codice.ddf.internal.admin.configurator.actions.FeatureActions;
-import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
-import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
-import org.codice.ddf.internal.admin.configurator.actions.ServiceReader;
 
 import com.google.common.collect.ImmutableList;
 
@@ -50,29 +46,13 @@ public class OpenSearchFieldProvider extends BaseFieldProvider {
 
     private DeleteOpenSearchConfiguration deleteOpenSearchConfig;
 
-    public OpenSearchFieldProvider(ConfiguratorFactory configuratorFactory,
-            ServiceActions serviceActions, ManagedServiceActions managedServiceActions,
-            ServiceReader serviceReader, FeatureActions featureActions) {
+    public OpenSearchFieldProvider(ConfiguratorSuite configuratorSuite) {
         super(ID, TYPE_NAME, DESCRIPTION);
-        discoverOpenSearchSource = new DiscoverOpenSearchSource();
-        getOpenSearchConfigs = new GetOpenSearchConfigurations(configuratorFactory,
-                serviceActions,
-                managedServiceActions,
-                serviceReader);
-
-        createOpenSearchConfigs = new CreateOpenSearchConfiguration(configuratorFactory,
-                serviceActions,
-                managedServiceActions,
-                serviceReader,
-                featureActions);
-        updateOpenSearchConfigs = new UpdateOpenSearchConfiguration(configuratorFactory,
-                serviceActions,
-                managedServiceActions,
-                serviceReader,
-                featureActions);
-        deleteOpenSearchConfig = new DeleteOpenSearchConfiguration(configuratorFactory,
-                serviceActions,
-                managedServiceActions);
+        discoverOpenSearchSource = new DiscoverOpenSearchSource(configuratorSuite);
+        getOpenSearchConfigs = new GetOpenSearchConfigurations(configuratorSuite);
+        createOpenSearchConfigs = new CreateOpenSearchConfiguration(configuratorSuite);
+        updateOpenSearchConfigs = new UpdateOpenSearchConfiguration(configuratorSuite);
+        deleteOpenSearchConfig = new DeleteOpenSearchConfiguration(configuratorSuite);
         updateInnerFieldPaths();
     }
 

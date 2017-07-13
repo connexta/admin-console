@@ -25,7 +25,8 @@ import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
 
 public class SecurityValidation {
 
-    public static Report validateStsClaimsExist(List<StringField> claimArgs, ServiceActions serviceActions, StsServiceProperties stsServiceProps){
+    public static Report validateStsClaimsExist(List<StringField> claimArgs,
+            ServiceActions serviceActions, StsServiceProperties stsServiceProps) {
         ReportImpl report = new ReportImpl();
         List<String> supportedClaims = stsServiceProps.getConfiguredStsClaims(serviceActions);
 

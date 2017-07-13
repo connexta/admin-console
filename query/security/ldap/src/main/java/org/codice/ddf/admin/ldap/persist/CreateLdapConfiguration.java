@@ -24,20 +24,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.configurator.Configurator;
-import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.configurator.OperationReport;
 import org.codice.ddf.admin.ldap.commons.LdapServiceCommons;
 import org.codice.ddf.admin.ldap.fields.config.LdapConfigurationField;
 import org.codice.ddf.admin.security.common.services.LdapClaimsHandlerServiceProperties;
 import org.codice.ddf.admin.security.common.services.LdapLoginServiceProperties;
-import org.codice.ddf.internal.admin.configurator.actions.FeatureActions;
-import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
-import org.codice.ddf.internal.admin.configurator.actions.PropertyActions;
 
 import com.google.common.collect.ImmutableList;
 
@@ -51,30 +48,18 @@ public class CreateLdapConfiguration extends BaseFunctionField<BooleanField> {
 
     private LdapConfigurationField config;
 
-    private final ConfiguratorFactory configuratorFactory;
-
-    private final FeatureActions featureActions;
-
-    private final ManagedServiceActions managedServiceActions;
-
-    private final PropertyActions propertyActions;
+    private final ConfiguratorSuite configuratorSuite;
 
     private LdapServiceCommons ldapServiceCommons;
 
-    public CreateLdapConfiguration(ConfiguratorFactory configuratorFactory,
-            FeatureActions featureActions, ManagedServiceActions managedServiceActions,
-            PropertyActions propertyActions) {
+    public CreateLdapConfiguration(ConfiguratorSuite configuratorSuite) {
         super(FIELD_NAME, DESCRIPTION);
-        this.configuratorFactory = configuratorFactory;
-        this.featureActions = featureActions;
-        this.managedServiceActions = managedServiceActions;
-        this.propertyActions = propertyActions;
+        this.configuratorSuite = configuratorSuite;
 
         config = new LdapConfigurationField().useDefaultRequired();
         updateArgumentPaths();
 
-        this.ldapServiceCommons = new LdapServiceCommons(this.propertyActions,
-                this.managedServiceActions);
+        this.ldapServiceCommons = new LdapServiceCommons(configuratorSuite);
     }
 
     @Override
@@ -89,7 +74,8 @@ public class CreateLdapConfiguration extends BaseFunctionField<BooleanField> {
 
     @Override
     public BooleanField performFunction() {
-        Configurator configurator = configuratorFactory.getConfigurator();
+        Configurator configurator = configuratorSuite.getConfiguratorFactory()
+                .getConfigurator();
 
         switch (config.settingsField()
                 .useCase()) {
@@ -97,9 +83,11 @@ public class CreateLdapConfiguration extends BaseFunctionField<BooleanField> {
         case AUTHENTICATION_AND_ATTRIBUTE_STORE: {
             Map<String, Object> ldapLoginServiceProps =
                     ldapServiceCommons.ldapConfigurationToLdapLoginService(config);
-            configurator.add(featureActions.start(LdapLoginServiceProperties.LDAP_LOGIN_FEATURE));
-            configurator.add(managedServiceActions.create(LdapLoginServiceProperties.LDAP_LOGIN_MANAGED_SERVICE_FACTORY_PID,
-                    ldapLoginServiceProps));
+            configurator.add(configuratorSuite.getFeatureActions()
+                    .start(LdapLoginServiceProperties.LDAP_LOGIN_FEATURE));
+            configurator.add(configuratorSuite.getManagedServiceActions()
+                    .create(LdapLoginServiceProperties.LDAP_LOGIN_MANAGED_SERVICE_FACTORY_PID,
+                            ldapLoginServiceProps));
         }
         }
 
@@ -115,11 +103,13 @@ public class CreateLdapConfiguration extends BaseFunctionField<BooleanField> {
             Map<String, Object> ldapClaimsServiceProps =
                     ldapServiceCommons.ldapConfigToLdapClaimsHandlerService(config,
                             newAttributeMappingPath.toString());
-            configurator.add(propertyActions.create(newAttributeMappingPath,
-                    config.claimsMapping()));
-            configurator.add(featureActions.start(LdapClaimsHandlerServiceProperties.LDAP_CLAIMS_HANDLER_FEATURE));
-            configurator.add(managedServiceActions.create(LdapClaimsHandlerServiceProperties.LDAP_CLAIMS_HANDLER_MANAGED_SERVICE_FACTORY_PID,
-                    ldapClaimsServiceProps));
+            configurator.add(configuratorSuite.getPropertyActions()
+                    .create(newAttributeMappingPath, config.claimsMapping()));
+            configurator.add(configuratorSuite.getFeatureActions()
+                    .start(LdapClaimsHandlerServiceProperties.LDAP_CLAIMS_HANDLER_FEATURE));
+            configurator.add(configuratorSuite.getManagedServiceActions()
+                    .create(LdapClaimsHandlerServiceProperties.LDAP_CLAIMS_HANDLER_MANAGED_SERVICE_FACTORY_PID,
+                            ldapClaimsServiceProps));
         }
         }
 
@@ -154,9 +144,6 @@ public class CreateLdapConfiguration extends BaseFunctionField<BooleanField> {
 
     @Override
     public FunctionField<BooleanField> newInstance() {
-        return new CreateLdapConfiguration(configuratorFactory,
-                featureActions,
-                managedServiceActions,
-                propertyActions);
+        return new CreateLdapConfiguration(configuratorSuite);
     }
 }

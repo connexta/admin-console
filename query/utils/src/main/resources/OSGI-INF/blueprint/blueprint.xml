@@ -15,4 +15,45 @@
     <service id="connFieldProvider" interface="org.codice.ddf.admin.api.FieldProvider">
         <bean class="org.codice.ddf.admin.utils.conn.ConnectionFieldProvider" />
     </service>
+
+    <service id="configuratorSuite" interface="org.codice.ddf.admin.api.ConfiguratorSuite">
+        <bean class="org.codice.ddf.admin.utils.configurator.ConfiguratorSuiteImpl">
+            <argument ref="configuratorFactory"/>
+            <argument ref="bundleActions"/>
+            <argument ref="featureActions"/>
+            <argument ref="managedServiceActions"/>
+            <argument ref="propertyActions"/>
+            <argument ref="serviceActions"/>
+            <argument ref="serviceReader"/>
+        </bean>
+    </service>
+
+    <reference id="configuratorFactory"
+               interface="org.codice.ddf.admin.configurator.ConfiguratorFactory"
+               availability="mandatory" filter="(type=txact)"/>
+
+    <reference id="bundleActions"
+               interface="org.codice.ddf.internal.admin.configurator.actions.BundleActions"
+               availability="mandatory"/>
+
+    <reference id="featureActions"
+               interface="org.codice.ddf.internal.admin.configurator.actions.FeatureActions"
+               availability="mandatory"/>
+
+    <reference id="managedServiceActions"
+               interface="org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions"
+               availability="mandatory"/>
+
+    <reference id="propertyActions"
+               interface="org.codice.ddf.internal.admin.configurator.actions.PropertyActions"
+               availability="mandatory"/>
+
+    <reference id="serviceActions"
+               interface="org.codice.ddf.internal.admin.configurator.actions.ServiceActions"
+               availability="mandatory"/>
+
+    <reference id="serviceReader"
+               interface="org.codice.ddf.internal.admin.configurator.actions.ServiceReader"
+               availability="mandatory"/>
+
 </blueprint>

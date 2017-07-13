@@ -22,6 +22,7 @@ import static org.codice.ddf.admin.security.common.services.LdapLoginServiceProp
 
 import java.util.List;
 
+import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
@@ -44,15 +45,17 @@ public class InstallEmbeddedLdap extends BaseFunctionField<BooleanField> {
 
     private LdapUseCase useCase;
 
+    private final ConfiguratorSuite configuratorSuite;
+
     private final ConfiguratorFactory configuratorFactory;
 
     private final FeatureActions featureActions;
 
-    public InstallEmbeddedLdap(ConfiguratorFactory configuratorFactory,
-            FeatureActions featureActions) {
+    public InstallEmbeddedLdap(ConfiguratorSuite configuratorSuite) {
         super(FIELD_NAME, DESCRIPTION);
-        this.configuratorFactory = configuratorFactory;
-        this.featureActions = featureActions;
+        this.configuratorSuite = configuratorSuite;
+        this.configuratorFactory = configuratorSuite.getConfiguratorFactory();
+        this.featureActions = configuratorSuite.getFeatureActions();
         useCase = new LdapUseCase();
         useCase.isRequired(true);
         updateArgumentPaths();
@@ -100,6 +103,6 @@ public class InstallEmbeddedLdap extends BaseFunctionField<BooleanField> {
 
     @Override
     public FunctionField<BooleanField> newInstance() {
-        return new InstallEmbeddedLdap(configuratorFactory, featureActions);
+        return new InstallEmbeddedLdap(configuratorSuite);
     }
 }

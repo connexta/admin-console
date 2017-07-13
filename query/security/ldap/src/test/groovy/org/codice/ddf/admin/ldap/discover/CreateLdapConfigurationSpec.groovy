@@ -67,7 +67,7 @@ class CreateLdapConfigurationSpec extends Specification {
 
     def 'fail on missing required fields for authentication'() {
         setup:
-        createConfigFunc = new CreateLdapConfiguration(null, null, null, null)
+        createConfigFunc = new CreateLdapConfiguration(null)
 
         when:
         FunctionReport report = createConfigFunc.getValue()
@@ -92,7 +92,7 @@ class CreateLdapConfigurationSpec extends Specification {
 
     def 'fail on missing required fields for attribute store'() {
         setup:
-        createConfigFunc = new CreateLdapConfiguration(null, null, null, null)
+        createConfigFunc = new CreateLdapConfiguration(null)
 
         def configArg = new LdapConfigurationField().settings(new LdapDirectorySettingsField().useCase(LdapUseCase.AttributeStore.ATTRIBUTE_STORE))
         def args = [

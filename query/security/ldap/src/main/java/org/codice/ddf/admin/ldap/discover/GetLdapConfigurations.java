@@ -13,13 +13,12 @@
  **/
 package org.codice.ddf.admin.ldap.discover;
 
+import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.fields.base.function.GetFunctionField;
 import org.codice.ddf.admin.ldap.commons.LdapServiceCommons;
 import org.codice.ddf.admin.ldap.fields.config.LdapConfigurationField;
-import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
-import org.codice.ddf.internal.admin.configurator.actions.PropertyActions;
 
 public class GetLdapConfigurations extends GetFunctionField<ListField<LdapConfigurationField>> {
 
@@ -27,22 +26,19 @@ public class GetLdapConfigurations extends GetFunctionField<ListField<LdapConfig
 
     public static final String DESCRIPTION = "Retrieves all currently configured LDAP settings.";
 
-    public static final LdapConfigurationField.ListImpl
-            RETURN_TYPE = new LdapConfigurationField.ListImpl();
+    public static final LdapConfigurationField.ListImpl RETURN_TYPE =
+            new LdapConfigurationField.ListImpl();
 
-    private final ManagedServiceActions managedServiceActions;
-
-    private final PropertyActions propertyActions;
+    private final ConfiguratorSuite configuratorSuite;
 
     private LdapServiceCommons serviceCommons;
 
-    public GetLdapConfigurations(ManagedServiceActions managedServiceActions, PropertyActions propertyActions) {
+    public GetLdapConfigurations(ConfiguratorSuite configuratorSuite) {
         super(FIELD_NAME, DESCRIPTION);
-        this.managedServiceActions = managedServiceActions;
-        this.propertyActions = propertyActions;
+        this.configuratorSuite = configuratorSuite;
         updateArgumentPaths();
 
-        serviceCommons = new LdapServiceCommons(this.propertyActions, this.managedServiceActions);
+        serviceCommons = new LdapServiceCommons(configuratorSuite);
     }
 
     @Override
@@ -57,6 +53,6 @@ public class GetLdapConfigurations extends GetFunctionField<ListField<LdapConfig
 
     @Override
     public FunctionField<ListField<LdapConfigurationField>> newInstance() {
-        return new GetLdapConfigurations(managedServiceActions, propertyActions);
+        return new GetLdapConfigurations(configuratorSuite);
     }
 }

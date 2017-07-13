@@ -18,17 +18,17 @@ import org.codice.ddf.admin.common.services.ServiceCommons;
 
 public abstract class BaseEnumValuePoller<V, T> implements EnumValuePoller<V, T> {
 
-    private static final String BINDING_ENUM_VALUE = "Binding enum value for class ";
+    private static final String BINDING_ENUM_VALUE = "Binding enum value for %s";
 
-    private static final String UNBINDING_ENUM_VALUE = "Unbinding enum value for class ";
+    private static final String UNBINDING_ENUM_VALUE = "Unbinding enum value for %s";
 
     @Override
     public void bindValue(V value) {
-        ServiceCommons.updateGraphQLSchema(getClass(), BINDING_ENUM_VALUE + getClass());
+        ServiceCommons.updateGraphQLSchema(getClass(), String.format(BINDING_ENUM_VALUE, getClass()));
     }
 
     @Override
     public void unbindValue(V value) {
-        ServiceCommons.updateGraphQLSchema(getClass(), UNBINDING_ENUM_VALUE + getClass());
+        ServiceCommons.updateGraphQLSchema(getClass(), String.format(UNBINDING_ENUM_VALUE, getClass()));
     }
 }

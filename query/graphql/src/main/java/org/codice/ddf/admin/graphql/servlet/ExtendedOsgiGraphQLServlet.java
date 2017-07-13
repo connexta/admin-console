@@ -66,8 +66,8 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet implements Ev
     private static final long CACHE_EXPIRATION_IN_SECONDS = 1;
     private static final long CACHE_CLEANUP_INVOCATION_IN_SECONDS = 1;
 
-    private static final String BINDING_FIELD_PROVIDER = "GraphQL servlet binding field provider ";
-    private static final String UNBINDING_FIELD_PROVIDER = "GraphQL servlet unbinding field provider ";
+    private static final String BINDING_FIELD_PROVIDER = "GraphQL servlet binding field provider %s";
+    private static final String UNBINDING_FIELD_PROVIDER = "GraphQL servlet unbinding field provider %s";
 
     private Cache<String, Object> cache;
     private ScheduledExecutorService scheduler;
@@ -197,20 +197,22 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet implements Ev
     }
 
     public void bindFieldProvider(FieldProvider fieldProvider) {
-        triggerSchemaRefresh(BINDING_FIELD_PROVIDER + fieldProvider.fieldTypeName());
+        triggerSchemaRefresh(String.format(BINDING_FIELD_PROVIDER, fieldProvider.fieldTypeName()));
     }
 
     public void unbindFieldProvider(FieldProvider fieldProvider) {
-        triggerSchemaRefresh(UNBINDING_FIELD_PROVIDER + fieldProvider.fieldTypeName());
+        triggerSchemaRefresh(String.format(UNBINDING_FIELD_PROVIDER, fieldProvider.fieldTypeName()));
     }
 
     public void setFieldProviders(List<FieldProvider> fieldProviders) {
         this.fieldProviders = fieldProviders;
     }
 
-    private static class GraphQLProviderImpl implements GraphQLProvider, GraphQLQueryProvider, GraphQLMutationProvider {
+    private static class GraphQLProviderImpl
+            implements GraphQLProvider, GraphQLQueryProvider, GraphQLMutationProvider {
 
         private List<GraphQLFieldDefinition> queries;
+
         private List<GraphQLFieldDefinition> mutations;
 
         public GraphQLProviderImpl(FieldProvider provider,

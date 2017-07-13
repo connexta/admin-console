@@ -225,15 +225,17 @@ public class ServiceCommons {
         getEventAdmin(clazz).postEvent(getUpdateSchemaEvent(eventReason));
     }
 
-    public static Event getUpdateSchemaEvent(String eventReason){
+    public static Event getUpdateSchemaEvent(String eventReason) {
         return new Event(Events.REFRESH_SCHEMA, ImmutableMap.of(Events.EVENT_REASON, eventReason));
     }
 
     public static EventAdmin getEventAdmin(Class clazz) {
-        return getBundleContext(clazz).getService(getBundleContext(clazz).getServiceReference(EventAdmin.class));
+        return getBundleContext(clazz).getService(getBundleContext(clazz).getServiceReference(
+                EventAdmin.class));
     }
 
     public static BundleContext getBundleContext(Class clazz) {
-        return FrameworkUtil.getBundle(clazz).getBundleContext();
+        return FrameworkUtil.getBundle(clazz)
+                .getBundleContext();
     }
 }

@@ -15,19 +15,15 @@ package org.codice.ddf.admin.sources.wfs;
 
 import java.util.List;
 
+import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.function.BaseFieldProvider;
-import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.sources.wfs.discover.DiscoverWfsSource;
 import org.codice.ddf.admin.sources.wfs.discover.GetWfsConfigurations;
 import org.codice.ddf.admin.sources.wfs.persist.CreateWfsConfiguration;
 import org.codice.ddf.admin.sources.wfs.persist.DeleteWfsConfiguration;
 import org.codice.ddf.admin.sources.wfs.persist.UpdateWfsConfiguration;
-import org.codice.ddf.internal.admin.configurator.actions.FeatureActions;
-import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
-import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
-import org.codice.ddf.internal.admin.configurator.actions.ServiceReader;
 
 import com.google.common.collect.ImmutableList;
 
@@ -51,29 +47,13 @@ public class WfsFieldProvider extends BaseFieldProvider {
 
     private DeleteWfsConfiguration deleteWfsConfig;
 
-    public WfsFieldProvider(ConfiguratorFactory configuratorFactory, ServiceActions serviceActions,
-            ManagedServiceActions managedServiceActions, ServiceReader serviceReader,
-            FeatureActions featureActions) {
+    public WfsFieldProvider(ConfiguratorSuite configuratorSuite) {
         super(NAME, TYPE_NAME, DESCRIPTION);
-        discoverWfsSource = new DiscoverWfsSource();
-        getWfsConfigs = new GetWfsConfigurations(configuratorFactory,
-                serviceActions,
-                managedServiceActions,
-                serviceReader);
-
-        createWfsConfig = new CreateWfsConfiguration(configuratorFactory,
-                serviceActions,
-                managedServiceActions,
-                serviceReader,
-                featureActions);
-        updateWfsConfig = new UpdateWfsConfiguration(configuratorFactory,
-                serviceActions,
-                managedServiceActions,
-                serviceReader,
-                featureActions);
-        deleteWfsConfig = new DeleteWfsConfiguration(configuratorFactory,
-                serviceActions,
-                managedServiceActions);
+        discoverWfsSource = new DiscoverWfsSource(configuratorSuite);
+        getWfsConfigs = new GetWfsConfigurations(configuratorSuite);
+        createWfsConfig = new CreateWfsConfiguration(configuratorSuite);
+        updateWfsConfig = new UpdateWfsConfiguration(configuratorSuite);
+        deleteWfsConfig = new DeleteWfsConfiguration(configuratorSuite);
         updateInnerFieldPaths();
     }
 

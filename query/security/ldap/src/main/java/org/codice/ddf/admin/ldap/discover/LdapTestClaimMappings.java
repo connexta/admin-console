@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.function.TestFunctionField;
@@ -33,7 +34,6 @@ import org.codice.ddf.admin.ldap.fields.connection.LdapConnectionField;
 import org.codice.ddf.admin.security.common.SecurityValidation;
 import org.codice.ddf.admin.security.common.fields.wcpm.ClaimsMapEntry;
 import org.codice.ddf.admin.security.common.services.StsServiceProperties;
-import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.Filter;
 import org.forgerock.opendj.ldap.SearchScope;
@@ -68,11 +68,11 @@ public class LdapTestClaimMappings extends TestFunctionField {
 
     private LdapTestingUtils utils;
 
-    private final ServiceActions serviceActions;
+    private final ConfiguratorSuite configuratorSuite;
 
-    public LdapTestClaimMappings(ServiceActions serviceActions) {
+    public LdapTestClaimMappings(ConfiguratorSuite configuratorSuite) {
         super(FIELD_NAME, DESCRIPTION);
-        this.serviceActions = serviceActions;
+        this.configuratorSuite = configuratorSuite;
 
         conn = new LdapConnectionField().useDefaultRequired();
         bindInfo = new LdapBindUserInfo().useDefaultRequired();
@@ -96,7 +96,7 @@ public class LdapTestClaimMappings extends TestFunctionField {
 
     @Override
     public FunctionField<BooleanField> newInstance() {
-        return new LdapTestClaimMappings(serviceActions);
+        return new LdapTestClaimMappings(configuratorSuite);
     }
 
     @Override
@@ -113,7 +113,7 @@ public class LdapTestClaimMappings extends TestFunctionField {
                 .collect(Collectors.toList());
 
         addMessages(SecurityValidation.validateStsClaimsExist(claimArgs,
-                serviceActions,
+                configuratorSuite.getServiceActions(),
                 stsServiceProperties));
 
         // TODO: 7/7/17 - tbatie - Currently the ClaimsMapEntry contains a StringField as a value. It really should be a LdapAttributeName. Fix this once there is a generic way to create MapField objects that contain different value field.

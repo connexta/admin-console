@@ -15,15 +15,13 @@ package org.codice.ddf.admin.sources.wfs.persist;
 
 import java.util.List;
 
+import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.common.services.ServiceCommons;
-import org.codice.ddf.admin.configurator.ConfiguratorFactory;
-import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
-import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
 
 import com.google.common.collect.ImmutableList;
 
@@ -40,27 +38,17 @@ public class DeleteWfsConfiguration extends BaseFunctionField<BooleanField> {
 
     private ServiceCommons serviceCommons;
 
-    private final ConfiguratorFactory configuratorFactory;
+    private final ConfiguratorSuite configuratorSuite;
 
-    private final ServiceActions serviceActions;
-
-    private final ManagedServiceActions managedServiceActions;
-
-    public DeleteWfsConfiguration(ConfiguratorFactory configuratorFactory,
-            ServiceActions serviceActions, ManagedServiceActions managedServiceActions) {
+    public DeleteWfsConfiguration(ConfiguratorSuite configuratorSuite) {
         super(FIELD_NAME, DESCRIPTION);
-        this.configuratorFactory = configuratorFactory;
-        this.serviceActions = serviceActions;
-        this.managedServiceActions = managedServiceActions;
+        this.configuratorSuite = configuratorSuite;
 
         pid = new PidField();
         pid.isRequired(true);
         updateArgumentPaths();
 
-        serviceCommons = new ServiceCommons(managedServiceActions,
-                serviceActions,
-                null,
-                configuratorFactory);
+        serviceCommons = new ServiceCommons(configuratorSuite);
     }
 
     @Override
@@ -90,8 +78,6 @@ public class DeleteWfsConfiguration extends BaseFunctionField<BooleanField> {
 
     @Override
     public FunctionField<BooleanField> newInstance() {
-        return new DeleteWfsConfiguration(configuratorFactory,
-                serviceActions,
-                managedServiceActions);
+        return new DeleteWfsConfiguration(configuratorSuite);
     }
 }

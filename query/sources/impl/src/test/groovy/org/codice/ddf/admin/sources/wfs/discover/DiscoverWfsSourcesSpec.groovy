@@ -13,6 +13,7 @@
  **/
 package org.codice.ddf.admin.sources.wfs.discover
 
+import org.codice.ddf.admin.api.ConfiguratorSuite
 import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.common.fields.common.HostField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
@@ -47,7 +48,7 @@ class DiscoverWfsSourcesSpec extends SourceCommonsSpec {
     static URL_FIELD_PATH = [ADDRESS_FIELD_PATH, URL_NAME].flatten()
 
     def setup() {
-        discoverWfs = new DiscoverWfsSource()
+        discoverWfs = new DiscoverWfsSource(Mock(ConfiguratorSuite))
     }
 
     def 'Successfully discover WFS 1.0.0 configuration using URL'() {

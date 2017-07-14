@@ -13,10 +13,10 @@
  **/
 package org.codice.ddf.admin.sources.csw
 
+import org.codice.ddf.admin.api.ConfiguratorSuite
 import org.codice.ddf.admin.api.FieldProvider
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.internal.admin.configurator.actions.FeatureActions
-import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceReader
 import spock.lang.Specification
@@ -26,11 +26,12 @@ class CswFieldProviderSpec extends Specification {
     CswFieldProvider cswFieldProvider
 
     def setup() {
-        cswFieldProvider = new CswFieldProvider(Mock(ConfiguratorFactory),
-                Mock(ServiceActions),
-                Mock(ManagedServiceActions),
-                Mock(ServiceReader),
-                Mock(FeatureActions))
+        ConfiguratorSuite configuratorSuite = Mock(ConfiguratorSuite)
+        configuratorSuite.getConfiguratorFactory() >> Mock(ConfiguratorFactory)
+        configuratorSuite.getServiceActions() >> Mock(ServiceActions)
+        configuratorSuite.getServiceReader() >> Mock(ServiceReader)
+        configuratorSuite.getFeatureActions() >> Mock(FeatureActions)
+        cswFieldProvider = new CswFieldProvider(configuratorSuite)
     }
 
     def 'Verify discovery fields immutability'() {

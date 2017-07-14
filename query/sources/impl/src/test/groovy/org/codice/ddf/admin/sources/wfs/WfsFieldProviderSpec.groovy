@@ -13,6 +13,7 @@
  **/
 package org.codice.ddf.admin.sources.wfs
 
+import org.codice.ddf.admin.api.ConfiguratorSuite
 import org.codice.ddf.admin.api.FieldProvider
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.internal.admin.configurator.actions.FeatureActions
@@ -26,11 +27,14 @@ class WfsFieldProviderSpec extends Specification {
     WfsFieldProvider wfsFieldProvider
 
     def setup() {
-        wfsFieldProvider = new WfsFieldProvider(Mock(ConfiguratorFactory),
-                Mock(ServiceActions),
-                Mock(ManagedServiceActions),
-                Mock(ServiceReader),
-                Mock(FeatureActions))
+        def configuratorSuite = Mock(ConfiguratorSuite)
+        configuratorSuite.configuratorFactory >> Mock(ConfiguratorFactory)
+        configuratorSuite.serviceActions >> Mock(ServiceActions)
+        configuratorSuite.managedServiceActions >> Mock(ManagedServiceActions)
+        configuratorSuite.serviceReader >> Mock(ServiceReader)
+        configuratorSuite.featureActions >> Mock(FeatureActions)
+
+        wfsFieldProvider = new WfsFieldProvider(configuratorSuite)
     }
 
     def 'Verify discovery fields immutability'() {

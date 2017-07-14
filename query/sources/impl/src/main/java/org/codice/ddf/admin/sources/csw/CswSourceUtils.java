@@ -28,6 +28,7 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 
+import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.api.report.ReportWithResult;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
 import org.codice.ddf.admin.common.fields.common.HostField;
@@ -75,9 +76,9 @@ public class CswSourceUtils {
 
     private RequestUtils requestUtils;
 
-    public CswSourceUtils() {
+    public CswSourceUtils(ConfiguratorSuite configuratorSuite) {
         this.requestUtils = new RequestUtils();
-        this.sourceUtilCommons = new SourceUtilCommons();
+        this.sourceUtilCommons = new SourceUtilCommons(configuratorSuite);
     }
 
     /**

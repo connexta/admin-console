@@ -15,18 +15,16 @@ package org.codice.ddf.admin.security.wcpm;
 
 import java.util.List;
 
+import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.function.BaseFieldProvider;
-import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.security.wcpm.discover.GetAuthTypes;
 import org.codice.ddf.admin.security.wcpm.discover.GetContextPolicies;
 import org.codice.ddf.admin.security.wcpm.discover.GetRealms;
 import org.codice.ddf.admin.security.wcpm.discover.GetWhiteListContexts;
 import org.codice.ddf.admin.security.wcpm.persist.SaveContextPolices;
 import org.codice.ddf.admin.security.wcpm.persist.SaveWhitelistContexts;
-import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
-import org.codice.ddf.internal.admin.configurator.actions.ServiceReader;
 
 import com.google.common.collect.ImmutableList;
 
@@ -52,16 +50,15 @@ public class WcpmFieldProvider extends BaseFieldProvider {
 
     private SaveWhitelistContexts saveWhitelistContexts;
 
-    public WcpmFieldProvider(ConfiguratorFactory configuratorFactory, ServiceActions serviceActions,
-            ServiceReader serviceReader) {
+    public WcpmFieldProvider(ConfiguratorSuite configuratorSuite) {
         super(NAME, TYPE_NAME, DESCRIPTION);
-        getAuthTypes = new GetAuthTypes(serviceReader);
-        getRealms = new GetRealms(serviceReader);
-        getWhiteListContexts = new GetWhiteListContexts(serviceActions);
-        getContextPolicies = new GetContextPolicies(serviceReader);
+        getAuthTypes = new GetAuthTypes(configuratorSuite.getServiceReader());
+        getRealms = new GetRealms(configuratorSuite.getServiceReader());
+        getWhiteListContexts = new GetWhiteListContexts(configuratorSuite);
+        getContextPolicies = new GetContextPolicies(configuratorSuite.getServiceReader());
 
-        saveContextPolices = new SaveContextPolices(configuratorFactory, serviceActions, serviceReader);
-        saveWhitelistContexts = new SaveWhitelistContexts(configuratorFactory, serviceActions);
+        saveContextPolices = new SaveContextPolices(configuratorSuite);
+        saveWhitelistContexts = new SaveWhitelistContexts(configuratorSuite);
         updateInnerFieldPaths();
     }
 

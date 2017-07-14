@@ -18,20 +18,17 @@ import static org.codice.ddf.admin.sources.services.OpenSearchServiceProperties.
 
 import java.util.List;
 
+import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.common.services.ServiceCommons;
-import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.sources.fields.type.OpenSearchSourceConfigurationField;
 import org.codice.ddf.admin.sources.fields.type.SourceConfigField;
 import org.codice.ddf.admin.sources.opensearch.OpenSearchSourceInfoField;
 import org.codice.ddf.admin.sources.utils.SourceUtilCommons;
-import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
-import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
-import org.codice.ddf.internal.admin.configurator.actions.ServiceReader;
 
 import com.google.common.collect.ImmutableList;
 
@@ -52,30 +49,17 @@ public class GetOpenSearchConfigurations
 
     private ServiceCommons serviceCommons;
 
-    private final ConfiguratorFactory configuratorFactory;
+    private final ConfiguratorSuite configuratorSuite;
 
-    private final ServiceActions serviceActions;
-
-    private final ManagedServiceActions managedServiceActions;
-
-    private final ServiceReader serviceReader;
-
-    public GetOpenSearchConfigurations(ConfiguratorFactory configuratorFactory,
-            ServiceActions serviceActions, ManagedServiceActions managedServiceActions,
-            ServiceReader serviceReader) {
+    public GetOpenSearchConfigurations(ConfiguratorSuite configuratorSuite) {
         super(FIELD_NAME, DESCRIPTION);
-        this.configuratorFactory = configuratorFactory;
-        this.serviceActions = serviceActions;
-        this.managedServiceActions = managedServiceActions;
-        this.serviceReader = serviceReader;
+        this.configuratorSuite = configuratorSuite;
 
         pid = new PidField();
         updateArgumentPaths();
 
-        sourceUtilCommons = new SourceUtilCommons(managedServiceActions,
-                serviceActions,
-                serviceReader);
-        serviceCommons = new ServiceCommons(null, serviceActions, null, null);
+        sourceUtilCommons = new SourceUtilCommons(configuratorSuite);
+        serviceCommons = new ServiceCommons(configuratorSuite);
 
     }
 
@@ -126,9 +110,6 @@ public class GetOpenSearchConfigurations
 
     @Override
     public FunctionField<ListField<OpenSearchSourceInfoField>> newInstance() {
-        return new GetOpenSearchConfigurations(configuratorFactory,
-                serviceActions,
-                managedServiceActions,
-                serviceReader);
+        return new GetOpenSearchConfigurations(configuratorSuite);
     }
 }

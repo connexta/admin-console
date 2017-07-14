@@ -20,20 +20,16 @@ import static org.codice.ddf.admin.sources.services.OpenSearchServiceProperties.
 
 import java.util.List;
 
+import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.common.services.ServiceCommons;
 import org.codice.ddf.admin.configurator.Configurator;
-import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.configurator.OperationReport;
 import org.codice.ddf.admin.sources.fields.type.OpenSearchSourceConfigurationField;
 import org.codice.ddf.admin.sources.utils.SourceValidationUtils;
-import org.codice.ddf.internal.admin.configurator.actions.FeatureActions;
-import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
-import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
-import org.codice.ddf.internal.admin.configurator.actions.ServiceReader;
 
 import com.google.common.collect.ImmutableList;
 
@@ -41,8 +37,7 @@ public class CreateOpenSearchConfiguration extends BaseFunctionField<BooleanFiel
 
     public static final String FIELD_NAME = "createOpenSearchSource";
 
-    public static final String DESCRIPTION =
-            "Creates an OpenSearch source configuration.";
+    public static final String DESCRIPTION = "Creates an OpenSearch source configuration.";
 
     public static final BooleanField RETURN_TYPE = new BooleanField();
 
@@ -52,44 +47,26 @@ public class CreateOpenSearchConfiguration extends BaseFunctionField<BooleanFiel
 
     private ServiceCommons serviceCommons;
 
-    private final ConfiguratorFactory configuratorFactory;
+    private final ConfiguratorSuite configuratorSuite;
 
-    private final ServiceActions serviceActions;
-
-    private final ManagedServiceActions managedServiceActions;
-
-    private final ServiceReader serviceReader;
-
-    private final FeatureActions featureActions;
-
-    public CreateOpenSearchConfiguration(ConfiguratorFactory configuratorFactory,
-            ServiceActions serviceActions, ManagedServiceActions managedServiceActions,
-            ServiceReader serviceReader, FeatureActions featureActions) {
+    public CreateOpenSearchConfiguration(ConfiguratorSuite configuratorSuite) {
         super(FIELD_NAME, DESCRIPTION);
-        this.configuratorFactory = configuratorFactory;
-        this.serviceActions = serviceActions;
-        this.managedServiceActions = managedServiceActions;
-        this.serviceReader = serviceReader;
-        this.featureActions = featureActions;
+        this.configuratorSuite = configuratorSuite;
 
         config = new OpenSearchSourceConfigurationField();
         config.useDefaultRequired();
         updateArgumentPaths();
 
-        sourceValidationUtils = new SourceValidationUtils(serviceReader,
-                managedServiceActions,
-                configuratorFactory,
-                serviceActions);
-        serviceCommons = new ServiceCommons(managedServiceActions,
-                serviceActions,
-                serviceReader,
-                configuratorFactory);
+        sourceValidationUtils = new SourceValidationUtils(configuratorSuite);
+        serviceCommons = new ServiceCommons(configuratorSuite);
     }
 
     @Override
     public BooleanField performFunction() {
-        Configurator configurator = configuratorFactory.getConfigurator();
-        configurator.add(featureActions.start(OPENSEARCH_FEATURE));
+        Configurator configurator = configuratorSuite.getConfiguratorFactory()
+                .getConfigurator();
+        configurator.add(configuratorSuite.getFeatureActions()
+                .start(OPENSEARCH_FEATURE));
         OperationReport report = configurator.commit("Starting feature [{}]", OPENSEARCH_FEATURE);
 
         if (report.containsFailedResults()) {
@@ -122,10 +99,6 @@ public class CreateOpenSearchConfiguration extends BaseFunctionField<BooleanFiel
 
     @Override
     public FunctionField<BooleanField> newInstance() {
-        return new CreateOpenSearchConfiguration(configuratorFactory,
-                serviceActions,
-                managedServiceActions,
-                serviceReader,
-                featureActions);
+        return new CreateOpenSearchConfiguration(configuratorSuite);
     }
 }

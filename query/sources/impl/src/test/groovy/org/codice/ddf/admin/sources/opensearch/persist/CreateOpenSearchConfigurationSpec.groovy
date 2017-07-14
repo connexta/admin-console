@@ -14,6 +14,7 @@
 package org.codice.ddf.admin.sources.opensearch.persist
 
 import ddf.catalog.source.FederatedSource
+import org.codice.ddf.admin.api.ConfiguratorSuite
 import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.configurator.Configurator
@@ -70,8 +71,14 @@ class CreateOpenSearchConfigurationSpec extends SourceCommonsSpec {
         configuratorFactory = Mock(ConfiguratorFactory)
         configuratorFactory.getConfigurator() >> configurator
 
-        createOpenSearchConfiguration = new CreateOpenSearchConfiguration(configuratorFactory, serviceActions,
-                managedServiceActions, serviceReader, featureActions)
+        ConfiguratorSuite configuratorSuite = Mock(ConfiguratorSuite)
+        configuratorSuite.configuratorFactory >> configuratorFactory
+        configuratorSuite.serviceActions >> serviceActions
+        configuratorSuite.serviceReader >> serviceReader
+        configuratorSuite.managedServiceActions >> managedServiceActions
+        configuratorSuite.featureActions >> featureActions
+
+        createOpenSearchConfiguration = new CreateOpenSearchConfiguration(configuratorSuite)
     }
 
     def 'Successfully create new OpenSearch configuration'() {

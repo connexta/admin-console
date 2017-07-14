@@ -18,7 +18,6 @@ import static org.codice.ddf.admin.common.services.ServiceCommons.FLAG_PASSWORD;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -29,14 +28,10 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang.StringUtils;
+import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.sources.fields.type.SourceConfigField;
-import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
-import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
-import org.codice.ddf.internal.admin.configurator.actions.ServiceReader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -47,29 +42,7 @@ import ddf.catalog.source.FederatedSource;
 import ddf.catalog.source.Source;
 
 public class SourceUtilCommons {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(SourceUtilCommons.class);
-
-    private ManagedServiceActions managedServiceActions;
-
-    private ServiceActions serviceActions;
-
-    private ServiceReader serviceReader;
-
-    public SourceUtilCommons() {
-    }
-
-    /**
-     * @param managedServiceActions service to interact with managed service configurations
-     * @param serviceActions        service to interact with admin configurations
-     * @param serviceReader         service to query service state
-     */
-    public SourceUtilCommons(ManagedServiceActions managedServiceActions,
-            ServiceActions serviceActions, ServiceReader serviceReader) {
-        this.managedServiceActions = managedServiceActions;
-        this.serviceActions = serviceActions;
-        this.serviceReader = serviceReader;
-    }
+    private final ConfiguratorSuite configuratorSuite;
 
     public static final NamespaceContext SOURCES_NAMESPACE_CONTEXT = new NamespaceContext() {
         @Override
@@ -107,6 +80,10 @@ public class SourceUtilCommons {
         }
     };
 
+    public SourceUtilCommons(ConfiguratorSuite configuratorSuite) {
+        this.configuratorSuite = configuratorSuite;
+    }
+
     public Document createDocument(String body)
             throws ParserConfigurationException, IOException, SAXException {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -116,14 +93,11 @@ public class SourceUtilCommons {
     }
 
     public List<Source> getAllSourceReferences() {
-        if (serviceReader == null) {
-            LOGGER.debug("Unable to get source references due to missing serviceReader");
-            return Collections.emptyList();
-        }
-
         List<Source> sources = new ArrayList<>();
-        sources.addAll(serviceReader.getServices(FederatedSource.class, null));
-        sources.addAll(serviceReader.getServices(ConnectedSource.class, null));
+        sources.addAll(configuratorSuite.getServiceReader()
+                .getServices(FederatedSource.class, null));
+        sources.addAll(configuratorSuite.getServiceReader()
+                .getServices(ConnectedSource.class, null));
         return sources;
     }
 
@@ -139,28 +113,26 @@ public class SourceUtilCommons {
      */
     public List<SourceConfigField> getSourceConfigurations(List<String> factoryPids,
             Function<Map<String, Object>, SourceConfigField> mapper, String pid) {
-        if (serviceActions == null || managedServiceActions == null) {
-            LOGGER.debug(
-                    "Unable to get source configurations due to missing serviceActions or managedServiceActions");
-            return Collections.emptyList();
-        }
-
         List<SourceConfigField> sourceInfoListField = new ArrayList<>();
         if (StringUtils.isNotEmpty(pid)) {
-            SourceConfigField config = mapper.apply(serviceActions.read(pid));
-            config.credentials().password(FLAG_PASSWORD);
+            SourceConfigField config = mapper.apply(configuratorSuite.getServiceActions()
+                    .read(pid));
+            config.credentials()
+                    .password(FLAG_PASSWORD);
             sourceInfoListField.add(config);
             return sourceInfoListField;
         }
 
         factoryPids.stream()
-                .flatMap(factoryPid -> managedServiceActions.read(factoryPid)
+                .flatMap(factoryPid -> configuratorSuite.getManagedServiceActions()
+                        .read(factoryPid)
                         .values()
                         .stream())
                 .map(mapper)
                 .forEach(sourceInfoListField::add);
 
-        sourceInfoListField.forEach(config -> config.credentials().password(FLAG_PASSWORD));
+        sourceInfoListField.forEach(config -> config.credentials()
+                .password(FLAG_PASSWORD));
         return sourceInfoListField;
     }
 
@@ -175,17 +147,5 @@ public class SourceUtilCommons {
                 }
             }
         }
-    }
-
-    public void setManagedServiceActions(ManagedServiceActions managedServiceActions) {
-        this.managedServiceActions = managedServiceActions;
-    }
-
-    public void setServiceActions(ServiceActions serviceActions) {
-        this.serviceActions = serviceActions;
-    }
-
-    public void setServiceReader(ServiceReader serviceReader) {
-        this.serviceReader = serviceReader;
     }
 }

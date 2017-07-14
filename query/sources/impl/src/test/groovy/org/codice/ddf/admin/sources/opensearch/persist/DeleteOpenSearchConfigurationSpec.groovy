@@ -1,5 +1,6 @@
 package org.codice.ddf.admin.sources.opensearch.persist
 
+import org.codice.ddf.admin.api.ConfiguratorSuite
 import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.configurator.Configurator
@@ -35,8 +36,12 @@ class DeleteOpenSearchConfigurationSpec extends SourceCommonsSpec {
         serviceActions = Mock(ServiceActions)
         def managedServiceActions = Mock(ManagedServiceActions)
 
-        deleteOpenSearchConfigurationFunction = new DeleteOpenSearchConfiguration(configuratorFactory,
-                serviceActions, managedServiceActions)
+        def configuratorSuite = Mock(ConfiguratorSuite)
+        configuratorSuite.configuratorFactory >> configuratorFactory
+        configuratorSuite.serviceActions >> serviceActions
+        configuratorSuite.managedServiceActions >> managedServiceActions
+
+        deleteOpenSearchConfigurationFunction = new DeleteOpenSearchConfiguration(configuratorSuite)
     }
 
     def 'Successfully deleting WFS config returns true'() {

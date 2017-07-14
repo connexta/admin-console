@@ -13,6 +13,7 @@
  **/
 package org.codice.ddf.admin.sources.opensearch.discover
 
+import org.codice.ddf.admin.api.ConfiguratorSuite
 import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.common.fields.common.HostField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
@@ -40,7 +41,7 @@ class DiscoverOpenSearchSpec extends SourceCommonsSpec {
     static URL_FIELD_PATH = [ADDRESS_FIELD_PATH, URL_NAME].flatten()
 
     def setup() {
-        discoverOpenSearch = new DiscoverOpenSearchSource()
+        discoverOpenSearch = new DiscoverOpenSearchSource(Mock(ConfiguratorSuite))
     }
 
     def 'Successfully discover OpenSearch configuration using URL'() {

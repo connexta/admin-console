@@ -13,6 +13,7 @@
  */
 package org.codice.ddf.admin.security.wcpm.persist
 
+import org.codice.ddf.admin.api.ConfiguratorSuite
 import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.api.report.ReportWithResult
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField
@@ -52,10 +53,12 @@ class SaveWhitelistContextsTest extends Specification {
             [(PolicyManagerServiceProperties.WHITE_LIST_CONTEXT): policyManager.getWhiteListContexts()]
         }
 
+        def configuratorSuite = Mock(ConfiguratorSuite)
+        configuratorSuite.configuratorFactory >> configuratorFactory
+        configuratorSuite.serviceActions >> serviceActions
+        configuratorSuite.serviceReader >> Mock(ServiceReader)
 
-        wcpmFieldProvider = new WcpmFieldProvider(configuratorFactory,
-                serviceActions,
-                Mock(ServiceReader))
+        wcpmFieldProvider = new WcpmFieldProvider(configuratorSuite)
 
         saveWhitelistContextsFunction = wcpmFieldProvider.getMutationFunction(SaveWhitelistContexts.FIELD_NAME)
     }

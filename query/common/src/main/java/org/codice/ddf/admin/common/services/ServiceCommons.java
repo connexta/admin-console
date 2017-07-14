@@ -23,16 +23,13 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.text.StrSubstitutor;
+import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.api.Events;
 import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.common.report.ReportImpl;
 import org.codice.ddf.admin.configurator.Configurator;
-import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.configurator.OperationReport;
-import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
-import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
-import org.codice.ddf.internal.admin.configurator.actions.ServiceReader;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.service.event.Event;
@@ -54,24 +51,10 @@ public class ServiceCommons {
     // password will not be updated.
     public static final String FLAG_PASSWORD = "secret";
 
-    private ManagedServiceActions managedServiceActions;
+    private final ConfiguratorSuite configuratorSuite;
 
-    private ServiceActions serviceActions;
-
-    private ServiceReader serviceReader;
-
-    private ConfiguratorFactory configuratorFactory;
-
-    public ServiceCommons() {
-    }
-
-    public ServiceCommons(ManagedServiceActions managedServiceActions,
-            ServiceActions serviceActions, ServiceReader serviceReader,
-            ConfiguratorFactory configuratorFactory) {
-        this.managedServiceActions = managedServiceActions;
-        this.serviceActions = serviceActions;
-        this.serviceReader = serviceReader;
-        this.configuratorFactory = configuratorFactory;
+    public ServiceCommons(ConfiguratorSuite configuratorSuite) {
+        this.configuratorSuite = configuratorSuite;
     }
 
     public String resolveProperty(String str) {
@@ -87,17 +70,14 @@ public class ServiceCommons {
     public ReportImpl createManagedService(Map<String, Object> serviceProps, String factoryPid) {
         ReportImpl report = new ReportImpl();
 
-        if (configuratorFactory != null && managedServiceActions != null) {
-            Configurator configurator = configuratorFactory.getConfigurator();
-            configurator.add(managedServiceActions.create(factoryPid, serviceProps));
+        Configurator configurator = configuratorSuite.getConfiguratorFactory()
+                .getConfigurator();
+        configurator.add(configuratorSuite.getManagedServiceActions()
+                .create(factoryPid, serviceProps));
 
-            if (configurator.commit("Service saved with details [{}]", serviceProps.toString())
-                    .containsFailedResults()) {
-                report.addResultMessage(failedPersistError());
-            }
-        } else {
-            LOGGER.debug(
-                    "Unable to create managed service due to missing configuratorFactory or managedServiceActions.");
+        // TODO RAP 13 Jul 17: Blank out password in the parameters passed here
+        if (configurator.commit("Service saved with details [{}]", serviceProps.toString())
+                .containsFailedResults()) {
             report.addResultMessage(failedPersistError());
         }
 
@@ -107,26 +87,24 @@ public class ServiceCommons {
     public ReportImpl updateService(PidField servicePid, Map<String, Object> newConfig) {
         ReportImpl report = new ReportImpl();
 
-        if (configuratorFactory == null || serviceActions == null) {
-            LOGGER.debug(
-                    "Unable to update service due to missing configuratorFactory or serviceActions.");
-            report.addResultMessage(failedPersistError());
-        } else {
-            report.addMessages(serviceConfigurationExists(servicePid));
-            if (report.containsErrorMsgs()) {
-                return report;
-            }
+        report.addMessages(serviceConfigurationExists(servicePid));
+        if (report.containsErrorMsgs()) {
+            return report;
+        }
 
-            String pid = servicePid.getValue();
-            Configurator configurator = configuratorFactory.getConfigurator();
-            configurator.add(serviceActions.build(pid, newConfig, true));
-            OperationReport operationReport = configurator.commit(
-                    "Updated config with pid [{}] and new service properties [{}]",
-                    pid,
-                    newConfig.toString());
-            if (operationReport.containsFailedResults()) {
-                report.addResultMessage(failedPersistError());
-            }
+        String pid = servicePid.getValue();
+        Configurator configurator = configuratorSuite.getConfiguratorFactory()
+                .getConfigurator();
+        configurator.add(configuratorSuite.getServiceActions()
+                .build(pid, newConfig, true));
+
+        // TODO RAP 13 Jul 17: Blank out password in the parameters passed here
+        OperationReport operationReport = configurator.commit(
+                "Updated config with pid [{}] and new service properties [{}]",
+                pid,
+                newConfig.toString());
+        if (operationReport.containsFailedResults()) {
+            report.addResultMessage(failedPersistError());
         }
 
         return report;
@@ -135,16 +113,12 @@ public class ServiceCommons {
     public ReportImpl deleteService(PidField servicePid) {
         ReportImpl report = new ReportImpl();
 
-        if (configuratorFactory != null && managedServiceActions != null) {
-            Configurator configurator = configuratorFactory.getConfigurator();
-            configurator.add(managedServiceActions.delete(servicePid.getValue()));
-            if (configurator.commit("Deleted service with pid [{}].", servicePid.getValue())
-                    .containsFailedResults()) {
-                report.addResultMessage(failedPersistError());
-            }
-        } else {
-            LOGGER.debug(
-                    "Unable to delete service to missing configuratorFactory or managedServiceActions.");
+        Configurator configurator = configuratorSuite.getConfiguratorFactory()
+                .getConfigurator();
+        configurator.add(configuratorSuite.getManagedServiceActions()
+                .delete(servicePid.getValue()));
+        if (configurator.commit("Deleted service with pid [{}].", servicePid.getValue())
+                .containsFailedResults()) {
             report.addResultMessage(failedPersistError());
         }
         return report;
@@ -171,7 +145,8 @@ public class ServiceCommons {
      * @return with the serviceExists or not
      */
     public boolean serviceConfigurationExists(String servicePid) {
-        return serviceActions != null && !serviceActions.read(servicePid)
+        return !configuratorSuite.getServiceActions()
+                .read(servicePid)
                 .isEmpty();
     }
 
@@ -203,22 +178,6 @@ public class ServiceCommons {
             return serviceProperties;
         }
 
-    }
-
-    public void setManagedServiceActions(ManagedServiceActions managedServiceActions) {
-        this.managedServiceActions = managedServiceActions;
-    }
-
-    public void setServiceActions(ServiceActions serviceActions) {
-        this.serviceActions = serviceActions;
-    }
-
-    public void setServiceReader(ServiceReader serviceReader) {
-        this.serviceReader = serviceReader;
-    }
-
-    public void setConfiguratorFactory(ConfiguratorFactory configuratorFactory) {
-        this.configuratorFactory = configuratorFactory;
     }
 
     public static void updateGraphQLSchema(Class clazz, String eventReason) {

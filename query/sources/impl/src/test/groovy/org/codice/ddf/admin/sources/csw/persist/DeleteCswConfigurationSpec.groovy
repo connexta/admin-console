@@ -13,6 +13,7 @@
  */
 package org.codice.ddf.admin.sources.csw.persist
 
+import org.codice.ddf.admin.api.ConfiguratorSuite
 import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.configurator.Configurator
@@ -31,6 +32,8 @@ class DeleteCswConfigurationSpec extends SourceCommonsSpec {
     Configurator configurator
 
     ServiceActions serviceActions
+
+    ConfiguratorSuite configuratorSuite
 
     static TEST_CSW_URL = "testCswUrl"
 
@@ -58,7 +61,12 @@ class DeleteCswConfigurationSpec extends SourceCommonsSpec {
         configuratorFactory = Mock(ConfiguratorFactory) {
             getConfigurator() >> configurator
         }
-        deleteCswConfiguration = new DeleteCswConfiguration(configuratorFactory, this.serviceActions, managedServiceActions)
+
+        configuratorSuite = Mock(ConfiguratorSuite)
+        configuratorSuite.configuratorFactory >> configuratorFactory
+        configuratorSuite.serviceActions >> serviceActions
+        configuratorSuite.managedServiceActions >> managedServiceActions
+        deleteCswConfiguration = new DeleteCswConfiguration(configuratorSuite)
     }
 
     def 'Successfully deleting CSW configuration returns true'() {

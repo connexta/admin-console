@@ -14,6 +14,7 @@
 package org.codice.ddf.admin.sources.wfs.persist
 
 import ddf.catalog.source.FederatedSource
+import org.codice.ddf.admin.api.ConfiguratorSuite
 import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.configurator.Configurator
@@ -80,8 +81,13 @@ class UpdateWfsConfigurationSpec extends SourceCommonsSpec {
             getConfigurator() >> configurator
         }
 
-        updateWfsConfiguration = new UpdateWfsConfiguration(configuratorFactory, serviceActions,
-                managedServiceActions, serviceReader, featureActions)
+        def configuratorSuite = Mock(ConfiguratorSuite)
+        configuratorSuite.configuratorFactory >> configuratorFactory
+        configuratorSuite.serviceActions >> serviceActions
+        configuratorSuite.serviceReader >> serviceReader
+        configuratorSuite.managedServiceActions >> managedServiceActions
+        configuratorSuite.featureActions >> featureActions
+        updateWfsConfiguration = new UpdateWfsConfiguration(configuratorSuite)
     }
 
     def 'Successfully update WFS configuration'() {

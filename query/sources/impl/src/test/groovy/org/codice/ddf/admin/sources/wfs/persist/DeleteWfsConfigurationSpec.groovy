@@ -13,6 +13,7 @@
  **/
 package org.codice.ddf.admin.sources.wfs.persist
 
+import org.codice.ddf.admin.api.ConfiguratorSuite
 import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.configurator.Configurator
@@ -49,8 +50,11 @@ class DeleteWfsConfigurationSpec extends SourceCommonsSpec {
         serviceActions = Mock(ServiceActions)
         def managedServiceActions = Mock(ManagedServiceActions)
 
-        deleteWfsConfiguration = new DeleteWfsConfiguration(configuratorFactory, serviceActions,
-                managedServiceActions)
+        def configuratorSuite = Mock(ConfiguratorSuite)
+        configuratorSuite.configuratorFactory >> configuratorFactory
+        configuratorSuite.serviceActions >> serviceActions
+        configuratorSuite.managedServiceActions >> managedServiceActions
+        deleteWfsConfiguration = new DeleteWfsConfiguration(configuratorSuite)
     }
 
     def 'Successfully delete WFS configuration'() {

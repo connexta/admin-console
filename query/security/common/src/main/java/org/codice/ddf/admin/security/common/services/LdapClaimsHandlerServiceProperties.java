@@ -15,7 +15,7 @@ package org.codice.ddf.admin.security.common.services;
 
 import java.util.Map;
 
-import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
+import org.codice.ddf.admin.api.ConfiguratorSuite;
 
 public class LdapClaimsHandlerServiceProperties {
 
@@ -50,13 +50,14 @@ public class LdapClaimsHandlerServiceProperties {
     public static final String PROPERTY_FILE_LOCATION = "propertyFileLocation";
     // ---
 
-    private ManagedServiceActions managedServiceActions;
+    private final ConfiguratorSuite configuratorSuite;
 
-    public LdapClaimsHandlerServiceProperties(ManagedServiceActions managedServiceActions) {
-        this.managedServiceActions = managedServiceActions;
+    public LdapClaimsHandlerServiceProperties(ConfiguratorSuite configuratorSuite) {
+        this.configuratorSuite = configuratorSuite;
     }
 
     public Map<String, Map<String, Object>> getLdapClaimsHandlerManagedServices() {
-        return managedServiceActions.read(LDAP_CLAIMS_HANDLER_MANAGED_SERVICE_FACTORY_PID);
+        return configuratorSuite.getManagedServiceActions()
+                .read(LDAP_CLAIMS_HANDLER_MANAGED_SERVICE_FACTORY_PID);
     }
 }

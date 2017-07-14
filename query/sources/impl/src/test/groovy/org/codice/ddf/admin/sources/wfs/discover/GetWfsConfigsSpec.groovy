@@ -13,6 +13,7 @@
  **/
 package org.codice.ddf.admin.sources.wfs.discover
 
+import org.codice.ddf.admin.api.ConfiguratorSuite
 import org.codice.ddf.admin.api.Field
 import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.api.fields.ListField
@@ -62,9 +63,13 @@ class GetWfsConfigsSpec extends SourceCommonsSpec {
         serviceActions = Mock(ServiceActions)
         managedServiceActions = Mock(ManagedServiceActions)
         serviceReader = Mock(ServiceReader)
+        def configuratorSuite = Mock(ConfiguratorSuite)
+        configuratorSuite.configuratorFactory >> configuratorFactory
+        configuratorSuite.serviceActions >> serviceActions
+        configuratorSuite.serviceReader >> serviceReader
+        configuratorSuite.managedServiceActions >> managedServiceActions
 
-        getWfsConfigsFunction = new GetWfsConfigurations(configuratorFactory, serviceActions,
-                managedServiceActions, serviceReader)
+        getWfsConfigsFunction = new GetWfsConfigurations(configuratorSuite)
     }
 
     def 'No pid argument returns all configs'() {

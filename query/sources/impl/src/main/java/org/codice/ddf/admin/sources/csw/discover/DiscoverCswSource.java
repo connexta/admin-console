@@ -15,6 +15,7 @@ package org.codice.ddf.admin.sources.csw.discover;
 
 import java.util.List;
 
+import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.api.report.ReportWithResult;
@@ -44,14 +45,18 @@ public class DiscoverCswSource extends BaseFunctionField<CswSourceConfigurationF
 
     private CswSourceUtils cswSourceUtils;
 
-    public DiscoverCswSource() {
+    private final ConfiguratorSuite configuratorSuite;
+
+    public DiscoverCswSource(ConfiguratorSuite configuratorSuite) {
         super(FIELD_NAME, DESCRIPTION);
+        this.configuratorSuite = configuratorSuite;
+
         credentials = new CredentialsField();
         address = new AddressField();
         address.isRequired(true);
         updateArgumentPaths();
 
-        cswSourceUtils = new CswSourceUtils();
+        cswSourceUtils = new CswSourceUtils(configuratorSuite);
     }
 
     @Override
@@ -87,7 +92,7 @@ public class DiscoverCswSource extends BaseFunctionField<CswSourceConfigurationF
 
     @Override
     public FunctionField<CswSourceConfigurationField> newInstance() {
-        return new DiscoverCswSource();
+        return new DiscoverCswSource(configuratorSuite);
     }
 
     /**

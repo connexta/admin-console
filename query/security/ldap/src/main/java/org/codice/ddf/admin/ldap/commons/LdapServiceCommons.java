@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang.StringUtils;
+import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.api.report.Report;
 import org.codice.ddf.admin.common.report.ReportImpl;
@@ -46,32 +47,26 @@ import org.codice.ddf.admin.ldap.fields.connection.LdapConnectionField;
 import org.codice.ddf.admin.security.common.services.LdapClaimsHandlerServiceProperties;
 import org.codice.ddf.admin.security.common.services.LdapLoginServiceProperties;
 import org.codice.ddf.configuration.PropertyResolver;
-import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
-import org.codice.ddf.internal.admin.configurator.actions.PropertyActions;
 
 public class LdapServiceCommons {
     private static final Pattern URI_MATCHER = Pattern.compile("\\w*://.*");
 
-    private final PropertyActions propertyActions;
+    private final ConfiguratorSuite configuratorSuite;
 
-    private final ManagedServiceActions managedServiceActions;
-
-    public LdapServiceCommons(PropertyActions propertyActions,
-            ManagedServiceActions managedServiceActions) {
-        this.propertyActions = propertyActions;
-        this.managedServiceActions = managedServiceActions;
+    public LdapServiceCommons(ConfiguratorSuite configuratorSuite) {
+        this.configuratorSuite = configuratorSuite;
     }
 
     public ListField<LdapConfigurationField> getLdapConfigurations() {
         List<LdapConfigurationField> ldapLoginConfigs = new LdapLoginServiceProperties(
-                managedServiceActions).getLdapLoginManagedServices()
+                configuratorSuite).getLdapLoginManagedServices()
                 .values()
                 .stream()
                 .map(this::ldapLoginServiceToLdapConfiguration)
                 .collect(Collectors.toList());
 
         List<LdapConfigurationField> ldapClaimsHandlerConfigs =
-                new LdapClaimsHandlerServiceProperties(managedServiceActions).getLdapClaimsHandlerManagedServices()
+                new LdapClaimsHandlerServiceProperties(configuratorSuite).getLdapClaimsHandlerManagedServices()
                         .values()
                         .stream()
                         .map(this::ldapClaimsHandlerServiceToLdapConfig)
@@ -227,7 +222,8 @@ public class LdapServiceCommons {
             Path path = Paths.get(attributeMappingsPath)
                     .toAbsolutePath();
             if (Files.exists(path)) {
-                claimMappings = new HashMap<>(propertyActions.getProperties(path));
+                claimMappings = new HashMap<>(configuratorSuite.getPropertyActions()
+                        .getProperties(path));
             }
         }
 

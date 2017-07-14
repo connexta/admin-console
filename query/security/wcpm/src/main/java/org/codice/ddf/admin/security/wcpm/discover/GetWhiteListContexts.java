@@ -17,10 +17,10 @@ import static org.codice.ddf.admin.security.common.services.PolicyManagerService
 
 import java.util.List;
 
+import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.function.GetFunctionField;
 import org.codice.ddf.admin.common.fields.common.ContextPath;
-import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
 
 public class GetWhiteListContexts extends GetFunctionField<ContextPath.ListImpl> {
 
@@ -29,20 +29,19 @@ public class GetWhiteListContexts extends GetFunctionField<ContextPath.ListImpl>
     public static final String DESCRIPTION =
             "Returns all white listed contexts. Any contexts that are white listed have no security policy applied to them.";
 
-    public static final ContextPath.ListImpl RETURN_TYPE =
-            new ContextPath.ListImpl();
+    public static final ContextPath.ListImpl RETURN_TYPE = new ContextPath.ListImpl();
 
-    private final ServiceActions serviceActions;
+    private final ConfiguratorSuite configuratorSuite;
 
-    public GetWhiteListContexts(ServiceActions serviceActions) {
+    public GetWhiteListContexts(ConfiguratorSuite configuratorSuite) {
         super(DEFAULT_FIELD_NAME, DESCRIPTION);
 
-        this.serviceActions = serviceActions;
+        this.configuratorSuite = configuratorSuite;
     }
 
     @Override
     public ContextPath.ListImpl performFunction() {
-        List<String> whiteListStrs = getWhitelistContexts(serviceActions);
+        List<String> whiteListStrs = getWhitelistContexts(configuratorSuite);
         ContextPath.ListImpl whiteListedField = new ContextPath.ListImpl();
         for (String whiteListStr : whiteListStrs) {
             ContextPath newContextPath = new ContextPath();
@@ -59,6 +58,6 @@ public class GetWhiteListContexts extends GetFunctionField<ContextPath.ListImpl>
 
     @Override
     public FunctionField<ContextPath.ListImpl> newInstance() {
-        return new GetWhiteListContexts(serviceActions);
+        return new GetWhiteListContexts(configuratorSuite);
     }
 }

@@ -13,6 +13,7 @@
  **/
 package org.codice.ddf.admin.sources.opensearch.discover
 
+import org.codice.ddf.admin.api.ConfiguratorSuite
 import org.codice.ddf.admin.api.Field
 import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.api.fields.ListField
@@ -57,8 +58,13 @@ class GetOpenSearchConfigsSpec extends SourceCommonsSpec {
         serviceActions = Mock(ServiceActions)
         serviceReader = Mock(ServiceReader)
         managedServiceActions = Mock(ManagedServiceActions)
-        getOpenSearchConfigsFunction = new GetOpenSearchConfigurations(configuratorFactory, serviceActions,
-                this.managedServiceActions, serviceReader)
+        ConfiguratorSuite configuratorSuite = Mock(ConfiguratorSuite)
+        configuratorSuite.configuratorFactory >> configuratorFactory
+        configuratorSuite.serviceActions >> serviceActions
+        configuratorSuite.serviceReader >> serviceReader
+        configuratorSuite.managedServiceActions >> managedServiceActions
+
+        getOpenSearchConfigsFunction = new GetOpenSearchConfigurations(configuratorSuite)
     }
 
     def 'No pid argument returns all configs'() {

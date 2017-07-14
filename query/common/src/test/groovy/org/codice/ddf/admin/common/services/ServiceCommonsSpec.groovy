@@ -13,6 +13,7 @@
  **/
 package org.codice.ddf.admin.common.services
 
+import org.codice.ddf.admin.api.ConfiguratorSuite
 import org.codice.ddf.admin.common.fields.common.PidField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.configurator.Configurator
@@ -25,7 +26,8 @@ import spock.lang.Specification
 
 import static org.codice.ddf.admin.common.services.ServiceCommons.validateServiceConfigurationExists
 
-class ServiceCommonsTest extends Specification {
+class ServiceCommonsSpec extends Specification {
+    ConfiguratorSuite configuratorSuite
 
     ConfiguratorFactory configuratorFactory
 
@@ -46,7 +48,14 @@ class ServiceCommonsTest extends Specification {
         configuratorFactory = Mock(ConfiguratorFactory)
         serviceReader = Mock(ServiceReader)
         configuratorFactory.getConfigurator() >> configurator
-        serviceCommons = new ServiceCommons(managedServiceActions, serviceActions, serviceReader, configuratorFactory)
+
+        configuratorSuite = Mock(ConfiguratorSuite)
+        configuratorSuite.getConfiguratorFactory() >> configuratorFactory
+        configuratorSuite.getManagedServiceActions() >> managedServiceActions
+        configuratorSuite.getServiceActions() >> serviceActions
+        configuratorSuite.getServiceReader() >> serviceReader
+
+        serviceCommons = new ServiceCommons(configuratorSuite)
     }
 
     def 'Create managed service success'() {

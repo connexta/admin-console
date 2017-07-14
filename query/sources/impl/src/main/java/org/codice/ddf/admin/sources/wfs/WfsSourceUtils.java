@@ -25,6 +25,7 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
 import org.codice.ddf.admin.common.fields.common.HostField;
 import org.codice.ddf.admin.common.fields.common.ResponseField;
@@ -62,9 +63,9 @@ public class WfsSourceUtils {
 
     private RequestUtils requestUtils;
 
-    public WfsSourceUtils() {
+    public WfsSourceUtils(ConfiguratorSuite configuratorSuite) {
         this.requestUtils = new RequestUtils();
-        this.sourceUtilCommons = new SourceUtilCommons();
+        this.sourceUtilCommons = new SourceUtilCommons(configuratorSuite);
     }
 
     /**

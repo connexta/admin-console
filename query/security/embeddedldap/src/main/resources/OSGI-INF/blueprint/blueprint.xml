@@ -14,8 +14,7 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
     <bean id="installEmbeddedLdap" class="org.codice.ddf.admin.ldap.embedded.InstallEmbeddedLdap">
-        <argument ref="configuratorFactory"/>
-        <argument ref="featureActions"/>
+        <argument ref="configuratorSuite"/>
     </bean>
 
     <service ref="installEmbeddedLdap" interface="org.codice.ddf.admin.api.fields.FunctionField">
@@ -24,12 +23,8 @@
         </service-properties>
     </service>
 
-    <reference id="configuratorFactory"
-               interface="org.codice.ddf.admin.configurator.ConfiguratorFactory"
-               availability="mandatory" filter="(type=txact)"/>
-
-    <reference id="featureActions"
-               interface="org.codice.ddf.internal.admin.configurator.actions.FeatureActions"
+    <reference id="configuratorSuite"
+               interface="org.codice.ddf.admin.api.ConfiguratorSuite"
                availability="mandatory"/>
 
 </blueprint>

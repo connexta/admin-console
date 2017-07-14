@@ -13,6 +13,7 @@
  **/
 package org.codice.ddf.admin.ldap.discover
 
+import org.codice.ddf.admin.api.ConfiguratorSuite
 import org.codice.ddf.admin.api.fields.ListField
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField
 import org.codice.ddf.admin.common.services.ServiceCommons
@@ -33,10 +34,15 @@ class GetLdapConfigurationsSpec extends Specification {
 
     PropertyActions propertyActions
 
+    ConfiguratorSuite configuratorSuite
+
     def setup() {
         propertyActions = Mock(PropertyActions)
         managedServiceActions = Mock(ManagedServiceActions)
-        getLdapConfigurations = new GetLdapConfigurations(managedServiceActions, propertyActions)
+        configuratorSuite = Mock(ConfiguratorSuite)
+        configuratorSuite.propertyActions >> propertyActions
+        configuratorSuite.managedServiceActions >> managedServiceActions
+        getLdapConfigurations = new GetLdapConfigurations(configuratorSuite)
     }
 
     def 'Retrieved LDAP configurations have flag password'() {
@@ -61,7 +67,7 @@ class GetLdapConfigurationsSpec extends Specification {
                 .connection(LdapTestingCommons.noEncryptionLdapConnectionInfo())
 
         return [
-                'somePid': new LdapServiceCommons(propertyActions, managedServiceActions).ldapConfigToLdapClaimsHandlerService(config, "/some/path")
+                'somePid': new LdapServiceCommons(configuratorSuite).ldapConfigToLdapClaimsHandlerService(config, "/some/path")
         ]
     }
 }

@@ -14,6 +14,7 @@
 package org.codice.ddf.admin.sources.csw.persist
 
 import ddf.catalog.source.Source
+import org.codice.ddf.admin.api.ConfiguratorSuite
 import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.configurator.Configurator
@@ -62,6 +63,8 @@ class CreateCswConfigurationSpec extends SourceCommonsSpec {
 
     FeatureActions featureActions
 
+    ConfiguratorSuite configuratorSuite
+
     Source federatedSource
 
     def federatedSources = []
@@ -77,8 +80,15 @@ class CreateCswConfigurationSpec extends SourceCommonsSpec {
         federatedSource = new TestSource(S_PID, TEST_SOURCENAME, false)
         federatedSources.add(federatedSource)
         configuratorFactory.getConfigurator() >> configurator
-        createCswConfiguration = new CreateCswConfiguration(configuratorFactory, serviceActions,
-                managedServiceActions, serviceReader, featureActions)
+
+        configuratorSuite = Mock(ConfiguratorSuite)
+        configuratorSuite.configuratorFactory >> configuratorFactory
+        configuratorSuite.serviceActions >> serviceActions
+        configuratorSuite.serviceReader >> serviceReader
+        configuratorSuite.featureActions >> featureActions
+        configuratorSuite.managedServiceActions >> managedServiceActions
+
+        createCswConfiguration = new CreateCswConfiguration(configuratorSuite)
     }
 
     def 'Successfully create new CSW configuration'() {

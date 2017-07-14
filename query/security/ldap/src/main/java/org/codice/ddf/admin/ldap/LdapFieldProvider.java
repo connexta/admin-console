@@ -16,10 +16,10 @@ package org.codice.ddf.admin.ldap;
 import java.util.Collections;
 import java.util.List;
 
+import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.function.BaseFieldProvider;
-import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.ldap.discover.GetLdapConfigurations;
 import org.codice.ddf.admin.ldap.discover.LdapQuery;
 import org.codice.ddf.admin.ldap.discover.LdapRecommendedSettings;
@@ -30,10 +30,6 @@ import org.codice.ddf.admin.ldap.discover.LdapTestDirectorySettings;
 import org.codice.ddf.admin.ldap.discover.LdapUserAttributes;
 import org.codice.ddf.admin.ldap.persist.CreateLdapConfiguration;
 import org.codice.ddf.admin.ldap.persist.DeleteLdapConfiguration;
-import org.codice.ddf.internal.admin.configurator.actions.FeatureActions;
-import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions;
-import org.codice.ddf.internal.admin.configurator.actions.PropertyActions;
-import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
 
 import com.google.common.collect.ImmutableList;
 
@@ -70,28 +66,20 @@ public class LdapFieldProvider extends BaseFieldProvider {
 
     private List<FunctionField> ldapMutationFields = Collections.emptyList();
 
-    public LdapFieldProvider(ConfiguratorFactory configuratorFactory, FeatureActions featureActions,
-            ManagedServiceActions managedServiceActions, PropertyActions propertyActions,
-            ServiceActions serviceActions) {
+    public LdapFieldProvider(ConfiguratorSuite configuratorSuite) {
         super(NAME, TYPE_NAME, DESCRIPTION);
         testConnection = new LdapTestConnection();
         testBind = new LdapTestBind();
         testSettings = new LdapTestDirectorySettings();
         recommendedSettings = new LdapRecommendedSettings();
-        claimMappings = new LdapTestClaimMappings(serviceActions);
+        claimMappings = new LdapTestClaimMappings(configuratorSuite);
 
         ldapQuery = new LdapQuery();
         getUserAttris = new LdapUserAttributes();
-        getConfigs = new GetLdapConfigurations(managedServiceActions, propertyActions);
+        getConfigs = new GetLdapConfigurations(configuratorSuite);
 
-        createConfig = new CreateLdapConfiguration(configuratorFactory,
-                featureActions,
-                managedServiceActions,
-                propertyActions);
-        deleteConfig = new DeleteLdapConfiguration(configuratorFactory,
-                managedServiceActions,
-                propertyActions,
-                serviceActions);
+        createConfig = new CreateLdapConfiguration(configuratorSuite);
+        deleteConfig = new DeleteLdapConfiguration(configuratorSuite);
     }
 
     @Override

@@ -103,23 +103,13 @@
     
     <service id="wcpmFieldProvider" interface="org.codice.ddf.admin.api.FieldProvider">
         <bean class="org.codice.ddf.admin.security.wcpm.WcpmFieldProvider">
-            <argument ref="configuratorFactory" />
-            <argument ref="serviceActions"/>
-            <argument ref="serviceReader"/>
+            <argument ref="configuratorSuite"/>
         </bean>
     </service>
 
 
-    <reference id="configuratorFactory"
-               interface="org.codice.ddf.admin.configurator.ConfiguratorFactory"
-               availability="mandatory" filter="(type=txact)"/>
-
-    <reference id="serviceActions"
-               interface="org.codice.ddf.internal.admin.configurator.actions.ServiceActions"
-               availability="mandatory"/>
-
-    <reference id="serviceReader"
-               interface="org.codice.ddf.internal.admin.configurator.actions.ServiceReader"
+    <reference id="configuratorSuite"
+               interface="org.codice.ddf.admin.api.ConfiguratorSuite"
                availability="mandatory"/>
 
 </blueprint>

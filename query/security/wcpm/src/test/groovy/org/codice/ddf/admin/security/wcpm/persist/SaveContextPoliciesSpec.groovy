@@ -13,6 +13,7 @@
  */
 package org.codice.ddf.admin.security.wcpm.persist
 
+import org.codice.ddf.admin.api.ConfiguratorSuite
 import org.codice.ddf.admin.api.FieldProvider
 import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.api.poller.EnumValuePoller
@@ -39,7 +40,7 @@ import spock.lang.Specification
 
 import static groovy.org.codice.ddf.admin.security.wcpm.persist.WcpmTestingCommons.*
 
-class SaveContextPoliciesTest extends Specification {
+class SaveContextPoliciesSpec extends Specification {
 
     FieldProvider queryProvider
     ConfiguratorFactory configuratorFactory
@@ -117,7 +118,11 @@ class SaveContextPoliciesTest extends Specification {
         contextPolicies.setValue(testData.policies)
         policyManager.setPolicies(new PolicyManagerServiceProperties().contextPoliciesToPolicyManagerProps(contextPolicies.getList()))
 
-        queryProvider = new WcpmFieldProvider(configuratorFactory, serviceActions, serviceReader)
+        def configuratorSuite = Mock(ConfiguratorSuite)
+        configuratorSuite.configuratorFactory >> configuratorFactory
+        configuratorSuite.serviceActions >> serviceActions
+        configuratorSuite.serviceReader >> serviceReader
+        queryProvider = new WcpmFieldProvider(configuratorSuite)
         saveContextPoliciesFunction = queryProvider.getMutationFunction(SaveContextPolices.FUNCTION_FIELD_NAME)
     }
 

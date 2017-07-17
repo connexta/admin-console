@@ -17,9 +17,9 @@ import Navigation, { Back, Finish } from 'components/wizard/Navigation'
 import { confirmationInfo } from './styles.less'
 
 const useCaseMapping = {
-  authentication: 'Authentication source',
-  attributeStore: 'Attribute store',
-  authenticationAndAttributeStore: 'Authentication and attribute store'
+  Authentication: 'Authentication',
+  AttributeStore: 'Attribute Store',
+  AuthenticationAndAttributeStore: 'Authentication and Attribute Store'
 }
 
 const createLdapConfig = (conn, info, settings, mapping) => ({
@@ -81,7 +81,7 @@ const ConfirmStage = (props) => {
     useCase: configs.ldapUseCase
   }
 
-  const mapping = Object.keys(configs.attributeMappings).map((key) => ({ key, value: configs.attributeMappings[key] }))
+  const mapping = Object.keys(configs.attributeMappings || {}).map((key) => ({ key, value: configs.attributeMappings[key] }))
 
   return (
     <Stage submitting={submitting}>
@@ -114,9 +114,9 @@ const ConfirmStage = (props) => {
               value={configs.memberAttributeReferencedInGroup} />
           </Flexbox>
         </Flexbox>
-        <MapDisplay visible={configs.ldapUseCase !== 'authentication'}
+        <MapDisplay visible={configs.ldapUseCase !== 'Authentication'}
           label='Attribute Mappings'
-          mapping={configs.attributeMappings} />
+          mapping={configs.attributeMappings || {}} />
       </Flexbox>
 
       <Body>

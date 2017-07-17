@@ -24,6 +24,16 @@ import spock.lang.Shared
 
 class DiscoverCswSourceSpec extends SourceCommonsSpec {
 
+    static TEST_CSW_URL = 'https://localhost:8993/services/csw'
+
+    static NO_FILTER = 'NO_FILTER'
+
+    static BASE_PATH = [DiscoverCswSource.FIELD_NAME, FunctionField.ARGUMENT]
+
+    static ADDRESS_FIELD_PATH = [BASE_PATH, ADDRESS].flatten()
+
+    static URL_FIELD_PATH = [ADDRESS_FIELD_PATH, URL_NAME].flatten()
+
     @Shared
             ddfCswResponse = this.getClass().getClassLoader().getResource('responses/csw/DDFCswGetCapabilities.xml').text
 
@@ -42,17 +52,7 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
     @Shared
             badResponseBody = this.getClass().getClassLoader().getResource('responses/badResponse.xml').text
 
-    static TEST_CSW_URL = 'https://localhost:8993/services/csw'
-
-    static NO_FILTER = 'NO_FILTER'
-
     DiscoverCswSource discoverCsw
-
-    static BASE_PATH = [DiscoverCswSource.FIELD_NAME, FunctionField.ARGUMENT]
-
-    static ADDRESS_FIELD_PATH = [BASE_PATH, ADDRESS].flatten()
-
-    static URL_FIELD_PATH = [ADDRESS_FIELD_PATH, URL_NAME].flatten()
 
     def setup() {
         discoverCsw = new DiscoverCswSource()

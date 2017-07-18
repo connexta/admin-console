@@ -82,9 +82,9 @@ class SourceCommonsSpec extends Specification {
 
     public static final String TEST_SOURCENAME = "testSourceName"
 
-    static Map<String, Object> getBaseDiscoverByAddressArgs() {
+    static Map<String, Object> getBaseDiscoverByAddressArgs(String hostName = 'localhost', int port = 8993) {
         return [
-                (ADDRESS)    : new AddressField().hostname('localhost').port(8993).getValue(),
+                (ADDRESS)    : new AddressField().hostname(hostName).port(port).getValue(),
                 (CREDENTIALS): new CredentialsField().username(TEST_USERNAME).password(TEST_PASSWORD).getValue()
         ]
     }
@@ -153,7 +153,7 @@ class SourceCommonsSpec extends Specification {
         return report
     }
 
-    def createMockFactory(int statusCode, String responseBody) {
+    SecureCxfClientFactory createMockFactory(int statusCode, String responseBody) {
         def mockResponse = Mock(Response)
         mockResponse.getStatus() >> statusCode
         mockResponse.readEntity(String.class) >> responseBody

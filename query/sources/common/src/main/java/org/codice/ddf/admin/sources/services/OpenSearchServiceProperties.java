@@ -24,7 +24,6 @@ import java.util.function.Function;
 
 import org.codice.ddf.admin.common.services.ServiceCommons;
 import org.codice.ddf.admin.sources.fields.type.OpenSearchSourceConfigurationField;
-import org.codice.ddf.admin.sources.fields.type.SourceConfigField;
 
 public class OpenSearchServiceProperties {
 
@@ -45,7 +44,7 @@ public class OpenSearchServiceProperties {
     public static final List<String> OPENSEARCH_FACTORY_PIDS = Collections.singletonList(
             OPENSEARCH_FACTORY_PID);
 
-    public static final Function<Map<String, Object>, SourceConfigField>
+    public static final Function<Map<String, Object>, OpenSearchSourceConfigurationField>
             SERVICE_PROPS_TO_OPENSEARCH_CONFIG =
             OpenSearchServiceProperties::servicePropsToOpenSearchConfig;
 

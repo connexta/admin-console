@@ -24,7 +24,6 @@ import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.common.services.ServiceCommons;
-import org.codice.ddf.admin.sources.fields.type.SourceConfigField;
 import org.codice.ddf.admin.sources.fields.type.WfsSourceConfigurationField;
 import org.codice.ddf.admin.sources.utils.SourceUtilCommons;
 import org.codice.ddf.admin.sources.wfs.WfsSourceInfoField;
@@ -63,14 +62,12 @@ public class GetWfsConfigurations extends BaseFunctionField<ListField<WfsSourceI
     public ListField<WfsSourceInfoField> performFunction() {
         WfsSourceInfoField.ListImpl cswSourceInfoFields = new WfsSourceInfoField.ListImpl();
 
-        List<SourceConfigField> configs =
-                sourceUtilCommons.getSourceConfigurations(WFS_FACTORY_PIDS,
-                        SERVICE_PROPS_TO_WFS_CONFIG,
-                        pid.getValue());
+        List<WfsSourceConfigurationField> configs = sourceUtilCommons.getSourceConfigurations(
+                WFS_FACTORY_PIDS,
+                SERVICE_PROPS_TO_WFS_CONFIG,
+                pid.getValue());
 
-        configs.forEach(config -> {
-            cswSourceInfoFields.add(new WfsSourceInfoField().config((WfsSourceConfigurationField) config));
-        });
+        configs.forEach(config -> cswSourceInfoFields.add(new WfsSourceInfoField().config(config)));
 
         for (WfsSourceInfoField sourceInfoField : cswSourceInfoFields.getList()) {
             sourceUtilCommons.populateAvailability(sourceInfoField.isAvailableField(),

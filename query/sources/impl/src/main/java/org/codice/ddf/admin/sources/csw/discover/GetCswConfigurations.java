@@ -27,7 +27,6 @@ import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.common.services.ServiceCommons;
 import org.codice.ddf.admin.sources.csw.CswSourceInfoField;
 import org.codice.ddf.admin.sources.fields.type.CswSourceConfigurationField;
-import org.codice.ddf.admin.sources.fields.type.SourceConfigField;
 import org.codice.ddf.admin.sources.utils.SourceUtilCommons;
 
 import com.google.common.collect.ImmutableList;
@@ -66,12 +65,12 @@ public class GetCswConfigurations extends BaseFunctionField<ListField<CswSourceI
     public ListField<CswSourceInfoField> performFunction() {
         ListField<CswSourceInfoField> cswSourceInfoFields = new CswSourceInfoField.ListImpl();
 
-        List<SourceConfigField> configs =
-                sourceUtilCommons.getSourceConfigurations(CSW_FACTORY_PIDS,
-                        SERVICE_PROPS_TO_CSW_CONFIG,
-                        pid.getValue());
+        List<CswSourceConfigurationField> configs = sourceUtilCommons.getSourceConfigurations(
+                CSW_FACTORY_PIDS,
+                SERVICE_PROPS_TO_CSW_CONFIG,
+                pid.getValue());
 
-        configs.forEach(config -> cswSourceInfoFields.add(new CswSourceInfoField().config((CswSourceConfigurationField) config)));
+        configs.forEach(config -> cswSourceInfoFields.add(new CswSourceInfoField().config(config)));
 
         for (CswSourceInfoField sourceInfoField : cswSourceInfoFields.getList()) {
             sourceUtilCommons.populateAvailability(sourceInfoField.isAvailableField(),

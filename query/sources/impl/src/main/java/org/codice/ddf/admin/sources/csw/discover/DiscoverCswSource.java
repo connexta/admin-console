@@ -23,7 +23,6 @@ import org.codice.ddf.admin.api.report.ReportWithResult;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.common.AddressField;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
-import org.codice.ddf.admin.common.fields.common.ResponseField;
 import org.codice.ddf.admin.common.report.message.DefaultMessages;
 import org.codice.ddf.admin.sources.csw.CswSourceUtils;
 import org.codice.ddf.admin.sources.fields.type.CswSourceConfigurationField;
@@ -33,7 +32,7 @@ import com.google.common.collect.ImmutableSet;
 
 public class DiscoverCswSource extends BaseFunctionField<CswSourceConfigurationField> {
 
-    public static final String FIELD_NAME = "discoverCsw";
+    public static final String FIELD_NAME = "discover";
 
     public static final String DESCRIPTION =
             "Attempts to discover a CSW source using the given hostname and port or URL. If a URL is provided, "
@@ -42,7 +41,6 @@ public class DiscoverCswSource extends BaseFunctionField<CswSourceConfigurationF
     public static final CswSourceConfigurationField RETURN_TYPE = new CswSourceConfigurationField();
 
     private CredentialsField credentials;
-
 
     private AddressField address;
 
@@ -64,23 +62,19 @@ public class DiscoverCswSource extends BaseFunctionField<CswSourceConfigurationF
 
     @Override
     public CswSourceConfigurationField performFunction() {
-        ReportWithResult<ResponseField> responseResult;
+        ReportWithResult<CswSourceConfigurationField> configResult;
         if (address.url() != null) {
-            responseResult = cswSourceUtils.sendRequest(address.urlField(), credentials);
+            configResult = cswSourceUtils.getCswConfigFromUrl(address.urlField(), credentials);
         } else {
-            responseResult = cswSourceUtils.discoverCswUrl(address.host(), credentials);
+            configResult = cswSourceUtils.getConfigFromHost(address.host(), credentials);
         }
 
-        addMessages(responseResult);
+        addMessages(configResult);
         if (containsErrorMsgs()) {
             return null;
         }
 
-        ReportWithResult<CswSourceConfigurationField> configResult =
-                cswSourceUtils.getPreferredCswConfig(responseResult.result(), credentials);
-
-        addMessages(configResult);
-        return configResult.isResultPresent() ? configResult.result() : null;
+        return configResult.result();
     }
 
     @Override

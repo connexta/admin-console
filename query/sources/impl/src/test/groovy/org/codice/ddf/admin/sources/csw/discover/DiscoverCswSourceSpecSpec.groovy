@@ -53,6 +53,8 @@ class DiscoverCswSourceSpecSpec extends SourceCommonsSpec {
 
     static ADDRESS_FIELD_PATH = [BASE_PATH, ADDRESS].flatten()
 
+    static HOST_FIELD_PATH = [ADDRESS_FIELD_PATH, HostField.DEFAULT_FIELD_NAME].flatten()
+
     static URL_FIELD_PATH = [ADDRESS_FIELD_PATH, URL_NAME].flatten()
 
     def setup() {
@@ -173,7 +175,7 @@ class DiscoverCswSourceSpecSpec extends SourceCommonsSpec {
         then:
         report.messages().size() == 1
         report.messages()[0].getCode() == DefaultMessages.UNKNOWN_ENDPOINT
-        report.messages()[0].getPath() == [DiscoverCswSource.FIELD_NAME]
+        report.messages()[0].getPath() == URL_FIELD_PATH
     }
 
     def 'Unknown endpoint error with unrecognized response when using URL'() {
@@ -187,7 +189,7 @@ class DiscoverCswSourceSpecSpec extends SourceCommonsSpec {
         then:
         report.messages().size() == 1
         report.messages()[0].getCode() == DefaultMessages.UNKNOWN_ENDPOINT
-        report.messages()[0].getPath() == [DiscoverCswSource.FIELD_NAME]
+        report.messages()[0].getPath() == URL_FIELD_PATH
     }
 
     def 'Unknown endpoint error with unrecognized response when using hostname+port'() {
@@ -201,10 +203,10 @@ class DiscoverCswSourceSpecSpec extends SourceCommonsSpec {
         then:
         report.messages().size() == 1
         report.messages()[0].getCode() == DefaultMessages.UNKNOWN_ENDPOINT
-        report.messages()[0].getPath() == [DiscoverCswSource.FIELD_NAME]
+        report.messages()[0].getPath() == HOST_FIELD_PATH
     }
 
-    def 'Cannot connect if errors from discover url from host'() {
+    def 'Unknown endpoint if no pre-formatted URLs work when discovering with host+port'() {
         setup:
         discoverCsw.setCswSourceUtils(prepareCswSourceUtils(200, badResponseBody, false))
         discoverCsw.setValue(getBaseDiscoverByAddressArgs())
@@ -214,8 +216,8 @@ class DiscoverCswSourceSpecSpec extends SourceCommonsSpec {
 
         then:
         report.messages().size() == 1
-        report.messages()[0].getCode() == DefaultMessages.CANNOT_CONNECT
-        report.messages()[0].getPath() == [ADDRESS_FIELD_PATH, HostField.DEFAULT_FIELD_NAME].flatten()
+        report.messages()[0].getCode() == DefaultMessages.UNKNOWN_ENDPOINT
+        report.messages()[0].getPath() == HOST_FIELD_PATH
     }
 
     def 'Unrecognized CSW output schema defaults to CSW 2.0.2 schema'() {
@@ -247,7 +249,7 @@ class DiscoverCswSourceSpecSpec extends SourceCommonsSpec {
         report.result() == null
         report.messages().size() == 1
         report.messages()[0].getCode() == DefaultMessages.UNKNOWN_ENDPOINT
-        report.messages()[0].getPath() == [DiscoverCswSource.FIELD_NAME]
+        report.messages()[0].getPath() == URL_FIELD_PATH
     }
 
     def 'Fail when missing required fields'() {

@@ -72,23 +72,41 @@ public class OpenSearchSourceUtils {
      * Attempts to discover an OpenSearch endpoint from the given hostname and port
      * <p>
      * Possible Error Codes to be returned
-     * - {@link org.codice.ddf.admin.common.report.message.DefaultMessages#CANNOT_CONNECT}
+     * - {@link org.codice.ddf.admin.common.report.message.DefaultMessages#UNKNOWN_ENDPOINT}
      *
      * @param hostField hostname and port to probe for OpenSearch capabilities
      * @param creds     optional credentials for authentication
-     * @return a {@link ReportWithResultImpl} containing the discovered {@link ResponseField} on success, or containing {@link org.codice.ddf.admin.api.report.ErrorMessage}s on failure.
+     * @return a {@link ReportWithResultImpl} containing the discovered {@link OpenSearchSourceConfigurationField} on success, or containing {@link org.codice.ddf.admin.api.report.ErrorMessage}s on failure.
      */
-    public ReportWithResultImpl<ResponseField> discoverOpenSearchUrl(HostField hostField,
-            CredentialsField creds) {
-        return requestUtils.discoverUrlFromHost(hostField,
-                URL_FORMATS,
-                creds,
-                GET_CAPABILITIES_PARAMS);
+    public ReportWithResultImpl<OpenSearchSourceConfigurationField> getOpenSearchConfigFromHost(
+            HostField hostField, CredentialsField creds) {
+        for (String urlFormat : URL_FORMATS) {
+            UrlField clientUrl = new UrlField();
+            clientUrl.setValue(String.format(urlFormat, hostField.hostname(), hostField.port()));
+
+            ReportWithResultImpl<OpenSearchSourceConfigurationField> configResult =
+                    getOpenSearchConfigFromUrl(clientUrl, creds);
+
+            if (!configResult.containsErrorMsgs()) {
+                return configResult;
+            }
+        }
+
+        return new ReportWithResultImpl<OpenSearchSourceConfigurationField>().addResultMessage(
+                unknownEndpointError(hostField.path()));
     }
 
-    public ReportWithResultImpl<ResponseField> sendRequest(UrlField urlField,
-            CredentialsField creds) {
-        return requestUtils.sendGetRequest(urlField, creds, GET_CAPABILITIES_PARAMS);
+    public ReportWithResultImpl<OpenSearchSourceConfigurationField> getOpenSearchConfigFromUrl(
+            UrlField urlField, CredentialsField creds) {
+        ReportWithResultImpl<ResponseField> responseResult = requestUtils.sendGetRequest(urlField,
+                creds,
+                GET_CAPABILITIES_PARAMS);
+
+        if (responseResult.containsErrorMsgs()) {
+            return (ReportWithResultImpl) responseResult;
+        }
+
+        return getOpenSearchConfigFromResponse(responseResult.result(), creds);
     }
 
     /**
@@ -101,7 +119,7 @@ public class OpenSearchSourceUtils {
      * @param creds         optional credentials used in the original capabilities request
      * @return a {@link ReportWithResultImpl} containing the {@link OpenSearchSourceConfigurationField} or containing {@link org.codice.ddf.admin.api.report.ErrorMessage}s on failure.
      */
-    public ReportWithResultImpl<OpenSearchSourceConfigurationField> getOpenSearchConfig(
+    private ReportWithResultImpl<OpenSearchSourceConfigurationField> getOpenSearchConfigFromResponse(
             ResponseField responseField, CredentialsField creds) {
         ReportWithResultImpl<OpenSearchSourceConfigurationField> configResult =
                 new ReportWithResultImpl<>();
@@ -110,7 +128,8 @@ public class OpenSearchSourceUtils {
         int statusCode = responseField.statusCode();
 
         if (statusCode != HTTP_OK || responseBody.length() < 1) {
-            configResult.addResultMessage(unknownEndpointError());
+            configResult.addResultMessage(unknownEndpointError(responseField.requestUrlField()
+                    .path()));
             return configResult;
         }
 
@@ -143,7 +162,8 @@ public class OpenSearchSourceUtils {
             }
         } catch (XPathExpressionException e) {
             LOGGER.debug("Failed to compile OpenSearch totalResults XPath.");
-            configResult.addResultMessage(unknownEndpointError());
+            configResult.addResultMessage(unknownEndpointError(responseField.requestUrlField()
+                    .path()));
         }
 
         return configResult;

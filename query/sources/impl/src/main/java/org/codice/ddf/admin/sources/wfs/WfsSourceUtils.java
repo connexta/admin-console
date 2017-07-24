@@ -72,23 +72,42 @@ public class WfsSourceUtils {
      * Attempts to discover a WFS endpoint at a given hostname and port.
      * <p>
      * Possible Error Codes to be returned
-     * - {@link org.codice.ddf.admin.common.report.message.DefaultMessages#CANNOT_CONNECT}
+     * - {@link org.codice.ddf.admin.common.report.message.DefaultMessages#UNKNOWN_ENDPOINT}
      *
      * @param hostField address to probe for WFS capabilities
      * @param creds     optional username to add to Basic Auth header
-     * @return a {@link ReportWithResultImpl} containing the {@link ResponseField} or an {@link org.codice.ddf.admin.api.report.ErrorMessage} on failure.
+     * @return a {@link ReportWithResultImpl} containing the {@link WfsSourceConfigurationField} or an {@link org.codice.ddf.admin.api.report.ErrorMessage} on failure.
      */
-    public ReportWithResultImpl<ResponseField> discoverWfsUrl(HostField hostField,
-            CredentialsField creds) {
-        return requestUtils.discoverUrlFromHost(hostField,
-                URL_FORMATS,
-                creds,
-                GET_CAPABILITIES_PARAMS);
+    public ReportWithResultImpl<WfsSourceConfigurationField> getWfsConfigFromHost(
+            HostField hostField, CredentialsField creds) {
+        for (String urlFormat : URL_FORMATS) {
+            UrlField clientUrl = new UrlField();
+            clientUrl.setValue(String.format(urlFormat, hostField.hostname(), hostField.port()));
+
+            ReportWithResultImpl<WfsSourceConfigurationField> configResult = getWfsConfigFromUrl(
+                    clientUrl,
+                    creds);
+
+            if (!configResult.containsErrorMsgs()) {
+                return configResult;
+            }
+        }
+
+        return new ReportWithResultImpl<WfsSourceConfigurationField>().addResultMessage(
+                unknownEndpointError(hostField.path()));
     }
 
-    public ReportWithResultImpl<ResponseField> sendRequest(UrlField urlField,
+    public ReportWithResultImpl<WfsSourceConfigurationField> getWfsConfigFromUrl(UrlField urlField,
             CredentialsField creds) {
-        return requestUtils.sendGetRequest(urlField, creds, GET_CAPABILITIES_PARAMS);
+        ReportWithResultImpl<ResponseField> responseResult = requestUtils.sendGetRequest(urlField,
+                creds,
+                GET_CAPABILITIES_PARAMS);
+
+        if (responseResult.containsErrorMsgs()) {
+            return (ReportWithResultImpl) responseResult;
+        }
+
+        return getWfsConfigFromResult(responseResult.result(), creds);
     }
 
     /**
@@ -101,7 +120,7 @@ public class WfsSourceUtils {
      * @param creds         optional username to add to Basic Auth header used in the original request
      * @return a {@link ReportWithResultImpl} containing the preferred {@link WfsSourceConfigurationField}, or containing {@link org.codice.ddf.admin.api.report.ErrorMessage}s on failure.
      */
-    public ReportWithResultImpl<WfsSourceConfigurationField> getPreferredWfsConfig(
+    private ReportWithResultImpl<WfsSourceConfigurationField> getWfsConfigFromResult(
             ResponseField responseField, CredentialsField creds) {
         ReportWithResultImpl<WfsSourceConfigurationField> configResult =
                 new ReportWithResultImpl<>();
@@ -110,7 +129,8 @@ public class WfsSourceUtils {
         UrlField requestUrl = responseField.requestUrlField();
 
         if (responseField.statusCode() != HTTP_OK || responseBody.length() < 1) {
-            configResult.addResultMessage(unknownEndpointError());
+            configResult.addResultMessage(unknownEndpointError(responseField.requestUrlField()
+                    .path()));
             return configResult;
         }
 
@@ -119,7 +139,8 @@ public class WfsSourceUtils {
             capabilitiesXml = sourceUtilCommons.createDocument(responseBody);
         } catch (Exception e) {
             LOGGER.debug("Failed to read response from WFS endpoint.");
-            configResult.addResultMessage(unknownEndpointError());
+            configResult.addResultMessage(unknownEndpointError(responseField.requestUrlField()
+                    .path()));
             return configResult;
         }
 
@@ -145,7 +166,8 @@ public class WfsSourceUtils {
         configResult.result(preferredConfig.wfsVersion(wfsVersion));
         if (!preferredConfig.validate()
                 .isEmpty()) {
-            configResult.addResultMessage(unknownEndpointError());
+            configResult.addResultMessage(unknownEndpointError(responseField.requestUrlField()
+                    .path()));
         }
 
         return configResult;

@@ -45,6 +45,8 @@ class DiscoverWfsSourcesSpec extends SourceCommonsSpec {
 
     static ADDRESS_FIELD_PATH = [BASE_PATH, ADDRESS].flatten()
 
+    static HOST_FIELD_PATH = [ADDRESS_FIELD_PATH, HostField.DEFAULT_FIELD_NAME].flatten()
+
     static URL_FIELD_PATH = [ADDRESS_FIELD_PATH, URL_NAME].flatten()
 
     def setup() {
@@ -122,7 +124,7 @@ class DiscoverWfsSourcesSpec extends SourceCommonsSpec {
         then:
         report.messages().size() == 1
         report.messages()[0].getCode() == DefaultMessages.UNKNOWN_ENDPOINT
-        report.messages()[0].getPath() == [DiscoverWfsSource.FIELD_NAME]
+        report.messages()[0].getPath() == URL_FIELD_PATH
     }
 
     def 'Unknown endpoint error when bad HTTP code received'() {
@@ -136,7 +138,7 @@ class DiscoverWfsSourcesSpec extends SourceCommonsSpec {
         then:
         report.messages().size() == 1
         report.messages()[0].getCode() == DefaultMessages.UNKNOWN_ENDPOINT
-        report.messages()[0].getPath() == [DiscoverWfsSource.FIELD_NAME]
+        report.messages()[0].getPath() == URL_FIELD_PATH
     }
 
     def 'Unknown endpoint error when unrecognized response received'() {
@@ -150,10 +152,10 @@ class DiscoverWfsSourcesSpec extends SourceCommonsSpec {
         then:
         report.messages().size() == 1
         report.messages()[0].getCode() == DefaultMessages.UNKNOWN_ENDPOINT
-        report.messages()[0].getPath() == [DiscoverWfsSource.FIELD_NAME]
+        report.messages()[0].getPath() == URL_FIELD_PATH
     }
 
-    def 'Cannot connect if errors from discover url from host'() {
+    def 'Unknown endpoint if no pre-formatted URLs work when discovering with host+port'() {
         setup:
         discoverWfs.setWfsSourceUtils(prepareOpenSearchSourceUtils(200, badResponseBody, false))
         discoverWfs.setValue(getBaseDiscoverByAddressArgs())
@@ -163,8 +165,8 @@ class DiscoverWfsSourcesSpec extends SourceCommonsSpec {
 
         then:
         report.messages().size() == 1
-        report.messages()[0].getCode() == DefaultMessages.CANNOT_CONNECT
-        report.messages()[0].getPath() == [ADDRESS_FIELD_PATH, HostField.DEFAULT_FIELD_NAME].flatten()
+        report.messages()[0].getCode() == DefaultMessages.UNKNOWN_ENDPOINT
+        report.messages()[0].getPath() == HOST_FIELD_PATH
     }
 
     def 'Fail when missing required fields'() {

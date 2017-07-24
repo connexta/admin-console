@@ -92,7 +92,7 @@ public class OpenSearchSourceUtils {
             }
         }
 
-        return new ReportWithResultImpl<OpenSearchSourceConfigurationField>().addResultMessage(
+        return new ReportWithResultImpl<OpenSearchSourceConfigurationField>().addArgumentMessage(
                 unknownEndpointError(hostField.path()));
     }
 
@@ -128,7 +128,7 @@ public class OpenSearchSourceUtils {
         int statusCode = responseField.statusCode();
 
         if (statusCode != HTTP_OK || responseBody.length() < 1) {
-            configResult.addResultMessage(unknownEndpointError(responseField.requestUrlField()
+            configResult.addArgumentMessage(unknownEndpointError(responseField.requestUrlField()
                     .path()));
             return configResult;
         }
@@ -138,7 +138,8 @@ public class OpenSearchSourceUtils {
             capabilitiesXml = sourceUtilCommons.createDocument(responseBody);
         } catch (Exception e) {
             LOGGER.debug("Failed to read response from OpenSearch endpoint.");
-            configResult.addResultMessage(unknownEndpointError());
+            configResult.addArgumentMessage(unknownEndpointError(responseField.requestUrlField()
+                    .path()));
             return configResult;
         }
 
@@ -158,11 +159,12 @@ public class OpenSearchSourceUtils {
 
                 configResult.result(config);
             } else {
-                configResult.addResultMessage(unknownEndpointError());
+                configResult.addArgumentMessage(unknownEndpointError(responseField.requestUrlField()
+                        .path()));
             }
         } catch (XPathExpressionException e) {
             LOGGER.debug("Failed to compile OpenSearch totalResults XPath.");
-            configResult.addResultMessage(unknownEndpointError(responseField.requestUrlField()
+            configResult.addArgumentMessage(unknownEndpointError(responseField.requestUrlField()
                     .path()));
         }
 

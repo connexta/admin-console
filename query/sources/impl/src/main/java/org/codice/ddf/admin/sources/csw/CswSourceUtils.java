@@ -106,7 +106,7 @@ public class CswSourceUtils {
             }
         }
 
-        return new ReportWithResultImpl<CswSourceConfigurationField>().addResultMessage(
+        return new ReportWithResultImpl<CswSourceConfigurationField>().addArgumentMessage(
                 unknownEndpointError(hostField.path()));
     }
 
@@ -140,7 +140,7 @@ public class CswSourceUtils {
 
         String responseBody = responseField.responseBody();
         if (responseField.statusCode() != HTTP_OK || responseBody.length() < 1) {
-            configResult.addResultMessage(unknownEndpointError(responseField.requestUrlField()
+            configResult.addArgumentMessage(unknownEndpointError(responseField.requestUrlField()
                     .path()));
             return configResult;
         }
@@ -150,7 +150,7 @@ public class CswSourceUtils {
             capabilitiesXml = sourceUtilCommons.createDocument(responseBody);
         } catch (Exception e) {
             LOGGER.debug("Failed to create XML document from response.");
-            configResult.addResultMessage(unknownEndpointError(responseField.requestUrlField()
+            configResult.addArgumentMessage(unknownEndpointError(responseField.requestUrlField()
                     .path()));
             return configResult;
         }
@@ -203,7 +203,7 @@ public class CswSourceUtils {
 
         LOGGER.debug("URL [{}] responded to GetCapabilities request, but response was not readable.",
                 requestUrl);
-        configResult.addResultMessage(unknownEndpointError(responseField.requestUrlField()
+        configResult.addArgumentMessage(unknownEndpointError(responseField.requestUrlField()
                 .path()));
         return configResult;
     }

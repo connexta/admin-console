@@ -93,7 +93,7 @@ public class WfsSourceUtils {
             }
         }
 
-        return new ReportWithResultImpl<WfsSourceConfigurationField>().addResultMessage(
+        return new ReportWithResultImpl<WfsSourceConfigurationField>().addArgumentMessage(
                 unknownEndpointError(hostField.path()));
     }
 
@@ -129,7 +129,7 @@ public class WfsSourceUtils {
         UrlField requestUrl = responseField.requestUrlField();
 
         if (responseField.statusCode() != HTTP_OK || responseBody.length() < 1) {
-            configResult.addResultMessage(unknownEndpointError(responseField.requestUrlField()
+            configResult.addArgumentMessage(unknownEndpointError(responseField.requestUrlField()
                     .path()));
             return configResult;
         }
@@ -139,7 +139,7 @@ public class WfsSourceUtils {
             capabilitiesXml = sourceUtilCommons.createDocument(responseBody);
         } catch (Exception e) {
             LOGGER.debug("Failed to read response from WFS endpoint.");
-            configResult.addResultMessage(unknownEndpointError(responseField.requestUrlField()
+            configResult.addArgumentMessage(unknownEndpointError(responseField.requestUrlField()
                     .path()));
             return configResult;
         }
@@ -159,14 +159,15 @@ public class WfsSourceUtils {
                     .evaluate(capabilitiesXml);
         } catch (XPathExpressionException e) {
             LOGGER.debug("Failed to parse XML response.");
-            configResult.addResultMessage(unknownEndpointError());
+            configResult.addArgumentMessage(unknownEndpointError(responseField.requestUrlField()
+                    .path()));
             return configResult;
         }
 
         configResult.result(preferredConfig.wfsVersion(wfsVersion));
         if (!preferredConfig.validate()
                 .isEmpty()) {
-            configResult.addResultMessage(unknownEndpointError(responseField.requestUrlField()
+            configResult.addArgumentMessage(unknownEndpointError(responseField.requestUrlField()
                     .path()));
         }
 

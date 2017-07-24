@@ -85,7 +85,7 @@ class DiscoverOpenSearchSpec extends SourceCommonsSpec {
         then:
         report.messages().size() == 1
         report.messages()[0].getCode() == DefaultMessages.UNKNOWN_ENDPOINT
-        report.messages()[0].getPath() == [DiscoverOpenSearchSource.FIELD_NAME]
+        report.messages()[0].getPath() == URL_FIELD_PATH
     }
 
     def 'Unknown endpoint with bad HTTP status code received'() {

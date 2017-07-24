@@ -69,7 +69,6 @@ class BaseDataTypeTest extends Specification {
         setup:
         TestDataType missingTestField = new TestDataType<String>()
         missingTestField.isRequired(true)
-        missingTestField.setValue([])
 
         when:
         def errorCodes = missingTestField.getErrorCodes()

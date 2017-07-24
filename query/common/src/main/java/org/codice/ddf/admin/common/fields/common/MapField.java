@@ -29,6 +29,7 @@ import org.codice.ddf.admin.common.fields.base.BaseObjectField;
 import org.codice.ddf.admin.common.report.message.DefaultMessages;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 public class MapField extends BaseObjectField {
 
@@ -118,9 +119,10 @@ public class MapField extends BaseObjectField {
 
     @Override
     public Set<String> getErrorCodes() {
-        Set<String> errors = super.getErrorCodes();
-        errors.add(DefaultMessages.DUPLICATE_MAP_KEY);
-        return errors;
+        return new ImmutableSet.Builder<String>()
+                .addAll(super.getErrorCodes())
+                .add(DefaultMessages.DUPLICATE_MAP_KEY)
+                .build();
     }
 
     public static class ListImpl extends BaseListField<MapField> {

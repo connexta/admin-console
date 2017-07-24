@@ -13,6 +13,7 @@
  **/
 package org.codice.ddf.admin.common.fields.base
 
+import com.google.common.collect.ImmutableSet
 import org.codice.ddf.admin.api.DataType
 import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.common.fields.base.scalar.StringField
@@ -111,6 +112,14 @@ class BaseFunctionFieldTest extends Specification {
 
         then:
         errorCodes.size() == 6
+
+        errorCodes.contains(DefaultMessages.EMPTY_FIELD)
+        errorCodes.contains(DefaultMessages.UNSUPPORTED_ENUM)
+        errorCodes.contains(DefaultMessages.MISSING_REQUIRED_FIELD)
+        errorCodes.contains(TestBaseFunctionField.FUNCTION_TEST_ERROR)
+        errorCodes.contains(TestObjectField.OBJECT_FIELD_TEST_ERROR)
+        errorCodes.contains(TestObjectField.InnerTestObjectField.INNER_OBJECT_FIELD_TEST_ERROR)
+
         errorCodes.containsAll(arg1Errors)
         errorCodes.containsAll(arg2Errors)
         errorCodes.containsAll(functionError)
@@ -168,9 +177,9 @@ class BaseFunctionFieldTest extends Specification {
 
         @Override
         Set<String> getFunctionErrorCodes() {
-            Set<String> errorCodes = super.getFunctionErrorCodes()
-            errorCodes.add(FUNCTION_TEST_ERROR)
-            return errorCodes
+            return new ImmutableSet.Builder<String>()
+                    .add(FUNCTION_TEST_ERROR)
+                    .build()
         }
     }
 }

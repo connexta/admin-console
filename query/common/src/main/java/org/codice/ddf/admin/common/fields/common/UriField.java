@@ -24,6 +24,8 @@ import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 import org.codice.ddf.admin.common.report.message.DefaultMessages;
 
+import com.google.common.collect.ImmutableSet;
+
 public class UriField extends StringField {
 
     public static final String DEFAULT_FIELD_NAME = "uri";
@@ -69,8 +71,9 @@ public class UriField extends StringField {
 
     @Override
     public Set<String> getErrorCodes() {
-        Set<String> errors = super.getErrorCodes();
-        errors.add(DefaultMessages.INVALID_URI);
-        return errors;
+        return new ImmutableSet.Builder<String>()
+                .addAll(super.getErrorCodes())
+                .add(DefaultMessages.INVALID_URI)
+                .build();
     }
 }

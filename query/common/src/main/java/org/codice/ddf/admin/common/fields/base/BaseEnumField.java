@@ -23,6 +23,8 @@ import org.codice.ddf.admin.api.fields.EnumValue;
 import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.codice.ddf.admin.common.report.message.DefaultMessages;
 
+import com.google.common.collect.ImmutableSet;
+
 public abstract class BaseEnumField<S> extends BaseDataType<S>
         implements EnumField<S, EnumValue<S>> {
 
@@ -90,8 +92,9 @@ public abstract class BaseEnumField<S> extends BaseDataType<S>
 
     @Override
     public Set<String> getErrorCodes() {
-        Set<String> errors = super.getErrorCodes();
-        errors.add(DefaultMessages.UNSUPPORTED_ENUM);
-        return errors;
+        return new ImmutableSet.Builder<String>()
+                .addAll(super.getErrorCodes())
+                .add(DefaultMessages.UNSUPPORTED_ENUM)
+                .build();
     }
 }

@@ -43,6 +43,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 public class LdapTestDirectorySettings extends TestFunctionField {
     private static final Logger LOGGER = LoggerFactory.getLogger(LdapTestDirectorySettings.class);
@@ -138,17 +139,15 @@ public class LdapTestDirectorySettings extends TestFunctionField {
 
     @Override
     public Set<String> getFunctionErrorCodes() {
-        Set<String> errorMessages = super.getFunctionErrorCodes();
-        errorMessages.add(LdapMessages.CANNOT_BIND);
-        errorMessages.add(LdapMessages.DN_DOES_NOT_EXIST);
-        errorMessages.add(LdapMessages.NO_USERS_IN_BASE_USER_DN);
-        errorMessages.add(LdapMessages.USER_ATTRIBUTE_NOT_FOUND);
-        errorMessages.add(LdapMessages.NO_GROUPS_IN_BASE_GROUP_DN);
-        errorMessages.add(LdapMessages.NO_GROUPS_WITH_MEMBERS);
-        errorMessages.add(LdapMessages.NO_REFERENCED_MEMBER);
-        errorMessages.add(DefaultMessages.FAILED_TEST_SETUP);
-        errorMessages.add(DefaultMessages.CANNOT_CONNECT);
-        return errorMessages;
+        return ImmutableSet.of(LdapMessages.CANNOT_BIND,
+                LdapMessages.DN_DOES_NOT_EXIST,
+                LdapMessages.NO_USERS_IN_BASE_USER_DN,
+                LdapMessages.USER_ATTRIBUTE_NOT_FOUND,
+                LdapMessages.NO_GROUPS_IN_BASE_GROUP_DN,
+                LdapMessages.NO_GROUPS_WITH_MEMBERS,
+                LdapMessages.NO_REFERENCED_MEMBER,
+                DefaultMessages.FAILED_TEST_SETUP,
+                DefaultMessages.CANNOT_CONNECT);
     }
 
     /**

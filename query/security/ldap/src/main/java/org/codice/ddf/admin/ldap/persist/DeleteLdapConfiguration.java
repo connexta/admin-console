@@ -26,6 +26,7 @@ import org.codice.ddf.admin.common.report.message.DefaultMessages;
 import org.codice.ddf.admin.common.services.ServiceCommons;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 public class DeleteLdapConfiguration extends BaseFunctionField<BooleanField> {
     public static final String FIELD_NAME = "deleteLdapConfig";
@@ -84,9 +85,7 @@ public class DeleteLdapConfiguration extends BaseFunctionField<BooleanField> {
 
     @Override
     public Set<String> getFunctionErrorCodes() {
-        Set<String> errorMessages = super.getFunctionErrorCodes();
-        errorMessages.add(DefaultMessages.FAILED_PERSIST);
-        errorMessages.add(DefaultMessages.NO_EXISTING_CONFIG);
-        return errorMessages;
+        return ImmutableSet.of(DefaultMessages.FAILED_PERSIST,
+            DefaultMessages.NO_EXISTING_CONFIG);
     }
 }

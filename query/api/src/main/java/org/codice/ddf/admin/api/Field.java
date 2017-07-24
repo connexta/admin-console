@@ -68,7 +68,7 @@ public interface Field<S, G> {
     void updatePath(List<String> subPath);
 
     /**
-     * Returns the possible errors that could aries while validating the {@code Field}.
+     * Returns the possible errors that could arise while validating the {@code Field}.
      *
      * @return a {@code Set} of Strings containing the errors.
      */

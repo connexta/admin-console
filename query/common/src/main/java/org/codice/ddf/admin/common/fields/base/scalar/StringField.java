@@ -24,6 +24,8 @@ import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.codice.ddf.admin.common.fields.base.BaseListField;
 import org.codice.ddf.admin.common.report.message.DefaultMessages;
 
+import com.google.common.collect.ImmutableSet;
+
 public class StringField extends BaseScalarField<String> {
 
     public static final String DEFAULT_FIELD_NAME  = "string";
@@ -63,9 +65,10 @@ public class StringField extends BaseScalarField<String> {
 
     @Override
     public Set<String> getErrorCodes() {
-        Set<String> errors = super.getErrorCodes();
-        errors.add(DefaultMessages.EMPTY_FIELD);
-        return errors;
+        return new ImmutableSet.Builder<String>()
+                .addAll(super.getErrorCodes())
+                .add(DefaultMessages.EMPTY_FIELD)
+                .build();
     }
 
     public static class ListImpl extends BaseListField<StringField> {

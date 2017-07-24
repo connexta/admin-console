@@ -27,6 +27,7 @@ import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 import org.codice.ddf.admin.common.report.message.DefaultMessages;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 public class ClaimsMapEntry extends BaseObjectField {
 
@@ -103,9 +104,10 @@ public class ClaimsMapEntry extends BaseObjectField {
 
     @Override
     public Set<String> getErrorCodes() {
-        Set<String> errors = super.getErrorCodes();
-        errors.add(DefaultMessages.MISSING_KEY_VALUE);
-        return errors;
+        return new ImmutableSet.Builder<String>()
+                .addAll(super.getErrorCodes())
+                .add(DefaultMessages.MISSING_KEY_VALUE)
+                .build();
     }
 
     @Override

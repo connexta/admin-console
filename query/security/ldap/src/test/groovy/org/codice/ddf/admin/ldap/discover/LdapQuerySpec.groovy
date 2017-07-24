@@ -279,19 +279,15 @@ class LdapQuerySpec extends Specification {
         LdapQuery cannotBindQuery = new LdapQuery()
         cannotBindQuery.setValue(cannotBindArgs)
 
-        LdapQuery missingFieldsQuery = new LdapQuery()
-
         when:
         def errorCodes = ldapQueryFunction.getFunctionErrorCodes()
         def cannotConnectReport = cannotConnectQuery.getValue()
         def cannotBindReport = cannotBindQuery.getValue()
-        def missingFieldReport = missingFieldsQuery.getValue()
 
         then:
-        errorCodes.size() == 4
+        errorCodes.size() == 3
         errorCodes.contains(cannotConnectReport.messages().get(0).getCode())
         errorCodes.contains(cannotBindReport.messages().get(0).getCode())
-        errorCodes.contains(missingFieldReport.messages().get(0).getCode())
         errorCodes.contains(DefaultMessages.FAILED_TEST_SETUP)
     }
 

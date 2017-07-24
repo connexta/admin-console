@@ -37,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 public class LdapUserAttributes extends BaseFunctionField<StringField.ListImpl> {
 
@@ -119,11 +120,9 @@ public class LdapUserAttributes extends BaseFunctionField<StringField.ListImpl> 
 
     @Override
     public Set<String> getFunctionErrorCodes() {
-        Set<String> errorMessages = super.getFunctionErrorCodes();
-        errorMessages.add(LdapMessages.CANNOT_BIND);
-        errorMessages.add(DefaultMessages.FAILED_TEST_SETUP);
-        errorMessages.add(DefaultMessages.CANNOT_CONNECT);
-        return errorMessages;
+        return ImmutableSet.of(LdapMessages.CANNOT_BIND,
+                DefaultMessages.FAILED_TEST_SETUP,
+                DefaultMessages.CANNOT_CONNECT);
     }
 
     /**

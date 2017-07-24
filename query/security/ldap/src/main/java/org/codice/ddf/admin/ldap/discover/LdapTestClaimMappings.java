@@ -45,6 +45,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 public class LdapTestClaimMappings extends TestFunctionField {
     private static final Logger LOGGER = LoggerFactory.getLogger(LdapTestClaimMappings.class);
@@ -162,14 +163,12 @@ public class LdapTestClaimMappings extends TestFunctionField {
 
     @Override
     public Set<String> getFunctionErrorCodes() {
-        Set<String> errorMessages = super.getFunctionErrorCodes();
-        errorMessages.add(SecurityMessages.INVALID_CLAIM_TYPE);
-        errorMessages.add(LdapMessages.CANNOT_BIND);
-        errorMessages.add(LdapMessages.DN_DOES_NOT_EXIST);
-        errorMessages.add(LdapMessages.USER_ATTRIBUTE_NOT_FOUND);
-        errorMessages.add(DefaultMessages.FAILED_TEST_SETUP);
-        errorMessages.add(DefaultMessages.CANNOT_CONNECT);
-        return errorMessages;
+        return ImmutableSet.of(SecurityMessages.INVALID_CLAIM_TYPE,
+                LdapMessages.CANNOT_BIND,
+                LdapMessages.DN_DOES_NOT_EXIST,
+                LdapMessages.USER_ATTRIBUTE_NOT_FOUND,
+                DefaultMessages.FAILED_TEST_SETUP,
+                DefaultMessages.CANNOT_CONNECT);
     }
 
     /**

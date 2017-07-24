@@ -15,6 +15,7 @@ package org.codice.ddf.admin.common.fields.test;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.Field;
@@ -30,6 +31,7 @@ import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 import org.codice.ddf.admin.common.report.message.ErrorMessageImpl;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 public class TestFieldProvider extends BaseFieldProvider {
 
@@ -138,6 +140,11 @@ public class TestFieldProvider extends BaseFieldProvider {
         public FunctionField<IntegerField> newInstance() {
             return new GetInt();
         }
+
+        @Override
+        public Set<String> getFunctionErrorCodes() {
+            return ImmutableSet.of();
+        }
     }
 
     public static class GetBoolean extends GetFunctionField<BooleanField> {
@@ -165,6 +172,11 @@ public class TestFieldProvider extends BaseFieldProvider {
         public FunctionField<BooleanField> newInstance() {
             return new GetBoolean();
         }
+
+        @Override
+        public Set<String> getFunctionErrorCodes() {
+            return ImmutableSet.of();
+        }
     }
 
     public static class GetString extends GetFunctionField<StringField> {
@@ -191,6 +203,11 @@ public class TestFieldProvider extends BaseFieldProvider {
         @Override
         public FunctionField<StringField> newInstance() {
             return new GetString();
+        }
+
+        @Override
+        public Set<String> getFunctionErrorCodes() {
+            return ImmutableSet.of();
         }
     }
 
@@ -228,6 +245,11 @@ public class TestFieldProvider extends BaseFieldProvider {
         public FunctionField<ListField<TestObjectField>> newInstance() {
             return new GetList();
         }
+
+        @Override
+        public Set<String> getFunctionErrorCodes() {
+            return ImmutableSet.of();
+        }
     }
 
     public static class GetEnum extends GetFunctionField<TestEnumField> {
@@ -253,6 +275,11 @@ public class TestFieldProvider extends BaseFieldProvider {
         @Override
         public FunctionField<TestEnumField> newInstance() {
             return new GetEnum();
+        }
+
+        @Override
+        public Set<String> getFunctionErrorCodes() {
+            return ImmutableSet.of();
         }
     }
 
@@ -290,6 +317,11 @@ public class TestFieldProvider extends BaseFieldProvider {
         @Override
         public FunctionField<TestObjectField> newInstance() {
             return new RequiredArgsFunction();
+        }
+
+        @Override
+        public Set<String> getFunctionErrorCodes() {
+            return ImmutableSet.of();
         }
     }
 
@@ -340,6 +372,11 @@ public class TestFieldProvider extends BaseFieldProvider {
         @Override
         public FunctionField<TestObjectField> newInstance() {
             return new MultiArgFunction();
+        }
+
+        @Override
+        public Set<String> getFunctionErrorCodes() {
+            return ImmutableSet.of();
         }
     }
 
@@ -455,6 +492,14 @@ public class TestFieldProvider extends BaseFieldProvider {
         public FunctionField<TestObjectField> newInstance() {
             return new ReturnErrorsFunction();
         }
+
+        @Override
+        public Set<String> getFunctionErrorCodes() {
+            return new ImmutableSet.Builder<String>()
+                    .add(ARGUMENT_MSG)
+                    .add(RETURN_VALUE_MSG)
+                    .build();
+        }
     }
 
     public static ErrorMessageImpl sampleArgumentError(List<String> path) {
@@ -499,6 +544,14 @@ public class TestFieldProvider extends BaseFieldProvider {
         @Override
         public FunctionField<TestObjectField> newInstance() {
             return new SampleMutation();
+        }
+
+        @Override
+        public Set<String> getFunctionErrorCodes() {
+            return new ImmutableSet.Builder<String>()
+                    .add(ARGUMENT_MSG)
+                    .add(RETURN_VALUE_MSG)
+                    .build();
         }
     }
 }

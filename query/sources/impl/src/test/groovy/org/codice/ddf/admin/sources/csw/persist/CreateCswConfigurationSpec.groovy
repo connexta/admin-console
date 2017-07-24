@@ -168,19 +168,15 @@ class CreateCswConfigurationSpec extends SourceCommonsSpec {
         createFailPersistConfig.setValue(createCswArgs())
         serviceReader.getServices(_, _) >> []
 
-        CreateCswConfiguration createMissingFieldConfig = new CreateCswConfiguration(configuratorSuite)
-
         when:
         def errorCodes = createCswConfiguration.getFunctionErrorCodes()
         def duplicateNameReport = createDuplicateNameConfig.getValue()
         def createFailPersistReport = createFailPersistConfig.getValue()
-        def createMissingFieldReport = createMissingFieldConfig.getValue()
 
         then:
-        errorCodes.size() == 3
+        errorCodes.size() == 2
         errorCodes.contains(duplicateNameReport.messages().get(0).getCode())
         errorCodes.contains(createFailPersistReport.messages().get(0).getCode())
-        errorCodes.contains(createMissingFieldReport.messages().get(0).getCode())
     }
 
     def createCswArgs() {

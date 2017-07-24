@@ -13,12 +13,16 @@
  **/
 package org.codice.ddf.admin.ldap.discover;
 
+import java.util.Set;
+
 import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.fields.base.function.GetFunctionField;
 import org.codice.ddf.admin.ldap.commons.LdapServiceCommons;
 import org.codice.ddf.admin.ldap.fields.config.LdapConfigurationField;
+
+import com.google.common.collect.ImmutableSet;
 
 public class GetLdapConfigurations extends GetFunctionField<ListField<LdapConfigurationField>> {
 
@@ -54,5 +58,10 @@ public class GetLdapConfigurations extends GetFunctionField<ListField<LdapConfig
     @Override
     public FunctionField<ListField<LdapConfigurationField>> newInstance() {
         return new GetLdapConfigurations(configuratorSuite);
+    }
+
+    @Override
+    public Set<String> getFunctionErrorCodes() {
+        return ImmutableSet.of();
     }
 }

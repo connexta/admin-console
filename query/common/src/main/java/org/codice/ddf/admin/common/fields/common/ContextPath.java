@@ -27,6 +27,8 @@ import org.codice.ddf.admin.common.fields.base.BaseListField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 import org.codice.ddf.admin.common.report.message.DefaultMessages;
 
+import com.google.common.collect.ImmutableSet;
+
 public class ContextPath extends StringField {
 
     public static final String DEFAULT_FIELD_NAME = "path";
@@ -73,9 +75,10 @@ public class ContextPath extends StringField {
 
     @Override
     public Set<String> getErrorCodes() {
-        Set<String> errors = super.getErrorCodes();
-        errors.add(DefaultMessages.INVALID_CONTEXT_PATH);
-        return errors;
+        return new ImmutableSet.Builder<String>()
+                .addAll(super.getErrorCodes())
+                .add(DefaultMessages.INVALID_CONTEXT_PATH)
+                .build();
     }
 
     private static class UriPathValidator {

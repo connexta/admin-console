@@ -164,19 +164,15 @@ class LdapUserAttributesSpec extends Specification {
         cannotBindAction.setValue(cannotBindArgs)
         cannotBindAction.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
-        LdapUserAttributes missingFieldAction = new LdapUserAttributes()
-
         when:
         def errorCodes = action.getFunctionErrorCodes()
         def cannotConnectReport = cannotConnectAction.getValue()
         def cannotBindReport = cannotBindAction.getValue()
-        def missingFieldReport = missingFieldAction.getValue()
 
         then:
-        errorCodes.size() == 4
+        errorCodes.size() == 3
         errorCodes.contains(cannotConnectReport.messages().get(0).getCode())
         errorCodes.contains(cannotBindReport.messages().get(0).getCode())
-        errorCodes.contains(missingFieldReport.messages().get(0).getCode())
         errorCodes.contains(DefaultMessages.FAILED_TEST_SETUP)
     }
 

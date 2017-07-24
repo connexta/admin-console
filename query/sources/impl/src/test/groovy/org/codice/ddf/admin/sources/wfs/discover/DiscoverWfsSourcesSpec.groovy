@@ -190,19 +190,15 @@ class DiscoverWfsSourcesSpec extends SourceCommonsSpec {
         unknownEndpointWfs.setWfsSourceUtils(prepareOpenSearchSourceUtils(200, badResponseBody, true))
         unknownEndpointWfs.setValue(getBaseDiscoverByUrlArgs(TEST_WFS_URL))
 
-        DiscoverWfsSource missingFieldWfs = new DiscoverWfsSource(Mock(ConfiguratorSuite))
-
         when:
         def errorCodes = discoverWfs.getFunctionErrorCodes()
         def cannotConnectReport = cannotConnectWfs.getValue()
         def unknownEndpointReport = unknownEndpointWfs.getValue()
-        def missingFieldReport = missingFieldWfs.getValue()
 
         then:
-        errorCodes.size() == 3
+        errorCodes.size() == 2
         errorCodes.contains(cannotConnectReport.messages()[0].getCode())
         errorCodes.contains(unknownEndpointReport.messages()[0].getCode())
-        errorCodes.contains(missingFieldReport.messages()[0].getCode())
     }
 
     def prepareOpenSearchSourceUtils(int statusCode, String responseBody, boolean endpointIsReachable) {

@@ -37,6 +37,7 @@ import org.codice.ddf.admin.sources.fields.type.WfsSourceConfigurationField;
 import org.codice.ddf.admin.sources.utils.SourceValidationUtils;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 public class UpdateWfsConfiguration extends BaseFunctionField<BooleanField> {
 
@@ -123,10 +124,8 @@ public class UpdateWfsConfiguration extends BaseFunctionField<BooleanField> {
 
     @Override
     public Set<String> getFunctionErrorCodes() {
-        Set<String> errorMessages = super.getFunctionErrorCodes();
-        errorMessages.add(DefaultMessages.FAILED_PERSIST);
-        errorMessages.add(DefaultMessages.NO_EXISTING_CONFIG);
-        errorMessages.add(SourceMessages.DUPLICATE_SOURCE_NAME);
-        return errorMessages;
+        return ImmutableSet.of(DefaultMessages.FAILED_PERSIST,
+                DefaultMessages.NO_EXISTING_CONFIG,
+                SourceMessages.DUPLICATE_SOURCE_NAME);
     }
 }

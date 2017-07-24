@@ -156,8 +156,7 @@ class GetWfsConfigsSpec extends SourceCommonsSpec {
         def noExistingConfigReport = getWfsConfigsFunction.getValue()
 
         then:
-        errorCodes.size() == 2
+        errorCodes.size() == 1
         errorCodes.contains(noExistingConfigReport.messages().get(0).code)
-        errorCodes.contains(DefaultMessages.MISSING_REQUIRED_FIELD)
     }
 }

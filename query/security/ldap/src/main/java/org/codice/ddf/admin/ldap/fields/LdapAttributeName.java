@@ -24,6 +24,8 @@ import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 import org.codice.ddf.admin.ldap.commons.LdapMessages;
 
+import com.google.common.collect.ImmutableSet;
+
 /**
  * The description of an attribute names and the logic for validating them are defined in RFC 4512.
  * @see <a href="https://www.ietf.org/rfc/rfc4512.txt"> RFC 4512 </a>
@@ -81,8 +83,9 @@ public class LdapAttributeName extends StringField {
 
     @Override
     public Set<String> getErrorCodes() {
-        Set<String> errors = super.getErrorCodes();
-        errors.add(LdapMessages.INVALID_USER_ATTRIBUTE);
-        return errors;
+        return new ImmutableSet.Builder<String>()
+                .addAll(super.getErrorCodes())
+                .add(LdapMessages.INVALID_USER_ATTRIBUTE)
+                .build();
     }
 }

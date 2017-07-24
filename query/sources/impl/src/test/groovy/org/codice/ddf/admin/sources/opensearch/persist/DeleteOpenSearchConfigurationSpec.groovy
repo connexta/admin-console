@@ -109,18 +109,14 @@ class DeleteOpenSearchConfigurationSpec extends SourceCommonsSpec {
         configurator.commit(_, _) >> mockReport(true)
         deleteOpenSearchFailPersist.setValue(functionArgs)
 
-        DeleteOpenSearchConfiguration deleteOpenSearchMissingField = new DeleteOpenSearchConfiguration(configuratorSuite)
-
         when:
         def errorCodes = deleteOpenSearchConfigurationFunction.getFunctionErrorCodes()
         def noExistingConfigReport = deleteOpenSearchNoExistingConfig.getValue()
         def failedPersistReport = deleteOpenSearchFailPersist.getValue()
-        def missingFieldReport = deleteOpenSearchMissingField.getValue()
 
         then:
-        errorCodes.size() == 3
+        errorCodes.size() == 2
         errorCodes.contains(noExistingConfigReport.messages().get(0).getCode())
         errorCodes.contains(failedPersistReport.messages().get(0).getCode())
-        errorCodes.contains(missingFieldReport.messages().get(0).getCode())
     }
 }

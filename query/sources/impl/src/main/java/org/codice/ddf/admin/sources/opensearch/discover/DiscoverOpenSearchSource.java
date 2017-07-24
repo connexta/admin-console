@@ -30,6 +30,7 @@ import org.codice.ddf.admin.sources.fields.type.OpenSearchSourceConfigurationFie
 import org.codice.ddf.admin.sources.opensearch.OpenSearchSourceUtils;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 public class DiscoverOpenSearchSource
         extends BaseFunctionField<OpenSearchSourceConfigurationField> {
@@ -108,9 +109,7 @@ public class DiscoverOpenSearchSource
 
     @Override
     public Set<String> getFunctionErrorCodes() {
-        Set<String> errorMessages = super.getFunctionErrorCodes();
-        errorMessages.add(DefaultMessages.CANNOT_CONNECT);
-        errorMessages.add(DefaultMessages.UNKNOWN_ENDPOINT);
-        return errorMessages;
+        return ImmutableSet.of(DefaultMessages.CANNOT_CONNECT,
+                DefaultMessages.UNKNOWN_ENDPOINT);
     }
 }

@@ -132,19 +132,15 @@ class DeleteCswConfigurationSpec extends SourceCommonsSpec {
         configurator.commit(_, _) >> mockReport(true)
         deleteCswFailPersist.setValue(functionArgs)
 
-        DeleteCswConfiguration deleteCswMissingField = new DeleteCswConfiguration(configuratorSuite)
-
         when:
         def errorCodes = deleteCswConfiguration.getFunctionErrorCodes()
         def noExistingConfigReport = deleteCswNoExistingConfig.getValue()
         def failedPersistReport = deleteCswFailPersist.getValue()
-        def missingFieldReport = deleteCswMissingField.getValue()
 
         then:
-        errorCodes.size() == 3
+        errorCodes.size() == 2
         errorCodes.contains(noExistingConfigReport.messages().get(0).getCode())
         errorCodes.contains(failedPersistReport.messages().get(0).getCode())
-        errorCodes.contains(missingFieldReport.messages().get(0).getCode())
     }
 
     def createCswConfigToDelete() {

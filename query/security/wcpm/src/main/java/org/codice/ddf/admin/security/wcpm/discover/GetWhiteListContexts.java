@@ -16,11 +16,14 @@ package org.codice.ddf.admin.security.wcpm.discover;
 import static org.codice.ddf.admin.security.common.services.PolicyManagerServiceProperties.getWhitelistContexts;
 
 import java.util.List;
+import java.util.Set;
 
 import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.function.GetFunctionField;
 import org.codice.ddf.admin.common.fields.common.ContextPath;
+
+import com.google.common.collect.ImmutableSet;
 
 public class GetWhiteListContexts extends GetFunctionField<ContextPath.ListImpl> {
 
@@ -59,5 +62,10 @@ public class GetWhiteListContexts extends GetFunctionField<ContextPath.ListImpl>
     @Override
     public FunctionField<ContextPath.ListImpl> newInstance() {
         return new GetWhiteListContexts(configuratorSuite);
+    }
+
+    @Override
+    public Set<String> getFunctionErrorCodes() {
+        return ImmutableSet.of();
     }
 }

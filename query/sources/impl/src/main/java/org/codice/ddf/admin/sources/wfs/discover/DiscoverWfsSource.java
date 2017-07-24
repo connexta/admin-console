@@ -29,6 +29,7 @@ import org.codice.ddf.admin.sources.fields.type.WfsSourceConfigurationField;
 import org.codice.ddf.admin.sources.wfs.WfsSourceUtils;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 public class DiscoverWfsSource extends BaseFunctionField<WfsSourceConfigurationField> {
 
@@ -98,10 +99,8 @@ public class DiscoverWfsSource extends BaseFunctionField<WfsSourceConfigurationF
 
     @Override
     public Set<String> getFunctionErrorCodes() {
-        Set<String> errorMessages = super.getFunctionErrorCodes();
-        errorMessages.add(DefaultMessages.CANNOT_CONNECT);
-        errorMessages.add(DefaultMessages.UNKNOWN_ENDPOINT);
-        return errorMessages;
+        return ImmutableSet.of(DefaultMessages.CANNOT_CONNECT,
+                DefaultMessages.UNKNOWN_ENDPOINT);
     }
 
     /**

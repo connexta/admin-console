@@ -31,6 +31,7 @@ import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 
 public class TestObjectField extends BaseObjectField {
 
@@ -154,9 +155,10 @@ public class TestObjectField extends BaseObjectField {
 
     @Override
     public Set<String> getErrorCodes() {
-        Set<String> errorCodes = super.getErrorCodes();
-        errorCodes.add(OBJECT_FIELD_TEST_ERROR);
-        return errorCodes;
+        return new ImmutableSet.Builder<String>()
+                .addAll(super.getErrorCodes())
+                .add(OBJECT_FIELD_TEST_ERROR)
+                .build();
     }
 
     public class InnerTestObjectField extends BaseObjectField {
@@ -193,9 +195,10 @@ public class TestObjectField extends BaseObjectField {
 
         @Override
         public Set<String> getErrorCodes() {
-            Set<String> errorCodes = super.getErrorCodes();
-            errorCodes.add(INNER_OBJECT_FIELD_TEST_ERROR);
-            return errorCodes;
+            return new ImmutableSet.Builder<String>()
+                    .addAll(super.getErrorCodes())
+                    .add(INNER_OBJECT_FIELD_TEST_ERROR)
+                    .build();
         }
     }
 

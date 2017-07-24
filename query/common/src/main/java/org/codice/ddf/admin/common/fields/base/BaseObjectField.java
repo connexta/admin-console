@@ -27,6 +27,8 @@ import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.api.fields.ObjectField;
 import org.codice.ddf.admin.api.report.ErrorMessage;
 
+import com.google.common.collect.ImmutableSet;
+
 public abstract class BaseObjectField extends BaseDataType<Map<String, Object>>
         implements ObjectField {
 
@@ -103,13 +105,14 @@ public abstract class BaseObjectField extends BaseDataType<Map<String, Object>>
 
     @Override
     public Set<String> getErrorCodes() {
-        Set<String> errors = super.getErrorCodes();
-        errors.addAll(getFields().stream()
-                .filter(field -> field instanceof DataType)
-                .map(field -> field.getErrorCodes())
-                .flatMap(Collection<String>::stream)
-                .collect(Collectors.toList()));
-        return errors;
+        return new ImmutableSet.Builder<String>()
+                .addAll(super.getErrorCodes())
+                .addAll(getFields().stream()
+                        .filter(field -> field instanceof DataType)
+                        .map(field -> field.getErrorCodes())
+                        .flatMap(Collection<String>::stream)
+                        .collect(Collectors.toList()))
+                .build();
     }
 
     public void updateInnerFieldPaths() {

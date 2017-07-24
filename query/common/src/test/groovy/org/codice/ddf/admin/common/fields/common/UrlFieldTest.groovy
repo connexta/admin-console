@@ -18,7 +18,7 @@ import spock.lang.Specification
 
 class UrlFieldTest extends Specification {
 
-    def urlField
+    UrlField urlField
 
     def setup() {
         urlField = new UrlField()

@@ -131,12 +131,18 @@ class BaseObjectFieldTest extends Specification {
 
         then:
         errorCodes.size() == 5
+
+        errorCodes.contains(DefaultMessages.EMPTY_FIELD)
+        errorCodes.contains(DefaultMessages.UNSUPPORTED_ENUM)
+        errorCodes.contains(DefaultMessages.MISSING_REQUIRED_FIELD)
+        errorCodes.contains(TestObjectField.OBJECT_FIELD_TEST_ERROR)
+        errorCodes.contains(TestObjectField.InnerTestObjectField.INNER_OBJECT_FIELD_TEST_ERROR)
+
         errorCodes.containsAll(field1)
         errorCodes.containsAll(field2)
         errorCodes.containsAll(field3)
         errorCodes.containsAll(field4)
         errorCodes.containsAll(field5)
         errorCodes.containsAll(field6)
-        errorCodes.contains(topLevelField.OBJECT_FIELD_TEST_ERROR)
     }
 }

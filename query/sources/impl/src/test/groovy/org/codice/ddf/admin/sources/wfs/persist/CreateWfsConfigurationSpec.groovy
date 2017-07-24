@@ -172,19 +172,15 @@ class CreateWfsConfigurationSpec extends SourceCommonsSpec {
         createFailPersistConfig.setValue(createWfsArgs())
         serviceReader.getServices(_, _) >> []
 
-        CreateWfsConfiguration createMissingFieldConfig = new CreateWfsConfiguration(configuratorSuite)
-
         when:
         def errorCodes = createWfsConfiguration.getFunctionErrorCodes()
         def duplicateNameReport = createDuplicateNameConfig.getValue()
         def createFailPersistReport = createFailPersistConfig.getValue()
-        def createMissingFieldReport = createMissingFieldConfig.getValue()
 
         then:
-        errorCodes.size() == 3
+        errorCodes.size() == 2
         errorCodes.contains(duplicateNameReport.messages().get(0).getCode())
         errorCodes.contains(createFailPersistReport.messages().get(0).getCode())
-        errorCodes.contains(createMissingFieldReport.messages().get(0).getCode())
     }
 
     def createWfsArgs() {

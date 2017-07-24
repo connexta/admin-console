@@ -165,19 +165,15 @@ class CreateOpenSearchConfigurationSpec extends SourceCommonsSpec {
         createFailPersistConfig.setValue(createFunctionArgs())
         serviceReader.getServices(_, _) >> []
 
-        CreateOpenSearchConfiguration createMissingFieldConfig = new CreateOpenSearchConfiguration(configuratorSuite)
-
         when:
         def errorCodes = createOpenSearchConfiguration.getFunctionErrorCodes()
         def duplicateNameReport = createDuplicateNameConfig.getValue()
         def createFailPersistReport = createFailPersistConfig.getValue()
-        def createMissingFieldReport = createMissingFieldConfig.getValue()
 
         then:
-        errorCodes.size() == 3
+        errorCodes.size() == 2
         errorCodes.contains(duplicateNameReport.messages().get(0).getCode())
         errorCodes.contains(createFailPersistReport.messages().get(0).getCode())
-        errorCodes.contains(createMissingFieldReport.messages().get(0).getCode())
     }
 
     def createFunctionArgs() {

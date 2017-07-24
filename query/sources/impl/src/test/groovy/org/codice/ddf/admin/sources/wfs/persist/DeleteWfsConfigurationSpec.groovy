@@ -126,18 +126,14 @@ class DeleteWfsConfigurationSpec extends SourceCommonsSpec {
         configurator.commit(_, _) >> mockReport(true)
         deleteWfsFailPersist.setValue(functionArgs)
 
-        DeleteWfsConfiguration deleteWfsMissingField = new DeleteWfsConfiguration(configuratorSuite)
-
         when:
         def errorCodes = deleteWfsConfiguration.getFunctionErrorCodes()
         def noExistingConfigReport = deleteWfsNoExistingConfig.getValue()
         def failedPersistReport = deleteWfsFailPersist.getValue()
-        def missingFieldReport = deleteWfsMissingField.getValue()
 
         then:
-        errorCodes.size() == 3
+        errorCodes.size() == 2
         errorCodes.contains(noExistingConfigReport.messages().get(0).getCode())
         errorCodes.contains(failedPersistReport.messages().get(0).getCode())
-        errorCodes.contains(missingFieldReport.messages().get(0).getCode())
     }
 }

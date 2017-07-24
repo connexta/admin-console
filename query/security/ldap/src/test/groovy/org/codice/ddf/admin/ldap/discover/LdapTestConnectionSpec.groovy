@@ -207,19 +207,15 @@ class LdapTestConnectionSpec extends Specification {
         failedSetupLdapFunc.setValue(failedSetupArgs)
         failedSetupLdapFunc.setTestingUtils(new LdapTestingUtilsMock(true))
 
-        LdapTestConnection missingFieldLdapFunc = new LdapTestConnection()
-
         when:
         def errorCodes = ldapConnectFunction.getFunctionErrorCodes()
         def cannotConnectReport = cannotConnectLdapFunc.getValue()
         def failedSetupReport = failedSetupLdapFunc.getValue()
-        def missingFieldReport = missingFieldLdapFunc.getValue()
 
         then:
-        errorCodes.size() == 3
+        errorCodes.size() == 2
         errorCodes.contains(cannotConnectReport.messages().get(0).getCode())
         errorCodes.contains(failedSetupReport.messages().get(0).getCode())
-        errorCodes.contains(missingFieldReport.messages().get(0).getCode())
     }
 
     LdapConnectionField ldapsLdapConnectionInfo() {

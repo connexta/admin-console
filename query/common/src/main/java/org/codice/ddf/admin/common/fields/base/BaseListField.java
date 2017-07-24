@@ -27,6 +27,8 @@ import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.ImmutableSet;
+
 public abstract class BaseListField<T extends DataType> extends BaseDataType<List>
         implements ListField<T> {
 
@@ -127,9 +129,10 @@ public abstract class BaseListField<T extends DataType> extends BaseDataType<Lis
 
     @Override
     public Set<String> getErrorCodes() {
-        Set<String> errors = super.getErrorCodes();
-        errors.addAll(createListEntry().getErrorCodes());
-        return errors;
+        return new ImmutableSet.Builder<String>()
+                .addAll(super.getErrorCodes())
+                .addAll(createListEntry().getErrorCodes())
+                .build();
     }
 
     public BaseListField<T> useDefaultRequired() {

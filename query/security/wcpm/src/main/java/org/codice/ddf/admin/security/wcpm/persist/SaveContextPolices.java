@@ -40,6 +40,7 @@ import org.codice.ddf.admin.security.common.services.PolicyManagerServicePropert
 import org.codice.ddf.admin.security.common.services.StsServiceProperties;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 public class SaveContextPolices extends BaseFunctionField<ContextPolicyBin.ListImpl> {
 
@@ -139,10 +140,8 @@ public class SaveContextPolices extends BaseFunctionField<ContextPolicyBin.ListI
 
     @Override
     public Set<String> getFunctionErrorCodes() {
-        Set<String> errorMessages = super.getFunctionErrorCodes();
-        errorMessages.add(DefaultMessages.FAILED_PERSIST);
-        errorMessages.add(SecurityMessages.INVALID_CLAIM_TYPE);
-        errorMessages.add(SecurityMessages.NO_ROOT_CONTEXT);
-        return errorMessages;
+        return ImmutableSet.of(DefaultMessages.FAILED_PERSIST,
+                SecurityMessages.INVALID_CLAIM_TYPE,
+                SecurityMessages.NO_ROOT_CONTEXT);
     }
 }

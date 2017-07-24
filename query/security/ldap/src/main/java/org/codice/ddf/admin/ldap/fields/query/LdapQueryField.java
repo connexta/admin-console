@@ -23,6 +23,8 @@ import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 import org.codice.ddf.admin.ldap.commons.LdapMessages;
 import org.forgerock.opendj.ldap.Filter;
 
+import com.google.common.collect.ImmutableSet;
+
 public class LdapQueryField extends StringField {
     public static final String DEFAULT_FIELD_NAME = "query";
 
@@ -65,8 +67,9 @@ public class LdapQueryField extends StringField {
 
     @Override
     public Set<String> getErrorCodes() {
-        Set<String> errors = super.getErrorCodes();
-        errors.add(LdapMessages.INVALID_QUERY);
-        return errors;
+        return new ImmutableSet.Builder<String>()
+                .addAll(super.getErrorCodes())
+                .add(LdapMessages.INVALID_QUERY)
+                .build();
     }
 }

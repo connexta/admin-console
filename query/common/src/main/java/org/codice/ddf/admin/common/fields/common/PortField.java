@@ -22,6 +22,8 @@ import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.codice.ddf.admin.common.fields.base.scalar.IntegerField;
 import org.codice.ddf.admin.common.report.message.DefaultMessages;
 
+import com.google.common.collect.ImmutableSet;
+
 public class PortField extends IntegerField {
 
     public static final String DEFAULT_FIELD_NAME = "port";
@@ -52,9 +54,10 @@ public class PortField extends IntegerField {
 
     @Override
     public Set<String> getErrorCodes() {
-        Set<String> errors = super.getErrorCodes();
-        errors.add(DefaultMessages.INVALID_PORT_RANGE);
-        return errors;
+        return new ImmutableSet.Builder<String>()
+                .addAll(super.getErrorCodes())
+                .add(DefaultMessages.INVALID_PORT_RANGE)
+                .build();
     }
 
     public boolean validPortRange(int port) {

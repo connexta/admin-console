@@ -258,21 +258,17 @@ class LdapTestBindSpec extends Specification {
         md5NeededBindFunc.setValue(cannotBindArgs)
         md5NeededBindFunc.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
-        LdapTestBind missingFieldBindFunc = new LdapTestBind()
-
         when:
         def errorCodes = ldapBindFunction.getFunctionErrorCodes()
         def cannotConnectReport = cannotConnectBindFunc.getValue()
         def cannotBindReport = cannotBindFunc.getValue()
         def md5NeededReport = md5NeededBindFunc.getValue()
-        def missingFieldReport = missingFieldBindFunc.getValue()
 
         then:
-        errorCodes.size() == 5
+        errorCodes.size() == 4
         errorCodes.contains(cannotConnectReport.messages().get(0).getCode())
         errorCodes.contains(cannotBindReport.messages().get(0).getCode())
         errorCodes.contains(md5NeededReport.messages().get(0).getCode())
-        errorCodes.contains(missingFieldReport.messages().get(0).getCode())
         errorCodes.contains(DefaultMessages.FAILED_TEST_SETUP)
     }
 }

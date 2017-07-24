@@ -33,6 +33,7 @@ import org.codice.ddf.admin.sources.opensearch.OpenSearchSourceInfoField;
 import org.codice.ddf.admin.sources.utils.SourceUtilCommons;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 public class GetOpenSearchConfigurations
         extends BaseFunctionField<ListField<OpenSearchSourceInfoField>> {
@@ -117,8 +118,6 @@ public class GetOpenSearchConfigurations
 
     @Override
     public Set<String> getFunctionErrorCodes() {
-        Set<String> errorMessages = super.getFunctionErrorCodes();
-        errorMessages.add(DefaultMessages.NO_EXISTING_CONFIG);
-        return errorMessages;
+        return ImmutableSet.of(DefaultMessages.NO_EXISTING_CONFIG);
     }
 }

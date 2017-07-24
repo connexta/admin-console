@@ -32,6 +32,7 @@ import org.codice.ddf.admin.sources.utils.SourceUtilCommons;
 import org.codice.ddf.admin.sources.wfs.WfsSourceInfoField;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 public class GetWfsConfigurations extends BaseFunctionField<ListField<WfsSourceInfoField>> {
 
@@ -112,8 +113,6 @@ public class GetWfsConfigurations extends BaseFunctionField<ListField<WfsSourceI
 
     @Override
     public Set<String> getFunctionErrorCodes() {
-        Set<String> errorMessages = super.getFunctionErrorCodes();
-        errorMessages.add(DefaultMessages.NO_EXISTING_CONFIG);
-        return errorMessages;
+        return ImmutableSet.of(DefaultMessages.NO_EXISTING_CONFIG);
     }
 }

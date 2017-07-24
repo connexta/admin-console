@@ -210,6 +210,17 @@ class UpdateOpenSearchConfigurationSpec extends SourceCommonsSpec {
         report.messages()*.getPath() == [PID_PATH, SOURCE_NAME_PATH, ENDPOINT_URL_PATH]
     }
 
+    def 'Returns all the possible error codes correctly'(){
+        when:
+        def errorCodes = updateOpenSearchConfiguration.getFunctionErrorCodes()
+
+        then:
+        errorCodes.size() == 3
+        errorCodes.contains(DefaultMessages.NO_EXISTING_CONFIG)
+        errorCodes.contains(DefaultMessages.FAILED_PERSIST)
+        errorCodes.contains(SourceMessages.DUPLICATE_SOURCE_NAME)
+    }
+
     def createUpdateFunctionArgs(String password) {
         return [(OpenSearchSourceConfigurationField.DEFAULT_FIELD_NAME): createOpenSearchSourceConfig(password).getValue()]
     }

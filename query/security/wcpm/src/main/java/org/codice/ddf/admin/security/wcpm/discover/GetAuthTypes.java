@@ -14,12 +14,15 @@
 package org.codice.ddf.admin.security.wcpm.discover;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.function.GetFunctionField;
 import org.codice.ddf.admin.security.common.fields.wcpm.AuthType;
 import org.codice.ddf.internal.admin.configurator.actions.ServiceReader;
+
+import com.google.common.collect.ImmutableSet;
 
 public class GetAuthTypes extends GetFunctionField<AuthType.ListImpl> {
 
@@ -56,5 +59,10 @@ public class GetAuthTypes extends GetFunctionField<AuthType.ListImpl> {
     @Override
     public FunctionField<AuthType.ListImpl> newInstance() {
         return new GetAuthTypes(serviceReader);
+    }
+
+    @Override
+    public Set<String> getFunctionErrorCodes() {
+        return ImmutableSet.of();
     }
 }

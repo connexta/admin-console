@@ -70,7 +70,7 @@ public class GraphQLTransformCommons {
 
         return () -> Collections.singletonList(GraphQLFieldDefinition.newFieldDefinition()
                 .name("errorCodes")
-                .description("Returns all the possible error codes from the graphql schema.")
+                .description("Returns all the possible error codes from the graphQL schema.")
                 .type(GraphQLList.list(errorCodeEnumType))
                 .dataFetcher((dataFetchingEnvironment) -> errorCodes)
                 .build());

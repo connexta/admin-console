@@ -353,6 +353,20 @@ class LdapTestClaimMappingsSpec extends Specification {
         ldapConnectionIsClosed
     }
 
+    def 'Returns all the possible error codes correctly'(){
+        when:
+        def errorCodes = action.getFunctionErrorCodes()
+
+        then:
+        errorCodes.size() == 6
+        errorCodes.contains(DefaultMessages.CANNOT_CONNECT)
+        errorCodes.contains(DefaultMessages.FAILED_TEST_SETUP)
+        errorCodes.contains(LdapMessages.USER_ATTRIBUTE_NOT_FOUND)
+        errorCodes.contains(LdapMessages.DN_DOES_NOT_EXIST)
+        errorCodes.contains(LdapMessages.CANNOT_BIND)
+        errorCodes.contains(SecurityMessages.INVALID_CLAIM_TYPE)
+    }
+
     private static ClaimsMapEntry.ListImpl createClaimsMapping(Map<String, String> claims) {
         def claimMappings = new ClaimsMapEntry.ListImpl()
         claims.each {

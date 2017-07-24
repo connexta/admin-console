@@ -280,18 +280,14 @@ class DiscoverCswSourceSpecSpec extends SourceCommonsSpec {
         unknownEndpointCsw.setCswSourceUtils(prepareCswSourceUtils(200, noOutputSchemaCswResponse, true))
         unknownEndpointCsw.setValue(getBaseDiscoverByUrlArgs(TEST_CSW_URL))
 
-        DiscoverCswSource missingFieldCsw = new DiscoverCswSource(Mock(ConfiguratorSuite))
-
         when:
         def errorCodes = discoverCsw.getFunctionErrorCodes()
         def cannotConnectReport = cannotConnectCsw.getValue()
         def unknownEndpointReport = unknownEndpointCsw.getValue()
-        def missingFieldReport = missingFieldCsw.getValue()
 
         then:
-        errorCodes.size() == 3
+        errorCodes.size() == 2
         errorCodes.contains(cannotConnectReport.messages()[0].getCode())
         errorCodes.contains(unknownEndpointReport.messages()[0].getCode())
-        errorCodes.contains(missingFieldReport.messages()[0].getCode())
     }
 }

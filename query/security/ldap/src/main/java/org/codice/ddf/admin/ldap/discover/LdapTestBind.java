@@ -36,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 public class LdapTestBind extends TestFunctionField {
     private static final Logger LOGGER = LoggerFactory.getLogger(LdapTestBind.class);
@@ -102,12 +103,10 @@ public class LdapTestBind extends TestFunctionField {
 
     @Override
     public Set<String> getFunctionErrorCodes() {
-        Set<String> errorMessages = super.getFunctionErrorCodes();
-        errorMessages.add(LdapMessages.CANNOT_BIND);
-        errorMessages.add(LdapMessages.MD5_NEEDS_ENCRYPTED);
-        errorMessages.add(DefaultMessages.FAILED_TEST_SETUP);
-        errorMessages.add(DefaultMessages.CANNOT_CONNECT);
-        return errorMessages;
+        return ImmutableSet.of(LdapMessages.CANNOT_BIND,
+                LdapMessages.MD5_NEEDS_ENCRYPTED,
+                DefaultMessages.FAILED_TEST_SETUP,
+                DefaultMessages.CANNOT_CONNECT);
     }
 
     /**

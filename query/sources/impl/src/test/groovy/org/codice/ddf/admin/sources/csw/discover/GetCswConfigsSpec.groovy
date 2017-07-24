@@ -155,8 +155,7 @@ class GetCswConfigsSpec extends SourceCommonsSpec {
         def noExistingConfigReport = noExistingConfigFunc.getValue()
 
         then:
-        errorCodes.size() == 2
+        errorCodes.size() == 1
         errorCodes.contains(noExistingConfigReport.messages().get(0).getCode())
-        errorCodes.contains(DefaultMessages.MISSING_REQUIRED_FIELD)
     }
 }

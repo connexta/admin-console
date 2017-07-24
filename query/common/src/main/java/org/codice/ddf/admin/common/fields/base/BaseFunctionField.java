@@ -13,14 +13,12 @@
  **/
 package org.codice.ddf.admin.common.fields.base;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
@@ -28,9 +26,9 @@ import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.codice.ddf.admin.api.report.FunctionReport;
 import org.codice.ddf.admin.api.report.Report;
 import org.codice.ddf.admin.common.report.FunctionReportImpl;
-import org.codice.ddf.admin.common.report.message.DefaultMessages;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 public abstract class BaseFunctionField<T extends DataType> extends BaseField<Map<String, Object>, FunctionReport<T>> implements FunctionField<T> {
 
@@ -46,31 +44,29 @@ public abstract class BaseFunctionField<T extends DataType> extends BaseField<Ma
 
     @Override
     public String description() {
-        if (this.getErrorCodes() != null) {
-            return String.format("%s The possible errors are:    \r\n %s.",
+        Set<String> errors = getErrorCodes();
+        if (!errors.isEmpty()) {
+            return String.format("%s %n%n The possible errors are: %n- %s",
                     description,
-                    formatErrorCodes(getErrorCodes()));
+                    formatErrorCodes(errors));
         }
         return super.description();
     }
 
     public abstract T performFunction();
 
-    public Set<String> getFunctionErrorCodes() {
-        Set<String> errors = new HashSet<>();
-        errors.add(DefaultMessages.MISSING_REQUIRED_FIELD);
-        return errors;
-    }
+    public abstract Set<String> getFunctionErrorCodes();
 
+    @Override
     public Set<String> getErrorCodes() {
-        Set<String> allErrorCodes = new HashSet<>();
-        for (DataType arg : getArguments()) {
-            Stream.of(allErrorCodes, arg.getErrorCodes())
-                    .forEach(allErrorCodes::addAll);
+        Set<String> errorCodes = new HashSet<>();
+        for (DataType dataType : getArguments()) {
+            errorCodes.addAll(dataType.getErrorCodes());
         }
-
-        allErrorCodes.addAll(getFunctionErrorCodes());
-        return allErrorCodes;
+        return new ImmutableSet.Builder<String>()
+                .addAll(getFunctionErrorCodes())
+                .addAll(errorCodes)
+                .build();
     }
 
     @Override
@@ -167,8 +163,8 @@ public abstract class BaseFunctionField<T extends DataType> extends BaseField<Ma
     }
 
     private String formatErrorCodes(Set<String> errorCodes) {
-        List sortedErrors = new ArrayList<>(errorCodes);
-        Collections.sort(sortedErrors);
-        return String.join(",    \r\n", sortedErrors);
+        return errorCodes.stream()
+                .sorted()
+                .collect(Collectors.joining("\n- "));
     }
 }

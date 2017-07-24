@@ -14,6 +14,7 @@
 package org.codice.ddf.admin.security.sts.discover;
 
 import java.util.List;
+import java.util.Set;
 
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.api.fields.ListField;
@@ -21,6 +22,8 @@ import org.codice.ddf.admin.common.fields.base.function.GetFunctionField;
 import org.codice.ddf.admin.security.common.fields.sts.StsClaimField;
 import org.codice.ddf.admin.security.common.services.StsServiceProperties;
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
+
+import com.google.common.collect.ImmutableSet;
 
 public class GetStsClaimsFunctionField extends GetFunctionField<ListField<StsClaimField>> {
 
@@ -62,5 +65,10 @@ public class GetStsClaimsFunctionField extends GetFunctionField<ListField<StsCla
     @Override
     public FunctionField<ListField<StsClaimField>> newInstance() {
         return new GetStsClaimsFunctionField(serviceActions);
+    }
+
+    @Override
+    public Set<String> getFunctionErrorCodes() {
+        return ImmutableSet.of();
     }
 }

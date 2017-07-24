@@ -29,6 +29,7 @@ import org.codice.ddf.admin.sources.csw.CswSourceUtils;
 import org.codice.ddf.admin.sources.fields.type.CswSourceConfigurationField;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 public class DiscoverCswSource extends BaseFunctionField<CswSourceConfigurationField> {
 
@@ -99,10 +100,8 @@ public class DiscoverCswSource extends BaseFunctionField<CswSourceConfigurationF
 
     @Override
     public Set<String> getFunctionErrorCodes() {
-        Set<String> errorMessages = super.getFunctionErrorCodes();
-        errorMessages.add(DefaultMessages.CANNOT_CONNECT);
-        errorMessages.add(DefaultMessages.UNKNOWN_ENDPOINT);
-        return errorMessages;
+        return ImmutableSet.of(DefaultMessages.CANNOT_CONNECT,
+                DefaultMessages.UNKNOWN_ENDPOINT);
     }
 
     /**

@@ -39,6 +39,7 @@ import org.codice.ddf.admin.security.common.services.LdapClaimsHandlerServicePro
 import org.codice.ddf.admin.security.common.services.LdapLoginServiceProperties;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 public class CreateLdapConfiguration extends BaseFunctionField<BooleanField> {
 
@@ -151,9 +152,7 @@ public class CreateLdapConfiguration extends BaseFunctionField<BooleanField> {
 
     @Override
     public Set<String> getFunctionErrorCodes() {
-        Set<String> errorMessages = super.getFunctionErrorCodes();
-        errorMessages.add(DefaultMessages.FAILED_PERSIST);
-        errorMessages.add(DefaultMessages.SIMILAR_SERVICE_EXISTS);
-        return errorMessages;
+        return ImmutableSet.of(DefaultMessages.FAILED_PERSIST,
+                DefaultMessages.SIMILAR_SERVICE_EXISTS);
     }
 }

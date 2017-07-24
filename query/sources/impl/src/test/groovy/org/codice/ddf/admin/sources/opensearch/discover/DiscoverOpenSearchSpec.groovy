@@ -137,19 +137,15 @@ class DiscoverOpenSearchSpec extends SourceCommonsSpec {
         unknownEndpointOpenSearch.setOpenSearchSourceUtils(prepareOpenSearchSourceUtils(200, badResponseBody, true))
         unknownEndpointOpenSearch.setValue(getBaseDiscoverByUrlArgs(TEST_OPEN_SEARCH_URL))
 
-        DiscoverOpenSearchSource missingFieldOpenSearch = new DiscoverOpenSearchSource(Mock(ConfiguratorSuite))
-
         when:
         def errorCodes = discoverOpenSearch.getFunctionErrorCodes()
         def cannotConnectReport = cannotConnectOpenSearch.getValue()
         def unknownEndpointReport = unknownEndpointOpenSearch.getValue()
-        def missingFieldReport = missingFieldOpenSearch.getValue()
 
         then:
-        errorCodes.size() == 3
+        errorCodes.size() == 2
         errorCodes.contains(cannotConnectReport.messages()[0].getCode())
         errorCodes.contains(unknownEndpointReport.messages()[0].getCode())
-        errorCodes.contains(missingFieldReport.messages()[0].getCode())
     }
 
     def prepareOpenSearchSourceUtils(int statusCode, String responseBody, boolean endpointIsReachable) {

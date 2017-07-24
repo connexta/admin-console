@@ -185,19 +185,15 @@ class LdapRecommendedSettingsSpec extends Specification {
         cannotConnectSettings.setValue(cannotConnectArgs)
         cannotConnectSettings.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
-        LdapRecommendedSettings missingFieldSettings = new LdapRecommendedSettings()
-
         when:
         def errorCodes = action.getFunctionErrorCodes()
         def cannotBindReport = cannotBindSettings.getValue()
         def cannotConnectReport = cannotConnectSettings.getValue()
-        def missingFieldReport = missingFieldSettings.getValue()
 
         then:
-        errorCodes.size() == 4
+        errorCodes.size() == 3
         errorCodes.contains(cannotBindReport.messages().get(0).getCode())
         errorCodes.contains(cannotConnectReport.messages().get(0).getCode())
-        errorCodes.contains(missingFieldReport.messages().get(0).getCode())
         errorCodes.contains(DefaultMessages.FAILED_TEST_SETUP)
     }
 }

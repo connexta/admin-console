@@ -206,10 +206,18 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet implements Ev
     }
 
     public void bindFieldProvider(FieldProvider fieldProvider) {
+        if (fieldProvider == null) {
+            return;
+        }
+
         triggerSchemaRefresh(String.format(BINDING_FIELD_PROVIDER, fieldProvider.fieldTypeName()));
     }
 
     public void unbindFieldProvider(FieldProvider fieldProvider) {
+        if (fieldProvider == null) {
+            return;
+        }
+
         triggerSchemaRefresh(String.format(UNBINDING_FIELD_PROVIDER, fieldProvider == null ? "" : fieldProvider.fieldTypeName()));
     }
 

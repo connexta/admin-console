@@ -1,4 +1,3 @@
-package org.codice.ddf.admin.beta;
 /**
  * Copyright (c) Codice Foundation
  * <p>
@@ -12,8 +11,13 @@ package org.codice.ddf.admin.beta;
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
+package org.codice.ddf.admin.beta;
 
+import static org.codice.ddf.admin.security.common.services.PolicyManagerServiceProperties.POLICY_MANAGER_PID;
+import static org.codice.ddf.admin.security.common.services.PolicyManagerServiceProperties.WHITE_LIST_CONTEXT;
 import static org.codice.ddf.admin.security.common.services.StsServiceProperties.STS_CLAIMS_PROPS_KEY_CLAIMS;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
 import static org.ops4j.pax.exam.CoreOptions.maven;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.debugConfiguration;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFilePut;
@@ -30,9 +34,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import javax.security.auth.login.AppConfigurationEntry;
@@ -45,10 +52,13 @@ import org.apache.commons.io.IOUtils;
 import org.apache.karaf.jaas.config.JaasRealm;
 import org.boon.Boon;
 import org.codice.ddf.admin.security.common.services.StsServiceProperties;
+import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
+import org.codice.ddf.itests.common.WaitCondition;
 import org.codice.ddf.itests.common.annotations.BeforeExam;
 import org.codice.ddf.security.handler.api.AuthenticationHandler;
 import org.codice.ddf.security.handler.api.HandlerResult;
 import org.codice.ddf.security.policy.context.ContextPolicyManager;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;
@@ -74,13 +84,17 @@ public class WebContextPolicyManagerIT {
     public static final String GRAPHQL_ENDPOINT = "http://localhost:8181/admin/beta/graphql";
 
     public static final String VARIABLE_RESOURCE_PATH = "/query/wcpm/RequestVariables.json";
+
     public static final String QUERY_RESOURCE_PATH = "/query/wcpm/query/";
+
     public static final String MUTATION_RESOURCE_PATH = "/query/wcpm/mutation/";
 
     private String graphqlVariables;
 
     public static final String TEST_AUTH_1 = "TEST_AUTH_1";
+
     public static final String TEST_AUTH_2 = "TEST_AUTH_2";
+
     public static final String TEST_AUTH_3 = "TEST_AUTH_3";
 
     public static final List<AuthenticationHandler> MOCK_AUTH_TYPES =
@@ -89,14 +103,18 @@ public class WebContextPolicyManagerIT {
                     new MockAuthenticationHandler(TEST_AUTH_3));
 
     public static final String TEST_REALM_1 = "TEST_REALM_1";
+
     public static final String TEST_REALM_2 = "TEST_REALM_2";
+
     public static final String TEST_REALM_3 = "TEST_REALM_3";
 
     public static final List<JaasRealm> MOCK_REALMS = ImmutableList.of(new MockJaasRealm(
             TEST_REALM_1), new MockJaasRealm(TEST_REALM_2), new MockJaasRealm(TEST_REALM_3));
 
     public static final String TEST_CLAIM_1 = "TEST_CLAIM_1";
+
     public static final String TEST_CLAIM_2 = "TEST_CLAIM_2";
+
     public static final String TEST_CLAIM_3 = "TEST_CLAIM_3";
 
     public static final String[] MOCK_CLAIMS =
@@ -115,15 +133,39 @@ public class WebContextPolicyManagerIT {
         getServices(JaasRealm.class).forEach(realm -> System.out.println(realm.getName()));
 
         System.out.println("\nPrinting context policies:");
-        getServices(ContextPolicyManager.class).get(0).getAllContextPolicies().forEach(System.out::println);
+        getServices(ContextPolicyManager.class).get(0)
+                .getAllContextPolicies()
+                .forEach(System.out::println);
+    }
+
+    @Before
+    public void setup() {
+        WaitCondition.expect("Schema is ready")
+                .within(10L, TimeUnit.SECONDS)
+                .until(() -> {
+                    ExtractableResponse response = sendGraphQlQuery("GetWhiteListed.graphql");
+                    System.out.println("\nResponse:\n" + response.body()
+                            .asString());
+                    return response.jsonPath()
+                            .get("data") != null;
+                });
     }
 
     // TODO: tbatie - 7/6/17 - Write test for ensuring:
     //  policies bin collapse
+    /*
     @Test
     public void getAuthTypes() throws IOException {
         ExtractableResponse response = sendGraphQlQuery("GetAuthTypes.graphql");
         System.out.println("\nResponse:\n" + response.body().asString());
+    }
+
+    @Test
+    public void getRealms() throws IOException {
+        ExtractableResponse response = sendGraphQlQuery("GetRealms.graphql");
+        System.out.println("\nResponse:\n" + response.body().asString());
+        assertThat(response.jsonPath()
+                .get("data.wcpm.realms"), is(MOCK_REALMS));
     }
 
     @Test
@@ -133,33 +175,55 @@ public class WebContextPolicyManagerIT {
     }
 
 
-    @Test
-    public void getRealms() throws IOException {
-        ExtractableResponse response = sendGraphQlQuery("GetRealms.graphql");
-        System.out.println("\nResponse:\n" + response.body().asString());
-    }
-
-
-    @Test
-    public void getWhiteListed() throws IOException {
-        ExtractableResponse response = sendGraphQlQuery("GetWhiteListed.graphql");
-        System.out.println("\nResponse:\n" + response.body().asString());
-    }
 
     @Test
     public void savePolicies() throws IOException {
         ExtractableResponse response = sendGraphQlMutation("SavePolicies.graphql");
         System.out.println("\nResponse:\n" + response.body().asString());
+    }*/
+
+
+    @Test
+    public void getWhiteListed() throws IOException {
+        List<String> whitelist = ImmutableList.of("a", "b", "c");
+
+        Map<String, Object> config = new HashMap<>();
+        config.put(WHITE_LIST_CONTEXT,
+                whitelist.stream()
+                        .toArray(String[]::new));
+        getServices(ServiceActions.class).get(0)
+                .build(POLICY_MANAGER_PID, config, true)
+                .commit();
+
+        ExtractableResponse response = sendGraphQlQuery("GetWhiteListed.graphql");
+        System.out.println("\nResponse:\n" + response.body()
+                .asString());
+
+        assertThat(response.jsonPath()
+                .get("data.wcpm.whitelisted"), is(whitelist));
     }
 
     @Test
     public void saveWhiteListed() throws IOException {
+        List<String> whitelist = ImmutableList.of("/services/SecurityTokenService",
+                "/services/internal/metrics",
+                "/proxy",
+                "/services/saml",
+                "/services/idp",
+                "/idp",
+                "/services/platform/config/ui",
+                "/logout");
+
         ExtractableResponse response = sendGraphQlMutation("SaveWhiteListed.graphql");
         System.out.println("\nResponse:\n" + response.body().asString());
+
+        assertThat(getServices(ServiceActions.class).get(0)
+                .read(POLICY_MANAGER_PID)
+                .get(WHITE_LIST_CONTEXT), is(whitelist));
     }
 
     public String getGraphQlVariables() {
-        if(graphqlVariables == null) {
+        if (graphqlVariables == null) {
             graphqlVariables = getResourceAsString(VARIABLE_RESOURCE_PATH);
         }
 
@@ -167,7 +231,10 @@ public class WebContextPolicyManagerIT {
     }
 
     public ExtractableResponse sendGraphQlQuery(String queryFileName) {
-        String body = Boon.toJson(ImmutableMap.of("query", getResourceAsString(QUERY_RESOURCE_PATH + queryFileName), "variables", getGraphQlVariables()));
+        String body = Boon.toJson(ImmutableMap.of("query",
+                getResourceAsString(QUERY_RESOURCE_PATH + queryFileName),
+                "variables",
+                getGraphQlVariables()));
 
         System.out.println("\nRequest: \n" + body);
         return given().when()
@@ -178,7 +245,10 @@ public class WebContextPolicyManagerIT {
     }
 
     public ExtractableResponse sendGraphQlMutation(String mutationFileName) {
-        String body = Boon.toJson(ImmutableMap.of("query", getResourceAsString(MUTATION_RESOURCE_PATH + mutationFileName), "variables", getGraphQlVariables()));
+        String body = Boon.toJson(ImmutableMap.of("query",
+                getResourceAsString(MUTATION_RESOURCE_PATH + mutationFileName),
+                "variables",
+                getGraphQlVariables()));
 
         System.out.println("\nRequest: \n" + body);
 
@@ -203,6 +273,7 @@ public class WebContextPolicyManagerIT {
     public static class MockSts {
 
         private Dictionary<String, String> serviceProps;
+
         private Dictionary<String, Object> configProps;
 
         public MockSts(String[] stsClaims) {
@@ -223,7 +294,9 @@ public class WebContextPolicyManagerIT {
 
         public static void register(String[] stsClaims) {
             MockSts mock = new MockSts(stsClaims);
-            getBundleContext().registerService(MockSts.class, new MockSts(stsClaims), mock.getServiceProps());
+            getBundleContext().registerService(MockSts.class,
+                    new MockSts(stsClaims),
+                    mock.getServiceProps());
             try {
                 getBundleContext().getService(getBundleContext().getServiceReference(
                         ConfigurationAdmin.class))
@@ -258,8 +331,8 @@ public class WebContextPolicyManagerIT {
         }
 
         @Override
-        public HandlerResult handleError(ServletRequest servletRequest, ServletResponse servletResponse,
-                FilterChain filterChain) throws ServletException {
+        public HandlerResult handleError(ServletRequest servletRequest,
+                ServletResponse servletResponse, FilterChain filterChain) throws ServletException {
             return null;
         }
     }
@@ -268,7 +341,7 @@ public class WebContextPolicyManagerIT {
 
         private String realm;
 
-        public MockJaasRealm(String realm){
+        public MockJaasRealm(String realm) {
             this.realm = realm;
         }
 
@@ -298,7 +371,8 @@ public class WebContextPolicyManagerIT {
             .version("4.1.1")
             .type("tar.gz");
 
-    public static final MavenArtifactUrlReference PAX_WEB_FEATURE_URL = maven().groupId("org.ops4j.pax.web")
+    public static final MavenArtifactUrlReference PAX_WEB_FEATURE_URL = maven().groupId(
+            "org.ops4j.pax.web")
             .artifactId("pax-web-features")
             .type("xml")
             .classifier("features")
@@ -320,48 +394,45 @@ public class WebContextPolicyManagerIT {
 
     @Configuration
     public Option[] config() {
-        return combineOptions(
-                distributionSettings(),
-                bootFeatures(),
-                configurableSettings()
-        );
+        return combineOptions(distributionSettings(), bootFeatures(), configurableSettings());
     }
 
     public Option[] distributionSettings() {
-        return new Option[] {
-                debugConfiguration("50005", Boolean.getBoolean("isDebugEnabled")),
-                karafDistributionConfiguration()
-                        .frameworkUrl(KARAF_DISTRO_URL)
-                        .unpackDirectory(new File("target/exam"))
-                        .useDeployFolder(false)
-        };
+        return new Option[] {debugConfiguration("50005", Boolean.getBoolean("isDebugEnabled")),
+                karafDistributionConfiguration().frameworkUrl(KARAF_DISTRO_URL)
+                        .unpackDirectory(new File("target/exam")).useDeployFolder(false)};
     }
 
     public Option[] bootFeatures() {
-        return new Option[] {
-                features(KARAF_FEATUERS, "standard"),
-                features(ITEST_FEATURE_URL, "test-dependencies", "security-core-api", "security-handler-api", "configurator", "security-policy-context"),
-                features(PAX_WEB_FEATURE_URL,"pax-http-whiteboard"),
-                features(ADMIN_APP_FEATURE_URL, "admin-beta-graphql", "admin-beta-wcpm")
-        };
+        return new Option[] {features(KARAF_FEATUERS, "standard"), features(ITEST_FEATURE_URL,
+                "test-dependencies",
+                "security-core-api",
+                "security-handler-api",
+                "mock-configurator",
+                "security-policy-context"), features(PAX_WEB_FEATURE_URL, "pax-http-whiteboard"),
+                features(ADMIN_APP_FEATURE_URL,
+                        "admin-beta-graphql",
+                        "admin-beta-utils",
+                        "admin-beta-wcpm")};
     }
 
     public Option[] configurableSettings() {
-        return new Option[] {
-                keepRuntimeFolder(),
-                logLevel(LogLevelOption.LogLevel.INFO),
-                editConfigurationFilePut("etc/org.apache.karaf.management.cfg", "rmiRegistryPort", "20001"),
-                editConfigurationFilePut("etc/org.apache.karaf.management.cfg", "rmiServerPort", "20002")
-        };
+        return new Option[] {keepRuntimeFolder(), logLevel(LogLevelOption.LogLevel.INFO),
+                editConfigurationFilePut("etc/org.apache.karaf.management.cfg",
+                        "rmiRegistryPort",
+                        "20001"), editConfigurationFilePut("etc/org.apache.karaf.management.cfg",
+                "rmiServerPort",
+                "20002")};
     }
 
     public Option[] combineOptions(Option[]... options) {
-        return Arrays.stream(options).filter(Objects::nonNull)
+        return Arrays.stream(options)
+                .filter(Objects::nonNull)
                 .flatMap(Arrays::stream)
                 .toArray(Option[]::new);
     }
 
-    public static <T> void registerServices(Class<T> clazz, List<T> instances){
+    public static <T> void registerServices(Class<T> clazz, List<T> instances) {
         instances.forEach(instance -> registerService(clazz, instance));
     }
 
@@ -384,6 +455,7 @@ public class WebContextPolicyManagerIT {
     }
 
     public static BundleContext getBundleContext() {
-        return FrameworkUtil.getBundle(WebContextPolicyManagerIT.class).getBundleContext();
+        return FrameworkUtil.getBundle(WebContextPolicyManagerIT.class)
+                .getBundleContext();
     }
 }

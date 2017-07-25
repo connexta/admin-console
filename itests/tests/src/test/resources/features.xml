@@ -90,6 +90,11 @@
         <bundle>mvn:ddf.admin/admin-configurator-actions-api/${ddf.version}</bundle>
     </feature>
 
+    <feature name="mock-configurator" install="manual" version="${project.version}"
+             description="Mock configurator implementation for itests.">
+        <bundle>mvn:org.codice.ddf.admin.beta/mocks/${project.version}</bundle>
+    </feature>
+
     <feature name="security-handler-api" install="manual" version="${project.version}"
              description="Basic Authentication Handler for web applications.">
         <bundle>mvn:ddf.security.handler/security-handler-api/${ddf.version}</bundle>
@@ -109,5 +114,6 @@
             mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.hamcrest/1.3_1
         </bundle>
         <bundle>mvn:ddf.test.thirdparty/rest-assured/${ddf.version}</bundle>
+        <bundle>mvn:ddf.test.itests/test-itests-common/${ddf.version}</bundle>
     </feature>
 </features>

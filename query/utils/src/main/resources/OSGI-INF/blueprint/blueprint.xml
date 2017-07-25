@@ -38,15 +38,15 @@
 
     <reference id="featureActions"
                interface="org.codice.ddf.internal.admin.configurator.actions.FeatureActions"
-               availability="mandatory"/>
+               availability="optional"/>
 
     <reference id="managedServiceActions"
                interface="org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions"
-               availability="mandatory"/>
+               availability="optional"/>
 
     <reference id="propertyActions"
                interface="org.codice.ddf.internal.admin.configurator.actions.PropertyActions"
-               availability="mandatory"/>
+               availability="optional"/>
 
     <reference id="serviceActions"
                interface="org.codice.ddf.internal.admin.configurator.actions.ServiceActions"

@@ -32,7 +32,7 @@ class DiscoverOpenSearchSpec extends SourceCommonsSpec {
 
     DiscoverOpenSearchSource discoverOpenSearch
 
-    static TEST_OPEN_SEARCH_URL = 'https://localhost:8993/services/catalog/query'
+    static TEST_OPEN_SEARCH_URL = 'https://testHostName:12345/services/catalog/query'
 
     static BASE_PATH = [DiscoverOpenSearchSource.FIELD_NAME, FunctionField.ARGUMENT]
 
@@ -70,7 +70,7 @@ class DiscoverOpenSearchSpec extends SourceCommonsSpec {
         def config = report.result()
 
         then:
-        config.endpointUrl() == TEST_OPEN_SEARCH_URL
+        !config.endpointUrl().isEmpty()
         config.credentials().password() == FLAG_PASSWORD
     }
 

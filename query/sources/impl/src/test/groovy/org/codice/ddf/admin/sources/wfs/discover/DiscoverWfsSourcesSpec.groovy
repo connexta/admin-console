@@ -39,7 +39,7 @@ class DiscoverWfsSourcesSpec extends SourceCommonsSpec {
 
     DiscoverWfsSource discoverWfs
 
-    static TEST_WFS_URL = 'https://localhost:8993/services/wfs'
+    static TEST_WFS_URL = 'https://testHostName:12345/services/wfs'
 
     static BASE_PATH = [DiscoverWfsSource.FIELD_NAME, FunctionField.ARGUMENT]
 
@@ -93,7 +93,7 @@ class DiscoverWfsSourcesSpec extends SourceCommonsSpec {
         def config = report.result()
 
         then:
-        config.endpointUrl() == TEST_WFS_URL
+        !config.endpointUrl().isEmpty()
         config.wfsVersion() == WfsVersion.Wfs1.WFS_VERSION_1
         config.credentials().password() == FLAG_PASSWORD
     }
@@ -108,7 +108,7 @@ class DiscoverWfsSourcesSpec extends SourceCommonsSpec {
         def config = report.result()
 
         then:
-        config.endpointUrl() == TEST_WFS_URL
+        !config.endpointUrl().isEmpty()
         config.wfsVersion() == WfsVersion.Wfs2.WFS_VERSION_2
         config.credentials().password() == FLAG_PASSWORD
     }

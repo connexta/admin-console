@@ -120,7 +120,7 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
         def config = report.result()
 
         then:
-        config.endpointUrl() == TEST_CSW_URL
+        !config.endpointUrl().isEmpty()
         config.cswProfile() == CswProfile.DDFCswFederatedSource.CSW_FEDERATION_PROFILE_SOURCE
         config.outputSchema() == CswSourceUtils.METACARD_OUTPUT_SCHEMA
         config.spatialOperator() == NO_FILTER
@@ -138,7 +138,7 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
         def config = report.result()
 
         then:
-        config.endpointUrl() == TEST_CSW_URL
+        !config.endpointUrl().isEmpty()
         config.cswProfile() == CswProfile.CswFederatedSource.CSW_SPEC_PROFILE_FEDERATED_SOURCE
         config.outputSchema() == CswSourceUtils.CSW_2_0_2_OUTPUT_SCHEMA
         config.spatialOperator() == NO_FILTER
@@ -155,7 +155,7 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
         def config = report.result()
 
         then:
-        config.endpointUrl() == TEST_CSW_URL
+        !config.endpointUrl().isEmpty()
         config.cswProfile() == CswProfile.GmdCswFederatedSource.GMD_CSW_ISO_FEDERATED_SOURCE
         config.outputSchema() == CswSourceUtils.GMD_OUTPUT_SCHEMA
         config.spatialOperator() == NO_FILTER

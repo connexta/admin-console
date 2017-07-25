@@ -18,19 +18,20 @@ import org.codice.ddf.admin.common.fields.common.HostField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.sources.csw.CswSourceUtils
 import org.codice.ddf.admin.sources.fields.CswProfile
-import org.codice.ddf.admin.sources.fields.type.CswSourceConfigurationField
 import org.codice.ddf.admin.sources.test.SourceCommonsSpec
 import spock.lang.Shared
 
 class DiscoverCswSourceSpec extends SourceCommonsSpec {
 
-    static TEST_CSW_URL = 'https://localhost:8993/services/csw'
+    static TEST_CSW_URL = 'https://testHostName:12345/services/csw'
 
     static NO_FILTER = 'NO_FILTER'
 
     static BASE_PATH = [DiscoverCswSource.FIELD_NAME, FunctionField.ARGUMENT]
 
     static ADDRESS_FIELD_PATH = [BASE_PATH, ADDRESS].flatten()
+
+    static HOST_FIELD_PATH = [ADDRESS_FIELD_PATH, HostField.DEFAULT_FIELD_NAME].flatten()
 
     static URL_FIELD_PATH = [ADDRESS_FIELD_PATH, URL_NAME].flatten()
 
@@ -65,7 +66,7 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
 
         when:
         def report = discoverCsw.getValue()
-        def config = (CswSourceConfigurationField) report.result()
+        def config = report.result()
 
         then:
         config.endpointUrl() == TEST_CSW_URL
@@ -82,7 +83,7 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
 
         when:
         def report = discoverCsw.getValue()
-        def config = (CswSourceConfigurationField) report.result()
+        def config = report.result()
 
         then:
         config.endpointUrl() == TEST_CSW_URL
@@ -99,7 +100,7 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
 
         when:
         def report = discoverCsw.getValue()
-        def config = (CswSourceConfigurationField) report.result()
+        def config = report.result()
 
         then:
         config.endpointUrl() == TEST_CSW_URL
@@ -116,7 +117,7 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
 
         when:
         def report = discoverCsw.getValue()
-        def config = (CswSourceConfigurationField) report.result()
+        def config = report.result()
 
         then:
         config.endpointUrl() == TEST_CSW_URL
@@ -134,7 +135,7 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
 
         when:
         def report = discoverCsw.getValue()
-        def config = (CswSourceConfigurationField) report.result()
+        def config = report.result()
 
         then:
         config.endpointUrl() == TEST_CSW_URL
@@ -151,7 +152,7 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
 
         when:
         def report = discoverCsw.getValue()
-        def config = (CswSourceConfigurationField) report.result()
+        def config = report.result()
 
         then:
         config.endpointUrl() == TEST_CSW_URL
@@ -172,7 +173,7 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
         then:
         report.messages().size() == 1
         report.messages()[0].getCode() == DefaultMessages.UNKNOWN_ENDPOINT
-        report.messages()[0].getPath() == [DiscoverCswSource.FIELD_NAME]
+        report.messages()[0].getPath() == URL_FIELD_PATH
     }
 
     def 'Unknown endpoint error with unrecognized response when using URL'() {
@@ -186,7 +187,7 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
         then:
         report.messages().size() == 1
         report.messages()[0].getCode() == DefaultMessages.UNKNOWN_ENDPOINT
-        report.messages()[0].getPath() == [DiscoverCswSource.FIELD_NAME]
+        report.messages()[0].getPath() == URL_FIELD_PATH
     }
 
     def 'Unknown endpoint error with unrecognized response when using hostname+port'() {
@@ -200,10 +201,10 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
         then:
         report.messages().size() == 1
         report.messages()[0].getCode() == DefaultMessages.UNKNOWN_ENDPOINT
-        report.messages()[0].getPath() == [DiscoverCswSource.FIELD_NAME]
+        report.messages()[0].getPath() == HOST_FIELD_PATH
     }
 
-    def 'Cannot connect if errors from discover url from host'() {
+    def 'Unknown endpoint if no pre-formatted URLs work when discovering with host+port'() {
         setup:
         discoverCsw.setCswSourceUtils(prepareCswSourceUtils(200, badResponseBody, false))
         discoverCsw.setValue(getBaseDiscoverByAddressArgs())
@@ -213,7 +214,7 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
 
         then:
         report.messages().size() == 1
-        report.messages()[0].getCode() == DefaultMessages.CANNOT_CONNECT
+        report.messages()[0].getCode() == DefaultMessages.UNKNOWN_ENDPOINT
         report.messages()[0].getPath() == [ADDRESS_FIELD_PATH, HostField.DEFAULT_FIELD_NAME].flatten()
     }
 
@@ -224,7 +225,7 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
 
         when:
         def report = discoverCsw.getValue()
-        def config = (CswSourceConfigurationField) report.result()
+        def config = report.result()
 
         then:
         config.endpointUrl() == TEST_CSW_URL
@@ -246,7 +247,7 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
         report.result() == null
         report.messages().size() == 1
         report.messages()[0].getCode() == DefaultMessages.UNKNOWN_ENDPOINT
-        report.messages()[0].getPath() == [DiscoverCswSource.FIELD_NAME]
+        report.messages()[0].getPath() == URL_FIELD_PATH
     }
 
     def 'Fail when missing required fields'() {

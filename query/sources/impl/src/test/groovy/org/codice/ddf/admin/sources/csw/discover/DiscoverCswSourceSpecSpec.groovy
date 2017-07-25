@@ -43,7 +43,7 @@ class DiscoverCswSourceSpecSpec extends SourceCommonsSpec {
     @Shared
             badResponseBody = this.getClass().getClassLoader().getResource('responses/badResponse.xml').text
 
-    static TEST_CSW_URL = 'https://localhost:8993/services/csw'
+    static TEST_CSW_URL = 'https://testHostName:12345/services/csw'
 
     static NO_FILTER = 'NO_FILTER'
 
@@ -85,7 +85,7 @@ class DiscoverCswSourceSpecSpec extends SourceCommonsSpec {
 
         when:
         def report = discoverCsw.getValue()
-        def config = (CswSourceConfigurationField) report.result()
+        def config = report.result()
 
         then:
         config.endpointUrl() == TEST_CSW_URL
@@ -102,7 +102,7 @@ class DiscoverCswSourceSpecSpec extends SourceCommonsSpec {
 
         when:
         def report = discoverCsw.getValue()
-        def config = (CswSourceConfigurationField) report.result()
+        def config = report.result()
 
         then:
         config.endpointUrl() == TEST_CSW_URL
@@ -119,10 +119,9 @@ class DiscoverCswSourceSpecSpec extends SourceCommonsSpec {
 
         when:
         def report = discoverCsw.getValue()
-        def config = (CswSourceConfigurationField) report.result()
+        def config = report.result()
 
         then:
-        config.endpointUrl() == TEST_CSW_URL
         config.cswProfile() == CswProfile.DDFCswFederatedSource.CSW_FEDERATION_PROFILE_SOURCE
         config.outputSchema() == CswSourceUtils.METACARD_OUTPUT_SCHEMA
         config.spatialOperator() == NO_FILTER
@@ -137,10 +136,9 @@ class DiscoverCswSourceSpecSpec extends SourceCommonsSpec {
 
         when:
         def report = discoverCsw.getValue()
-        def config = (CswSourceConfigurationField) report.result()
+        def config = report.result()
 
         then:
-        config.endpointUrl() == TEST_CSW_URL
         config.cswProfile() == CswProfile.CswFederatedSource.CSW_SPEC_PROFILE_FEDERATED_SOURCE
         config.outputSchema() == CswSourceUtils.CSW_2_0_2_OUTPUT_SCHEMA
         config.spatialOperator() == NO_FILTER
@@ -154,10 +152,9 @@ class DiscoverCswSourceSpecSpec extends SourceCommonsSpec {
 
         when:
         def report = discoverCsw.getValue()
-        def config = (CswSourceConfigurationField) report.result()
+        def config = report.result()
 
         then:
-        config.endpointUrl() == TEST_CSW_URL
         config.cswProfile() == CswProfile.GmdCswFederatedSource.GMD_CSW_ISO_FEDERATED_SOURCE
         config.outputSchema() == CswSourceUtils.GMD_OUTPUT_SCHEMA
         config.spatialOperator() == NO_FILTER

@@ -60,7 +60,7 @@ class DiscoverWfsSourcesSpec extends SourceCommonsSpec {
 
         when:
         def report = discoverWfs.getValue()
-        def config = (WfsSourceConfigurationField) report.result()
+        def config = report.result()
 
         then:
         config.endpointUrl() == TEST_WFS_URL
@@ -75,7 +75,7 @@ class DiscoverWfsSourcesSpec extends SourceCommonsSpec {
 
         when:
         def report = discoverWfs.getValue()
-        def config = (WfsSourceConfigurationField) report.result()
+        def config = report.result()
 
         then:
         config.endpointUrl() == TEST_WFS_URL
@@ -90,7 +90,7 @@ class DiscoverWfsSourcesSpec extends SourceCommonsSpec {
 
         when:
         def report = discoverWfs.getValue()
-        def config = (WfsSourceConfigurationField) report.result()
+        def config = report.result()
 
         then:
         config.endpointUrl() == TEST_WFS_URL
@@ -105,7 +105,7 @@ class DiscoverWfsSourcesSpec extends SourceCommonsSpec {
 
         when:
         def report = discoverWfs.getValue()
-        def config = (WfsSourceConfigurationField) report.result()
+        def config = report.result()
 
         then:
         config.endpointUrl() == TEST_WFS_URL

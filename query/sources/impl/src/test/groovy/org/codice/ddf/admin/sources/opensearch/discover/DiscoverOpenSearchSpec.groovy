@@ -53,7 +53,7 @@ class DiscoverOpenSearchSpec extends SourceCommonsSpec {
 
         when:
         def report = discoverOpenSearch.getValue()
-        def config = (OpenSearchSourceConfigurationField) report.result()
+        def config = report.result()
 
         then:
         config.endpointUrl() == TEST_OPEN_SEARCH_URL
@@ -67,7 +67,7 @@ class DiscoverOpenSearchSpec extends SourceCommonsSpec {
 
         when:
         def report = discoverOpenSearch.getValue()
-        def config = (OpenSearchSourceConfigurationField) report.result()
+        def config = report.result()
 
         then:
         config.endpointUrl() == TEST_OPEN_SEARCH_URL

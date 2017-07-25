@@ -21,8 +21,10 @@ import static org.codice.ddf.admin.sources.fields.CswProfile.DDFCswFederatedSour
 import static org.codice.ddf.admin.sources.fields.CswProfile.GmdCswFederatedSource.GMD_CSW_ISO_FEDERATED_SOURCE;
 import static org.codice.ddf.admin.sources.utils.SourceUtilCommons.SOURCES_NAMESPACE_CONTEXT;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
@@ -30,6 +32,7 @@ import javax.xml.xpath.XPathFactory;
 
 import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.api.report.ReportWithResult;
+import org.codice.ddf.admin.common.PrioritizedBatchExecutor;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
 import org.codice.ddf.admin.common.fields.common.HostField;
 import org.codice.ddf.admin.common.fields.common.ResponseField;
@@ -37,6 +40,8 @@ import org.codice.ddf.admin.common.fields.common.UrlField;
 import org.codice.ddf.admin.common.report.ReportWithResultImpl;
 import org.codice.ddf.admin.sources.fields.type.CswSourceConfigurationField;
 import org.codice.ddf.admin.sources.utils.RequestUtils;
+import org.codice.ddf.admin.sources.utils.SourceTaskCallable;
+import org.codice.ddf.admin.sources.utils.SourceTaskHandler;
 import org.codice.ddf.admin.sources.utils.SourceUtilCommons;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,8 +59,9 @@ public class CswSourceUtils {
             "request",
             "GetCapabilities");
 
-    private static final List<String> URL_FORMATS = ImmutableList.of("https://%s:%d/services/csw",
-            "https://%s:%d/csw");
+    private static final List<List<String>> URL_FORMATS = ImmutableList.of(ImmutableList.of(
+            "https://%s:%d/services/csw",
+            "https://%s:%d/csw"));
 
     public static final String GMD_OUTPUT_SCHEMA = "http://www.isotc211.org/2005/gmd";
 
@@ -93,21 +99,31 @@ public class CswSourceUtils {
      */
     public ReportWithResult<CswSourceConfigurationField> getConfigFromHost(HostField hostField,
             CredentialsField creds) {
-        for (String urlFormat : URL_FORMATS) {
-            UrlField clientUrl = new UrlField();
-            clientUrl.setValue(String.format(urlFormat, hostField.hostname(), hostField.port()));
+        List<List<SourceTaskCallable<CswSourceConfigurationField>>> taskList = new ArrayList<>();
 
-            ReportWithResultImpl<CswSourceConfigurationField> configResult = getCswConfigFromUrl(
-                    clientUrl,
-                    creds);
-
-            if (!configResult.containsErrorMsgs()) {
-                return configResult;
-            }
+        for (List<String> urlFormats : URL_FORMATS) {
+            List<SourceTaskCallable<CswSourceConfigurationField>> callables = new ArrayList<>();
+            urlFormats.forEach(url -> callables.add(new SourceTaskCallable<>(url,
+                    hostField,
+                    creds,
+                    this::getCswConfigFromUrl)));
+            taskList.add(callables);
         }
 
-        return new ReportWithResultImpl<CswSourceConfigurationField>().addArgumentMessage(
-                unknownEndpointError(hostField.path()));
+        PrioritizedBatchExecutor<ReportWithResultImpl<CswSourceConfigurationField>>
+                prioritizedExecutor = new PrioritizedBatchExecutor(2,
+                taskList,
+                new SourceTaskHandler<CswSourceConfigurationField>());
+
+        Optional<ReportWithResultImpl<CswSourceConfigurationField>> result =
+                prioritizedExecutor.getFirst();
+
+        if (result.isPresent()) {
+            return result.get();
+        } else {
+            return new ReportWithResultImpl<CswSourceConfigurationField>().addArgumentMessage(
+                    unknownEndpointError(hostField.path()));
+        }
     }
 
     public ReportWithResultImpl<CswSourceConfigurationField> getCswConfigFromUrl(UrlField urlField,

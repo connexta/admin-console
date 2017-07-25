@@ -18,8 +18,10 @@ import static org.codice.ddf.admin.common.report.message.DefaultMessages.unknown
 import static org.codice.ddf.admin.common.services.ServiceCommons.FLAG_PASSWORD;
 import static org.codice.ddf.admin.sources.utils.SourceUtilCommons.SOURCES_NAMESPACE_CONTEXT;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
@@ -27,6 +29,7 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.codice.ddf.admin.api.ConfiguratorSuite;
+import org.codice.ddf.admin.common.PrioritizedBatchExecutor;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
 import org.codice.ddf.admin.common.fields.common.HostField;
 import org.codice.ddf.admin.common.fields.common.ResponseField;
@@ -34,6 +37,8 @@ import org.codice.ddf.admin.common.fields.common.UrlField;
 import org.codice.ddf.admin.common.report.ReportWithResultImpl;
 import org.codice.ddf.admin.sources.fields.type.OpenSearchSourceConfigurationField;
 import org.codice.ddf.admin.sources.utils.RequestUtils;
+import org.codice.ddf.admin.sources.utils.SourceTaskCallable;
+import org.codice.ddf.admin.sources.utils.SourceTaskHandler;
 import org.codice.ddf.admin.sources.utils.SourceUtilCommons;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,9 +51,9 @@ public class OpenSearchSourceUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenSearchSourceUtils.class);
 
-    private static final List<String> URL_FORMATS = ImmutableList.of(
+    private static final List<List<String>> URL_FORMATS = ImmutableList.of(ImmutableList.of(
             "https://%s:%d/services/catalog/query",
-            "https://%s:%d/catalog/query");
+            "https://%s:%d/catalog/query"));
 
     public static final Map<String, String> GET_CAPABILITIES_PARAMS = ImmutableMap.of("q",
             "test",
@@ -80,20 +85,33 @@ public class OpenSearchSourceUtils {
      */
     public ReportWithResultImpl<OpenSearchSourceConfigurationField> getOpenSearchConfigFromHost(
             HostField hostField, CredentialsField creds) {
-        for (String urlFormat : URL_FORMATS) {
-            UrlField clientUrl = new UrlField();
-            clientUrl.setValue(String.format(urlFormat, hostField.hostname(), hostField.port()));
+        List<List<SourceTaskCallable<OpenSearchSourceConfigurationField>>> taskList =
+                new ArrayList<>();
 
-            ReportWithResultImpl<OpenSearchSourceConfigurationField> configResult =
-                    getOpenSearchConfigFromUrl(clientUrl, creds);
-
-            if (!configResult.containsErrorMsgs()) {
-                return configResult;
-            }
+        for (List<String> urlFormats : URL_FORMATS) {
+            List<SourceTaskCallable<OpenSearchSourceConfigurationField>> callables =
+                    new ArrayList<>();
+            urlFormats.forEach(url -> callables.add(new SourceTaskCallable<>(url,
+                    hostField,
+                    creds,
+                    this::getOpenSearchConfigFromUrl)));
+            taskList.add(callables);
         }
 
-        return new ReportWithResultImpl<OpenSearchSourceConfigurationField>().addArgumentMessage(
-                unknownEndpointError(hostField.path()));
+        PrioritizedBatchExecutor<ReportWithResultImpl<OpenSearchSourceConfigurationField>>
+                prioritizedExecutor = new PrioritizedBatchExecutor(2,
+                taskList,
+                new SourceTaskHandler<OpenSearchSourceConfigurationField>());
+
+        Optional<ReportWithResultImpl<OpenSearchSourceConfigurationField>> result =
+                prioritizedExecutor.getFirst();
+
+        if (result.isPresent()) {
+            return result.get();
+        } else {
+            return new ReportWithResultImpl<OpenSearchSourceConfigurationField>().addArgumentMessage(
+                    unknownEndpointError(hostField.path()));
+        }
     }
 
     public ReportWithResultImpl<OpenSearchSourceConfigurationField> getOpenSearchConfigFromUrl(

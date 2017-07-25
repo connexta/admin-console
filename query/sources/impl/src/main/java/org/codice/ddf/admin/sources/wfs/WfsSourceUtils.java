@@ -18,14 +18,18 @@ import static org.codice.ddf.admin.common.report.message.DefaultMessages.unknown
 import static org.codice.ddf.admin.common.services.ServiceCommons.FLAG_PASSWORD;
 import static org.codice.ddf.admin.sources.utils.SourceUtilCommons.SOURCES_NAMESPACE_CONTEXT;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.Callable;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.codice.ddf.admin.api.ConfiguratorSuite;
+import org.codice.ddf.admin.common.PrioritizedBatchExecutor;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
 import org.codice.ddf.admin.common.fields.common.HostField;
 import org.codice.ddf.admin.common.fields.common.ResponseField;
@@ -33,6 +37,8 @@ import org.codice.ddf.admin.common.fields.common.UrlField;
 import org.codice.ddf.admin.common.report.ReportWithResultImpl;
 import org.codice.ddf.admin.sources.fields.type.WfsSourceConfigurationField;
 import org.codice.ddf.admin.sources.utils.RequestUtils;
+import org.codice.ddf.admin.sources.utils.SourceTaskCallable;
+import org.codice.ddf.admin.sources.utils.SourceTaskHandler;
 import org.codice.ddf.admin.sources.utils.SourceUtilCommons;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,10 +58,11 @@ public class WfsSourceUtils {
             "AcceptVersions",
             "2.0.0,1.0.0");
 
-    private static final List<String> URL_FORMATS = ImmutableList.of("https://%s:%d/services/wfs",
+    private static final List<List<String>> URL_FORMATS = ImmutableList.of(ImmutableList.of(
+            "https://%s:%d/services/wfs",
             "https://%s:%d/wfs",
             "http://%s:%d/services/wfs",
-            "http://%s:%d/wfs");
+            "http://%s:%d/wfs"));
 
     private static final String WFS_VERSION_EXP = "/wfs:WFS_Capabilities/attribute::version";
 
@@ -80,21 +87,31 @@ public class WfsSourceUtils {
      */
     public ReportWithResultImpl<WfsSourceConfigurationField> getWfsConfigFromHost(
             HostField hostField, CredentialsField creds) {
-        for (String urlFormat : URL_FORMATS) {
-            UrlField clientUrl = new UrlField();
-            clientUrl.setValue(String.format(urlFormat, hostField.hostname(), hostField.port()));
+        List<List<SourceTaskCallable<WfsSourceConfigurationField>>> taskList = new ArrayList<>();
 
-            ReportWithResultImpl<WfsSourceConfigurationField> configResult = getWfsConfigFromUrl(
-                    clientUrl,
-                    creds);
-
-            if (!configResult.containsErrorMsgs()) {
-                return configResult;
-            }
+        for (List<String> urlFormats : URL_FORMATS) {
+            List<SourceTaskCallable<WfsSourceConfigurationField>> callables = new ArrayList<>();
+            urlFormats.forEach(url -> callables.add(new SourceTaskCallable<>(url,
+                    hostField,
+                    creds,
+                    this::getWfsConfigFromUrl)));
+            taskList.add(callables);
         }
 
-        return new ReportWithResultImpl<WfsSourceConfigurationField>().addArgumentMessage(
-                unknownEndpointError(hostField.path()));
+        PrioritizedBatchExecutor<ReportWithResultImpl<WfsSourceConfigurationField>>
+                prioritizedExecutor = new PrioritizedBatchExecutor(4,
+                taskList,
+                new SourceTaskHandler<WfsSourceConfigurationField>());
+
+        Optional<ReportWithResultImpl<WfsSourceConfigurationField>> result =
+                prioritizedExecutor.getFirst();
+
+        if (result.isPresent()) {
+            return result.get();
+        } else {
+            return new ReportWithResultImpl<WfsSourceConfigurationField>().addArgumentMessage(
+                    unknownEndpointError(hostField.path()));
+        }
     }
 
     public ReportWithResultImpl<WfsSourceConfigurationField> getWfsConfigFromUrl(UrlField urlField,
@@ -172,6 +189,39 @@ public class WfsSourceUtils {
         }
 
         return configResult;
+    }
+
+    private class WfsTaskCallable
+            implements Callable<ReportWithResultImpl<WfsSourceConfigurationField>> {
+
+        private String url;
+
+        private HostField host;
+
+        private CredentialsField creds;
+
+        public WfsTaskCallable(String url, HostField host, CredentialsField creds) {
+            this.url = url;
+            this.host = host;
+            this.creds = creds;
+        }
+
+        @Override
+        public ReportWithResultImpl<WfsSourceConfigurationField> call() throws Exception {
+            UrlField requestUrl = new UrlField();
+            String formattedUrl = String.format(url, host.hostname(), host.port());
+            requestUrl.setValue(formattedUrl);
+
+            ReportWithResultImpl<WfsSourceConfigurationField> configResult = getWfsConfigFromUrl(
+                    requestUrl,
+                    creds);
+
+            if (!configResult.containsErrorMsgs()) {
+                return configResult;
+            }
+
+            return null;
+        }
     }
 
     /**

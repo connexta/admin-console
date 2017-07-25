@@ -24,7 +24,6 @@ import java.util.function.Function;
 
 import org.codice.ddf.admin.common.services.ServiceCommons;
 import org.codice.ddf.admin.sources.fields.WfsVersion;
-import org.codice.ddf.admin.sources.fields.type.SourceConfigField;
 import org.codice.ddf.admin.sources.fields.type.WfsSourceConfigurationField;
 
 import com.google.common.collect.BiMap;
@@ -54,7 +53,7 @@ public class WfsServiceProperties {
     public static final List<String> WFS_FACTORY_PIDS = ImmutableList.of(WFS1_FACTORY_PID,
             WFS2_FACTORY_PID);
 
-    public static final Function<Map<String, Object>, SourceConfigField>
+    public static final Function<Map<String, Object>, WfsSourceConfigurationField>
             SERVICE_PROPS_TO_WFS_CONFIG = WfsServiceProperties::servicePropsToWfsConfig;
 
     private static final BiMap<String, String> WFS_VERSION_MAPPING =

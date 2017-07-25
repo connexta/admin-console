@@ -38,65 +38,65 @@ import javax.ws.rs.core.Response
 
 class SourceCommonsSpec extends Specification {
 
-    public static final ENDPOINT_URL = SourceConfigField.ENDPOINT_URL_FIELD_NAME
+    public static final String ENDPOINT_URL = SourceConfigField.ENDPOINT_URL_FIELD_NAME
 
-    public static final CREDENTIALS = CredentialsField.DEFAULT_FIELD_NAME
+    public static final String CREDENTIALS = CredentialsField.DEFAULT_FIELD_NAME
 
-    public static final USERNAME = CredentialsField.USERNAME_FIELD_NAME
+    public static final String USERNAME = CredentialsField.USERNAME_FIELD_NAME
 
-    public static final PASSWORD = CredentialsField.PASSWORD_FIELD_NAME
+    public static final String PASSWORD = CredentialsField.PASSWORD_FIELD_NAME
 
-    public static final ADDRESS = AddressField.DEFAULT_FIELD_NAME
+    public static final String ADDRESS = AddressField.DEFAULT_FIELD_NAME
 
-    public static final URL_NAME = UrlField.DEFAULT_FIELD_NAME
+    public static final String URL_NAME = UrlField.DEFAULT_FIELD_NAME
 
-    public static final PID = PidField.DEFAULT_FIELD_NAME
+    public static final String PID = PidField.DEFAULT_FIELD_NAME
 
-    public static final FACTORY_PID_KEY = ServiceCommons.FACTORY_PID_KEY
+    public static final String FACTORY_PID_KEY = ServiceCommons.FACTORY_PID_KEY
 
-    public static final SERVICE_PID_KEY = ServiceCommons.SERVICE_PID_KEY
+    public static final String SERVICE_PID_KEY = ServiceCommons.SERVICE_PID_KEY
 
-    public static final SOURCE_NAME = SourceConfigField.SOURCE_NAME_FIELD_NAME
+    public static final String SOURCE_NAME = SourceConfigField.SOURCE_NAME_FIELD_NAME
 
-    public static final ID = 'id'
+    public static final String ID = 'id'
 
-    public static final FLAG_PASSWORD = ServiceCommons.FLAG_PASSWORD
+    public static final String FLAG_PASSWORD = ServiceCommons.FLAG_PASSWORD
 
-    public static final TEST_ERROR_CODE = "testErrorCode"
+    public static final String TEST_ERROR_CODE = "testErrorCode"
 
-    public static final F_PID = "testFactoryPid"
+    public static final String F_PID = "testFactoryPid"
 
-    public static final S_PID = "testServicePid"
+    public static final String S_PID = "testServicePid"
 
-    public static final S_PID_1 = "testServicePid1"
+    public static final String S_PID_1 = "testServicePid1"
 
-    public static final S_PID_2 = "testServicePid2"
+    public static final String S_PID_2 = "testServicePid2"
 
-    public static final SOURCE_ID_1 = "testId1"
+    public static final String SOURCE_ID_1 = "testId1"
 
-    public static final SOURCE_ID_2 = "testId2"
+    public static final String SOURCE_ID_2 = "testId2"
 
-    public static final TEST_USERNAME = "admin"
+    public static final String TEST_USERNAME = "admin"
 
-    public static final TEST_PASSWORD = "admin"
+    public static final String TEST_PASSWORD = "admin"
 
-    public static final TEST_SOURCENAME = "testSourceName"
+    public static final String TEST_SOURCENAME = "testSourceName"
 
-    static getBaseDiscoverByAddressArgs() {
+    static Map<String, Object> getBaseDiscoverByAddressArgs(String hostName = 'localhost', int port = 8993) {
         return [
-                (ADDRESS)    : new AddressField().hostname('localhost').port(8993).getValue(),
+                (ADDRESS)    : new AddressField().hostname(hostName).port(port).getValue(),
                 (CREDENTIALS): new CredentialsField().username(TEST_USERNAME).password(TEST_PASSWORD).getValue()
         ]
     }
 
-    static getBaseDiscoverByUrlArgs(String url) {
+    static Map<String, Object> getBaseDiscoverByUrlArgs(String url) {
         return [
                 (ADDRESS)    : new AddressField().url(url).getValue(),
                 (CREDENTIALS): new CredentialsField().username(TEST_USERNAME).password(TEST_PASSWORD).getValue()
         ]
     }
 
-    static baseManagedServiceConfigs = [
+    static Map<String, Map<String, String>> baseManagedServiceConfigs = [
             (S_PID_1): [
                     (PASSWORD)       : TEST_PASSWORD,
                     (ID)             : SOURCE_ID_1,
@@ -113,7 +113,7 @@ class SourceCommonsSpec extends Specification {
             ]
     ]
 
-    static configToBeDeleted = [
+    static Map<String, String> configToBeDeleted = [
             (PASSWORD)       : TEST_PASSWORD,
             (ID)             : SOURCE_ID_1,
             (FACTORY_PID_KEY): F_PID,
@@ -153,7 +153,7 @@ class SourceCommonsSpec extends Specification {
         return report
     }
 
-    def createMockFactory(int statusCode, String responseBody) {
+    SecureCxfClientFactory createMockFactory(int statusCode, String responseBody) {
         def mockResponse = Mock(Response)
         mockResponse.getStatus() >> statusCode
         mockResponse.readEntity(String.class) >> responseBody

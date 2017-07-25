@@ -26,7 +26,6 @@ import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.common.services.ServiceCommons;
 import org.codice.ddf.admin.sources.fields.type.OpenSearchSourceConfigurationField;
-import org.codice.ddf.admin.sources.fields.type.SourceConfigField;
 import org.codice.ddf.admin.sources.opensearch.OpenSearchSourceInfoField;
 import org.codice.ddf.admin.sources.utils.SourceUtilCommons;
 
@@ -68,14 +67,13 @@ public class GetOpenSearchConfigurations
         ListField<OpenSearchSourceInfoField> cswSourceInfoFields =
                 new OpenSearchSourceInfoField.ListImpl();
 
-        List<SourceConfigField> configs = sourceUtilCommons.getSourceConfigurations(
-                OPENSEARCH_FACTORY_PIDS,
-                SERVICE_PROPS_TO_OPENSEARCH_CONFIG,
-                pid.getValue());
+        List<OpenSearchSourceConfigurationField> configs =
+                sourceUtilCommons.getSourceConfigurations(OPENSEARCH_FACTORY_PIDS,
+                        SERVICE_PROPS_TO_OPENSEARCH_CONFIG,
+                        pid.getValue());
 
-        configs.forEach(config -> {
-            cswSourceInfoFields.add(new OpenSearchSourceInfoField().config((OpenSearchSourceConfigurationField) config));
-        });
+        configs.forEach(config -> cswSourceInfoFields.add(new OpenSearchSourceInfoField().config(
+                config)));
 
         for (OpenSearchSourceInfoField sourceInfoField : cswSourceInfoFields.getList()) {
             sourceUtilCommons.populateAvailability(sourceInfoField.isAvailableField(),

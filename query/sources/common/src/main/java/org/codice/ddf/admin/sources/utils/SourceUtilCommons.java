@@ -111,16 +111,16 @@ public class SourceUtilCommons {
      * @param pid         a servicePid to select a single configuration, returns all configs when null or empty
      * @return a list of {@code SourceInfoField}s configured in the system
      */
-    public List<SourceConfigField> getSourceConfigurations(List<String> factoryPids,
-            Function<Map<String, Object>, SourceConfigField> mapper, String pid) {
-        List<SourceConfigField> sourceInfoListField = new ArrayList<>();
+    public <T extends SourceConfigField> List<T> getSourceConfigurations(List<String> factoryPids,
+            Function<Map<String, Object>, T> mapper, String pid) {
+        List<T> sourceConfigs = new ArrayList<>();
         if (StringUtils.isNotEmpty(pid)) {
-            SourceConfigField config = mapper.apply(configuratorSuite.getServiceActions()
+            T config = mapper.apply(configuratorSuite.getServiceActions()
                     .read(pid));
             config.credentials()
                     .password(FLAG_PASSWORD);
-            sourceInfoListField.add(config);
-            return sourceInfoListField;
+            sourceConfigs.add(config);
+            return sourceConfigs;
         }
 
         factoryPids.stream()
@@ -129,11 +129,11 @@ public class SourceUtilCommons {
                         .values()
                         .stream())
                 .map(mapper)
-                .forEach(sourceInfoListField::add);
+                .forEach(sourceConfigs::add);
 
-        sourceInfoListField.forEach(config -> config.credentials()
+        sourceConfigs.forEach(config -> config.credentials()
                 .password(FLAG_PASSWORD));
-        return sourceInfoListField;
+        return sourceConfigs;
     }
 
     public void populateAvailability(BooleanField availability, PidField pid) {

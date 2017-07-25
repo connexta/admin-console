@@ -28,7 +28,6 @@ import java.util.function.Function;
 
 import org.codice.ddf.admin.common.services.ServiceCommons;
 import org.codice.ddf.admin.sources.fields.type.CswSourceConfigurationField;
-import org.codice.ddf.admin.sources.fields.type.SourceConfigField;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
@@ -64,7 +63,7 @@ public class CswServiceProperties {
             CSW_GMD_FACTORY_PID,
             CSW_SPEC_FACTORY_PID);
 
-    public static final Function<Map<String, Object>, SourceConfigField>
+    public static final Function<Map<String, Object>, CswSourceConfigurationField>
             SERVICE_PROPS_TO_CSW_CONFIG = CswServiceProperties::servicePropsToCswConfig;
 
     private static final BiMap<String, String> CSW_PROFILE_MAPPING = ImmutableBiMap.of(

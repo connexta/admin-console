@@ -152,7 +152,7 @@ public class CreateLdapConfiguration extends BaseFunctionField<BooleanField> {
 
     @Override
     public Set<String> getFunctionErrorCodes() {
-        return ImmutableSet.of(DefaultMessages.FAILED_PERSIST,
-                DefaultMessages.SIMILAR_SERVICE_EXISTS);
+        return ImmutableSet.of(DefaultMessages.FAILED_PERSIST);
+
     }
 }

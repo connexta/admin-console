@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
@@ -64,6 +65,8 @@ public class OpenSearchSourceUtils {
 
     private static final String TOTAL_RESULTS_XPATH = "//os:totalResults|//opensearch:totalResults";
 
+    private static final int THREAD_POOL_SIZE = 2;
+
     private final SourceUtilCommons sourceUtilCommons;
 
     private RequestUtils requestUtils;
@@ -90,16 +93,17 @@ public class OpenSearchSourceUtils {
 
         for (List<String> urlFormats : URL_FORMATS) {
             List<SourceTaskCallable<OpenSearchSourceConfigurationField>> callables =
-                    new ArrayList<>();
-            urlFormats.forEach(url -> callables.add(new SourceTaskCallable<>(url,
-                    hostField,
-                    creds,
-                    this::getOpenSearchConfigFromUrl)));
+                    urlFormats.stream()
+                            .map(urlFormat -> new SourceTaskCallable<>(urlFormat,
+                                    hostField,
+                                    creds,
+                                    this::getOpenSearchConfigFromUrl))
+                            .collect(Collectors.toList());
             taskList.add(callables);
         }
 
         PrioritizedBatchExecutor<ReportWithResultImpl<OpenSearchSourceConfigurationField>>
-                prioritizedExecutor = new PrioritizedBatchExecutor(2,
+                prioritizedExecutor = new PrioritizedBatchExecutor(THREAD_POOL_SIZE,
                 taskList,
                 new SourceTaskHandler<OpenSearchSourceConfigurationField>());
 

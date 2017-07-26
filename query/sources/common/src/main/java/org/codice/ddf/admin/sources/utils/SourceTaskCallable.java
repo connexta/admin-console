@@ -23,7 +23,7 @@ import org.codice.ddf.admin.common.report.ReportWithResultImpl;
 
 public class SourceTaskCallable<T> implements Callable<ReportWithResultImpl<T>> {
 
-    private String url;
+    private String urlFormatString;
 
     private HostField host;
 
@@ -31,9 +31,9 @@ public class SourceTaskCallable<T> implements Callable<ReportWithResultImpl<T>> 
 
     private BiFunction<UrlField, CredentialsField, ReportWithResultImpl<T>> function;
 
-    public SourceTaskCallable(String url, HostField host, CredentialsField creds,
+    public SourceTaskCallable(String urlFormatString, HostField host, CredentialsField creds,
             BiFunction<UrlField, CredentialsField, ReportWithResultImpl<T>> function) {
-        this.url = url;
+        this.urlFormatString = urlFormatString;
         this.host = host;
         this.creds = creds;
         this.function = function;
@@ -42,7 +42,7 @@ public class SourceTaskCallable<T> implements Callable<ReportWithResultImpl<T>> 
     @Override
     public ReportWithResultImpl<T> call() throws Exception {
         UrlField requestUrl = new UrlField();
-        String formattedUrl = String.format(url, host.hostname(), host.port());
+        String formattedUrl = String.format(urlFormatString, host.hostname(), host.port());
         requestUrl.setValue(formattedUrl);
 
         ReportWithResultImpl<T> configResult = function.apply(requestUrl, creds);

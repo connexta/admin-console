@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
@@ -62,6 +63,8 @@ public class CswSourceUtils {
     private static final List<List<String>> URL_FORMATS = ImmutableList.of(ImmutableList.of(
             "https://%s:%d/services/csw",
             "https://%s:%d/csw"));
+
+    private static final int THREAD_POOL_SIZE = 2;
 
     public static final String GMD_OUTPUT_SCHEMA = "http://www.isotc211.org/2005/gmd";
 
@@ -102,16 +105,17 @@ public class CswSourceUtils {
         List<List<SourceTaskCallable<CswSourceConfigurationField>>> taskList = new ArrayList<>();
 
         for (List<String> urlFormats : URL_FORMATS) {
-            List<SourceTaskCallable<CswSourceConfigurationField>> callables = new ArrayList<>();
-            urlFormats.forEach(url -> callables.add(new SourceTaskCallable<>(url,
-                    hostField,
-                    creds,
-                    this::getCswConfigFromUrl)));
+            List<SourceTaskCallable<CswSourceConfigurationField>> callables = urlFormats.stream()
+                    .map(urlFormat -> new SourceTaskCallable<>(urlFormat,
+                            hostField,
+                            creds,
+                            this::getCswConfigFromUrl))
+                    .collect(Collectors.toList());
             taskList.add(callables);
         }
 
         PrioritizedBatchExecutor<ReportWithResultImpl<CswSourceConfigurationField>>
-                prioritizedExecutor = new PrioritizedBatchExecutor(2,
+                prioritizedExecutor = new PrioritizedBatchExecutor(THREAD_POOL_SIZE,
                 taskList,
                 new SourceTaskHandler<CswSourceConfigurationField>());
 

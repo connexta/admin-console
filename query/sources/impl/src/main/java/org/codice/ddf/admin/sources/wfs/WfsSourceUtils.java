@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
@@ -66,6 +67,8 @@ public class WfsSourceUtils {
 
     private static final String WFS_VERSION_EXP = "/wfs:WFS_Capabilities/attribute::version";
 
+    private static final int THREAD_POOL_SIZE = 4;
+
     private SourceUtilCommons sourceUtilCommons;
 
     private RequestUtils requestUtils;
@@ -90,16 +93,17 @@ public class WfsSourceUtils {
         List<List<SourceTaskCallable<WfsSourceConfigurationField>>> taskList = new ArrayList<>();
 
         for (List<String> urlFormats : URL_FORMATS) {
-            List<SourceTaskCallable<WfsSourceConfigurationField>> callables = new ArrayList<>();
-            urlFormats.forEach(url -> callables.add(new SourceTaskCallable<>(url,
-                    hostField,
-                    creds,
-                    this::getWfsConfigFromUrl)));
+            List<SourceTaskCallable<WfsSourceConfigurationField>> callables = urlFormats.stream()
+                    .map(urlFormat -> new SourceTaskCallable<>(urlFormat,
+                            hostField,
+                            creds,
+                            this::getWfsConfigFromUrl))
+                    .collect(Collectors.toList());
             taskList.add(callables);
         }
 
         PrioritizedBatchExecutor<ReportWithResultImpl<WfsSourceConfigurationField>>
-                prioritizedExecutor = new PrioritizedBatchExecutor(4,
+                prioritizedExecutor = new PrioritizedBatchExecutor(THREAD_POOL_SIZE,
                 taskList,
                 new SourceTaskHandler<WfsSourceConfigurationField>());
 

@@ -14,7 +14,6 @@
 package org.codice.ddf.admin.common;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Callable;
@@ -27,6 +26,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
+import org.apache.commons.lang.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,18 +63,14 @@ public class PrioritizedBatchExecutor<T> {
      */
     public PrioritizedBatchExecutor(int threadPoolSize, List<List<Callable<T>>> tasks,
             Function<T, T> taskHandler) {
-        if (tasks == null) {
-            throw new IllegalArgumentException("Argument {tasks} cannot be null.");
-        }
-
-        if (taskHandler == null) {
-            throw new IllegalArgumentException("Argument {taskHandler} cannot be null.");
-        }
+        Validate.notNull(tasks, "Argument {tasks} cannot be null.");
+        Validate.notNull(taskHandler, "Argument {taskHandler} cannot be null.");
 
         if (threadPoolSize > MAX_THREAD_POOL_SIZE) {
-            LOGGER.debug(String.format(
-                    "Thread pool size exceeds maximum allowed value of %d, defaulting to number of processors available to the JVM [{}].",
-                    MAX_THREAD_POOL_SIZE));
+            LOGGER.debug(
+                    "Argument {threadPoolSize} with value [{}] exceeds maximum allowed value, defaulting to the max number of threads [{}].",
+                    threadPoolSize,
+                    MAX_THREAD_POOL_SIZE);
 
             threadPoolSize = MAX_THREAD_POOL_SIZE;
         }
@@ -116,6 +112,8 @@ public class PrioritizedBatchExecutor<T> {
                         }
                     } catch (InterruptedException e) {
                         LOGGER.debug("\t\tFailed to get future from completion service.");
+                        Thread.currentThread()
+                                .interrupt();
                     }
 
                     LOGGER.debug("\tReceived invalid task result {} of {} tasks.",
@@ -137,7 +135,7 @@ public class PrioritizedBatchExecutor<T> {
      * according to the task handler, then cleans up remaining tasks. The current instance of the
      * {@code PrioritizedBatchExecutor} is not useable after calling {@code getFirst(long, TimeUnit)}.
      *
-     * @param batchWaitTime amount of time to wait for each batch execution
+     * @param batchWaitTime amount of time to wait for each batch execution.
      * @param timeUnit      {@code TimeUnit} to use for the {@code batchWaitTime}
      * @return an {@code Optional} containing a task's result, if there was one
      */
@@ -150,6 +148,9 @@ public class PrioritizedBatchExecutor<T> {
             return getFirst();
         }
 
+        Validate.notNull(timeUnit,
+                "Argument {timeUnit} cannot be null when argument {batchWaitTime} is above 0.");
+
         long batchWaitTimeInMillis = TimeUnit.MILLISECONDS.convert(batchWaitTime, timeUnit);
 
         try {
@@ -160,7 +161,7 @@ public class PrioritizedBatchExecutor<T> {
                 List<Callable<T>> taskBatch = tasks.get(i);
                 CompletionService<T> completionService = prioritizedCompletionServices.get(i);
 
-                long batchStartTime = new Date().getTime();
+                long batchStartTime = System.currentTimeMillis();
                 long batchEndTime = batchStartTime + batchWaitTimeInMillis;
                 long lastPollTime = batchStartTime;
                 LOGGER.debug("Executing batch {} of {}.", i + 1, tasks.size());
@@ -172,7 +173,7 @@ public class PrioritizedBatchExecutor<T> {
                             LOGGER.debug("\tPolling task result queue for {} milliseconds.",
                                     pollTime);
                             taskFuture = completionService.poll(pollTime, TimeUnit.MILLISECONDS);
-                            lastPollTime = new Date().getTime();
+                            lastPollTime = System.currentTimeMillis();
                         } else {
                             LOGGER.debug(
                                     "\tWaited {} {} for batch results. Skipping remaining tasks in batch {}.",
@@ -191,6 +192,8 @@ public class PrioritizedBatchExecutor<T> {
                         }
                     } catch (InterruptedException e) {
                         LOGGER.debug("\t\tFailed to get future from completion service.");
+                        Thread.currentThread()
+                                .interrupt();
                     }
 
                     LOGGER.debug("\tReceived invalid task result {} of {} tasks.",

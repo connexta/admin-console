@@ -36,9 +36,6 @@ import java.util.stream.Stream;
 import org.apache.commons.lang.StringUtils;
 import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.api.fields.ListField;
-import org.codice.ddf.admin.api.report.Report;
-import org.codice.ddf.admin.common.report.ReportImpl;
-import org.codice.ddf.admin.common.report.message.DefaultMessages;
 import org.codice.ddf.admin.common.services.ServiceCommons;
 import org.codice.ddf.admin.ldap.fields.config.LdapConfigurationField;
 import org.codice.ddf.admin.ldap.fields.config.LdapDirectorySettingsField;
@@ -171,30 +168,6 @@ public class LdapServiceCommons {
         return ldapStsConfig;
     }
 
-    /**
-     * Checks for existing LDAP configurations with the same hostname and port of the {@code configuration}.
-     * If there is an existing configuration, errors will be returned.
-     * <p>
-     * Possible error types: IDENTICAL_SERVICE_EXISTS
-     *
-     * @param newConfig configuration to check for existing configurations for
-     * @return {@link Report} with errors indicating there are existing configurations
-     * the {@code configuration}
-     */
-    public Report validateSimilarLdapServiceExists(LdapConfigurationField newConfig) {
-        ReportImpl report = new ReportImpl();
-        List<LdapConfigurationField> existingConfigs = getLdapConfigurations().getList();
-
-        boolean identicalServiceExists = existingConfigs.stream()
-                .anyMatch(existingConfig -> identicalSettingsExist(existingConfig, newConfig));
-
-        if (identicalServiceExists) {
-            report.addArgumentMessage(DefaultMessages.similarServiceExists(newConfig.path()));
-        }
-
-        return report;
-    }
-
     private LdapConfigurationField ldapClaimsHandlerServiceToLdapConfig(Map<String, Object> props) {
         LdapConnectionField connection = getLdapConnectionField(props,
                 LdapClaimsHandlerServiceProperties.URL,
@@ -274,19 +247,6 @@ public class LdapServiceCommons {
             connection.encryptionMethod(startTls);
         }
         return connection;
-    }
-
-    private boolean identicalSettingsExist(LdapConfigurationField existingConfiguration,
-            LdapConfigurationField newConfiguration) {
-        return existingConfiguration.connectionField()
-                .hostname()
-                .equals(newConfiguration.connectionField()
-                        .hostname()) && existingConfiguration.connectionField()
-                .port() == existingConfiguration.connectionField()
-                .port() && existingConfiguration.settingsField()
-                .useCase()
-                .equals(newConfiguration.settingsField()
-                        .useCase());
     }
 
     private static boolean isStartTls(LdapConnectionField config) {

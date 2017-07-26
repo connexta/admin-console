@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
  *
  * @param <T> the expected return type of execution results
  */
-public class PrioritizedBatchExecutor<T> {
+public class PrioritizedBatchExecutor<T, R> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PrioritizedBatchExecutor.class);
 
@@ -45,7 +45,7 @@ public class PrioritizedBatchExecutor<T> {
 
     private final List<List<Callable<T>>> tasks;
 
-    private final Function<T, T> taskHandler;
+    private final Function<T, R> taskHandler;
 
     /**
      * Creates a new {@code PrioritizedBatchExecutor}.
@@ -62,7 +62,7 @@ public class PrioritizedBatchExecutor<T> {
      * @param taskHandler    a non-null task handler that determines if a task result is valid to return
      */
     public PrioritizedBatchExecutor(int threadPoolSize, List<List<Callable<T>>> tasks,
-            Function<T, T> taskHandler) {
+            Function<T, R> taskHandler) {
         Validate.notNull(tasks, "Argument {tasks} cannot be null.");
         Validate.notNull(taskHandler, "Argument {taskHandler} cannot be null.");
 
@@ -88,7 +88,7 @@ public class PrioritizedBatchExecutor<T> {
      *
      * @return an {@code Optional} containing a task's result, if there was one
      */
-    public Optional<T> getFirst() {
+    public Optional<R> getFirst() {
         try {
             List<CompletionService<T>> prioritizedCompletionServices =
                     getPrioritizedCompletionServices();
@@ -103,7 +103,7 @@ public class PrioritizedBatchExecutor<T> {
                         LOGGER.debug("\tAttempting to take from completion service queue.");
                         Future<T> taskFuture = completionService.take();
 
-                        Optional<T> result = handleTaskResult(taskFuture);
+                        Optional<R> result = handleTaskResult(taskFuture);
                         if (result.isPresent()) {
                             LOGGER.debug("\tReturning valid task result {} of {} tasks.",
                                     j + 1,
@@ -139,7 +139,7 @@ public class PrioritizedBatchExecutor<T> {
      * @param timeUnit      {@code TimeUnit} to use for the {@code batchWaitTime}
      * @return an {@code Optional} containing a task's result, if there was one
      */
-    public Optional<T> getFirst(long batchWaitTime, TimeUnit timeUnit) {
+    public Optional<R> getFirst(long batchWaitTime, TimeUnit timeUnit) {
         if (batchWaitTime < 0) {
             throw new IllegalArgumentException("Batch wait time must be 0 or greater.");
         }
@@ -183,7 +183,7 @@ public class PrioritizedBatchExecutor<T> {
                             break;
                         }
 
-                        Optional<T> result = handleTaskResult(taskFuture);
+                        Optional<R> result = handleTaskResult(taskFuture);
                         if (result.isPresent()) {
                             LOGGER.debug("\tReturning valid task result {} of {} tasks.",
                                     j + 1,
@@ -225,9 +225,9 @@ public class PrioritizedBatchExecutor<T> {
         return prioritizedCompletionServices;
     }
 
-    private Optional<T> handleTaskResult(Future<T> future) {
+    private Optional<R> handleTaskResult(Future<T> future) {
         try {
-            T result;
+            R result;
             if (future != null && (result = taskHandler.apply(future.get())) != null) {
                 return Optional.of(result);
             }

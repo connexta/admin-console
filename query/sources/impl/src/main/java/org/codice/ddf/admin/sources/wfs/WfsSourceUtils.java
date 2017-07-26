@@ -61,9 +61,8 @@ public class WfsSourceUtils {
 
     private static final List<List<String>> URL_FORMATS = ImmutableList.of(ImmutableList.of(
             "https://%s:%d/services/wfs",
-            "https://%s:%d/wfs",
-            "http://%s:%d/services/wfs",
-            "http://%s:%d/wfs"));
+            "https://%s:%d/wfs"),
+            ImmutableList.of("http://%s:%d/services/wfs", "http://%s:%d/wfs"));
 
     private static final String WFS_VERSION_EXP = "/wfs:WFS_Capabilities/attribute::version";
 
@@ -102,7 +101,7 @@ public class WfsSourceUtils {
             taskList.add(callables);
         }
 
-        PrioritizedBatchExecutor<ReportWithResultImpl<WfsSourceConfigurationField>>
+        PrioritizedBatchExecutor<ReportWithResultImpl<WfsSourceConfigurationField>, ReportWithResultImpl<WfsSourceConfigurationField>>
                 prioritizedExecutor = new PrioritizedBatchExecutor(THREAD_POOL_SIZE,
                 taskList,
                 new SourceTaskHandler<WfsSourceConfigurationField>());

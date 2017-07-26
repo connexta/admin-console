@@ -102,7 +102,7 @@ public class OpenSearchSourceUtils {
             taskList.add(callables);
         }
 
-        PrioritizedBatchExecutor<ReportWithResultImpl<OpenSearchSourceConfigurationField>>
+        PrioritizedBatchExecutor<ReportWithResultImpl<OpenSearchSourceConfigurationField>, ReportWithResultImpl<OpenSearchSourceConfigurationField>>
                 prioritizedExecutor = new PrioritizedBatchExecutor(THREAD_POOL_SIZE,
                 taskList,
                 new SourceTaskHandler<OpenSearchSourceConfigurationField>());

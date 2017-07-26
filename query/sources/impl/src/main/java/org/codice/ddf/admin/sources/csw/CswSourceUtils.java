@@ -62,7 +62,8 @@ public class CswSourceUtils {
 
     private static final List<List<String>> URL_FORMATS = ImmutableList.of(ImmutableList.of(
             "https://%s:%d/services/csw",
-            "https://%s:%d/csw"));
+            "https://%s:%d/csw"),
+            ImmutableList.of("http://%s:%d/services/csw", "http://%s:%d/csw"));
 
     private static final int THREAD_POOL_SIZE = 2;
 
@@ -114,7 +115,7 @@ public class CswSourceUtils {
             taskList.add(callables);
         }
 
-        PrioritizedBatchExecutor<ReportWithResultImpl<CswSourceConfigurationField>>
+        PrioritizedBatchExecutor<ReportWithResultImpl<CswSourceConfigurationField>, ReportWithResultImpl<CswSourceConfigurationField>>
                 prioritizedExecutor = new PrioritizedBatchExecutor(THREAD_POOL_SIZE,
                 taskList,
                 new SourceTaskHandler<CswSourceConfigurationField>());

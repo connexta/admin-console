@@ -169,6 +169,7 @@ public class RequestUtils {
         SecureCxfClientFactory<WebClient> clientFactory = createFactory(url, creds);
 
         WebClient client = clientFactory.getClient();
+
         if (queryParams != null) {
             queryParams.entrySet()
                     .forEach(entry -> client.query(entry.getKey(), entry.getValue()));

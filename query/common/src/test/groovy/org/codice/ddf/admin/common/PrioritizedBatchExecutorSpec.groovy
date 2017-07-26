@@ -30,7 +30,7 @@ class PrioritizedBatchExecutorSpec extends Specification {
 
     def 'Greater than max number of threads defaults to max numbers of threads'() {
         when:
-        prioritizedBatchExecutor = new PrioritizedBatchExecutor<String>(65, [], createTaskHandler(['foobar']))
+        prioritizedBatchExecutor = new PrioritizedBatchExecutor<String, String>(65, [], createTaskHandler(['foobar']))
 
         then:
         ((ThreadPoolExecutor) prioritizedBatchExecutor.threadPool).getCorePoolSize() == PrioritizedBatchExecutor.MAX_THREAD_POOL_SIZE
@@ -38,7 +38,7 @@ class PrioritizedBatchExecutorSpec extends Specification {
 
     def '0 or less threadPoolSize throws IllegalArgumentException'() {
         when:
-        prioritizedBatchExecutor = new PrioritizedBatchExecutor<String>(0, [], createTaskHandler(['foobar']))
+        prioritizedBatchExecutor = new PrioritizedBatchExecutor<String, String>(0, [], createTaskHandler(['foobar']))
 
         then:
         thrown(IllegalArgumentException)
@@ -46,7 +46,7 @@ class PrioritizedBatchExecutorSpec extends Specification {
 
     def 'Null task list throws IllegalArgumentException'() {
         when:
-        prioritizedBatchExecutor = new PrioritizedBatchExecutor<String>(1, null, createTaskHandler(['foobar']))
+        prioritizedBatchExecutor = new PrioritizedBatchExecutor<String, String>(1, null, createTaskHandler(['foobar']))
 
         then:
         thrown(IllegalArgumentException)
@@ -54,7 +54,7 @@ class PrioritizedBatchExecutorSpec extends Specification {
 
     def 'Null task handler throws IllegalArgumentException'() {
         when:
-        prioritizedBatchExecutor = new PrioritizedBatchExecutor<String>(1, [], null)
+        prioritizedBatchExecutor = new PrioritizedBatchExecutor<String, String>(1, [], null)
 
         then:
         thrown(IllegalArgumentException)
@@ -63,10 +63,10 @@ class PrioritizedBatchExecutorSpec extends Specification {
     def 'Result is successfully retrieved from single batch'() {
         setup:
         def taskResults = [[NOT_EXPECTED_RESULT, EXPECTED_RESULT]]
-        prioritizedBatchExecutor = new PrioritizedBatchExecutor<String>(8, createTaskList(taskResults), createTaskHandler([EXPECTED_RESULT]))
+        prioritizedBatchExecutor = new PrioritizedBatchExecutor<String, String>(2, createTaskList(taskResults), createTaskHandler([EXPECTED_RESULT]))
 
         when:
-        def result = prioritizedBatchExecutor.getFirst()
+        def result = prioritizedBatchExecutor.getFirst(500, TimeUnit.MILLISECONDS)
 
         then:
         result.isPresent()
@@ -79,14 +79,14 @@ class PrioritizedBatchExecutorSpec extends Specification {
                 [NOT_EXPECTED_RESULT, NOT_EXPECTED_RESULT],
                 [NOT_EXPECTED_RESULT, EXPECTED_RESULT]
         ]
-        prioritizedBatchExecutor = new PrioritizedBatchExecutor<String>(8, createTaskList(taskResults), createTaskHandler([EXPECTED_RESULT]))
+        prioritizedBatchExecutor = new PrioritizedBatchExecutor<String, String>(2, createTaskList(taskResults), createTaskHandler([EXPECTED_RESULT]))
 
         when:
-        def result = prioritizedBatchExecutor.getFirst()
+        def result = prioritizedBatchExecutor.getFirst(500, TimeUnit.MILLISECONDS)
 
         then:
         result.isPresent()
-        result.get()
+        result.get() == EXPECTED_RESULT
     }
 
     def 'No results from many batches returns empty optional'() {
@@ -95,10 +95,10 @@ class PrioritizedBatchExecutorSpec extends Specification {
                 [NOT_EXPECTED_RESULT, NOT_EXPECTED_RESULT],
                 [NOT_EXPECTED_RESULT, NOT_EXPECTED_RESULT]
         ]
-        prioritizedBatchExecutor = new PrioritizedBatchExecutor<String>(8, createTaskList(taskResults), createTaskHandler([EXPECTED_RESULT]))
+        prioritizedBatchExecutor = new PrioritizedBatchExecutor<String, String>(2, createTaskList(taskResults), createTaskHandler([EXPECTED_RESULT]))
 
         when:
-        def result = prioritizedBatchExecutor.getFirst()
+        def result = prioritizedBatchExecutor.getFirst(500, TimeUnit.MILLISECONDS)
 
         then:
         !result.isPresent()
@@ -118,7 +118,7 @@ class PrioritizedBatchExecutorSpec extends Specification {
         taskList.add(batch1)
         taskList.add(batch2)
 
-        prioritizedBatchExecutor = new PrioritizedBatchExecutor<String>(8, taskList, createTaskHandler([EXPECTED_RESULT, 'anotherExpectedResult']))
+        prioritizedBatchExecutor = new PrioritizedBatchExecutor<String, String>(2, taskList, createTaskHandler([EXPECTED_RESULT, 'anotherExpectedResult']))
 
 
         when:
@@ -143,7 +143,7 @@ class PrioritizedBatchExecutorSpec extends Specification {
         taskList.add(batch1)
         taskList.add(batch2)
 
-        prioritizedBatchExecutor = new PrioritizedBatchExecutor<String>(8, taskList, createTaskHandler([EXPECTED_RESULT]))
+        prioritizedBatchExecutor = new PrioritizedBatchExecutor<String, String>(2, taskList, createTaskHandler([EXPECTED_RESULT]))
 
         when:
         def result = prioritizedBatchExecutor.getFirst(100, TimeUnit.MILLISECONDS)
@@ -155,7 +155,7 @@ class PrioritizedBatchExecutorSpec extends Specification {
     def 'IllegalArgumentException when batch wait time is negative'() {
         setup:
         def taskResults = [[NOT_EXPECTED_RESULT, NOT_EXPECTED_RESULT]]
-        prioritizedBatchExecutor = new PrioritizedBatchExecutor<String>(8, createTaskList(taskResults), createTaskHandler([EXPECTED_RESULT]))
+        prioritizedBatchExecutor = new PrioritizedBatchExecutor<String, String>(2, createTaskList(taskResults), createTaskHandler([EXPECTED_RESULT]))
 
         when:
         prioritizedBatchExecutor.getFirst(-1, TimeUnit.MILLISECONDS)

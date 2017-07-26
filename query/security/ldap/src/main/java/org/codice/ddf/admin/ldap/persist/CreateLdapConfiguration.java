@@ -142,7 +142,6 @@ public class CreateLdapConfiguration extends BaseFunctionField<BooleanField> {
             return;
         }
 
-        addMessages(ldapServiceCommons.validateSimilarLdapServiceExists(config));
     }
 
     @Override

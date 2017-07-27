@@ -280,4 +280,20 @@ class SaveContextPoliciesSpec extends Specification {
         report.messages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, BaseFunctionField.ARGUMENT, 'policies', '0', 'claimsMapping', '0', ClaimsMapEntry.KEY_FIELD_NAME]
         report.result() == null
     }
+
+    def 'Returns all the possible error codes correctly'(){
+        when:
+        def errorCodes = saveContextPoliciesFunction.getErrorCodes()
+
+        then:
+        errorCodes.size() == 8
+        errorCodes.contains(DefaultMessages.FAILED_PERSIST)
+        errorCodes.contains(DefaultMessages.INVALID_CONTEXT_PATH)
+        errorCodes.contains(DefaultMessages.MISSING_REQUIRED_FIELD)
+        errorCodes.contains(DefaultMessages.EMPTY_FIELD)
+        errorCodes.contains(DefaultMessages.MISSING_KEY_VALUE)
+        errorCodes.contains(DefaultMessages.UNSUPPORTED_ENUM)
+        errorCodes.contains(SecurityMessages.INVALID_CLAIM_TYPE)
+        errorCodes.contains(SecurityMessages.NO_ROOT_CONTEXT)
+    }
 }

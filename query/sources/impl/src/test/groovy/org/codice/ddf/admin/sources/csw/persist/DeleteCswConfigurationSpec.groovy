@@ -121,6 +121,28 @@ class DeleteCswConfigurationSpec extends SourceCommonsSpec {
         report.messages()*.getPath() == [SERVICE_PID_PATH]
     }
 
+    def 'Returns all the possible error codes correctly'(){
+        setup:
+        DeleteCswConfiguration deleteCswNoExistingConfig = new DeleteCswConfiguration(configuratorSuite)
+        serviceActions.read(_ as String) >> [:]
+        deleteCswNoExistingConfig.setValue(functionArgs)
+
+        DeleteCswConfiguration deleteCswFailPersist = new DeleteCswConfiguration(configuratorSuite)
+        serviceActions.read(S_PID) >> configToDelete
+        configurator.commit(_, _) >> mockReport(true)
+        deleteCswFailPersist.setValue(functionArgs)
+
+        when:
+        def errorCodes = deleteCswConfiguration.getFunctionErrorCodes()
+        def noExistingConfigReport = deleteCswNoExistingConfig.getValue()
+        def failedPersistReport = deleteCswFailPersist.getValue()
+
+        then:
+        errorCodes.size() == 2
+        errorCodes.contains(noExistingConfigReport.messages().get(0).getCode())
+        errorCodes.contains(failedPersistReport.messages().get(0).getCode())
+    }
+
     def createCswConfigToDelete() {
         configToDelete = configToBeDeleted
         configToDelete.put(EVENT_SERVICE_ADDRESS, TEST_EVENT_SERVICE_ADDRESS)

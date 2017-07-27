@@ -16,10 +16,14 @@ package org.codice.ddf.admin.ldap.fields.query;
 import static org.codice.ddf.admin.ldap.commons.LdapMessages.invalidQueryError;
 
 import java.util.List;
+import java.util.Set;
 
 import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
+import org.codice.ddf.admin.ldap.commons.LdapMessages;
 import org.forgerock.opendj.ldap.Filter;
+
+import com.google.common.collect.ImmutableSet;
 
 public class LdapQueryField extends StringField {
     public static final String DEFAULT_FIELD_NAME = "query";
@@ -59,5 +63,13 @@ public class LdapQueryField extends StringField {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public Set<String> getErrorCodes() {
+        return new ImmutableSet.Builder<String>()
+                .addAll(super.getErrorCodes())
+                .add(LdapMessages.INVALID_QUERY)
+                .build();
     }
 }

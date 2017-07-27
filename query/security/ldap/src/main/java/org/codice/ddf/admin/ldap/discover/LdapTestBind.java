@@ -20,12 +20,15 @@ import static org.codice.ddf.admin.ldap.fields.connection.LdapEncryptionMethodFi
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.function.TestFunctionField;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
+import org.codice.ddf.admin.common.report.message.DefaultMessages;
 import org.codice.ddf.admin.ldap.commons.LdapConnectionAttempt;
+import org.codice.ddf.admin.ldap.commons.LdapMessages;
 import org.codice.ddf.admin.ldap.commons.LdapTestingUtils;
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindUserInfo;
 import org.codice.ddf.admin.ldap.fields.connection.LdapConnectionField;
@@ -33,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 public class LdapTestBind extends TestFunctionField {
     private static final Logger LOGGER = LoggerFactory.getLogger(LdapTestBind.class);
@@ -95,6 +99,14 @@ public class LdapTestBind extends TestFunctionField {
                         .path()));
             }
         }
+    }
+
+    @Override
+    public Set<String> getFunctionErrorCodes() {
+        return ImmutableSet.of(LdapMessages.CANNOT_BIND,
+                LdapMessages.MD5_NEEDS_ENCRYPTED,
+                DefaultMessages.FAILED_TEST_SETUP,
+                DefaultMessages.CANNOT_CONNECT);
     }
 
     /**

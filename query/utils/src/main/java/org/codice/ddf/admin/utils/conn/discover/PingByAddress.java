@@ -14,6 +14,7 @@
 package org.codice.ddf.admin.utils.conn.discover;
 
 import java.util.List;
+import java.util.Set;
 
 import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
@@ -22,6 +23,7 @@ import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.common.fields.common.AddressField;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 public class PingByAddress extends TestFunctionField {
     public static final String NAME = "pingByAddress";
@@ -50,5 +52,10 @@ public class PingByAddress extends TestFunctionField {
     @Override
     public FunctionField<BooleanField> newInstance() {
         return new PingByAddress();
+    }
+
+    @Override
+    public Set<String> getFunctionErrorCodes() {
+        return ImmutableSet.of();
     }
 }

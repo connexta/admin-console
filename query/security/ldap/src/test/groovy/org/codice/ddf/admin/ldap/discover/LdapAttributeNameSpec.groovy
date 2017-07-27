@@ -62,4 +62,27 @@ class LdapAttributeNameSpec extends Specification {
                 '2017'
         ]
     }
+
+    def 'Returns all the possible error codes correctly'(){
+        setup:
+        LdapAttributeName invalidAttributeName = new LdapAttributeName()
+        invalidAttributeName.setValue('no space')
+
+        LdapAttributeName emptyAttributeName = new LdapAttributeName()
+        emptyAttributeName.setValue('')
+
+        LdapAttributeName missingAttributeName = new LdapAttributeName().isRequired(true)
+
+        when:
+        def errorCodes = ldapAttributeName.getErrorCodes()
+        def invalidAttributeReport = invalidAttributeName.validate()
+        def emptyAttributeReport = emptyAttributeName.validate()
+        def missingAttributeReport = missingAttributeName.validate()
+
+        then:
+        errorCodes.size() == 3
+        errorCodes.contains(invalidAttributeReport[0].getCode())
+        errorCodes.contains(emptyAttributeReport[0].getCode())
+        errorCodes.contains(missingAttributeReport[0].getCode())
+    }
 }

@@ -21,12 +21,14 @@ import static org.codice.ddf.admin.security.common.services.LdapClaimsHandlerSer
 import static org.codice.ddf.admin.security.common.services.LdapLoginServiceProperties.LDAP_LOGIN_FEATURE;
 
 import java.util.List;
+import java.util.Set;
 
 import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
+import org.codice.ddf.admin.common.report.message.DefaultMessages;
 import org.codice.ddf.admin.configurator.Configurator;
 import org.codice.ddf.admin.configurator.ConfiguratorFactory;
 import org.codice.ddf.admin.configurator.OperationReport;
@@ -34,6 +36,7 @@ import org.codice.ddf.admin.security.common.fields.ldap.LdapUseCase;
 import org.codice.ddf.internal.admin.configurator.actions.FeatureActions;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 public class InstallEmbeddedLdap extends BaseFunctionField<BooleanField> {
     public static final String FIELD_NAME = "installEmbeddedLdap";
@@ -104,5 +107,10 @@ public class InstallEmbeddedLdap extends BaseFunctionField<BooleanField> {
     @Override
     public FunctionField<BooleanField> newInstance() {
         return new InstallEmbeddedLdap(configuratorSuite);
+    }
+
+    @Override
+    public Set<String> getFunctionErrorCodes() {
+        return ImmutableSet.of(DefaultMessages.FAILED_PERSIST);
     }
 }

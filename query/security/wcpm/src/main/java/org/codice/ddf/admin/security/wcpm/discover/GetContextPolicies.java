@@ -13,11 +13,15 @@
  **/
 package org.codice.ddf.admin.security.wcpm.discover;
 
+import java.util.Set;
+
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.function.GetFunctionField;
 import org.codice.ddf.admin.security.common.fields.wcpm.ContextPolicyBin;
 import org.codice.ddf.admin.security.common.services.PolicyManagerServiceProperties;
 import org.codice.ddf.internal.admin.configurator.actions.ServiceReader;
+
+import com.google.common.collect.ImmutableSet;
 
 public class GetContextPolicies extends GetFunctionField<ContextPolicyBin.ListImpl> {
 
@@ -51,5 +55,10 @@ public class GetContextPolicies extends GetFunctionField<ContextPolicyBin.ListIm
     @Override
     public FunctionField<ContextPolicyBin.ListImpl> newInstance() {
         return new GetContextPolicies(serviceReader);
+    }
+
+    @Override
+    public Set<String> getFunctionErrorCodes() {
+        return ImmutableSet.of();
     }
 }

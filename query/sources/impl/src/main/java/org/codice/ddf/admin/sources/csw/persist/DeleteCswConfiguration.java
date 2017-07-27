@@ -14,6 +14,7 @@
 package org.codice.ddf.admin.sources.csw.persist;
 
 import java.util.List;
+import java.util.Set;
 
 import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.api.DataType;
@@ -21,9 +22,11 @@ import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.common.fields.common.PidField;
+import org.codice.ddf.admin.common.report.message.DefaultMessages;
 import org.codice.ddf.admin.common.services.ServiceCommons;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 public class DeleteCswConfiguration extends BaseFunctionField<BooleanField> {
 
@@ -79,5 +82,11 @@ public class DeleteCswConfiguration extends BaseFunctionField<BooleanField> {
     @Override
     public FunctionField<BooleanField> newInstance() {
         return new DeleteCswConfiguration(configuratorSuite);
+    }
+
+    @Override
+    public Set<String> getFunctionErrorCodes() {
+        return ImmutableSet.of(DefaultMessages.FAILED_PERSIST,
+                DefaultMessages.NO_EXISTING_CONFIG);
     }
 }

@@ -17,18 +17,21 @@ import static org.codice.ddf.admin.sources.services.WfsServiceProperties.SERVICE
 import static org.codice.ddf.admin.sources.services.WfsServiceProperties.WFS_FACTORY_PIDS;
 
 import java.util.List;
+import java.util.Set;
 
 import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.common.PidField;
+import org.codice.ddf.admin.common.report.message.DefaultMessages;
 import org.codice.ddf.admin.common.services.ServiceCommons;
 import org.codice.ddf.admin.sources.fields.type.WfsSourceConfigurationField;
 import org.codice.ddf.admin.sources.utils.SourceUtilCommons;
 import org.codice.ddf.admin.sources.wfs.WfsSourceInfoField;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 public class GetWfsConfigurations extends BaseFunctionField<ListField<WfsSourceInfoField>> {
 
@@ -103,5 +106,10 @@ public class GetWfsConfigurations extends BaseFunctionField<ListField<WfsSourceI
     @Override
     public ListField<WfsSourceInfoField> getReturnType() {
         return RETURN_TYPE;
+    }
+
+    @Override
+    public Set<String> getFunctionErrorCodes() {
+        return ImmutableSet.of(DefaultMessages.NO_EXISTING_CONFIG);
     }
 }

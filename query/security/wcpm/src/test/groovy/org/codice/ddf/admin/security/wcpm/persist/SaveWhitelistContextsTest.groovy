@@ -135,4 +135,16 @@ class SaveWhitelistContextsTest extends Specification {
         report.messages()[0].path == [wcpmFieldProvider.NAME, SaveWhitelistContexts.FIELD_NAME]
         report.result() == null
     }
+
+    def 'Returns all the possible error codes correctly'(){
+        when:
+        def errorCodes = saveWhitelistContextsFunction.getErrorCodes()
+
+        then:
+        errorCodes.size() == 4
+        errorCodes.contains(DefaultMessages.FAILED_PERSIST)
+        errorCodes.contains(DefaultMessages.INVALID_CONTEXT_PATH)
+        errorCodes.contains(DefaultMessages.MISSING_REQUIRED_FIELD)
+        errorCodes.contains(DefaultMessages.EMPTY_FIELD)
+    }
 }

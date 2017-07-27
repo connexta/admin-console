@@ -20,20 +20,24 @@ import static org.codice.ddf.admin.sources.services.WfsServiceProperties.WFS2_FE
 import static org.codice.ddf.admin.sources.services.WfsServiceProperties.wfsConfigToServiceProps;
 
 import java.util.List;
+import java.util.Set;
 
 import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
+import org.codice.ddf.admin.common.report.message.DefaultMessages;
 import org.codice.ddf.admin.common.services.ServiceCommons;
 import org.codice.ddf.admin.configurator.Configurator;
 import org.codice.ddf.admin.configurator.OperationReport;
+import org.codice.ddf.admin.sources.SourceMessages;
 import org.codice.ddf.admin.sources.fields.WfsVersion;
 import org.codice.ddf.admin.sources.fields.type.WfsSourceConfigurationField;
 import org.codice.ddf.admin.sources.utils.SourceValidationUtils;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 public class UpdateWfsConfiguration extends BaseFunctionField<BooleanField> {
 
@@ -116,5 +120,12 @@ public class UpdateWfsConfiguration extends BaseFunctionField<BooleanField> {
     @Override
     public FunctionField<BooleanField> newInstance() {
         return new UpdateWfsConfiguration(configuratorSuite);
+    }
+
+    @Override
+    public Set<String> getFunctionErrorCodes() {
+        return ImmutableSet.of(DefaultMessages.FAILED_PERSIST,
+                DefaultMessages.NO_EXISTING_CONFIG,
+                SourceMessages.DUPLICATE_SOURCE_NAME);
     }
 }

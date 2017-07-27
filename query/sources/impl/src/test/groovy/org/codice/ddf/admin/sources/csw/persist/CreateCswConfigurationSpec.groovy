@@ -158,6 +158,27 @@ class CreateCswConfigurationSpec extends SourceCommonsSpec {
         report.messages()*.getPath() == [SOURCE_NAME_PATH, ENDPOINT_URL_PATH, CSW_PROFILE_PATH]
     }
 
+    def 'Returns all the possible error codes correctly'(){
+        setup:
+        CreateCswConfiguration createDuplicateNameConfig = new CreateCswConfiguration(configuratorSuite)
+        createDuplicateNameConfig.setValue(createCswArgs())
+        serviceReader.getServices(_, _) >> federatedSources
+
+        CreateCswConfiguration createFailPersistConfig = new CreateCswConfiguration(configuratorSuite)
+        createFailPersistConfig.setValue(createCswArgs())
+        serviceReader.getServices(_, _) >> []
+
+        when:
+        def errorCodes = createCswConfiguration.getFunctionErrorCodes()
+        def duplicateNameReport = createDuplicateNameConfig.getValue()
+        def createFailPersistReport = createFailPersistConfig.getValue()
+
+        then:
+        errorCodes.size() == 2
+        errorCodes.contains(duplicateNameReport.messages().get(0).getCode())
+        errorCodes.contains(createFailPersistReport.messages().get(0).getCode())
+    }
+
     def createCswArgs() {
         def config = new CswSourceConfigurationField()
                 .outputSchema(TEST_OUTPUT_SCHEMA)

@@ -269,4 +269,25 @@ class DiscoverCswSourceSpecSpec extends SourceCommonsSpec {
         cswUtils.setRequestUtils(requestUtils)
         return cswUtils
     }
+
+    def 'Returns all the possible error codes correctly'(){
+        setup:
+        DiscoverCswSource cannotConnectCsw = new DiscoverCswSource(Mock(ConfiguratorSuite))
+        cannotConnectCsw.setCswSourceUtils(prepareCswSourceUtils(200, badResponseBody, false))
+        cannotConnectCsw.setValue(getBaseDiscoverByAddressArgs())
+
+        DiscoverCswSource unknownEndpointCsw = new DiscoverCswSource(Mock(ConfiguratorSuite))
+        unknownEndpointCsw.setCswSourceUtils(prepareCswSourceUtils(200, noOutputSchemaCswResponse, true))
+        unknownEndpointCsw.setValue(getBaseDiscoverByUrlArgs(TEST_CSW_URL))
+
+        when:
+        def errorCodes = discoverCsw.getFunctionErrorCodes()
+        def cannotConnectReport = cannotConnectCsw.getValue()
+        def unknownEndpointReport = unknownEndpointCsw.getValue()
+
+        then:
+        errorCodes.size() == 2
+        errorCodes.contains(cannotConnectReport.messages()[0].getCode())
+        errorCodes.contains(unknownEndpointReport.messages()[0].getCode())
+    }
 }

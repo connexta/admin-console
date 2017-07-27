@@ -432,4 +432,21 @@ class LdapTestDirectorySettingsSpec extends Specification {
         0 * action.checkGroup(_)
         0 * action.checkReferencedUser(_, _)
     }
+
+    def 'Returns all the possible error codes correctly'(){
+        when:
+        def errorCodes = action.getFunctionErrorCodes()
+
+        then:
+        errorCodes.size() == 9
+        errorCodes.contains(DefaultMessages.CANNOT_CONNECT)
+        errorCodes.contains(DefaultMessages.FAILED_TEST_SETUP)
+        errorCodes.contains(LdapMessages.USER_ATTRIBUTE_NOT_FOUND)
+        errorCodes.contains(LdapMessages.DN_DOES_NOT_EXIST)
+        errorCodes.contains(LdapMessages.CANNOT_BIND)
+        errorCodes.contains(LdapMessages.NO_USERS_IN_BASE_USER_DN)
+        errorCodes.contains(LdapMessages.NO_GROUPS_IN_BASE_GROUP_DN)
+        errorCodes.contains(LdapMessages.NO_GROUPS_WITH_MEMBERS)
+        errorCodes.contains(LdapMessages.NO_REFERENCED_MEMBER)
+    }
 }

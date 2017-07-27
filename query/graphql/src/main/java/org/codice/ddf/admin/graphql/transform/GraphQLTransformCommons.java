@@ -14,12 +14,20 @@
 package org.codice.ddf.admin.graphql.transform;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.commons.lang.StringUtils;
+import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.api.FieldProvider;
+import org.codice.ddf.admin.api.fields.FunctionField;
 
+import graphql.schema.GraphQLEnumType;
 import graphql.schema.GraphQLFieldDefinition;
+import graphql.schema.GraphQLList;
+import graphql.servlet.GraphQLQueryProvider;
 import graphql.servlet.GraphQLTypesProvider;
 
 public class GraphQLTransformCommons {
@@ -36,6 +44,36 @@ public class GraphQLTransformCommons {
 
     public List<GraphQLFieldDefinition> fieldProviderToQueries(FieldProvider provider) {
         return transformOutput.fieldsToGraphQLFieldDefinition(Arrays.asList(provider));
+    }
+
+    public GraphQLQueryProvider getErrorCodesQueryProvider(List<FieldProvider> fieldProviders) {
+        Set<String> errorCodes = new TreeSet<>();
+
+        for (FieldProvider fieldProvider : fieldProviders) {
+            List<FunctionField> mutations = fieldProvider.getMutationFunctions();
+            List<Field> queryFields = fieldProvider.getDiscoveryFields();
+
+            for (FunctionField mutation : mutations) {
+                errorCodes.addAll(mutation.getErrorCodes());
+            }
+
+            for (Field field : queryFields) {
+                errorCodes.addAll(field.getErrorCodes());
+            }
+        }
+
+        GraphQLEnumType.Builder enumTypeBuilder = GraphQLEnumType.newEnum()
+                .name("ErrorCode")
+                .description("All possible error codes.");
+        errorCodes.forEach(enumTypeBuilder::value);
+        GraphQLEnumType errorCodeEnumType = enumTypeBuilder.build();
+
+        return () -> Collections.singletonList(GraphQLFieldDefinition.newFieldDefinition()
+                .name("errorCodes")
+                .description("Returns all the possible error codes from the graphQL schema.")
+                .type(GraphQLList.list(errorCodeEnumType))
+                .dataFetcher((dataFetchingEnvironment) -> errorCodes)
+                .build());
     }
 
     public static String capitalize(String str) {

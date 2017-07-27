@@ -17,10 +17,14 @@ import static org.codice.ddf.admin.api.fields.ScalarField.ScalarType.STRING;
 import static org.codice.ddf.admin.common.report.message.DefaultMessages.emptyFieldError;
 
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
 
 import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.codice.ddf.admin.common.fields.base.BaseListField;
+import org.codice.ddf.admin.common.report.message.DefaultMessages;
+
+import com.google.common.collect.ImmutableSet;
 
 public class StringField extends BaseScalarField<String> {
 
@@ -57,6 +61,14 @@ public class StringField extends BaseScalarField<String> {
     public StringField isRequired(boolean required) {
         super.isRequired(required);
         return this;
+    }
+
+    @Override
+    public Set<String> getErrorCodes() {
+        return new ImmutableSet.Builder<String>()
+                .addAll(super.getErrorCodes())
+                .add(DefaultMessages.EMPTY_FIELD)
+                .build();
     }
 
     public static class ListImpl extends BaseListField<StringField> {

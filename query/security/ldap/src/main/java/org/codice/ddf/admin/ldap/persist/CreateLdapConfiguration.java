@@ -22,6 +22,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.codice.ddf.admin.api.ConfiguratorSuite;
@@ -29,6 +30,7 @@ import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
+import org.codice.ddf.admin.common.report.message.DefaultMessages;
 import org.codice.ddf.admin.configurator.Configurator;
 import org.codice.ddf.admin.configurator.OperationReport;
 import org.codice.ddf.admin.ldap.commons.LdapServiceCommons;
@@ -37,6 +39,7 @@ import org.codice.ddf.admin.security.common.services.LdapClaimsHandlerServicePro
 import org.codice.ddf.admin.security.common.services.LdapLoginServiceProperties;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 public class CreateLdapConfiguration extends BaseFunctionField<BooleanField> {
 
@@ -145,5 +148,11 @@ public class CreateLdapConfiguration extends BaseFunctionField<BooleanField> {
     @Override
     public FunctionField<BooleanField> newInstance() {
         return new CreateLdapConfiguration(configuratorSuite);
+    }
+
+    @Override
+    public Set<String> getFunctionErrorCodes() {
+        return ImmutableSet.of(DefaultMessages.FAILED_PERSIST);
+
     }
 }

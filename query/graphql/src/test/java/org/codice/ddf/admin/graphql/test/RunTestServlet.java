@@ -13,6 +13,8 @@
  **/
 package org.codice.ddf.admin.graphql.test;
 
+import java.util.Arrays;
+
 import org.codice.ddf.admin.common.fields.test.TestFieldProvider;
 import org.codice.ddf.admin.graphql.servlet.ExtendedOsgiGraphQLServlet;
 import org.eclipse.jetty.server.Server;
@@ -35,6 +37,7 @@ public class RunTestServlet {
     public static class TestServlet extends ExtendedOsgiGraphQLServlet {
         public TestServlet() {
             super();
+            setFieldProviders(Arrays.asList(new TestFieldProvider()));
             bindFieldProvider(new TestFieldProvider());
         }
     }

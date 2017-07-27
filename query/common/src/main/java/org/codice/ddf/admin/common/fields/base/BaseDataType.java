@@ -17,9 +17,13 @@ import static org.codice.ddf.admin.common.report.message.DefaultMessages.missing
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.report.ErrorMessage;
+import org.codice.ddf.admin.common.report.message.DefaultMessages;
+
+import com.google.common.collect.ImmutableSet;
 
 public class BaseDataType<T> extends BaseField<T, T> implements DataType<T> {
 
@@ -74,5 +78,10 @@ public class BaseDataType<T> extends BaseField<T, T> implements DataType<T> {
         }
 
         return errors;
+    }
+
+    @Override
+    public Set<String> getErrorCodes() {
+        return ImmutableSet.of(DefaultMessages.MISSING_REQUIRED_FIELD);
     }
 }

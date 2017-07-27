@@ -30,6 +30,8 @@ class DeleteWfsConfigurationSpec extends SourceCommonsSpec {
 
     Configurator configurator
 
+    ConfiguratorSuite configuratorSuite
+
     private ServiceActions serviceActions
 
     static RESULT_ARGUMENT_PATH = [DeleteWfsConfiguration.FIELD_NAME]
@@ -50,7 +52,7 @@ class DeleteWfsConfigurationSpec extends SourceCommonsSpec {
         serviceActions = Mock(ServiceActions)
         def managedServiceActions = Mock(ManagedServiceActions)
 
-        def configuratorSuite = Mock(ConfiguratorSuite)
+        configuratorSuite = Mock(ConfiguratorSuite)
         configuratorSuite.configuratorFactory >> configuratorFactory
         configuratorSuite.serviceActions >> serviceActions
         configuratorSuite.managedServiceActions >> managedServiceActions
@@ -111,5 +113,27 @@ class DeleteWfsConfigurationSpec extends SourceCommonsSpec {
             it.getCode() == DefaultMessages.MISSING_REQUIRED_FIELD
         } == 1
         report.messages()*.getPath() == [PID_PATH]
+    }
+
+    def 'Returns all the possible error codes correctly'(){
+        setup:
+        DeleteWfsConfiguration deleteWfsNoExistingConfig = new DeleteWfsConfiguration(configuratorSuite)
+        serviceActions.read(S_PID) >> [:]
+        deleteWfsNoExistingConfig.setValue(functionArgs)
+
+        DeleteWfsConfiguration deleteWfsFailPersist = new DeleteWfsConfiguration(configuratorSuite)
+        serviceActions.read(S_PID) >> configToBeDeleted
+        configurator.commit(_, _) >> mockReport(true)
+        deleteWfsFailPersist.setValue(functionArgs)
+
+        when:
+        def errorCodes = deleteWfsConfiguration.getFunctionErrorCodes()
+        def noExistingConfigReport = deleteWfsNoExistingConfig.getValue()
+        def failedPersistReport = deleteWfsFailPersist.getValue()
+
+        then:
+        errorCodes.size() == 2
+        errorCodes.contains(noExistingConfigReport.messages().get(0).getCode())
+        errorCodes.contains(failedPersistReport.messages().get(0).getCode())
     }
 }

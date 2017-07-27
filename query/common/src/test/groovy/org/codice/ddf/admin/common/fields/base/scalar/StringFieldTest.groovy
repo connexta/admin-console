@@ -31,4 +31,23 @@ class StringFieldTest extends Specification {
         validationMsgs[0].getCode() == DefaultMessages.EMPTY_FIELD
         validationMsgs[0].getPath() == [StringField.DEFAULT_FIELD_NAME]
     }
+
+    def 'Returns all the possible error codes correctly'(){
+        setup:
+        def emptyStringField = new StringField()
+        emptyStringField.setValue('')
+
+        def missingStringField = new StringField()
+        missingStringField.isRequired(true)
+
+        when:
+        def errorCodes = emptyStringField.getErrorCodes()
+        def emptyStringFieldValidation = emptyStringField.validate()
+        def missingStringFieldValidation = missingStringField.validate()
+
+        then:
+        errorCodes.size() == 2
+        errorCodes.contains(emptyStringFieldValidation[0].getCode())
+        errorCodes.contains(missingStringFieldValidation[0].getCode())
+    }
 }

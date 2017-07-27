@@ -33,6 +33,8 @@ class GetWfsConfigsSpec extends SourceCommonsSpec {
 
     ConfiguratorFactory configuratorFactory
 
+    ConfiguratorSuite configuratorSuite
+
     private ServiceActions serviceActions
 
     private ManagedServiceActions managedServiceActions
@@ -141,5 +143,20 @@ class GetWfsConfigsSpec extends SourceCommonsSpec {
         managedServiceConfigs.get(S_PID_1).put(FACTORY_PID_KEY, TEST_FACTORY_PID_1)
         managedServiceConfigs.get(S_PID_2).put(FACTORY_PID_KEY, TEST_FACTORY_PID_2)
         return managedServiceConfigs
+    }
+
+    def 'Returns all the possible error codes correctly'(){
+        setup:
+        functionArgs.put(PID, S_PID)
+        getWfsConfigsFunction.setValue(functionArgs)
+        serviceActions.read(S_PID) >> [:]
+
+        when:
+        def errorCodes = getWfsConfigsFunction.getFunctionErrorCodes()
+        def noExistingConfigReport = getWfsConfigsFunction.getValue()
+
+        then:
+        errorCodes.size() == 1
+        errorCodes.contains(noExistingConfigReport.messages().get(0).code)
     }
 }

@@ -14,12 +14,15 @@
 package org.codice.ddf.admin.security.wcpm.discover;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.function.GetFunctionField;
 import org.codice.ddf.admin.security.common.fields.wcpm.Realm;
 import org.codice.ddf.internal.admin.configurator.actions.ServiceReader;
+
+import com.google.common.collect.ImmutableSet;
 
 public class GetRealms extends GetFunctionField<Realm.ListImpl> {
 
@@ -52,5 +55,10 @@ public class GetRealms extends GetFunctionField<Realm.ListImpl> {
     @Override
     public FunctionField<Realm.ListImpl> newInstance() {
         return new GetRealms(serviceReader);
+    }
+
+    @Override
+    public Set<String> getFunctionErrorCodes() {
+        return ImmutableSet.of();
     }
 }

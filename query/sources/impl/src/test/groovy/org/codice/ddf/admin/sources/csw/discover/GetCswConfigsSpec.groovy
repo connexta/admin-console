@@ -142,4 +142,20 @@ class GetCswConfigsSpec extends SourceCommonsSpec {
         managedServiceConfigs.get(S_PID_2).put(FACTORY_PID_KEY, TEST_FACTORY_PID)
         return managedServiceConfigs
     }
+
+    def 'Returns all the possible error codes correctly'(){
+        setup:
+        GetCswConfigurations noExistingConfigFunc = new GetCswConfigurations(configuratorSuite)
+        functionArgs.put(PID, S_PID)
+        noExistingConfigFunc.setValue(functionArgs)
+        serviceActions.read(S_PID) >> [:]
+
+        when:
+        def errorCodes = getCswConfigsFunction.getFunctionErrorCodes()
+        def noExistingConfigReport = noExistingConfigFunc.getValue()
+
+        then:
+        errorCodes.size() == 1
+        errorCodes.contains(noExistingConfigReport.messages().get(0).getCode())
+    }
 }

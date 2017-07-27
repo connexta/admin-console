@@ -16,12 +16,16 @@ package org.codice.ddf.admin.ldap.fields;
 import static org.codice.ddf.admin.ldap.commons.LdapMessages.invalidDnFormatError;
 
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
 
 import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.codice.ddf.admin.common.fields.base.BaseListField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
+import org.codice.ddf.admin.ldap.commons.LdapMessages;
 import org.forgerock.opendj.ldap.DN;
+
+import com.google.common.collect.ImmutableSet;
 
 public class LdapDistinguishedName extends StringField {
     public static final String DEFAULT_FIELD_NAME = "dn";
@@ -56,6 +60,14 @@ public class LdapDistinguishedName extends StringField {
         }
 
         return validationMsgs;
+    }
+
+    @Override
+    public Set<String> getErrorCodes() {
+        return new ImmutableSet.Builder<String>()
+                .addAll(super.getErrorCodes())
+                .add(LdapMessages.INVALID_DN)
+                .build();
     }
 
     private boolean isValidDN(String dn) {

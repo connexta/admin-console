@@ -168,4 +168,32 @@ class LdapRecommendedSettingsSpec extends Specification {
 
         ldapConnectionIsClosed
     }
+
+    def 'Returns all the possible error codes correctly'(){
+        setup:
+        LdapRecommendedSettings cannotBindSettings = new LdapRecommendedSettings()
+        Map<String, Object> cannotBindArgs = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue(),
+                (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().password('badPassword').getValue(),
+                (LdapTypeField.DEFAULT_FIELD_NAME)      : LdapTypeField.Unknown.UNKNOWN]
+        cannotBindSettings.setValue(cannotBindArgs)
+        cannotBindSettings.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
+
+        LdapRecommendedSettings cannotConnectSettings = new LdapRecommendedSettings()
+        Map<String, Object> cannotConnectArgs = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().port(666).getValue(),
+                (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue(),
+                (LdapTypeField.DEFAULT_FIELD_NAME)      : LdapTypeField.Unknown.UNKNOWN]
+        cannotConnectSettings.setValue(cannotConnectArgs)
+        cannotConnectSettings.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
+
+        when:
+        def errorCodes = action.getFunctionErrorCodes()
+        def cannotBindReport = cannotBindSettings.getValue()
+        def cannotConnectReport = cannotConnectSettings.getValue()
+
+        then:
+        errorCodes.size() == 3
+        errorCodes.contains(cannotBindReport.messages().get(0).getCode())
+        errorCodes.contains(cannotConnectReport.messages().get(0).getCode())
+        errorCodes.contains(DefaultMessages.FAILED_TEST_SETUP)
+    }
 }

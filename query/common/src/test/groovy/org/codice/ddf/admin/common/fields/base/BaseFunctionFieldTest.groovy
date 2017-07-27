@@ -13,6 +13,7 @@
  **/
 package org.codice.ddf.admin.common.fields.base
 
+import com.google.common.collect.ImmutableSet
 import org.codice.ddf.admin.api.DataType
 import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.common.fields.base.scalar.StringField
@@ -99,11 +100,38 @@ class BaseFunctionFieldTest extends Specification {
         functionField.getArguments()[0].path() == ['test', TestBaseFunctionField.DEFAULT_NAME, FunctionField.ARGUMENT, StringField.DEFAULT_FIELD_NAME]
     }
 
+    def 'Returns all the possible error codes correctly from all arguments'(){
+        setup:
+        functionField = new TestBaseFunctionField(false)
+
+        when:
+        def errorCodes = functionField.getErrorCodes()
+        def arg1Errors = functionField.getArguments()[0].getErrorCodes()
+        def arg2Errors = functionField.getArguments()[1].getErrorCodes()
+        def functionError = functionField.getFunctionErrorCodes()
+
+        then:
+        errorCodes.size() == 6
+
+        errorCodes.contains(DefaultMessages.EMPTY_FIELD)
+        errorCodes.contains(DefaultMessages.UNSUPPORTED_ENUM)
+        errorCodes.contains(DefaultMessages.MISSING_REQUIRED_FIELD)
+        errorCodes.contains(TestBaseFunctionField.FUNCTION_TEST_ERROR)
+        errorCodes.contains(TestObjectField.OBJECT_FIELD_TEST_ERROR)
+        errorCodes.contains(TestObjectField.InnerTestObjectField.INNER_OBJECT_FIELD_TEST_ERROR)
+
+        errorCodes.containsAll(arg1Errors)
+        errorCodes.containsAll(arg2Errors)
+        errorCodes.containsAll(functionError)
+    }
+
     class TestBaseFunctionField extends BaseFunctionField<StringField> {
 
         static String DEFAULT_NAME = 'testBaseFunctionField'
 
         static String ARG_VALUE = 'valid'
+
+        static String FUNCTION_TEST_ERROR = 'FUNCTION_TEST_ERROR'
 
         public static final StringField RETURN_TYPE = new StringField()
 
@@ -145,6 +173,13 @@ class BaseFunctionFieldTest extends Specification {
         @Override
         StringField performFunction() {
             return new StringField('result')
+        }
+
+        @Override
+        Set<String> getFunctionErrorCodes() {
+            return new ImmutableSet.Builder<String>()
+                    .add(FUNCTION_TEST_ERROR)
+                    .build()
         }
     }
 }

@@ -16,10 +16,14 @@ package org.codice.ddf.admin.common.fields.common;
 import static org.codice.ddf.admin.common.report.message.DefaultMessages.invalidHostnameError;
 
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
+import org.codice.ddf.admin.common.report.message.DefaultMessages;
+
+import com.google.common.collect.ImmutableSet;
 
 public class HostnameField extends StringField {
 
@@ -57,5 +61,13 @@ public class HostnameField extends StringField {
 
     public boolean validHostname(String hostname) {
         return HOST_NAME_PATTERN.matcher(hostname).matches();
+    }
+
+    @Override
+    public Set<String> getErrorCodes() {
+        return new ImmutableSet.Builder<String>()
+                .addAll(super.getErrorCodes())
+                .add(DefaultMessages.INVALID_HOSTNAME)
+                .build();
     }
 }

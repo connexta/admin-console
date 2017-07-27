@@ -14,6 +14,7 @@
 package org.codice.ddf.admin.sources.opensearch.discover;
 
 import java.util.List;
+import java.util.Set;
 
 import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.api.DataType;
@@ -24,10 +25,12 @@ import org.codice.ddf.admin.common.fields.common.AddressField;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
 import org.codice.ddf.admin.common.fields.common.ResponseField;
 import org.codice.ddf.admin.common.report.ReportWithResultImpl;
+import org.codice.ddf.admin.common.report.message.DefaultMessages;
 import org.codice.ddf.admin.sources.fields.type.OpenSearchSourceConfigurationField;
 import org.codice.ddf.admin.sources.opensearch.OpenSearchSourceUtils;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 public class DiscoverOpenSearchSource
         extends BaseFunctionField<OpenSearchSourceConfigurationField> {
@@ -102,5 +105,11 @@ public class DiscoverOpenSearchSource
      */
     private void setOpenSearchSourceUtils(OpenSearchSourceUtils openSearchSourceUtils) {
         this.openSearchSourceUtils = openSearchSourceUtils;
+    }
+
+    @Override
+    public Set<String> getFunctionErrorCodes() {
+        return ImmutableSet.of(DefaultMessages.CANNOT_CONNECT,
+                DefaultMessages.UNKNOWN_ENDPOINT);
     }
 }

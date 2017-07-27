@@ -16,10 +16,14 @@ package org.codice.ddf.admin.common.fields.base;
 import static org.codice.ddf.admin.common.report.message.DefaultMessages.unsupportedEnum;
 
 import java.util.List;
+import java.util.Set;
 
 import org.codice.ddf.admin.api.fields.EnumField;
 import org.codice.ddf.admin.api.fields.EnumValue;
 import org.codice.ddf.admin.api.report.ErrorMessage;
+import org.codice.ddf.admin.common.report.message.DefaultMessages;
+
+import com.google.common.collect.ImmutableSet;
 
 public abstract class BaseEnumField<S> extends BaseDataType<S>
         implements EnumField<S, EnumValue<S>> {
@@ -84,5 +88,13 @@ public abstract class BaseEnumField<S> extends BaseDataType<S>
             }
         }
         return validationMsgs;
+    }
+
+    @Override
+    public Set<String> getErrorCodes() {
+        return new ImmutableSet.Builder<String>()
+                .addAll(super.getErrorCodes())
+                .add(DefaultMessages.UNSUPPORTED_ENUM)
+                .build();
     }
 }

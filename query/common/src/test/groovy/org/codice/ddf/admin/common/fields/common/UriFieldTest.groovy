@@ -68,4 +68,27 @@ class UriFieldTest extends Specification {
                 'emptyPathWithScheme:',
                 'schemeWithEmptyPathCantStartWithDoubleSlash://']
     }
+
+    def 'Returns all the possible error codes correctly'(){
+        setup:
+        UriField invalidUriField = new UriField()
+        invalidUriField.setValue('Inv@!id:U&i')
+
+        UriField emptyUriField = new UriField()
+        emptyUriField.setValue('')
+
+        UriField missingUriField = new UriField().isRequired(true)
+
+        when:
+        def errorCodes = uriField.getErrorCodes()
+        def invalidUriValidation = invalidUriField.validate()
+        def emptyUriValidation = emptyUriField.validate()
+        def missingUriValidation= missingUriField.validate()
+
+        then:
+        errorCodes.size() == 3
+        errorCodes.contains(invalidUriValidation.get(0).getCode())
+        errorCodes.contains(emptyUriValidation.get(0).getCode())
+        errorCodes.contains(missingUriValidation.get(0).getCode())
+    }
 }

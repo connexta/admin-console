@@ -17,6 +17,7 @@ import static org.codice.ddf.admin.ldap.commons.LdapMessages.userAttributeNotFou
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.api.ConfiguratorSuite;
@@ -25,12 +26,15 @@ import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.function.TestFunctionField;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
+import org.codice.ddf.admin.common.report.message.DefaultMessages;
 import org.codice.ddf.admin.ldap.commons.LdapConnectionAttempt;
+import org.codice.ddf.admin.ldap.commons.LdapMessages;
 import org.codice.ddf.admin.ldap.commons.LdapTestingUtils;
 import org.codice.ddf.admin.ldap.fields.LdapAttributeName;
 import org.codice.ddf.admin.ldap.fields.LdapDistinguishedName;
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindUserInfo;
 import org.codice.ddf.admin.ldap.fields.connection.LdapConnectionField;
+import org.codice.ddf.admin.security.common.SecurityMessages;
 import org.codice.ddf.admin.security.common.SecurityValidation;
 import org.codice.ddf.admin.security.common.fields.wcpm.ClaimsMapEntry;
 import org.codice.ddf.admin.security.common.services.StsServiceProperties;
@@ -41,6 +45,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 public class LdapTestClaimMappings extends TestFunctionField {
     private static final Logger LOGGER = LoggerFactory.getLogger(LdapTestClaimMappings.class);
@@ -154,6 +159,16 @@ public class LdapTestClaimMappings extends TestFunctionField {
         }
 
         return new BooleanField(!containsErrorMsgs());
+    }
+
+    @Override
+    public Set<String> getFunctionErrorCodes() {
+        return ImmutableSet.of(SecurityMessages.INVALID_CLAIM_TYPE,
+                LdapMessages.CANNOT_BIND,
+                LdapMessages.DN_DOES_NOT_EXIST,
+                LdapMessages.USER_ATTRIBUTE_NOT_FOUND,
+                DefaultMessages.FAILED_TEST_SETUP,
+                DefaultMessages.CANNOT_CONNECT);
     }
 
     /**

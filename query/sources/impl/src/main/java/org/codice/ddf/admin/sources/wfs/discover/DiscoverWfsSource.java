@@ -14,6 +14,7 @@
 package org.codice.ddf.admin.sources.wfs.discover;
 
 import java.util.List;
+import java.util.Set;
 
 import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.api.DataType;
@@ -23,10 +24,12 @@ import org.codice.ddf.admin.common.fields.common.AddressField;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
 import org.codice.ddf.admin.common.fields.common.ResponseField;
 import org.codice.ddf.admin.common.report.ReportWithResultImpl;
+import org.codice.ddf.admin.common.report.message.DefaultMessages;
 import org.codice.ddf.admin.sources.fields.type.WfsSourceConfigurationField;
 import org.codice.ddf.admin.sources.wfs.WfsSourceUtils;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 public class DiscoverWfsSource extends BaseFunctionField<WfsSourceConfigurationField> {
 
@@ -92,6 +95,12 @@ public class DiscoverWfsSource extends BaseFunctionField<WfsSourceConfigurationF
     @Override
     public FunctionField<WfsSourceConfigurationField> newInstance() {
         return new DiscoverWfsSource(configuratorSuite);
+    }
+
+    @Override
+    public Set<String> getFunctionErrorCodes() {
+        return ImmutableSet.of(DefaultMessages.CANNOT_CONNECT,
+                DefaultMessages.UNKNOWN_ENDPOINT);
     }
 
     /**

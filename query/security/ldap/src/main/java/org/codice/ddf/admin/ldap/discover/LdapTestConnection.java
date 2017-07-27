@@ -15,11 +15,13 @@ package org.codice.ddf.admin.ldap.discover;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.function.TestFunctionField;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
+import org.codice.ddf.admin.common.report.message.DefaultMessages;
 import org.codice.ddf.admin.ldap.commons.LdapConnectionAttempt;
 import org.codice.ddf.admin.ldap.commons.LdapTestingUtils;
 import org.codice.ddf.admin.ldap.fields.connection.LdapConnectionField;
@@ -27,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 public class LdapTestConnection extends TestFunctionField {
     private static final Logger LOGGER = LoggerFactory.getLogger(LdapTestConnection.class);
@@ -67,6 +70,12 @@ public class LdapTestConnection extends TestFunctionField {
     @Override
     public FunctionField<BooleanField> newInstance() {
         return new LdapTestConnection();
+    }
+
+    @Override
+    public Set<String> getFunctionErrorCodes() {
+        return ImmutableSet.of(DefaultMessages.FAILED_TEST_SETUP,
+                DefaultMessages.CANNOT_CONNECT);
     }
 
     /**

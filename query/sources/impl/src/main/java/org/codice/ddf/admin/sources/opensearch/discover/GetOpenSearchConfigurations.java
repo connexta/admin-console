@@ -17,6 +17,7 @@ import static org.codice.ddf.admin.sources.services.OpenSearchServiceProperties.
 import static org.codice.ddf.admin.sources.services.OpenSearchServiceProperties.SERVICE_PROPS_TO_OPENSEARCH_CONFIG;
 
 import java.util.List;
+import java.util.Set;
 
 import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.api.DataType;
@@ -24,12 +25,14 @@ import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.common.PidField;
+import org.codice.ddf.admin.common.report.message.DefaultMessages;
 import org.codice.ddf.admin.common.services.ServiceCommons;
 import org.codice.ddf.admin.sources.fields.type.OpenSearchSourceConfigurationField;
 import org.codice.ddf.admin.sources.opensearch.OpenSearchSourceInfoField;
 import org.codice.ddf.admin.sources.utils.SourceUtilCommons;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 public class GetOpenSearchConfigurations
         extends BaseFunctionField<ListField<OpenSearchSourceInfoField>> {
@@ -109,5 +112,10 @@ public class GetOpenSearchConfigurations
     @Override
     public FunctionField<ListField<OpenSearchSourceInfoField>> newInstance() {
         return new GetOpenSearchConfigurations(configuratorSuite);
+    }
+
+    @Override
+    public Set<String> getFunctionErrorCodes() {
+        return ImmutableSet.of(DefaultMessages.NO_EXISTING_CONFIG);
     }
 }

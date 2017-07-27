@@ -223,6 +223,17 @@ class UpdateCswConfigurationSpec extends SourceCommonsSpec {
         report.messages()*.getPath() == [SERVICE_PID_PATH, SOURCE_NAME_PATH, ENDPOINT_URL_PATH, CSW_PROFILE_PATH]
     }
 
+    def 'Returns all the possible error codes correctly'(){
+        when:
+        def errorCodes = updateCswConfiguration.getFunctionErrorCodes()
+
+        then:
+        errorCodes.size() == 3
+        errorCodes.contains(DefaultMessages.NO_EXISTING_CONFIG)
+        errorCodes.contains(DefaultMessages.FAILED_PERSIST)
+        errorCodes.contains(SourceMessages.DUPLICATE_SOURCE_NAME)
+    }
+
     def createCswUpdateArgs(String password) {
         return [(CswSourceConfigurationField.DEFAULT_FIELD_NAME): createCswSourceConfig(password).getValue()]
     }

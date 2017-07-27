@@ -15,11 +15,14 @@ package org.codice.ddf.admin.ldap.discover;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
+import org.codice.ddf.admin.common.report.message.DefaultMessages;
 import org.codice.ddf.admin.ldap.commons.LdapConnectionAttempt;
+import org.codice.ddf.admin.ldap.commons.LdapMessages;
 import org.codice.ddf.admin.ldap.commons.LdapTestingUtils;
 import org.codice.ddf.admin.ldap.commons.ServerGuesser;
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindUserInfo;
@@ -30,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 public class LdapRecommendedSettings extends BaseFunctionField<LdapRecommendedSettingsField> {
 
@@ -101,6 +105,13 @@ public class LdapRecommendedSettings extends BaseFunctionField<LdapRecommendedSe
     @Override
     public LdapRecommendedSettingsField getReturnType() {
         return RETURN_TYPE;
+    }
+
+    @Override
+    public Set<String> getFunctionErrorCodes() {
+        return ImmutableSet.of(LdapMessages.CANNOT_BIND,
+                DefaultMessages.FAILED_TEST_SETUP,
+                DefaultMessages.CANNOT_CONNECT);
     }
 
     /**

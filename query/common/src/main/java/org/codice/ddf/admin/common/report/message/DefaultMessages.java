@@ -51,7 +51,7 @@ public class DefaultMessages {
 
     public static final String DUPLICATE_MAP_KEY = "DUPLICATE_MAP_KEY";
 
-    private static final String SIMILAR_SERVICE_EXISTS = "SIMILAR_SERVICE_EXISTS";
+    public static final String SIMILAR_SERVICE_EXISTS = "SIMILAR_SERVICE_EXISTS";
 
     public static ErrorMessage failedTestSetup() {
         return new ErrorMessageImpl(FAILED_TEST_SETUP);

@@ -97,4 +97,28 @@ class HostnameFieldTest extends Specification {
         validationMsgs.get(0).getCode() == DefaultMessages.MISSING_REQUIRED_FIELD
         validationMsgs.get(0).getPath() == HOSTNAME_FIELD_PATH
     }
+
+    def 'Returns all the possible error codes correctly'(){
+        setup:
+        HostnameField emptyHostnameField = new HostnameField()
+        emptyHostnameField.setValue('')
+
+        HostnameField missingHostnameField = new HostnameField()
+        missingHostnameField.isRequired(true)
+
+        HostnameField invalidHostnameField = new HostnameField()
+        invalidHostnameField.setValue('invalid host')
+
+        when:
+        def errorCodes = hostnameField.getErrorCodes()
+        def emptyHostnameFieldValidation = emptyHostnameField.validate()
+        def missingHostnameFieldValidation = missingHostnameField.validate()
+        def invalidHostnameFieldValidation = invalidHostnameField.validate()
+
+        then:
+        errorCodes.size() == 3
+        errorCodes.contains(emptyHostnameFieldValidation.get(0).getCode())
+        errorCodes.contains(missingHostnameFieldValidation.get(0).getCode())
+        errorCodes.contains(invalidHostnameFieldValidation.get(0).getCode())
+    }
 }

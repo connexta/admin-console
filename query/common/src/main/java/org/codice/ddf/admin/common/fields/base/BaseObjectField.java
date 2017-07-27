@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.api.DataType;
@@ -25,6 +26,8 @@ import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.api.fields.ObjectField;
 import org.codice.ddf.admin.api.report.ErrorMessage;
+
+import com.google.common.collect.ImmutableSet;
 
 public abstract class BaseObjectField extends BaseDataType<Map<String, Object>>
         implements ObjectField {
@@ -98,6 +101,18 @@ public abstract class BaseObjectField extends BaseDataType<Map<String, Object>>
     public void pathName(String pathName) {
         super.pathName(pathName);
         updateInnerFieldPaths();
+    }
+
+    @Override
+    public Set<String> getErrorCodes() {
+        return new ImmutableSet.Builder<String>()
+                .addAll(super.getErrorCodes())
+                .addAll(getFields().stream()
+                        .filter(field -> field instanceof DataType)
+                        .map(field -> field.getErrorCodes())
+                        .flatMap(Collection<String>::stream)
+                        .collect(Collectors.toList()))
+                .build();
     }
 
     public void updateInnerFieldPaths() {

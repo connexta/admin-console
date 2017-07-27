@@ -49,4 +49,23 @@ class BaseEnumFieldTest extends Specification {
         validationMsgs.get(0).getCode() == DefaultMessages.UNSUPPORTED_ENUM
         validationMsgs.get(0).getPath() == [TestEnumField.DEFAULT_FIELD_NAME]
     }
+
+    def 'Returns all the possible error codes correctly'(){
+        setup:
+        Field invalidEnumField = new TestEnumField()
+        invalidEnumField.setValue('notValidEnum')
+
+        Field missingEnumField = new TestEnumField()
+        missingEnumField.isRequired(true)
+
+        when:
+        def errorCodes = invalidEnumField.getErrorCodes()
+        def invalidEnumFieldValidation = invalidEnumField.validate()
+        def missingEnumFieldValidation = missingEnumField.validate()
+
+        then:
+        errorCodes.size() == 2
+        errorCodes.contains(invalidEnumFieldValidation.get(0).getCode())
+        errorCodes.contains(missingEnumFieldValidation.get(0).getCode())
+    }
 }

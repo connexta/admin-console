@@ -14,8 +14,11 @@
 package org.codice.ddf.admin.common.fields.base;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
@@ -25,17 +28,46 @@ import org.codice.ddf.admin.api.report.Report;
 import org.codice.ddf.admin.common.report.FunctionReportImpl;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 public abstract class BaseFunctionField<T extends DataType> extends BaseField<Map<String, Object>, FunctionReport<T>> implements FunctionField<T> {
 
     private FunctionReportImpl<T> report;
 
+    private String description;
+
     public BaseFunctionField(String functionName, String description) {
         super(functionName, description);
+        this.description = description;
         report = new FunctionReportImpl<>();
     }
 
+    @Override
+    public String description() {
+        Set<String> errors = getErrorCodes();
+        if (!errors.isEmpty()) {
+            return String.format("%s %n%n The possible errors are: %n- %s",
+                    description,
+                    formatErrorCodes(errors));
+        }
+        return super.description();
+    }
+
     public abstract T performFunction();
+
+    public abstract Set<String> getFunctionErrorCodes();
+
+    @Override
+    public Set<String> getErrorCodes() {
+        Set<String> errorCodes = new HashSet<>();
+        for (DataType dataType : getArguments()) {
+            errorCodes.addAll(dataType.getErrorCodes());
+        }
+        return new ImmutableSet.Builder<String>()
+                .addAll(getFunctionErrorCodes())
+                .addAll(errorCodes)
+                .build();
+    }
 
     @Override
     public void setValue(Map<String, Object> args) {
@@ -128,5 +160,11 @@ public abstract class BaseFunctionField<T extends DataType> extends BaseField<Ma
     protected BaseFunctionField addMessages(Report report) {
         return addArgumentMessages(report.argumentMessages()).
                 addResultMessages(report.resultMessages());
+    }
+
+    private String formatErrorCodes(Set<String> errorCodes) {
+        return errorCodes.stream()
+                .sorted()
+                .collect(Collectors.joining("\n- "));
     }
 }

@@ -17,6 +17,7 @@ package org.codice.ddf.admin.common.fields.base;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
@@ -25,6 +26,8 @@ import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.ImmutableSet;
 
 public abstract class BaseListField<T extends DataType> extends BaseDataType<List>
         implements ListField<T> {
@@ -122,6 +125,14 @@ public abstract class BaseListField<T extends DataType> extends BaseDataType<Lis
     public void pathName(String pathName) {
         super.pathName(pathName);
         getList().forEach(field -> field.updatePath(path()));
+    }
+
+    @Override
+    public Set<String> getErrorCodes() {
+        return new ImmutableSet.Builder<String>()
+                .addAll(super.getErrorCodes())
+                .addAll(createListEntry().getErrorCodes())
+                .build();
     }
 
     public BaseListField<T> useDefaultRequired() {

@@ -18,9 +18,13 @@ import static org.codice.ddf.admin.common.report.message.DefaultMessages.invalid
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Set;
 
 import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
+import org.codice.ddf.admin.common.report.message.DefaultMessages;
+
+import com.google.common.collect.ImmutableSet;
 
 public class UriField extends StringField {
 
@@ -63,5 +67,13 @@ public class UriField extends StringField {
             }
         }
         return validationMsgs;
+    }
+
+    @Override
+    public Set<String> getErrorCodes() {
+        return new ImmutableSet.Builder<String>()
+                .addAll(super.getErrorCodes())
+                .add(DefaultMessages.INVALID_URI)
+                .build();
     }
 }

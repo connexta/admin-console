@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -28,7 +27,6 @@ import javax.ws.rs.core.Response;
 
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
-import org.codice.ddf.admin.common.fields.common.HostField;
 import org.codice.ddf.admin.common.fields.common.ResponseField;
 import org.codice.ddf.admin.common.fields.common.UrlField;
 import org.codice.ddf.admin.common.report.ReportImpl;
@@ -43,38 +41,6 @@ public class RequestUtils {
 
     private static final int CLIENT_TIMEOUT_MILLIS =
             new Long(TimeUnit.SECONDS.toMillis(10)).intValue();
-
-    /**
-     * Takes a list of url formats, for example "https://%s:%d/wfs", formats them together with the
-     * hostField name and port, then sends GET requests to those URLs. If a request URL is returned in the
-     * {@code ResponseField}, it will not have the same path as the {@code hostField}.
-     * <p>
-     * Possible Error Codes to be returned
-     * - {@link org.codice.ddf.admin.common.report.message.DefaultMessages#CANNOT_CONNECT}
-     *
-     * @param hostField   host field containing the host name and port
-     * @param urlFormats  list of url formats to format with the hostField
-     * @param creds       credentials for basic authentication
-     * @param queryParams additional query params
-     * @return a {@link ReportWithResultImpl} containing a {@link ResponseField} on success, or {@link org.codice.ddf.admin.api.report.ErrorMessage}s on failure
-     */
-    public ReportWithResultImpl<ResponseField> discoverUrlFromHost(HostField hostField,
-            List<String> urlFormats, CredentialsField creds, Map<String, String> queryParams) {
-        for (String formatUrl : urlFormats) {
-            UrlField clientUrl = new UrlField();
-            clientUrl.setValue(String.format(formatUrl, hostField.hostname(), hostField.port()));
-
-            ReportWithResultImpl<ResponseField> responseReport = sendGetRequest(clientUrl,
-                    creds,
-                    queryParams);
-            if (!responseReport.containsErrorMsgs()) {
-                return responseReport;
-            }
-        }
-
-        return new ReportWithResultImpl<ResponseField>().addArgumentMessage(cannotConnectError(
-                hostField.path()));
-    }
 
     /**
      * Creates a secure CXF {@code WebClient} and sends a GET request to the URL given by the clientUrl and
@@ -203,6 +169,7 @@ public class RequestUtils {
         SecureCxfClientFactory<WebClient> clientFactory = createFactory(url, creds);
 
         WebClient client = clientFactory.getClient();
+
         if (queryParams != null) {
             queryParams.entrySet()
                     .forEach(entry -> client.query(entry.getKey(), entry.getValue()));

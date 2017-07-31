@@ -22,7 +22,6 @@ import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.common.AddressField;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
-import org.codice.ddf.admin.common.fields.common.ResponseField;
 import org.codice.ddf.admin.common.report.ReportWithResultImpl;
 import org.codice.ddf.admin.common.report.message.DefaultMessages;
 import org.codice.ddf.admin.sources.fields.type.WfsSourceConfigurationField;
@@ -33,7 +32,7 @@ import com.google.common.collect.ImmutableSet;
 
 public class DiscoverWfsSource extends BaseFunctionField<WfsSourceConfigurationField> {
 
-    public static final String FIELD_NAME = "discoverWfs";
+    public static final String FIELD_NAME = "discover";
 
     public static final String DESCRIPTION =
             "Attempts to discover a WFS source using the given hostname and port or URL. If a URL"
@@ -63,23 +62,19 @@ public class DiscoverWfsSource extends BaseFunctionField<WfsSourceConfigurationF
 
     @Override
     public WfsSourceConfigurationField performFunction() {
-        ReportWithResultImpl<ResponseField> responseResult;
+        ReportWithResultImpl<WfsSourceConfigurationField> configResult;
         if (address.url() != null) {
-            responseResult = wfsSourceUtils.sendRequest(address.urlField(), credentials);
+            configResult = wfsSourceUtils.getWfsConfigFromUrl(address.urlField(), credentials);
         } else {
-            responseResult = wfsSourceUtils.discoverWfsUrl(address.host(), credentials);
+            configResult = wfsSourceUtils.getWfsConfigFromHost(address.host(), credentials);
         }
 
-        addMessages(responseResult);
+        addMessages(configResult);
         if (containsErrorMsgs()) {
             return null;
         }
 
-        ReportWithResultImpl<WfsSourceConfigurationField> configResult =
-                wfsSourceUtils.getPreferredWfsConfig(responseResult.result(), credentials);
-
-        addMessages(configResult);
-        return configResult.isResultPresent() ? configResult.result() : null;
+        return configResult.result();
     }
 
     @Override

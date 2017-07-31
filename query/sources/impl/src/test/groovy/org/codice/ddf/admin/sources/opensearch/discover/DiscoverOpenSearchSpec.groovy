@@ -32,11 +32,13 @@ class DiscoverOpenSearchSpec extends SourceCommonsSpec {
 
     DiscoverOpenSearchSource discoverOpenSearch
 
-    static TEST_OPEN_SEARCH_URL = 'https://localhost:8993/services/catalog/query'
+    static TEST_OPEN_SEARCH_URL = 'https://testHostName:12345/services/catalog/query'
 
     static BASE_PATH = [DiscoverOpenSearchSource.FIELD_NAME, FunctionField.ARGUMENT]
 
     static ADDRESS_FIELD_PATH = [BASE_PATH, ADDRESS].flatten()
+
+    static HOST_FIELD_PATH = [ADDRESS_FIELD_PATH, HostField.DEFAULT_FIELD_NAME].flatten()
 
     static URL_FIELD_PATH = [ADDRESS_FIELD_PATH, URL_NAME].flatten()
 
@@ -51,7 +53,7 @@ class DiscoverOpenSearchSpec extends SourceCommonsSpec {
 
         when:
         def report = discoverOpenSearch.getValue()
-        def config = (OpenSearchSourceConfigurationField) report.result()
+        def config = report.result()
 
         then:
         config.endpointUrl() == TEST_OPEN_SEARCH_URL
@@ -65,10 +67,10 @@ class DiscoverOpenSearchSpec extends SourceCommonsSpec {
 
         when:
         def report = discoverOpenSearch.getValue()
-        def config = (OpenSearchSourceConfigurationField) report.result()
+        def config = report.result()
 
         then:
-        config.endpointUrl() == TEST_OPEN_SEARCH_URL
+        !config.endpointUrl().isEmpty()
         config.credentials().password() == FLAG_PASSWORD
     }
 
@@ -83,7 +85,7 @@ class DiscoverOpenSearchSpec extends SourceCommonsSpec {
         then:
         report.messages().size() == 1
         report.messages()[0].getCode() == DefaultMessages.UNKNOWN_ENDPOINT
-        report.messages()[0].getPath() == [DiscoverOpenSearchSource.FIELD_NAME]
+        report.messages()[0].getPath() == URL_FIELD_PATH
     }
 
     def 'Unknown endpoint with bad HTTP status code received'() {
@@ -97,10 +99,10 @@ class DiscoverOpenSearchSpec extends SourceCommonsSpec {
         then:
         report.messages().size() == 1
         report.messages()[0].getCode() == DefaultMessages.UNKNOWN_ENDPOINT
-        report.messages()[0].getPath() == [DiscoverOpenSearchSource.FIELD_NAME]
+        report.messages()[0].getPath() == URL_FIELD_PATH
     }
 
-    def 'Cannot connect if errors from discover url from host'() {
+    def 'Unknown endpoint if no pre-formatted URLs work when discovering with host+port'() {
         setup:
         discoverOpenSearch.setOpenSearchSourceUtils(prepareOpenSearchSourceUtils(200, osResponseBody, false))
         discoverOpenSearch.setValue(getBaseDiscoverByAddressArgs())
@@ -110,8 +112,8 @@ class DiscoverOpenSearchSpec extends SourceCommonsSpec {
 
         then:
         report.messages().size() == 1
-        report.messages()[0].getCode() == DefaultMessages.CANNOT_CONNECT
-        report.messages()[0].getPath() == [ADDRESS_FIELD_PATH, HostField.DEFAULT_FIELD_NAME].flatten()
+        report.messages()[0].getCode() == DefaultMessages.UNKNOWN_ENDPOINT
+        report.messages()[0].getPath() == HOST_FIELD_PATH
     }
 
     def 'Fail when missing required fields'() {

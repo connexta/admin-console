@@ -4,7 +4,7 @@ const CSW = {
   query: gql`
     query discovercsw ($address: Address!, $creds: Credentials) {
       csw {
-        discoverCsw(
+        discover(
           address : $address,
           creds : $creds
         )
@@ -27,14 +27,14 @@ const CSW = {
       createCswSource(source : $config)
     }
   `,
-  selector: (result) => result.csw.discoverCsw
+  selector: (result) => result.csw.discover
 }
 
 const WFS = {
   query: gql`
     query discoverWfs ($address: Address!, $creds: Credentials) {
       wfs {
-        discoverWfs(
+        discover(
           address : $address,
           creds : $creds
         )
@@ -55,14 +55,14 @@ const WFS = {
       createWfsSource(source : $config)
     }
   `,
-  selector: (result) => result.wfs.discoverWfs
+  selector: (result) => result.wfs.discover
 }
 
 const OpenSearch = {
   query: gql`
     query discoverOpenSearch ($address: Address!, $creds: Credentials) {
       openSearch {
-        discoverOpenSearch(
+        discover(
           address : $address,
           creds : $creds
         )
@@ -82,7 +82,7 @@ const OpenSearch = {
       createOpenSearchSource(source : $config)
     }
   `,
-  selector: (result) => result.openSearch.discoverOpenSearch
+  selector: (result) => result.openSearch.discover
 }
 
 export default { CSW, WFS, OpenSearch }

@@ -21,8 +21,11 @@ import static org.codice.ddf.admin.sources.fields.CswProfile.DDFCswFederatedSour
 import static org.codice.ddf.admin.sources.fields.CswProfile.GmdCswFederatedSource.GMD_CSW_ISO_FEDERATED_SOURCE;
 import static org.codice.ddf.admin.sources.utils.SourceUtilCommons.SOURCES_NAMESPACE_CONTEXT;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
@@ -30,6 +33,7 @@ import javax.xml.xpath.XPathFactory;
 
 import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.api.report.ReportWithResult;
+import org.codice.ddf.admin.common.PrioritizedBatchExecutor;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
 import org.codice.ddf.admin.common.fields.common.HostField;
 import org.codice.ddf.admin.common.fields.common.ResponseField;
@@ -37,6 +41,8 @@ import org.codice.ddf.admin.common.fields.common.UrlField;
 import org.codice.ddf.admin.common.report.ReportWithResultImpl;
 import org.codice.ddf.admin.sources.fields.type.CswSourceConfigurationField;
 import org.codice.ddf.admin.sources.utils.RequestUtils;
+import org.codice.ddf.admin.sources.utils.SourceTaskCallable;
+import org.codice.ddf.admin.sources.utils.SourceTaskHandler;
 import org.codice.ddf.admin.sources.utils.SourceUtilCommons;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,8 +60,12 @@ public class CswSourceUtils {
             "request",
             "GetCapabilities");
 
-    private static final List<String> URL_FORMATS = ImmutableList.of("https://%s:%d/services/csw",
-            "https://%s:%d/csw");
+    private static final List<List<String>> URL_FORMATS = ImmutableList.of(ImmutableList.of(
+            "https://%s:%d/services/csw",
+            "https://%s:%d/csw"),
+            ImmutableList.of("http://%s:%d/services/csw", "http://%s:%d/csw"));
+
+    private static final int THREAD_POOL_SIZE = 2;
 
     public static final String GMD_OUTPUT_SCHEMA = "http://www.isotc211.org/2005/gmd";
 
@@ -85,23 +95,53 @@ public class CswSourceUtils {
      * Attempts to discover the source from the given hostname and port with optional basic authentication.
      * <p>
      * Possible Error Codes to be returned
-     * - {@link org.codice.ddf.admin.common.report.message.DefaultMessages#CANNOT_CONNECT}
+     * - {@link org.codice.ddf.admin.common.report.message.DefaultMessages#UNKNOWN_ENDPOINT}
      *
      * @param hostField address to probe for CSW capabilities
      * @param creds     optional credentials for basic authentication
-     * @return a {@link ReportWithResultImpl} containing the {@link UrlField} or an {@link org.codice.ddf.admin.api.report.ErrorMessage} on failure.
+     * @return a {@link ReportWithResultImpl} containing the {@link CswSourceConfigurationField} or an {@link org.codice.ddf.admin.api.report.ErrorMessage} on failure.
      */
-    public ReportWithResult<ResponseField> discoverCswUrl(HostField hostField,
+    public ReportWithResult<CswSourceConfigurationField> getConfigFromHost(HostField hostField,
             CredentialsField creds) {
-        return requestUtils.discoverUrlFromHost(hostField,
-                URL_FORMATS,
-                creds,
-                GET_CAPABILITIES_PARAMS);
+        List<List<SourceTaskCallable<CswSourceConfigurationField>>> taskList = new ArrayList<>();
+
+        for (List<String> urlFormats : URL_FORMATS) {
+            List<SourceTaskCallable<CswSourceConfigurationField>> callables = urlFormats.stream()
+                    .map(urlFormat -> new SourceTaskCallable<>(urlFormat,
+                            hostField,
+                            creds,
+                            this::getCswConfigFromUrl))
+                    .collect(Collectors.toList());
+            taskList.add(callables);
+        }
+
+        PrioritizedBatchExecutor<ReportWithResultImpl<CswSourceConfigurationField>, ReportWithResultImpl<CswSourceConfigurationField>>
+                prioritizedExecutor = new PrioritizedBatchExecutor(THREAD_POOL_SIZE,
+                taskList,
+                new SourceTaskHandler<CswSourceConfigurationField>());
+
+        Optional<ReportWithResultImpl<CswSourceConfigurationField>> result =
+                prioritizedExecutor.getFirst();
+
+        if (result.isPresent()) {
+            return result.get();
+        } else {
+            return new ReportWithResultImpl<CswSourceConfigurationField>().addArgumentMessage(
+                    unknownEndpointError(hostField.path()));
+        }
     }
 
-    public ReportWithResultImpl<ResponseField> sendRequest(UrlField urlField,
+    public ReportWithResultImpl<CswSourceConfigurationField> getCswConfigFromUrl(UrlField urlField,
             CredentialsField creds) {
-        return requestUtils.sendGetRequest(urlField, creds, GET_CAPABILITIES_PARAMS);
+        ReportWithResultImpl<ResponseField> responseResult = requestUtils.sendGetRequest(urlField,
+                creds,
+                GET_CAPABILITIES_PARAMS);
+
+        if (responseResult.containsErrorMsgs()) {
+            return (ReportWithResultImpl) responseResult;
+        }
+
+        return getCswConfigFromResponse(responseResult.result(), creds);
     }
 
     /**
@@ -114,14 +154,15 @@ public class CswSourceUtils {
      * @param creds         credentials used for the original HTTP request
      * @return a {@link ReportWithResultImpl} containing the {@link CswSourceConfigurationField} or an {@link org.codice.ddf.admin.api.report.ErrorMessage} on failure.
      */
-    public ReportWithResult<CswSourceConfigurationField> getPreferredCswConfig(
+    private ReportWithResultImpl<CswSourceConfigurationField> getCswConfigFromResponse(
             ResponseField responseField, CredentialsField creds) {
         ReportWithResultImpl<CswSourceConfigurationField> configResult =
                 new ReportWithResultImpl<>();
 
         String responseBody = responseField.responseBody();
         if (responseField.statusCode() != HTTP_OK || responseBody.length() < 1) {
-            configResult.addResultMessage(unknownEndpointError());
+            configResult.addArgumentMessage(unknownEndpointError(responseField.requestUrlField()
+                    .path()));
             return configResult;
         }
 
@@ -130,7 +171,8 @@ public class CswSourceUtils {
             capabilitiesXml = sourceUtilCommons.createDocument(responseBody);
         } catch (Exception e) {
             LOGGER.debug("Failed to create XML document from response.");
-            configResult.addResultMessage(unknownEndpointError());
+            configResult.addArgumentMessage(unknownEndpointError(responseField.requestUrlField()
+                    .path()));
             return configResult;
         }
 
@@ -182,7 +224,8 @@ public class CswSourceUtils {
 
         LOGGER.debug("URL [{}] responded to GetCapabilities request, but response was not readable.",
                 requestUrl);
-        configResult.addResultMessage(unknownEndpointError());
+        configResult.addArgumentMessage(unknownEndpointError(responseField.requestUrlField()
+                .path()));
         return configResult;
     }
 

@@ -23,8 +23,6 @@ import org.codice.ddf.admin.api.report.ReportWithResult;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.common.AddressField;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
-import org.codice.ddf.admin.common.fields.common.ResponseField;
-import org.codice.ddf.admin.common.report.ReportWithResultImpl;
 import org.codice.ddf.admin.common.report.message.DefaultMessages;
 import org.codice.ddf.admin.sources.fields.type.OpenSearchSourceConfigurationField;
 import org.codice.ddf.admin.sources.opensearch.OpenSearchSourceUtils;
@@ -35,13 +33,14 @@ import com.google.common.collect.ImmutableSet;
 public class DiscoverOpenSearchSource
         extends BaseFunctionField<OpenSearchSourceConfigurationField> {
 
-    public static final String FIELD_NAME = "discoverOpenSearch";
+    public static final String FIELD_NAME = "discover";
 
     public static final String DESCRIPTION =
             "Attempts to discover an OpenSearch source using the given hostname and port or URL. If a URL "
                     + "is provided, it will take precedence over a hostname and port.";
 
-    public static final OpenSearchSourceConfigurationField RETURN_TYPE = new OpenSearchSourceConfigurationField();
+    public static final OpenSearchSourceConfigurationField RETURN_TYPE =
+            new OpenSearchSourceConfigurationField();
 
     private CredentialsField credentials;
 
@@ -70,24 +69,21 @@ public class DiscoverOpenSearchSource
 
     @Override
     public OpenSearchSourceConfigurationField performFunction() {
-        ReportWithResult<ResponseField> responseField;
+        ReportWithResult<OpenSearchSourceConfigurationField> configResult;
         if (address.url() != null) {
-            responseField = openSearchSourceUtils.sendRequest(address.urlField(), credentials);
+            configResult = openSearchSourceUtils.getOpenSearchConfigFromUrl(address.urlField(),
+                    credentials);
         } else {
-            responseField = openSearchSourceUtils.discoverOpenSearchUrl(address.host(),
+            configResult = openSearchSourceUtils.getOpenSearchConfigFromHost(address.host(),
                     credentials);
         }
 
-        addMessages(responseField);
+        addMessages(configResult);
         if (containsErrorMsgs()) {
             return null;
         }
 
-        ReportWithResultImpl<OpenSearchSourceConfigurationField> configResult =
-                openSearchSourceUtils.getOpenSearchConfig(responseField.result(), credentials);
-
-        addMessages(configResult);
-        return configResult.isResultPresent() ? configResult.result() : null;
+        return configResult.result();
     }
 
     @Override
@@ -100,16 +96,16 @@ public class DiscoverOpenSearchSource
         return new DiscoverOpenSearchSource(configuratorSuite);
     }
 
+    @Override
+    public Set<String> getFunctionErrorCodes() {
+        return ImmutableSet.of(DefaultMessages.CANNOT_CONNECT,
+                DefaultMessages.UNKNOWN_ENDPOINT);
+    }
+
     /**
      * For testing purposes only. Groovy can access private methods
      */
     private void setOpenSearchSourceUtils(OpenSearchSourceUtils openSearchSourceUtils) {
         this.openSearchSourceUtils = openSearchSourceUtils;
-    }
-
-    @Override
-    public Set<String> getFunctionErrorCodes() {
-        return ImmutableSet.of(DefaultMessages.CANNOT_CONNECT,
-                DefaultMessages.UNKNOWN_ENDPOINT);
     }
 }

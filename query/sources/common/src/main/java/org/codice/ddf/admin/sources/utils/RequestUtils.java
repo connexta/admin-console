@@ -73,7 +73,7 @@ public class RequestUtils {
     }
 
     /**
-     * Executes a request by creating a Secure CXF Client from the provided url, credentials, and query params.
+     * Sends a GET request with the given {@code WebClient}
      * <p>
      * Possible Error Codes to return
      * - {@link org.codice.ddf.admin.common.report.message.DefaultMessages#CANNOT_CONNECT}
@@ -90,7 +90,7 @@ public class RequestUtils {
         try {
             response = webClient.get();
         } catch (ProcessingException e) {
-            responseResult.addResultMessage(cannotConnectError());
+            responseResult.addArgumentMessage(cannotConnectError(urlField.path()));
             return responseResult;
         }
 
@@ -121,13 +121,14 @@ public class RequestUtils {
         WebClient webClient = createWebClientBuilder(urlField.getValue(),
                 creds.username(),
                 creds.password(),
-                null).build();
+                null).contentType(contentType)
+                .build();
 
         return sendPostRequest(webClient, urlField, content);
     }
 
     /**
-     * Sends a POST request with the given webClient
+     * Sends a POST request with the given {@code WebClient}
      * <p>
      * Possible Error Codes to return
      * - {@link org.codice.ddf.admin.common.report.message.DefaultMessages#CANNOT_CONNECT}
@@ -145,7 +146,7 @@ public class RequestUtils {
         try {
             response = webClient.post(content);
         } catch (ProcessingException e) {
-            responseResult.addArgumentMessage(cannotConnectError());
+            responseResult.addArgumentMessage(cannotConnectError(urlField.path()));
             return responseResult;
         }
 

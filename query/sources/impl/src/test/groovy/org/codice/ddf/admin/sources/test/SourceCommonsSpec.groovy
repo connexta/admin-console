@@ -35,6 +35,7 @@ import org.codice.ddf.admin.sources.utils.RequestUtils
 import org.codice.ddf.cxf.SecureCxfClientFactory
 import spock.lang.Specification
 
+import javax.ws.rs.core.MediaType
 import javax.ws.rs.core.Response
 
 class SourceCommonsSpec extends Specification {
@@ -82,6 +83,8 @@ class SourceCommonsSpec extends Specification {
     public static final String TEST_PASSWORD = "admin"
 
     public static final String TEST_SOURCENAME = "testSourceName"
+
+    public static final String TEST_CONTENT_TYPE = 'text/xml'
 
     static Map<String, Object> getBaseDiscoverByAddressArgs(String hostName = 'localhost', int port = 8993) {
         return [
@@ -159,10 +162,14 @@ class SourceCommonsSpec extends Specification {
         return report
     }
 
-    def createMockWebClientBuilder(int statusCode, String responseBody) {
+    def createMockWebClientBuilder(int statusCode, String responseBody, String contentType = TEST_CONTENT_TYPE) {
+        def mediaType = Spy(MediaType)
+        mediaType.toString() >> contentType
+
         def mockResponse = Mock(Response)
         mockResponse.getStatus() >> statusCode
         mockResponse.readEntity(String.class) >> responseBody
+        mockResponse.getMediaType() >> mediaType
 
         def mockWebClient = Mock(WebClient)
         mockWebClient.get() >> mockResponse

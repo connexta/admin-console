@@ -159,16 +159,24 @@ class SourceCommonsSpec extends Specification {
         return report
     }
 
-    RequestUtils.WebClientBuilder createMockWebClientBuilder(int statusCode, String responseBody) {
+    def createMockWebClientBuilder(int statusCode, String responseBody) {
         def mockResponse = Mock(Response)
         mockResponse.getStatus() >> statusCode
         mockResponse.readEntity(String.class) >> responseBody
 
         def mockWebClient = Mock(WebClient)
         mockWebClient.get() >> mockResponse
-        mockWebClient.post(_) >> mockResponse
+        mockWebClient.post(_ as Object) >> mockResponse
 
         def webClientBuilder = Mock(RequestUtils.WebClientBuilder)
+        webClientBuilder.queryParams(_) >> webClientBuilder
+        webClientBuilder.path(_) >> webClientBuilder
+        webClientBuilder.contentType(_) >> webClientBuilder
+        webClientBuilder.accept(_) >> webClientBuilder
+        webClientBuilder.encoding(_) >> webClientBuilder
+        webClientBuilder.acceptEncoding(_) >> webClientBuilder
+        webClientBuilder.header(_, _) >> webClientBuilder
+        webClientBuilder.headers(_) >> webClientBuilder
         webClientBuilder.build() >> mockWebClient
 
         return webClientBuilder

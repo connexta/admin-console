@@ -42,9 +42,14 @@ public class LdapTestingCommons {
     }
 
     public static LdapBindUserInfo simpleBindInfo() {
-        return new LdapBindUserInfo().bindMethod(LdapBindMethod.Simple.SIMPLE)
-                .username(TestLdapServer.getBasicAuthDn())
-                .password(TestLdapServer.getBasicAuthPassword());
+        LdapBindUserInfo ldapBindUserInfo =
+                new LdapBindUserInfo().bindMethod(LdapBindMethod.Simple.SIMPLE)
+                        .username(TestLdapServer.getBasicAuthDn())
+                        .password(TestLdapServer.getBasicAuthPassword());
+        ldapBindUserInfo.credentialsField()
+                .passwordField()
+                .markAsInternalProcess();
+        return ldapBindUserInfo;
     }
 
     public static LdapDirectorySettingsField initLdapSettings(String useCase) {

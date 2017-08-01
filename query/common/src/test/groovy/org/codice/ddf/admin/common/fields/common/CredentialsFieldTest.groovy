@@ -24,6 +24,8 @@ class CredentialsFieldTest extends Specification {
 
     static PASSWORD_FIELD_PATH = [CredentialsField.DEFAULT_FIELD_NAME, CredentialsField.PASSWORD_FIELD_NAME]
 
+    static String REAL_PASSWORD = "admin"
+
     def setup() {
         credentialsField = new CredentialsField()
     }
@@ -70,5 +72,16 @@ class CredentialsFieldTest extends Specification {
         validationMsgs.size() == 1
         validationMsgs.get(0).getCode() == DefaultMessages.MISSING_REQUIRED_FIELD
         validationMsgs.get(0).getPath() == USERNAME_FIELD_PATH
+    }
+
+    def 'Verify if the set password is returned correctly'(){
+        setup:
+        credentialsField.password(REAL_PASSWORD)
+
+        when:
+        String password = credentialsField.password()
+
+        then:
+        password == REAL_PASSWORD
     }
 }

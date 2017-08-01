@@ -151,8 +151,8 @@ class DiscoverOpenSearchSpec extends SourceCommonsSpec {
     }
 
     def prepareOpenSearchSourceUtils(int statusCode, String responseBody, boolean endpointIsReachable) {
-        def requestUtils = new TestRequestUtils(createMockFactory(statusCode, responseBody), endpointIsReachable)
-        def openSearchUtils = new OpenSearchSourceUtils()
+        def requestUtils = new TestRequestUtils(createMockWebClientBuilder(statusCode, responseBody), endpointIsReachable)
+        def openSearchUtils = new OpenSearchSourceUtils(Mock(ConfiguratorSuite))
         openSearchUtils.setRequestUtils(requestUtils)
         return openSearchUtils
     }

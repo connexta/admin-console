@@ -57,7 +57,7 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
     DiscoverCswSource discoverCsw
 
     def setup() {
-        discoverCsw = new DiscoverCswSource()
+        discoverCsw = new DiscoverCswSource(Mock(ConfiguratorSuite))
     }
 
     def 'Successfully discover DDF federation profile with URL'() {
@@ -286,8 +286,8 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
     }
 
     def prepareCswSourceUtils(int statusCode, String responseBody, boolean endpointIsReachable) {
-        def requestUtils = new TestRequestUtils(createMockFactory(statusCode, responseBody), endpointIsReachable)
-        def cswUtils = new CswSourceUtils()
+        def requestUtils = new TestRequestUtils(createMockWebClientBuilder(statusCode, responseBody), endpointIsReachable)
+        def cswUtils = new CswSourceUtils(Mock(ConfiguratorSuite))
         cswUtils.setRequestUtils(requestUtils)
         return cswUtils
     }

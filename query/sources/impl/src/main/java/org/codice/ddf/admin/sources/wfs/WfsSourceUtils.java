@@ -52,7 +52,7 @@ public class WfsSourceUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WfsSourceUtils.class);
 
-    public static final Map<String, String> GET_CAPABILITIES_PARAMS = ImmutableMap.of("service",
+    public static final Map<String, Object> GET_CAPABILITIES_PARAMS = ImmutableMap.of("service",
             "WFS",
             "request",
             "GetCapabilities",

@@ -18,13 +18,13 @@ import static org.codice.ddf.admin.common.report.message.DefaultMessages.cannotC
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.Collections;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
+import javax.annotation.Nullable;
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.core.Response;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
 import org.codice.ddf.admin.common.fields.common.ResponseField;
@@ -35,12 +35,13 @@ import org.codice.ddf.cxf.SecureCxfClientFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ddf.security.Subject;
+
 public class RequestUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RequestUtils.class);
 
-    private static final int CLIENT_TIMEOUT_MILLIS =
-            new Long(TimeUnit.SECONDS.toMillis(10)).intValue();
+    private static final int CLIENT_TIMEOUT_MILLIS = 10000;
 
     /**
      * Creates a secure CXF {@code WebClient} and sends a GET request to the URL given by the clientUrl and
@@ -55,23 +56,20 @@ public class RequestUtils {
      * @return {@link ReportWithResultImpl} containing a {@link ResponseField}, or containing an {@link org.codice.ddf.admin.api.report.ErrorMessage}
      */
     public ReportWithResultImpl<ResponseField> sendGetRequest(UrlField requestUrl,
-            CredentialsField creds, Map<String, String> queryParams) {
+            CredentialsField creds, Map<String, Object> queryParams) {
         ReportWithResultImpl<ResponseField> responseResult = new ReportWithResultImpl<>();
         responseResult.addMessages(endpointIsReachable(requestUrl));
         if (responseResult.containsErrorMsgs()) {
             return responseResult;
         }
 
-        ReportWithResultImpl<Response> httpResponse = executeGetRequest(requestUrl,
-                creds,
-                queryParams);
-        if (httpResponse.containsErrorMsgs()) {
-            responseResult.addMessages(httpResponse);
-            return responseResult;
-        }
+        WebClient webClient = createWebClientBuilder(requestUrl.getValue(),
+                creds.username(),
+                creds.password(),
+                null).queryParams(queryParams)
+                .build();
 
-        return new ReportWithResultImpl<>(responseFieldFromResponse(httpResponse.result(),
-                requestUrl));
+        return sendGetRequest(webClient, requestUrl);
     }
 
     /**
@@ -80,25 +78,24 @@ public class RequestUtils {
      * Possible Error Codes to return
      * - {@link org.codice.ddf.admin.common.report.message.DefaultMessages#CANNOT_CONNECT}
      *
-     * @param clientUrl   url to send GET request to
-     * @param creds       optional basic authentication
-     * @param queryParams additional query parameters
+     * @param webClient {@code WebClient} to send a GET request with
+     * @param urlField  the original request url
      * @return {@link Response} of the request
      */
-    public ReportWithResultImpl<Response> executeGetRequest(UrlField clientUrl,
-            CredentialsField creds, Map<String, String> queryParams) {
-        WebClient client = generateClient(clientUrl.getValue(), creds, queryParams);
-        ReportWithResultImpl<Response> report = new ReportWithResultImpl<>();
+    public ReportWithResultImpl<ResponseField> sendGetRequest(WebClient webClient,
+            UrlField urlField) {
+        ReportWithResultImpl<ResponseField> responseResult = new ReportWithResultImpl<>();
         Response response;
+
         try {
-            response = client.get();
+            response = webClient.get();
         } catch (ProcessingException e) {
-            report.addResultMessage(cannotConnectError());
-            return report;
+            responseResult.addResultMessage(cannotConnectError());
+            return responseResult;
         }
 
-        report.result(response);
-        return report;
+        responseResult.result(responseFieldFromResponse(response, urlField));
+        return responseResult;
     }
 
     /**
@@ -121,9 +118,36 @@ public class RequestUtils {
             return responseResult;
         }
 
-        WebClient client = generateClient(urlField.getValue(), creds, Collections.emptyMap());
-        Response response = client.type(contentType)
-                .post(content);
+        WebClient webClient = createWebClientBuilder(urlField.getValue(),
+                creds.username(),
+                creds.password(),
+                null).build();
+
+        return sendPostRequest(webClient, urlField, content);
+    }
+
+    /**
+     * Sends a POST request with the given webClient
+     * <p>
+     * Possible Error Codes to return
+     * - {@link org.codice.ddf.admin.common.report.message.DefaultMessages#CANNOT_CONNECT}
+     *
+     * @param webClient {@code WebClient} to send POST request with
+     * @param urlField  original request url field
+     * @param content   Body of the post request
+     * @return
+     */
+    public ReportWithResultImpl<ResponseField> sendPostRequest(WebClient webClient,
+            UrlField urlField, String content) {
+        ReportWithResultImpl<ResponseField> responseResult = new ReportWithResultImpl<>();
+        Response response;
+
+        try {
+            response = webClient.post(content);
+        } catch (ProcessingException e) {
+            responseResult.addArgumentMessage(cannotConnectError());
+            return responseResult;
+        }
 
         ResponseField responseField = responseFieldFromResponse(response, urlField);
 
@@ -164,29 +188,85 @@ public class RequestUtils {
         return report;
     }
 
-    private WebClient generateClient(String url, CredentialsField creds,
-            Map<String, String> queryParams) {
-        SecureCxfClientFactory<WebClient> clientFactory = createFactory(url, creds);
+    public class WebClientBuilder {
 
-        WebClient client = clientFactory.getClient();
+        private final WebClient webClient;
 
-        if (queryParams != null) {
-            queryParams.entrySet()
-                    .forEach(entry -> client.query(entry.getKey(), entry.getValue()));
+        private WebClientBuilder(String url, String username, String password,
+                @Nullable Subject subject) {
+            this(url, username, password, subject, WebClient.class);
         }
-        return client;
+
+        private WebClientBuilder(String url, String username, String password,
+                @Nullable Subject subject, Class clientServiceClass) {
+            SecureCxfClientFactory<WebClient> clientFactory =
+                    StringUtils.isEmpty(username) || StringUtils.isEmpty(password) ?
+                            new SecureCxfClientFactory<>(url, clientServiceClass) :
+                            new SecureCxfClientFactory<>(url,
+                                    clientServiceClass,
+                                    username,
+                                    password);
+
+            webClient = clientFactory.getWebClientForSubject(subject);
+        }
+
+        public WebClientBuilder queryParams(Map<String, Object> queryParams) {
+            queryParams.entrySet()
+                    .forEach(entry -> webClient.query(entry.getKey(), entry.getValue()));
+
+            return this;
+        }
+
+        public WebClientBuilder path(String path) {
+            webClient.path(path);
+            return this;
+        }
+
+        public WebClientBuilder contentType(String contentType) {
+            webClient.type(contentType);
+            return this;
+        }
+
+        public WebClientBuilder accept(String... mediaTypes) {
+            webClient.accept(mediaTypes);
+            return this;
+        }
+
+        public WebClientBuilder encoding(String encoding) {
+            webClient.encoding(encoding);
+            return this;
+        }
+
+        public WebClientBuilder acceptEncoding(String... acceptEncodings) {
+            webClient.acceptEncoding(acceptEncodings);
+            return this;
+        }
+
+        public WebClientBuilder header(String header, Object... values) {
+            webClient.header(header, values);
+            return this;
+        }
+
+        public WebClientBuilder headers(Map<String, Object> headers) {
+            headers.entrySet()
+                    .forEach(entry -> webClient.header(entry.getKey(), entry.getValue()));
+
+            return this;
+        }
+
+        public WebClient build() {
+            return webClient;
+        }
     }
 
-    /**
-     * This is broken out for testing purposes so that the SecureCxfClientFactory can be mocked out.
-     */
-    protected SecureCxfClientFactory<WebClient> createFactory(String url, CredentialsField creds) {
-        return creds.username() == null || creds.password() == null ? new SecureCxfClientFactory<>(
-                url,
-                WebClient.class) : new SecureCxfClientFactory<>(url,
-                WebClient.class,
-                creds.username(),
-                creds.password());
+    public WebClientBuilder createWebClientBuilder(String url, String username, String password,
+            Subject subject) {
+        return new WebClientBuilder(url, username, password, subject, WebClient.class);
+    }
+
+    public WebClientBuilder createWebClientBuilder(String url, String username, String password,
+            Subject subject, Class serviceClass) {
+        return new WebClientBuilder(url, username, password, subject, serviceClass);
     }
 
     private ResponseField responseFieldFromResponse(Response response, UrlField requestUrl) {

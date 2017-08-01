@@ -20,6 +20,7 @@ import ddf.catalog.service.ConfiguredService
 import ddf.catalog.source.Source
 import ddf.catalog.source.SourceMonitor
 import ddf.catalog.source.UnsupportedQueryException
+import ddf.security.Subject
 import org.apache.cxf.jaxrs.client.WebClient
 import org.codice.ddf.admin.common.fields.common.AddressField
 import org.codice.ddf.admin.common.fields.common.CredentialsField
@@ -123,18 +124,23 @@ class SourceCommonsSpec extends Specification {
 
     static class TestRequestUtils extends RequestUtils {
 
-        SecureCxfClientFactory factory
+        RequestUtils.WebClientBuilder webClientBuilder
 
         boolean endpointIsReachable
 
-        TestRequestUtils(SecureCxfClientFactory mockFactory, boolean isReachable) {
-            factory = mockFactory
+        TestRequestUtils(RequestUtils.WebClientBuilder mockWebClientBuilder, boolean isReachable) {
+            webClientBuilder = mockWebClientBuilder
             endpointIsReachable = isReachable
         }
 
         @Override
-        protected SecureCxfClientFactory<WebClient> createFactory(String url, CredentialsField creds) {
-            return factory
+        public RequestUtils.WebClientBuilder createWebClientBuilder(String url, String username, String password, Subject subject) {
+            return webClientBuilder
+        }
+
+        @Override
+        public RequestUtils.WebClientBuilder createWebClientBuilder(String url, String username, String password, Subject subject, Class serviceClass) {
+            return webClientBuilder
         }
 
         @Override
@@ -153,18 +159,19 @@ class SourceCommonsSpec extends Specification {
         return report
     }
 
-    SecureCxfClientFactory createMockFactory(int statusCode, String responseBody) {
+    RequestUtils.WebClientBuilder createMockWebClientBuilder(int statusCode, String responseBody) {
         def mockResponse = Mock(Response)
         mockResponse.getStatus() >> statusCode
         mockResponse.readEntity(String.class) >> responseBody
 
         def mockWebClient = Mock(WebClient)
         mockWebClient.get() >> mockResponse
+        mockWebClient.post(_) >> mockResponse
 
-        def mockFactory = Mock(SecureCxfClientFactory)
-        mockFactory.getClient() >> mockWebClient
+        def webClientBuilder = Mock(RequestUtils.WebClientBuilder)
+        webClientBuilder.build() >> mockWebClient
 
-        return mockFactory
+        return webClientBuilder
     }
 
     /**

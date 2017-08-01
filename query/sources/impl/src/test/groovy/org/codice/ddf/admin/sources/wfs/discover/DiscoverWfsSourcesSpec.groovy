@@ -204,8 +204,8 @@ class DiscoverWfsSourcesSpec extends SourceCommonsSpec {
     }
 
     def prepareOpenSearchSourceUtils(int statusCode, String responseBody, boolean endpointIsReachable) {
-        def requestUtils = new TestRequestUtils(createMockFactory(statusCode, responseBody), endpointIsReachable)
-        def wfsUtils = new WfsSourceUtils()
+        def requestUtils = new TestRequestUtils(createMockWebClientBuilder(statusCode, responseBody), endpointIsReachable)
+        def wfsUtils = new WfsSourceUtils(Mock(ConfiguratorSuite))
         wfsUtils.setRequestUtils(requestUtils)
         return wfsUtils
     }

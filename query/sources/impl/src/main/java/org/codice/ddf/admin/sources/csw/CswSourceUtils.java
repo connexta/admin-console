@@ -55,7 +55,7 @@ public class CswSourceUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CswSourceUtils.class);
 
-    public static final Map<String, String> GET_CAPABILITIES_PARAMS = ImmutableMap.of("service",
+    public static final Map<String, Object> GET_CAPABILITIES_PARAMS = ImmutableMap.of("service",
             "CSW",
             "request",
             "GetCapabilities");

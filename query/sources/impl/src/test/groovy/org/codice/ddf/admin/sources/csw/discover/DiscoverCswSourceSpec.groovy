@@ -74,7 +74,7 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
         config.cswProfile() == CswProfile.DDFCswFederatedSource.CSW_FEDERATION_PROFILE_SOURCE
         config.outputSchema() == CswSourceUtils.METACARD_OUTPUT_SCHEMA
         config.spatialOperator() == NO_FILTER
-        config.credentials().password() == FLAG_PASSWORD
+        config.credentials().realPassword() == FLAG_PASSWORD
     }
 
     def 'Successfully discover CSWSpecification federation profile with URL'() {
@@ -91,7 +91,7 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
         config.cswProfile() == CswProfile.CswFederatedSource.CSW_SPEC_PROFILE_FEDERATED_SOURCE
         config.outputSchema() == CswSourceUtils.CSW_2_0_2_OUTPUT_SCHEMA
         config.spatialOperator() == NO_FILTER
-        config.credentials().password() == FLAG_PASSWORD
+        config.credentials().realPassword() == FLAG_PASSWORD
     }
 
     def 'Successfully discover GMD CSW federation profile with URL'() {
@@ -108,7 +108,7 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
         config.cswProfile() == CswProfile.GmdCswFederatedSource.GMD_CSW_ISO_FEDERATED_SOURCE
         config.outputSchema() == CswSourceUtils.GMD_OUTPUT_SCHEMA
         config.spatialOperator() == NO_FILTER
-        config.credentials().password() == FLAG_PASSWORD
+        config.credentials().realPassword() == FLAG_PASSWORD
     }
 
     def 'Successfully discover DDF federation profile using hostname and port'() {
@@ -125,7 +125,7 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
         config.cswProfile() == CswProfile.DDFCswFederatedSource.CSW_FEDERATION_PROFILE_SOURCE
         config.outputSchema() == CswSourceUtils.METACARD_OUTPUT_SCHEMA
         config.spatialOperator() == NO_FILTER
-        config.credentials().password() == FLAG_PASSWORD
+        config.credentials().realPassword() == FLAG_PASSWORD
     }
 
 
@@ -143,7 +143,7 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
         config.cswProfile() == CswProfile.CswFederatedSource.CSW_SPEC_PROFILE_FEDERATED_SOURCE
         config.outputSchema() == CswSourceUtils.CSW_2_0_2_OUTPUT_SCHEMA
         config.spatialOperator() == NO_FILTER
-        config.credentials().password() == FLAG_PASSWORD
+        config.credentials().realPassword() == FLAG_PASSWORD
     }
 
     def 'Successfully discover GMD CSW federation profile using hostname and port'() {
@@ -160,7 +160,7 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
         config.cswProfile() == CswProfile.GmdCswFederatedSource.GMD_CSW_ISO_FEDERATED_SOURCE
         config.outputSchema() == CswSourceUtils.GMD_OUTPUT_SCHEMA
         config.spatialOperator() == NO_FILTER
-        config.credentials().password() == FLAG_PASSWORD
+        config.credentials().realPassword() == FLAG_PASSWORD
     }
 
     def 'Unknown endpoint error with bad HTTP status'() {
@@ -233,7 +233,7 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
         config.cswProfile() == CswProfile.CswFederatedSource.CSW_SPEC_PROFILE_FEDERATED_SOURCE
         config.outputSchema() == CswSourceUtils.CSW_2_0_2_OUTPUT_SCHEMA
         config.spatialOperator() == NO_FILTER
-        config.credentials().password() == FLAG_PASSWORD
+        config.credentials().realPassword() == FLAG_PASSWORD
     }
 
     def 'Unknown endpoint error when there is no output schema'() {

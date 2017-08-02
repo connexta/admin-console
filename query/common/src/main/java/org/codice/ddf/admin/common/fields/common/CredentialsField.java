@@ -62,7 +62,7 @@ public class CredentialsField extends BaseObjectField {
         return password;
     }
 
-    public String password() {
+    public String realPassword() {
         return password.getRealPassword();
     }
 

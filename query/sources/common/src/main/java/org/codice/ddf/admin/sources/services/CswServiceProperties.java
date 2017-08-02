@@ -103,11 +103,11 @@ public class CswServiceProperties {
                         .putPropertyIfNotNull(FORCE_SPATIAL_FILTER, config.spatialOperatorField());
 
         String password = config.credentials()
-                .password();
+                .realPassword();
         if (password != null && !password.equals(FLAG_PASSWORD)) {
             builder.put(PASSWORD,
                     config.credentials()
-                            .password());
+                            .realPassword());
         }
 
         if (config.endpointUrl() != null && config.cswProfile()

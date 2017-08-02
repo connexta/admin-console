@@ -65,7 +65,7 @@ class DiscoverWfsSourcesSpec extends SourceCommonsSpec {
         then:
         config.endpointUrl() == TEST_WFS_URL
         config.wfsVersion() == WfsVersion.Wfs1.WFS_VERSION_1
-        config.credentials().password() == FLAG_PASSWORD
+        config.credentials().realPassword() == FLAG_PASSWORD
     }
 
     def 'Successfully discover WFS 2.0.0 configuration using URL'() {
@@ -80,7 +80,7 @@ class DiscoverWfsSourcesSpec extends SourceCommonsSpec {
         then:
         config.endpointUrl() == TEST_WFS_URL
         config.wfsVersion() == WfsVersion.Wfs2.WFS_VERSION_2
-        config.credentials().password() == FLAG_PASSWORD
+        config.credentials().realPassword() == FLAG_PASSWORD
     }
 
     def 'Successfully discover WFS 1.0.0 configuration using hostname and port'() {
@@ -95,7 +95,7 @@ class DiscoverWfsSourcesSpec extends SourceCommonsSpec {
         then:
         !config.endpointUrl().isEmpty()
         config.wfsVersion() == WfsVersion.Wfs1.WFS_VERSION_1
-        config.credentials().password() == FLAG_PASSWORD
+        config.credentials().realPassword() == FLAG_PASSWORD
     }
 
     def 'Successfully discover WFS 2.0.0 configuration using hostname and port'() {
@@ -110,7 +110,7 @@ class DiscoverWfsSourcesSpec extends SourceCommonsSpec {
         then:
         !config.endpointUrl().isEmpty()
         config.wfsVersion() == WfsVersion.Wfs2.WFS_VERSION_2
-        config.credentials().password() == FLAG_PASSWORD
+        config.credentials().realPassword() == FLAG_PASSWORD
     }
 
     def 'Unknown endpoint error when unrecognized WFS version is received'() {

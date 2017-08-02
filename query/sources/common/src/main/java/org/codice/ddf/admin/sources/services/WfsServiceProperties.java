@@ -85,11 +85,11 @@ public class WfsServiceProperties {
                                         .usernameField());
 
         String password = config.credentials()
-                .password();
+                .realPassword();
         if (password != null && !password.equals(FLAG_PASSWORD)) {
             builder.put(PASSWORD,
                     config.credentials()
-                            .password());
+                            .realPassword());
         }
         return builder.build();
     }

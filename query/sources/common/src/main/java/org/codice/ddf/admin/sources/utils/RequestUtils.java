@@ -56,7 +56,7 @@ public class RequestUtils {
             CredentialsField creds, Map<String, Object> queryParams) {
         WebClient webClient = createWebClientBuilder(requestUrl.getValue(),
                 creds.username(),
-                creds.password()).queryParams(queryParams)
+                creds.realPassword()).queryParams(queryParams)
                 .build();
 
         return sendGetRequest(webClient, requestUrl);
@@ -107,7 +107,7 @@ public class RequestUtils {
             CredentialsField creds, String contentType, String content) {
         WebClient webClient = createWebClientBuilder(urlField.getValue(),
                 creds.username(),
-                creds.password()).contentType(contentType)
+                creds.realPassword()).contentType(contentType)
                 .build();
 
         return sendPostRequest(webClient, urlField, content);

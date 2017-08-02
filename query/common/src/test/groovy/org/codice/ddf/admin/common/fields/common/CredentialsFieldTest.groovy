@@ -79,7 +79,7 @@ class CredentialsFieldTest extends Specification {
         credentialsField.password(REAL_PASSWORD)
 
         when:
-        String password = credentialsField.password()
+        String password = credentialsField.realPassword()
 
         then:
         password == REAL_PASSWORD

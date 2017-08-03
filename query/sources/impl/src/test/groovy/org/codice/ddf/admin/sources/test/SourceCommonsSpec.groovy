@@ -20,6 +20,7 @@ import ddf.catalog.service.ConfiguredService
 import ddf.catalog.source.Source
 import ddf.catalog.source.SourceMonitor
 import ddf.catalog.source.UnsupportedQueryException
+import ddf.security.Subject
 import org.apache.cxf.jaxrs.client.WebClient
 import org.codice.ddf.admin.common.fields.common.AddressField
 import org.codice.ddf.admin.common.fields.common.CredentialsField
@@ -34,6 +35,7 @@ import org.codice.ddf.admin.sources.utils.RequestUtils
 import org.codice.ddf.cxf.SecureCxfClientFactory
 import spock.lang.Specification
 
+import javax.ws.rs.core.MediaType
 import javax.ws.rs.core.Response
 
 class SourceCommonsSpec extends Specification {
@@ -82,6 +84,8 @@ class SourceCommonsSpec extends Specification {
 
     public static final String TEST_SOURCENAME = "testSourceName"
 
+    public static final String TEST_CONTENT_TYPE = 'text/xml'
+
     static Map<String, Object> getBaseDiscoverByAddressArgs(String hostName = 'localhost', int port = 8993) {
         return [
                 (ADDRESS)    : new AddressField().hostname(hostName).port(port).getValue(),
@@ -123,22 +127,35 @@ class SourceCommonsSpec extends Specification {
 
     static class TestRequestUtils extends RequestUtils {
 
-        SecureCxfClientFactory factory
+        RequestUtils.WebClientBuilder webClientBuilder
 
-        boolean endpointIsReachable
+        Boolean endpointIsReachable
 
-        TestRequestUtils(SecureCxfClientFactory mockFactory, boolean isReachable) {
-            factory = mockFactory
+        TestRequestUtils(RequestUtils.WebClientBuilder mockWebClientBuilder, Boolean isReachable) {
+            webClientBuilder = mockWebClientBuilder
             endpointIsReachable = isReachable
         }
 
+        TestRequestUtils(RequestUtils.WebClientBuilder mockWebClientBuilder) {
+            webClientBuilder = mockWebClientBuilder
+        }
+
         @Override
-        protected SecureCxfClientFactory<WebClient> createFactory(String url, CredentialsField creds) {
-            return factory
+        public RequestUtils.WebClientBuilder createWebClientBuilder(String url, String username, String password) {
+            return webClientBuilder
+        }
+
+        @Override
+        public RequestUtils.WebClientBuilder createWebClientBuilder(String url, String username, String password, Class serviceClass) {
+            return webClientBuilder
         }
 
         @Override
         public ReportImpl endpointIsReachable(UrlField urlField) {
+            if(endpointIsReachable == null) {
+                return super.endpointIsReachable(urlField)
+            }
+
             def report = new ReportImpl()
             if (!endpointIsReachable) {
                 report.addArgumentMessage(new ErrorMessageImpl(TEST_ERROR_CODE))
@@ -153,18 +170,31 @@ class SourceCommonsSpec extends Specification {
         return report
     }
 
-    SecureCxfClientFactory createMockFactory(int statusCode, String responseBody) {
+    def createMockWebClientBuilder(int statusCode, String responseBody, String contentType = TEST_CONTENT_TYPE) {
+        def mediaType = Spy(MediaType)
+        mediaType.toString() >> contentType
+
         def mockResponse = Mock(Response)
         mockResponse.getStatus() >> statusCode
         mockResponse.readEntity(String.class) >> responseBody
+        mockResponse.getMediaType() >> mediaType
 
         def mockWebClient = Mock(WebClient)
         mockWebClient.get() >> mockResponse
+        mockWebClient.post(_ as Object) >> mockResponse
 
-        def mockFactory = Mock(SecureCxfClientFactory)
-        mockFactory.getClient() >> mockWebClient
+        def webClientBuilder = Mock(RequestUtils.WebClientBuilder)
+        webClientBuilder.queryParams(_) >> webClientBuilder
+        webClientBuilder.path(_) >> webClientBuilder
+        webClientBuilder.contentType(_) >> webClientBuilder
+        webClientBuilder.accept(_) >> webClientBuilder
+        webClientBuilder.encoding(_) >> webClientBuilder
+        webClientBuilder.acceptEncoding(_) >> webClientBuilder
+        webClientBuilder.header(_, _) >> webClientBuilder
+        webClientBuilder.headers(_) >> webClientBuilder
+        webClientBuilder.build() >> mockWebClient
 
-        return mockFactory
+        return webClientBuilder
     }
 
     /**

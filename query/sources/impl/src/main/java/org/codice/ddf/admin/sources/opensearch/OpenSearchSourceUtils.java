@@ -57,7 +57,7 @@ public class OpenSearchSourceUtils {
             "https://%s:%d/catalog/query"),
             ImmutableList.of("http://%s:%d/services/catalog/query", "http://%s:%d/catalog/query"));
 
-    public static final Map<String, String> GET_CAPABILITIES_PARAMS = ImmutableMap.of("q",
+    public static final Map<String, Object> GET_CAPABILITIES_PARAMS = ImmutableMap.of("q",
             "test",
             "mr",
             "1",

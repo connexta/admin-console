@@ -137,12 +137,12 @@ class SourceCommonsSpec extends Specification {
         }
 
         @Override
-        public RequestUtils.WebClientBuilder createWebClientBuilder(String url, String username, String password, Subject subject) {
+        public RequestUtils.WebClientBuilder createWebClientBuilder(String url, String username, String password) {
             return webClientBuilder
         }
 
         @Override
-        public RequestUtils.WebClientBuilder createWebClientBuilder(String url, String username, String password, Subject subject, Class serviceClass) {
+        public RequestUtils.WebClientBuilder createWebClientBuilder(String url, String username, String password, Class serviceClass) {
             return webClientBuilder
         }
 

@@ -4,7 +4,6 @@ import Flexbox from 'flexbox-react'
 
 import { gql, withApollo } from 'react-apollo'
 
-import Stage from 'components/Stage'
 import Title from 'components/Title'
 import Description from 'components/Description'
 import Info from 'components/Information'
@@ -53,9 +52,7 @@ const ConfirmStage = (props) => {
     onEndSubmit,
     next,
 
-    disabled,
     prev,
-    submitting,
     messages = [],
     configs
   } = props
@@ -88,7 +85,7 @@ const ConfirmStage = (props) => {
   const mapping = Object.keys(configs.attributeMappings || {}).map((key) => ({ key, value: configs.attributeMappings[key] }))
 
   return (
-    <Stage submitting={submitting}>
+    <div>
       <Title>LDAP Settings Confirmation</Title>
 
       <Description>
@@ -125,27 +122,25 @@ const ConfirmStage = (props) => {
 
       <Body>
         <Navigation>
-          <Back
-            onClick={prev}
-            disabled={disabled} />
+          <Back onClick={prev} />
           <Finish
             onClick={() => {
               onStartSubmit()
               client.mutate(createLdapConfig(conn, info, settings, mapping))
                 .then(() => {
                   onEndSubmit()
-                  next({ nextStageId: 'final-stage' })
+                  next('final-stage')
                 })
                 .catch((err) => {
                   onEndSubmit()
                   onError(err.graphQLErrors)
                 })
             }}
-            disabled={disabled} />
+          />
         </Navigation>
         {messages.map((msg, i) => <Message key={i} {...msg} />)}
       </Body>
-    </Stage>
+    </div>
   )
 }
 

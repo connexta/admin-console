@@ -1,4 +1,8 @@
+import React from 'react'
+
 import { createWizard } from 'admin-wizard'
+
+import { List, Map } from 'immutable'
 
 import IntroductionStage from './stages/introduction-stage'
 import UseCaseStage from './stages/use-case-stage'
@@ -24,27 +28,20 @@ export const stages = {
   'final-stage': FinalStage
 }
 
-const configIds = [
-  'baseGroupDn',
-  'baseUserDn',
-  'bindKdcAddress',
-  'bindRealm',
-  'bindUser',
-  'bindUserMethod',
-  'bindUserPassword',
-  'encryption',
-  'groupAttributeHoldingMember',
-  'groupObjectClass',
-  'hostname',
-  'ldapType',
-  'ldapUseCase',
-  'memberAttributeReferencedInGroup',
-  'port',
-  'query',
-  'queryBase',
-  'subjectClaims',
-  'userAttributes',
-  'userNameAttribute'
-]
+const withLdapQuery = (Component) => ({ state, setState, props }) => {
+  return (
+    <Component
+      results={Map.isMap(state) || List.isList(state) ? state.toJS() : state}
+      onQuery={setState}
+      {...props}
+    />
+  )
+}
 
-export default createWizard('ldap', stages, configIds)
+const opts = {
+  shared: {
+    query: withLdapQuery
+  }
+}
+
+export default createWizard('ldap', stages, opts)

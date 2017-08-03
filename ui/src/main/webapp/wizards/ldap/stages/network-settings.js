@@ -4,7 +4,6 @@ import { gql, withApollo } from 'react-apollo'
 
 import Mount from 'react-mount'
 
-import Stage from 'components/Stage'
 import Title from 'components/Title'
 import Description from 'components/Description'
 import Message from 'components/Message'
@@ -30,27 +29,38 @@ const testConnect = (conn) => ({
   variables: { conn }
 })
 
+const keys = {
+  hostname: true,
+  port: true,
+  encryption: true
+}
+
 const NetworkSettings = (props) => {
   const {
     client,
     setDefaults,
     prev,
     next,
-    submitting,
-    disabled,
     configs,
+    onEdit,
     onError,
     onStartSubmit,
     onEndSubmit,
-    messages = []
+    errors
   } = props
 
+  const messages = errors.filter((err) => {
+    const attr = err.path[err.path.length - 1]
+    return !keys[attr]
+  })
+
   return (
-    <Stage submitting={submitting}>
+    <div>
       <Mount
         on={setDefaults}
         port={636}
         encryption='ldaps' />
+
       <Title>LDAP Network Settings</Title>
       <Description>
         To establish a connection to the remote LDAP store, we need the hostname of the
@@ -60,17 +70,24 @@ const NetworkSettings = (props) => {
       </Description>
 
       <Body>
-        <Hostname id='hostname' disabled={disabled} autoFocus />
-        <Port id='port' disabled={disabled} options={[389, 636]} />
-        <Select id='encryption'
+        <Hostname
+          value={configs.hostname}
+          onEdit={onEdit('hostname')}
+          autoFocus />
+
+        <Port
+          value={configs.port}
+          onEdit={onEdit('port')}
+          options={[389, 636]} />
+
+        <Select
+          value={configs.encryption}
+          onEdit={onEdit('encryption')}
           label='Encryption Method'
-          disabled={disabled}
           options={[ 'none', 'ldaps', 'startTls' ]} />
 
         <Navigation>
-          <Back
-            onClick={prev}
-            disabled={disabled} />
+          <Back onClick={prev} />
           <Next
             onClick={() => {
               onStartSubmit()
@@ -81,18 +98,18 @@ const NetworkSettings = (props) => {
               }))
                 .then(() => {
                   onEndSubmit()
-                  next({ nextStageId: 'bind-settings' })
+                  next('bind-settings')
                 })
                 .catch((err) => {
                   onEndSubmit()
                   onError(err.graphQLErrors)
                 })
             }}
-            disabled={disabled} />
+          />
         </Navigation>
         {messages.map((msg, i) => <Message key={i} {...msg} />)}
       </Body>
-    </Stage>
+    </div>
   )
 }
 

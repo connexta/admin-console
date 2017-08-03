@@ -1,30 +1,12 @@
 import React from 'react'
-import { connect } from 'react-redux'
+
 import { withApollo } from 'react-apollo'
 
 import Flexbox from 'flexbox-react'
 
-import { queryAllSources } from '../graphql-queries/source-discovery'
-import { SourceRadioButtons } from '../components'
-import {
-  getDiscoveryType,
-  getDiscoveredEndpoints,
-  getChosenEndpoint,
-  getErrors
-} from '../reducer'
-import {
-  changeStage,
-  setDiscoveredEndpoints,
-  setChosenEndpoint,
-  startSubmitting,
-  endSubmitting,
-  setErrors,
-  clearErrors
-} from '../actions'
+import { queries } from '../graphql'
 
 import RaisedButton from 'material-ui/RaisedButton'
-
-import { getAllConfig } from 'admin-wizard/reducer'
 
 import Title from 'components/Title'
 import Description from 'components/Description'
@@ -32,17 +14,20 @@ import Message from 'components/Message'
 import Body from 'components/wizard/Body'
 import Navigation, { Next, Back } from 'components/wizard/Navigation'
 
-const currentStageId = 'sourceSelectionStage'
+import { SourceRadioButtons } from './components'
 
-const SourceSelectionStageView = (props) => {
+const SourceSelectionStage = (props) => {
   const {
-    messages,
-    changeStage,
+    errors: messages = [],
+    prev,
+    next,
+    onStartSubmit,
+    onEndSubmit,
     discoveredEndpoints = {},
+    setDiscoveredEndpoints,
     chosenEndpoint,
     setChosenEndpoint,
-    clearErrors,
-    setErrors
+    onError
   } = props
 
   if (Object.keys(discoveredEndpoints).length !== 0) {
@@ -60,11 +45,11 @@ const SourceSelectionStageView = (props) => {
             valueSelected={chosenEndpoint}
             onChange={setChosenEndpoint}
           />
-          {messages.map((msg, i) => <Message key={i} message={msg} type='FAILURE' />)}
           <Navigation>
-            <Back onClick={() => changeStage('discoveryStage')} />
-            <Next disabled={chosenEndpoint === ''}
-              onClick={() => changeStage('confirmationStage')} />
+            <Back onClick={prev} />
+            <Next
+              disabled={chosenEndpoint === ''}
+              onClick={() => next('confirmationStage')} />
           </Navigation>
         </Body>
       </div>
@@ -87,41 +72,28 @@ const SourceSelectionStageView = (props) => {
               primary
               label='Refresh'
               onClick={() => {
-                queryAllSources(props)
+                onStartSubmit()
+                queries.queryAllSources(props)
                   .then((endpoints) => {
-                    props.setDiscoveredEndpoints(endpoints)
-                    clearErrors()
+                    onEndSubmit()
+                    setDiscoveredEndpoints(endpoints)
                   })
                   .catch((e) => {
-                    setErrors(currentStageId, e)
+                    onEndSubmit()
+                    onError(e)
                   })
-              }} />
+              }}
+            />
           </Flexbox>
           <Navigation>
-            <Back onClick={() => changeStage('discoveryStage')} />
+            <Back onClick={prev} />
             <Next disabled />
           </Navigation>
-          { messages.map((msg, i) => <Message key={i} {...msg} />) }
+          {messages.map((msg, i) => <Message key={i} {...msg} />)}
         </Body>
       </div>
     )
   }
 }
-
-const SourceSelectionStage = connect((state) => ({
-  messages: getErrors(state, currentStageId),
-  discoveryType: getDiscoveryType(state),
-  discoveredEndpoints: getDiscoveredEndpoints(state),
-  configs: getAllConfig(state),
-  chosenEndpoint: getChosenEndpoint(state)
-}), {
-  changeStage,
-  setDiscoveredEndpoints,
-  setChosenEndpoint,
-  startSubmitting,
-  endSubmitting,
-  setErrors,
-  clearErrors
-})(SourceSelectionStageView)
 
 export default withApollo(SourceSelectionStage)

@@ -1,13 +1,12 @@
 import React from 'react'
 
-import Stage from 'components/Stage'
 import Title from 'components/Title'
 import Description from 'components/Description'
 
 import Navigation, { Begin } from 'components/wizard/Navigation'
 
-const IntroductionStage = ({ disabled, next, configs: { ldapUseCase } = {} }) => (
-  <Stage>
+const IntroductionStage = ({ next, configs: { ldapUseCase } = {} }) => (
+  <div>
     <Title>Welcome to the LDAP Configuration Wizard</Title>
     <Description>
       This wizard will guide you through configuring an LDAP store. An LDAP can be configured
@@ -17,10 +16,9 @@ const IntroductionStage = ({ disabled, next, configs: { ldapUseCase } = {} }) =>
     <Navigation>
       <Begin
         name='ldap'
-        disabled={disabled}
-        onClick={() => next({ nextStageId: 'use-case-stage' })} />
+        onClick={() => next('use-case-stage')} />
     </Navigation>
-  </Stage>
+  </div>
 )
 
 export default IntroductionStage

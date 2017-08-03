@@ -1,5 +1,3 @@
-import {getFriendlyMessage} from 'graphql-errors'
-
 const discoverSources = ({ query, configs, discoveryType }) => {
   let queryObject = {
     query,
@@ -63,9 +61,7 @@ export const queryAllSources = (props) => {
     client,
     configs,
     discoveryType,
-    sources,
-    startSubmitting,
-    endSubmitting
+    sources
   } = props
 
   const dispatchQuery = (sourceType, query, selector) =>
@@ -73,20 +69,17 @@ export const queryAllSources = (props) => {
       .then(({ data }) => ({ type: 'SUCCESS', sourceType, value: selector(data) }))
       .catch((e) => ({ type: 'ERROR', sourceType, value: e.graphQLErrors }))
 
-  startSubmitting()
   return Promise.all(Object.keys(sources).map((key) =>
     dispatchQuery(key, sources[key].query, sources[key].selector)
   )).then((responses) => new Promise((resolve, reject) => {
-    endSubmitting()
-
     const { foundSources, uniqueErrors, fatalErrors } = groupResponses(responses)
 
     if (Object.keys(foundSources).length > 0) {
       resolve(foundSources)
     } else if (discoveryType === 'url') {
-      reject(uniqueErrors.map(getFriendlyMessage))
+      reject(uniqueErrors.map((message) => ({ message })))
     } else if (fatalErrors.length > 0) {
-      reject(fatalErrors.map(getFriendlyMessage))
+      reject(fatalErrors.map((message) => ({ message })))
     } else {
       resolve({})
     }

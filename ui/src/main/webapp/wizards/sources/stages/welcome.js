@@ -1,16 +1,11 @@
 import React from 'react'
-import { connect } from 'react-redux'
-
-import { changeStage } from '../actions'
 
 import Title from 'components/Title'
 import Description from 'components/Description'
 import Navigation, { Begin } from 'components/wizard/Navigation'
 
-import { CenteredElements } from '../components'
-
-const WelcomeStageView = ({ changeStage }) => (
-  <CenteredElements>
+export default ({ next }) => (
+  <div>
     <Title>
       Welcome to the Source Configuration Wizard
     </Title>
@@ -22,11 +17,8 @@ const WelcomeStageView = ({ changeStage }) => (
     <Navigation>
       <Begin
         name='Sources'
-        onClick={() => changeStage('discoveryStage')}
+        onClick={() => next('discoveryStage')}
       />
     </Navigation>
-  </CenteredElements>
+  </div>
 )
-export default connect(null, {
-  changeStage: changeStage
-})(WelcomeStageView)

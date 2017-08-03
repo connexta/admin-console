@@ -2,7 +2,6 @@ import React from 'react'
 
 import { gql, withApollo } from 'react-apollo'
 
-import Stage from 'components/Stage'
 import Title from 'components/Title'
 import Description from 'components/Description'
 import Message from 'components/Message'
@@ -27,8 +26,6 @@ const ConfigureEmbeddedLdap = (props) => {
     onEndSubmit,
     next,
 
-    disabled,
-    submitting,
     configs: {
       ldapUseCase
     } = {},
@@ -38,7 +35,7 @@ const ConfigureEmbeddedLdap = (props) => {
   } = props
 
   return (
-    <Stage submitting={submitting}>
+    <div>
       <Title>Are You Sure You Want to Install Embedded LDAP?</Title>
       <Description>
         { /* todo - add a 'warning-style' box around this <p/> */ }
@@ -49,27 +46,25 @@ const ConfigureEmbeddedLdap = (props) => {
       </Description>
       <Body>
         <Navigation>
-          <Back
-            onClick={prev}
-            disabled={disabled} />
+          <Back onClick={prev} />
           <Finish
             onClick={() => {
               onStartSubmit()
               client.mutate(installEmbeddedLdap(ldapUseCase))
                 .then(() => {
                   onEndSubmit()
-                  next({ nextStageId: 'final-stage' })
+                  next('final-stage')
                 })
                 .catch((err) => {
                   onEndSubmit()
                   onError(err.graphQLErrors)
                 })
             }}
-            disabled={disabled} />
+          />
         </Navigation>
         {messages.map((msg, i) => <Message key={i} {...msg} />)}
       </Body>
-    </Stage>
+    </div>
   )
 }
 

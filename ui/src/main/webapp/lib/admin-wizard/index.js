@@ -1,100 +1,100 @@
 import React from 'react'
 
 import { connect } from 'react-redux'
-import Mount from 'react-mount'
 
 import {
-  getDisplayedLdapStage,
-  getAllConfig,
-  getMessages,
-  isSubmitting
+  getCurrentStage,
+  prev,
+  next,
+  setShared,
+  clearShared,
+  getShared,
+  setLocal,
+  clearLocal,
+  getLocal
 } from './reducer'
 
-import { getFriendlyMessage } from 'graphql-errors'
-
 import {
-  // sync
-  setDefaults,
-  setOptions,
-  setMessages,
-  clearWizard,
-  clearMessages,
-  prevStage,
-  nextStage,
-  start,
-  end
-} from './actions'
+  withConfigs,
+  withOptions,
+  withPaper,
+  withErrors,
+  withLoading
+} from './enhancers'
 
-const WizardView = (props) => {
-  const {
-    wizardId,
-    clearWizard,
-    stages,
-    stageId,
-    ...rest
-  } = props
-
-  return (
-    <Mount key={wizardId} off={clearWizard}>
-      {(stages[stageId] !== undefined)
-        ? React.createElement(stages[stageId], rest)
-        : <div>Cannot Find stage with id = {stageId}</div>}
-    </Mount>
-  )
-}
+import WizardView from './wizard'
 
 const mapStateToProps = (state, { wizardId }) => {
-  const stageId = getDisplayedLdapStage(state)
+  const stageId = getCurrentStage(state)
 
   return {
     stageId,
-    configs: getAllConfig(state),
-    submitting: isSubmitting(state, wizardId),
-    messages: getMessages(state, stageId)
+    local: getLocal(state),
+    shared: getShared(state)
   }
 }
 
-const mapDispatchToProps = (dispatch, { wizardId, ids = [] }) => ({
-  setDefaults: (arg) => dispatch(setDefaults(arg)),
-  setOptions: (arg) => dispatch(setOptions(arg)),
-  clearWizard: () => dispatch(clearWizard()),
-  prev: (arg) => dispatch((dispatch, getState) => {
-    const stageId = getDisplayedLdapStage(getState())
-    dispatch(clearMessages())
-    dispatch(setMessages(stageId, []))
-    dispatch(prevStage())
-  }),
-  next: (arg) => dispatch((dispatch, getState) => {
-    const stageId = getDisplayedLdapStage(getState())
-    dispatch(clearMessages())
-    dispatch(setMessages(stageId, []))
-    dispatch(nextStage(arg))
-  }),
-  onError: (messages) => dispatch((dispatch, getState) => {
-    dispatch(clearMessages())
-
-    const stageId = getDisplayedLdapStage(getState())
-
-    const errors = messages.map(({ path = [], ...rest }) => {
-      const id = path[path.length - 1]
-      if (ids.includes(id)) {
-        return { configFieldId: id, ...rest }
-      } else {
-        return { ...rest }
-      }
-    }).map(({ message: code, ...rest }) => ({
-      message: getFriendlyMessage(code),
-      ...rest
-    }))
-
-    dispatch(setMessages(stageId, errors))
-  }),
-  onStartSubmit: () => dispatch(start(wizardId)),
-  onEndSubmit: () => dispatch(end(wizardId))
-})
+const mapDispatchToProps = {
+  setShared,
+  clearShared,
+  setLocal,
+  clearLocal,
+  prev,
+  next
+}
 
 const Wizard = connect(mapStateToProps, mapDispatchToProps)(WizardView)
 
-export const createWizard = (wizardId, stages, ids) =>
-  (props) => <Wizard wizardId={wizardId} stages={stages} ids={ids} {...props} />
+const localEnhancers = {
+  errors: withErrors,
+  loading: withLoading,
+  paper: withPaper,
+  options: withOptions
+}
+
+const sharedEnchancers = {
+  configs: withConfigs
+}
+
+const createLocalEnhancer = (enhancer, name = Date.now().toString()) => (Component) => {
+  Component = enhancer(Component)
+
+  return (props) => {
+    const state = props.local.get(name)
+    const setState = (v) => props.setLocal(name, v)
+    return <Component state={state} setState={setState} props={props} />
+  }
+}
+
+const createSharedEnhancer = (enhancer, name = Date.now().toString()) => (Component) => {
+  Component = enhancer(Component)
+
+  return (props) => {
+    const state = props.shared.get(name)
+    const setState = (v) => props.setShared(name, v)
+    return <Component state={state} setState={setState} props={props} />
+  }
+}
+
+export const createWizard = (wizardId, stages, { shared = {} } = {}) => {
+  const enhanced = Object.keys(stages).reduce((o, stageId) => {
+    o[stageId] = stages[stageId]
+
+    Object.keys(localEnhancers).forEach((name) => {
+      o[stageId] = createLocalEnhancer(localEnhancers[name], name)(o[stageId])
+    })
+
+    Object.keys(shared).forEach((name) => {
+      o[stageId] = createSharedEnhancer(shared[name], name)(o[stageId])
+    })
+
+    Object.keys(sharedEnchancers).forEach((name) => {
+      o[stageId] = createSharedEnhancer(sharedEnchancers[name], name)(o[stageId])
+    })
+
+    return o
+  }, {})
+
+  return (props) => <Wizard wizardId={wizardId} stages={enhanced} {...props} />
+}
 

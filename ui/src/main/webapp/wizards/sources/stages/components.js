@@ -4,8 +4,6 @@ import muiThemeable from 'material-ui/styles/muiThemeable'
 import { RadioButton, RadioButtonGroup } from 'material-ui/RadioButton'
 
 import {
-  animated,
-  fadeIn,
   sideLines
 } from './styles.css'
 
@@ -19,12 +17,6 @@ const styles = {
     zIndex: 1
   }
 }
-
-export const CenteredElements = ({ children, stageIndex, style }) => (
-  <div style={style} className={[animated, fadeIn].join(' ')}>
-    {children}
-  </div>
-)
 
 export const SourceRadioButtons = ({ disabled, options = {}, valueSelected, onChange }) => {
   return (
@@ -56,4 +48,3 @@ const SideLinesView = ({ muiTheme, label }) => (
 )
 
 export const SideLines = muiThemeable()(SideLinesView)
-

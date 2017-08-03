@@ -1,10 +1,8 @@
 import React from 'react'
-import { connect } from 'react-redux'
+
 import { withApollo } from 'react-apollo'
 
-import { getAllConfig } from 'admin-wizard/reducer'
 import { Input } from 'admin-wizard/inputs'
-import { getFriendlyMessage } from 'graphql-errors'
 
 import Info from 'components/Information'
 import Title from 'components/Title'
@@ -13,35 +11,24 @@ import Message from 'components/Message'
 import Body from 'components/wizard/Body'
 import Navigation, { Finish, Back } from 'components/wizard/Navigation'
 
-import { saveSource } from '../graphql-mutations/source-persist'
-import {
-  getSourceName,
-  getChosenEndpoint,
-  getDiscoveredEndpoints,
-  getErrors
-} from '../reducer'
-import {
-  changeStage,
-  startSubmitting,
-  endSubmitting,
-  setErrors,
-  clearErrors
-} from '../actions'
+import { mutations } from '../graphql'
 
-const currentStageId = 'confirmationStage'
-
-const ConfirmationStageView = (props) => {
+const ConfirmationStage = (props) => {
   const {
-    messages,
-    sourceName,
-    inputConfigs,
-    config,
-    changeStage,
-    endSubmitting,
-    clearErrors,
-    startSubmitting,
-    setErrors
+    errors: messages = [],
+    configs,
+    prev,
+    next,
+    onStartSubmit,
+    onEndSubmit,
+    discoveredEndpoints,
+    chosenEndpoint,
+    onError,
+    onEdit
   } = props
+
+  const config = discoveredEndpoints[chosenEndpoint]
+  const sourceName = configs.sourceName
 
   return (
     <div>
@@ -52,45 +39,39 @@ const ConfirmationStageView = (props) => {
         Please give your source a unique name, confirm details, and press finish to create source.
       </Description>
       <Body>
-        <Input id='sourceName' label='Source Name' autoFocus />
+
+        <Input
+          label='Source Name'
+          value={sourceName}
+          onEdit={onEdit('sourceName')}
+          autoFocus />
+
         <Info label='Source Address' value={config.endpointUrl} />
-        <Info label='Username' value={inputConfigs.sourceUserName || 'none'} />
-        <Info label='Password' value={inputConfigs.sourceUserPassword ? '*****' : 'none'} />
+        <Info label='Username' value={configs.sourceUserName || 'none'} />
+        <Info label='Password' value={configs.sourceUserPassword ? '*****' : 'none'} />
+
         <Navigation>
-          <Back onClick={() => changeStage('sourceSelectionStage')} />
+          <Back onClick={prev} />
           <Finish
             disabled={sourceName === undefined || sourceName.trim() === ''}
             onClick={() => {
-              clearErrors()
-              startSubmitting()
-              saveSource(props).then(() => {
-                changeStage('completedStage', currentStageId)
-                endSubmitting()
-              }).catch((e) => {
-                setErrors(currentStageId, e.graphQLErrors.map((error) =>
-                  getFriendlyMessage(error.message)))
-                endSubmitting()
-              })
-            }} />
+              onStartSubmit()
+              mutations.saveSource({ ...props, config, inputConfigs: configs, sourceName })
+                .then(() => {
+                  onEndSubmit()
+                  next('completedStage')
+                })
+                .catch((e) => {
+                  onEndSubmit()
+                  onError(e.graphQLErrors)
+                })
+            }}
+          />
         </Navigation>
-        { messages.map((msg, i) => <Message key={i} message={msg} type='FAILURE' />) }
+        {messages.map((msg, i) => <Message key={i} type='FAILURE' {...msg} />)}
       </Body>
     </div>
   )
 }
-
-let ConfirmationStage = connect((state) => ({
-  sourceName: getSourceName(state),
-  messages: getErrors(state, currentStageId),
-  inputConfigs: getAllConfig(state),
-  type: getChosenEndpoint(state),
-  config: getDiscoveredEndpoints(state)[getChosenEndpoint(state)]
-}), {
-  changeStage,
-  startSubmitting,
-  endSubmitting,
-  setErrors,
-  clearErrors
-})(ConfirmationStageView)
 
 export default withApollo(ConfirmationStage)

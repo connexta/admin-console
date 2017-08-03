@@ -1,20 +1,10 @@
 import React from 'react'
-import { connect } from 'react-redux'
+
 import Mount from 'react-mount'
 import { withApollo } from 'react-apollo'
 
-import { getDiscoveryType, getErrors } from '../reducer'
-import { SideLines } from '../components'
-import { queryAllSources } from '../graphql-queries/source-discovery'
-import {
-  setDiscoveryType,
-  changeStage,
-  setDiscoveredEndpoints,
-  startSubmitting,
-  endSubmitting,
-  setErrors,
-  clearErrors
-} from '../actions'
+import { queries } from '../graphql'
+
 import {
   discoveryStageDisableNext,
   hostnameError,
@@ -22,7 +12,7 @@ import {
   passwordError,
   portError,
   urlError
-} from '../validation'
+} from './validation'
 
 import Title from 'components/Title'
 import Description from 'components/Description'
@@ -30,29 +20,31 @@ import Message from 'components/Message'
 import Body from 'components/wizard/Body'
 import Navigation, { Next, Back } from 'components/wizard/Navigation'
 
-import { getAllConfig } from 'admin-wizard/reducer'
-import { setDefaults } from 'admin-wizard/actions'
+import { SideLines } from './components'
+
 import { Input, Password, Hostname, Port } from 'admin-wizard/inputs'
 
 import FlatButton from 'material-ui/FlatButton'
-
-const currentStageId = 'discoveryStage'
 
 const discoveryStageDefaults = {
   sourceHostName: '',
   sourcePort: 8993
 }
 
-const DiscoveryStageView = (props) => {
+const DiscoveryStage = (props) => {
   const {
-    messages,
+    errors: messages = [],
     setDefaults,
     configs,
+    onEdit,
+    onError,
+    onStartSubmit,
+    onEndSubmit,
     discoveryType,
     setDiscoveryType,
-    changeStage,
-    setErrors,
-    clearErrors
+    setDiscoveredEndpoints,
+    prev,
+    next
   } = props
 
   return (
@@ -66,20 +58,23 @@ const DiscoveryStageView = (props) => {
         </Description>
         <Body>
           <Hostname
+            value={configs.sourceHostName}
+            onEdit={onEdit('sourceHostName')}
             visible={discoveryType === 'hostnamePort'}
-            id='sourceHostName'
             label='Host'
             errorText={hostnameError(configs)}
             autoFocus
           />
           <Port
+            value={configs.sourcePort}
+            onEdit={onEdit('sourcePort')}
             visible={discoveryType === 'hostnamePort'}
-            id='sourcePort'
             label='Port'
             errorText={portError(configs)} />
           <Input
             visible={discoveryType === 'url'}
-            id='endpointUrl'
+            value={configs.endpointUrl}
+            onEdit={onEdit('endpointUrl')}
             label='Source URL'
             autoFocus
             errorText={urlError(configs)} />
@@ -106,48 +101,38 @@ const DiscoveryStageView = (props) => {
           }
           <SideLines label='Authentication (Optional)' />
           <Input
-            id='sourceUserName'
             label='Username'
+            value={configs.sourceUserName}
+            onEdit={onEdit('sourceUserName')}
             errorText={userNameError(configs)} />
           <Password
-            id='sourceUserPassword'
             label='Password'
+            value={configs.sourceUserPassword}
+            onEdit={onEdit('sourceUserPassword')}
             errorText={passwordError(configs)} />
           <Navigation>
-            <Back onClick={() => changeStage('welcomeStage')} />
+            <Back onClick={prev} />
             <Next disabled={discoveryStageDisableNext(props)}
               onClick={() => {
-                queryAllSources(props)
-                      .then((endpoints) => {
-                        props.setDiscoveredEndpoints(endpoints)
-                        clearErrors()
-                        changeStage('sourceSelectionStage')
-                      })
-                      .catch((e) => {
-                        setErrors(currentStageId, e)
-                      })
-              }} />
+                onStartSubmit()
+                queries.queryAllSources(props)
+                  .then((endpoints) => {
+                    onEndSubmit()
+                    setDiscoveredEndpoints(endpoints)
+                    next('sourceSelectionStage')
+                  })
+                  .catch((e) => {
+                    onEndSubmit()
+                    onError(e)
+                  })
+              }}
+            />
           </Navigation>
-          { messages.map((msg, i) => <Message key={i} message={msg} type='FAILURE' />) }
+          {messages.map((msg, i) => <Message key={i} type='FAILURE' {...msg} />)}
         </Body>
       </div>
     </Mount>
   )
 }
-
-let DiscoveryStage = connect((state) => ({
-  configs: getAllConfig(state),
-  messages: getErrors(state, currentStageId),
-  discoveryType: getDiscoveryType(state)
-}), {
-  setDefaults,
-  setDiscoveryType,
-  changeStage,
-  setDiscoveredEndpoints,
-  startSubmitting,
-  endSubmitting,
-  setErrors,
-  clearErrors
-})(DiscoveryStageView)
 
 export default withApollo(DiscoveryStage)

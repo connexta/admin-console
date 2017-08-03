@@ -1,12 +1,7 @@
 import React, { Component } from 'react'
 
-import { connect } from 'react-redux'
-
 import { gql, graphql, withApollo } from 'react-apollo'
 
-import { editConfig } from 'admin-wizard/actions'
-
-import Stage from 'components/Stage'
 import Title from 'components/Title'
 import Description from 'components/Description'
 
@@ -30,61 +25,64 @@ import {
 
 import RaisedButton from 'material-ui/RaisedButton'
 
-class AttributeMapperView extends Component {
+class AttributeMapper extends Component {
   constructor (props) {
     super(props)
     this.state = { selected: [] }
   }
   filterUpdateMappings () {
     const {
-      editConfig,
+      onEdit,
       configs: {
         attributeMappings = {}
       } = {}
     } = this.props
 
-    let o = {}
-
-    Object.keys(attributeMappings).filter((_, i) => {
+    const filtered = Object.keys(attributeMappings).filter((_, i) => {
       if (this.state.selected === 'all') {
         return false
       }
       return this.state.selected.indexOf(i) === -1
-    }).forEach((key) => {
+    }).reduce((o, key) => {
       o[key] = attributeMappings[key]
-    })
+      return o
+    }, {})
 
-    editConfig('attributeMappings', o)
+    onEdit('attributeMappings')(filtered)
     this.setState({ selected: [] })
   }
   render () {
     const {
-      editConfig,
       claims,
       attributes,
       configs: {
         attributeMappings = {},
         subjectClaims,
         userAttributes
-      } = {}
+      } = {},
+      onEdit
     } = this.props
 
     return (
       <div>
+
         <Select
-          options={claims}
-          id='subjectClaims'
-          label='STS Claim' />
+          label='STS Claim'
+          value={subjectClaims}
+          onEdit={onEdit('subjectClaims')}
+          options={claims} />
+
         <InputAuto
-          options={attributes}
-          id='userAttributes'
-          label='LDAP User Attribute' />
+          label='LDAP User Attribute'
+          value={userAttributes}
+          onEdit={onEdit('userAttributes')}
+          options={attributes} />
 
         <RaisedButton
           primary
           style={{margin: '0 auto', marginBottom: '30px', marginTop: '10px', display: 'block'}}
           label='Add Mapping'
-          onClick={() => editConfig('attributeMappings', { ...attributeMappings, [subjectClaims]: userAttributes })}
+          onClick={() => onEdit('attributeMappings')({ ...attributeMappings, [subjectClaims]: userAttributes })}
           disabled={subjectClaims === undefined || userAttributes === undefined} />
 
         <Card expanded style={{ width: '100%' }}>
@@ -125,8 +123,6 @@ class AttributeMapperView extends Component {
   }
 }
 
-const AttributeMapper = connect(null, { editConfig })(AttributeMapperView)
-
 const testClaimMappings = (conn, info, userNameAttribute, dn, mapping) => ({
   fetchPolicy: 'network-only',
   query: gql`
@@ -159,12 +155,11 @@ const LdapAttributeMappingStage = (props) => {
     onEndSubmit,
     next,
 
-    disabled,
-    submitting,
     configs,
     configs: {
       attributeMappings = {}
     } = {},
+    onEdit,
 
     messages = [],
 
@@ -193,7 +188,7 @@ const LdapAttributeMappingStage = (props) => {
   const mapping = Object.keys(attributeMappings).map((key) => ({ key, value: attributeMappings[key] }))
 
   return (
-    <Stage submitting={submitting}>
+    <div>
       <Title>LDAP User Attribute Mapping</Title>
       <Description>
         In order to authorize users, their attributes must be mapped to the Security Token
@@ -202,34 +197,32 @@ const LdapAttributeMappingStage = (props) => {
       </Description>
 
       <AttributeMapper
+        onEdit={onEdit}
         claims={sts.claims}
         attributes={ldap.userAttributes}
-        disabled={disabled}
         configs={configs} />
 
       <Body>
         <Navigation>
-          <Back
-            onClick={prev}
-            disabled={disabled} />
+          <Back onClick={prev} />
           <Next
             onClick={() => {
               onStartSubmit()
               client.query(testClaimMappings(conn, info, userNameAttribute, dn, mapping))
                 .then(() => {
                   onEndSubmit()
-                  next({ nextStageId: 'confirm' })
+                  next('confirm')
                 })
                 .catch((err) => {
                   onEndSubmit()
                   onError(err.graphQLErrors)
                 })
             }}
-            disabled={disabled || Object.keys(attributeMappings).length === 0} />
+            disabled={Object.keys(attributeMappings).length === 0} />
         </Navigation>
         {messages.map((msg, i) => <Message key={i} {...msg} />)}
       </Body>
-    </Stage>
+    </div>
   )
 }
 

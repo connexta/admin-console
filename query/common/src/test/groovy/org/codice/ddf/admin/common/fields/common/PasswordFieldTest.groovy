@@ -50,7 +50,7 @@ class PasswordFieldTest extends Specification{
     def 'Real password is returned when password is markAsInternalProcess'(){
         setup:
         passwordField.setValue(REAL_PASSWORD)
-        passwordField.markAsInternalProcess()
+        passwordField.alwaysReturnPassword()
 
         when:
         String password = passwordField.getValue()

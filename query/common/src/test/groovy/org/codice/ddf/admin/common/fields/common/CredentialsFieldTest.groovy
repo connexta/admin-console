@@ -22,7 +22,7 @@ class CredentialsFieldTest extends Specification {
 
     static USERNAME_FIELD_PATH = [CredentialsField.DEFAULT_FIELD_NAME, CredentialsField.USERNAME_FIELD_NAME]
 
-    static PASSWORD_FIELD_PATH = [CredentialsField.DEFAULT_FIELD_NAME, CredentialsField.PASSWORD_FIELD_NAME]
+    static PASSWORD_FIELD_PATH = [CredentialsField.DEFAULT_FIELD_NAME, PasswordField.DEFAULT_FIELD_NAME]
 
     static String REAL_PASSWORD = "admin"
 

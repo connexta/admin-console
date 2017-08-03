@@ -48,7 +48,7 @@ public class LdapTestingCommons {
                         .password(TestLdapServer.getBasicAuthPassword());
         ldapBindUserInfo.credentialsField()
                 .passwordField()
-                .markAsInternalProcess();
+                .alwaysReturnPassword();
         return ldapBindUserInfo;
     }
 

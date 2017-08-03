@@ -244,7 +244,7 @@ class UpdateCswConfigurationSpec extends SourceCommonsSpec {
                 .cswProfile(TEST_CSW_PROFILE)
         config.endpointUrl(TEST_URL).sourceName(TEST_SOURCENAME)
                 .pid(S_PID)
-        config.credentials().username(TEST_USERNAME).password(password).passwordField().markAsInternalProcess()
+        config.credentials().username(TEST_USERNAME).password(password).passwordField().alwaysReturnPassword()
         return config
     }
 }

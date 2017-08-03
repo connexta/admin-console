@@ -15,6 +15,7 @@
 package org.codice.ddf.admin.common.fields.common;
 
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
+import org.codice.ddf.admin.common.services.ServiceCommons;
 
 public class PasswordField extends StringField{
 
@@ -24,19 +25,11 @@ public class PasswordField extends StringField{
 
     public static final String DESCRIPTION = "Password used for authentication";
 
-    // A flag to indicate if a service being updated has a password of "secret".
-    public static final String FLAG_PASSWORD = "secret";
-
     // Determine which calls need the real password and which ones get the flag password
     private boolean internalProcess;
 
     public PasswordField() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
-        internalProcess = false;
-    }
-
-    public PasswordField(String fieldName) {
-        super(fieldName, FIELD_TYPE_NAME, DESCRIPTION);
         internalProcess = false;
     }
 
@@ -51,7 +44,7 @@ public class PasswordField extends StringField{
             return null;
         }
         if(!internalProcess) {
-            return FLAG_PASSWORD;
+            return ServiceCommons.FLAG_PASSWORD;
         }
         return getRealPassword();
     }
@@ -68,7 +61,7 @@ public class PasswordField extends StringField{
     /**
      * Identifies internal calls versus graphQL calls.
      */
-    public void markAsInternalProcess(){
+    public void alwaysReturnPassword(){
         internalProcess = true;
     }
 

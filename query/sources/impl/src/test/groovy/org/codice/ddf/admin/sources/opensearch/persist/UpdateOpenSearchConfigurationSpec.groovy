@@ -228,7 +228,7 @@ class UpdateOpenSearchConfigurationSpec extends SourceCommonsSpec {
     def createOpenSearchSourceConfig(String password) {
         def config = new OpenSearchSourceConfigurationField()
         config.endpointUrl('https://localhost:8993').sourceName(TEST_SOURCENAME)
-                .pid(S_PID).credentials().username(TEST_USERNAME).password(password).passwordField().markAsInternalProcess()
+                .pid(S_PID).credentials().username(TEST_USERNAME).password(password).passwordField().alwaysReturnPassword()
         return config
     }
 }

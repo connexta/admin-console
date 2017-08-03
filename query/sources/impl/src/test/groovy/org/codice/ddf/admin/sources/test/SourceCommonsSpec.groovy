@@ -129,11 +129,15 @@ class SourceCommonsSpec extends Specification {
 
         RequestUtils.WebClientBuilder webClientBuilder
 
-        boolean endpointIsReachable
+        Boolean endpointIsReachable
 
-        TestRequestUtils(RequestUtils.WebClientBuilder mockWebClientBuilder, boolean isReachable) {
+        TestRequestUtils(RequestUtils.WebClientBuilder mockWebClientBuilder, Boolean isReachable) {
             webClientBuilder = mockWebClientBuilder
             endpointIsReachable = isReachable
+        }
+
+        TestRequestUtils(RequestUtils.WebClientBuilder mockWebClientBuilder) {
+            webClientBuilder = mockWebClientBuilder
         }
 
         @Override
@@ -148,6 +152,10 @@ class SourceCommonsSpec extends Specification {
 
         @Override
         public ReportImpl endpointIsReachable(UrlField urlField) {
+            if(endpointIsReachable == null) {
+                return super.endpointIsReachable(urlField)
+            }
+
             def report = new ReportImpl()
             if (!endpointIsReachable) {
                 report.addArgumentMessage(new ErrorMessageImpl(TEST_ERROR_CODE))

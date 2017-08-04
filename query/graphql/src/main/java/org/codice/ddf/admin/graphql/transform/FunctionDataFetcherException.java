@@ -14,7 +14,6 @@
 package org.codice.ddf.admin.graphql.transform;
 
 import java.util.List;
-import java.util.Map;
 
 import org.boon.Boon;
 import org.codice.ddf.admin.api.report.ErrorMessage;
@@ -23,15 +22,16 @@ import com.google.common.collect.ImmutableMap;
 
 public class FunctionDataFetcherException extends RuntimeException {
 
-    private String functionName;
-    private Map<String, Object> args;
-
     private List<ErrorMessage> customMessage;
 
-    public FunctionDataFetcherException(String functionName, Map<String, Object> args, List<ErrorMessage> customMessage) {
-        super();
-        this.functionName = functionName;
-        this.args = args;
+    public FunctionDataFetcherException(String functionName, List<Object> args,
+            List<ErrorMessage> customMessage) {
+        super(Boon.toPrettyJson(ImmutableMap.of("functionName",
+                functionName,
+                "args",
+                args,
+                "errors",
+                customMessage)));
         this.customMessage = customMessage;
     }
 
@@ -40,14 +40,7 @@ public class FunctionDataFetcherException extends RuntimeException {
     }
 
     @Override
-    public String toString() {
-        return Boon.toPrettyJson(toMap());
-    }
-
-    private Map<String, Object> toMap() {
-        return ImmutableMap.of(
-                "functionName", functionName,
-                "args", args,
-                "errors", customMessage);
+    public synchronized Throwable fillInStackTrace() {
+        return this;
     }
 }

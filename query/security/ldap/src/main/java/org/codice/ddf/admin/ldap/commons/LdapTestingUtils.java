@@ -134,7 +134,7 @@ public class LdapTestingUtils {
                     bindInfo.credentialsField()
                             .username(),
                     bindInfo.credentialsField()
-                            .password(),
+                            .realPassword(),
                     bindInfo.realm(),
                     null);
             connection.bind(bindRequest);

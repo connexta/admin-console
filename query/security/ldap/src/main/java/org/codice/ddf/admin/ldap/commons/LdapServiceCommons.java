@@ -99,7 +99,7 @@ public class LdapServiceCommons {
             props.put(LdapClaimsHandlerServiceProperties.PASSWORD,
                     config.bindUserInfoField()
                             .credentialsField()
-                            .password());
+                            .realPassword());
             props.put(LdapClaimsHandlerServiceProperties.BIND_METHOD,
                     config.bindUserInfoField()
                             .bindMethod());
@@ -146,7 +146,7 @@ public class LdapServiceCommons {
             ldapStsConfig.put(LdapLoginServiceProperties.LDAP_BIND_USER_PASS,
                     config.bindUserInfoField()
                             .credentialsField()
-                            .password());
+                            .realPassword());
             ldapStsConfig.put(LdapLoginServiceProperties.BIND_METHOD,
                     config.bindUserInfoField()
                             .bindMethod());

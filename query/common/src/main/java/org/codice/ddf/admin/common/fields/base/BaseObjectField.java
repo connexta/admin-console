@@ -26,6 +26,7 @@ import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.api.fields.ObjectField;
 import org.codice.ddf.admin.api.report.ErrorMessage;
+import org.codice.ddf.admin.common.fields.common.PasswordField;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -40,9 +41,13 @@ public abstract class BaseObjectField extends BaseDataType<Map<String, Object>>
     public Map<String, Object> getValue() {
         Map<String, Object> values = new HashMap<>();
 
-        for(Field field : getFields()) {
-            if(!(field instanceof FunctionField)) {
-                values.put(field.fieldName(), field.getValue());
+        for (Field field : getFields()) {
+            if (!(field instanceof FunctionField)) {
+                if (field.fieldName().equals(PasswordField.DEFAULT_FIELD_NAME) && ((PasswordField) field).isInternalProcess()){
+                    values.put(field.fieldName(), ((PasswordField) field).getRealPassword());
+                } else {
+                    values.put(field.fieldName(), field.getValue());
+                }
             }
         }
 

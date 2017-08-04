@@ -236,7 +236,7 @@ class UpdateWfsConfigurationSpec extends SourceCommonsSpec {
         config.wfsVersion(TEST_WFS_VERSION)
                 .endpointUrl('https://localhost:8993/geoserver/wfs').sourceName(TEST_SOURCENAME)
                 .pid(S_PID)
-                .credentials().username(TEST_USERNAME).password(password)
+                .credentials().username(TEST_USERNAME).password(password).passwordField().alwaysReturnPassword()
         return config
     }
 }

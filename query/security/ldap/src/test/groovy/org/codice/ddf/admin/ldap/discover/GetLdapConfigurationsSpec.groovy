@@ -57,7 +57,7 @@ class GetLdapConfigurationsSpec extends Specification {
         then:
         configs != null
         configs.getList().size() == 2
-        configs.getList()*.bindUserInfoField()*.credentialsField()*.password() as List ==
+        configs.getList()*.bindUserInfoField()*.credentialsField()*.realPassword() as List ==
                 [ServiceCommons.FLAG_PASSWORD, ServiceCommons.FLAG_PASSWORD]
     }
 

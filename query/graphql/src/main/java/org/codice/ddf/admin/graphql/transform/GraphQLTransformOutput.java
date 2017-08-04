@@ -166,8 +166,12 @@ public class GraphQLTransformOutput {
         funcField.setValue(args);
         FunctionReport<DataType> result = funcField.getValue();
 
+        List<Object> arguments = funcField.getArguments().stream()
+                .map(Field::getValue)
+                .collect(Collectors.toList());
+
         if(!result.messages().isEmpty()) {
-            throw new FunctionDataFetcherException(funcField.fieldName(), args, result.messages());
+            throw new FunctionDataFetcherException(funcField.fieldName(), arguments, result.messages());
         } else if(result.isResultPresent()){
             return result.result().getValue();
         }

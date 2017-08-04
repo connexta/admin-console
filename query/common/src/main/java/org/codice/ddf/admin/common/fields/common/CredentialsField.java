@@ -35,12 +35,12 @@ public class CredentialsField extends BaseObjectField {
 
     private StringField username;
 
-    private StringField password;
+    private PasswordField password;
 
     public CredentialsField() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
         this.username = new StringField(USERNAME_FIELD_NAME);
-        this.password = new StringField(PASSWORD_FIELD_NAME);
+        this.password = new PasswordField();
         updateInnerFieldPaths();
     }
 
@@ -58,12 +58,12 @@ public class CredentialsField extends BaseObjectField {
         return username;
     }
 
-    public StringField passwordField() {
+    public PasswordField passwordField() {
         return password;
     }
 
-    public String password() {
-        return password.getValue();
+    public String realPassword() {
+        return password.getRealPassword();
     }
 
     public String username() {

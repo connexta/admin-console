@@ -57,7 +57,7 @@ class DiscoverOpenSearchSpec extends SourceCommonsSpec {
 
         then:
         config.endpointUrl() == TEST_OPEN_SEARCH_URL
-        config.credentials().password() == FLAG_PASSWORD
+        config.credentials().realPassword() == FLAG_PASSWORD
     }
 
     def 'Successfully discover OpenSearch Configuration using hostname and port'() {
@@ -71,7 +71,7 @@ class DiscoverOpenSearchSpec extends SourceCommonsSpec {
 
         then:
         !config.endpointUrl().isEmpty()
-        config.credentials().password() == FLAG_PASSWORD
+        config.credentials().realPassword() == FLAG_PASSWORD
     }
 
     def 'Failure to discover OpenSearch configuration due to unrecognized response when using URL'() {

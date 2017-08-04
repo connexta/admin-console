@@ -130,7 +130,7 @@ class GetWfsConfigsSpec extends SourceCommonsSpec {
         def sourceInfo = (WfsSourceInfoField) field
         assert sourceInfo.path()[-1] == index.toString()
         assert sourceInfo.isAvailable() == availability
-        assert sourceInfo.config().credentials().password() == FLAG_PASSWORD
+        assert sourceInfo.config().credentials().realPassword() == FLAG_PASSWORD
         assert sourceInfo.config().credentials().username() == TEST_USERNAME
         assert sourceInfo.config().sourceName() == sourceName
         assert sourceInfo.config().pid() == pid

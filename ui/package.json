@@ -31,7 +31,6 @@
     "dist:stat": "cross-env NODE_ENV=production webpack --json | webpack-bundle-size-analyzer"
   },
   "peerDependencies": {
-    "less": "^2.7.1",
     "react": "^15.1.0",
     "redux": "^3.5.2"
   },
@@ -78,8 +77,6 @@
     "html-webpack-plugin": "^2.28.0",
     "istanbul": "^0.4.5",
     "json-loader": "^0.5.4",
-    "less": "^2.7.1",
-    "less-loader": "^2.2.3",
     "mocha": "^3.4.2",
     "mocha-loader": "^1.1.1",
     "mocha-phantomjs-core": "^2.1.1",

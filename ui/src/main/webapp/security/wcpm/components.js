@@ -17,12 +17,9 @@ import muiThemeable from 'material-ui/styles/muiThemeable'
 import Des from 'components/Description'
 
 import {
-  error,
-  policyBinOuterStyle,
-  disabledPanel,
   editRegion,
   editButton
-} from './styles.less'
+} from './styles.css'
 
 export const Description = ({ children }) => (
   <Des style={{ textAlign: 'left' }}>{children}</Des>
@@ -63,12 +60,24 @@ export const EditRegion = ({ children, onEdit }) => (
 )
 
 export const Panel = ({ children, style }) => (
-  <Paper style={style} className={policyBinOuterStyle}>{children}</Paper>
+  <Paper style={{ marginBottom: '20px', padding: '10px', ...style }}>
+    {children}
+  </Paper>
 )
+
+const disabledStyle = ({
+  backgroundColor: 'rgba(125, 125, 125, 0.25)',
+  position: 'absolute',
+  left: 0,
+  right: 0,
+  top: 0,
+  bottom: 0,
+  zIndex: 200
+})
 
 export const Disabled = ({ children }) => (
   <div style={{ position: 'relative' }}>
-    <div className={disabledPanel} />
+    <div style={disabledStyle} />
     {children}
   </div>
 )
@@ -144,8 +153,10 @@ export const ServerErrors = muiThemeable()(({ muiTheme, errors = [] }) => (
         key={i}
         flexDirection='row'
         justifyContent='center'
-        className={error}
         style={{
+          padding: '10px 0',
+          fontSize: '14px',
+          fontWeight: 'bold',
           background: muiTheme.palette.errorColor,
           color: muiTheme.palette.alternateTextColor
         }}>

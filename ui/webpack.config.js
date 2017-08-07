@@ -25,7 +25,7 @@ var config = {
         ]
       },
       {
-        test: /\.(css|less)$/,
+        test: /\.(css)$/,
         exclude: /node_modules/,
         use: [
           'style-loader',
@@ -36,12 +36,6 @@ var config = {
               modules: true,
               importLoaders: 1,
               localIdentName: '[name]__[local]___[hash:base64:5]'
-            }
-          },
-          {
-            loader: 'less-loader',
-            options: {
-              sourceMap: true,
             }
           }
         ]
@@ -84,7 +78,7 @@ if (process.env.NODE_ENV === 'production') {
     module: {
       rules: [
         {
-          test: /\.(css|less)$/,
+          test: /\.(css)$/,
           exclude: /node_modules/,
           loader: ExtractTextPlugin.extract({
             fallback: 'style-loader',
@@ -96,12 +90,6 @@ if (process.env.NODE_ENV === 'production') {
                   modules: true,
                   importLoaders: 1,
                   localIdentName: '[name]__[local]___[hash:base64:5]'
-                }
-              },
-              {
-                loader: 'less-loader',
-                options: {
-                  sourceMap: true,
                 }
               }
             ]

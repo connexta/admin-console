@@ -9,12 +9,12 @@ import LanguageIcon from 'material-ui/svg-icons/action/language'
 import VpnLockIcon from 'material-ui/svg-icons/notification/vpn-lock'
 import muiThemeable from 'material-ui/styles/muiThemeable'
 
-import * as styles from './styles.less'
+import { expandingTile } from './styles.css'
 
 let TileLink = ({ to, title, subtitle, Icon, muiTheme }) => (
   <div>
     <Link to={to}>
-      <Paper className={styles.main}>
+      <Paper className={expandingTile}>
         <div style={{width: '100%', height: '100%'}}>
           <Flexbox
             alignItems='center'
@@ -22,9 +22,23 @@ let TileLink = ({ to, title, subtitle, Icon, muiTheme }) => (
             justifyContent='center'
             style={{width: '100%', height: '100%'}}>
 
-            <p className={styles.titleTitle}>{title}</p>
+            <p style={{
+              fontSize: '18px',
+              position: 'relative',
+              textAlign: 'center',
+              margin: '5px 0px'
+            }}>
+              {title}
+            </p>
             {React.createElement(Icon, { style: { color: muiTheme.palette.primary1Color, width: '50%', height: '50%' } })}
-            <p className={styles.tileSubtitle}>{subtitle}</p>
+            <p style={{
+              fontSize: '14px',
+              position: 'relative',
+              textAlign: 'center',
+              margin: '10px 30px'
+            }}>
+              {subtitle}
+            </p>
 
           </Flexbox>
         </div>

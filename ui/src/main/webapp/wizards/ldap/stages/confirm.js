@@ -14,13 +14,17 @@ import MapDisplay from 'components/MapDisplay'
 import Body from 'components/wizard/Body'
 import Navigation, { Back, Finish } from 'components/wizard/Navigation'
 
-import { confirmationInfo } from './styles.less'
-
 const useCaseMapping = {
   Authentication: 'Authentication',
   AttributeStore: 'Attribute Store',
   AuthenticationAndAttributeStore: 'Authentication and Attribute Store'
 }
+
+const confirmationInfo = ({
+  width: '50%',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis'
+})
 
 const createLdapConfig = (conn, info, settings, mapping) => ({
   mutation: gql`
@@ -94,7 +98,7 @@ const ConfirmStage = (props) => {
 
       <Flexbox flexDirection='column'>
         <Flexbox flexDirection='row' justifyContent='space-between'>
-          <Flexbox className={confirmationInfo} flexDirection='column'>
+          <Flexbox style={confirmationInfo} flexDirection='column'>
             <Info label='LDAP Function' value={useCaseMapping[configs.ldapUseCase]} />
             <Info label='Hostname' value={configs.hostname} />
             <Info label='Port' value={configs.port} />
@@ -102,7 +106,7 @@ const ConfirmStage = (props) => {
             <Info label='Base User DN' value={configs.baseUserDn} />
             <Info label='User Name Attribute' value={configs.userNameAttribute} />
           </Flexbox>
-          <Flexbox className={confirmationInfo} flexDirection='column'>
+          <Flexbox style={confirmationInfo} flexDirection='column'>
             <Info label='Base Group DN' value={configs.baseGroupDn} />
             <Info label='Bind User' value={configs.bindUser} />
             <Info label='Bind User Password' value='*****' />

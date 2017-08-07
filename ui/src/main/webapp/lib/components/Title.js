@@ -1,10 +1,17 @@
 import React from 'react'
 import muiThemeable from 'material-ui/styles/muiThemeable'
 
-import { title } from './styles.less'
+const titleStyle = ({
+  fontSize: '18px',
+  position: 'relative',
+  textAlign: 'center',
+  margin: '10px 0px'
+})
 
 const Title = ({ children, muiTheme }) => (
-  <p className={title} style={{ color: muiTheme.palette.textColor }}>{children}</p>
+  <p style={{ ...titleStyle, color: muiTheme.palette.textColor }}>
+    {children}
+  </p>
 )
 
 export default muiThemeable()(Title)

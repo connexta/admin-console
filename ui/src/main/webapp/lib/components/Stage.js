@@ -4,12 +4,17 @@ import Paper from 'material-ui/Paper'
 
 import Spinner from './Spinner'
 
-import * as styles from './styles.less'
+const mainStyle = ({
+  margin: '20px 0',
+  padding: '0px',
+  position: 'relative',
+  boxSizing: 'border-box'
+})
 
 export default ({ children, submitting }) => (
-  <Paper className={styles.main}>
+  <Paper style={mainStyle}>
     <Spinner submitting={submitting}>
-      <div className={styles.innerSpinner}>
+      <div style={{ padding: '40px', position: 'relative' }}>
         {children}
       </div>
     </Spinner>

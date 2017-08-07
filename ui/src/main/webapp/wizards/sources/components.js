@@ -6,9 +6,8 @@ import { RadioButton, RadioButtonGroup } from 'material-ui/RadioButton'
 import {
   animated,
   fadeIn,
-  sideLines,
-  horizontalSideLines
-} from './styles.less'
+  sideLines
+} from './styles.css'
 
 export const CenteredElements = ({ children, stageIndex, style }) => (
   <div style={style} className={[animated, fadeIn].join(' ')}>
@@ -36,12 +35,21 @@ export const SourceRadioButtons = ({ disabled, options = {}, valueSelected, onCh
   )
 }
 
+const horizontalSideLinesStyle = ({
+  width: '100%',
+  display: 'block',
+  height: '1px',
+  position: 'absolute',
+  top: '50%',
+  zIndex: 1
+})
+
 const SideLinesView = ({ muiTheme, label }) => (
   <div className={sideLines}>
     <span style={{ color: muiTheme.palette.textColor, backgroundColor: muiTheme.palette.canvasColor }}>
       {label}
     </span>
-    <div className={horizontalSideLines} style={{ backgroundColor: muiTheme.palette.textColor }} />
+    <div style={{ ...horizontalSideLinesStyle, backgroundColor: muiTheme.palette.textColor }} />
   </div>
 )
 

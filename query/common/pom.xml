@@ -18,12 +18,12 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <artifactId>admin-query</artifactId>
-        <groupId>org.codice.ddf.admin.beta</groupId>
+        <groupId>org.codice.ddf.admin.query</groupId>
         <version>0.1.3-SNAPSHOT</version>
     </parent>
 
     <artifactId>admin-query-common</artifactId>
-    <name>DDF :: Admin (Beta) :: Common</name>
+    <name>DDF :: Admin Console :: Query :: Common</name>
     <packaging>jar</packaging>
 
     <dependencies>
@@ -33,7 +33,7 @@
             <version>${commons-collections.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.codice.ddf.admin.beta</groupId>
+            <groupId>org.codice.ddf.admin.query</groupId>
             <artifactId>admin-query-api</artifactId>
             <version>${project.version}</version>
         </dependency>

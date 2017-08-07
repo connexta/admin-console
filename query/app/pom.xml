@@ -17,54 +17,54 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>admin-query</artifactId>
-        <groupId>org.codice.ddf.admin.beta</groupId>
+        <groupId>org.codice.ddf.admin.query</groupId>
         <version>0.1.3-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>admin-query-app</artifactId>
-    <name>DDF :: Admin (Beta) :: Query App</name>
+    <name>DDF :: Admin Console :: Query :: App</name>
     <packaging>pom</packaging>
 
     <dependencies>
         <dependency>
-            <groupId>org.codice.ddf.admin.beta</groupId>
+            <groupId>org.codice.ddf.admin.query</groupId>
             <artifactId>admin-query-api</artifactId>
             <version>${project.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>org.codice.ddf.admin.beta</groupId>
+            <groupId>org.codice.ddf.admin.query</groupId>
             <artifactId>admin-query-sources-impl</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.codice.ddf.admin.beta</groupId>
+            <groupId>org.codice.ddf.admin.query</groupId>
             <artifactId>admin-query-sts</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.codice.ddf.admin.beta</groupId>
+            <groupId>org.codice.ddf.admin.query</groupId>
             <artifactId>admin-query-wcpm</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.codice.ddf.admin.beta</groupId>
+            <groupId>org.codice.ddf.admin.query</groupId>
             <artifactId>admin-query-ldap</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.codice.ddf.admin.beta</groupId>
+            <groupId>org.codice.ddf.admin.query</groupId>
             <artifactId>admin-query-utils</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.codice.ddf.admin.beta</groupId>
+            <groupId>org.codice.ddf.admin.query</groupId>
             <artifactId>admin-ui</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.codice.ddf.admin.beta</groupId>
+            <groupId>org.codice.ddf.admin.query</groupId>
             <artifactId>admin-graphql</artifactId>
             <version>${project.version}</version>
         </dependency>

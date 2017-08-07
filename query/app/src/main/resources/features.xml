@@ -16,76 +16,76 @@
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.3.0 http://karaf.apache.org/xmlns/features/v1.3.0">
 
-    <feature name="admin-beta-query-app" install="auto" version="${project.version}"
-             description="DDF Admin App (Beta) includes a source setup wizard, LDAP setup wizard and a new GUI for the web context policy manager. Go to /admin/beta to access the UI.">
-        <feature>admin-beta-federation</feature>
-        <feature>admin-beta-security</feature>
-        <feature>admin-beta-embeddedldap</feature>
-        <feature>admin-beta-ldap</feature>
-        <feature>admin-beta-utils</feature>
-        <feature>admin-beta-ui</feature>
+    <feature name="admin-query-app" install="auto" version="${project.version}"
+             description="DDF Admin Query App includes a source setup wizard, LDAP setup wizard and a GUI for the web context policy manager. Go to /admin/hub to access the UI.">
+        <feature>admin-query-federation</feature>
+        <feature>admin-query-security</feature>
+        <feature>admin-query-embeddedldap</feature>
+        <feature>admin-query-ldap</feature>
+        <feature>admin-query-utils</feature>
+        <feature>admin-query-ui</feature>
     </feature>
 
-    <feature name="admin-beta-core" install="manual" version="${project.version}"
-             description="DDF Admin Core (Beta)">
-        <bundle>mvn:org.codice.ddf.admin.beta/admin-query-api/${project.version}</bundle>
+    <feature name="admin-query-core" install="manual" version="${project.version}"
+             description="DDF :: Admin Console :: Query :: Core ">
+        <bundle>mvn:org.codice.ddf.admin.query/admin-query-api/${project.version}</bundle>
     </feature>
-
-    <feature name="admin-beta-federation" install="manual" version="${project.version}"
-             description="DDF Admin Federation (Beta)">
-        <feature>admin-beta-core</feature>
+    <feature name="admin-query-federation" install="manual" version="${project.version}"
+             description="DDF :: Admin Console :: Query :: Federation">
+        <feature>admin-query-core</feature>
         <bundle>mvn:ddf.catalog.core/catalog-core-api/${ddf.version}</bundle>
-        <bundle>mvn:org.codice.ddf.admin.beta/admin-query-sources-impl/${project.version}</bundle>
+        <bundle>mvn:org.codice.ddf.admin.query/admin-query-sources-impl/${project.version}</bundle>
     </feature>
 
-    <feature name="admin-beta-security" install="manual" version="${project.version}"
-             description="DDF Admin Security (Beta)">
-        <feature>admin-beta-core</feature>
-        <feature>admin-beta-ldap</feature>
-        <feature>admin-beta-wcpm</feature>
-        <bundle>mvn:org.codice.ddf.admin.beta/admin-query-sts/${project.version}</bundle>
+    <feature name="admin-query-security" install="manual" version="${project.version}"
+             description="DDF :: Admin Console :: Query :: Security">
+        <feature>admin-query-core</feature>
+        <feature>admin-query-ldap</feature>
+        <feature>admin-query-wcpm</feature>
+        <bundle>mvn:org.codice.ddf.admin.query/admin-query-sts/${project.version}</bundle>
     </feature>
 
-    <feature name="admin-beta-wcpm" install="manual" version="${project.version}"
-             description="DDF Admin Web Context Policy Manager (Beta)">
-        <feature>admin-beta-core</feature>
-        <bundle>mvn:org.codice.ddf.admin.beta/admin-query-wcpm/${project.version}</bundle>
+    <feature name="admin-query-wcpm" install="manual" version="${project.version}"
+             description="DDF :: Admin Console :: Query :: Security :: Web Context Policy Manager">
+        <feature>admin-query-core</feature>
+        <bundle>mvn:org.codice.ddf.admin.query/admin-query-wcpm/${project.version}</bundle>
     </feature>
 
-    <feature name="admin-beta-ldap" install="manual" version="${project.version}"
-             description="DDF Admin Security (Beta) :: LDAP Handler">
-        <feature>admin-beta-core</feature>
-        <bundle>mvn:org.codice.ddf.admin.beta/admin-query-ldap/${project.version}</bundle>
+    <feature name="admin-query-ldap" install="manual" version="${project.version}"
+             description="DDF :: Admin Console :: Query :: Security :: LDAP">
+        <feature>admin-query-core</feature>
+        <bundle>mvn:org.codice.ddf.admin.query/admin-query-ldap/${project.version}</bundle>
     </feature>
 
-    <feature name="admin-beta-embeddedldap" install="manual" version="${project.version}"
-             description="DDF Admin Security (Beta) :: Embedded LDAP Installer">
-        <bundle>mvn:org.codice.ddf.admin.beta/admin-query-embeddedldap/${project.version}</bundle>
+    <feature name="admin-query-embeddedldap" install="manual" version="${project.version}"
+             description="DDF :: Admin Console :: Query :: Security :: Embedded LDAP">
+        <bundle>mvn:org.codice.ddf.admin.query/admin-query-embeddedldap/${project.version}</bundle>
     </feature>
 
-    <feature name="admin-beta-utils" install="manual" version="${project.version}"
-             description="DDF Admin Security (Beta) :: LDAP Handler">
-        <feature>admin-beta-core</feature>
-        <bundle>mvn:org.codice.ddf.admin.beta/admin-query-utils/${project.version}</bundle>
+    <feature name="admin-query-utils" install="manual" version="${project.version}"
+             description="DDF :: Admin Console :: Query :: Security :: LDAP Handler">
+        <feature>admin-query-core</feature>
+        <bundle>mvn:org.codice.ddf.admin.query/admin-query-utils/${project.version}</bundle>
     </feature>
 
-    <feature name="admin-beta-ui" install="auto" version="${project.version}"
-             description="DDF Admin UI (Beta)">
-        <feature>admin-beta-core</feature>
-        <feature>admin-beta-graphql</feature>
-        <bundle>mvn:org.codice.ddf.admin.beta/admin-ui/${project.version}</bundle>
+    <feature name="admin-query-ui" install="auto" version="${project.version}"
+             description="DDF :: Admin Console :: Query :: UI">
+        <feature>admin-query-core</feature>
+        <feature>admin-query-graphql</feature>
+        <bundle>mvn:org.codice.ddf.admin.query/admin-ui/${project.version}</bundle>
+        <bundle>mvn:org.codice.ddf.admin.query/admin-module/${project.version}</bundle>
     </feature>
 
-    <feature name="admin-beta-graphql" install="manual" version="${project.version}"
-             description="DDF Admin (Beta) GraphQL">
-        <feature>admin-beta-core</feature>
+    <feature name="admin-query-graphql" install="manual" version="${project.version}"
+             description="DDF :: Admin Console :: Query :: GraphQL">
+        <feature>admin-query-core</feature>
         <feature>graphql-dependencies</feature>
         <bundle>mvn:io.fastjson/boon/0.34</bundle>
-        <bundle>mvn:org.codice.ddf.admin.beta/admin-graphql/${project.version}</bundle>
+        <bundle>mvn:org.codice.ddf.admin.query/admin-graphql/${project.version}</bundle>
     </feature>
 
     <feature name="graphql-dependencies" install="manual" version="${project.version}"
-             description="Required dependencies for admin-beta-graphql">
+             description="Required dependencies for admin-query-graphql">
         <bundle>mvn:commons-io/commons-io/2.5</bundle>
         <bundle>mvn:javax.servlet/javax.servlet-api/3.1.0</bundle>
         <bundle>mvn:com.fasterxml.jackson.core/jackson-core/2.8.4</bundle>

@@ -29,7 +29,7 @@
             <value>org.osgi.service.event.EventHandler</value>
         </interfaces>
         <service-properties>
-            <entry key="urlPatterns" value="/admin/beta/graphql/*" />
+            <entry key="urlPatterns" value="/admin/hub/graphql/*" />
             <entry key="event.topics">
                 <array value-type="java.lang.String">
                     <value>graphql/servlet/REFRESH_SCHEMA</value>

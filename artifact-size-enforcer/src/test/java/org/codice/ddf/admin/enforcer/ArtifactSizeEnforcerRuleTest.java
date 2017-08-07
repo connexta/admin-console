@@ -11,13 +11,13 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  */
-package org.codice.ddf.admin.beta.enforcer;
+package org.codice.ddf.admin.enforcer;
 
-import static org.codice.ddf.admin.beta.enforcer.ArtifactSizeEnforcerRule.PROJECT_ARTIFACT_ID_PROP;
-import static org.codice.ddf.admin.beta.enforcer.ArtifactSizeEnforcerRule.PROJECT_BUILD_DIR_PROP;
-import static org.codice.ddf.admin.beta.enforcer.ArtifactSizeEnforcerRule.PROJECT_PACKAGING_PROP;
-import static org.codice.ddf.admin.beta.enforcer.ArtifactSizeEnforcerRule.PROJECT_VERSION_PROP;
-import static org.codice.ddf.admin.beta.enforcer.ArtifactSizeEnforcerRule.SUPPORTED_PACKAGE_TYPES;
+import static org.codice.ddf.admin.enforcer.ArtifactSizeEnforcerRule.PROJECT_ARTIFACT_ID_PROP;
+import static org.codice.ddf.admin.enforcer.ArtifactSizeEnforcerRule.PROJECT_BUILD_DIR_PROP;
+import static org.codice.ddf.admin.enforcer.ArtifactSizeEnforcerRule.PROJECT_PACKAGING_PROP;
+import static org.codice.ddf.admin.enforcer.ArtifactSizeEnforcerRule.PROJECT_VERSION_PROP;
+import static org.codice.ddf.admin.enforcer.ArtifactSizeEnforcerRule.SUPPORTED_PACKAGE_TYPES;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 import static junit.framework.TestCase.fail;

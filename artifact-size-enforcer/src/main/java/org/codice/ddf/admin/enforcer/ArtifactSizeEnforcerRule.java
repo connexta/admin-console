@@ -11,7 +11,7 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  */
-package org.codice.ddf.admin.beta.enforcer;
+package org.codice.ddf.admin.enforcer;
 
 import java.io.File;
 import java.util.Arrays;

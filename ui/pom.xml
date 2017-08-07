@@ -17,10 +17,10 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <artifactId>admin</artifactId>
-        <groupId>org.codice.ddf.admin.beta</groupId>
+        <groupId>org.codice.ddf.admin.query</groupId>
         <version>0.1.3-SNAPSHOT</version>
     </parent>
-    <name>DDF :: Admin (Beta) :: UI</name>
+    <name>DDF :: Admin Console :: Query :: UI</name>
     <artifactId>admin-ui</artifactId>
     <packaging>bundle</packaging>
     <dependencies>
@@ -43,9 +43,9 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
-                        <Web-ContextPath>/admin/beta</Web-ContextPath>
+                        <Web-ContextPath>/admin/hub</Web-ContextPath>
                         <_wab>${project.build.directory}/webapp/</_wab>
-                        <Bundle-SymbolicName>${project.artifactId}-beta</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Embed-Dependency>
                             platform-error-servlet
                         </Embed-Dependency>

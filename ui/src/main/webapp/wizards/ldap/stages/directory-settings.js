@@ -211,7 +211,7 @@ const DirectorySettings = (props) => {
           tooltip='The attribute of the user entry that, when combined with the Base User DN, forms the reference value, e.g. XXX=jsmith,ou=users,dc=example,dc=com'
           visible={isAttrStore}
           disabled={disabled}
-          options={options.groupAttributesHoldingMember} />
+          options={options.memberAttributesReferencedInGroup} />
 
         <InputAuto
           id='baseGroupDn'
@@ -276,7 +276,7 @@ export default graphql(gql`
         userDns
         groupsDns
         userNameAttributes
-        groupAttributesHoldingMember
+        memberAttributesReferencedInGroup
         groupObjectClasses
         groupAttributesHoldingMember
         queryBases

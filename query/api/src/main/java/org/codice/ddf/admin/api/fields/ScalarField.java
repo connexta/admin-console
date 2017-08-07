@@ -20,6 +20,6 @@ public interface ScalarField<S> extends DataType<S> {
     ScalarType scalarType();
 
     enum ScalarType {
-        STRING, INTEGER, FLOAT, BOOLEAN
+        STRING, INTEGER, FLOAT, BOOLEAN, HIDDEN_STRING
     }
 }

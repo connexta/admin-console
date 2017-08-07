@@ -17,14 +17,32 @@ import org.codice.ddf.admin.api.fields.ScalarField;
 import org.codice.ddf.admin.graphql.GraphQLTypesProviderImpl;
 
 import graphql.Scalars;
+import graphql.schema.Coercing;
 import graphql.schema.GraphQLScalarType;
 
 public class GraphQLTransformScalar {
 
     GraphQLTypesProviderImpl<GraphQLScalarType> scalarTypesProvider;
+    private Coercing encryptPasswordCoercing;
 
     public GraphQLTransformScalar() {
         scalarTypesProvider = new GraphQLTypesProviderImpl<>();
+        encryptPasswordCoercing = new Coercing() {
+            @Override
+            public Object serialize(Object input) {
+                return "***";
+            }
+
+            @Override
+            public Object parseValue(Object input) {
+                return Scalars.GraphQLString.getCoercing().parseValue(input);
+            }
+
+            @Override
+            public Object parseLiteral(Object input) {
+                return Scalars.GraphQLString.getCoercing().parseLiteral(input);
+            }
+        };
     }
 
     public GraphQLScalarType resolveScalarType(ScalarField field) {
@@ -54,6 +72,10 @@ public class GraphQLTransformScalar {
         case FLOAT:
             type = field.fieldTypeName() == null ? Scalars.GraphQLFloat :
                     new GraphQLScalarType(field.fieldTypeName(), field.description(), Scalars.GraphQLFloat.getCoercing());
+            break;
+        case HIDDEN_STRING:
+            type = field.fieldTypeName() == null ? Scalars.GraphQLString :
+                    new GraphQLScalarType(field.fieldTypeName(), field.description(), encryptPasswordCoercing);
         }
 
         scalarTypesProvider.addType(field.fieldTypeName(), type);

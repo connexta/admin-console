@@ -11,26 +11,23 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.graphql.transform;
+package org.codice.ddf.admin.common.fields.common;
 
-import java.util.List;
+import org.codice.ddf.admin.common.fields.base.scalar.BaseHiddenField;
 
-import org.codice.ddf.admin.api.report.ErrorMessage;
+public class PasswordField extends BaseHiddenField {
 
-public class FunctionDataFetcherException extends RuntimeException {
+    public static final String DEFAULT_FIELD_NAME = "password";
 
-    private List<ErrorMessage> customMessage;
+    public static final String FIELD_TYPE_NAME = "Password";
 
-    public FunctionDataFetcherException(String message, List<ErrorMessage> customMessage) {
-        super(message);
-        this.customMessage = customMessage;
+    public static final String DESCRIPTION = "Password used for authentication.";
+
+    public PasswordField() {
+        super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
     }
 
-    public List<ErrorMessage> getCustomMessages() {
-        return customMessage;
-    }
-
-    public synchronized Throwable fillInStackTrace() {
-        return this;
+    public PasswordField(String fieldName) {
+        super(fieldName, FIELD_TYPE_NAME, DESCRIPTION);
     }
 }

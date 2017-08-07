@@ -42,7 +42,7 @@ public class PrioritizedBatchExecutor<T, R> {
 
     private static final int MAX_THREAD_POOL_SIZE = 64;
 
-    private static final int DEFAULT_WAIT_TIME_SEC = 10;
+    private static final int DEFAULT_WAIT_TIME_SEC = 60;
 
     private final ExecutorService threadPool;
 

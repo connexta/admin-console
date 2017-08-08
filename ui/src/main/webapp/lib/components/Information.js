@@ -1,8 +1,8 @@
 import React from 'react'
 import muiThemeable from 'material-ui/styles/muiThemeable'
 
-const styles = ({
-  informationDiv: {
+const styles = {
+  div: {
     textAlign: 'left',
     fontSize: '16px',
     lineHeight: '24px',
@@ -11,40 +11,40 @@ const styles = ({
     position: 'relative',
     height: '200ms'
   },
-  informationLabel: {
+  label: {
     position: 'absolute',
     lineHeight: '22px',
     top: '30px',
     transform: 'scale(0.75) translate(0px, -28px)',
     transformOrigin: 'left top 0px'
   },
-  informationP: {
+  p: {
     position: 'relative',
     height: '100%',
     margin: '28px 0px 7px',
     whiteSpace: 'nowrap'
   },
-  informationListItemP: {
+  listItemP: {
     position: 'relative',
     height: '100%',
     margin: '0px',
     whiteSpace: 'nowrap'
   }
-})
+}
 
 const Information = ({ id, label, value, muiTheme }) => (
-  <div style={styles.informationDiv}>
-    <label style={{ color: muiTheme.palette.textColor, ...styles.informationLabel }}>{label}</label>
+  <div style={styles.div}>
+    <label style={{ color: muiTheme.palette.textColor, ...styles.label }}>{label}</label>
     { value instanceof Array
       ? (
-        <div style={styles.informationP}>
+        <div style={styles.p}>
           {value.map((text, i) => (
-            <p key={i} style={{ color: muiTheme.palette.textColor, ...styles.informationListItemP }}>
+            <p key={i} style={{ color: muiTheme.palette.textColor, ...styles.listItemP }}>
               {text}
             </p>))}
         </div>
         )
-      : (<p id={id} style={{ color: muiTheme.palette.textColor, ...styles.informationP }}>{value}</p>)
+      : (<p id={id} style={{ color: muiTheme.palette.textColor, ...styles.p }}>{value}</p>)
     }
   </div>
 )

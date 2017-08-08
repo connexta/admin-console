@@ -8,12 +8,14 @@ const ThemedFont = muiThemeable()(({ muiTheme, children, ...rest }) => (
     {children}</p>
 ))
 
-const infoSubtitleLeft = ({
-  fontSize: '14px',
-  position: 'relative',
-  textAlign: 'left',
-  margin: '10px 10px'
-})
+const styles = {
+  infoSubtitleLeft: {
+    fontSize: '14px',
+    position: 'relative',
+    textAlign: 'left',
+    margin: '10px 10px'
+  }
+}
 
 export default (InnerComponent) => class extends Component {
   constructor (props) {
@@ -44,7 +46,7 @@ export default (InnerComponent) => class extends Component {
       return (
         <Flexbox style={confirmableStyle}
           flexDirection='column' alignItems='center'>
-          <ThemedFont style={infoSubtitleLeft}>{confirmableMessage}</ThemedFont>
+          <ThemedFont style={styles.infoSubtitleLeft}>{confirmableMessage}</ThemedFont>
           <Flexbox flexDirection='row'>
             <RaisedButton label='Yes' className='yes' primary onClick={() => this.confirm(onClick)} />
             <RaisedButton label='No' className='no' secondary onClick={() => this.deny()} />

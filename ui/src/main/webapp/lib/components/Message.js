@@ -1,15 +1,17 @@
 import React from 'react'
 import muiThemeable from 'material-ui/styles/muiThemeable'
 
-const messageStyle = ({
-  marginTop: '20px',
-  padding: '10px',
-  boxSizing: 'border-box',
-  boxShadow: 'rgba(0, 0, 0, 0.117647) 0px 1px 6px, rgba(0, 0, 0, 0.117647) 0px 1px 4px',
-  borderRadius: '2px',
-  fontSize: '14px',
-  fontWeight: 'bold'
-})
+const styles = {
+  message: {
+    marginTop: '20px',
+    padding: '10px',
+    boxSizing: 'border-box',
+    boxShadow: 'rgba(0, 0, 0, 0.117647) 0px 1px 6px, rgba(0, 0, 0, 0.117647) 0px 1px 4px',
+    borderRadius: '2px',
+    fontSize: '14px',
+    fontWeight: 'bold'
+  }
+}
 
 const Message = ({ type, errorType, code, message, children, muiTheme }) => {
   const colorMap = {
@@ -19,7 +21,7 @@ const Message = ({ type, errorType, code, message, children, muiTheme }) => {
   }
   return (
     <div style={{
-      ...messageStyle,
+      ...styles.message,
       color: muiTheme.palette.alternateTextColor,
       background: colorMap[type || errorType] || muiTheme.palette.errorColor
     }}>

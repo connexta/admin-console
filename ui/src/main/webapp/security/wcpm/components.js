@@ -21,6 +21,18 @@ import {
   editButton
 } from './styles.css'
 
+const styles = {
+  disabled: {
+    backgroundColor: 'rgba(125, 125, 125, 0.25)',
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    zIndex: 200
+  }
+}
+
 export const Description = ({ children }) => (
   <Des style={{ textAlign: 'left' }}>{children}</Des>
 )
@@ -65,19 +77,9 @@ export const Panel = ({ children, style }) => (
   </Paper>
 )
 
-const disabledStyle = ({
-  backgroundColor: 'rgba(125, 125, 125, 0.25)',
-  position: 'absolute',
-  left: 0,
-  right: 0,
-  top: 0,
-  bottom: 0,
-  zIndex: 200
-})
-
 export const Disabled = ({ children }) => (
   <div style={{ position: 'relative' }}>
-    <div style={disabledStyle} />
+    <div style={styles.disabled} />
     {children}
   </div>
 )

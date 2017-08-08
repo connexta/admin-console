@@ -15,7 +15,6 @@ import SourceSelectionStage from './stages/source-selection'
 import ConfirmationStage from './stages/confirmation'
 import CompletedStage from './stages/completed'
 
-
 const WizardView = ({ id, children, clearWizard }) => (
   <Mount off={clearWizard} key={id}>{children}</Mount>
 )
@@ -30,7 +29,7 @@ const stageMapping = {
   completedStage: CompletedStage
 }
 
-const styles = ({
+const styles = {
   main: {
     margin: '20px 0',
     padding: '40px',
@@ -46,7 +45,7 @@ const styles = ({
     zIndex: 9001,
     display: 'flex'
   }
-})
+}
 
 export default (sources) => {
   const StageRouter = connect(
@@ -57,7 +56,7 @@ export default (sources) => {
     <Wizard id='sources'>
       <Paper style={styles.main}>
         <Spinner submitting={isSubmitting}>
-          <StageRouter/>
+          <StageRouter />
         </Spinner>
       </Paper>
     </Wizard>

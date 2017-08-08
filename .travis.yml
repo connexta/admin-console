@@ -20,5 +20,6 @@ script: mvn clean install sonar:sonar -q -pl \!itests
 
 env:
   global:
+    - MAVEN_OPTS="-Xmx4096m"
     - CODICE_USERNAME=ddf
     - secure: "kFHe2uFDq7toVyjZFxypZ5r9OZvaYWXEm2qPULkVms1DgSQqBncEKuSy9Y0Ab9UXlLkG0b9uUq8EEbXXcYX+OEnWIqOKleh+q/p912P/Xhmx2WFvs++743xzNa7gpBH5apZLlvLZst+UKfggvdMUqDSoSTZic1Pm+/RtMRbybMgnrdMvxXPaDqmjXGkKCoYE2OaUxQd+MtSUzgX76cXkCIADTrZKnGEKrfSzm52W0Lr90CQChJc9HOLtOiZYjYByLMRPLOZMEbG/fGjz2CSLP3BqCXuGwCW/4QcIaSk+DFxPu33HzKjYTztQYtGYksl1aY4WKlWw/BYfmZ4tzWIuyCSOVJcrxHZiXO3qj2fJDmK9QL/5yKVT+a7ly3ObiAdjtM5PF8h1qRP9Y++gLTUdBca5jaBvgqXTfdRvtwOo7vnD/VxDLy7+cd7f8qOo3fAacSedeQfYn5g0F0xaMB2tb2izdSBA1nb/nFGYdYffHIobmJplVwshi5GiGo8t1bYhel+HfT1SS8DyhAZXa5473UAQ8Lu/SErCqKsuFJMfiUa6TuS6Su3E2jJB3sjPYQP1Dhvp/vKCcY7z+Z0d6BoSQFYbkAgDNSqeZC/hjnzk+Di3Q1Q9KAT9x8RCH7cwmuDnLxGIzFnK3ECJIzz/ofoaPokrV9AYcPXa0HEuAr9vr7M="

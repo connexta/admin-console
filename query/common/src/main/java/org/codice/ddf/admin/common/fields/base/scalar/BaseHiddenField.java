@@ -26,7 +26,7 @@ import com.google.common.collect.ImmutableSet;
 
 public class BaseHiddenField extends BaseScalarField<String> {
 
-    public static final String DEFAULT_FIELD_NAME  = "hidden password";
+    private static final String DEFAULT_FIELD_NAME  = "hidden";
 
     protected BaseHiddenField(String fieldName, String fieldTypeName, String description) {
         super(fieldName, fieldTypeName, description, HIDDEN_STRING);

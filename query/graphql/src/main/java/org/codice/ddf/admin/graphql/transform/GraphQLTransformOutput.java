@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.boon.Boon;
 import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.api.FieldProvider;
@@ -28,14 +27,12 @@ import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.api.fields.ObjectField;
 import org.codice.ddf.admin.api.fields.ScalarField;
-import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.codice.ddf.admin.api.report.FunctionReport;
 import org.codice.ddf.admin.graphql.GraphQLTypesProviderImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 
 import graphql.schema.DataFetchingEnvironment;
@@ -169,10 +166,17 @@ public class GraphQLTransformOutput {
         funcField.setValue(args);
         FunctionReport<DataType> result = funcField.getValue();
 
-        if(!result.messages().isEmpty()) {
-            throw new FunctionDataFetcherException(toPrettyString(funcField, result.messages()), result.messages());
-        } else if(result.isResultPresent()){
-            return result.result().getValue();
+        if (!result.messages()
+                .isEmpty()) {
+            throw new FunctionDataFetcherException(funcField.fieldName(),
+                    funcField.getArguments()
+                            .stream()
+                            .map(Field::getValue)
+                            .collect(Collectors.toList()),
+                    result.messages());
+        } else if (result.isResultPresent()) {
+            return result.result()
+                    .getValue();
         }
 
         return null;
@@ -202,40 +206,5 @@ public class GraphQLTransformOutput {
                 transformScalar.getScalarTypesProvider(),
                 transformEnum.getEnumTypeProvider(),
                 outputTypeProvider);
-    }
-
-    private String toPrettyString(FunctionField<DataType> funcField,
-            List<ErrorMessage> customMessage) {
-        String functionName = funcField.fieldName();
-        List<Object> args = funcField.getArguments()
-                .stream()
-                .map(Field::getValue)
-                .collect(Collectors.toList());
-
-        return Boon.toPrettyJson(hidePassword(toMap(functionName, args, customMessage)));
-    }
-
-    private Object hidePassword(Object result) {
-        if (result instanceof List) {
-            for (Object obj : (ArrayList) result) {
-                hidePassword(obj);
-            }
-        } else if (result instanceof Map) {
-            Map<String, Object> innerMap = (Map) result;
-            for (String str : innerMap.keySet()) {
-                if (!(innerMap.get(str) instanceof HashMap)
-                        && !(innerMap.get(str) instanceof ArrayList) && str.contains("pass")) {
-                    innerMap.replace(str, "***");
-                } else {
-                    hidePassword(innerMap.get(str));
-                }
-            }
-        }
-        return result;
-    }
-
-    private Map<String, Object> toMap(String functionName, List<Object> args,
-            List<ErrorMessage> customMessage) {
-        return ImmutableMap.of("functionName", functionName, "args", args, "errors", customMessage);
     }
 }

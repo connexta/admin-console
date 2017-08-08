@@ -20,8 +20,6 @@ import Navigation, { Back, Next } from 'components/wizard/Navigation'
 
 import { InputAuto } from 'admin-wizard/inputs'
 
-import * as styles from './styles.less'
-
 import muiThemeable from 'material-ui/styles/muiThemeable'
 
 const QueryResultView = (props) => {
@@ -94,7 +92,7 @@ const LdapQueryToolView = ({ disabled, options = {}, client, conn, info, configs
       </div>
 
         (
-        <div className={styles.queryWindow}>
+        <div>
           <Title>Query Results</Title>
           {state.length === 0
                 ? 'No results'

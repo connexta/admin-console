@@ -1,0 +1,12 @@
+.editRegion:hover .editButton {
+  opacity: 1;
+}
+
+.editButton {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  opacity: 0;
+  z-index: 100;
+  transition: opacity .5s ease;
+}

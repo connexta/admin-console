@@ -27,42 +27,43 @@ export default class extends Component {
       presetSelection
     } = this.state
 
-    const cardStyle = ({
-      backgroundColor: theme.palette.backdropColor,
-      padding: '5px',
-      marginBottom: '10px'
-    })
-
-    const cardHeaderStyle = ({
-      margin: '0px',
-      fontSize: '18px',
-      whiteSpace: 'nowrap',
-      color: getReadableTextColor(theme.palette.backdropColor)
-    })
+    const styles = {
+      card: {
+        backgroundColor: theme.palette.backdropColor,
+        padding: '5px',
+        marginBottom: '10px'
+      },
+      cardHeader: {
+        margin: '0px',
+        fontSize: '18px',
+        whiteSpace: 'nowrap',
+        color: getReadableTextColor(theme.palette.backdropColor)
+      }
+    }
 
     return (
       <div style={{padding: '0px 5px'}}>
-        <Card style={cardStyle}>
-          <CardHeader title={<p style={cardHeaderStyle}>Labels & Buttons</p>} />
+        <Card style={styles.card}>
+          <CardHeader title={<p style={styles.cardHeader}>Labels & Buttons</p>} />
           <Swatch label='Primary' background={theme.palette.primary1Color} onChange={updateColor(['palette', 'primary1Color'])} />
           <Swatch label='Secondary' background={theme.palette.accent1Color} onChange={updateColor(['palette', 'accent1Color'])} />
           <Swatch label='Disabled' background={theme.palette.disabledColor} onChange={updateColor(['palette', 'disabledColor'])} />
           <Swatch label='Label Text' background={theme.palette.alternateTextColor} onChange={updateColor(['palette', 'alternateTextColor'])} />
         </Card>
-        <Card style={cardStyle}>
-          <CardHeader title={<p style={cardHeaderStyle}>Background & Text</p>} />
+        <Card style={styles.card}>
+          <CardHeader title={<p style={styles.cardHeader}>Background & Text</p>} />
           <Swatch label='Text' background={theme.palette.textColor} onChange={updateColor(['palette', 'textColor'])} />
           <Swatch label='Canvas' background={theme.palette.canvasColor} onChange={updateColor(['palette', 'canvasColor'])} />
           <Swatch label='Backdrop' background={theme.palette.backdropColor} onChange={updateColor(['palette', 'backdropColor'])} />
         </Card>
-        <Card style={cardStyle}>
-          <CardHeader title={<p style={cardHeaderStyle}>Alerts & Messages</p>} />
+        <Card style={styles.card}>
+          <CardHeader title={<p style={styles.cardHeader}>Alerts & Messages</p>} />
           <Swatch label='Error' background={theme.palette.errorColor} onChange={updateColor(['palette', 'errorColor'])} />
           <Swatch label='Warning' background={theme.palette.warningColor} onChange={updateColor(['palette', 'warningColor'])} />
           <Swatch label='Success' background={theme.palette.successColor} onChange={updateColor(['palette', 'successColor'])} />
         </Card>
-        <Card style={cardStyle}>
-          <CardHeader title={<p style={cardHeaderStyle}>Tables</p>} />
+        <Card style={styles.card}>
+          <CardHeader title={<p style={styles.cardHeader}>Tables</p>} />
           <Swatch label='Table Highlight' background={theme.palette.accent2Color} onChange={updateColor(['palette', 'accent2Color'])} />
           <Swatch label='Table Header' background={theme.palette.accent3Color} onChange={updateColor(['palette', 'accent3Color'])} />
           <Swatch label='Table Selected' background={theme.tableRow.selectedColor} onChange={updateColor(['tableRow', 'selectedColor'])} />

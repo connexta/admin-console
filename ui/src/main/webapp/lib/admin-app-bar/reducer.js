@@ -7,13 +7,13 @@ import adminTheme from 'themes/adminTheme'
 import parrettTheme from 'themes/parrettTheme'
 import solarizedDarkTheme from 'themes/solarizedDarkTheme'
 
-const presetThemes = ({
+const presetThemes = {
   'Admin': adminTheme,
   'Material': defaultTheme,
   'Dark': darkTheme,
   'Parrett': parrettTheme,
   'Solarized Dark': solarizedDarkTheme
-})
+}
 
 export const submarine = sub()
 

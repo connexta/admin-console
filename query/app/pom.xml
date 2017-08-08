@@ -74,6 +74,16 @@
             <artifactId>catalog-core-api</artifactId>
             <version>${ddf.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.codice.ddf.admin.query</groupId>
+            <artifactId>admin-query-embeddedldap</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codice.ddf.admin.query</groupId>
+            <artifactId>admin-module</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

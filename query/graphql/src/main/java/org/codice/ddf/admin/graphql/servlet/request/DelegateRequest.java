@@ -48,8 +48,24 @@ public class DelegateRequest implements HttpServletRequest {
         this.request = request;
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(toInputStream.getBytes(StandardCharsets.UTF_8));
         servletInputStream = new ServletInputStream(){
+            @Override
             public int read() throws IOException {
                 return byteArrayInputStream.read();
+            }
+
+            @Override
+            public int read(byte[] b) throws IOException {
+                return byteArrayInputStream.read(b);
+            }
+
+            @Override
+            public int read(byte[] b, int off, int len) throws IOException {
+                return byteArrayInputStream.read(b, off, len);
+            }
+
+            @Override
+            public long skip(long n) throws IOException {
+                return byteArrayInputStream.skip(n);
             }
         };
     }

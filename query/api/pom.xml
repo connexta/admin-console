@@ -22,7 +22,7 @@
         <version>0.1.3-SNAPSHOT</version>
     </parent>
 
-    <name>DDF :: Admin Console :: Query :: Api</name>
+    <name>DDF :: Admin Console :: Query :: API</name>
     <artifactId>admin-query-api</artifactId>
     <packaging>bundle</packaging>
 

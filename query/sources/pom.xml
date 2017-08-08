@@ -18,11 +18,11 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <artifactId>admin-query</artifactId>
-        <groupId>org.codice.ddf.admin.beta</groupId>
+        <groupId>org.codice.ddf.admin.query</groupId>
         <version>0.1.3-SNAPSHOT</version>
     </parent>
     <artifactId>admin-query-sources</artifactId>
-    <name>DDF Admin Console (Beta) :: Query :: Sources</name>
+    <name>DDF :: Admin Console :: Query :: Sources</name>
     <packaging>pom</packaging>
 
     <modules>

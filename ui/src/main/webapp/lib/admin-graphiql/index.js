@@ -4,7 +4,7 @@ import GraphiQL from 'graphiql'
 import 'graphiql/graphiql.css'
 
 const graphQLFetcher = (graphQLParams) => (
-  window.fetch(window.location.origin + '/admin/beta/graphql', {
+  window.fetch(window.location.origin + '/admin/hub/graphql', {
     method: 'post',
     credentials: 'same-origin',
     headers: { 'Content-Type': 'application/json' },

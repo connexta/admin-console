@@ -17,23 +17,23 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>admin-query-sources</artifactId>
-        <groupId>org.codice.ddf.admin.beta</groupId>
+        <groupId>org.codice.ddf.admin.query</groupId>
         <version>0.1.3-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>admin-query-sources-impl</artifactId>
-    <name>DDF :: Admin (Beta) :: Sources :: Impl</name>
+    <name>DDF :: Admin Console :: Query :: Sources :: Impl</name>
     <packaging>bundle</packaging>
 
     <dependencies>
         <dependency>
-            <groupId>org.codice.ddf.admin.beta</groupId>
+            <groupId>org.codice.ddf.admin.query</groupId>
             <artifactId>admin-query-common</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.codice.ddf.admin.beta</groupId>
+            <groupId>org.codice.ddf.admin.query</groupId>
             <artifactId>admin-query-sources-common</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -115,7 +115,7 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${project.artifactId}-beta</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Embed-Dependency>
                             admin-query-common,
                             admin-query-sources-common,
@@ -136,7 +136,7 @@
                 <version>1.4.1</version>
                 <dependencies>
                     <dependency>
-                        <groupId>org.codice.ddf.admin.beta</groupId>
+                        <groupId>org.codice.ddf.admin.query</groupId>
                         <artifactId>artifact-size-enforcer</artifactId>
                         <version>${project.version}</version>
                     </dependency>
@@ -151,7 +151,7 @@
                         <configuration>
                             <rules>
                                 <ArtifactSizeEnforcerRule
-                                        implementation="org.codice.ddf.admin.beta.enforcer.ArtifactSizeEnforcerRule">
+                                        implementation="org.codice.ddf.admin.enforcer.ArtifactSizeEnforcerRule">
                                     <maxArtifactSize>2.8_MB</maxArtifactSize>
                                 </ArtifactSizeEnforcerRule>
                             </rules>

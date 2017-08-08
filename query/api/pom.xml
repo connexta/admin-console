@@ -18,11 +18,11 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <artifactId>admin-query</artifactId>
-        <groupId>org.codice.ddf.admin.beta</groupId>
+        <groupId>org.codice.ddf.admin.query</groupId>
         <version>0.1.3-SNAPSHOT</version>
     </parent>
 
-    <name>DDF :: Admin (Beta) :: API</name>
+    <name>DDF :: Admin Console :: Query :: API</name>
     <artifactId>admin-query-api</artifactId>
     <packaging>bundle</packaging>
 
@@ -46,7 +46,7 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${project.artifactId}-beta</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Export-Package>
                             org.codice.ddf.admin.api.*
                         </Export-Package>

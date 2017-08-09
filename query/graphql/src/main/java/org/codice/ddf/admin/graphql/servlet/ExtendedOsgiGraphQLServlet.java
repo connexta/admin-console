@@ -248,7 +248,7 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet implements Ev
                 GraphQLFieldDefinition fieldDef, Map<String, Object> argumentValues, Exception e) {
             if (e instanceof FunctionDataFetcherException) {
                 for (ErrorMessage msg : ((FunctionDataFetcherException) e).getCustomMessages()) {
-                    LOGGER.debug("Unsuccessful GraphQL request:\n", e.toString());
+                    LOGGER.debug("Unsuccessful GraphQL request:\n", e);
                     executionContext.addError(new DataFetchingGraphQLError(msg));
                 }
             } else {

@@ -17,11 +17,34 @@ import org.codice.ddf.admin.api.fields.ScalarField;
 import org.codice.ddf.admin.graphql.GraphQLTypesProviderImpl;
 
 import graphql.Scalars;
+import graphql.schema.Coercing;
 import graphql.schema.GraphQLScalarType;
 
 public class GraphQLTransformScalar {
 
     GraphQLTypesProviderImpl<GraphQLScalarType> scalarTypesProvider;
+
+    private static final String HIDDEN_FLAG = "*****";
+
+    private static final Coercing HIDDEN_COERCING  = new Coercing() {
+        @Override
+        public Object serialize(Object input) {
+            return HIDDEN_FLAG;
+        }
+
+        @Override
+        public Object parseValue(Object input) {
+            return Scalars.GraphQLString.getCoercing()
+                    .parseValue(input);
+        }
+
+        @Override
+        public Object parseLiteral(Object input) {
+            return Scalars.GraphQLString.getCoercing()
+                    .parseLiteral(input);
+        }
+
+    };
 
     public GraphQLTransformScalar() {
         scalarTypesProvider = new GraphQLTypesProviderImpl<>();
@@ -54,6 +77,10 @@ public class GraphQLTransformScalar {
         case FLOAT:
             type = field.fieldTypeName() == null ? Scalars.GraphQLFloat :
                     new GraphQLScalarType(field.fieldTypeName(), field.description(), Scalars.GraphQLFloat.getCoercing());
+            break;
+        case HIDDEN_STRING:
+            type = field.fieldTypeName() == null ? Scalars.GraphQLString :
+                    new GraphQLScalarType(field.fieldTypeName(), field.description(), HIDDEN_COERCING);
         }
 
         scalarTypesProvider.addType(field.fieldTypeName(), type);

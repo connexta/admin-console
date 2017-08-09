@@ -11,15 +11,23 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.api.fields;
+package org.codice.ddf.admin.common.fields.common;
 
-import org.codice.ddf.admin.api.DataType;
+import org.codice.ddf.admin.common.fields.base.scalar.BaseHiddenField;
 
-public interface ScalarField<S> extends DataType<S> {
+public class PasswordField extends BaseHiddenField {
 
-    ScalarType scalarType();
+    public static final String DEFAULT_FIELD_NAME = "password";
 
-    enum ScalarType {
-        STRING, INTEGER, FLOAT, BOOLEAN, HIDDEN_STRING
+    public static final String FIELD_TYPE_NAME = "Password";
+
+    public static final String DESCRIPTION = "Password used for authentication.";
+
+    public PasswordField() {
+        super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
+    }
+
+    public PasswordField(String fieldName) {
+        super(fieldName, FIELD_TYPE_NAME, DESCRIPTION);
     }
 }

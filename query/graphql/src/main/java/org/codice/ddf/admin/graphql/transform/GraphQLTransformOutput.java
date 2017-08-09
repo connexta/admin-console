@@ -159,23 +159,23 @@ public class GraphQLTransformOutput {
 
         FunctionField<DataType> funcField = field.newInstance();
 
-        //Remove the field name of the function from that path since the update is using a subpath
+        //Remove the field name of the function emptyReport that path since the update is using a subpath
         List<String> fixedPath = Lists.newArrayList(field.path());
         fixedPath.remove(fixedPath.size() - 1);
         funcField.updatePath(fixedPath);
         funcField.setValue(args);
         FunctionReport<DataType> result = funcField.getValue();
 
-        if (!result.messages()
+        if (!result.getErrorMessages()
                 .isEmpty()) {
             throw new FunctionDataFetcherException(funcField.fieldName(),
                     funcField.getArguments()
                             .stream()
                             .map(Field::getValue)
                             .collect(Collectors.toList()),
-                    result.messages());
+                    result.getErrorMessages());
         } else if (result.isResultPresent()) {
-            return result.result()
+            return result.getResult()
                     .getValue();
         }
 

@@ -119,7 +119,7 @@ public class CreateLdapConfiguration extends BaseFunctionField<BooleanField> {
         OperationReport report = configurator.commit("Creating LDAP configuration.");
 
         if (report.containsFailedResults()) {
-            addResultMessage(failedPersistError());
+            addErrorMessage(failedPersistError());
         }
 
         return new BooleanField(!containsErrorMsgs());

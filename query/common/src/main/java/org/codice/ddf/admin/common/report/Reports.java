@@ -11,20 +11,34 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.sources.utils;
+package org.codice.ddf.admin.common.report;
 
-import java.util.function.Function;
+import java.util.List;
 
+import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.codice.ddf.admin.api.report.Report;
 
-public class SourceTaskHandler<T>
-        implements Function<Report<T>, Report<T>> {
+public class Reports {
 
-    @Override
-    public Report<T> apply(Report<T> configResult) {
-        if (configResult != null && !configResult.containsErrorMessages()) {
-            return configResult;
-        }
-        return null;
+    public static <T> Report<T> emptyReport() {
+        return new ReportImpl<>();
+    }
+
+    public static <T> Report<T> from(T result) {
+        return new ReportImpl<>(result);
+    }
+
+    public static <T> Report<T> from(ErrorMessage message){
+        return new ReportImpl<>(message);
+    }
+
+    public static <T> Report<T> from(List<ErrorMessage> messages) {
+        return new ReportImpl<>(messages);
+    }
+
+    public static <T> Report<T> from(Report report){
+        List<ErrorMessage> messages = report.getErrorMessages();
+        return new ReportImpl<>(messages);
     }
 }
+

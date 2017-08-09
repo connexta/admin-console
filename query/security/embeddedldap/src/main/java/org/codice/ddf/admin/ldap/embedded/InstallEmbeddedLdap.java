@@ -93,7 +93,7 @@ public class InstallEmbeddedLdap extends BaseFunctionField<BooleanField> {
         OperationReport report = configurator.commit("Installed Embedded LDAP");
 
         if (report.containsFailedResults()) {
-            addResultMessage(failedPersistError());
+            addErrorMessage(failedPersistError());
         }
 
         return new BooleanField(!containsErrorMsgs());

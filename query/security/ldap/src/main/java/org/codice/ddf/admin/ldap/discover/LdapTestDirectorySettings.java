@@ -80,16 +80,16 @@ public class LdapTestDirectorySettings extends TestFunctionField {
     public BooleanField performFunction() {
         try (LdapConnectionAttempt connectionAttempt = utils.bindUserToLdapConnection(conn,
                 bindInfo)) {
-            addMessages(connectionAttempt);
+            addReportMessages(connectionAttempt);
 
             if (containsErrorMsgs()) {
                 return new BooleanField(false);
             }
 
-            Connection ldapConnection = connectionAttempt.result();
+            Connection ldapConnection = connectionAttempt.getResult();
 
-            addMessages(utils.checkDirExists(settings.baseGroupDnField(), ldapConnection));
-            addMessages(utils.checkDirExists(settings.baseUserDnField(), ldapConnection));
+            addReportMessages(utils.checkDirExists(settings.baseGroupDnField(), ldapConnection));
+            addReportMessages(utils.checkDirExists(settings.baseUserDnField(), ldapConnection));
 
             // Short-circuit return here, if either the user or group directory does not exist
             if (containsErrorMsgs()) {
@@ -164,9 +164,9 @@ public class LdapTestDirectorySettings extends TestFunctionField {
                 1);
 
         if (baseUsersResults.isEmpty()) {
-            addArgumentMessage(noUsersInBaseUserDnError(settings.baseUserDnField()
+            addErrorMessage(noUsersInBaseUserDnError(settings.baseUserDnField()
                     .path()));
-            addArgumentMessage(userAttributeNotFoundError(settings.usernameAttributeField()
+            addErrorMessage(userAttributeNotFoundError(settings.usernameAttributeField()
                     .path()));
         }
     }
@@ -185,9 +185,9 @@ public class LdapTestDirectorySettings extends TestFunctionField {
                 1);
 
         if (baseGroupResults.isEmpty()) {
-            addArgumentMessage(noGroupsInBaseGroupDnError(settings.baseGroupDnField()
+            addErrorMessage(noGroupsInBaseGroupDnError(settings.baseGroupDnField()
                     .path()));
-            addArgumentMessage(noGroupsInBaseGroupDnError(settings.groupObjectClassField()
+            addErrorMessage(noGroupsInBaseGroupDnError(settings.groupObjectClassField()
                     .path()));
         }
     }
@@ -202,7 +202,7 @@ public class LdapTestDirectorySettings extends TestFunctionField {
                 1);
 
         if (groups.isEmpty()) {
-            addArgumentMessage(noGroupsWithMembersError(settings.groupAttributeHoldingMemberField()
+            addErrorMessage(noGroupsWithMembersError(settings.groupAttributeHoldingMemberField()
                     .path()));
         } else {
             checkReferencedUser(ldapConnection, groups.get(0));
@@ -231,11 +231,11 @@ public class LdapTestDirectorySettings extends TestFunctionField {
                     1);
 
             if (foundMember.isEmpty()) {
-                addArgumentMessage(noReferencedMemberError(settings.memberAttributeReferencedInGroupField()
+                addErrorMessage(noReferencedMemberError(settings.memberAttributeReferencedInGroupField()
                         .path()));
             }
         } else {
-            addArgumentMessage(noReferencedMemberError(settings.memberAttributeReferencedInGroupField()
+            addErrorMessage(noReferencedMemberError(settings.memberAttributeReferencedInGroupField()
                     .path()));
         }
     }

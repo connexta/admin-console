@@ -15,6 +15,6 @@ package org.codice.ddf.admin.api.report;
 
 import org.codice.ddf.admin.api.DataType;
 
-public interface FunctionReport<T extends DataType> extends ReportWithResult<T> {
+public interface FunctionReport<T extends DataType> extends Report<T> {
 
 }

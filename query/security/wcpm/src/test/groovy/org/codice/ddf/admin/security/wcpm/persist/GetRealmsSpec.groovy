@@ -1,7 +1,7 @@
 package groovy.org.codice.ddf.admin.security.wcpm.persist
 
 import org.codice.ddf.admin.api.poller.EnumValuePoller
-import org.codice.ddf.admin.api.report.ReportWithResult
+import org.codice.ddf.admin.api.report.Report
 import org.codice.ddf.admin.security.common.fields.wcpm.Realm
 import org.codice.ddf.admin.security.wcpm.RealmTypesPoller
 import org.codice.ddf.admin.security.wcpm.discover.GetRealms
@@ -27,10 +27,10 @@ class GetRealmsSpec extends Specification {
 
     def 'Successfully retrieves realms from realm value poller'() {
         when:
-        ReportWithResult report = getRealms.getValue()
+        Report report = getRealms.getValue()
 
         then:
-        report.messages().isEmpty()
-        report.result().getValue() == [KARAF]
+        report.getErrorMessages().isEmpty()
+        report.getResult().getValue() == [KARAF]
     }
 }

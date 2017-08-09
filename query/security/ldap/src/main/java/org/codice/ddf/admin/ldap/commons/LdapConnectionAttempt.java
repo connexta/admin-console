@@ -17,10 +17,10 @@ import java.io.Closeable;
 import java.io.IOException;
 
 import org.codice.ddf.admin.api.report.ErrorMessage;
-import org.codice.ddf.admin.common.report.ReportWithResultImpl;
+import org.codice.ddf.admin.common.report.ReportImpl;
 import org.forgerock.opendj.ldap.Connection;
 
-public class LdapConnectionAttempt extends ReportWithResultImpl<Connection> implements Closeable {
+public class LdapConnectionAttempt extends ReportImpl<Connection> implements Closeable {
 
     public LdapConnectionAttempt() {
         super();
@@ -31,21 +31,15 @@ public class LdapConnectionAttempt extends ReportWithResultImpl<Connection> impl
     }
 
     @Override
-    public LdapConnectionAttempt addArgumentMessage(ErrorMessage message) {
-        super.addArgumentMessage(message);
-        return this;
-    }
-
-    @Override
-    public LdapConnectionAttempt addResultMessage(ErrorMessage message) {
-        super.addResultMessage(message);
+    public LdapConnectionAttempt addErrorMessage(ErrorMessage message) {
+        super.addErrorMessage(message);
         return this;
     }
 
     @Override
     public void close() throws IOException {
-        if (isResultPresent() && !result().isClosed()) {
-            result().close();
+        if (isResultPresent() && !getResult().isClosed()) {
+            getResult().close();
         }
     }
 }

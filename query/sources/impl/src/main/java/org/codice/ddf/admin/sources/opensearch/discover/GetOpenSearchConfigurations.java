@@ -95,7 +95,7 @@ public class GetOpenSearchConfigurations
         }
 
         if (pid.getValue() != null) {
-            addMessages(serviceCommons.serviceConfigurationExists(pid));
+            addReportMessages(serviceCommons.serviceConfigurationExists(pid));
         }
     }
 

@@ -169,22 +169,15 @@ class GraphQLTransformationTest extends Specification {
 
         then:
         response.getStatus() == STATUS_OK
-        getResponseContentAsMap().errors.size() == 14
+        getResponseContentAsMap().errors.size() == 7
         getResponseContentAsMap().errors as Set == [
-                createArgumentError([TEST_OBJECT_NAME]),
-                createArgumentError([TEST_OBJECT_NAME, INTEGER]),
-                createArgumentError([TEST_OBJECT_NAME, BOOLEAN]),
-                createArgumentError([TEST_OBJECT_NAME, STRING]),
-                createArgumentError([TEST_OBJECT_NAME, ENUMERATION]),
-                createArgumentError([TEST_OBJECT_NAME, LIST]),
-                createArgumentError([TEST_OBJECT_NAME, LIST, '0']),
-                createReturnValueError([]),
-                createReturnValueError([INTEGER]),
-                createReturnValueError([BOOLEAN]),
-                createReturnValueError([STRING]),
-                createReturnValueError([LIST]),
-                createReturnValueError([LIST, '0']),
-                createReturnValueError([ENUMERATION])
+                createError([TEST_OBJECT_NAME]),
+                createError([TEST_OBJECT_NAME, INTEGER]),
+                createError([TEST_OBJECT_NAME, BOOLEAN]),
+                createError([TEST_OBJECT_NAME, STRING]),
+                createError([TEST_OBJECT_NAME, ENUMERATION]),
+                createError([TEST_OBJECT_NAME, LIST]),
+                createError([TEST_OBJECT_NAME, LIST, '0'])
         ] as Set
 
         getResponseContentAsMap().data ==
@@ -421,26 +414,16 @@ class GraphQLTransformationTest extends Specification {
         return isArg ? functionPath + FunctionField.ARGUMENT + additionalPath : functionPath + additionalPath;
     }
 
-    def createArgumentError(List<String> argPath) {
-        return createMessage(TestFieldProvider.ARGUMENT_MSG, true, returnErrorMessageFunctionPath, argPath)
-    }
-
-    def createReturnValueError(List<String> argPath) {
-        return createMessage(TestFieldProvider.RETURN_VALUE_MSG, false, returnErrorMessageFunctionPath, argPath)
+    def createError(List<String> argPath) {
+        return createMessage(TestFieldProvider.ERROR_MSG, returnErrorMessageFunctionPath, argPath)
     }
 
     def createMissingRequiredFieldError(List<String> functionPath, List<String> argPath) {
-        return createMessage(DefaultMessages.MISSING_REQUIRED_FIELD, true, functionPath, argPath)
+        return createMessage(DefaultMessages.MISSING_REQUIRED_FIELD, functionPath, argPath)
     }
 
-    def createMessage(String code, boolean isArgument, List<String> functionPath, List<String> additionalPath) {
-        List<String> path = functionPath
-        if (isArgument) {
-            path = path + FunctionField.ARGUMENT
-        }
-
-        path = path + additionalPath
-
+    def createMessage(String code, List<String> functionPath, List<String> additionalPath) {
+        List<String> path = functionPath + FunctionField.ARGUMENT + additionalPath
 
         return [
                 path: path,

@@ -67,7 +67,7 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
 
         when:
         def report = discoverCsw.getValue()
-        def config = report.result()
+        def config = report.getResult()
 
         then:
         config.endpointUrl() == TEST_CSW_URL
@@ -84,7 +84,7 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
 
         when:
         def report = discoverCsw.getValue()
-        def config = report.result()
+        def config = report.getResult()
 
         then:
         config.endpointUrl() == TEST_CSW_URL
@@ -101,7 +101,7 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
 
         when:
         def report = discoverCsw.getValue()
-        def config = report.result()
+        def config = report.getResult()
 
         then:
         config.endpointUrl() == TEST_CSW_URL
@@ -118,7 +118,7 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
 
         when:
         def report = discoverCsw.getValue()
-        def config = report.result()
+        def config = report.getResult()
 
         then:
         !config.endpointUrl().isEmpty()
@@ -136,7 +136,7 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
 
         when:
         def report = discoverCsw.getValue()
-        def config = report.result()
+        def config = report.getResult()
 
         then:
         !config.endpointUrl().isEmpty()
@@ -153,7 +153,7 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
 
         when:
         def report = discoverCsw.getValue()
-        def config = report.result()
+        def config = report.getResult()
 
         then:
         !config.endpointUrl().isEmpty()
@@ -172,9 +172,9 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
         def report = discoverCsw.getValue()
 
         then:
-        report.messages().size() == 1
-        report.messages()[0].getCode() == DefaultMessages.UNKNOWN_ENDPOINT
-        report.messages()[0].getPath() == URL_FIELD_PATH
+        report.getErrorMessages().size() == 1
+        report.getErrorMessages()[0].getCode() == DefaultMessages.UNKNOWN_ENDPOINT
+        report.getErrorMessages()[0].getPath() == URL_FIELD_PATH
     }
 
     def 'Unknown endpoint error with unrecognized response when using URL'() {
@@ -186,9 +186,9 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
         def report = discoverCsw.getValue()
 
         then:
-        report.messages().size() == 1
-        report.messages()[0].getCode() == DefaultMessages.UNKNOWN_ENDPOINT
-        report.messages()[0].getPath() == URL_FIELD_PATH
+        report.getErrorMessages().size() == 1
+        report.getErrorMessages()[0].getCode() == DefaultMessages.UNKNOWN_ENDPOINT
+        report.getErrorMessages()[0].getPath() == URL_FIELD_PATH
     }
 
     def 'Unknown endpoint error with unrecognized response when using hostname+port'() {
@@ -200,9 +200,9 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
         def report = discoverCsw.getValue()
 
         then:
-        report.messages().size() == 1
-        report.messages()[0].getCode() == DefaultMessages.UNKNOWN_ENDPOINT
-        report.messages()[0].getPath() == HOST_FIELD_PATH
+        report.getErrorMessages().size() == 1
+        report.getErrorMessages()[0].getCode() == DefaultMessages.UNKNOWN_ENDPOINT
+        report.getErrorMessages()[0].getPath() == HOST_FIELD_PATH
     }
 
     def 'Unknown endpoint if no pre-formatted URLs work when discovering with host+port'() {
@@ -214,9 +214,9 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
         def report = discoverCsw.getValue()
 
         then:
-        report.messages().size() == 1
-        report.messages()[0].getCode() == DefaultMessages.UNKNOWN_ENDPOINT
-        report.messages()[0].getPath() == [ADDRESS_FIELD_PATH, HostField.DEFAULT_FIELD_NAME].flatten()
+        report.getErrorMessages().size() == 1
+        report.getErrorMessages()[0].getCode() == DefaultMessages.UNKNOWN_ENDPOINT
+        report.getErrorMessages()[0].getPath() == [ADDRESS_FIELD_PATH, HostField.DEFAULT_FIELD_NAME].flatten()
     }
 
     def 'Unrecognized CSW output schema defaults to CSW 2.0.2 schema'() {
@@ -226,7 +226,7 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
 
         when:
         def report = discoverCsw.getValue()
-        def config = report.result()
+        def config = report.getResult()
 
         then:
         config.endpointUrl() == TEST_CSW_URL
@@ -245,10 +245,10 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
         def report = discoverCsw.getValue()
 
         then:
-        report.result() == null
-        report.messages().size() == 1
-        report.messages()[0].getCode() == DefaultMessages.UNKNOWN_ENDPOINT
-        report.messages()[0].getPath() == URL_FIELD_PATH
+        report.getResult() == null
+        report.getErrorMessages().size() == 1
+        report.getErrorMessages()[0].getCode() == DefaultMessages.UNKNOWN_ENDPOINT
+        report.getErrorMessages()[0].getPath() == URL_FIELD_PATH
     }
 
     def 'Fail when missing required fields'() {
@@ -256,12 +256,12 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
         def report = discoverCsw.getValue()
 
         then:
-        report.result() == null
-        report.messages().size() == 1
-        report.messages().count {
+        report.getResult() == null
+        report.getErrorMessages().size() == 1
+        report.getErrorMessages().count {
             it.getCode() == DefaultMessages.MISSING_REQUIRED_FIELD
         } == 1
-        report.messages()*.getPath() == [URL_FIELD_PATH]
+        report.getErrorMessages()*.getPath() == [URL_FIELD_PATH]
     }
 
     def 'Returns all the possible error codes correctly'(){
@@ -281,8 +281,8 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
 
         then:
         errorCodes.size() == 2
-        errorCodes.contains(cannotConnectReport.messages()[0].getCode())
-        errorCodes.contains(unknownEndpointReport.messages()[0].getCode())
+        errorCodes.contains(cannotConnectReport.getErrorMessages()[0].getCode())
+        errorCodes.contains(unknownEndpointReport.getErrorMessages()[0].getCode())
     }
 
     def prepareCswSourceUtils(int statusCode, String responseBody, boolean endpointIsReachable) {

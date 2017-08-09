@@ -61,9 +61,7 @@ public class TestFieldProvider extends BaseFieldProvider {
 
     public static final String PATH_3 = "path3";
 
-    public static final String ARGUMENT_MSG = "ARGUMENT_MSG";
-
-    public static final String RETURN_VALUE_MSG = "RETURN_VALUE_MSG";
+    public static final String ERROR_MSG = "ERROR_MSG";
 
     private GetInt getInt;
 
@@ -453,39 +451,22 @@ public class TestFieldProvider extends BaseFieldProvider {
 
         @Override
         public TestObjectField performFunction() {
-            addArgumentMessage(sampleArgumentError(objectFieldArg.path()));
-            addArgumentMessage(sampleArgumentError(objectFieldArg.getIntegerField()
+            addErrorMessage(sampleError(objectFieldArg.path()));
+            addErrorMessage(sampleError(objectFieldArg.getIntegerField()
                     .path()));
-            addArgumentMessage(sampleArgumentError(objectFieldArg.getBooleanField()
+            addErrorMessage(sampleError(objectFieldArg.getBooleanField()
                     .path()));
-            addArgumentMessage(sampleArgumentError(objectFieldArg.getStringField()
+            addErrorMessage(sampleError(objectFieldArg.getStringField()
                     .path()));
-            addArgumentMessage(sampleArgumentError(objectFieldArg.getListField()
+            addErrorMessage(sampleError(objectFieldArg.getListField()
                     .path()));
-            addArgumentMessage(sampleArgumentError(objectFieldArg.getListField()
+            addErrorMessage(sampleError(objectFieldArg.getListField()
                     .getList()
                     .get(0)
                     .path()));
-            addArgumentMessage(sampleArgumentError(objectFieldArg.getEnumField()
+            addErrorMessage(sampleError(objectFieldArg.getEnumField()
                     .path()));
-
-            TestObjectField testObject = TestObjectField.createSampleTestObject();
-            addResultMessage(sampleReturnValueError(testObject.path()));
-            addResultMessage(sampleReturnValueError(testObject.getIntegerField()
-                    .path()));
-            addResultMessage(sampleReturnValueError(testObject.getBooleanField()
-                    .path()));
-            addResultMessage(sampleReturnValueError(testObject.getStringField()
-                    .path()));
-            addResultMessage(sampleReturnValueError(testObject.getListField()
-                    .path()));
-            addResultMessage(sampleReturnValueError(testObject.getListField()
-                    .getList()
-                    .get(0)
-                    .path()));
-            addResultMessage(sampleReturnValueError(testObject.getEnumField()
-                    .path()));
-            return testObject;
+            return objectFieldArg;
         }
 
         @Override
@@ -495,19 +476,12 @@ public class TestFieldProvider extends BaseFieldProvider {
 
         @Override
         public Set<String> getFunctionErrorCodes() {
-            return new ImmutableSet.Builder<String>()
-                    .add(ARGUMENT_MSG)
-                    .add(RETURN_VALUE_MSG)
-                    .build();
+            return ImmutableSet.of(ERROR_MSG);
         }
     }
 
-    public static ErrorMessageImpl sampleArgumentError(List<String> path) {
-        return new ErrorMessageImpl(ARGUMENT_MSG, path);
-    }
-
-    public static ErrorMessageImpl sampleReturnValueError(List<String> path) {
-        return new ErrorMessageImpl(RETURN_VALUE_MSG, path);
+    public static ErrorMessageImpl sampleError(List<String> path) {
+        return new ErrorMessageImpl(ERROR_MSG, path);
     }
 
     public static class SampleMutation extends BaseFunctionField<TestObjectField> {
@@ -535,10 +509,8 @@ public class TestFieldProvider extends BaseFieldProvider {
 
         @Override
         public TestObjectField performFunction() {
-            addArgumentMessage(sampleArgumentError(objFieldArg.path()));
-            TestObjectField testObject = TestObjectField.createSampleTestObject();
-            addResultMessage(sampleReturnValueError(testObject.path()));
-            return testObject;
+            addErrorMessage(sampleError(objFieldArg.path()));
+            return objFieldArg;
         }
 
         @Override
@@ -548,10 +520,7 @@ public class TestFieldProvider extends BaseFieldProvider {
 
         @Override
         public Set<String> getFunctionErrorCodes() {
-            return new ImmutableSet.Builder<String>()
-                    .add(ARGUMENT_MSG)
-                    .add(RETURN_VALUE_MSG)
-                    .build();
+            return ImmutableSet.of(ERROR_MSG);
         }
     }
 }

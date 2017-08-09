@@ -52,9 +52,4 @@ public class ErrorMessageImpl implements org.codice.ddf.admin.api.report.ErrorMe
         this.path = path;
         return this;
     }
-
-    @Override
-    public ErrorMessageImpl copy() {
-        return new ErrorMessageImpl(getCode(), getPath());
-    }
 }

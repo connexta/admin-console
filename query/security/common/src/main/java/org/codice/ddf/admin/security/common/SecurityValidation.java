@@ -19,7 +19,7 @@ import java.util.List;
 
 import org.codice.ddf.admin.api.report.Report;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
-import org.codice.ddf.admin.common.report.ReportImpl;
+import org.codice.ddf.admin.common.report.Reports;
 import org.codice.ddf.admin.security.common.services.StsServiceProperties;
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
 
@@ -27,12 +27,12 @@ public class SecurityValidation {
 
     public static Report validateStsClaimsExist(List<StringField> claimArgs,
             ServiceActions serviceActions, StsServiceProperties stsServiceProps) {
-        ReportImpl report = new ReportImpl();
+        Report report = Reports.emptyReport();
         List<String> supportedClaims = stsServiceProps.getConfiguredStsClaims(serviceActions);
 
         claimArgs.stream()
                 .filter(claimArg -> !supportedClaims.contains(claimArg.getValue()))
-                .forEach(claimArg -> report.addArgumentMessage(invalidClaimType(claimArg.path())));
+                .forEach(claimArg -> report.addErrorMessage(invalidClaimType(claimArg.path())));
 
         return report;
     }

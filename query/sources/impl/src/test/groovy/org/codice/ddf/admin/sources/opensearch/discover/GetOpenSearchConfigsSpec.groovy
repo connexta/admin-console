@@ -70,13 +70,13 @@ class GetOpenSearchConfigsSpec extends SourceCommonsSpec {
     def 'No pid argument returns all configs'() {
         when:
         def report = getOpenSearchConfigsFunction.getValue()
-        def list = ((ListField) report.result())
+        def list = ((ListField) report.getResult())
 
         then:
         1 * managedServiceActions.read(_ as String) >> baseManagedServiceConfigs
         2 * serviceReader.getServices(_, _) >> [new TestSource(S_PID_1, true)]
         2 * serviceReader.getServices(_, _) >> [new TestSource(S_PID_2, false)]
-        report.result() != null
+        report.getResult() != null
         list.getList().size() == 2
         assertConfig(list.getList().get(0), 0, TEST_SHORT_NAME, S_PID_1, true)
         assertConfig(list.getList().get(1), 1, TEST_SHORT_NAME, S_PID_2, false)
@@ -88,13 +88,13 @@ class GetOpenSearchConfigsSpec extends SourceCommonsSpec {
 
         when:
         def report = getOpenSearchConfigsFunction.getValue()
-        def list = ((ListField) report.result())
+        def list = ((ListField) report.getResult())
 
         then:
         1 * serviceReader.getServices(_, _) >> [new TestSource(S_PID_2, false)]
         1 * serviceReader.getServices(_, _) >> []
         serviceActions.read(S_PID_2) >> baseManagedServiceConfigs.get(S_PID_2)
-        report.result() != null
+        report.getResult() != null
         list.getList().size() == 1
         assertConfig(list.getList().get(0), 0, TEST_SHORT_NAME, S_PID_2, false)
     }
@@ -109,10 +109,10 @@ class GetOpenSearchConfigsSpec extends SourceCommonsSpec {
         def report = getOpenSearchConfigsFunction.getValue()
 
         then:
-        report.result() == null
-        report.messages().size() == 1
-        report.messages().get(0).code == DefaultMessages.NO_EXISTING_CONFIG
-        report.messages().get(0).path == RESULT_ARGUMENT_PATH
+        report.getResult() == null
+        report.getErrorMessages().size() == 1
+        report.getErrorMessages().get(0).code == DefaultMessages.NO_EXISTING_CONFIG
+        report.getErrorMessages().get(0).path == RESULT_ARGUMENT_PATH
     }
 
     def createOpenSearchManagedServiceConfigs() {
@@ -145,6 +145,6 @@ class GetOpenSearchConfigsSpec extends SourceCommonsSpec {
 
         then:
         errorCodes.size() == 1
-        errorCodes.contains(noExistingConfigReport.messages().get(0).code)
+        errorCodes.contains(noExistingConfigReport.getErrorMessages().get(0).code)
     }
 }

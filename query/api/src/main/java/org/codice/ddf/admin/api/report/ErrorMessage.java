@@ -22,6 +22,4 @@ public interface ErrorMessage {
     List<String> getPath();
 
     ErrorMessage setPath(List<String> path);
-
-    ErrorMessage copy();
 }

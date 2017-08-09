@@ -19,7 +19,7 @@ import java.util.Set;
 import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
-import org.codice.ddf.admin.api.report.ReportWithResult;
+import org.codice.ddf.admin.api.report.Report;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.common.AddressField;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
@@ -62,19 +62,19 @@ public class DiscoverCswSource extends BaseFunctionField<CswSourceConfigurationF
 
     @Override
     public CswSourceConfigurationField performFunction() {
-        ReportWithResult<CswSourceConfigurationField> configResult;
+        Report<CswSourceConfigurationField> configResult;
         if (address.url() != null) {
             configResult = cswSourceUtils.getCswConfigFromUrl(address.urlField(), credentials);
         } else {
             configResult = cswSourceUtils.getConfigFromHost(address.host(), credentials);
         }
 
-        addMessages(configResult);
+        addReportMessages(configResult);
         if (containsErrorMsgs()) {
             return null;
         }
 
-        return configResult.result();
+        return configResult.getResult();
     }
 
     @Override

@@ -25,11 +25,11 @@ import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
+import org.codice.ddf.admin.api.report.Report;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
 import org.codice.ddf.admin.common.fields.common.ResponseField;
 import org.codice.ddf.admin.common.fields.common.UrlField;
-import org.codice.ddf.admin.common.report.ReportImpl;
-import org.codice.ddf.admin.common.report.ReportWithResultImpl;
+import org.codice.ddf.admin.common.report.Reports;
 import org.codice.ddf.cxf.SecureCxfClientFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,9 +50,9 @@ public class RequestUtils {
      * @param requestUrl  url to send GET request to
      * @param creds       optional credentials for basic authentication
      * @param queryParams optional query parameters
-     * @return {@link ReportWithResultImpl} containing a {@link ResponseField}, or containing an {@link org.codice.ddf.admin.api.report.ErrorMessage}
+     * @return {@link Report} containing a {@link ResponseField}, or containing an {@link org.codice.ddf.admin.api.report.ErrorMessage}
      */
-    public ReportWithResultImpl<ResponseField> sendGetRequest(UrlField requestUrl,
+    public Report<ResponseField> sendGetRequest(UrlField requestUrl,
             CredentialsField creds, Map<String, Object> queryParams) {
         WebClient webClient = createWebClientBuilder(requestUrl.getValue(),
                 creds.username(),
@@ -72,21 +72,20 @@ public class RequestUtils {
      * @param urlField  the original request url
      * @return {@link Response} of the request
      */
-    public ReportWithResultImpl<ResponseField> sendGetRequest(WebClient webClient,
+    public Report<ResponseField> sendGetRequest(WebClient webClient,
             UrlField urlField) {
-        ReportWithResultImpl<ResponseField> responseResult = new ReportWithResultImpl<>();
-        responseResult.addMessages(endpointIsReachable(urlField));
-        if (responseResult.containsErrorMsgs()) {
+        Report<ResponseField> responseResult = Reports.from(endpointIsReachable(urlField));
+        if (responseResult.containsErrorMessages()) {
             return responseResult;
         }
 
         try {
             Response response = webClient.get();
-            responseResult.result(responseFieldFromResponse(response, urlField));
+            responseResult.setResult(responseFieldFromResponse(response, urlField));
             return responseResult;
 
         } catch (ProcessingException e) {
-            responseResult.addArgumentMessage(cannotConnectError(urlField.path()));
+            responseResult.addErrorMessage(cannotConnectError(urlField.path()));
             return responseResult;
         }
     }
@@ -101,9 +100,9 @@ public class RequestUtils {
      * @param creds       optional credentials consisting of a username and password
      * @param contentType Mime type of the post body
      * @param content     Body of the post request
-     * @return a {@link ReportWithResultImpl} containing a {@link ResponseField} or an {@link org.codice.ddf.admin.api.report.ErrorMessage} on failure.
+     * @return a {@link Report} containing a {@link ResponseField} or an {@link org.codice.ddf.admin.api.report.ErrorMessage} on failure.
      */
-    public ReportWithResultImpl<ResponseField> sendPostRequest(UrlField urlField,
+    public Report<ResponseField> sendPostRequest(UrlField urlField,
             CredentialsField creds, String contentType, String content) {
         WebClient webClient = createWebClientBuilder(urlField.getValue(),
                 creds.username(),
@@ -122,23 +121,22 @@ public class RequestUtils {
      * @param webClient {@code WebClient} to send POST request with
      * @param urlField  original request url field
      * @param content   Body of the post request
-     * @return a {@link ReportWithResultImpl} containing a {@link ResponseField} or an {@link org.codice.ddf.admin.api.report.ErrorMessage} on failure.
+     * @return a {@link Report} containing a {@link ResponseField} or an {@link org.codice.ddf.admin.api.report.ErrorMessage} on failure.
      */
-    public ReportWithResultImpl<ResponseField> sendPostRequest(WebClient webClient,
+    public Report<ResponseField> sendPostRequest(WebClient webClient,
             UrlField urlField, String content) {
-        ReportWithResultImpl<ResponseField> responseResult = new ReportWithResultImpl<>();
-        responseResult.addMessages(endpointIsReachable(urlField));
-        if (responseResult.containsErrorMsgs()) {
+        Report<ResponseField> responseResult = Reports.from(endpointIsReachable(urlField));
+        if (responseResult.containsErrorMessages()) {
             return responseResult;
         }
 
         try {
             Response response = webClient.post(content);
-            responseResult.result(responseFieldFromResponse(response, urlField));
+            responseResult.setResult(responseFieldFromResponse(response, urlField));
             return responseResult;
 
         } catch (ProcessingException e) {
-            responseResult.addArgumentMessage(cannotConnectError(urlField.path()));
+            responseResult.addErrorMessage(cannotConnectError(urlField.path()));
             return responseResult;
         }
     }
@@ -150,10 +148,10 @@ public class RequestUtils {
      * - {@link org.codice.ddf.admin.common.report.message.DefaultMessages#CANNOT_CONNECT}
      *
      * @param urlField {@link UrlField} containing the URL to connect to
-     * @return a {@link ReportImpl} containing no messages on success, or containing {@link org.codice.ddf.admin.api.report.ErrorMessage}s on failure.
+     * @return a {@link Report} containing no messages on success, or containing {@link org.codice.ddf.admin.api.report.ErrorMessage}s on failure.
      */
-    public ReportImpl endpointIsReachable(UrlField urlField) {
-        ReportImpl report = new ReportImpl();
+    public Report endpointIsReachable(UrlField urlField) {
+        Report report = Reports.emptyReport();
         URLConnection urlConnection = null;
         try {
             urlConnection = new URL(urlField.getValue()).openConnection();
@@ -162,7 +160,7 @@ public class RequestUtils {
             LOGGER.debug("Successfully reached {}.", urlField);
         } catch (IOException e) {
             LOGGER.debug("Failed to reach {}, returning an error.", urlField, e);
-            report.addArgumentMessage(cannotConnectError(urlField.path()));
+            report = Reports.from(cannotConnectError(urlField.path()));
         } finally {
             try {
                 if (urlConnection != null) {

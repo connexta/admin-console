@@ -264,7 +264,7 @@ public class CswSpatialOperator extends BaseEnumField<String> {
         public static final String OVERLAPS = "Overlaps";
 
         public static final String DESCRIPTION =
-                "Determines whether two geometries of the same dimensions overlap. If their intersection produces a geometry different from both and of the same dimension, they overlap.";
+                "Determines whether two geometries of the same dimensions overlap. If their intersection produces a geometry different emptyReport both and of the same dimension, they overlap.";
 
         @Override
         public String enumTitle() {

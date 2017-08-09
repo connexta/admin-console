@@ -93,7 +93,7 @@ class CreateOpenSearchConfigurationSpec extends SourceCommonsSpec {
         def report = createOpenSearchConfiguration.getValue()
 
         then:
-        report.result().getValue()
+        report.getResult().getValue()
     }
 
     def 'Fail to create new OpenSearch config due to duplicate source name'() {
@@ -105,10 +105,10 @@ class CreateOpenSearchConfigurationSpec extends SourceCommonsSpec {
         def report = createOpenSearchConfiguration.getValue()
 
         then:
-        report.result() == null
-        report.messages().size() == 1
-        report.messages().get(0).code == SourceMessages.DUPLICATE_SOURCE_NAME
-        report.messages().get(0).path == SOURCE_NAME_PATH
+        report.getResult() == null
+        report.getErrorMessages().size() == 1
+        report.getErrorMessages().get(0).code == SourceMessages.DUPLICATE_SOURCE_NAME
+        report.getErrorMessages().get(0).path == SOURCE_NAME_PATH
     }
 
     def 'Fail to create new OpenSearch config due to failure to commit'() {
@@ -122,10 +122,10 @@ class CreateOpenSearchConfigurationSpec extends SourceCommonsSpec {
         then:
         1 * configurator.commit(_, _) >> mockReport(false)
         1 * configurator.commit(_, _) >> mockReport(true)
-        !report.result().getValue()
-        report.messages().size() == 1
-        report.messages().get(0).path == RESULT_ARGUMENT_PATH
-        report.messages().get(0).code == DefaultMessages.FAILED_PERSIST
+        !report.getResult().getValue()
+        report.getErrorMessages().size() == 1
+        report.getErrorMessages().get(0).path == RESULT_ARGUMENT_PATH
+        report.getErrorMessages().get(0).code == DefaultMessages.FAILED_PERSIST
     }
 
     def 'Return false when opensearch feature fails to start'() {
@@ -136,10 +136,10 @@ class CreateOpenSearchConfigurationSpec extends SourceCommonsSpec {
 
         then:
         1 * configurator.commit(_, _) >> mockReport(true)
-        !report.result().getValue()
-        report.messages().size() == 1
-        report.messages().get(0).path == RESULT_ARGUMENT_PATH
-        report.messages().get(0).code == DefaultMessages.FAILED_PERSIST
+        !report.getResult().getValue()
+        report.getErrorMessages().size() == 1
+        report.getErrorMessages().get(0).path == RESULT_ARGUMENT_PATH
+        report.getErrorMessages().get(0).code == DefaultMessages.FAILED_PERSIST
     }
 
     def 'Fail when missing required fields'() {
@@ -147,12 +147,12 @@ class CreateOpenSearchConfigurationSpec extends SourceCommonsSpec {
         def report = createOpenSearchConfiguration.getValue()
 
         then:
-        report.result() == null
-        report.messages().size() == 2
-        report.messages().count {
+        report.getResult() == null
+        report.getErrorMessages().size() == 2
+        report.getErrorMessages().count {
             it.getCode() == DefaultMessages.MISSING_REQUIRED_FIELD
         } == 2
-        report.messages()*.getPath() == [SOURCE_NAME_PATH, ENDPOINT_URL_PATH]
+        report.getErrorMessages()*.getPath() == [SOURCE_NAME_PATH, ENDPOINT_URL_PATH]
     }
 
     def 'Returns all the possible error codes correctly'(){
@@ -172,8 +172,8 @@ class CreateOpenSearchConfigurationSpec extends SourceCommonsSpec {
 
         then:
         errorCodes.size() == 2
-        errorCodes.contains(duplicateNameReport.messages().get(0).getCode())
-        errorCodes.contains(createFailPersistReport.messages().get(0).getCode())
+        errorCodes.contains(duplicateNameReport.getErrorMessages().get(0).getCode())
+        errorCodes.contains(createFailPersistReport.getErrorMessages().get(0).getCode())
     }
 
     def createFunctionArgs() {

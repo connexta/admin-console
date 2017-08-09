@@ -21,7 +21,7 @@ public class CswOutputSchemaField extends UriField {
 
     public static final String FIELD_TYPE_NAME = "CswOutputSchema";
 
-    public static final String DESCRIPTION = "A URI identifying the schema of the CSW records returned from a CSW GetRecords response.";
+    public static final String DESCRIPTION = "A URI identifying the schema of the CSW records returned emptyReport a CSW GetRecords response.";
 
     public CswOutputSchemaField() {
         this(DEFAULT_FIELD_NAME);

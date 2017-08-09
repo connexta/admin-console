@@ -15,16 +15,19 @@ package org.codice.ddf.admin.api.report;
 
 import java.util.List;
 
-public interface Report {
+public interface Report<T> {
 
-    /**
-     * Returns a list of messages relating to arguments
-     *
-     * @return
-     */
-    List<ErrorMessage> argumentMessages();
+    Report<T> addErrorMessage(ErrorMessage message);
 
-    List<ErrorMessage> resultMessages();
+    Report<T> addErrorMessages(List<ErrorMessage> messages);
 
-    List<ErrorMessage> messages();
+    List<ErrorMessage> getErrorMessages();
+
+    boolean containsErrorMessages();
+
+    T getResult();
+
+    Report<T> setResult(T result);
+
+    boolean isResultPresent();
 }

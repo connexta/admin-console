@@ -55,7 +55,7 @@ public class DeleteOpenSearchConfiguration extends BaseFunctionField<BooleanFiel
 
     @Override
     public BooleanField performFunction() {
-        addMessages(serviceCommons.deleteService(pid));
+        addReportMessages(serviceCommons.deleteService(pid));
         return new BooleanField(!containsErrorMsgs());
     }
 
@@ -65,7 +65,7 @@ public class DeleteOpenSearchConfiguration extends BaseFunctionField<BooleanFiel
         if (containsErrorMsgs()) {
             return;
         }
-        addMessages(serviceCommons.serviceConfigurationExists(pid));
+        addReportMessages(serviceCommons.serviceConfigurationExists(pid));
     }
 
     @Override

@@ -19,7 +19,7 @@ import java.util.Set;
 import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
-import org.codice.ddf.admin.api.report.ReportWithResult;
+import org.codice.ddf.admin.api.report.Report;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.common.AddressField;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
@@ -69,7 +69,7 @@ public class DiscoverOpenSearchSource
 
     @Override
     public OpenSearchSourceConfigurationField performFunction() {
-        ReportWithResult<OpenSearchSourceConfigurationField> configResult;
+        Report<OpenSearchSourceConfigurationField> configResult;
         if (address.url() != null) {
             configResult = openSearchSourceUtils.getOpenSearchConfigFromUrl(address.urlField(),
                     credentials);
@@ -78,12 +78,12 @@ public class DiscoverOpenSearchSource
                     credentials);
         }
 
-        addMessages(configResult);
+        addReportMessages(configResult);
         if (containsErrorMsgs()) {
             return null;
         }
 
-        return configResult.result();
+        return configResult.getResult();
     }
 
     @Override

@@ -30,7 +30,7 @@ import java.util.List;
 import javax.net.ssl.SSLContext;
 
 import org.codice.ddf.admin.api.report.Report;
-import org.codice.ddf.admin.common.report.ReportImpl;
+import org.codice.ddf.admin.common.report.Reports;
 import org.codice.ddf.admin.ldap.fields.LdapDistinguishedName;
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindUserInfo;
 import org.codice.ddf.admin.ldap.fields.connection.LdapConnectionField;
@@ -89,7 +89,7 @@ public class LdapTestingUtils {
                     LdapTestingUtils.class.getClassLoader());
         } catch (Exception e) {
             LOGGER.debug("Error prepping LDAP connection", e);
-            return new LdapConnectionAttempt().addResultMessage(failedTestSetup());
+            return new LdapConnectionAttempt().addErrorMessage(failedTestSetup());
         }
 
         Connection ldapConnection;
@@ -102,7 +102,7 @@ public class LdapTestingUtils {
             LOGGER.debug("Error opening LDAP connection to [{}:{}]",
                     connection.hostname(),
                     connection.port());
-            return new LdapConnectionAttempt().addArgumentMessage(cannotConnectError(connection.path()));
+            return new LdapConnectionAttempt().addErrorMessage(cannotConnectError(connection.path()));
         }
 
         return new LdapConnectionAttempt(ldapConnection);
@@ -127,7 +127,7 @@ public class LdapTestingUtils {
             return connectionAttempt;
         }
 
-        Connection connection = connectionAttempt.result();
+        Connection connection = connectionAttempt.getResult();
 
         try {
             BindRequest bindRequest = selectBindMethod(bindInfo.bindMethod(),
@@ -145,7 +145,7 @@ public class LdapTestingUtils {
             } catch (IOException closeException) {
                 LOGGER.warn("Error closing LDAP connection", closeException);
             }
-            return new LdapConnectionAttempt().addArgumentMessage(LdapMessages.cannotBindError(
+            return new LdapConnectionAttempt().addErrorMessage(LdapMessages.cannotBindError(
                     bindInfo.path()));
         }
 
@@ -159,7 +159,7 @@ public class LdapTestingUtils {
      * @param ldapSearchBaseDN Base DN to run the query on
      * @param ldapQuery        Query to perform
      * @param searchScope      Scope of query
-     * @param maxResults       Max number of results to return from query. Use -1 for all results
+     * @param maxResults       Max number of results to return emptyReport query. Use -1 for all results
      * @param attributes       Optional list of attributes for return projection; if null,
      *                         then all attributes will be returned
      * @return list of results
@@ -245,7 +245,6 @@ public class LdapTestingUtils {
      * the path to the DN; else, an empty {@code Optional}.
      */
     public Report checkDirExists(LdapDistinguishedName dirDn, Connection ldapConnection) {
-        ReportImpl report = new ReportImpl();
         boolean dirExists = !getLdapQueryResults(ldapConnection,
                 dirDn.getValue(),
                 Filter.present("objectClass")
@@ -254,9 +253,9 @@ public class LdapTestingUtils {
                 1).isEmpty();
 
         if (!dirExists) {
-            report.addArgumentMessage(dnDoesNotExistError(dirDn.path()));
+            return Reports.from(dnDoesNotExistError(dirDn.path()));
         }
 
-        return report;
+        return Reports.emptyReport();
     }
 }

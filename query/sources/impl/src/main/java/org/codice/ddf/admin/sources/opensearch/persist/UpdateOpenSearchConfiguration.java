@@ -78,10 +78,10 @@ public class UpdateOpenSearchConfiguration extends BaseFunctionField<BooleanFiel
         OperationReport report = configurator.commit("Starting feature [{}]", OPENSEARCH_FEATURE);
 
         if (report.containsFailedResults()) {
-            addResultMessage(failedPersistError());
+            addErrorMessage(failedPersistError());
             return new BooleanField(false);
         }
-        addMessages(serviceCommons.updateService(config.pidField(),
+        addReportMessages(serviceCommons.updateService(config.pidField(),
                 openSearchConfigToServiceProps(config)));
         return new BooleanField(!containsErrorMsgs());
     }
@@ -92,7 +92,7 @@ public class UpdateOpenSearchConfiguration extends BaseFunctionField<BooleanFiel
         if (containsErrorMsgs()) {
             return;
         }
-        addMessages(sourceValidationUtils.duplicateSourceNameExists(config.sourceNameField(),
+        addReportMessages(sourceValidationUtils.duplicateSourceNameExists(config.sourceNameField(),
                 config.pidField()));
     }
 

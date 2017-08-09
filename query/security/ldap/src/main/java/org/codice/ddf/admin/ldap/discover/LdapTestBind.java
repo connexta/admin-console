@@ -71,7 +71,7 @@ public class LdapTestBind extends TestFunctionField {
     public BooleanField performFunction() {
         try (LdapConnectionAttempt ldapConnectionAttempt = utils.bindUserToLdapConnection(conn,
                 creds)) {
-            addMessages(ldapConnectionAttempt);
+            addReportMessages(ldapConnectionAttempt);
         } catch (IOException e) {
             LOGGER.warn("Error closing LDAP connection", e);
         }
@@ -95,7 +95,7 @@ public class LdapTestBind extends TestFunctionField {
             // To use MD5, we require an encrypted connection
             if (!(START_TLS.equals(conn.encryptionMethod()) //
                     || LDAPS.equals(conn.encryptionMethod()))) {
-                addArgumentMessage(md5NeedsEncryptedError(creds.bindMethodField()
+                addErrorMessage(md5NeedsEncryptedError(creds.bindMethodField()
                         .path()));
             }
         }

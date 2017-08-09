@@ -32,13 +32,13 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 
 import org.codice.ddf.admin.api.ConfiguratorSuite;
-import org.codice.ddf.admin.api.report.ReportWithResult;
+import org.codice.ddf.admin.api.report.Report;
 import org.codice.ddf.admin.common.PrioritizedBatchExecutor;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
 import org.codice.ddf.admin.common.fields.common.HostField;
 import org.codice.ddf.admin.common.fields.common.ResponseField;
 import org.codice.ddf.admin.common.fields.common.UrlField;
-import org.codice.ddf.admin.common.report.ReportWithResultImpl;
+import org.codice.ddf.admin.common.report.Reports;
 import org.codice.ddf.admin.sources.fields.type.CswSourceConfigurationField;
 import org.codice.ddf.admin.sources.utils.RequestUtils;
 import org.codice.ddf.admin.sources.utils.SourceTaskCallable;
@@ -92,16 +92,16 @@ public class CswSourceUtils {
     }
 
     /**
-     * Attempts to discover the source from the given hostname and port with optional basic authentication.
+     * Attempts to discover the source emptyReport the given hostname and port with optional basic authentication.
      * <p>
      * Possible Error Codes to be returned
      * - {@link org.codice.ddf.admin.common.report.message.DefaultMessages#UNKNOWN_ENDPOINT}
      *
      * @param hostField address to probe for CSW capabilities
      * @param creds     optional credentials for basic authentication
-     * @return a {@link ReportWithResultImpl} containing the {@link CswSourceConfigurationField} or an {@link org.codice.ddf.admin.api.report.ErrorMessage} on failure.
+     * @return a {@link Report} containing the {@link CswSourceConfigurationField} or an {@link org.codice.ddf.admin.api.report.ErrorMessage} on failure.
      */
-    public ReportWithResult<CswSourceConfigurationField> getConfigFromHost(HostField hostField,
+    public Report<CswSourceConfigurationField> getConfigFromHost(HostField hostField,
             CredentialsField creds) {
         List<List<SourceTaskCallable<CswSourceConfigurationField>>> taskList = new ArrayList<>();
 
@@ -115,65 +115,59 @@ public class CswSourceUtils {
             taskList.add(callables);
         }
 
-        PrioritizedBatchExecutor<ReportWithResultImpl<CswSourceConfigurationField>, ReportWithResultImpl<CswSourceConfigurationField>>
+        PrioritizedBatchExecutor<Report<CswSourceConfigurationField>, Report<CswSourceConfigurationField>>
                 prioritizedExecutor = new PrioritizedBatchExecutor(THREAD_POOL_SIZE,
                 taskList,
                 new SourceTaskHandler<CswSourceConfigurationField>());
 
-        Optional<ReportWithResultImpl<CswSourceConfigurationField>> result =
-                prioritizedExecutor.getFirst();
+        Optional<Report<CswSourceConfigurationField>> result = prioritizedExecutor.getFirst();
 
         if (result.isPresent()) {
             return result.get();
         } else {
-            return new ReportWithResultImpl<CswSourceConfigurationField>().addArgumentMessage(
-                    unknownEndpointError(hostField.path()));
+            return Reports.from(unknownEndpointError(hostField.path()));
         }
     }
 
-    public ReportWithResultImpl<CswSourceConfigurationField> getCswConfigFromUrl(UrlField urlField,
+    public Report<CswSourceConfigurationField> getCswConfigFromUrl(UrlField urlField,
             CredentialsField creds) {
-        ReportWithResultImpl<ResponseField> responseResult = requestUtils.sendGetRequest(urlField,
+        Report<ResponseField> responseResult = requestUtils.sendGetRequest(urlField,
                 creds,
                 GET_CAPABILITIES_PARAMS);
 
-        if (responseResult.containsErrorMsgs()) {
-            return (ReportWithResultImpl) responseResult;
+        if (responseResult.containsErrorMessages()) {
+            return (Report) responseResult;
         }
 
-        return getCswConfigFromResponse(responseResult.result(), creds);
+        return getCswConfigFromResponse(responseResult.getResult(), creds);
     }
 
     /**
-     * Attempts to create a CSW configuration from a CSW GetCapabilities response.
+     * Attempts to create a CSW configuration emptyReport a CSW GetCapabilities response.
      * <p>
      * Possible Error Codes to be returned
      * - {@link org.codice.ddf.admin.common.report.message.DefaultMessages#UNKNOWN_ENDPOINT}
      *
      * @param responseField an HTTP response containing the result of a getCapabilities request
      * @param creds         credentials used for the original HTTP request
-     * @return a {@link ReportWithResultImpl} containing the {@link CswSourceConfigurationField} or an {@link org.codice.ddf.admin.api.report.ErrorMessage} on failure.
+     * @return a {@link Report} containing the {@link CswSourceConfigurationField} or an {@link org.codice.ddf.admin.api.report.ErrorMessage} on failure.
      */
-    private ReportWithResultImpl<CswSourceConfigurationField> getCswConfigFromResponse(
+    private Report<CswSourceConfigurationField> getCswConfigFromResponse(
             ResponseField responseField, CredentialsField creds) {
-        ReportWithResultImpl<CswSourceConfigurationField> configResult =
-                new ReportWithResultImpl<>();
 
         String responseBody = responseField.responseBody();
         if (responseField.statusCode() != HTTP_OK || responseBody.length() < 1) {
-            configResult.addArgumentMessage(unknownEndpointError(responseField.requestUrlField()
+            return Reports.from(unknownEndpointError(responseField.requestUrlField()
                     .path()));
-            return configResult;
         }
 
         Document capabilitiesXml;
         try {
             capabilitiesXml = sourceUtilCommons.createDocument(responseBody);
         } catch (Exception e) {
-            LOGGER.debug("Failed to create XML document from response.");
-            configResult.addArgumentMessage(unknownEndpointError(responseField.requestUrlField()
+            LOGGER.debug("Failed to create XML document emptyReport response.");
+            return Reports.from(unknownEndpointError(responseField.requestUrlField()
                     .path()));
-            return configResult;
         }
 
         String requestUrl = responseField.requestUrlField()
@@ -191,9 +185,8 @@ public class CswSourceUtils {
         try {
             if ((Boolean) xpath.compile(HAS_CATALOG_METACARD_EXP)
                     .evaluate(capabilitiesXml, XPathConstants.BOOLEAN)) {
-                configResult.result(preferred.outputSchema(METACARD_OUTPUT_SCHEMA)
+                return Reports.from(preferred.outputSchema(METACARD_OUTPUT_SCHEMA)
                         .cswProfile(CSW_FEDERATION_PROFILE_SOURCE));
-                return configResult;
             }
         } catch (Exception e) {
             LOGGER.debug("Failed to compile DDF Profile CSW discovery XPath expression.");
@@ -202,9 +195,8 @@ public class CswSourceUtils {
         try {
             if ((Boolean) xpath.compile(HAS_GMD_ISO_EXP)
                     .evaluate(capabilitiesXml, XPathConstants.BOOLEAN)) {
-                configResult.result(preferred.outputSchema(GMD_OUTPUT_SCHEMA)
+                return Reports.from(preferred.outputSchema(GMD_OUTPUT_SCHEMA)
                         .cswProfile(GMD_CSW_ISO_FEDERATED_SOURCE));
-                return configResult;
             }
         } catch (Exception e) {
             LOGGER.debug("Failed to compile GMD CSW discovery XPath expression.");
@@ -214,9 +206,8 @@ public class CswSourceUtils {
             if (!xpath.compile(GET_FIRST_OUTPUT_SCHEMA)
                     .evaluate(capabilitiesXml)
                     .isEmpty()) {
-                configResult.result(preferred.outputSchema(CSW_2_0_2_OUTPUT_SCHEMA)
+                return Reports.from(preferred.outputSchema(CSW_2_0_2_OUTPUT_SCHEMA)
                         .cswProfile(CSW_SPEC_PROFILE_FEDERATED_SOURCE));
-                return configResult;
             }
         } catch (Exception e) {
             LOGGER.debug("Failed to compile generic CSW specification discovery XPath expression.");
@@ -224,9 +215,8 @@ public class CswSourceUtils {
 
         LOGGER.debug("URL [{}] responded to GetCapabilities request, but response was not readable.",
                 requestUrl);
-        configResult.addArgumentMessage(unknownEndpointError(responseField.requestUrlField()
+        return Reports.from(unknownEndpointError(responseField.requestUrlField()
                 .path()));
-        return configResult;
     }
 
     /**

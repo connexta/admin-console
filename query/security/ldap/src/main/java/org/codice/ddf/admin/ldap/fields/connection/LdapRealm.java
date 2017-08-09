@@ -21,7 +21,7 @@ public class LdapRealm extends StringField {
     public static final String FIELD_TYPE_NAME = "LdapRealm";
 
     public static final String DESCRIPTION =
-            "The ldap realm performs authentication using information from an LDAP server. User information includes user name, password, and the groups to which the user belongs. To use an LDAP realm, the users and groups must already be defined in your LDAP directory";
+            "The ldap realm performs authentication using information emptyReport an LDAP server. User information includes user name, password, and the groups to which the user belongs. To use an LDAP realm, the users and groups must already be defined in your LDAP directory";
 
     LdapRealm() {
         super(DEFAULT_FIELD_NAME);

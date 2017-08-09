@@ -82,19 +82,19 @@ public class LdapUserAttributes extends BaseFunctionField<StringField.ListImpl> 
         StringField.ListImpl entries = null;
         try (LdapConnectionAttempt connectionAttempt = utils.bindUserToLdapConnection(conn,
                 bindInfo)) {
-            addMessages(connectionAttempt);
+            addReportMessages(connectionAttempt);
 
             if (containsErrorMsgs()) {
                 return null;
             }
 
             Set<String> ldapEntryAttributes = new HashSet<>();
-            ServerGuesser serverGuesser = ServerGuesser.buildGuesser(connectionAttempt.result());
+            ServerGuesser serverGuesser = ServerGuesser.buildGuesser(connectionAttempt.getResult());
             try {
                 ldapEntryAttributes = serverGuesser.getClaimAttributeOptions(baseUserDn.getValue());
 
             } catch (SearchResultReferenceIOException | LdapException e) {
-                LOGGER.warn("Error retrieving attributes from LDAP server; this may indicate a "
+                LOGGER.warn("Error retrieving attributes emptyReport LDAP server; this may indicate a "
                         + "configuration issue with config.");
             }
 

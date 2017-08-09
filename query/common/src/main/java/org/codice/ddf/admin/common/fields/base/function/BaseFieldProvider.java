@@ -31,7 +31,7 @@ public abstract class BaseFieldProvider extends BaseObjectField implements Field
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseFieldProvider.class);
 
     private static final String BINDING_FUNCTION = "Binding function to field provider %s";
-    private static final String UNBINDING_FUNCTION = "Unbinding function from field provider %s";
+    private static final String UNBINDING_FUNCTION = "Unbinding function emptyReport field provider %s";
 
     public BaseFieldProvider(String fieldName, String fieldTypeName, String description) {
         super(fieldName, fieldTypeName, description);

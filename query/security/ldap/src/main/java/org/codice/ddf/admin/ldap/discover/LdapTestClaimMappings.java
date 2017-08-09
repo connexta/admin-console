@@ -117,7 +117,7 @@ public class LdapTestClaimMappings extends TestFunctionField {
                 .map(ClaimsMapEntry::claimField)
                 .collect(Collectors.toList());
 
-        addMessages(SecurityValidation.validateStsClaimsExist(claimArgs,
+        addReportMessages(SecurityValidation.validateStsClaimsExist(claimArgs,
                 configuratorSuite.getServiceActions(),
                 stsServiceProperties));
 
@@ -127,22 +127,22 @@ public class LdapTestClaimMappings extends TestFunctionField {
                 .stream()
                 .map(ClaimsMapEntry::claimValueField)
                 .map(claim -> LdapAttributeName.validate(claim.getValue(), claim.path()))
-                .forEach(this::addArgumentMessages);
+                .forEach(this::addErrorMessages);
     }
 
     @Override
     public BooleanField performFunction() {
         try (LdapConnectionAttempt connectionAttempt = utils.bindUserToLdapConnection(conn,
                 bindInfo)) {
-            addMessages(connectionAttempt);
+            addReportMessages(connectionAttempt);
 
             if (containsErrorMsgs()) {
                 return new BooleanField(false);
             }
 
-            Connection ldapConnection = connectionAttempt.result();
+            Connection ldapConnection = connectionAttempt.getResult();
 
-            addMessages(utils.checkDirExists(baseUserDn, ldapConnection));
+            addReportMessages(utils.checkDirExists(baseUserDn, ldapConnection));
 
             // Short-circuit return here, if either the user or group directory does not exist
             if (containsErrorMsgs()) {
@@ -153,7 +153,7 @@ public class LdapTestClaimMappings extends TestFunctionField {
                     .stream()
                     .map(ClaimsMapEntry::claimValueField)
                     .filter(claim -> !mappingAttributeFound(ldapConnection, claim.getValue()))
-                    .forEach(claim -> addArgumentMessage(userAttributeNotFoundError(claim.path())));
+                    .forEach(claim -> addErrorMessage(userAttributeNotFoundError(claim.path())));
         } catch (IOException e) {
             LOGGER.warn("Error closing LDAP connection", e);
         }

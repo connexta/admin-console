@@ -19,7 +19,7 @@ import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.api.report.Report;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 import org.codice.ddf.admin.common.fields.common.PidField;
-import org.codice.ddf.admin.common.report.ReportImpl;
+import org.codice.ddf.admin.common.report.Reports;
 import org.codice.ddf.admin.common.services.ServiceCommons;
 import org.codice.ddf.admin.sources.SourceMessages;
 
@@ -64,11 +64,10 @@ public class SourceValidationUtils {
                 .map(Describable::getId)
                 .anyMatch(id -> id.equals(sourceName.getValue()));
 
-        ReportImpl report = new ReportImpl();
         if (matchFound) {
-            report.addArgumentMessage(SourceMessages.duplicateSourceNameError(sourceName.path()));
+            return Reports.from(SourceMessages.duplicateSourceNameError(sourceName.path()));
         }
-        return report;
+        return Reports.emptyReport();
     }
 
     /**
@@ -84,15 +83,15 @@ public class SourceValidationUtils {
      * @return a {@link Report} containing an {@link org.codice.ddf.admin.api.report.ErrorMessage}s on failure.
      */
     public Report duplicateSourceNameExists(StringField sourceName, PidField pid) {
-        ReportImpl sourceNameReport = new ReportImpl();
+        Report sourceNameReport = Reports.emptyReport();
         if (pid.getValue() != null) {
             sourceNameReport = serviceCommons.serviceConfigurationExists(pid);
-            if (!sourceNameReport.containsErrorMsgs() && !findSourceNameMatch(pid.getValue(),
+            if (!sourceNameReport.containsErrorMessages() && !findSourceNameMatch(pid.getValue(),
                     sourceName.getValue())) {
-                sourceNameReport.addMessages(duplicateSourceNameExists(sourceName));
+                sourceNameReport.addErrorMessages(duplicateSourceNameExists(sourceName).getErrorMessages());
             }
         } else {
-            sourceNameReport.addMessages(duplicateSourceNameExists(sourceName));
+            sourceNameReport.addErrorMessages(duplicateSourceNameExists(sourceName).getErrorMessages());
         }
         return sourceNameReport;
     }

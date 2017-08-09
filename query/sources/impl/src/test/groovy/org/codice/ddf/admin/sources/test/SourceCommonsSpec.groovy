@@ -20,8 +20,8 @@ import ddf.catalog.service.ConfiguredService
 import ddf.catalog.source.Source
 import ddf.catalog.source.SourceMonitor
 import ddf.catalog.source.UnsupportedQueryException
-import ddf.security.Subject
 import org.apache.cxf.jaxrs.client.WebClient
+import org.codice.ddf.admin.api.report.Report
 import org.codice.ddf.admin.common.fields.common.AddressField
 import org.codice.ddf.admin.common.fields.common.CredentialsField
 import org.codice.ddf.admin.common.fields.common.PidField
@@ -32,7 +32,6 @@ import org.codice.ddf.admin.common.services.ServiceCommons
 import org.codice.ddf.admin.configurator.OperationReport
 import org.codice.ddf.admin.sources.fields.type.SourceConfigField
 import org.codice.ddf.admin.sources.utils.RequestUtils
-import org.codice.ddf.cxf.SecureCxfClientFactory
 import spock.lang.Specification
 
 import javax.ws.rs.core.MediaType
@@ -151,14 +150,14 @@ class SourceCommonsSpec extends Specification {
         }
 
         @Override
-        public ReportImpl endpointIsReachable(UrlField urlField) {
+        public Report endpointIsReachable(UrlField urlField) {
             if(endpointIsReachable == null) {
                 return super.endpointIsReachable(urlField)
             }
 
-            def report = new ReportImpl()
+            Report report = new ReportImpl()
             if (!endpointIsReachable) {
-                report.addArgumentMessage(new ErrorMessageImpl(TEST_ERROR_CODE))
+                report.addErrorMessage(new ErrorMessageImpl(TEST_ERROR_CODE))
             }
             return report
         }

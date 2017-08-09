@@ -17,7 +17,7 @@ import org.codice.ddf.admin.api.ConfiguratorSuite
 import org.codice.ddf.admin.api.FieldProvider
 import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.api.poller.EnumValuePoller
-import org.codice.ddf.admin.api.report.ReportWithResult
+import org.codice.ddf.admin.api.report.Report
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.configurator.Configurator
@@ -132,11 +132,11 @@ class SaveContextPoliciesSpec extends Specification {
 
         when:
         saveContextPoliciesFunction.setValue(testData)
-        ReportWithResult report = saveContextPoliciesFunction.getValue()
+        Report report = saveContextPoliciesFunction.getValue()
 
         then:
-        report.messages().isEmpty()
-        report.result().getValue() == testData.policies
+        report.getErrorMessages().isEmpty()
+        report.getResult().getValue() == testData.policies
     }
 
     def 'Fail when failed to persist'() {
@@ -145,13 +145,13 @@ class SaveContextPoliciesSpec extends Specification {
 
         when:
         saveContextPoliciesFunction.setValue(testData)
-        ReportWithResult report = saveContextPoliciesFunction.getValue()
+        Report report = saveContextPoliciesFunction.getValue()
 
         then:
-        report.messages().size() == 1
-        report.messages()[0].code == DefaultMessages.FAILED_PERSIST
-        report.messages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME]
-        report.result() == null
+        report.getErrorMessages().size() == 1
+        report.getErrorMessages()[0].code == DefaultMessages.FAILED_PERSIST
+        report.getErrorMessages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME]
+        report.getResult() == null
     }
 
     def 'Fail if no root context is present'() {
@@ -161,13 +161,13 @@ class SaveContextPoliciesSpec extends Specification {
 
         when:
         saveContextPoliciesFunction.setValue(testData)
-        ReportWithResult report = saveContextPoliciesFunction.getValue()
+        Report report = saveContextPoliciesFunction.getValue()
 
         then:
-        report.messages().size() == 1
-        report.messages()[0].code == SecurityMessages.NO_ROOT_CONTEXT
-        report.messages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, BaseFunctionField.ARGUMENT, 'policies']
-        report.result() == null
+        report.getErrorMessages().size() == 1
+        report.getErrorMessages()[0].code == SecurityMessages.NO_ROOT_CONTEXT
+        report.getErrorMessages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, BaseFunctionField.ARGUMENT, 'policies']
+        report.getResult() == null
     }
 
     def 'Fail if invalid authType'() {
@@ -177,13 +177,13 @@ class SaveContextPoliciesSpec extends Specification {
 
         when:
         saveContextPoliciesFunction.setValue(testData)
-        ReportWithResult report = saveContextPoliciesFunction.getValue()
+        Report report = saveContextPoliciesFunction.getValue()
 
         then:
-        report.messages().size() == 1
-        report.messages()[0].code == DefaultMessages.UNSUPPORTED_ENUM
-        report.messages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, BaseFunctionField.ARGUMENT, 'policies', '0', 'authTypes', '1']
-        report.result() == null
+        report.getErrorMessages().size() == 1
+        report.getErrorMessages()[0].code == DefaultMessages.UNSUPPORTED_ENUM
+        report.getErrorMessages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, BaseFunctionField.ARGUMENT, 'policies', '0', 'authTypes', '1']
+        report.getResult() == null
     }
 
     def 'Fail if no authType'() {
@@ -193,13 +193,13 @@ class SaveContextPoliciesSpec extends Specification {
 
         when:
         saveContextPoliciesFunction.setValue(testData)
-        ReportWithResult report = saveContextPoliciesFunction.getValue()
+        Report report = saveContextPoliciesFunction.getValue()
 
         then:
-        report.messages().size() == 1
-        report.messages()[0].code == DefaultMessages.MISSING_REQUIRED_FIELD
-        report.messages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, BaseFunctionField.ARGUMENT, 'policies', '0', 'authTypes']
-        report.result() == null
+        report.getErrorMessages().size() == 1
+        report.getErrorMessages()[0].code == DefaultMessages.MISSING_REQUIRED_FIELD
+        report.getErrorMessages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, BaseFunctionField.ARGUMENT, 'policies', '0', 'authTypes']
+        report.getResult() == null
 
     }
 
@@ -210,13 +210,13 @@ class SaveContextPoliciesSpec extends Specification {
 
         when:
         saveContextPoliciesFunction.setValue(testData)
-        ReportWithResult report = saveContextPoliciesFunction.getValue()
+        Report report = saveContextPoliciesFunction.getValue()
 
         then:
-        report.messages().size() == 1
-        report.messages()[0].code == DefaultMessages.UNSUPPORTED_ENUM
-        report.messages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, BaseFunctionField.ARGUMENT, 'policies', '0', Realm.DEFAULT_FIELD_NAME]
-        report.result() == null
+        report.getErrorMessages().size() == 1
+        report.getErrorMessages()[0].code == DefaultMessages.UNSUPPORTED_ENUM
+        report.getErrorMessages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, BaseFunctionField.ARGUMENT, 'policies', '0', Realm.DEFAULT_FIELD_NAME]
+        report.getResult() == null
     }
 
     def 'Fail if no realm'() {
@@ -226,13 +226,13 @@ class SaveContextPoliciesSpec extends Specification {
 
         when:
         saveContextPoliciesFunction.setValue(testData)
-        ReportWithResult report = saveContextPoliciesFunction.getValue()
+        Report report = saveContextPoliciesFunction.getValue()
 
         then:
-        report.messages().size() == 1
-        report.messages()[0].code == DefaultMessages.MISSING_REQUIRED_FIELD
-        report.messages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, BaseFunctionField.ARGUMENT, 'policies', '0', Realm.DEFAULT_FIELD_NAME]
-        report.result() == null
+        report.getErrorMessages().size() == 1
+        report.getErrorMessages()[0].code == DefaultMessages.MISSING_REQUIRED_FIELD
+        report.getErrorMessages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, BaseFunctionField.ARGUMENT, 'policies', '0', Realm.DEFAULT_FIELD_NAME]
+        report.getResult() == null
     }
 
     def 'Pass if no claims Mapping'() {
@@ -242,11 +242,11 @@ class SaveContextPoliciesSpec extends Specification {
 
         when:
         saveContextPoliciesFunction.setValue(testData)
-        ReportWithResult report = saveContextPoliciesFunction.getValue()
+        Report report = saveContextPoliciesFunction.getValue()
 
         then:
-        report.messages().isEmpty()
-        report.result().getValue() == testData.policies
+        report.getErrorMessages().isEmpty()
+        report.getResult().getValue() == testData.policies
     }
 
     def 'Fail if claim entry with no value '() {
@@ -256,13 +256,13 @@ class SaveContextPoliciesSpec extends Specification {
 
         when:
         saveContextPoliciesFunction.setValue(testData)
-        ReportWithResult report = saveContextPoliciesFunction.getValue()
+        Report report = saveContextPoliciesFunction.getValue()
 
         then:
-        report.messages().size() == 1
-        report.messages()[0].code == DefaultMessages.MISSING_REQUIRED_FIELD
-        report.messages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, BaseFunctionField.ARGUMENT, 'policies', '0', 'claimsMapping', '0', ClaimsMapEntry.VALUE_FIELD_NAME]
-        report.result() == null
+        report.getErrorMessages().size() == 1
+        report.getErrorMessages()[0].code == DefaultMessages.MISSING_REQUIRED_FIELD
+        report.getErrorMessages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, BaseFunctionField.ARGUMENT, 'policies', '0', 'claimsMapping', '0', ClaimsMapEntry.VALUE_FIELD_NAME]
+        report.getResult() == null
     }
 
     def 'Fail if claim is not supported'() {
@@ -272,13 +272,13 @@ class SaveContextPoliciesSpec extends Specification {
 
         when:
         saveContextPoliciesFunction.setValue(testData)
-        ReportWithResult report = saveContextPoliciesFunction.getValue()
+        Report report = saveContextPoliciesFunction.getValue()
 
         then:
-        report.messages().size() == 1
-        report.messages()[0].code == SecurityMessages.INVALID_CLAIM_TYPE
-        report.messages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, BaseFunctionField.ARGUMENT, 'policies', '0', 'claimsMapping', '0', ClaimsMapEntry.KEY_FIELD_NAME]
-        report.result() == null
+        report.getErrorMessages().size() == 1
+        report.getErrorMessages()[0].code == SecurityMessages.INVALID_CLAIM_TYPE
+        report.getErrorMessages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, BaseFunctionField.ARGUMENT, 'policies', '0', 'claimsMapping', '0', ClaimsMapEntry.KEY_FIELD_NAME]
+        report.getResult() == null
     }
 
     def 'Returns all the possible error codes correctly'(){

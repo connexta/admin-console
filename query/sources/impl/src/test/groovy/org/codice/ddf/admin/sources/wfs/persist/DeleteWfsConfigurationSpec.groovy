@@ -69,8 +69,8 @@ class DeleteWfsConfigurationSpec extends SourceCommonsSpec {
         def report = deleteWfsConfiguration.getValue()
 
         then:
-        report.result() != null
-        report.result().getValue()
+        report.getResult() != null
+        report.getResult().getValue()
     }
 
     def 'Fail to discover WFS config when no existing config found with provided pid'() {
@@ -82,10 +82,10 @@ class DeleteWfsConfigurationSpec extends SourceCommonsSpec {
         def report = deleteWfsConfiguration.getValue()
 
         then:
-        report.result() == null
-        report.messages().size() == 1
-        report.messages().get(0).code == DefaultMessages.NO_EXISTING_CONFIG
-        report.messages().get(0).path == RESULT_ARGUMENT_PATH
+        report.getResult() == null
+        report.getErrorMessages().size() == 1
+        report.getErrorMessages().get(0).code == DefaultMessages.NO_EXISTING_CONFIG
+        report.getErrorMessages().get(0).path == RESULT_ARGUMENT_PATH
     }
 
     def 'Error while committing delete configuration with given pid'() {
@@ -96,10 +96,10 @@ class DeleteWfsConfigurationSpec extends SourceCommonsSpec {
         def report = deleteWfsConfiguration.getValue()
 
         then:
-        !report.result().getValue()
-        report.messages().size() == 1
-        report.messages().get(0).code == DefaultMessages.FAILED_PERSIST
-        report.messages().get(0).path == RESULT_ARGUMENT_PATH
+        !report.getResult().getValue()
+        report.getErrorMessages().size() == 1
+        report.getErrorMessages().get(0).code == DefaultMessages.FAILED_PERSIST
+        report.getErrorMessages().get(0).path == RESULT_ARGUMENT_PATH
     }
 
     def 'Fail when missing required fields'() {
@@ -107,12 +107,12 @@ class DeleteWfsConfigurationSpec extends SourceCommonsSpec {
         def report = deleteWfsConfiguration.getValue()
 
         then:
-        report.result() == null
-        report.messages().size() == 1
-        report.messages().count {
+        report.getResult() == null
+        report.getErrorMessages().size() == 1
+        report.getErrorMessages().count {
             it.getCode() == DefaultMessages.MISSING_REQUIRED_FIELD
         } == 1
-        report.messages()*.getPath() == [PID_PATH]
+        report.getErrorMessages()*.getPath() == [PID_PATH]
     }
 
     def 'Returns all the possible error codes correctly'(){
@@ -133,7 +133,7 @@ class DeleteWfsConfigurationSpec extends SourceCommonsSpec {
 
         then:
         errorCodes.size() == 2
-        errorCodes.contains(noExistingConfigReport.messages().get(0).getCode())
-        errorCodes.contains(failedPersistReport.messages().get(0).getCode())
+        errorCodes.contains(noExistingConfigReport.getErrorMessages().get(0).getCode())
+        errorCodes.contains(failedPersistReport.getErrorMessages().get(0).getCode())
     }
 }

@@ -15,64 +15,74 @@ package org.codice.ddf.admin.common.report;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-import org.apache.commons.collections.ListUtils;
 import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.codice.ddf.admin.api.report.Report;
 
 import com.google.common.collect.ImmutableList;
 
-public class ReportImpl implements Report {
+public class ReportImpl<T> implements Report<T> {
 
-    private List<ErrorMessage> argumentMessages;
+    private List<ErrorMessage> errorMessages;
 
-    private List<ErrorMessage> resultMessages;
+    private Optional<T> result;
 
     public ReportImpl() {
-        argumentMessages = new ArrayList<>();
-        resultMessages = new ArrayList<>();
+        errorMessages = new ArrayList<>();
+        this.result = Optional.empty();
+    }
+
+    public ReportImpl(T result) {
+        this();
+        this.result = Optional.of(result);
+    }
+
+    public ReportImpl(ErrorMessage message) {
+        this();
+        errorMessages.add(message);
+    }
+
+    public ReportImpl(List<ErrorMessage> messages) {
+        this();
+        errorMessages.addAll(messages);
     }
 
     @Override
-    public List<ErrorMessage> argumentMessages() {
-        return ImmutableList.copyOf(argumentMessages);
+    public Report<T> addErrorMessage(ErrorMessage message){
+        errorMessages.add(message);
+        return this;
     }
 
     @Override
-    public List<ErrorMessage> resultMessages() {
-        return ImmutableList.copyOf(resultMessages);
+    public Report<T> addErrorMessages(List<ErrorMessage> messages){
+        errorMessages.addAll(messages);
+        return this;
     }
 
     @Override
-    public List<ErrorMessage> messages() {
-        return ListUtils.union(argumentMessages, resultMessages);
+    public List<ErrorMessage> getErrorMessages(){
+        return ImmutableList.copyOf(errorMessages);
     }
 
-    public ReportImpl addArgumentMessages(List<ErrorMessage> messages) {
-        argumentMessages.addAll(messages);
+    @Override
+    public boolean containsErrorMessages(){
+        return !errorMessages.isEmpty();
+    }
+
+    @Override
+    public T getResult(){
+        return result.orElseGet(() -> null);
+    }
+
+    @Override
+    public Report<T> setResult(T result){
+        this.result = Optional.ofNullable(result);
         return this;
     }
 
-    public ReportImpl addArgumentMessage(ErrorMessage message) {
-        argumentMessages.add(message);
-        return this;
-    }
-
-    public ReportImpl addResultMessages(List<ErrorMessage> messages) {
-        resultMessages.addAll(messages);
-        return this;
-    }
-
-    public ReportImpl addResultMessage(ErrorMessage message) {
-        resultMessages.add(message);
-        return this;
-    }
-
-    public ReportImpl addMessages(Report report) {
-        return addResultMessages(report.resultMessages()).addArgumentMessages(report.argumentMessages());
-    }
-
-    public boolean containsErrorMsgs() {
-        return !messages().isEmpty();
+    @Override
+    public boolean isResultPresent(){
+        return result.isPresent();
     }
 }

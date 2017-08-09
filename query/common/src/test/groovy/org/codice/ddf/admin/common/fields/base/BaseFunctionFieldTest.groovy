@@ -51,22 +51,22 @@ class BaseFunctionFieldTest extends Specification {
         def report = functionField.getValue()
 
         then:
-        report.messages().size() == 1
-        report.messages()[0].getCode() == DefaultMessages.EMPTY_FIELD
-        report.messages()[0].getPath() == [TestBaseFunctionField.DEFAULT_NAME, BaseFunctionField.ARGUMENT, StringField.DEFAULT_FIELD_NAME]
+        report.getErrorMessages().size() == 1
+        report.getErrorMessages()[0].getCode() == DefaultMessages.EMPTY_FIELD
+        report.getErrorMessages()[0].getPath() == [TestBaseFunctionField.DEFAULT_NAME, BaseFunctionField.ARGUMENT, StringField.DEFAULT_FIELD_NAME]
     }
 
     def 'Adding result message has correct path on added message'() {
         setup:
         functionField = new TestBaseFunctionField(false)
-        functionField.addResultMessage(new ErrorMessageImpl('test'))
+        functionField.addErrorMessage(new ErrorMessageImpl('test'))
 
         when:
         def report = functionField.getValue()
 
         then:
-        report.messages().size() == 1
-        report.messages()[0].getPath() == [TestBaseFunctionField.DEFAULT_NAME]
+        report.getErrorMessages().size() == 1
+        report.getErrorMessages()[0].getPath() == [TestBaseFunctionField.DEFAULT_NAME]
     }
 
     def 'Setting function arguments populates argument values correctly'() {

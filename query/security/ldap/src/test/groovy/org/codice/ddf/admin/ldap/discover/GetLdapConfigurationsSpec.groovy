@@ -52,7 +52,7 @@ class GetLdapConfigurationsSpec extends Specification {
 
         when:
         def report = getLdapConfigurations.getValue()
-        def configs = (ListField<LdapConfigurationField>) report.result()
+        def configs = (ListField<LdapConfigurationField>) report.getResult()
 
         then:
         configs != null

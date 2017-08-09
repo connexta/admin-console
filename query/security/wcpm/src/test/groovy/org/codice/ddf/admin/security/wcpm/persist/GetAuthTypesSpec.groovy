@@ -5,7 +5,7 @@ import org.codice.ddf.admin.security.wcpm.discover.GetAuthTypes
 import spock.lang.Specification
 
 import static groovy.org.codice.ddf.admin.security.wcpm.persist.WcpmTestingCommons.*
-import org.codice.ddf.admin.api.report.ReportWithResult
+import org.codice.ddf.admin.api.report.Report
 import org.codice.ddf.admin.security.common.fields.wcpm.AuthType
 import org.codice.ddf.admin.security.wcpm.AuthTypesPoller
 import org.codice.ddf.internal.admin.configurator.actions.ServiceReader
@@ -26,10 +26,10 @@ class GetAuthTypesSpec extends Specification {
 
     def 'Successfully retrieve auth type definitions from the auth type poller'() {
         when:
-        ReportWithResult report = getAuthTypes.getValue()
+        Report report = getAuthTypes.getValue()
 
         then:
-        report.messages().isEmpty()
-        report.result().getValue() == [BASIC, SAML, PKI]
+        report.getErrorMessages().isEmpty()
+        report.getResult().getValue() == [BASIC, SAML, PKI]
     }
 }

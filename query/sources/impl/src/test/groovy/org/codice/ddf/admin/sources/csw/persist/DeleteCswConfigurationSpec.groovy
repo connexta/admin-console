@@ -77,8 +77,8 @@ class DeleteCswConfigurationSpec extends SourceCommonsSpec {
         def report = deleteCswConfiguration.getValue()
 
         then:
-        report.result() != null
-        report.result().getValue()
+        report.getResult() != null
+        report.getResult().getValue()
     }
 
     def 'Fail with no existing config found with provided pid'() {
@@ -88,10 +88,10 @@ class DeleteCswConfigurationSpec extends SourceCommonsSpec {
         def report = deleteCswConfiguration.getValue()
 
         then:
-        report.result() == null
-        report.messages().size() == 1
-        report.messages().get(0).path == RESULT_ARGUMENT_PATH
-        report.messages().get(0).code == DefaultMessages.NO_EXISTING_CONFIG
+        report.getResult() == null
+        report.getErrorMessages().size() == 1
+        report.getErrorMessages().get(0).path == RESULT_ARGUMENT_PATH
+        report.getErrorMessages().get(0).code == DefaultMessages.NO_EXISTING_CONFIG
     }
 
     def 'Error while committing deleted configuration with the given servicePid'() {
@@ -102,10 +102,10 @@ class DeleteCswConfigurationSpec extends SourceCommonsSpec {
         def report = deleteCswConfiguration.getValue()
 
         then:
-        !report.result().getValue()
-        report.messages().size() == 1
-        report.messages().get(0).path == RESULT_ARGUMENT_PATH
-        report.messages().get(0).code == DefaultMessages.FAILED_PERSIST
+        !report.getResult().getValue()
+        report.getErrorMessages().size() == 1
+        report.getErrorMessages().get(0).path == RESULT_ARGUMENT_PATH
+        report.getErrorMessages().get(0).code == DefaultMessages.FAILED_PERSIST
     }
 
     def 'Fail when missing required fields'() {
@@ -113,12 +113,12 @@ class DeleteCswConfigurationSpec extends SourceCommonsSpec {
         def report = deleteCswConfiguration.getValue()
 
         then:
-        report.result() == null
-        report.messages().size() == 1
-        report.messages().count {
+        report.getResult() == null
+        report.getErrorMessages().size() == 1
+        report.getErrorMessages().count {
             it.getCode() == DefaultMessages.MISSING_REQUIRED_FIELD
         } == 1
-        report.messages()*.getPath() == [SERVICE_PID_PATH]
+        report.getErrorMessages()*.getPath() == [SERVICE_PID_PATH]
     }
 
     def 'Returns all the possible error codes correctly'(){
@@ -139,8 +139,8 @@ class DeleteCswConfigurationSpec extends SourceCommonsSpec {
 
         then:
         errorCodes.size() == 2
-        errorCodes.contains(noExistingConfigReport.messages().get(0).getCode())
-        errorCodes.contains(failedPersistReport.messages().get(0).getCode())
+        errorCodes.contains(noExistingConfigReport.getErrorMessages().get(0).getCode())
+        errorCodes.contains(failedPersistReport.getErrorMessages().get(0).getCode())
     }
 
     def createCswConfigToDelete() {

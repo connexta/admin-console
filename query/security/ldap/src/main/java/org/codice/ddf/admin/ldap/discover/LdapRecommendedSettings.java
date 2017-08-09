@@ -42,7 +42,7 @@ public class LdapRecommendedSettings extends BaseFunctionField<LdapRecommendedSe
     public static final String FIELD_NAME = "recommendedSettings";
 
     public static final String DESCRIPTION =
-            "Attempts to retrieve recommended settings from the LDAP connection.";
+            "Attempts to retrieve recommended settings emptyReport the LDAP connection.";
 
     public static final LdapRecommendedSettingsField RETURN_TYPE =
             new LdapRecommendedSettingsField();
@@ -75,14 +75,14 @@ public class LdapRecommendedSettings extends BaseFunctionField<LdapRecommendedSe
     public LdapRecommendedSettingsField performFunction() {
         try (LdapConnectionAttempt connectionAttempt = utils.bindUserToLdapConnection(conn,
                 creds)) {
-            addMessages(connectionAttempt);
+            addReportMessages(connectionAttempt);
 
             if (!connectionAttempt.isResultPresent()) {
                 return null;
             }
 
             ServerGuesser guesser = ServerGuesser.buildGuesser(ldapType.getValue(),
-                    connectionAttempt.result());
+                    connectionAttempt.getResult());
 
             return new LdapRecommendedSettingsField().userDns(guesser.getUserBaseChoices())
                     .groupDns(guesser.getGroupBaseChoices())

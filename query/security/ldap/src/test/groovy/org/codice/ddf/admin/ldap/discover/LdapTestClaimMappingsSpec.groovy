@@ -111,12 +111,12 @@ class LdapTestClaimMappingsSpec extends Specification {
         FunctionReport report = action.getValue()
 
         then:
-        report.messages().size() == badPaths.size()
-        report.messages().count {
+        report.getErrorMessages().size() == badPaths.size()
+        report.getErrorMessages().count {
             it.getCode() == DefaultMessages.MISSING_REQUIRED_FIELD
         } == badPaths.size()
 
-        report.messages()*.path as Set == badPaths.values() as Set
+        report.getErrorMessages()*.path as Set == badPaths.values() as Set
     }
 
     def 'fail with invalid user dn'() {
@@ -134,12 +134,12 @@ class LdapTestClaimMappingsSpec extends Specification {
         FunctionReport report = action.getValue()
 
         then:
-        report.messages().size() == 1
-        report.messages().count {
+        report.getErrorMessages().size() == 1
+        report.getErrorMessages().count {
             it.getCode() == LdapMessages.INVALID_DN
         } == 1
 
-        report.messages()*.getPath() as Set == [badPaths.missingUserPath] as Set
+        report.getErrorMessages()*.getPath() as Set == [badPaths.missingUserPath] as Set
     }
 
     def 'fail to connect to LDAP'() {
@@ -157,10 +157,10 @@ class LdapTestClaimMappingsSpec extends Specification {
         FunctionReport report = action.getValue()
 
         then:
-        report.messages().size() == 1
-        !report.result().getValue()
-        report.messages().get(0).getCode() == DefaultMessages.CANNOT_CONNECT
-        report.messages().get(0).getPath() == baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME]
+        report.getErrorMessages().size() == 1
+        !report.getResult().getValue()
+        report.getErrorMessages().get(0).getCode() == DefaultMessages.CANNOT_CONNECT
+        report.getErrorMessages().get(0).getPath() == baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME]
     }
 
     def 'fail to bind to LDAP'() {
@@ -178,10 +178,10 @@ class LdapTestClaimMappingsSpec extends Specification {
         FunctionReport report = action.getValue()
 
         then:
-        report.messages().size() == 1
-        !report.result().getValue()
-        report.messages().get(0).getCode() == LdapMessages.CANNOT_BIND
-        report.messages().get(0).getPath() == baseMsg + [LdapBindUserInfo.DEFAULT_FIELD_NAME]
+        report.getErrorMessages().size() == 1
+        !report.getResult().getValue()
+        report.getErrorMessages().get(0).getCode() == LdapMessages.CANNOT_BIND
+        report.getErrorMessages().get(0).getPath() == baseMsg + [LdapBindUserInfo.DEFAULT_FIELD_NAME]
     }
 
     def 'fail when baseUserDN does not exist'() {
@@ -200,12 +200,12 @@ class LdapTestClaimMappingsSpec extends Specification {
         FunctionReport report = action.getValue()
 
         then:
-        report.messages().size() == 1
-        report.messages().count {
+        report.getErrorMessages().size() == 1
+        report.getErrorMessages().count {
             it.getCode() == LdapMessages.DN_DOES_NOT_EXIST
         } == 1
 
-        report.messages()*.path as Set == [badPaths.missingUserPath] as Set
+        report.getErrorMessages()*.path as Set == [badPaths.missingUserPath] as Set
     }
 
     def 'fail when bad sts claim keys are supplied for mapping'() {
@@ -228,12 +228,12 @@ class LdapTestClaimMappingsSpec extends Specification {
         FunctionReport report = action.getValue()
 
         then:
-        report.messages().size() == 2
-        report.messages().count {
+        report.getErrorMessages().size() == 2
+        report.getErrorMessages().count {
             it.getCode() == SecurityMessages.INVALID_CLAIM_TYPE
         } == 2
 
-        report.messages()*.path as Set == failedPaths
+        report.getErrorMessages()*.path as Set == failedPaths
     }
 
     def 'fail when missing user attributes are supplied for mapping'() {
@@ -257,12 +257,12 @@ class LdapTestClaimMappingsSpec extends Specification {
         FunctionReport report = action.getValue()
 
         then:
-        report.messages().size() == 2
-        report.messages().count {
+        report.getErrorMessages().size() == 2
+        report.getErrorMessages().count {
             it.getCode() == LdapMessages.USER_ATTRIBUTE_NOT_FOUND
         } == 2
 
-        report.messages()*.path as Set == failedPaths
+        report.getErrorMessages()*.path as Set == failedPaths
     }
 
 
@@ -290,12 +290,12 @@ class LdapTestClaimMappingsSpec extends Specification {
         FunctionReport report = action.getValue()
 
         then:
-        report.messages().size() == 3
-        report.messages().count {
+        report.getErrorMessages().size() == 3
+        report.getErrorMessages().count {
             it.getCode() == LdapMessages.INVALID_USER_ATTRIBUTE
         } == 3
 
-        report.messages()*.path as Set == failedPaths
+        report.getErrorMessages()*.path as Set == failedPaths
     }
 
     def 'fail when usernameAttribute format is incorrect'() {
@@ -320,12 +320,12 @@ class LdapTestClaimMappingsSpec extends Specification {
         FunctionReport report = action.getValue()
 
         then:
-        report.messages().size() == 1
-        report.messages().count {
+        report.getErrorMessages().size() == 1
+        report.getErrorMessages().count {
             it.getCode() == LdapMessages.INVALID_USER_ATTRIBUTE
         } == 1
 
-        report.messages()*.path as Set == failedPaths
+        report.getErrorMessages()*.path as Set == failedPaths
     }
 
     def 'pass when all user attributes found'() {
@@ -345,11 +345,11 @@ class LdapTestClaimMappingsSpec extends Specification {
 
         when:
         FunctionReport report = action.getValue()
-        ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().result().isClosed()
+        ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().getResult().isClosed()
 
         then:
-        report.messages().empty
-        report.result().getValue()
+        report.getErrorMessages().empty
+        report.getResult().getValue()
         ldapConnectionIsClosed
     }
 

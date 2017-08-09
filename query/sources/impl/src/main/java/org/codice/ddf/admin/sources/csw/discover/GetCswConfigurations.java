@@ -92,7 +92,7 @@ public class GetCswConfigurations extends BaseFunctionField<ListField<CswSourceI
         }
 
         if (pid.getValue() != null) {
-            addMessages(serviceCommons.serviceConfigurationExists(pid));
+            addReportMessages(serviceCommons.serviceConfigurationExists(pid));
         }
     }
 

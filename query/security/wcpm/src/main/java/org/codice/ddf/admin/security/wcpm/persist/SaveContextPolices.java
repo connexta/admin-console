@@ -84,7 +84,7 @@ public class SaveContextPolices extends BaseFunctionField<ContextPolicyBin.ListI
                 contextPolicies.toString());
 
         if (configReport.containsFailedResults()) {
-            addResultMessage(failedPersistError());
+            addErrorMessage(failedPersistError());
         }
 
         return containsErrorMsgs() ? null : contextPolicies;
@@ -108,7 +108,7 @@ public class SaveContextPolices extends BaseFunctionField<ContextPolicyBin.ListI
                     .collect(Collectors.toList()));
         }
 
-        addMessages(SecurityValidation.validateStsClaimsExist(claimArgs,
+        addReportMessages(SecurityValidation.validateStsClaimsExist(claimArgs,
                 configuratorSuite.getServiceActions(),
                 stsServiceProps));
     }
@@ -119,7 +119,7 @@ public class SaveContextPolices extends BaseFunctionField<ContextPolicyBin.ListI
                 .map(ContextPolicyBin::contexts)
                 .flatMap(Collection::stream)
                 .noneMatch(ROOT_CONTEXT_PATH::equals)) {
-            addArgumentMessage(noRootContextError(contextPolicies.path()));
+            addErrorMessage(noRootContextError(contextPolicies.path()));
         }
     }
 

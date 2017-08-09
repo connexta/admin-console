@@ -95,13 +95,13 @@ public class LdapQuery extends BaseFunctionField<MapField.ListImpl> {
         List<MapField> convertedSearchResults = new ArrayList<>();
         try (LdapConnectionAttempt connectionAttempt = utils.bindUserToLdapConnection(conn,
                 creds)) {
-            addMessages(connectionAttempt);
+            addReportMessages(connectionAttempt);
 
             if (containsErrorMsgs()) {
                 return null;
             }
 
-            searchResults = utils.getLdapQueryResults(connectionAttempt.result(),
+            searchResults = utils.getLdapQueryResults(connectionAttempt.getResult(),
                     queryBase.getValue(),
                     query.getValue(),
                     SearchScope.WHOLE_SUBTREE,

@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.function.Function;
 
 import javax.xml.namespace.NamespaceContext;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang.StringUtils;
@@ -32,6 +31,7 @@ import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.sources.fields.type.SourceConfigField;
+import org.codice.ddf.platform.util.XMLUtils;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -42,6 +42,9 @@ import ddf.catalog.source.FederatedSource;
 import ddf.catalog.source.Source;
 
 public class SourceUtilCommons {
+
+    private static final XMLUtils XML_UTILS = XMLUtils.getInstance();
+
     private final ConfiguratorSuite configuratorSuite;
 
     public static final NamespaceContext SOURCES_NAMESPACE_CONTEXT = new NamespaceContext() {
@@ -86,9 +89,7 @@ public class SourceUtilCommons {
 
     public Document createDocument(String body)
             throws ParserConfigurationException, IOException, SAXException {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        factory.setNamespaceAware(true);
-        return factory.newDocumentBuilder()
+        return XML_UTILS.getSecureDocumentBuilder(true)
                 .parse(new InputSource(new StringReader(body)));
     }
 

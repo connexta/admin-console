@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.codice.ddf.admin.api.Events;
 import org.codice.ddf.admin.api.FieldProvider;
 import org.codice.ddf.admin.api.report.ErrorMessage;
@@ -46,6 +47,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.RemovalCause;
 import com.google.common.cache.RemovalNotification;
+import com.google.common.net.HttpHeaders;
 
 import graphql.GraphQLError;
 import graphql.annotations.EnhancedExecutionStrategy;
@@ -76,6 +78,12 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet implements Ev
     private ExecutionStrategyProvider execStrategy;
     private GraphQLErrorHandler errorHandler;
     private GraphQLQueryProvider errorCodeProvider;
+
+    private static final int MAX_REQUEST_SIZE = 1_000_000;
+
+    public static final String INVALID_CONTENT_LENGTH_MSG = "Invalid Content-Length header value. The Content-Length must be an integer below the value of " + MAX_REQUEST_SIZE + " bytes";
+
+    public static final String MISSING_CONTENT_LENGTH_HEADER_MSG = "Content-Length header is required.";
 
     public ExtendedOsgiGraphQLServlet() {
         super();
@@ -121,6 +129,30 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet implements Ev
     @Override
     protected void doPost(HttpServletRequest originalRequest, HttpServletResponse originalResponse)
             throws ServletException, IOException {
+
+        if (StringUtils.isEmpty(originalRequest.getHeader(HttpHeaders.CONTENT_LENGTH))) {
+            originalResponse.getWriter()
+                    .write(MISSING_CONTENT_LENGTH_HEADER_MSG);
+            originalResponse.setStatus(400);
+            return;
+        }
+
+        try {
+            int contentLength =
+                    Integer.parseInt(originalRequest.getHeader(HttpHeaders.CONTENT_LENGTH));
+            if (contentLength > MAX_REQUEST_SIZE) {
+                originalResponse.getWriter()
+                        .write(INVALID_CONTENT_LENGTH_MSG);
+                originalResponse.setStatus(400);
+                return;
+            }
+        } catch (Exception e) {
+            originalResponse.getWriter()
+                    .write(INVALID_CONTENT_LENGTH_MSG);
+            originalResponse.setStatus(400);
+            return;
+        }
+
         // TODO: tbatie - 6/9/17 - GraphQLServlet does not support batched requests even though a BatchedExecutionStrategy exists. This should be fixed in the GraphQLServlet and contributed back to graphql-java-servlet
         List<String> responses = new ArrayList<>();
         String originalReqContent = IOUtils.toString(originalRequest.getInputStream());
@@ -141,8 +173,12 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet implements Ev
                             "[" + String.join(",", responses) + "]" :
                             responses.get(0));
         } catch (Throwable t) {
-            originalResponse.setStatus(500);
-            log.error("Error executing GraphQL request!", t);
+            if(t instanceof RuntimeException) {
+                originalResponse.setStatus(500);
+            } else {
+                originalResponse.setStatus(400);
+            }
+            log.trace("Error executing GraphQL request!", t);
         }
     }
 
@@ -164,7 +200,7 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet implements Ev
     }
 
     private void triggerSchemaRefresh(String refreshReason) {
-        LOGGER.debug("GraphQL schema refresh requested. Cause: {}", refreshReason);
+        LOGGER.trace("GraphQL schema refresh requested. Cause: {}", refreshReason);
         cache.put(Events.REFRESH_SCHEMA, true);
     }
 
@@ -182,7 +218,7 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet implements Ev
     //Synchronized just in case the schema is still updating when another refresh is called
     //The performance decrease by the `synchronized` is negligible because of the periodic cache invalidation implementation
     private synchronized void refreshSchema() {
-        LOGGER.debug("Refreshing GraphQL schema.");
+        LOGGER.trace("Refreshing GraphQL schema.");
 
         transformedProviders.forEach(this::unbindProvider);
 
@@ -202,7 +238,7 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet implements Ev
 
         bindProvider(errorCodeProvider);
 
-        LOGGER.debug("Finished refreshing GraphQL schema.");
+        LOGGER.trace("Finished refreshing GraphQL schema.");
     }
 
     public void bindFieldProvider(FieldProvider fieldProvider) {
@@ -248,10 +284,11 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet implements Ev
                 GraphQLFieldDefinition fieldDef, Map<String, Object> argumentValues, Exception e) {
             if (e instanceof FunctionDataFetcherException) {
                 for (ErrorMessage msg : ((FunctionDataFetcherException) e).getCustomMessages()) {
-                    LOGGER.debug("Unsuccessful GraphQL request:\n", e);
+                    LOGGER.trace("Unsuccessful GraphQL request:\n", e);
                     executionContext.addError(new DataFetchingGraphQLError(msg));
                 }
             } else {
+                LOGGER.debug("Internal error.", e);
                 super.handleDataFetchingException(executionContext, fieldDef, argumentValues, e);
             }
         }

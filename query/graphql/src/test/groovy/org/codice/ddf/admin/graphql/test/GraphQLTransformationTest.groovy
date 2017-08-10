@@ -3,6 +3,7 @@ package org.codice.ddf.admin.graphql.test
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.common.base.Charsets
 import com.google.common.io.Resources
+import com.google.common.net.HttpHeaders
 import graphql.validation.ValidationErrorType
 import groovy.json.JsonBuilder
 import org.codice.ddf.admin.api.fields.FunctionField
@@ -22,6 +23,8 @@ import spock.lang.Specification
 class GraphQLTransformationTest extends Specification {
 
     static STATUS_OK = 200
+
+    static STATUS_INVALID_REQUEST = 400
 
     static TEST_OBJECT_NAME = TestObjectField.FIELD_NAME
 
@@ -267,7 +270,9 @@ class GraphQLTransformationTest extends Specification {
                 variables: getVariables()
         ]
 
-        request.setContent(toJson([query]).bytes)
+        def reqContent = toJson([query]).bytes
+        request.setContent(reqContent)
+        request.addHeader(HttpHeaders.CONTENT_LENGTH, reqContent.size())
 
         when:
         servlet.doPost(request, response)
@@ -302,7 +307,9 @@ class GraphQLTransformationTest extends Specification {
                 variables: getVariables()
         ]
 
-        request.setContent(toJson([goodQuery, badQuery]).bytes)
+        def reqContent = toJson([goodQuery, badQuery]).bytes
+        request.setContent(reqContent)
+        request.addHeader(HttpHeaders.CONTENT_LENGTH, reqContent.size())
 
         when:
         servlet.doPost(request, response)
@@ -349,6 +356,41 @@ class GraphQLTransformationTest extends Specification {
         then:
         response.getStatus() == STATUS_OK
         getResponseContentAsMap().errors == null
+    }
+
+    def 'fail when content-length exceeds allowed amount'() {
+        setup:
+        request.setContent(toJson([query: ""]).bytes)
+        request.addHeader(HttpHeaders.CONTENT_LENGTH, 1_000_000_000_000)
+
+        when:
+        servlet.doPost(request, response)
+
+        then:
+        response.getStatus() == STATUS_INVALID_REQUEST
+    }
+
+    def 'fail when content-length is invalid'() {
+        setup:
+        request.setContent(toJson([query: ""]).bytes)
+        request.addHeader(HttpHeaders.CONTENT_LENGTH, "INVALID_VALUE")
+
+        when:
+        servlet.doPost(request, response)
+
+        then:
+        response.getStatus() == STATUS_INVALID_REQUEST
+    }
+
+    def 'fail when content-length is absent'() {
+        setup:
+        request.setContent(toJson([query: ""]).bytes)
+
+        when:
+        servlet.doPost(request, response)
+
+        then:
+        response.getStatus() == STATUS_INVALID_REQUEST
     }
 
     def getResponseContentAsMap() {

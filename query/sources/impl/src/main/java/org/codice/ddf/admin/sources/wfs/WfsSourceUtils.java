@@ -189,39 +189,6 @@ public class WfsSourceUtils {
         return configResult;
     }
 
-    private class WfsTaskCallable
-            implements Callable<Report<WfsSourceConfigurationField>> {
-
-        private String url;
-
-        private HostField host;
-
-        private CredentialsField creds;
-
-        public WfsTaskCallable(String url, HostField host, CredentialsField creds) {
-            this.url = url;
-            this.host = host;
-            this.creds = creds;
-        }
-
-        @Override
-        public Report<WfsSourceConfigurationField> call() throws Exception {
-            UrlField requestUrl = new UrlField();
-            String formattedUrl = String.format(url, host.hostname(), host.port());
-            requestUrl.setValue(formattedUrl);
-
-            Report<WfsSourceConfigurationField> configResult = getWfsConfigFromUrl(
-                    requestUrl,
-                    creds);
-
-            if (!configResult.containsErrorMessages()) {
-                return configResult;
-            }
-
-            return null;
-        }
-    }
-
     /**
      * For testing purposes only. Groovy can access private methods
      */

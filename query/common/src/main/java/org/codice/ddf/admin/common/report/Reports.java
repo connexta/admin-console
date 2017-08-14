@@ -36,9 +36,8 @@ public class Reports {
         return new ReportImpl<>(messages);
     }
 
-    public static <T> Report<T> from(Report report){
-        List<ErrorMessage> messages = report.getErrorMessages();
-        return new ReportImpl<>(messages);
+    public static <T> Report<T> fromErrors(Report<Object> report){
+        return new ReportImpl<>(report.getErrorMessages());
     }
 }
 

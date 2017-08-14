@@ -159,7 +159,7 @@ public class GraphQLTransformOutput {
 
         FunctionField<DataType> funcField = field.newInstance();
 
-        //Remove the field name of the function emptyReport that path since the update is using a subpath
+        //Remove the field name of the function from that path since the update is using a subpath
         List<String> fixedPath = Lists.newArrayList(field.path());
         fixedPath.remove(fixedPath.size() - 1);
         funcField.updatePath(fixedPath);

@@ -74,7 +74,7 @@ public class RequestUtils {
      */
     public Report<ResponseField> sendGetRequest(WebClient webClient,
             UrlField urlField) {
-        Report<ResponseField> responseResult = Reports.from(endpointIsReachable(urlField));
+        Report<ResponseField> responseResult = Reports.fromErrors(endpointIsReachable(urlField));
         if (responseResult.containsErrorMessages()) {
             return responseResult;
         }
@@ -125,7 +125,7 @@ public class RequestUtils {
      */
     public Report<ResponseField> sendPostRequest(WebClient webClient,
             UrlField urlField, String content) {
-        Report<ResponseField> responseResult = Reports.from(endpointIsReachable(urlField));
+        Report<ResponseField> responseResult = Reports.fromErrors(endpointIsReachable(urlField));
         if (responseResult.containsErrorMessages()) {
             return responseResult;
         }

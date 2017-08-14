@@ -79,7 +79,7 @@ public class OpenSearchSourceUtils {
     }
 
     /**
-     * Attempts to discover an OpenSearch endpoint emptyReport the given hostname and port
+     * Attempts to discover an OpenSearch endpoint from the given hostname and port
      * <p>
      * Possible Error Codes to be returned
      * - {@link org.codice.ddf.admin.common.report.message.DefaultMessages#UNKNOWN_ENDPOINT}
@@ -157,7 +157,7 @@ public class OpenSearchSourceUtils {
         try {
             capabilitiesXml = sourceUtilCommons.createDocument(responseBody);
         } catch (Exception e) {
-            LOGGER.debug("Failed to read response emptyReport OpenSearch endpoint.");
+            LOGGER.debug("Failed to read response from OpenSearch endpoint.");
             return Reports.from(unknownEndpointError(responseField.requestUrlField()
                     .path()));
         }

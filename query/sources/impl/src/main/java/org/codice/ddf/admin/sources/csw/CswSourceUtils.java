@@ -92,7 +92,7 @@ public class CswSourceUtils {
     }
 
     /**
-     * Attempts to discover the source emptyReport the given hostname and port with optional basic authentication.
+     * Attempts to discover the source from the given hostname and port with optional basic authentication.
      * <p>
      * Possible Error Codes to be returned
      * - {@link org.codice.ddf.admin.common.report.message.DefaultMessages#UNKNOWN_ENDPOINT}
@@ -143,7 +143,7 @@ public class CswSourceUtils {
     }
 
     /**
-     * Attempts to create a CSW configuration emptyReport a CSW GetCapabilities response.
+     * Attempts to create a CSW configuration from a CSW GetCapabilities response.
      * <p>
      * Possible Error Codes to be returned
      * - {@link org.codice.ddf.admin.common.report.message.DefaultMessages#UNKNOWN_ENDPOINT}
@@ -165,7 +165,7 @@ public class CswSourceUtils {
         try {
             capabilitiesXml = sourceUtilCommons.createDocument(responseBody);
         } catch (Exception e) {
-            LOGGER.debug("Failed to create XML document emptyReport response.");
+            LOGGER.debug("Failed to create XML document from response.");
             return Reports.from(unknownEndpointError(responseField.requestUrlField()
                     .path()));
         }

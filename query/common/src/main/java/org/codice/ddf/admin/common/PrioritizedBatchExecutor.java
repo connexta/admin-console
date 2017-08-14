@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
  * Accepts a list of tasks that are executed in order.
  *
  * @param <T> the type of individual task results and argument type of the task result handler
- * @param <R> the result type returned emptyReport a task result handler
+ * @param <R> the result type returned from a task result handler
  */
 public class PrioritizedBatchExecutor<T, R> {
 

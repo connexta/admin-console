@@ -42,7 +42,7 @@ public class LdapRecommendedSettings extends BaseFunctionField<LdapRecommendedSe
     public static final String FIELD_NAME = "recommendedSettings";
 
     public static final String DESCRIPTION =
-            "Attempts to retrieve recommended settings emptyReport the LDAP connection.";
+            "Attempts to retrieve recommended settings from the LDAP connection.";
 
     public static final LdapRecommendedSettingsField RETURN_TYPE =
             new LdapRecommendedSettingsField();

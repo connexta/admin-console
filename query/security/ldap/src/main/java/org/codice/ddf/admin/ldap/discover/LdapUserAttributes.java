@@ -94,7 +94,7 @@ public class LdapUserAttributes extends BaseFunctionField<StringField.ListImpl> 
                 ldapEntryAttributes = serverGuesser.getClaimAttributeOptions(baseUserDn.getValue());
 
             } catch (SearchResultReferenceIOException | LdapException e) {
-                LOGGER.warn("Error retrieving attributes emptyReport LDAP server; this may indicate a "
+                LOGGER.warn("Error retrieving attributes from LDAP server; this may indicate a "
                         + "configuration issue with config.");
             }
 

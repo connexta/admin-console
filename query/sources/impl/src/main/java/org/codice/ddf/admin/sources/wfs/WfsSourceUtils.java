@@ -131,7 +131,7 @@ public class WfsSourceUtils {
     }
 
     /**
-     * Attempts to create a WFS configuration emptyReport the given WFS GetCapabilities response.
+     * Attempts to create a WFS configuration from the given WFS GetCapabilities response.
      * <p>
      * Possible Error Codes to be returned
      * - {@link org.codice.ddf.admin.common.report.message.DefaultMessages#UNKNOWN_ENDPOINT}
@@ -155,7 +155,7 @@ public class WfsSourceUtils {
         try {
             capabilitiesXml = sourceUtilCommons.createDocument(responseBody);
         } catch (Exception e) {
-            LOGGER.debug("Failed to read response emptyReport WFS endpoint.");
+            LOGGER.debug("Failed to read response from WFS endpoint.");
             return Reports.from(unknownEndpointError(responseField.requestUrlField()
                     .path()));
         }

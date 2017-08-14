@@ -159,7 +159,7 @@ public class LdapTestingUtils {
      * @param ldapSearchBaseDN Base DN to run the query on
      * @param ldapQuery        Query to perform
      * @param searchScope      Scope of query
-     * @param maxResults       Max number of results to return emptyReport query. Use -1 for all results
+     * @param maxResults       Max number of results to return from query. Use -1 for all results
      * @param attributes       Optional list of attributes for return projection; if null,
      *                         then all attributes will be returned
      * @return list of results

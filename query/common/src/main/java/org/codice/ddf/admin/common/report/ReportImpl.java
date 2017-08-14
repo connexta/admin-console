@@ -55,8 +55,8 @@ public class ReportImpl<T> implements Report<T> {
     }
 
     @Override
-    public Report<T> addErrorMessages(List<ErrorMessage> messages){
-        errorMessages.addAll(messages);
+    public <S> Report<T> addErrorMessages(Report<S> report){
+        errorMessages.addAll(report.getErrorMessages());
         return this;
     }
 
@@ -72,7 +72,7 @@ public class ReportImpl<T> implements Report<T> {
 
     @Override
     public T getResult(){
-        return result.orElseGet(() -> null);
+        return result.orElse(null);
     }
 
     @Override

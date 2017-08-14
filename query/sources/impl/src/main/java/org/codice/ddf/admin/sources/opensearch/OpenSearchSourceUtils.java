@@ -126,7 +126,7 @@ public class OpenSearchSourceUtils {
                 GET_CAPABILITIES_PARAMS);
 
         if (responseResult.containsErrorMessages()) {
-            return (Report) responseResult;
+            return Reports.from(responseResult.getErrorMessages());
         }
 
         return getOpenSearchConfigFromResponse(responseResult.getResult(), creds);
@@ -166,7 +166,6 @@ public class OpenSearchSourceUtils {
                 .newXPath();
         xpath.setNamespaceContext(SOURCES_NAMESPACE_CONTEXT);
 
-        Report<OpenSearchSourceConfigurationField> configResult = Reports.emptyReport();
         try {
             if ((Boolean) xpath.compile(TOTAL_RESULTS_XPATH)
                     .evaluate(capabilitiesXml, XPathConstants.BOOLEAN)) {
@@ -177,18 +176,16 @@ public class OpenSearchSourceUtils {
                         .username(creds.username())
                         .password(FLAG_PASSWORD);
 
-                configResult = Reports.from(config);
+                return Reports.from(config);
             } else {
-                configResult = Reports.from(unknownEndpointError(responseField.requestUrlField()
+                return Reports.from(unknownEndpointError(responseField.requestUrlField()
                         .path()));
             }
         } catch (XPathExpressionException e) {
             LOGGER.debug("Failed to compile OpenSearch totalResults XPath.");
-            configResult.addErrorMessage(unknownEndpointError(responseField.requestUrlField()
+            return Reports.from(unknownEndpointError(responseField.requestUrlField()
                     .path()));
         }
-
-        return configResult;
     }
 
     /**

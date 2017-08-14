@@ -117,7 +117,7 @@ public class LdapTestClaimMappings extends TestFunctionField {
                 .map(ClaimsMapEntry::claimField)
                 .collect(Collectors.toList());
 
-        addReportMessages(SecurityValidation.validateStsClaimsExist(claimArgs,
+        addErrorMessages(SecurityValidation.validateStsClaimsExist(claimArgs,
                 configuratorSuite.getServiceActions(),
                 stsServiceProperties));
 
@@ -134,7 +134,7 @@ public class LdapTestClaimMappings extends TestFunctionField {
     public BooleanField performFunction() {
         try (LdapConnectionAttempt connectionAttempt = utils.bindUserToLdapConnection(conn,
                 bindInfo)) {
-            addReportMessages(connectionAttempt);
+            addErrorMessages(connectionAttempt);
 
             if (containsErrorMsgs()) {
                 return new BooleanField(false);
@@ -142,7 +142,7 @@ public class LdapTestClaimMappings extends TestFunctionField {
 
             Connection ldapConnection = connectionAttempt.getResult();
 
-            addReportMessages(utils.checkDirExists(baseUserDn, ldapConnection));
+            addErrorMessages(utils.checkDirExists(baseUserDn, ldapConnection));
 
             // Short-circuit return here, if either the user or group directory does not exist
             if (containsErrorMsgs()) {

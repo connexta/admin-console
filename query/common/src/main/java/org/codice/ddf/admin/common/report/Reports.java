@@ -36,7 +36,7 @@ public class Reports {
         return new ReportImpl<>(messages);
     }
 
-    public static <T> Report<T> fromErrors(Report<Object> report){
+    public static<S, T> Report<T> fromErrors(Report<S> report){
         return new ReportImpl<>(report.getErrorMessages());
     }
 }

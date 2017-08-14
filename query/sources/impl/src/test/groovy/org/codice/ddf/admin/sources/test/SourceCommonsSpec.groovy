@@ -26,7 +26,7 @@ import org.codice.ddf.admin.common.fields.common.AddressField
 import org.codice.ddf.admin.common.fields.common.CredentialsField
 import org.codice.ddf.admin.common.fields.common.PidField
 import org.codice.ddf.admin.common.fields.common.UrlField
-import org.codice.ddf.admin.common.report.ReportImpl
+import org.codice.ddf.admin.common.report.Reports
 import org.codice.ddf.admin.common.report.message.ErrorMessageImpl
 import org.codice.ddf.admin.common.services.ServiceCommons
 import org.codice.ddf.admin.configurator.OperationReport
@@ -150,12 +150,12 @@ class SourceCommonsSpec extends Specification {
         }
 
         @Override
-        public Report endpointIsReachable(UrlField urlField) {
+        public Report<Void> endpointIsReachable(UrlField urlField) {
             if(endpointIsReachable == null) {
                 return super.endpointIsReachable(urlField)
             }
 
-            Report report = new ReportImpl()
+            Report report = Reports.emptyReport()
             if (!endpointIsReachable) {
                 report.addErrorMessage(new ErrorMessageImpl(TEST_ERROR_CODE))
             }

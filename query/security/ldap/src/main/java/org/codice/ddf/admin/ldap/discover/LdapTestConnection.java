@@ -59,7 +59,7 @@ public class LdapTestConnection extends TestFunctionField {
     @Override
     public BooleanField performFunction() {
         try (LdapConnectionAttempt ldapConnectionAttempt = utils.getLdapConnection(connection)) {
-            addReportMessages(ldapConnectionAttempt);
+            addErrorMessages(ldapConnectionAttempt);
             return new BooleanField(!containsErrorMsgs());
         } catch (IOException e) {
             LOGGER.warn("Error closing LDAP connection", e);

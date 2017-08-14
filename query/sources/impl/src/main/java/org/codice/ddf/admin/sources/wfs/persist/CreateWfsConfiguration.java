@@ -89,7 +89,7 @@ public class CreateWfsConfiguration extends BaseFunctionField<BooleanField> {
             return new BooleanField(false);
         }
 
-        addReportMessages(serviceCommons.createManagedService(wfsConfigToServiceProps(config),
+        addErrorMessages(serviceCommons.createManagedService(wfsConfigToServiceProps(config),
                 wfsVersionToFactoryPid(config.wfsVersion())));
         return new BooleanField(!containsErrorMsgs());
     }
@@ -100,7 +100,7 @@ public class CreateWfsConfiguration extends BaseFunctionField<BooleanField> {
         if (containsErrorMsgs()) {
             return;
         }
-        addReportMessages(sourceValidationUtils.duplicateSourceNameExists(config.sourceNameField()));
+        addErrorMessages(sourceValidationUtils.duplicateSourceNameExists(config.sourceNameField()));
     }
 
     @Override

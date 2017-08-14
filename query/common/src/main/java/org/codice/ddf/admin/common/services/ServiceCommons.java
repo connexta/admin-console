@@ -68,7 +68,7 @@ public class ServiceCommons {
                 .collect(Collectors.toList());
     }
 
-    public Report createManagedService(Map<String, Object> serviceProps, String factoryPid) {
+    public Report<Void> createManagedService(Map<String, Object> serviceProps, String factoryPid) {
         Configurator configurator = configuratorSuite.getConfiguratorFactory()
                 .getConfigurator();
         configurator.add(configuratorSuite.getManagedServiceActions()
@@ -83,7 +83,7 @@ public class ServiceCommons {
         return Reports.emptyReport();
     }
 
-    public Report updateService(PidField servicePid, Map<String, Object> newConfig) {
+    public Report<Void> updateService(PidField servicePid, Map<String, Object> newConfig) {
         Report report = serviceConfigurationExists(servicePid);
         if (report.containsErrorMessages()) {
             return report;
@@ -107,7 +107,7 @@ public class ServiceCommons {
         return report;
     }
 
-    public Report deleteService(PidField servicePid) {
+    public Report<Void> deleteService(PidField servicePid) {
         Configurator configurator = configuratorSuite.getConfiguratorFactory()
                 .getConfigurator();
         configurator.add(configuratorSuite.getManagedServiceActions()
@@ -125,7 +125,7 @@ public class ServiceCommons {
      * @param servicePid identifier of the service
      * @return
      */
-    public Report serviceConfigurationExists(PidField servicePid) {
+    public Report<Void> serviceConfigurationExists(PidField servicePid) {
         if (!serviceConfigurationExists(servicePid.getValue())) {
             return Reports.from(noExistingConfigError());
         }

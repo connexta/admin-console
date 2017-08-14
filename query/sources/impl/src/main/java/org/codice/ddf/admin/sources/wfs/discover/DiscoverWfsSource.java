@@ -69,7 +69,7 @@ public class DiscoverWfsSource extends BaseFunctionField<WfsSourceConfigurationF
             configResult = wfsSourceUtils.getWfsConfigFromHost(address.host(), credentials);
         }
 
-        addReportMessages(configResult);
+        addErrorMessages(configResult);
         if (containsErrorMsgs()) {
             return null;
         }

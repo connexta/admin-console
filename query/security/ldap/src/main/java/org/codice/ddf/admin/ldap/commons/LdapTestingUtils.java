@@ -244,7 +244,7 @@ public class LdapTestingUtils {
      * @return If the path does not exist, the {@code Optional} contains
      * the path to the DN; else, an empty {@code Optional}.
      */
-    public Report checkDirExists(LdapDistinguishedName dirDn, Connection ldapConnection) {
+    public Report<Void> checkDirExists(LdapDistinguishedName dirDn, Connection ldapConnection) {
         boolean dirExists = !getLdapQueryResults(ldapConnection,
                 dirDn.getValue(),
                 Filter.present("objectClass")

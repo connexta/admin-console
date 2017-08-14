@@ -108,7 +108,7 @@ public class SaveContextPolices extends BaseFunctionField<ContextPolicyBin.ListI
                     .collect(Collectors.toList()));
         }
 
-        addReportMessages(SecurityValidation.validateStsClaimsExist(claimArgs,
+        addErrorMessages(SecurityValidation.validateStsClaimsExist(claimArgs,
                 configuratorSuite.getServiceActions(),
                 stsServiceProps));
     }

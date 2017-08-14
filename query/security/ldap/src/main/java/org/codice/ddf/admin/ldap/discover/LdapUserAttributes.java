@@ -82,7 +82,7 @@ public class LdapUserAttributes extends BaseFunctionField<StringField.ListImpl> 
         StringField.ListImpl entries = null;
         try (LdapConnectionAttempt connectionAttempt = utils.bindUserToLdapConnection(conn,
                 bindInfo)) {
-            addReportMessages(connectionAttempt);
+            addErrorMessages(connectionAttempt);
 
             if (containsErrorMsgs()) {
                 return null;

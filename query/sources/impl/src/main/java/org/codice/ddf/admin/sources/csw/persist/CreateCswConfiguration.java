@@ -78,7 +78,7 @@ public class CreateCswConfiguration extends BaseFunctionField<BooleanField> {
             return new BooleanField(false);
         }
 
-        addReportMessages(serviceCommons.createManagedService(cswConfigToServiceProps(config),
+        addErrorMessages(serviceCommons.createManagedService(cswConfigToServiceProps(config),
                 cswProfileToFactoryPid(config.cswProfile())));
         return new BooleanField(!containsErrorMsgs());
     }
@@ -89,7 +89,7 @@ public class CreateCswConfiguration extends BaseFunctionField<BooleanField> {
         if (containsErrorMsgs()) {
             return;
         }
-        addReportMessages(sourceValidationUtils.duplicateSourceNameExists(config.sourceNameField()));
+        addErrorMessages(sourceValidationUtils.duplicateSourceNameExists(config.sourceNameField()));
     }
 
     @Override

@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 import javax.xml.xpath.XPath;
@@ -37,6 +36,7 @@ import org.codice.ddf.admin.common.fields.common.HostField;
 import org.codice.ddf.admin.common.fields.common.ResponseField;
 import org.codice.ddf.admin.common.fields.common.UrlField;
 import org.codice.ddf.admin.common.report.Reports;
+import org.codice.ddf.admin.sources.fields.WfsVersion;
 import org.codice.ddf.admin.sources.fields.type.WfsSourceConfigurationField;
 import org.codice.ddf.admin.sources.utils.RequestUtils;
 import org.codice.ddf.admin.sources.utils.SourceTaskCallable;
@@ -124,7 +124,7 @@ public class WfsSourceUtils {
                 GET_CAPABILITIES_PARAMS);
 
         if (responseResult.containsErrorMessages()) {
-            return (Report) responseResult;
+            return Reports.from(responseResult.getErrorMessages());
         }
 
         return getWfsConfigFromResult(responseResult.getResult(), creds);
@@ -179,14 +179,22 @@ public class WfsSourceUtils {
                     .path()));
         }
 
-        Report<WfsSourceConfigurationField> configResult = Reports.from(preferredConfig.wfsVersion(wfsVersion));
-        if (!preferredConfig.validate()
-                .isEmpty()) {
-            configResult = Reports.from(unknownEndpointError(responseField.requestUrlField()
+        WfsVersion wfsVersionToCheck = new WfsVersion();
+        wfsVersionToCheck.isRequired(true);
+        wfsVersionToCheck.setValue(wfsVersion);
+        if(!wfsVersionToCheck.validate().isEmpty()) {
+            return Reports.from(unknownEndpointError(responseField.requestUrlField()
                     .path()));
         }
 
-        return configResult;
+        WfsSourceConfigurationField wfsSourceConfigurationField =
+                new WfsSourceConfigurationField().wfsVersion(wfsVersion);
+        wfsSourceConfigurationField.endpointUrl(requestUrl.getValue())
+                .credentials()
+                .username(creds.username())
+                .password(FLAG_PASSWORD);
+
+        return Reports.from(wfsSourceConfigurationField);
     }
 
     /**

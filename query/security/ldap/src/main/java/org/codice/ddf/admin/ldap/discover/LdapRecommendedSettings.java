@@ -75,7 +75,7 @@ public class LdapRecommendedSettings extends BaseFunctionField<LdapRecommendedSe
     public LdapRecommendedSettingsField performFunction() {
         try (LdapConnectionAttempt connectionAttempt = utils.bindUserToLdapConnection(conn,
                 creds)) {
-            addReportMessages(connectionAttempt);
+            addErrorMessages(connectionAttempt);
 
             if (!connectionAttempt.isResultPresent()) {
                 return null;

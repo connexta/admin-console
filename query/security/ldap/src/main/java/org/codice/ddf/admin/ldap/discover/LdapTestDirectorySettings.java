@@ -80,7 +80,7 @@ public class LdapTestDirectorySettings extends TestFunctionField {
     public BooleanField performFunction() {
         try (LdapConnectionAttempt connectionAttempt = utils.bindUserToLdapConnection(conn,
                 bindInfo)) {
-            addReportMessages(connectionAttempt);
+            addErrorMessages(connectionAttempt);
 
             if (containsErrorMsgs()) {
                 return new BooleanField(false);
@@ -88,8 +88,8 @@ public class LdapTestDirectorySettings extends TestFunctionField {
 
             Connection ldapConnection = connectionAttempt.getResult();
 
-            addReportMessages(utils.checkDirExists(settings.baseGroupDnField(), ldapConnection));
-            addReportMessages(utils.checkDirExists(settings.baseUserDnField(), ldapConnection));
+            addErrorMessages(utils.checkDirExists(settings.baseGroupDnField(), ldapConnection));
+            addErrorMessages(utils.checkDirExists(settings.baseUserDnField(), ldapConnection));
 
             // Short-circuit return here, if either the user or group directory does not exist
             if (containsErrorMsgs()) {

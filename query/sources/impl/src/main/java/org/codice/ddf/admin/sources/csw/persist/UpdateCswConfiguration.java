@@ -82,7 +82,7 @@ public class UpdateCswConfiguration extends BaseFunctionField<BooleanField> {
             return new BooleanField(false);
         }
 
-        addReportMessages(serviceCommons.updateService(config.pidField(),
+        addErrorMessages(serviceCommons.updateService(config.pidField(),
                 cswConfigToServiceProps(config)));
         return new BooleanField(!containsErrorMsgs());
     }
@@ -93,7 +93,7 @@ public class UpdateCswConfiguration extends BaseFunctionField<BooleanField> {
         if (containsErrorMsgs()) {
             return;
         }
-        addReportMessages(sourceValidationUtils.duplicateSourceNameExists(config.sourceNameField(),
+        addErrorMessages(sourceValidationUtils.duplicateSourceNameExists(config.sourceNameField(),
                 config.pidField()));
     }
 

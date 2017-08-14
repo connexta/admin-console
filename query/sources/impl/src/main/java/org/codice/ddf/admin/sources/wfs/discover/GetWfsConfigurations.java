@@ -89,7 +89,7 @@ public class GetWfsConfigurations extends BaseFunctionField<ListField<WfsSourceI
         }
 
         if (pid.getValue() != null) {
-            addReportMessages(serviceCommons.serviceConfigurationExists(pid));
+            addErrorMessages(serviceCommons.serviceConfigurationExists(pid));
         }
     }
 

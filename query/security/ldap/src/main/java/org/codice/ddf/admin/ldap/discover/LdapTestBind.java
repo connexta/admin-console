@@ -71,7 +71,7 @@ public class LdapTestBind extends TestFunctionField {
     public BooleanField performFunction() {
         try (LdapConnectionAttempt ldapConnectionAttempt = utils.bindUserToLdapConnection(conn,
                 creds)) {
-            addReportMessages(ldapConnectionAttempt);
+            addErrorMessages(ldapConnectionAttempt);
         } catch (IOException e) {
             LOGGER.warn("Error closing LDAP connection", e);
         }

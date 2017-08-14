@@ -15,11 +15,14 @@ package org.codice.ddf.admin.api.report;
 
 import java.util.List;
 
+/**
+ * A Report can contain only errors messages or a result but not both.
+ */
 public interface Report<T> {
 
     Report<T> addErrorMessage(ErrorMessage message);
 
-    Report<T> addErrorMessages(List<ErrorMessage> messages);
+    <S> Report<T> addErrorMessages(Report<S> report);
 
     List<ErrorMessage> getErrorMessages();
 

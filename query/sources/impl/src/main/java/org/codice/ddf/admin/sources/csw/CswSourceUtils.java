@@ -136,7 +136,7 @@ public class CswSourceUtils {
                 GET_CAPABILITIES_PARAMS);
 
         if (responseResult.containsErrorMessages()) {
-            return (Report) responseResult;
+            return Reports.from(responseResult.getErrorMessages());
         }
 
         return getCswConfigFromResponse(responseResult.getResult(), creds);

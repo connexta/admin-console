@@ -69,7 +69,7 @@ public class DiscoverCswSource extends BaseFunctionField<CswSourceConfigurationF
             configResult = cswSourceUtils.getConfigFromHost(address.host(), credentials);
         }
 
-        addReportMessages(configResult);
+        addErrorMessages(configResult);
         if (containsErrorMsgs()) {
             return null;
         }

@@ -78,7 +78,7 @@ public class DiscoverOpenSearchSource
                     credentials);
         }
 
-        addReportMessages(configResult);
+        addErrorMessages(configResult);
         if (containsErrorMsgs()) {
             return null;
         }

@@ -81,12 +81,10 @@ public class RequestUtils {
 
         try {
             Response response = webClient.get();
-            responseResult.setResult(responseFieldFromResponse(response, urlField));
-            return responseResult;
+            return Reports.from(responseFieldFromResponse(response, urlField));
 
         } catch (ProcessingException e) {
-            responseResult.addErrorMessage(cannotConnectError(urlField.path()));
-            return responseResult;
+            return Reports.from(cannotConnectError(urlField.path()));
         }
     }
 
@@ -125,19 +123,16 @@ public class RequestUtils {
      */
     public Report<ResponseField> sendPostRequest(WebClient webClient,
             UrlField urlField, String content) {
-        Report<ResponseField> responseResult = Reports.fromErrors(endpointIsReachable(urlField));
-        if (responseResult.containsErrorMessages()) {
-            return responseResult;
+        Report endpointIsReachableReport = endpointIsReachable(urlField);
+        if(endpointIsReachableReport.containsErrorMessages()){
+            return Reports.fromErrors(endpointIsReachable(urlField));
         }
-
         try {
             Response response = webClient.post(content);
-            responseResult.setResult(responseFieldFromResponse(response, urlField));
-            return responseResult;
+            return Reports.from(responseFieldFromResponse(response, urlField));
 
         } catch (ProcessingException e) {
-            responseResult.addErrorMessage(cannotConnectError(urlField.path()));
-            return responseResult;
+            return Reports.from(cannotConnectError(urlField.path()));
         }
     }
 
@@ -150,8 +145,7 @@ public class RequestUtils {
      * @param urlField {@link UrlField} containing the URL to connect to
      * @return a {@link Report} containing no messages on success, or containing {@link org.codice.ddf.admin.api.report.ErrorMessage}s on failure.
      */
-    public Report endpointIsReachable(UrlField urlField) {
-        Report report = Reports.emptyReport();
+    public Report<Void> endpointIsReachable(UrlField urlField) {
         URLConnection urlConnection = null;
         try {
             urlConnection = new URL(urlField.getValue()).openConnection();
@@ -160,7 +154,7 @@ public class RequestUtils {
             LOGGER.debug("Successfully reached {}.", urlField);
         } catch (IOException e) {
             LOGGER.debug("Failed to reach {}, returning an error.", urlField, e);
-            report = Reports.from(cannotConnectError(urlField.path()));
+            return Reports.from(cannotConnectError(urlField.path()));
         } finally {
             try {
                 if (urlConnection != null) {
@@ -171,7 +165,7 @@ public class RequestUtils {
                 LOGGER.debug("Error closing connection stream.");
             }
         }
-        return report;
+        return Reports.emptyReport();
     }
 
     public class WebClientBuilder {

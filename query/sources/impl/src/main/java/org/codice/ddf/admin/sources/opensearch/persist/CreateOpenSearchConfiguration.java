@@ -77,7 +77,7 @@ public class CreateOpenSearchConfiguration extends BaseFunctionField<BooleanFiel
             addErrorMessage(failedPersistError());
             return new BooleanField(false);
         }
-        addReportMessages(serviceCommons.createManagedService(openSearchConfigToServiceProps(config),
+        addErrorMessages(serviceCommons.createManagedService(openSearchConfigToServiceProps(config),
                 OPENSEARCH_FACTORY_PID));
         return new BooleanField(!containsErrorMsgs());
     }
@@ -88,7 +88,7 @@ public class CreateOpenSearchConfiguration extends BaseFunctionField<BooleanFiel
         if (containsErrorMsgs()) {
             return;
         }
-        addReportMessages(sourceValidationUtils.duplicateSourceNameExists(config.sourceNameField()));
+        addErrorMessages(sourceValidationUtils.duplicateSourceNameExists(config.sourceNameField()));
     }
 
     @Override

@@ -136,7 +136,7 @@ public abstract class BaseFunctionField<T extends DataType> extends BaseField<Ma
         return this;
     }
 
-    protected BaseFunctionField addReportMessages(Report report) {
+    protected BaseFunctionField addErrorMessages(Report report) {
         return addErrorMessages(report.getErrorMessages());
     }
 

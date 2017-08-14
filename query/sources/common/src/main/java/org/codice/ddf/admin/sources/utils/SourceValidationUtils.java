@@ -58,7 +58,7 @@ public class SourceValidationUtils {
      * @param sourceName source name to validate
      * @return a {@link Report} containing a {@link SourceMessages#DUPLICATE_SOURCE_NAME} on failure.
      */
-    public Report duplicateSourceNameExists(StringField sourceName) {
+    public Report<Void> duplicateSourceNameExists(StringField sourceName) {
         List<Source> sources = sourceUtilCommons.getAllSourceReferences();
         boolean matchFound = sources.stream()
                 .map(Describable::getId)
@@ -82,16 +82,16 @@ public class SourceValidationUtils {
      * @param pid        service pid of the service properties
      * @return a {@link Report} containing an {@link org.codice.ddf.admin.api.report.ErrorMessage}s on failure.
      */
-    public Report duplicateSourceNameExists(StringField sourceName, PidField pid) {
+    public Report<Void> duplicateSourceNameExists(StringField sourceName, PidField pid) {
         Report sourceNameReport = Reports.emptyReport();
         if (pid.getValue() != null) {
             sourceNameReport = serviceCommons.serviceConfigurationExists(pid);
             if (!sourceNameReport.containsErrorMessages() && !findSourceNameMatch(pid.getValue(),
                     sourceName.getValue())) {
-                sourceNameReport.addErrorMessages(duplicateSourceNameExists(sourceName).getErrorMessages());
+                sourceNameReport.addErrorMessages(duplicateSourceNameExists(sourceName));
             }
         } else {
-            sourceNameReport.addErrorMessages(duplicateSourceNameExists(sourceName).getErrorMessages());
+            sourceNameReport.addErrorMessages(duplicateSourceNameExists(sourceName));
         }
         return sourceNameReport;
     }

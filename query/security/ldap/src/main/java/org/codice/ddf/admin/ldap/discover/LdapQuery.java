@@ -95,7 +95,7 @@ public class LdapQuery extends BaseFunctionField<MapField.ListImpl> {
         List<MapField> convertedSearchResults = new ArrayList<>();
         try (LdapConnectionAttempt connectionAttempt = utils.bindUserToLdapConnection(conn,
                 creds)) {
-            addReportMessages(connectionAttempt);
+            addErrorMessages(connectionAttempt);
 
             if (containsErrorMsgs()) {
                 return null;

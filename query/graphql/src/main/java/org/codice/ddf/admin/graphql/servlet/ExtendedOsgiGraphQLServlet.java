@@ -81,7 +81,7 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet implements Ev
 
     private static final int MAX_REQUEST_SIZE = 1_000_000;
 
-    public static final String INVALID_CONTENT_LENGTH_MSG = "Invalid Content-Length header value. The Content-Length must be an integer below the value of " + MAX_REQUEST_SIZE + " bytes";
+    public static final String INVALID_CONTENT_LENGTH_MSG = "Invalid Content-Length header value. The Content-Length must be an integer less than or equal to " + MAX_REQUEST_SIZE + " bytes";
 
     public static final String MISSING_CONTENT_LENGTH_HEADER_MSG = "Content-Length header is required.";
 
@@ -133,7 +133,7 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet implements Ev
         if (StringUtils.isEmpty(originalRequest.getHeader(HttpHeaders.CONTENT_LENGTH))) {
             originalResponse.getWriter()
                     .write(MISSING_CONTENT_LENGTH_HEADER_MSG);
-            originalResponse.setStatus(400);
+            originalResponse.setStatus(411);
             return;
         }
 
@@ -143,7 +143,7 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet implements Ev
             if (contentLength > MAX_REQUEST_SIZE) {
                 originalResponse.getWriter()
                         .write(INVALID_CONTENT_LENGTH_MSG);
-                originalResponse.setStatus(400);
+                originalResponse.setStatus(413);
                 return;
             }
         } catch (Exception e) {
@@ -172,12 +172,10 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet implements Ev
                     .write(isBatchRequest ?
                             "[" + String.join(",", responses) + "]" :
                             responses.get(0));
+        } catch (RuntimeException t) {
+            originalResponse.setStatus(500);
         } catch (Throwable t) {
-            if(t instanceof RuntimeException) {
-                originalResponse.setStatus(500);
-            } else {
-                originalResponse.setStatus(400);
-            }
+            originalResponse.setStatus(400);
             log.trace("Error executing GraphQL request!", t);
         }
     }

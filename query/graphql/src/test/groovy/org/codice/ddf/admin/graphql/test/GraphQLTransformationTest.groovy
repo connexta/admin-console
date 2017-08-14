@@ -26,6 +26,10 @@ class GraphQLTransformationTest extends Specification {
 
     static STATUS_INVALID_REQUEST = 400
 
+    static MISSING_CONTENT_LENGTH = 411
+
+    static PAYLOAD_TOO_LARGE = 413
+
     static TEST_OBJECT_NAME = TestObjectField.FIELD_NAME
 
     static STRING_ARG_VALUE = TestObjectField.SAMPLE_STRING_VALUE
@@ -361,13 +365,13 @@ class GraphQLTransformationTest extends Specification {
     def 'fail when content-length exceeds allowed amount'() {
         setup:
         request.setContent(toJson([query: ""]).bytes)
-        request.addHeader(HttpHeaders.CONTENT_LENGTH, 1_000_000_000_000)
+        request.addHeader(HttpHeaders.CONTENT_LENGTH, 1_000_001)
 
         when:
         servlet.doPost(request, response)
 
         then:
-        response.getStatus() == STATUS_INVALID_REQUEST
+        response.getStatus() == PAYLOAD_TOO_LARGE
     }
 
     def 'fail when content-length is invalid'() {
@@ -390,7 +394,7 @@ class GraphQLTransformationTest extends Specification {
         servlet.doPost(request, response)
 
         then:
-        response.getStatus() == STATUS_INVALID_REQUEST
+        response.getStatus() == MISSING_CONTENT_LENGTH
     }
 
     def getResponseContentAsMap() {

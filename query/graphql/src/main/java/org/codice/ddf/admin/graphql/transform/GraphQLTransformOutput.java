@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.api.FieldProvider;
 import org.codice.ddf.admin.api.fields.EnumField;
@@ -61,9 +60,9 @@ public class GraphQLTransformOutput {
         referenceTypeProvider = new GraphQLTypesProviderImpl<>();
     }
 
-    public GraphQLOutputType fieldToGraphQLOutputType(DataType field) {
-        if (outputTypeProvider.isTypePresent(field.fieldTypeName())) {
-            return outputTypeProvider.getType(field.fieldTypeName());
+    public GraphQLOutputType fieldToGraphQLOutputType(Field field) {
+        if (outputTypeProvider.isTypePresent(field.getTypeName())) {
+            return outputTypeProvider.getType(field.getTypeName());
         }
 
         GraphQLOutputType type = null;
@@ -74,9 +73,9 @@ public class GraphQLTransformOutput {
             type = transformEnum.enumFieldToGraphQLEnumType((EnumField) field);
         } else if (field instanceof ListField) {
             try {
-                type = new GraphQLList(fieldToGraphQLOutputType(((ListField<DataType>) field).createListEntry()));
+                type = new GraphQLList(fieldToGraphQLOutputType(((ListField<Field>) field).createListEntry()));
             } catch (Exception e) {
-                throw new RuntimeException("Unable to build field list content type for output type: " + field.fieldName());
+                throw new RuntimeException("Unable to build field list content type for output type: " + field.getName());
             }
         } else if(field instanceof ScalarField) {
             type = transformScalar.resolveScalarType((ScalarField) field);
@@ -88,32 +87,35 @@ public class GraphQLTransformOutput {
                             + field.getClass());
         }
 
-        outputTypeProvider.addType(field.fieldTypeName(), type);
+        outputTypeProvider.addType(field.getTypeName(), type);
         return type;
     }
 
     public GraphQLOutputType fieldToGraphQLObjectType(ObjectField field) {
         //Check if the objectField is recursive, if so bail early
-        if(referenceTypeProvider.isTypePresent(field.fieldTypeName())) {
-            return referenceTypeProvider.getType(field.fieldTypeName());
+        if(referenceTypeProvider.isTypePresent(field.getTypeName())) {
+            return referenceTypeProvider.getType(field.getTypeName());
         }
 
         //Field provider names should be unique and looks pretty without "Payload" added to the name
         String typeName = field instanceof FieldProvider ?
-                field.fieldTypeName() :
-                createOutputObjectFieldTypeName(field.fieldTypeName());
+                field.getTypeName() :
+                createOutputObjectFieldTypeName(field.getTypeName());
+
+        List<GraphQLFieldDefinition> innerFields =
+                fieldsToGraphQLFieldDefinition(field.getFields());
 
         //Skip mutations on field provider
-        List<Field> innerFields = field instanceof FieldProvider ?
-                ((FieldProvider) field).getDiscoveryFields() :
-                field.getFields();
+        if (field instanceof FieldProvider) {
+            innerFields.addAll(functionsToGraphQLFieldDefinition(((FieldProvider) field).getDiscoveryFunctions()));
+        }
 
         //Add a GraphQLTypeReference to support recursion
-        referenceTypeProvider.addType(field.fieldTypeName(), new GraphQLTypeReference(typeName));
+        referenceTypeProvider.addType(field.getTypeName(), new GraphQLTypeReference(typeName));
         return GraphQLObjectType.newObject()
                 .name(typeName)
-                .description(field.description())
-                .fields(fieldsToGraphQLFieldDefinition(innerFields))
+                .description(field.getDescription())
+                .fields(innerFields)
                 .build();
     }
 
@@ -127,48 +129,63 @@ public class GraphQLTransformOutput {
                 .collect(Collectors.toList());
     }
 
+    public List<GraphQLFieldDefinition> functionsToGraphQLFieldDefinition(
+            List<? extends FunctionField> funcFields) {
+        if (funcFields == null) {
+            return new ArrayList<>();
+        }
+        return funcFields.stream()
+                .map(this::functionToGraphQLFieldDefinition)
+                .collect(Collectors.toList());
+    }
+
     public GraphQLFieldDefinition fieldToGraphQLFieldDefinition(Field field) {
         List<GraphQLArgument> graphQLArgs = new ArrayList<>();
-        DataType returnType;
 
-        if(field instanceof FunctionField) {
-            FunctionField function = (FunctionField) field;
-            if (function.getArguments() != null) {
-                function.getArguments()
-                        .forEach(f -> graphQLArgs.add(inputTransformer.fieldToGraphQLArgument((DataType) f)));
-            }
-            returnType = function.getReturnType();
-        } else {
-            returnType = (DataType) field;
+        return GraphQLFieldDefinition.newFieldDefinition()
+                .name(field.getName())
+                .description(field.getDescription())
+                .type(fieldToGraphQLOutputType(field))
+                .argument(graphQLArgs)
+                .dataFetcher(env -> fieldDataFetcher(env, field))
+                .build();
+    }
+
+    public GraphQLFieldDefinition functionToGraphQLFieldDefinition(FunctionField function) {
+        List<GraphQLArgument> graphQLArgs = new ArrayList<>();
+
+        if (function.getArguments() != null) {
+            function.getArguments()
+                    .forEach(f -> graphQLArgs.add(inputTransformer.fieldToGraphQLArgument((Field)f)));
         }
 
         return GraphQLFieldDefinition.newFieldDefinition()
-                    .name(field.fieldName())
-                    .description(field.description())
-                    .type(fieldToGraphQLOutputType(returnType))
-                    .argument(graphQLArgs)
-                    .dataFetcher(field instanceof FunctionField ? (env -> functionDataFetcher(env, (FunctionField)field)) : (env -> dataTypeDataFetcher(env, (DataType)field)))
-                    .build();
+                .name(function.getName())
+                .description(function.getDescription())
+                .type(fieldToGraphQLOutputType(function.getReturnType()))
+                .argument(graphQLArgs)
+                .dataFetcher((env -> functionDataFetcher(env, function)))
+                .build();
     }
 
-    public Object functionDataFetcher(DataFetchingEnvironment env, FunctionField<DataType> field) {
+    public Object functionDataFetcher(DataFetchingEnvironment env, FunctionField<Field> field) {
         Map<String, Object> args = new HashMap<>();
         if (env.getArguments() != null) {
             args.putAll(env.getArguments());
         }
 
-        FunctionField<DataType> funcField = field.newInstance();
+        FunctionField<Field> funcField = field.newInstance();
 
         //Remove the field name of the function from that path since the update is using a subpath
         List<String> fixedPath = Lists.newArrayList(field.path());
         fixedPath.remove(fixedPath.size() - 1);
         funcField.updatePath(fixedPath);
-        funcField.setValue(args);
-        FunctionReport<DataType> result = funcField.getValue();
+        funcField.setArguments(args);
+        FunctionReport<Field> result = funcField.execute();
 
         if (!result.getErrorMessages()
                 .isEmpty()) {
-            throw new FunctionDataFetcherException(funcField.fieldName(),
+            throw new FunctionDataFetcherException(funcField.getName(),
                     funcField.getArguments()
                             .stream()
                             .map(Field::getValue)
@@ -182,12 +199,12 @@ public class GraphQLTransformOutput {
         return null;
     }
 
-    public Object dataTypeDataFetcher(DataFetchingEnvironment env, DataType field) {
+    public Object fieldDataFetcher(DataFetchingEnvironment env, Field field) {
         Object source = env.getSource();
         //If no values are passed for the source, return a field definition to continue the execution strategy instead of returning null. This is an expansion of the PropertyDataFetcher
         if (source instanceof Map) {
             if(!((Map) source).isEmpty()) {
-                return ((Map<?, ?>) source).get(field.fieldName());
+                return ((Map<?, ?>) source).get(field.getName());
             }
         }
 

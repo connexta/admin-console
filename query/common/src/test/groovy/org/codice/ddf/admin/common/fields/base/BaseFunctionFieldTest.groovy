@@ -14,7 +14,7 @@
 package org.codice.ddf.admin.common.fields.base
 
 import com.google.common.collect.ImmutableSet
-import org.codice.ddf.admin.api.DataType
+import org.codice.ddf.admin.api.Field
 import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.common.fields.base.scalar.StringField
 import org.codice.ddf.admin.common.fields.test.TestObjectField
@@ -48,7 +48,7 @@ class BaseFunctionFieldTest extends Specification {
         functionField = new TestBaseFunctionField(true)
 
         when:
-        def report = functionField.getValue()
+        def report = functionField.execute()
 
         then:
         report.getErrorMessages().size() == 1
@@ -62,7 +62,7 @@ class BaseFunctionFieldTest extends Specification {
         functionField.addErrorMessage(new ErrorMessageImpl('test'))
 
         when:
-        def report = functionField.getValue()
+        def report = functionField.execute()
 
         then:
         report.getErrorMessages().size() == 1
@@ -78,13 +78,13 @@ class BaseFunctionFieldTest extends Specification {
                 (StringField.DEFAULT_FIELD_NAME): 'test1',
                 (TestObjectField.FIELD_NAME)    : [(StringField.DEFAULT_FIELD_NAME): 'test2', (TestObjectField.INNER_OBJECT_FIELD_NAME): [(TestObjectField.SUB_FIELD_OF_INNER_FIELD_NAME): 'test3']]
         ]
-        functionField.setValue(value)
+        functionField.setArguments(value)
 
         then:
         functionField.getStringArg().getValue() == 'test1'
         ((TestObjectField) functionField.getArguments()[1]).getStringField().getValue() == 'test2'
         ((TestObjectField) functionField.getArguments()[1]).getFields().find {
-            (it.fieldName() == TestObjectField.INNER_OBJECT_FIELD_NAME)
+            (it.getName() == TestObjectField.INNER_OBJECT_FIELD_NAME)
         }.getFields()[0].getValue() == 'test3'
     }
 
@@ -161,7 +161,7 @@ class BaseFunctionFieldTest extends Specification {
         }
 
         @Override
-        List<DataType> getArguments() {
+        List<Field> getArguments() {
             return [stringArg, testObjectField]
         }
 

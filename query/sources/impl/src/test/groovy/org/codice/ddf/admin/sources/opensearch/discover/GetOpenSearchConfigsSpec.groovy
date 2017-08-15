@@ -69,7 +69,7 @@ class GetOpenSearchConfigsSpec extends SourceCommonsSpec {
 
     def 'No pid argument returns all configs'() {
         when:
-        def report = getOpenSearchConfigsFunction.getValue()
+        def report = getOpenSearchConfigsFunction.execute()
         def list = ((ListField) report.getResult())
 
         then:
@@ -84,10 +84,10 @@ class GetOpenSearchConfigsSpec extends SourceCommonsSpec {
 
     def 'Pid filter returns 1 result'() {
         setup:
-        getOpenSearchConfigsFunction.setValue(functionArgs)
+        getOpenSearchConfigsFunction.setArguments(functionArgs)
 
         when:
-        def report = getOpenSearchConfigsFunction.getValue()
+        def report = getOpenSearchConfigsFunction.execute()
         def list = ((ListField) report.getResult())
 
         then:
@@ -102,11 +102,11 @@ class GetOpenSearchConfigsSpec extends SourceCommonsSpec {
     def 'Fail due to no existing config with specified pid'() {
         setup:
         functionArgs.put(PID, S_PID)
-        getOpenSearchConfigsFunction.setValue(functionArgs)
+        getOpenSearchConfigsFunction.setArguments(functionArgs)
         serviceActions.read(S_PID) >> [:]
 
         when:
-        def report = getOpenSearchConfigsFunction.getValue()
+        def report = getOpenSearchConfigsFunction.execute()
 
         then:
         report.getResult() == null
@@ -136,12 +136,12 @@ class GetOpenSearchConfigsSpec extends SourceCommonsSpec {
     def 'Returns all the possible error codes correctly'(){
         setup:
         functionArgs.put(PID, S_PID)
-        getOpenSearchConfigsFunction.setValue(functionArgs)
+        getOpenSearchConfigsFunction.setArguments(functionArgs)
         serviceActions.read(S_PID) >> [:]
 
         when:
         def errorCodes = getOpenSearchConfigsFunction.getFunctionErrorCodes()
-        def noExistingConfigReport = getOpenSearchConfigsFunction.getValue()
+        def noExistingConfigReport = getOpenSearchConfigsFunction.execute()
 
         then:
         errorCodes.size() == 1

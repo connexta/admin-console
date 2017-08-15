@@ -41,7 +41,7 @@ class BaseListFieldTest extends Specification {
         listField.add(new TestObjectField())
 
         def innerObjectField = listField.getList()[0].getFields().find {
-            (it.fieldName() == TestObjectField.INNER_OBJECT_FIELD_NAME)
+            (it.getName() == TestObjectField.INNER_OBJECT_FIELD_NAME)
         }
 
         List<String> parentPath = listField.path()

@@ -51,7 +51,7 @@ class GetLdapConfigurationsSpec extends Specification {
         managedServiceActions.read(LdapClaimsHandlerServiceProperties.LDAP_CLAIMS_HANDLER_MANAGED_SERVICE_FACTORY_PID) >> getTestLdapServiceProps()
 
         when:
-        def report = getLdapConfigurations.getValue()
+        def report = getLdapConfigurations.execute()
         def configs = (ListField<LdapConfigurationField>) report.getResult()
 
         then:

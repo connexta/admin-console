@@ -16,17 +16,17 @@ package org.codice.ddf.admin.common.fields.base.function;
 import java.util.Collections;
 import java.util.List;
 
-import org.codice.ddf.admin.api.DataType;
+import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 
-public abstract class GetFunctionField<T extends DataType> extends BaseFunctionField<T> {
+public abstract class GetFunctionField<T extends Field> extends BaseFunctionField<T> {
 
     public GetFunctionField(String fieldName, String description) {
         super(fieldName, description);
     }
 
     @Override
-    public List<DataType> getArguments() {
+    public List<Field> getArguments() {
         return Collections.emptyList();
     }
 }

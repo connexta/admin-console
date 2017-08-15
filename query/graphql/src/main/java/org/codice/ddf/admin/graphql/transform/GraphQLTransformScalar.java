@@ -51,39 +51,39 @@ public class GraphQLTransformScalar {
     }
 
     public GraphQLScalarType resolveScalarType(ScalarField field) {
-        if(scalarTypesProvider.isTypePresent(field.fieldTypeName())) {
-            return scalarTypesProvider.getType(field.fieldTypeName());
+        if(scalarTypesProvider.isTypePresent(field.getTypeName())) {
+            return scalarTypesProvider.getType(field.getTypeName());
         }
 
         GraphQLScalarType type = null;
 
-        switch (field.scalarType()) {
+        switch (field.getScalarType()) {
         case INTEGER:
-            type = field.fieldTypeName() == null ?
+            type = field.getTypeName() == null ?
                     Scalars.GraphQLInt :
-                    new GraphQLScalarType(field.fieldTypeName(), field.description(), Scalars.GraphQLInt.getCoercing());
+                    new GraphQLScalarType(field.getTypeName(), field.getDescription(), Scalars.GraphQLInt.getCoercing());
             break;
 
         case BOOLEAN:
-            type = field.fieldTypeName() == null ?
+            type = field.getTypeName() == null ?
                     Scalars.GraphQLBoolean :
-                    new GraphQLScalarType(field.fieldTypeName(), field.description(), Scalars.GraphQLBoolean.getCoercing());
+                    new GraphQLScalarType(field.getTypeName(), field.getDescription(), Scalars.GraphQLBoolean.getCoercing());
             break;
 
         case STRING:
-            type = field.fieldTypeName() == null ? Scalars.GraphQLString :
-                        new GraphQLScalarType(field.fieldTypeName(), field.description(), Scalars.GraphQLString.getCoercing());
+            type = field.getTypeName() == null ? Scalars.GraphQLString :
+                        new GraphQLScalarType(field.getTypeName(), field.getDescription(), Scalars.GraphQLString.getCoercing());
             break;
         case FLOAT:
-            type = field.fieldTypeName() == null ? Scalars.GraphQLFloat :
-                    new GraphQLScalarType(field.fieldTypeName(), field.description(), Scalars.GraphQLFloat.getCoercing());
+            type = field.getTypeName() == null ? Scalars.GraphQLFloat :
+                    new GraphQLScalarType(field.getTypeName(), field.getDescription(), Scalars.GraphQLFloat.getCoercing());
             break;
         case HIDDEN_STRING:
-            type = field.fieldTypeName() == null ? Scalars.GraphQLString :
-                    new GraphQLScalarType(field.fieldTypeName(), field.description(), HIDDEN_COERCING);
+            type = field.getTypeName() == null ? Scalars.GraphQLString :
+                    new GraphQLScalarType(field.getTypeName(), field.getDescription(), HIDDEN_COERCING);
         }
 
-        scalarTypesProvider.addType(field.fieldTypeName(), type);
+        scalarTypesProvider.addType(field.getTypeName(), type);
         return type;
     }
 

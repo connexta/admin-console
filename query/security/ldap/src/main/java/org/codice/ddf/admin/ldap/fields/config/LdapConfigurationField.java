@@ -131,12 +131,6 @@ public class LdapConfigurationField extends BaseObjectField {
         return ImmutableList.of(pid, connection, bindUserInfo, settings, claimMappings);
     }
 
-    @Override
-    public LdapConfigurationField allFieldsRequired(boolean required) {
-        super.allFieldsRequired(required);
-        return this;
-    }
-
     public LdapConfigurationField useDefaultRequired() {
         connection.useDefaultRequired();
         bindUserInfo.useDefaultRequired();

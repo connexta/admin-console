@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.codice.ddf.admin.api.ConfiguratorSuite;
-import org.codice.ddf.admin.api.DataType;
+import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.common.ContextPath;
 import org.codice.ddf.admin.common.report.message.DefaultMessages;
@@ -77,7 +77,7 @@ public class SaveWhitelistContexts extends BaseFunctionField<ContextPath.ListImp
     }
 
     @Override
-    public List<DataType> getArguments() {
+    public List<Field> getArguments() {
         return ImmutableList.of(contexts);
     }
 

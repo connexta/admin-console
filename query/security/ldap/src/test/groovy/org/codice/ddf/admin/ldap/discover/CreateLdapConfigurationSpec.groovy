@@ -21,12 +21,12 @@ import org.codice.ddf.admin.common.fields.common.PortField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.ldap.fields.config.LdapConfigurationField
 import org.codice.ddf.admin.ldap.fields.config.LdapDirectorySettingsField
-import org.codice.ddf.admin.security.common.fields.ldap.LdapUseCase
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindMethod
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindUserInfo
 import org.codice.ddf.admin.ldap.fields.connection.LdapConnectionField
 import org.codice.ddf.admin.ldap.fields.connection.LdapEncryptionMethodField
 import org.codice.ddf.admin.ldap.persist.CreateLdapConfiguration
+import org.codice.ddf.admin.security.common.fields.ldap.LdapUseCase
 import spock.lang.Specification
 
 class CreateLdapConfigurationSpec extends Specification {
@@ -70,7 +70,7 @@ class CreateLdapConfigurationSpec extends Specification {
         createConfigFunc = new CreateLdapConfiguration(null)
 
         when:
-        FunctionReport report = createConfigFunc.getValue()
+        FunctionReport report = createConfigFunc.execute()
 
         then:
         report.getErrorMessages().size() == 10
@@ -99,9 +99,9 @@ class CreateLdapConfigurationSpec extends Specification {
                 (LdapConfigurationField.DEFAULT_FIELD_NAME): configArg.getValue()
         ]
 
-        createConfigFunc.setValue(args)
+        createConfigFunc.setArguments(args)
         when:
-        FunctionReport report = createConfigFunc.getValue()
+        FunctionReport report = createConfigFunc.execute()
 
         then:
         report.getErrorMessages()*.getPath() as Set == [authBadPaths.missingHostPath,

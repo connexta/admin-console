@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.codice.ddf.admin.api.ConfiguratorSuite;
-import org.codice.ddf.admin.api.DataType;
+import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
@@ -102,7 +102,7 @@ public class GetCswConfigurations extends BaseFunctionField<ListField<CswSourceI
     }
 
     @Override
-    public List<DataType> getArguments() {
+    public List<Field> getArguments() {
         return ImmutableList.of(pid);
     }
 

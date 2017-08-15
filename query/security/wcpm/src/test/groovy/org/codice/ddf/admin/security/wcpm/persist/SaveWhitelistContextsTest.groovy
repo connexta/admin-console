@@ -67,8 +67,8 @@ class SaveWhitelistContextsTest extends Specification {
         operationReport.containsFailedResults() >> false
 
         when:
-        saveWhitelistContextsFunction.setValue(testMap)
-        Report report = saveWhitelistContextsFunction.getValue()
+        saveWhitelistContextsFunction.setArguments(testMap)
+        Report report = saveWhitelistContextsFunction.execute()
 
         then:
         report.getErrorMessages().size() == 0
@@ -81,8 +81,8 @@ class SaveWhitelistContextsTest extends Specification {
         operationReport.containsFailedResults() >> false
 
         when:
-        saveWhitelistContextsFunction.setValue(testMap)
-        Report report = saveWhitelistContextsFunction.getValue()
+        saveWhitelistContextsFunction.setArguments(testMap)
+        Report report = saveWhitelistContextsFunction.execute()
 
         then:
         report.getErrorMessages()[0].code == DefaultMessages.INVALID_CONTEXT_PATH
@@ -96,8 +96,8 @@ class SaveWhitelistContextsTest extends Specification {
         operationReport.containsFailedResults() >> false
 
         when:
-        saveWhitelistContextsFunction.setValue(testMap)
-        Report report = saveWhitelistContextsFunction.getValue()
+        saveWhitelistContextsFunction.setArguments(testMap)
+        Report report = saveWhitelistContextsFunction.execute()
 
         then:
         report.getErrorMessages()[0].code == DefaultMessages.EMPTY_FIELD
@@ -111,8 +111,8 @@ class SaveWhitelistContextsTest extends Specification {
         operationReport.containsFailedResults() >> false
 
         when:
-        saveWhitelistContextsFunction.setValue(testMap)
-        Report report = saveWhitelistContextsFunction.getValue()
+        saveWhitelistContextsFunction.setArguments(testMap)
+        Report report = saveWhitelistContextsFunction.execute()
 
         then:
         report.getErrorMessages().size() == 0
@@ -125,8 +125,8 @@ class SaveWhitelistContextsTest extends Specification {
         operationReport.containsFailedResults() >> true
 
         when:
-        saveWhitelistContextsFunction.setValue(testMap)
-        Report report = saveWhitelistContextsFunction.getValue()
+        saveWhitelistContextsFunction.setArguments(testMap)
+        Report report = saveWhitelistContextsFunction.execute()
 
         then:
         report.getErrorMessages()[0].code == DefaultMessages.FAILED_PERSIST

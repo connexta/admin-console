@@ -21,15 +21,13 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.Field;
-import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.api.fields.ObjectField;
 import org.codice.ddf.admin.api.report.ErrorMessage;
 
 import com.google.common.collect.ImmutableSet;
 
-public abstract class BaseObjectField extends BaseDataType<Map<String, Object>>
+public abstract class BaseObjectField extends BaseField<Map<String, Object>>
         implements ObjectField {
 
     public BaseObjectField(String fieldName, String fieldTypeName, String description) {
@@ -40,10 +38,8 @@ public abstract class BaseObjectField extends BaseDataType<Map<String, Object>>
     public Map<String, Object> getValue() {
         Map<String, Object> values = new HashMap<>();
 
-        for(Field field : getFields()) {
-            if(!(field instanceof FunctionField)) {
-                values.put(field.fieldName(), field.getValue());
-            }
+        for (Field field : getFields()) {
+            values.put(field.getName(), field.getValue());
         }
 
         return values;
@@ -56,8 +52,8 @@ public abstract class BaseObjectField extends BaseDataType<Map<String, Object>>
         }
 
         getFields().stream()
-                .filter(field -> !(field instanceof FunctionField) && values.containsKey(field.fieldName()))
-                .forEach(field -> field.setValue(values.get(field.fieldName())));
+                .filter(field -> values.containsKey(field.getName()))
+                .forEach(field -> field.setValue(values.get(field.getName())));
     }
 
     @Override
@@ -69,26 +65,10 @@ public abstract class BaseObjectField extends BaseDataType<Map<String, Object>>
         }
 
         validationErrors.addAll(getFields().stream()
-                .filter(field -> field instanceof DataType)
-                .map(field -> (List<ErrorMessage>) ((DataType)field).validate())
+                .map(field -> (List<ErrorMessage>) field.validate())
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList()));
         return validationErrors;
-    }
-
-    @Override
-    public BaseObjectField allFieldsRequired(boolean required) {
-        if (required) {
-            isRequired(required);
-        }
-
-        getFields().stream()
-                .filter(field -> field instanceof DataType)
-                .map(field -> ((DataType) field).isRequired(required))
-                .filter(field -> field instanceof ObjectField)
-                .map(ObjectField.class::cast)
-                .forEach(objField -> objField.allFieldsRequired(required));
-        return this;
     }
 
     @Override
@@ -108,7 +88,6 @@ public abstract class BaseObjectField extends BaseDataType<Map<String, Object>>
         return new ImmutableSet.Builder<String>()
                 .addAll(super.getErrorCodes())
                 .addAll(getFields().stream()
-                        .filter(field -> field instanceof DataType)
                         .map(field -> field.getErrorCodes())
                         .flatMap(Collection<String>::stream)
                         .collect(Collectors.toList()))

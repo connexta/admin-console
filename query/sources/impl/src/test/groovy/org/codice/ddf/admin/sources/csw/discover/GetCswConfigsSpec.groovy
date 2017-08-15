@@ -74,7 +74,7 @@ class GetCswConfigsSpec extends SourceCommonsSpec {
 
     def 'No pid argument returns all configs'() {
         when:
-        def report = getCswConfigsFunction.getValue()
+        def report = getCswConfigsFunction.execute()
         def list = ((ListField) report.getResult())
 
         then:
@@ -90,8 +90,8 @@ class GetCswConfigsSpec extends SourceCommonsSpec {
 
     def 'Sending pid filter returns 1 result'() {
         when:
-        getCswConfigsFunction.setValue(functionArgs)
-        def report = getCswConfigsFunction.getValue()
+        getCswConfigsFunction.setArguments(functionArgs)
+        def report = getCswConfigsFunction.execute()
         def list = ((ListField) report.getResult())
 
         then:
@@ -106,11 +106,11 @@ class GetCswConfigsSpec extends SourceCommonsSpec {
     def 'Fail when there is no existing configuration for the service specified by the pid'() {
         setup:
         functionArgs.put(PID, S_PID)
-        getCswConfigsFunction.setValue(functionArgs)
+        getCswConfigsFunction.setArguments(functionArgs)
         serviceActions.read(S_PID) >> [:]
 
         when:
-        def report = getCswConfigsFunction.getValue()
+        def report = getCswConfigsFunction.execute()
 
         then:
         report.getResult() == null
@@ -147,12 +147,12 @@ class GetCswConfigsSpec extends SourceCommonsSpec {
         setup:
         GetCswConfigurations noExistingConfigFunc = new GetCswConfigurations(configuratorSuite)
         functionArgs.put(PID, S_PID)
-        noExistingConfigFunc.setValue(functionArgs)
+        noExistingConfigFunc.setArguments(functionArgs)
         serviceActions.read(S_PID) >> [:]
 
         when:
         def errorCodes = getCswConfigsFunction.getFunctionErrorCodes()
-        def noExistingConfigReport = noExistingConfigFunc.getValue()
+        def noExistingConfigReport = noExistingConfigFunc.execute()
 
         then:
         errorCodes.size() == 1

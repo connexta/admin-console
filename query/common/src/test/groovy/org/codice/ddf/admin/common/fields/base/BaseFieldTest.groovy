@@ -13,17 +13,17 @@
  **/
 package org.codice.ddf.admin.common.fields.base
 
-import org.codice.ddf.admin.common.fields.test.TestDataType
+import org.codice.ddf.admin.common.fields.test.TestField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import spock.lang.Specification
 
-class BaseDataTypeTest extends Specification {
+class BaseFieldTest extends Specification {
 
     BaseField testField
 
     def 'Missing required field when required value is not provided'() {
         setup:
-        testField = new TestDataType<String>()
+        testField = new TestField<String>()
         testField.isRequired(true)
         testField.setValue(null)
 
@@ -33,12 +33,12 @@ class BaseDataTypeTest extends Specification {
         then:
         validationMsgs.size() == 1
         validationMsgs.get(0).getCode() == DefaultMessages.MISSING_REQUIRED_FIELD
-        validationMsgs.get(0).getPath() == [TestDataType.FIELD_NAME]
+        validationMsgs.get(0).getPath() == [TestField.FIELD_NAME]
     }
 
     def 'Missing required field if value is List and is empty'() {
         setup:
-        testField = new TestDataType<List>()
+        testField = new TestField<List>()
         testField.isRequired(true)
         testField.setValue([])
 
@@ -48,15 +48,15 @@ class BaseDataTypeTest extends Specification {
         then:
         validationMsgs.size() == 1
         validationMsgs.get(0).getCode() == DefaultMessages.MISSING_REQUIRED_FIELD
-        validationMsgs.get(0).getPath() == [TestDataType.FIELD_NAME]
+        validationMsgs.get(0).getPath() == [TestField.FIELD_NAME]
     }
 
     def 'Updating field name updates path'() {
         setup:
-        testField = new TestDataType<String>()
+        testField = new TestField<String>()
 
         expect:
-        testField.path() == [TestDataType.FIELD_NAME]
+        testField.path() == [TestField.FIELD_NAME]
 
         when:
         testField.pathName('updatedName')
@@ -67,7 +67,7 @@ class BaseDataTypeTest extends Specification {
 
     def 'Returns all the possible error codes correctly'(){
         setup:
-        TestDataType missingTestField = new TestDataType<String>()
+        TestField missingTestField = new TestField<String>()
         missingTestField.isRequired(true)
 
         when:

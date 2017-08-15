@@ -17,7 +17,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.codice.ddf.admin.api.ConfiguratorSuite;
-import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.function.BaseFieldProvider;
 import org.codice.ddf.admin.ldap.discover.GetLdapConfigurations;
@@ -62,7 +61,7 @@ public class LdapFieldProvider extends BaseFieldProvider {
 
     private DeleteLdapConfiguration deleteConfig;
 
-    private List<Field> ldapDiscoveryFields = Collections.emptyList();
+    private List<FunctionField> ldapDiscoveryFields = Collections.emptyList();
 
     private List<FunctionField> ldapMutationFields = Collections.emptyList();
 
@@ -83,8 +82,8 @@ public class LdapFieldProvider extends BaseFieldProvider {
     }
 
     @Override
-    public List<Field> getDiscoveryFields() {
-        return new ImmutableList.Builder<Field>() //
+    public List<FunctionField> getDiscoveryFunctions() {
+        return new ImmutableList.Builder<FunctionField>() //
                 .addAll(ldapDiscoveryFields)
                 .add(testConnection)
                 .add(testBind)
@@ -106,7 +105,7 @@ public class LdapFieldProvider extends BaseFieldProvider {
                 .build();
     }
 
-    public void setLdapDiscoveryFields(List<Field> ldapDiscoveryFields) {
+    public void setLdapDiscoveryFields(List<FunctionField> ldapDiscoveryFields) {
         this.ldapDiscoveryFields = ldapDiscoveryFields;
     }
 

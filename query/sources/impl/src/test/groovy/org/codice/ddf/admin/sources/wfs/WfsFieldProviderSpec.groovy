@@ -39,7 +39,7 @@ class WfsFieldProviderSpec extends Specification {
 
     def 'Verify discovery fields immutability'() {
         when:
-        wfsFieldProvider.getDiscoveryFields().add(Mock(FieldProvider))
+        wfsFieldProvider.getDiscoveryFunctions().add(Mock(FieldProvider))
 
         then:
         thrown(UnsupportedOperationException)

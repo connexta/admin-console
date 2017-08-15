@@ -19,7 +19,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.codice.ddf.admin.api.DataType;
+import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
@@ -73,7 +73,7 @@ public class LdapUserAttributes extends BaseFunctionField<StringField.ListImpl> 
     }
 
     @Override
-    public List<DataType> getArguments() {
+    public List<Field> getArguments() {
         return ImmutableList.of(conn, bindInfo, baseUserDn);
     }
 

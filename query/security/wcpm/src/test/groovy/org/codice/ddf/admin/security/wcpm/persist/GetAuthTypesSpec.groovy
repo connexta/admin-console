@@ -1,14 +1,14 @@
 package groovy.org.codice.ddf.admin.security.wcpm.persist
 
 import org.codice.ddf.admin.api.poller.EnumValuePoller
-import org.codice.ddf.admin.security.wcpm.discover.GetAuthTypes
-import spock.lang.Specification
-
-import static groovy.org.codice.ddf.admin.security.wcpm.persist.WcpmTestingCommons.*
 import org.codice.ddf.admin.api.report.Report
 import org.codice.ddf.admin.security.common.fields.wcpm.AuthType
 import org.codice.ddf.admin.security.wcpm.AuthTypesPoller
+import org.codice.ddf.admin.security.wcpm.discover.GetAuthTypes
 import org.codice.ddf.internal.admin.configurator.actions.ServiceReader
+import spock.lang.Specification
+
+import static groovy.org.codice.ddf.admin.security.wcpm.persist.WcpmTestingCommons.*
 
 class GetAuthTypesSpec extends Specification {
 
@@ -26,7 +26,7 @@ class GetAuthTypesSpec extends Specification {
 
     def 'Successfully retrieve auth type definitions from the auth type poller'() {
         when:
-        Report report = getAuthTypes.getValue()
+        Report report = getAuthTypes.execute()
 
         then:
         report.getErrorMessages().isEmpty()

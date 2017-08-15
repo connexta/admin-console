@@ -20,7 +20,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.commons.lang.StringUtils;
-import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.api.FieldProvider;
 import org.codice.ddf.admin.api.fields.FunctionField;
 
@@ -39,7 +38,7 @@ public class GraphQLTransformCommons {
     }
 
     public List<GraphQLFieldDefinition> fieldProviderToMutations(FieldProvider provider){
-        return transformOutput.fieldsToGraphQLFieldDefinition(provider.getMutationFunctions());
+        return transformOutput.functionsToGraphQLFieldDefinition(provider.getMutationFunctions());
     }
 
     public List<GraphQLFieldDefinition> fieldProviderToQueries(FieldProvider provider) {
@@ -51,13 +50,13 @@ public class GraphQLTransformCommons {
 
         for (FieldProvider fieldProvider : fieldProviders) {
             List<FunctionField> mutations = fieldProvider.getMutationFunctions();
-            List<Field> queryFields = fieldProvider.getDiscoveryFields();
+            List<FunctionField> queryFields = fieldProvider.getDiscoveryFunctions();
 
             for (FunctionField mutation : mutations) {
                 errorCodes.addAll(mutation.getErrorCodes());
             }
 
-            for (Field field : queryFields) {
+            for (FunctionField field : queryFields) {
                 errorCodes.addAll(field.getErrorCodes());
             }
         }

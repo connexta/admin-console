@@ -15,9 +15,9 @@ package org.codice.ddf.admin.api.fields;
 
 public interface EnumValue<T> {
 
-    String enumTitle();
+    String getEnumTitle();
 
-    String description();
+    String getDescription();
 
-    T value();
+    T getValue();
 }

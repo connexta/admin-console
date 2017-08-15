@@ -86,13 +86,13 @@ class UpdateOpenSearchConfigurationSpec extends SourceCommonsSpec {
 
     def 'Successfully update existing OpenSearch configuration'() {
         setup:
-        updateOpenSearchConfiguration.setValue(createUpdateFunctionArgs(FLAG_PASSWORD))
+        updateOpenSearchConfiguration.setArguments(createUpdateFunctionArgs(FLAG_PASSWORD))
         serviceActions.read(_) >> [(ID): TEST_SOURCENAME]
         serviceReader.getServices(_, _) >> []
         configurator.commit(_, _) >> mockReport(false)
 
         when:
-        def report = updateOpenSearchConfiguration.getValue()
+        def report = updateOpenSearchConfiguration.execute()
 
         then:
         report.getResult().getValue()
@@ -100,12 +100,12 @@ class UpdateOpenSearchConfigurationSpec extends SourceCommonsSpec {
 
     def 'Fail to update config due to existing source name'() {
         setup:
-        updateOpenSearchConfiguration.setValue(createUpdateFunctionArgs(FLAG_PASSWORD))
+        updateOpenSearchConfiguration.setArguments(createUpdateFunctionArgs(FLAG_PASSWORD))
         serviceActions.read(_) >> [(ID): 'updatedName']
         serviceReader.getServices(_, _) >> [new TestSource(S_PID, 'updatedName', false), new TestSource("existingSource", TEST_SOURCENAME, false)]
 
         when:
-        def report = updateOpenSearchConfiguration.getValue()
+        def report = updateOpenSearchConfiguration.execute()
 
         then:
         report.getResult() == null
@@ -116,13 +116,13 @@ class UpdateOpenSearchConfigurationSpec extends SourceCommonsSpec {
 
     def 'Fail to update config due to failure to commit'() {
         setup:
-        updateOpenSearchConfiguration.setValue(createUpdateFunctionArgs(FLAG_PASSWORD))
+        updateOpenSearchConfiguration.setArguments(createUpdateFunctionArgs(FLAG_PASSWORD))
         serviceActions.read(_) >> [(ID): TEST_SOURCENAME]
         serviceReader.getServices(_, _) >> []
         configurator.commit(_, _) >> mockReport(true)
 
         when:
-        def report = updateOpenSearchConfiguration.getValue()
+        def report = updateOpenSearchConfiguration.execute()
 
         then:
         1 * configurator.commit(_, _) >> mockReport(false)
@@ -135,11 +135,11 @@ class UpdateOpenSearchConfigurationSpec extends SourceCommonsSpec {
 
     def 'Fail to update config due to no existing source specified by the pid'() {
         setup:
-        updateOpenSearchConfiguration.setValue(createUpdateFunctionArgs(FLAG_PASSWORD))
+        updateOpenSearchConfiguration.setArguments(createUpdateFunctionArgs(FLAG_PASSWORD))
         serviceActions.read(S_PID) >> [:]
 
         when:
-        def report = updateOpenSearchConfiguration.getValue()
+        def report = updateOpenSearchConfiguration.execute()
 
         then:
         report.getResult() == null
@@ -150,12 +150,12 @@ class UpdateOpenSearchConfigurationSpec extends SourceCommonsSpec {
 
     def 'Return false when opensearch feature fails to start'() {
         setup:
-        updateOpenSearchConfiguration.setValue(createUpdateFunctionArgs(FLAG_PASSWORD))
+        updateOpenSearchConfiguration.setArguments(createUpdateFunctionArgs(FLAG_PASSWORD))
         serviceReader.getServices(_, _) >> []
         serviceActions.read(_) >> [(ID): TEST_SOURCENAME]
 
         when:
-        def report = updateOpenSearchConfiguration.getValue()
+        def report = updateOpenSearchConfiguration.execute()
 
         then:
         1 * configurator.commit(_, _) >> mockReport(true)
@@ -167,7 +167,7 @@ class UpdateOpenSearchConfigurationSpec extends SourceCommonsSpec {
 
     def 'Updating with flag password sends service properties without password'() {
         setup:
-        updateOpenSearchConfiguration.setValue(createUpdateFunctionArgs(FLAG_PASSWORD))
+        updateOpenSearchConfiguration.setArguments(createUpdateFunctionArgs(FLAG_PASSWORD))
         serviceActions.read(_ as String) >> [(ID): TEST_SOURCENAME]
         serviceReader.getServices(_, _) >> []
         configurator.commit(_, _) >> mockReport(false)
@@ -175,7 +175,7 @@ class UpdateOpenSearchConfigurationSpec extends SourceCommonsSpec {
         def expectedUpdateConfig = OpenSearchServiceProperties.openSearchConfigToServiceProps(createOpenSearchSourceConfig(FLAG_PASSWORD))
 
         when:
-        updateOpenSearchConfiguration.getValue()
+        updateOpenSearchConfiguration.execute()
 
         then:
         1 * serviceActions.build(S_PID, expectedUpdateConfig, true)
@@ -183,7 +183,7 @@ class UpdateOpenSearchConfigurationSpec extends SourceCommonsSpec {
 
     def 'Updating with new password sends service properties with password'() {
         setup:
-        updateOpenSearchConfiguration.setValue(createUpdateFunctionArgs('notFlagPassword'))
+        updateOpenSearchConfiguration.setArguments(createUpdateFunctionArgs('notFlagPassword'))
         serviceActions.read(_ as String) >> [(ID): TEST_SOURCENAME]
         serviceReader.getServices(_, _) >> []
         configurator.commit(_, _) >> mockReport(false)
@@ -191,7 +191,7 @@ class UpdateOpenSearchConfigurationSpec extends SourceCommonsSpec {
         def expectedUpdateConfig = OpenSearchServiceProperties.openSearchConfigToServiceProps(createOpenSearchSourceConfig('notFlagPassword'))
 
         when:
-        updateOpenSearchConfiguration.getValue()
+        updateOpenSearchConfiguration.execute()
 
         then:
         1 * serviceActions.build(S_PID, expectedUpdateConfig, true)
@@ -199,7 +199,7 @@ class UpdateOpenSearchConfigurationSpec extends SourceCommonsSpec {
 
     def 'Fail when missing required fields'() {
         when:
-        def report = updateOpenSearchConfiguration.getValue()
+        def report = updateOpenSearchConfiguration.execute()
 
         then:
         report.getResult() == null

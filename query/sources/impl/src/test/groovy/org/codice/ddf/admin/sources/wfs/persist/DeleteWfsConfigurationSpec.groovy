@@ -63,10 +63,10 @@ class DeleteWfsConfigurationSpec extends SourceCommonsSpec {
         setup:
         serviceActions.read(S_PID) >> configToBeDeleted
         configurator.commit(_, _) >> mockReport(false)
-        deleteWfsConfiguration.setValue(functionArgs)
+        deleteWfsConfiguration.setArguments(functionArgs)
 
         when:
-        def report = deleteWfsConfiguration.getValue()
+        def report = deleteWfsConfiguration.execute()
 
         then:
         report.getResult() != null
@@ -76,10 +76,10 @@ class DeleteWfsConfigurationSpec extends SourceCommonsSpec {
     def 'Fail to discover WFS config when no existing config found with provided pid'() {
         setup:
         serviceActions.read(S_PID) >> [:]
-        deleteWfsConfiguration.setValue(functionArgs)
+        deleteWfsConfiguration.setArguments(functionArgs)
 
         when:
-        def report = deleteWfsConfiguration.getValue()
+        def report = deleteWfsConfiguration.execute()
 
         then:
         report.getResult() == null
@@ -92,8 +92,8 @@ class DeleteWfsConfigurationSpec extends SourceCommonsSpec {
         when:
         serviceActions.read(S_PID) >> configToBeDeleted
         configurator.commit(_, _) >> mockReport(true)
-        deleteWfsConfiguration.setValue(functionArgs)
-        def report = deleteWfsConfiguration.getValue()
+        deleteWfsConfiguration.setArguments(functionArgs)
+        def report = deleteWfsConfiguration.execute()
 
         then:
         !report.getResult().getValue()
@@ -104,7 +104,7 @@ class DeleteWfsConfigurationSpec extends SourceCommonsSpec {
 
     def 'Fail when missing required fields'() {
         when:
-        def report = deleteWfsConfiguration.getValue()
+        def report = deleteWfsConfiguration.execute()
 
         then:
         report.getResult() == null
@@ -119,17 +119,17 @@ class DeleteWfsConfigurationSpec extends SourceCommonsSpec {
         setup:
         DeleteWfsConfiguration deleteWfsNoExistingConfig = new DeleteWfsConfiguration(configuratorSuite)
         serviceActions.read(S_PID) >> [:]
-        deleteWfsNoExistingConfig.setValue(functionArgs)
+        deleteWfsNoExistingConfig.setArguments(functionArgs)
 
         DeleteWfsConfiguration deleteWfsFailPersist = new DeleteWfsConfiguration(configuratorSuite)
         serviceActions.read(S_PID) >> configToBeDeleted
         configurator.commit(_, _) >> mockReport(true)
-        deleteWfsFailPersist.setValue(functionArgs)
+        deleteWfsFailPersist.setArguments(functionArgs)
 
         when:
         def errorCodes = deleteWfsConfiguration.getFunctionErrorCodes()
-        def noExistingConfigReport = deleteWfsNoExistingConfig.getValue()
-        def failedPersistReport = deleteWfsFailPersist.getValue()
+        def noExistingConfigReport = deleteWfsNoExistingConfig.execute()
+        def failedPersistReport = deleteWfsFailPersist.execute()
 
         then:
         errorCodes.size() == 2

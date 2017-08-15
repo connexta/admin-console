@@ -39,7 +39,7 @@ class OpenSearchFieldProviderSpec extends Specification {
 
     def 'Verify discovery fields immutability'() {
         when:
-        openSearchFieldProvider.getDiscoveryFields().add(Mock(FieldProvider))
+        openSearchFieldProvider.getDiscoveryFunctions().add(Mock(FieldProvider))
 
         then:
         thrown(UnsupportedOperationException)

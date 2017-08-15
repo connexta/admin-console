@@ -15,9 +15,9 @@ package org.codice.ddf.admin.api.fields;
 
 import java.util.List;
 
-import org.codice.ddf.admin.api.DataType;
+import org.codice.ddf.admin.api.Field;
 
-public interface EnumField<S, T extends EnumValue<S>> extends DataType<S> {
+public interface EnumField<S, T extends EnumValue<S>> extends Field<S> {
 
     List<T> getEnumValues();
 }

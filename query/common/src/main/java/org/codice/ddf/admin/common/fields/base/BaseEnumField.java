@@ -25,7 +25,7 @@ import org.codice.ddf.admin.common.report.message.DefaultMessages;
 
 import com.google.common.collect.ImmutableSet;
 
-public abstract class BaseEnumField<S> extends BaseDataType<S>
+public abstract class BaseEnumField<S> extends BaseField<S>
         implements EnumField<S, EnumValue<S>> {
 
     private S enumValue;
@@ -51,7 +51,7 @@ public abstract class BaseEnumField<S> extends BaseDataType<S>
     public BaseEnumField(String fieldName, String fieldTypeName, String description,
             List<EnumValue<S>> enumValues, EnumValue<S> enumValue) {
         this(fieldName, fieldTypeName, description, enumValues);
-        setValue(enumValue == null ? null : enumValue.value());
+        setValue(enumValue == null ? null : enumValue.getValue());
     }
 
     @Override
@@ -68,7 +68,7 @@ public abstract class BaseEnumField<S> extends BaseDataType<S>
     public void setValue(S value) {
         if(value != null) {
             enumValue = getEnumValues().stream()
-                    .map(EnumValue::value)
+                    .map(EnumValue::getValue)
                     .filter(o -> o.equals(value) || (o instanceof String && o.toString()
                             .equalsIgnoreCase(value.toString())))
                     .findFirst()
@@ -82,7 +82,7 @@ public abstract class BaseEnumField<S> extends BaseDataType<S>
 
         if(validationMsgs.isEmpty() && getValue() != null) {
             if (getEnumValues().stream()
-                    .map(EnumValue::value)
+                    .map(EnumValue::getValue)
                     .noneMatch(v -> v.equals(getValue()))) {
                 validationMsgs.add(unsupportedEnum(path()));
             }

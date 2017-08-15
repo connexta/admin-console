@@ -13,6 +13,7 @@
  **/
 package org.codice.ddf.admin.common.fields.base;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -20,7 +21,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.codice.ddf.admin.api.DataType;
+import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.codice.ddf.admin.api.report.FunctionReport;
@@ -31,27 +32,40 @@ import org.codice.ddf.admin.common.report.message.ErrorMessageImpl;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
-public abstract class BaseFunctionField<T extends DataType> extends BaseField<Map<String, Object>, FunctionReport<T>> implements FunctionField<T> {
+public abstract class BaseFunctionField<T extends Field> implements FunctionField<T> {
 
     private FunctionReportImpl<T> report;
 
+    private String name;
+
     private String description;
 
-    public BaseFunctionField(String functionName, String description) {
-        super(functionName, description);
+    private List<String> subpath;
+
+    private String pathName;
+
+    public BaseFunctionField(String name, String description) {
+        this.name = name;
         this.description = description;
+        pathName = name;
+        subpath = new ArrayList<>();
         report = new FunctionReportImpl<>();
     }
 
     @Override
-    public String description() {
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public String getDescription() {
         Set<String> errors = getErrorCodes();
         if (!errors.isEmpty()) {
             return String.format("%s %n%n The possible errors are: %n- %s",
                     description,
                     formatErrorCodes(errors));
         }
-        return super.description();
+        return description;
     }
 
     public abstract T performFunction();
@@ -61,8 +75,8 @@ public abstract class BaseFunctionField<T extends DataType> extends BaseField<Ma
     @Override
     public Set<String> getErrorCodes() {
         Set<String> errorCodes = new HashSet<>();
-        for (DataType dataType : getArguments()) {
-            errorCodes.addAll(dataType.getErrorCodes());
+        for (Field field : getArguments()) {
+            errorCodes.addAll(field.getErrorCodes());
         }
         return new ImmutableSet.Builder<String>()
                 .addAll(getFunctionErrorCodes())
@@ -71,18 +85,18 @@ public abstract class BaseFunctionField<T extends DataType> extends BaseField<Ma
     }
 
     @Override
-    public void setValue(Map<String, Object> args) {
+    public void setArguments(Map<String, Object> args) {
         if (args == null || args.isEmpty()) {
             return;
         }
 
         getArguments().stream()
-                .filter(field -> args.containsKey(field.fieldName()))
-                .forEach(field -> field.setValue(args.get(field.fieldName())));
+                .filter(field -> args.containsKey(field.getName()))
+                .forEach(field -> field.setValue(args.get(field.getName())));
     }
 
     @Override
-    public FunctionReport<T> getValue() {
+    public FunctionReport<T> execute() {
         validate();
         if (!report.containsErrorMessages()) {
             report.setResult(performFunction());
@@ -92,14 +106,22 @@ public abstract class BaseFunctionField<T extends DataType> extends BaseField<Ma
     }
 
     @Override
-    public void updatePath(List<String> subPath) {
-        super.updatePath(subPath);
-        updateArgumentPaths();
+    public List<String> path() {
+        return new ImmutableList.Builder().addAll(subpath)
+                .add(pathName)
+                .build();
     }
 
     @Override
     public void pathName(String pathName) {
-        super.pathName(pathName);
+        this.pathName = pathName;
+        updateArgumentPaths();
+    }
+
+    @Override
+    public void updatePath(List<String> subPath) {
+        subpath.clear();
+        subpath.addAll(subPath);
         updateArgumentPaths();
     }
 
@@ -112,7 +134,7 @@ public abstract class BaseFunctionField<T extends DataType> extends BaseField<Ma
 
     public void validate() {
         getArguments().stream()
-                .map(DataType::validate)
+                .map(Field::validate)
                 .flatMap(Collection<ErrorMessage>::stream)
                 .forEach(this::addErrorMessage);
     }

@@ -131,8 +131,8 @@ class SaveContextPoliciesSpec extends Specification {
         operationReport.containsFailedResults() >> false
 
         when:
-        saveContextPoliciesFunction.setValue(testData)
-        Report report = saveContextPoliciesFunction.getValue()
+        saveContextPoliciesFunction.setArguments(testData)
+        Report report = saveContextPoliciesFunction.execute()
 
         then:
         report.getErrorMessages().isEmpty()
@@ -144,8 +144,8 @@ class SaveContextPoliciesSpec extends Specification {
         operationReport.containsFailedResults() >> true
 
         when:
-        saveContextPoliciesFunction.setValue(testData)
-        Report report = saveContextPoliciesFunction.getValue()
+        saveContextPoliciesFunction.setArguments(testData)
+        Report report = saveContextPoliciesFunction.execute()
 
         then:
         report.getErrorMessages().size() == 1
@@ -160,8 +160,8 @@ class SaveContextPoliciesSpec extends Specification {
         testData.policies[0].paths = ['/test']
 
         when:
-        saveContextPoliciesFunction.setValue(testData)
-        Report report = saveContextPoliciesFunction.getValue()
+        saveContextPoliciesFunction.setArguments(testData)
+        Report report = saveContextPoliciesFunction.execute()
 
         then:
         report.getErrorMessages().size() == 1
@@ -176,8 +176,8 @@ class SaveContextPoliciesSpec extends Specification {
         testData.policies[0].authTypes = [PKI, 'COFFEE']
 
         when:
-        saveContextPoliciesFunction.setValue(testData)
-        Report report = saveContextPoliciesFunction.getValue()
+        saveContextPoliciesFunction.setArguments(testData)
+        Report report = saveContextPoliciesFunction.execute()
 
         then:
         report.getErrorMessages().size() == 1
@@ -192,8 +192,8 @@ class SaveContextPoliciesSpec extends Specification {
         testData.policies[0].authTypes = []
 
         when:
-        saveContextPoliciesFunction.setValue(testData)
-        Report report = saveContextPoliciesFunction.getValue()
+        saveContextPoliciesFunction.setArguments(testData)
+        Report report = saveContextPoliciesFunction.execute()
 
         then:
         report.getErrorMessages().size() == 1
@@ -209,8 +209,8 @@ class SaveContextPoliciesSpec extends Specification {
         testData.policies[0].realm = 'COFFEE'
 
         when:
-        saveContextPoliciesFunction.setValue(testData)
-        Report report = saveContextPoliciesFunction.getValue()
+        saveContextPoliciesFunction.setArguments(testData)
+        Report report = saveContextPoliciesFunction.execute()
 
         then:
         report.getErrorMessages().size() == 1
@@ -225,8 +225,8 @@ class SaveContextPoliciesSpec extends Specification {
         testData.policies[0].realm = null
 
         when:
-        saveContextPoliciesFunction.setValue(testData)
-        Report report = saveContextPoliciesFunction.getValue()
+        saveContextPoliciesFunction.setArguments(testData)
+        Report report = saveContextPoliciesFunction.execute()
 
         then:
         report.getErrorMessages().size() == 1
@@ -241,8 +241,8 @@ class SaveContextPoliciesSpec extends Specification {
         testData.policies[0].claimsMapping = []
 
         when:
-        saveContextPoliciesFunction.setValue(testData)
-        Report report = saveContextPoliciesFunction.getValue()
+        saveContextPoliciesFunction.setArguments(testData)
+        Report report = saveContextPoliciesFunction.execute()
 
         then:
         report.getErrorMessages().isEmpty()
@@ -255,8 +255,8 @@ class SaveContextPoliciesSpec extends Specification {
         testData.policies[0].claimsMapping[0][ClaimsMapEntry.VALUE_FIELD_NAME] = null
 
         when:
-        saveContextPoliciesFunction.setValue(testData)
-        Report report = saveContextPoliciesFunction.getValue()
+        saveContextPoliciesFunction.setArguments(testData)
+        Report report = saveContextPoliciesFunction.execute()
 
         then:
         report.getErrorMessages().size() == 1
@@ -271,8 +271,8 @@ class SaveContextPoliciesSpec extends Specification {
         testData.policies[0].claimsMapping[0][ClaimsMapEntry.KEY_FIELD_NAME] = 'unsupportedClaim'
 
         when:
-        saveContextPoliciesFunction.setValue(testData)
-        Report report = saveContextPoliciesFunction.getValue()
+        saveContextPoliciesFunction.setArguments(testData)
+        Report report = saveContextPoliciesFunction.execute()
 
         then:
         report.getErrorMessages().size() == 1

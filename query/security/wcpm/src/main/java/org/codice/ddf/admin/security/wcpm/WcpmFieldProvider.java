@@ -16,7 +16,6 @@ package org.codice.ddf.admin.security.wcpm;
 import java.util.List;
 
 import org.codice.ddf.admin.api.ConfiguratorSuite;
-import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.function.BaseFieldProvider;
 import org.codice.ddf.admin.security.wcpm.discover.GetAuthTypes;
@@ -63,7 +62,7 @@ public class WcpmFieldProvider extends BaseFieldProvider {
     }
 
     @Override
-    public List<Field> getDiscoveryFields() {
+    public List<FunctionField> getDiscoveryFunctions() {
         return ImmutableList.of(getAuthTypes, getRealms, getWhiteListContexts, getContextPolicies);
     }
 

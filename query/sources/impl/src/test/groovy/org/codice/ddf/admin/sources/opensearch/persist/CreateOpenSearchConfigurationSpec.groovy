@@ -85,12 +85,12 @@ class CreateOpenSearchConfigurationSpec extends SourceCommonsSpec {
 
     def 'Successfully create new OpenSearch configuration'() {
         setup:
-        createOpenSearchConfiguration.setValue(createFunctionArgs())
+        createOpenSearchConfiguration.setArguments(createFunctionArgs())
         serviceReader.getServices(_, _) >> []
         configurator.commit(_, _) >> mockReport(false)
 
         when:
-        def report = createOpenSearchConfiguration.getValue()
+        def report = createOpenSearchConfiguration.execute()
 
         then:
         report.getResult().getValue()
@@ -98,11 +98,11 @@ class CreateOpenSearchConfigurationSpec extends SourceCommonsSpec {
 
     def 'Fail to create new OpenSearch config due to duplicate source name'() {
         setup:
-        createOpenSearchConfiguration.setValue(createFunctionArgs())
+        createOpenSearchConfiguration.setArguments(createFunctionArgs())
         serviceReader.getServices(_, _) >> federatedSources
 
         when:
-        def report = createOpenSearchConfiguration.getValue()
+        def report = createOpenSearchConfiguration.execute()
 
         then:
         report.getResult() == null
@@ -113,11 +113,11 @@ class CreateOpenSearchConfigurationSpec extends SourceCommonsSpec {
 
     def 'Fail to create new OpenSearch config due to failure to commit'() {
         setup:
-        createOpenSearchConfiguration.setValue(createFunctionArgs())
+        createOpenSearchConfiguration.setArguments(createFunctionArgs())
         serviceReader.getServices(_, _) >> []
 
         when:
-        def report = createOpenSearchConfiguration.getValue()
+        def report = createOpenSearchConfiguration.execute()
 
         then:
         1 * configurator.commit(_, _) >> mockReport(false)
@@ -130,9 +130,9 @@ class CreateOpenSearchConfigurationSpec extends SourceCommonsSpec {
 
     def 'Return false when opensearch feature fails to start'() {
         when:
-        createOpenSearchConfiguration.setValue(createFunctionArgs())
+        createOpenSearchConfiguration.setArguments(createFunctionArgs())
         serviceReader.getServices(_, _) >> []
-        def report = createOpenSearchConfiguration.getValue()
+        def report = createOpenSearchConfiguration.execute()
 
         then:
         1 * configurator.commit(_, _) >> mockReport(true)
@@ -144,7 +144,7 @@ class CreateOpenSearchConfigurationSpec extends SourceCommonsSpec {
 
     def 'Fail when missing required fields'() {
         when:
-        def report = createOpenSearchConfiguration.getValue()
+        def report = createOpenSearchConfiguration.execute()
 
         then:
         report.getResult() == null
@@ -158,17 +158,17 @@ class CreateOpenSearchConfigurationSpec extends SourceCommonsSpec {
     def 'Returns all the possible error codes correctly'(){
         setup:
         CreateOpenSearchConfiguration createDuplicateNameConfig = new CreateOpenSearchConfiguration(configuratorSuite)
-        createDuplicateNameConfig.setValue(createFunctionArgs())
+        createDuplicateNameConfig.setArguments(createFunctionArgs())
         serviceReader.getServices(_, _) >> federatedSources
 
         CreateOpenSearchConfiguration createFailPersistConfig = new CreateOpenSearchConfiguration(configuratorSuite)
-        createFailPersistConfig.setValue(createFunctionArgs())
+        createFailPersistConfig.setArguments(createFunctionArgs())
         serviceReader.getServices(_, _) >> []
 
         when:
         def errorCodes = createOpenSearchConfiguration.getFunctionErrorCodes()
-        def duplicateNameReport = createDuplicateNameConfig.getValue()
-        def createFailPersistReport = createFailPersistConfig.getValue()
+        def duplicateNameReport = createDuplicateNameConfig.execute()
+        def createFailPersistReport = createFailPersistConfig.execute()
 
         then:
         errorCodes.size() == 2

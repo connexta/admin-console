@@ -139,12 +139,6 @@ public class ContextPolicyBin extends BaseObjectField {
         return ImmutableList.of(contexts, authTypes, realm, claimsMapping);
     }
 
-    @Override
-    public ContextPolicyBin allFieldsRequired(boolean required) {
-        super.allFieldsRequired(required);
-        return this;
-    }
-
     public ContextPolicyBin useDefaultRequiredFields() {
         isRequired(true);
         contexts.isRequired(true);

@@ -47,17 +47,17 @@ public class LdapEncryptionMethodField extends BaseEnumField<String> {
         public static final String NONE = "none";
 
         @Override
-        public String enumTitle() {
+        public String getEnumTitle() {
             return NONE;
         }
 
         @Override
-        public String description() {
+        public String getDescription() {
             return DESCRIPTION;
         }
 
         @Override
-        public String value() {
+        public String getValue() {
             return NONE;
         }
     }
@@ -69,17 +69,17 @@ public class LdapEncryptionMethodField extends BaseEnumField<String> {
         public static final String LDAPS = "ldaps";
 
         @Override
-        public String enumTitle() {
+        public String getEnumTitle() {
             return LDAPS;
         }
 
         @Override
-        public String description() {
+        public String getDescription() {
             return DESCRIPTION;
         }
 
         @Override
-        public String value() {
+        public String getValue() {
             return LDAPS;
         }
     }
@@ -91,17 +91,17 @@ public class LdapEncryptionMethodField extends BaseEnumField<String> {
         public static final String START_TLS = "startTls";
 
         @Override
-        public String enumTitle() {
+        public String getEnumTitle() {
             return START_TLS;
         }
 
         @Override
-        public String description() {
+        public String getDescription() {
             return DESCRIPTION;
         }
 
         @Override
-        public String value() {
+        public String getValue() {
             return START_TLS;
         }
     }

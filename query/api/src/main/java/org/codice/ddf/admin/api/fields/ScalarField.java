@@ -13,11 +13,11 @@
  **/
 package org.codice.ddf.admin.api.fields;
 
-import org.codice.ddf.admin.api.DataType;
+import org.codice.ddf.admin.api.Field;
 
-public interface ScalarField<S> extends DataType<S> {
+public interface ScalarField<S> extends Field<S> {
 
-    ScalarType scalarType();
+    ScalarType getScalarType();
 
     enum ScalarType {
         STRING, INTEGER, FLOAT, BOOLEAN, HIDDEN_STRING

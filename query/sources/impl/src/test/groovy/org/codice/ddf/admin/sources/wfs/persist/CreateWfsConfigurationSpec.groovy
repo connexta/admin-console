@@ -91,12 +91,12 @@ class CreateWfsConfigurationSpec extends SourceCommonsSpec {
 
     def 'Successfully create new WFS configuration'() {
         setup:
-        createWfsConfiguration.setValue(createWfsArgs())
+        createWfsConfiguration.setArguments(createWfsArgs())
         serviceReader.getServices(_, _) >> []
         configurator.commit(_, _) >> mockReport(false)
 
         when:
-        def report = createWfsConfiguration.getValue()
+        def report = createWfsConfiguration.execute()
 
         then:
         report.getResult() != null
@@ -105,11 +105,11 @@ class CreateWfsConfigurationSpec extends SourceCommonsSpec {
 
     def 'Fail to create new WFS config due to duplicate source name'() {
         setup:
-        createWfsConfiguration.setValue(createWfsArgs())
+        createWfsConfiguration.setArguments(createWfsArgs())
         serviceReader.getServices(_, _) >> federatedSources
 
         when:
-        def report = createWfsConfiguration.getValue()
+        def report = createWfsConfiguration.execute()
 
         then:
         report.getResult() == null
@@ -120,11 +120,11 @@ class CreateWfsConfigurationSpec extends SourceCommonsSpec {
 
     def 'Fail to create new WFS config due to failure to commit'() {
         setup:
-        createWfsConfiguration.setValue(createWfsArgs())
+        createWfsConfiguration.setArguments(createWfsArgs())
         serviceReader.getServices(_, _) >> []
 
         when:
-        def report = createWfsConfiguration.getValue()
+        def report = createWfsConfiguration.execute()
 
         then:
         1 * configurator.commit(_, _) >> mockReport(false)
@@ -137,9 +137,9 @@ class CreateWfsConfigurationSpec extends SourceCommonsSpec {
 
     def 'Return false when wfs feature fails to start'() {
         when:
-        createWfsConfiguration.setValue(createWfsArgs())
+        createWfsConfiguration.setArguments(createWfsArgs())
         serviceReader.getServices(_, _) >> []
-        def report = createWfsConfiguration.getValue()
+        def report = createWfsConfiguration.execute()
 
         then:
         1 * configurator.commit(_, _) >> mockReport(true)
@@ -151,7 +151,7 @@ class CreateWfsConfigurationSpec extends SourceCommonsSpec {
 
     def 'Fail due to missing required fields'() {
         when:
-        def report = createWfsConfiguration.getValue()
+        def report = createWfsConfiguration.execute()
 
         then:
         report.getResult() == null
@@ -165,17 +165,17 @@ class CreateWfsConfigurationSpec extends SourceCommonsSpec {
     def 'Returns all the possible error codes correctly'(){
         setup:
         CreateWfsConfiguration createDuplicateNameConfig = new CreateWfsConfiguration(configuratorSuite)
-        createDuplicateNameConfig.setValue(createWfsArgs())
+        createDuplicateNameConfig.setArguments(createWfsArgs())
         serviceReader.getServices(_, _) >> federatedSources
 
         CreateWfsConfiguration createFailPersistConfig = new CreateWfsConfiguration(configuratorSuite)
-        createFailPersistConfig.setValue(createWfsArgs())
+        createFailPersistConfig.setArguments(createWfsArgs())
         serviceReader.getServices(_, _) >> []
 
         when:
         def errorCodes = createWfsConfiguration.getFunctionErrorCodes()
-        def duplicateNameReport = createDuplicateNameConfig.getValue()
-        def createFailPersistReport = createFailPersistConfig.getValue()
+        def duplicateNameReport = createDuplicateNameConfig.execute()
+        def createFailPersistReport = createFailPersistConfig.execute()
 
         then:
         errorCodes.size() == 2

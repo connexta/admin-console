@@ -39,17 +39,17 @@ public class AuthTypesPoller extends BaseEnumValuePoller<AuthenticationHandler, 
     public EnumValue<String> authHandlerToEnumValue(AuthenticationHandler handler) {
         return new EnumValue<String>() {
             @Override
-            public String enumTitle() {
+            public String getEnumTitle() {
                 return handler.getAuthenticationType();
             }
 
             @Override
-            public String description() {
+            public String getDescription() {
                 return descriptionMap.get(handler.getAuthenticationType());
             }
 
             @Override
-            public String value() {
+            public String getValue() {
                 return handler.getAuthenticationType();
             }
         };

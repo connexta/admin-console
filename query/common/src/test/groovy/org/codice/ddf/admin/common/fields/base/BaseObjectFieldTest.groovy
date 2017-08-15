@@ -13,7 +13,7 @@
  **/
 package org.codice.ddf.admin.common.fields.base
 
-import org.codice.ddf.admin.api.DataType
+import org.codice.ddf.admin.api.Field
 import org.codice.ddf.admin.api.fields.ObjectField
 import org.codice.ddf.admin.common.fields.test.TestObjectField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
@@ -29,7 +29,7 @@ class BaseObjectFieldTest extends Specification {
 
     def 'ObjectFields inner fields correctly validated'() {
         setup:
-        ((DataType) topLevelField.getInnerObjectField().getFields()[0]).isRequired(true)
+        ((Field) topLevelField.getInnerObjectField().getFields()[0]).isRequired(true)
 
         when:
         def validationMsgs = topLevelField.validate()
@@ -40,39 +40,10 @@ class BaseObjectFieldTest extends Specification {
         validationMsgs.get(0).getPath() == [TestObjectField.FIELD_NAME, TestObjectField.INNER_OBJECT_FIELD_NAME, TestObjectField.SUB_FIELD_OF_INNER_FIELD_NAME]
     }
 
-    def 'All inner fields requirements are true'() {
-        when:
-        topLevelField.allFieldsRequired(true)
-        def innerField = topLevelField.getFields().find {
-            (it.fieldName() == TestObjectField.INNER_OBJECT_FIELD_NAME)
-        }
-        def subFieldOfInnerField = ((ObjectField) innerField).getFields()[0]
-
-        then:
-        topLevelField.isRequired()
-        innerField.isRequired()
-        subFieldOfInnerField.isRequired()
-    }
-
-    def 'All inner fields requirements are false'() {
-        when:
-        topLevelField.isRequired(true)
-        topLevelField.allFieldsRequired(false)
-        def innerField = topLevelField.getFields().find {
-            (it.fieldName() == TestObjectField.INNER_OBJECT_FIELD_NAME)
-        }
-        def subFieldOfInnerField = ((ObjectField) innerField).getFields()[0]
-
-        then:
-        topLevelField.isRequired()
-        !innerField.isRequired()
-        !subFieldOfInnerField.isRequired()
-    }
-
     def 'Field paths of nested ObjectFields are correct order'() {
         when:
         def innerField = topLevelField.getFields().find {
-            (it.fieldName() == TestObjectField.INNER_OBJECT_FIELD_NAME)
+            (it.getName() == TestObjectField.INNER_OBJECT_FIELD_NAME)
         }
         def subFieldOfInnerField = ((ObjectField) innerField).getFields()[0]
 

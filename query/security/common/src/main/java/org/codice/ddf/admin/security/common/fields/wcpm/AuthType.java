@@ -45,7 +45,7 @@ public class AuthType extends BaseEnumField<String> {
 
     public AuthType(ServiceReader serviceReader, EnumValue<String> value) {
         this(serviceReader);
-        setValue(value.value());
+        setValue(value.getValue());
     }
 
     @Override

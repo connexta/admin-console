@@ -93,12 +93,12 @@ class LdapTestDirectorySettingsSpec extends Specification {
         FunctionReport report = action.getValue()
 
         then:
-        report.messages().size() == 10
-        report.messages().count {
+        report.getErrorMessages().size() == 10
+        report.getErrorMessages().count {
             it.getCode() == DefaultMessages.MISSING_REQUIRED_FIELD
         } == 10
 
-        report.messages()*.getPath() as Set == [badPaths.missingHostPath,
+        report.getErrorMessages()*.getPath() as Set == [badPaths.missingHostPath,
                                                 badPaths.missingPortPath,
                                                 badPaths.missingEncryptPath,
                                                 badPaths.missingUsernamePath,
@@ -124,11 +124,11 @@ class LdapTestDirectorySettingsSpec extends Specification {
         FunctionReport report = action.getValue()
 
         then:
-        report.messages().size() == 3
-        report.messages().count {
+        report.getErrorMessages().size() == 3
+        report.getErrorMessages().count {
             it.getCode() == DefaultMessages.MISSING_REQUIRED_FIELD
         } == 3
-        report.messages()*.getPath() as Set == [badPaths.missingGroupObjectPath,
+        report.getErrorMessages()*.getPath() as Set == [badPaths.missingGroupObjectPath,
                                                 badPaths.missingGroupAttribPath,
                                                 badPaths.missingMemberAttribPath] as Set
     }
@@ -149,12 +149,12 @@ class LdapTestDirectorySettingsSpec extends Specification {
         FunctionReport report = action.getValue()
 
         then:
-        report.messages().size() == 2
-        report.messages().count {
+        report.getErrorMessages().size() == 2
+        report.getErrorMessages().count {
             it.getCode() == LdapMessages.INVALID_DN
         } == 2
 
-        report.messages()*.getPath() as Set == [badPaths.badUserDnPath,
+        report.getErrorMessages()*.getPath() as Set == [badPaths.badUserDnPath,
                                                 badPaths.badGroupDnPath] as Set
     }
 
@@ -172,10 +172,10 @@ class LdapTestDirectorySettingsSpec extends Specification {
         FunctionReport report = action.getValue()
 
         then:
-        report.messages().size() == 1
-        !report.result().getValue()
-        report.messages().get(0).getCode() == DefaultMessages.CANNOT_CONNECT
-        report.messages().get(0).getPath() == baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME]
+        report.getErrorMessages().size() == 1
+        !report.getResult().getValue()
+        report.getErrorMessages().get(0).getCode() == DefaultMessages.CANNOT_CONNECT
+        report.getErrorMessages().get(0).getPath() == baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME]
     }
 
     def 'fail to bind to LDAP'() {
@@ -192,10 +192,10 @@ class LdapTestDirectorySettingsSpec extends Specification {
         FunctionReport report = action.getValue()
 
         then:
-        report.messages().size() == 1
-        !report.result().getValue()
-        report.messages().get(0).getCode() == LdapMessages.CANNOT_BIND
-        report.messages().get(0).getPath() == baseMsg + [LdapBindUserInfo.DEFAULT_FIELD_NAME]
+        report.getErrorMessages().size() == 1
+        !report.getResult().getValue()
+        report.getErrorMessages().get(0).getCode() == LdapMessages.CANNOT_BIND
+        report.getErrorMessages().get(0).getPath() == baseMsg + [LdapBindUserInfo.DEFAULT_FIELD_NAME]
     }
 
     def 'fail when baseUserDN & baseGroupDN do not exist'() {
@@ -214,12 +214,12 @@ class LdapTestDirectorySettingsSpec extends Specification {
         FunctionReport report = action.getValue()
 
         then:
-        report.messages().size() == 2
-        report.messages().count {
+        report.getErrorMessages().size() == 2
+        report.getErrorMessages().count {
             it.getCode() == LdapMessages.DN_DOES_NOT_EXIST
         } == 2
 
-        report.messages()*.getPath() as Set == [badPaths.badUserDnPath,
+        report.getErrorMessages()*.getPath() as Set == [badPaths.badUserDnPath,
                                                 badPaths.badGroupDnPath] as Set
     }
 
@@ -236,15 +236,15 @@ class LdapTestDirectorySettingsSpec extends Specification {
 
         when:
         FunctionReport report = action.getValue()
-        ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().result().isClosed()
+        ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().getResult().isClosed()
 
         then:
-        report.messages().size() == 2
-        report.messages().count {
+        report.getErrorMessages().size() == 2
+        report.getErrorMessages().count {
             it.getCode() == LdapMessages.NO_GROUPS_IN_BASE_GROUP_DN
         } == 2
 
-        report.messages()*.getPath() as Set == [badPaths.badGroupDnPath,
+        report.getErrorMessages()*.getPath() as Set == [badPaths.badGroupDnPath,
                                                 badPaths.missingGroupObjectPath] as Set
         ldapConnectionIsClosed
     }
@@ -262,15 +262,15 @@ class LdapTestDirectorySettingsSpec extends Specification {
 
         when:
         FunctionReport report = action.getValue()
-        ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().result().isClosed()
+        ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().getResult().isClosed()
 
         then:
-        report.messages().size() == 2
-        report.messages().count {
+        report.getErrorMessages().size() == 2
+        report.getErrorMessages().count {
             it.getCode() == LdapMessages.NO_GROUPS_IN_BASE_GROUP_DN
         } == 2
 
-        report.messages()*.getPath() as Set == [badPaths.badGroupDnPath,
+        report.getErrorMessages()*.getPath() as Set == [badPaths.badGroupDnPath,
                                                 badPaths.missingGroupObjectPath] as Set
         ldapConnectionIsClosed
     }
@@ -288,18 +288,18 @@ class LdapTestDirectorySettingsSpec extends Specification {
 
         when:
         FunctionReport report = action.getValue()
-        ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().result().isClosed()
+        ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().getResult().isClosed()
 
         then:
-        report.messages().size() == 2
-        report.messages().count {
+        report.getErrorMessages().size() == 2
+        report.getErrorMessages().count {
             it.getCode() == LdapMessages.NO_USERS_IN_BASE_USER_DN
         } == 1
-        report.messages().count {
+        report.getErrorMessages().count {
             it.getCode() == LdapMessages.USER_ATTRIBUTE_NOT_FOUND
         } == 1
 
-        report.messages()*.getPath() as Set == [badPaths.badUserDnPath,
+        report.getErrorMessages()*.getPath() as Set == [badPaths.badUserDnPath,
                                                 badPaths.missingUserNameAttrPath] as Set
         ldapConnectionIsClosed
     }
@@ -319,12 +319,12 @@ class LdapTestDirectorySettingsSpec extends Specification {
         FunctionReport report = action.getValue()
 
         then:
-        report.argumentMessages().size() == 1
-        report.messages().count {
+        report.getErrorMessages().size() == 1
+        report.getErrorMessages().count {
             it.getCode() == LdapMessages.INVALID_USER_ATTRIBUTE
         } == 1
 
-        report.messages()*.getPath() as Set == [badPaths.badUserNameAttribFormatPath] as Set
+        report.getErrorMessages()*.getPath() as Set == [badPaths.badUserNameAttribFormatPath] as Set
     }
 
     def 'fail when the groupAttributeHoldingMember format is incorrect'() {
@@ -342,12 +342,12 @@ class LdapTestDirectorySettingsSpec extends Specification {
         FunctionReport report = action.getValue()
 
         then:
-        report.argumentMessages().size() == 1
-        report.messages().count {
+        report.getErrorMessages().size() == 1
+        report.getErrorMessages().count {
             it.getCode() == LdapMessages.INVALID_USER_ATTRIBUTE
         } == 1
 
-        report.messages()*.getPath() as Set == [badPaths.badGroupAttribFormatPath] as Set
+        report.getErrorMessages()*.getPath() as Set == [badPaths.badGroupAttribFormatPath] as Set
     }
 
     def 'fail when the memberAttributeReferencedInGroup format is incorrect'() {
@@ -365,12 +365,12 @@ class LdapTestDirectorySettingsSpec extends Specification {
         FunctionReport report = action.getValue()
 
         then:
-        report.argumentMessages().size() == 1
-        report.messages().count {
+        report.getErrorMessages().size() == 1
+        report.getErrorMessages().count {
             it.getCode() == LdapMessages.INVALID_USER_ATTRIBUTE
         } == 1
 
-        report.messages()*.getPath() as Set == [badPaths.badMemberAttribFormatPath] as Set
+        report.getErrorMessages()*.getPath() as Set == [badPaths.badMemberAttribFormatPath] as Set
     }
 
     def 'succeed'() {
@@ -385,11 +385,11 @@ class LdapTestDirectorySettingsSpec extends Specification {
 
         when:
         FunctionReport report = action.getValue()
-        ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().result().isClosed()
+        ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().getResult().isClosed()
 
         then:
-        report.messages().empty
-        report.result().getValue()
+        report.getErrorMessages().empty
+        report.getResult().getValue()
         ldapConnectionIsClosed
     }
 

@@ -65,7 +65,7 @@ public class SaveWhitelistContexts extends BaseFunctionField<ContextPath.ListImp
                 contexts.toString());
 
         if (configReport.containsFailedResults()) {
-            addResultMessage(failedPersistError());
+            addErrorMessage(failedPersistError());
         }
 
         return configReport.containsFailedResults() ? null : contexts;

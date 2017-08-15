@@ -16,12 +16,12 @@ package org.codice.ddf.admin.sources.utils;
 import java.util.concurrent.Callable;
 import java.util.function.BiFunction;
 
+import org.codice.ddf.admin.api.report.Report;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
 import org.codice.ddf.admin.common.fields.common.HostField;
 import org.codice.ddf.admin.common.fields.common.UrlField;
-import org.codice.ddf.admin.common.report.ReportWithResultImpl;
 
-public class SourceTaskCallable<T> implements Callable<ReportWithResultImpl<T>> {
+public class SourceTaskCallable<T> implements Callable<Report<T>> {
 
     private String urlFormatString;
 
@@ -29,10 +29,10 @@ public class SourceTaskCallable<T> implements Callable<ReportWithResultImpl<T>> 
 
     private CredentialsField creds;
 
-    private BiFunction<UrlField, CredentialsField, ReportWithResultImpl<T>> function;
+    private BiFunction<UrlField, CredentialsField, Report<T>> function;
 
     public SourceTaskCallable(String urlFormatString, HostField host, CredentialsField creds,
-            BiFunction<UrlField, CredentialsField, ReportWithResultImpl<T>> function) {
+            BiFunction<UrlField, CredentialsField, Report<T>> function) {
         this.urlFormatString = urlFormatString;
         this.host = host;
         this.creds = creds;
@@ -40,14 +40,14 @@ public class SourceTaskCallable<T> implements Callable<ReportWithResultImpl<T>> 
     }
 
     @Override
-    public ReportWithResultImpl<T> call() throws Exception {
+    public Report<T> call() throws Exception {
         UrlField requestUrl = new UrlField();
         String formattedUrl = String.format(urlFormatString, host.hostname(), host.port());
         requestUrl.setValue(formattedUrl);
 
-        ReportWithResultImpl<T> configResult = function.apply(requestUrl, creds);
+        Report<T> configResult = function.apply(requestUrl, creds);
 
-        if (!configResult.containsErrorMsgs()) {
+        if (!configResult.containsErrorMessages()) {
             return configResult;
         }
 

@@ -89,10 +89,10 @@ public class UpdateWfsConfiguration extends BaseFunctionField<BooleanField> {
         }
 
         if (report != null && report.containsFailedResults()) {
-            addResultMessage(failedPersistError());
+            addErrorMessage(failedPersistError());
             return new BooleanField(false);
         }
-        addMessages(serviceCommons.updateService(config.pidField(),
+        addErrorMessages(serviceCommons.updateService(config.pidField(),
                 wfsConfigToServiceProps(config)));
         return new BooleanField(!containsErrorMsgs());
     }
@@ -103,7 +103,7 @@ public class UpdateWfsConfiguration extends BaseFunctionField<BooleanField> {
         if (containsErrorMsgs()) {
             return;
         }
-        addMessages(sourceValidationUtils.duplicateSourceNameExists(config.sourceNameField(),
+        addErrorMessages(sourceValidationUtils.duplicateSourceNameExists(config.sourceNameField(),
                 config.pidField()));
     }
 

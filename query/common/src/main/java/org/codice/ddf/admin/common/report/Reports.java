@@ -11,26 +11,33 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.api.report;
+package org.codice.ddf.admin.common.report;
 
 import java.util.List;
 
-/**
- * A Report can contain only errors messages or a result but not both.
- */
-public interface Report<T> {
+import org.codice.ddf.admin.api.report.ErrorMessage;
+import org.codice.ddf.admin.api.report.Report;
 
-    Report<T> addErrorMessage(ErrorMessage message);
+public class Reports {
 
-    <S> Report<T> addErrorMessages(Report<S> report);
+    public static <T> Report<T> emptyReport() {
+        return new ReportImpl<>();
+    }
 
-    List<ErrorMessage> getErrorMessages();
+    public static <T> Report<T> from(T result) {
+        return new ReportImpl<>(result);
+    }
 
-    boolean containsErrorMessages();
+    public static <T> Report<T> from(ErrorMessage message){
+        return new ReportImpl<>(message);
+    }
 
-    T getResult();
+    public static <T> Report<T> from(List<ErrorMessage> messages) {
+        return new ReportImpl<>(messages);
+    }
 
-    Report<T> setResult(T result);
-
-    boolean isResultPresent();
+    public static<S, T> Report<T> fromErrors(Report<S> report){
+        return new ReportImpl<>(report.getErrorMessages());
+    }
 }
+

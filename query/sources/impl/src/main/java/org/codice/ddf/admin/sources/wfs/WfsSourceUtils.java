@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 import javax.xml.xpath.XPath;
@@ -30,12 +29,14 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.codice.ddf.admin.api.ConfiguratorSuite;
+import org.codice.ddf.admin.api.report.Report;
 import org.codice.ddf.admin.common.PrioritizedBatchExecutor;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
 import org.codice.ddf.admin.common.fields.common.HostField;
 import org.codice.ddf.admin.common.fields.common.ResponseField;
 import org.codice.ddf.admin.common.fields.common.UrlField;
-import org.codice.ddf.admin.common.report.ReportWithResultImpl;
+import org.codice.ddf.admin.common.report.Reports;
+import org.codice.ddf.admin.sources.fields.WfsVersion;
 import org.codice.ddf.admin.sources.fields.type.WfsSourceConfigurationField;
 import org.codice.ddf.admin.sources.utils.RequestUtils;
 import org.codice.ddf.admin.sources.utils.SourceTaskCallable;
@@ -85,9 +86,9 @@ public class WfsSourceUtils {
      *
      * @param hostField address to probe for WFS capabilities
      * @param creds     optional username to add to Basic Auth header
-     * @return a {@link ReportWithResultImpl} containing the {@link WfsSourceConfigurationField} or an {@link org.codice.ddf.admin.api.report.ErrorMessage} on failure.
+     * @return a {@link Report} containing the {@link WfsSourceConfigurationField} or an {@link org.codice.ddf.admin.api.report.ErrorMessage} on failure.
      */
-    public ReportWithResultImpl<WfsSourceConfigurationField> getWfsConfigFromHost(
+    public Report<WfsSourceConfigurationField> getWfsConfigFromHost(
             HostField hostField, CredentialsField creds) {
         List<List<SourceTaskCallable<WfsSourceConfigurationField>>> taskList = new ArrayList<>();
 
@@ -101,33 +102,32 @@ public class WfsSourceUtils {
             taskList.add(callables);
         }
 
-        PrioritizedBatchExecutor<ReportWithResultImpl<WfsSourceConfigurationField>, ReportWithResultImpl<WfsSourceConfigurationField>>
+        PrioritizedBatchExecutor<Report<WfsSourceConfigurationField>, Report<WfsSourceConfigurationField>>
                 prioritizedExecutor = new PrioritizedBatchExecutor(THREAD_POOL_SIZE,
                 taskList,
                 new SourceTaskHandler<WfsSourceConfigurationField>());
 
-        Optional<ReportWithResultImpl<WfsSourceConfigurationField>> result =
+        Optional<Report<WfsSourceConfigurationField>> result =
                 prioritizedExecutor.getFirst();
 
         if (result.isPresent()) {
             return result.get();
         } else {
-            return new ReportWithResultImpl<WfsSourceConfigurationField>().addArgumentMessage(
-                    unknownEndpointError(hostField.path()));
+            return Reports.from(unknownEndpointError(hostField.path()));
         }
     }
 
-    public ReportWithResultImpl<WfsSourceConfigurationField> getWfsConfigFromUrl(UrlField urlField,
+    public Report<WfsSourceConfigurationField> getWfsConfigFromUrl(UrlField urlField,
             CredentialsField creds) {
-        ReportWithResultImpl<ResponseField> responseResult = requestUtils.sendGetRequest(urlField,
+        Report<ResponseField> responseResult = requestUtils.sendGetRequest(urlField,
                 creds,
                 GET_CAPABILITIES_PARAMS);
 
-        if (responseResult.containsErrorMsgs()) {
-            return (ReportWithResultImpl) responseResult;
+        if (responseResult.containsErrorMessages()) {
+            return Reports.from(responseResult.getErrorMessages());
         }
 
-        return getWfsConfigFromResult(responseResult.result(), creds);
+        return getWfsConfigFromResult(responseResult.getResult(), creds);
     }
 
     /**
@@ -138,20 +138,17 @@ public class WfsSourceUtils {
      *
      * @param responseField WFS URL to probe for a configuration
      * @param creds         optional username to add to Basic Auth header used in the original request
-     * @return a {@link ReportWithResultImpl} containing the preferred {@link WfsSourceConfigurationField}, or containing {@link org.codice.ddf.admin.api.report.ErrorMessage}s on failure.
+     * @return a {@link Report} containing the preferred {@link WfsSourceConfigurationField}, or containing {@link org.codice.ddf.admin.api.report.ErrorMessage}s on failure.
      */
-    private ReportWithResultImpl<WfsSourceConfigurationField> getWfsConfigFromResult(
+    private Report<WfsSourceConfigurationField> getWfsConfigFromResult(
             ResponseField responseField, CredentialsField creds) {
-        ReportWithResultImpl<WfsSourceConfigurationField> configResult =
-                new ReportWithResultImpl<>();
 
         String responseBody = responseField.responseBody();
         UrlField requestUrl = responseField.requestUrlField();
 
         if (responseField.statusCode() != HTTP_OK || responseBody.length() < 1) {
-            configResult.addArgumentMessage(unknownEndpointError(responseField.requestUrlField()
+            return Reports.from(unknownEndpointError(responseField.requestUrlField()
                     .path()));
-            return configResult;
         }
 
         Document capabilitiesXml;
@@ -159,9 +156,8 @@ public class WfsSourceUtils {
             capabilitiesXml = sourceUtilCommons.createDocument(responseBody);
         } catch (Exception e) {
             LOGGER.debug("Failed to read response from WFS endpoint.");
-            configResult.addArgumentMessage(unknownEndpointError(responseField.requestUrlField()
+            return Reports.from(unknownEndpointError(responseField.requestUrlField()
                     .path()));
-            return configResult;
         }
 
         WfsSourceConfigurationField preferredConfig = new WfsSourceConfigurationField();
@@ -179,52 +175,26 @@ public class WfsSourceUtils {
                     .evaluate(capabilitiesXml);
         } catch (XPathExpressionException e) {
             LOGGER.debug("Failed to parse XML response.");
-            configResult.addArgumentMessage(unknownEndpointError(responseField.requestUrlField()
-                    .path()));
-            return configResult;
-        }
-
-        configResult.result(preferredConfig.wfsVersion(wfsVersion));
-        if (!preferredConfig.validate()
-                .isEmpty()) {
-            configResult.addArgumentMessage(unknownEndpointError(responseField.requestUrlField()
+            return Reports.from(unknownEndpointError(responseField.requestUrlField()
                     .path()));
         }
 
-        return configResult;
-    }
-
-    private class WfsTaskCallable
-            implements Callable<ReportWithResultImpl<WfsSourceConfigurationField>> {
-
-        private String url;
-
-        private HostField host;
-
-        private CredentialsField creds;
-
-        public WfsTaskCallable(String url, HostField host, CredentialsField creds) {
-            this.url = url;
-            this.host = host;
-            this.creds = creds;
+        WfsVersion wfsVersionToCheck = new WfsVersion();
+        wfsVersionToCheck.isRequired(true);
+        wfsVersionToCheck.setValue(wfsVersion);
+        if(!wfsVersionToCheck.validate().isEmpty()) {
+            return Reports.from(unknownEndpointError(responseField.requestUrlField()
+                    .path()));
         }
 
-        @Override
-        public ReportWithResultImpl<WfsSourceConfigurationField> call() throws Exception {
-            UrlField requestUrl = new UrlField();
-            String formattedUrl = String.format(url, host.hostname(), host.port());
-            requestUrl.setValue(formattedUrl);
+        WfsSourceConfigurationField wfsSourceConfigurationField =
+                new WfsSourceConfigurationField().wfsVersion(wfsVersion);
+        wfsSourceConfigurationField.endpointUrl(requestUrl.getValue())
+                .credentials()
+                .username(creds.username())
+                .password(FLAG_PASSWORD);
 
-            ReportWithResultImpl<WfsSourceConfigurationField> configResult = getWfsConfigFromUrl(
-                    requestUrl,
-                    creds);
-
-            if (!configResult.containsErrorMsgs()) {
-                return configResult;
-            }
-
-            return null;
-        }
+        return Reports.from(wfsSourceConfigurationField);
     }
 
     /**

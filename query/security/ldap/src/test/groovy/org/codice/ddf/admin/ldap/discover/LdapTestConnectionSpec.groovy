@@ -75,12 +75,12 @@ class LdapTestConnectionSpec extends Specification {
         FunctionReport report = ldapConnectFunction.getValue()
 
         then:
-        report.messages().size() == 3
-        report.messages().count {
+        report.getErrorMessages().size() == 3
+        report.getErrorMessages().count {
             it.getCode() == DefaultMessages.MISSING_REQUIRED_FIELD
         } == 3
 
-        report.messages()*.getPath() as Set == [missingHostMsgPath, missingPortMsgPath, missingEncryptMsgPath] as Set
+        report.getErrorMessages()*.getPath() as Set == [missingHostMsgPath, missingPortMsgPath, missingEncryptMsgPath] as Set
     }
 
     def 'Successfully connect without encryption'() {
@@ -92,11 +92,11 @@ class LdapTestConnectionSpec extends Specification {
 
         when:
         FunctionReport report = ldapConnectFunction.getValue()
-        ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().result().isClosed()
+        ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().getResult().isClosed()
 
         then:
-        report.messages().empty
-        report.result().getValue()
+        report.getErrorMessages().empty
+        report.getResult().getValue()
         ldapConnectionIsClosed
     }
 
@@ -109,11 +109,11 @@ class LdapTestConnectionSpec extends Specification {
 
         when:
         FunctionReport report = ldapConnectFunction.getValue()
-        ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().result().isClosed()
+        ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().getResult().isClosed()
 
         then:
-        report.messages().empty
-        report.result().getValue()
+        report.getErrorMessages().empty
+        report.getResult().getValue()
         ldapConnectionIsClosed
     }
 
@@ -126,11 +126,11 @@ class LdapTestConnectionSpec extends Specification {
 
         when:
         FunctionReport report = ldapConnectFunction.getValue()
-        ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().result().isClosed()
+        ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().getResult().isClosed()
 
         then:
-        report.messages().isEmpty()
-        report.result().getValue()
+        report.getErrorMessages().isEmpty()
+        report.getResult().getValue()
         ldapConnectionIsClosed
     }
 
@@ -144,10 +144,10 @@ class LdapTestConnectionSpec extends Specification {
         FunctionReport report = ldapConnectFunction.getValue()
 
         then:
-        report.messages().size() == 1
-        !report.result().getValue()
-        report.messages().get(0).getCode() == DefaultMessages.CANNOT_CONNECT
-        report.messages().get(0).getPath() == [LdapTestConnection.FIELD_NAME, FunctionField.ARGUMENT, LdapConnectionField.DEFAULT_FIELD_NAME]
+        report.getErrorMessages().size() == 1
+        !report.getResult().getValue()
+        report.getErrorMessages().get(0).getCode() == DefaultMessages.CANNOT_CONNECT
+        report.getErrorMessages().get(0).getPath() == [LdapTestConnection.FIELD_NAME, FunctionField.ARGUMENT, LdapConnectionField.DEFAULT_FIELD_NAME]
     }
 
     def 'Fail to connect to LDAP (Bad hostname)'() {
@@ -159,10 +159,10 @@ class LdapTestConnectionSpec extends Specification {
         FunctionReport report = ldapConnectFunction.getValue()
 
         then:
-        report.messages().size() == 1
-        !report.result().getValue()
-        report.messages().get(0).getCode() == DefaultMessages.CANNOT_CONNECT
-        report.messages().get(0).getPath() == [LdapTestConnection.FIELD_NAME, FunctionField.ARGUMENT, LdapConnectionField.DEFAULT_FIELD_NAME]
+        report.getErrorMessages().size() == 1
+        !report.getResult().getValue()
+        report.getErrorMessages().get(0).getCode() == DefaultMessages.CANNOT_CONNECT
+        report.getErrorMessages().get(0).getPath() == [LdapTestConnection.FIELD_NAME, FunctionField.ARGUMENT, LdapConnectionField.DEFAULT_FIELD_NAME]
     }
 
     def 'Fail to connect to LDAP (Bad port)'() {
@@ -174,10 +174,10 @@ class LdapTestConnectionSpec extends Specification {
         FunctionReport report = ldapConnectFunction.getValue()
 
         then:
-        report.messages().size() == 1
-        !report.result().getValue()
-        report.messages().get(0).getCode() == DefaultMessages.CANNOT_CONNECT
-        report.messages().get(0).getPath() == [LdapTestConnection.FIELD_NAME, FunctionField.ARGUMENT, LdapConnectionField.DEFAULT_FIELD_NAME]
+        report.getErrorMessages().size() == 1
+        !report.getResult().getValue()
+        report.getErrorMessages().get(0).getCode() == DefaultMessages.CANNOT_CONNECT
+        report.getErrorMessages().get(0).getPath() == [LdapTestConnection.FIELD_NAME, FunctionField.ARGUMENT, LdapConnectionField.DEFAULT_FIELD_NAME]
     }
 
     def 'Fail to setup connection test'() {
@@ -190,10 +190,10 @@ class LdapTestConnectionSpec extends Specification {
         FunctionReport report = ldapConnectFunction.getValue()
 
         then:
-        report.messages().size() == 1
-        !report.result().getValue()
-        report.messages().get(0).getCode() == DefaultMessages.FAILED_TEST_SETUP
-        report.messages().get(0).getPath() == [LdapTestConnection.FIELD_NAME]
+        report.getErrorMessages().size() == 1
+        !report.getResult().getValue()
+        report.getErrorMessages().get(0).getCode() == DefaultMessages.FAILED_TEST_SETUP
+        report.getErrorMessages().get(0).getPath() == [LdapTestConnection.FIELD_NAME]
     }
 
     def 'Returns all the possible error codes correctly'(){
@@ -214,8 +214,8 @@ class LdapTestConnectionSpec extends Specification {
 
         then:
         errorCodes.size() == 2
-        errorCodes.contains(cannotConnectReport.messages().get(0).getCode())
-        errorCodes.contains(failedSetupReport.messages().get(0).getCode())
+        errorCodes.contains(cannotConnectReport.getErrorMessages().get(0).getCode())
+        errorCodes.contains(failedSetupReport.getErrorMessages().get(0).getCode())
     }
 
     LdapConnectionField ldapsLdapConnectionInfo() {

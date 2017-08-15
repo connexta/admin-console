@@ -19,7 +19,7 @@ import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.api.report.Report;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 import org.codice.ddf.admin.common.fields.common.PidField;
-import org.codice.ddf.admin.common.report.ReportImpl;
+import org.codice.ddf.admin.common.report.Reports;
 import org.codice.ddf.admin.common.services.ServiceCommons;
 import org.codice.ddf.admin.sources.SourceMessages;
 
@@ -58,17 +58,16 @@ public class SourceValidationUtils {
      * @param sourceName source name to validate
      * @return a {@link Report} containing a {@link SourceMessages#DUPLICATE_SOURCE_NAME} on failure.
      */
-    public Report duplicateSourceNameExists(StringField sourceName) {
+    public Report<Void> duplicateSourceNameExists(StringField sourceName) {
         List<Source> sources = sourceUtilCommons.getAllSourceReferences();
         boolean matchFound = sources.stream()
                 .map(Describable::getId)
                 .anyMatch(id -> id.equals(sourceName.getValue()));
 
-        ReportImpl report = new ReportImpl();
         if (matchFound) {
-            report.addArgumentMessage(SourceMessages.duplicateSourceNameError(sourceName.path()));
+            return Reports.from(SourceMessages.duplicateSourceNameError(sourceName.path()));
         }
-        return report;
+        return Reports.emptyReport();
     }
 
     /**
@@ -83,16 +82,16 @@ public class SourceValidationUtils {
      * @param pid        service pid of the service properties
      * @return a {@link Report} containing an {@link org.codice.ddf.admin.api.report.ErrorMessage}s on failure.
      */
-    public Report duplicateSourceNameExists(StringField sourceName, PidField pid) {
-        ReportImpl sourceNameReport = new ReportImpl();
+    public Report<Void> duplicateSourceNameExists(StringField sourceName, PidField pid) {
+        Report sourceNameReport = Reports.emptyReport();
         if (pid.getValue() != null) {
             sourceNameReport = serviceCommons.serviceConfigurationExists(pid);
-            if (!sourceNameReport.containsErrorMsgs() && !findSourceNameMatch(pid.getValue(),
+            if (!sourceNameReport.containsErrorMessages() && !findSourceNameMatch(pid.getValue(),
                     sourceName.getValue())) {
-                sourceNameReport.addMessages(duplicateSourceNameExists(sourceName));
+                sourceNameReport.addErrorMessages(duplicateSourceNameExists(sourceName));
             }
         } else {
-            sourceNameReport.addMessages(duplicateSourceNameExists(sourceName));
+            sourceNameReport.addErrorMessages(duplicateSourceNameExists(sourceName));
         }
         return sourceNameReport;
     }

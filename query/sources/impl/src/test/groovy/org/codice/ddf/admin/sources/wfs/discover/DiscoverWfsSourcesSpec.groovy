@@ -18,7 +18,6 @@ import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.common.fields.common.HostField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.sources.fields.WfsVersion
-import org.codice.ddf.admin.sources.fields.type.WfsSourceConfigurationField
 import org.codice.ddf.admin.sources.test.SourceCommonsSpec
 import org.codice.ddf.admin.sources.wfs.WfsSourceUtils
 import spock.lang.Shared
@@ -60,7 +59,7 @@ class DiscoverWfsSourcesSpec extends SourceCommonsSpec {
 
         when:
         def report = discoverWfs.getValue()
-        def config = report.result()
+        def config = report.getResult()
 
         then:
         config.endpointUrl() == TEST_WFS_URL
@@ -75,7 +74,7 @@ class DiscoverWfsSourcesSpec extends SourceCommonsSpec {
 
         when:
         def report = discoverWfs.getValue()
-        def config = report.result()
+        def config = report.getResult()
 
         then:
         config.endpointUrl() == TEST_WFS_URL
@@ -90,7 +89,7 @@ class DiscoverWfsSourcesSpec extends SourceCommonsSpec {
 
         when:
         def report = discoverWfs.getValue()
-        def config = report.result()
+        def config = report.getResult()
 
         then:
         !config.endpointUrl().isEmpty()
@@ -105,7 +104,7 @@ class DiscoverWfsSourcesSpec extends SourceCommonsSpec {
 
         when:
         def report = discoverWfs.getValue()
-        def config = report.result()
+        def config = report.getResult()
 
         then:
         !config.endpointUrl().isEmpty()
@@ -122,9 +121,9 @@ class DiscoverWfsSourcesSpec extends SourceCommonsSpec {
         def report = discoverWfs.getValue()
 
         then:
-        report.messages().size() == 1
-        report.messages()[0].getCode() == DefaultMessages.UNKNOWN_ENDPOINT
-        report.messages()[0].getPath() == URL_FIELD_PATH
+        report.getErrorMessages().size() == 1
+        report.getErrorMessages()[0].getCode() == DefaultMessages.UNKNOWN_ENDPOINT
+        report.getErrorMessages()[0].getPath() == URL_FIELD_PATH
     }
 
     def 'Unknown endpoint error when bad HTTP code received'() {
@@ -136,9 +135,9 @@ class DiscoverWfsSourcesSpec extends SourceCommonsSpec {
         def report = discoverWfs.getValue()
 
         then:
-        report.messages().size() == 1
-        report.messages()[0].getCode() == DefaultMessages.UNKNOWN_ENDPOINT
-        report.messages()[0].getPath() == URL_FIELD_PATH
+        report.getErrorMessages().size() == 1
+        report.getErrorMessages()[0].getCode() == DefaultMessages.UNKNOWN_ENDPOINT
+        report.getErrorMessages()[0].getPath() == URL_FIELD_PATH
     }
 
     def 'Unknown endpoint error when unrecognized response received'() {
@@ -150,9 +149,9 @@ class DiscoverWfsSourcesSpec extends SourceCommonsSpec {
         def report = discoverWfs.getValue()
 
         then:
-        report.messages().size() == 1
-        report.messages()[0].getCode() == DefaultMessages.UNKNOWN_ENDPOINT
-        report.messages()[0].getPath() == URL_FIELD_PATH
+        report.getErrorMessages().size() == 1
+        report.getErrorMessages()[0].getCode() == DefaultMessages.UNKNOWN_ENDPOINT
+        report.getErrorMessages()[0].getPath() == URL_FIELD_PATH
     }
 
     def 'Unknown endpoint if no pre-formatted URLs work when discovering with host+port'() {
@@ -164,9 +163,9 @@ class DiscoverWfsSourcesSpec extends SourceCommonsSpec {
         def report = discoverWfs.getValue()
 
         then:
-        report.messages().size() == 1
-        report.messages()[0].getCode() == DefaultMessages.UNKNOWN_ENDPOINT
-        report.messages()[0].getPath() == HOST_FIELD_PATH
+        report.getErrorMessages().size() == 1
+        report.getErrorMessages()[0].getCode() == DefaultMessages.UNKNOWN_ENDPOINT
+        report.getErrorMessages()[0].getPath() == HOST_FIELD_PATH
     }
 
     def 'Fail when missing required fields'() {
@@ -174,12 +173,12 @@ class DiscoverWfsSourcesSpec extends SourceCommonsSpec {
         def report = discoverWfs.getValue()
 
         then:
-        report.result() == null
-        report.messages().size() == 1
-        report.messages().count {
+        report.getResult() == null
+        report.getErrorMessages().size() == 1
+        report.getErrorMessages().count {
             it.getCode() == DefaultMessages.MISSING_REQUIRED_FIELD
         } == 1
-        report.messages()*.getPath() == [URL_FIELD_PATH]
+        report.getErrorMessages()*.getPath() == [URL_FIELD_PATH]
     }
 
     def 'Returns all the possible error codes correctly'(){
@@ -199,8 +198,8 @@ class DiscoverWfsSourcesSpec extends SourceCommonsSpec {
 
         then:
         errorCodes.size() == 2
-        errorCodes.contains(cannotConnectReport.messages()[0].getCode())
-        errorCodes.contains(unknownEndpointReport.messages()[0].getCode())
+        errorCodes.contains(cannotConnectReport.getErrorMessages()[0].getCode())
+        errorCodes.contains(unknownEndpointReport.getErrorMessages()[0].getCode())
     }
 
     def prepareOpenSearchSourceUtils(int statusCode, String responseBody, boolean endpointIsReachable) {

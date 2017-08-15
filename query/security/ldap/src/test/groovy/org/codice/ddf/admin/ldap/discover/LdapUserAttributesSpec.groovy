@@ -82,12 +82,12 @@ class LdapUserAttributesSpec extends Specification {
         FunctionReport report = action.getValue()
 
         then:
-        report.messages().size() == badPaths.size()
-        report.messages().count {
+        report.getErrorMessages().size() == badPaths.size()
+        report.getErrorMessages().count {
             it.getCode() == DefaultMessages.MISSING_REQUIRED_FIELD
         } == badPaths.size()
 
-        report.messages()*.getPath() as Set == badPaths.values() as Set
+        report.getErrorMessages()*.getPath() as Set == badPaths.values() as Set
     }
 
     def 'fail to connect to LDAP'() {
@@ -104,9 +104,9 @@ class LdapUserAttributesSpec extends Specification {
         FunctionReport report = action.getValue()
 
         then:
-        report.messages().size() == 1
-        report.messages().get(0).getCode() == DefaultMessages.CANNOT_CONNECT
-        report.messages().get(0).getPath() == baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME]
+        report.getErrorMessages().size() == 1
+        report.getErrorMessages().get(0).getCode() == DefaultMessages.CANNOT_CONNECT
+        report.getErrorMessages().get(0).getPath() == baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME]
     }
 
     def 'fail to bind to LDAP'() {
@@ -122,9 +122,9 @@ class LdapUserAttributesSpec extends Specification {
         FunctionReport report = action.getValue()
 
         then:
-        report.messages().size() == 1
-        report.messages().get(0).getCode() == LdapMessages.CANNOT_BIND
-        report.messages().get(0).getPath() == baseMsg + [LdapBindUserInfo.DEFAULT_FIELD_NAME]
+        report.getErrorMessages().size() == 1
+        report.getErrorMessages().get(0).getCode() == LdapMessages.CANNOT_BIND
+        report.getErrorMessages().get(0).getPath() == baseMsg + [LdapBindUserInfo.DEFAULT_FIELD_NAME]
     }
 
     def 'succeed'() {
@@ -137,8 +137,8 @@ class LdapUserAttributesSpec extends Specification {
         action.setTestingUtils(utilsMock)
 
         when:
-        ListField<StringField> report = action.getValue().result()
-        ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().result().isClosed()
+        ListField<StringField> report = action.getValue().getResult()
+        ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().getResult().isClosed()
 
         then:
         !report.list.empty
@@ -171,8 +171,8 @@ class LdapUserAttributesSpec extends Specification {
 
         then:
         errorCodes.size() == 3
-        errorCodes.contains(cannotConnectReport.messages().get(0).getCode())
-        errorCodes.contains(cannotBindReport.messages().get(0).getCode())
+        errorCodes.contains(cannotConnectReport.getErrorMessages().get(0).getCode())
+        errorCodes.contains(cannotBindReport.getErrorMessages().get(0).getCode())
         errorCodes.contains(DefaultMessages.FAILED_TEST_SETUP)
     }
 

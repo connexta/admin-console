@@ -75,14 +75,14 @@ class GetCswConfigsSpec extends SourceCommonsSpec {
     def 'No pid argument returns all configs'() {
         when:
         def report = getCswConfigsFunction.getValue()
-        def list = ((ListField) report.result())
+        def list = ((ListField) report.getResult())
 
         then:
         1 * managedServiceActions.read(TEST_FACTORY_PID) >> managedServiceConfigs
         2 * managedServiceActions.read(_ as String) >> [:]
         2 * serviceReader.getServices(_, _) >> [new TestSource(S_PID_1, true)]
         2 * serviceReader.getServices(_, _) >> [new TestSource(S_PID_2, false)]
-        report.result() != null
+        report.getResult() != null
         list.getList().size() == 2
         assertConfig(list.getList().get(0), 0, managedServiceConfigs.get(S_PID_1), SOURCE_ID_1, S_PID_1, true)
         assertConfig(list.getList().get(1), 1, managedServiceConfigs.get(S_PID_2), SOURCE_ID_2, S_PID_2, false)
@@ -92,13 +92,13 @@ class GetCswConfigsSpec extends SourceCommonsSpec {
         when:
         getCswConfigsFunction.setValue(functionArgs)
         def report = getCswConfigsFunction.getValue()
-        def list = ((ListField) report.result())
+        def list = ((ListField) report.getResult())
 
         then:
         1 * serviceReader.getServices(_, _) >> [new TestSource(S_PID_2, false)]
         1 * serviceReader.getServices(_, _) >> []
         serviceActions.read(S_PID_2) >> managedServiceConfigs.get(S_PID_2)
-        report.result() != null
+        report.getResult() != null
         list.getList().size() == 1
         assertConfig(list.getList().get(0), 0, managedServiceConfigs.get(S_PID_2), SOURCE_ID_2, S_PID_2, false)
     }
@@ -113,10 +113,10 @@ class GetCswConfigsSpec extends SourceCommonsSpec {
         def report = getCswConfigsFunction.getValue()
 
         then:
-        report.result() == null
-        report.messages().size() == 1
-        report.messages().get(0).code == DefaultMessages.NO_EXISTING_CONFIG
-        report.messages().get(0).path == [GetCswConfigurations.FIELD_NAME]
+        report.getResult() == null
+        report.getErrorMessages().size() == 1
+        report.getErrorMessages().get(0).code == DefaultMessages.NO_EXISTING_CONFIG
+        report.getErrorMessages().get(0).path == [GetCswConfigurations.FIELD_NAME]
     }
 
     def assertConfig(Field field, int index, Map<String, Object> properties, String sourceName, String pid, boolean availability) {
@@ -156,6 +156,6 @@ class GetCswConfigsSpec extends SourceCommonsSpec {
 
         then:
         errorCodes.size() == 1
-        errorCodes.contains(noExistingConfigReport.messages().get(0).getCode())
+        errorCodes.contains(noExistingConfigReport.getErrorMessages().get(0).getCode())
     }
 }

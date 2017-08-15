@@ -30,12 +30,13 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.codice.ddf.admin.api.ConfiguratorSuite;
+import org.codice.ddf.admin.api.report.Report;
 import org.codice.ddf.admin.common.PrioritizedBatchExecutor;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
 import org.codice.ddf.admin.common.fields.common.HostField;
 import org.codice.ddf.admin.common.fields.common.ResponseField;
 import org.codice.ddf.admin.common.fields.common.UrlField;
-import org.codice.ddf.admin.common.report.ReportWithResultImpl;
+import org.codice.ddf.admin.common.report.Reports;
 import org.codice.ddf.admin.sources.fields.type.OpenSearchSourceConfigurationField;
 import org.codice.ddf.admin.sources.utils.RequestUtils;
 import org.codice.ddf.admin.sources.utils.SourceTaskCallable;
@@ -85,9 +86,9 @@ public class OpenSearchSourceUtils {
      *
      * @param hostField hostname and port to probe for OpenSearch capabilities
      * @param creds     optional credentials for authentication
-     * @return a {@link ReportWithResultImpl} containing the discovered {@link OpenSearchSourceConfigurationField} on success, or containing {@link org.codice.ddf.admin.api.report.ErrorMessage}s on failure.
+     * @return a {@link Report} containing the discovered {@link OpenSearchSourceConfigurationField} on success, or containing {@link org.codice.ddf.admin.api.report.ErrorMessage}s on failure.
      */
-    public ReportWithResultImpl<OpenSearchSourceConfigurationField> getOpenSearchConfigFromHost(
+    public Report<OpenSearchSourceConfigurationField> getOpenSearchConfigFromHost(
             HostField hostField, CredentialsField creds) {
         List<List<SourceTaskCallable<OpenSearchSourceConfigurationField>>> taskList =
                 new ArrayList<>();
@@ -103,33 +104,32 @@ public class OpenSearchSourceUtils {
             taskList.add(callables);
         }
 
-        PrioritizedBatchExecutor<ReportWithResultImpl<OpenSearchSourceConfigurationField>, ReportWithResultImpl<OpenSearchSourceConfigurationField>>
+        PrioritizedBatchExecutor<Report<OpenSearchSourceConfigurationField>, Report<OpenSearchSourceConfigurationField>>
                 prioritizedExecutor = new PrioritizedBatchExecutor(THREAD_POOL_SIZE,
                 taskList,
                 new SourceTaskHandler<OpenSearchSourceConfigurationField>());
 
-        Optional<ReportWithResultImpl<OpenSearchSourceConfigurationField>> result =
+        Optional<Report<OpenSearchSourceConfigurationField>> result =
                 prioritizedExecutor.getFirst();
 
         if (result.isPresent()) {
             return result.get();
         } else {
-            return new ReportWithResultImpl<OpenSearchSourceConfigurationField>().addArgumentMessage(
-                    unknownEndpointError(hostField.path()));
+            return Reports.from(unknownEndpointError(hostField.path()));
         }
     }
 
-    public ReportWithResultImpl<OpenSearchSourceConfigurationField> getOpenSearchConfigFromUrl(
+    public Report<OpenSearchSourceConfigurationField> getOpenSearchConfigFromUrl(
             UrlField urlField, CredentialsField creds) {
-        ReportWithResultImpl<ResponseField> responseResult = requestUtils.sendGetRequest(urlField,
+        Report<ResponseField> responseResult = requestUtils.sendGetRequest(urlField,
                 creds,
                 GET_CAPABILITIES_PARAMS);
 
-        if (responseResult.containsErrorMsgs()) {
-            return (ReportWithResultImpl) responseResult;
+        if (responseResult.containsErrorMessages()) {
+            return Reports.from(responseResult.getErrorMessages());
         }
 
-        return getOpenSearchConfigFromResponse(responseResult.result(), creds);
+        return getOpenSearchConfigFromResponse(responseResult.getResult(), creds);
     }
 
     /**
@@ -140,20 +140,17 @@ public class OpenSearchSourceUtils {
      *
      * @param responseField The URL to probe for OpenSearch capabilities
      * @param creds         optional credentials used in the original capabilities request
-     * @return a {@link ReportWithResultImpl} containing the {@link OpenSearchSourceConfigurationField} or containing {@link org.codice.ddf.admin.api.report.ErrorMessage}s on failure.
+     * @return a {@link Report} containing the {@link OpenSearchSourceConfigurationField} or containing {@link org.codice.ddf.admin.api.report.ErrorMessage}s on failure.
      */
-    private ReportWithResultImpl<OpenSearchSourceConfigurationField> getOpenSearchConfigFromResponse(
+    private Report<OpenSearchSourceConfigurationField> getOpenSearchConfigFromResponse(
             ResponseField responseField, CredentialsField creds) {
-        ReportWithResultImpl<OpenSearchSourceConfigurationField> configResult =
-                new ReportWithResultImpl<>();
 
         String responseBody = responseField.responseBody();
         int statusCode = responseField.statusCode();
 
         if (statusCode != HTTP_OK || responseBody.length() < 1) {
-            configResult.addArgumentMessage(unknownEndpointError(responseField.requestUrlField()
+            return Reports.from(unknownEndpointError(responseField.requestUrlField()
                     .path()));
-            return configResult;
         }
 
         Document capabilitiesXml;
@@ -161,9 +158,8 @@ public class OpenSearchSourceUtils {
             capabilitiesXml = sourceUtilCommons.createDocument(responseBody);
         } catch (Exception e) {
             LOGGER.debug("Failed to read response from OpenSearch endpoint.");
-            configResult.addArgumentMessage(unknownEndpointError(responseField.requestUrlField()
+            return Reports.from(unknownEndpointError(responseField.requestUrlField()
                     .path()));
-            return configResult;
         }
 
         XPath xpath = XPathFactory.newInstance()
@@ -180,18 +176,16 @@ public class OpenSearchSourceUtils {
                         .username(creds.username())
                         .password(FLAG_PASSWORD);
 
-                configResult.result(config);
+                return Reports.from(config);
             } else {
-                configResult.addArgumentMessage(unknownEndpointError(responseField.requestUrlField()
+                return Reports.from(unknownEndpointError(responseField.requestUrlField()
                         .path()));
             }
         } catch (XPathExpressionException e) {
             LOGGER.debug("Failed to compile OpenSearch totalResults XPath.");
-            configResult.addArgumentMessage(unknownEndpointError(responseField.requestUrlField()
+            return Reports.from(unknownEndpointError(responseField.requestUrlField()
                     .path()));
         }
-
-        return configResult;
     }
 
     /**

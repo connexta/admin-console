@@ -75,14 +75,14 @@ public class LdapRecommendedSettings extends BaseFunctionField<LdapRecommendedSe
     public LdapRecommendedSettingsField performFunction() {
         try (LdapConnectionAttempt connectionAttempt = utils.bindUserToLdapConnection(conn,
                 creds)) {
-            addMessages(connectionAttempt);
+            addErrorMessages(connectionAttempt);
 
             if (!connectionAttempt.isResultPresent()) {
                 return null;
             }
 
             ServerGuesser guesser = ServerGuesser.buildGuesser(ldapType.getValue(),
-                    connectionAttempt.result());
+                    connectionAttempt.getResult());
 
             return new LdapRecommendedSettingsField().userDns(guesser.getUserBaseChoices())
                     .groupDns(guesser.getGroupBaseChoices())

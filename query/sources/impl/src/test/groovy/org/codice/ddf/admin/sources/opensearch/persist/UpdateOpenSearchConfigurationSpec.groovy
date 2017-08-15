@@ -95,7 +95,7 @@ class UpdateOpenSearchConfigurationSpec extends SourceCommonsSpec {
         def report = updateOpenSearchConfiguration.getValue()
 
         then:
-        report.result().getValue()
+        report.getResult().getValue()
     }
 
     def 'Fail to update config due to existing source name'() {
@@ -108,10 +108,10 @@ class UpdateOpenSearchConfigurationSpec extends SourceCommonsSpec {
         def report = updateOpenSearchConfiguration.getValue()
 
         then:
-        report.result() == null
-        report.messages().size() == 1
-        report.messages().get(0).path == SOURCE_NAME_PATH
-        report.messages().get(0).code == SourceMessages.DUPLICATE_SOURCE_NAME
+        report.getResult() == null
+        report.getErrorMessages().size() == 1
+        report.getErrorMessages().get(0).path == SOURCE_NAME_PATH
+        report.getErrorMessages().get(0).code == SourceMessages.DUPLICATE_SOURCE_NAME
     }
 
     def 'Fail to update config due to failure to commit'() {
@@ -127,10 +127,10 @@ class UpdateOpenSearchConfigurationSpec extends SourceCommonsSpec {
         then:
         1 * configurator.commit(_, _) >> mockReport(false)
         1 * configurator.commit(_, _) >> mockReport(true)
-        !report.result().getValue()
-        report.messages().size() == 1
-        report.messages().get(0).path == RESULT_ARGUMENT_PATH
-        report.messages().get(0).code == DefaultMessages.FAILED_PERSIST
+        !report.getResult().getValue()
+        report.getErrorMessages().size() == 1
+        report.getErrorMessages().get(0).path == RESULT_ARGUMENT_PATH
+        report.getErrorMessages().get(0).code == DefaultMessages.FAILED_PERSIST
     }
 
     def 'Fail to update config due to no existing source specified by the pid'() {
@@ -142,10 +142,10 @@ class UpdateOpenSearchConfigurationSpec extends SourceCommonsSpec {
         def report = updateOpenSearchConfiguration.getValue()
 
         then:
-        report.result() == null
-        report.messages().size() == 1
-        report.messages().get(0).code == DefaultMessages.NO_EXISTING_CONFIG
-        report.messages().get(0).path == RESULT_ARGUMENT_PATH
+        report.getResult() == null
+        report.getErrorMessages().size() == 1
+        report.getErrorMessages().get(0).code == DefaultMessages.NO_EXISTING_CONFIG
+        report.getErrorMessages().get(0).path == RESULT_ARGUMENT_PATH
     }
 
     def 'Return false when opensearch feature fails to start'() {
@@ -159,10 +159,10 @@ class UpdateOpenSearchConfigurationSpec extends SourceCommonsSpec {
 
         then:
         1 * configurator.commit(_, _) >> mockReport(true)
-        !report.result().getValue()
-        report.messages().size() == 1
-        report.messages().get(0).path == RESULT_ARGUMENT_PATH
-        report.messages().get(0).code == DefaultMessages.FAILED_PERSIST
+        !report.getResult().getValue()
+        report.getErrorMessages().size() == 1
+        report.getErrorMessages().get(0).path == RESULT_ARGUMENT_PATH
+        report.getErrorMessages().get(0).code == DefaultMessages.FAILED_PERSIST
     }
 
     def 'Updating with flag password sends service properties without password'() {
@@ -202,12 +202,12 @@ class UpdateOpenSearchConfigurationSpec extends SourceCommonsSpec {
         def report = updateOpenSearchConfiguration.getValue()
 
         then:
-        report.result() == null
-        report.messages().size() == 3
-        report.messages().count {
+        report.getResult() == null
+        report.getErrorMessages().size() == 3
+        report.getErrorMessages().count {
             it.getCode() == DefaultMessages.MISSING_REQUIRED_FIELD
         } == 3
-        report.messages()*.getPath() == [PID_PATH, SOURCE_NAME_PATH, ENDPOINT_URL_PATH]
+        report.getErrorMessages()*.getPath() == [PID_PATH, SOURCE_NAME_PATH, ENDPOINT_URL_PATH]
     }
 
     def 'Returns all the possible error codes correctly'(){

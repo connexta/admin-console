@@ -106,8 +106,8 @@ class UpdateCswConfigurationSpec extends SourceCommonsSpec {
         def report = updateCswConfiguration.getValue()
 
         then:
-        report.result() != null
-        report.result().getValue()
+        report.getResult() != null
+        report.getResult().getValue()
     }
 
     def 'Fail CSW configuration update due to existing source name'() {
@@ -122,10 +122,10 @@ class UpdateCswConfigurationSpec extends SourceCommonsSpec {
         def report = updateCswConfiguration.getValue()
 
         then:
-        report.result() == null
-        report.messages().size() == 1
-        report.messages().get(0).path == SOURCE_NAME_PATH
-        report.messages().get(0).code == SourceMessages.DUPLICATE_SOURCE_NAME
+        report.getResult() == null
+        report.getErrorMessages().size() == 1
+        report.getErrorMessages().get(0).path == SOURCE_NAME_PATH
+        report.getErrorMessages().get(0).code == SourceMessages.DUPLICATE_SOURCE_NAME
     }
 
     def 'Fail to update CSW config due to failure to commit'() {
@@ -140,10 +140,10 @@ class UpdateCswConfigurationSpec extends SourceCommonsSpec {
         then:
         1 * configurator.commit(_, _) >> mockReport(false)
         1 * configurator.commit(_, _) >> mockReport(true)
-        !report.result().getValue()
-        report.messages().size() == 1
-        report.messages().get(0).path == RESULT_ARGUMENT_PATH
-        report.messages().get(0).code == DefaultMessages.FAILED_PERSIST
+        !report.getResult().getValue()
+        report.getErrorMessages().size() == 1
+        report.getErrorMessages().get(0).path == RESULT_ARGUMENT_PATH
+        report.getErrorMessages().get(0).code == DefaultMessages.FAILED_PERSIST
     }
 
     def 'Fail to update CSW Configuration due to no existing source config'() {
@@ -155,10 +155,10 @@ class UpdateCswConfigurationSpec extends SourceCommonsSpec {
         def report = updateCswConfiguration.getValue()
 
         then:
-        report.result() == null
-        report.messages().size() == 1
-        report.messages().get(0).path == RESULT_ARGUMENT_PATH
-        report.messages().get(0).code == DefaultMessages.NO_EXISTING_CONFIG
+        report.getResult() == null
+        report.getErrorMessages().size() == 1
+        report.getErrorMessages().get(0).path == RESULT_ARGUMENT_PATH
+        report.getErrorMessages().get(0).code == DefaultMessages.NO_EXISTING_CONFIG
     }
 
     def 'Return false when csw feature fails to start'() {
@@ -172,10 +172,10 @@ class UpdateCswConfigurationSpec extends SourceCommonsSpec {
 
         then:
         1 * configurator.commit(_, _) >> mockReport(true)
-        !report.result().getValue()
-        report.messages().size() == 1
-        report.messages().get(0).path == RESULT_ARGUMENT_PATH
-        report.messages().get(0).code == DefaultMessages.FAILED_PERSIST
+        !report.getResult().getValue()
+        report.getErrorMessages().size() == 1
+        report.getErrorMessages().get(0).path == RESULT_ARGUMENT_PATH
+        report.getErrorMessages().get(0).code == DefaultMessages.FAILED_PERSIST
     }
 
     def 'Updating with flag password sends service properties without password'() {
@@ -215,12 +215,12 @@ class UpdateCswConfigurationSpec extends SourceCommonsSpec {
         def report = updateCswConfiguration.getValue()
 
         then:
-        report.result() == null
-        report.messages().size() == 4
-        report.messages().count {
+        report.getResult() == null
+        report.getErrorMessages().size() == 4
+        report.getErrorMessages().count {
             it.getCode() == DefaultMessages.MISSING_REQUIRED_FIELD
         } == 4
-        report.messages()*.getPath() == [SERVICE_PID_PATH, SOURCE_NAME_PATH, ENDPOINT_URL_PATH, CSW_PROFILE_PATH]
+        report.getErrorMessages()*.getPath() == [SERVICE_PID_PATH, SOURCE_NAME_PATH, ENDPOINT_URL_PATH, CSW_PROFILE_PATH]
     }
 
     def 'Returns all the possible error codes correctly'(){

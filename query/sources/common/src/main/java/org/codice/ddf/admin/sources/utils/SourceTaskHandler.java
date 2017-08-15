@@ -15,14 +15,14 @@ package org.codice.ddf.admin.sources.utils;
 
 import java.util.function.Function;
 
-import org.codice.ddf.admin.common.report.ReportWithResultImpl;
+import org.codice.ddf.admin.api.report.Report;
 
 public class SourceTaskHandler<T>
-        implements Function<ReportWithResultImpl<T>, ReportWithResultImpl<T>> {
+        implements Function<Report<T>, Report<T>> {
 
     @Override
-    public ReportWithResultImpl<T> apply(ReportWithResultImpl<T> configResult) {
-        if (configResult != null && !configResult.containsErrorMsgs()) {
+    public Report<T> apply(Report<T> configResult) {
+        if (configResult != null && !configResult.containsErrorMessages()) {
             return configResult;
         }
         return null;

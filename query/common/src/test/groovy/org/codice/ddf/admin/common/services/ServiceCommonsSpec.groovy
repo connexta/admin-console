@@ -24,8 +24,6 @@ import org.codice.ddf.internal.admin.configurator.actions.ServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceReader
 import spock.lang.Specification
 
-import static org.codice.ddf.admin.common.services.ServiceCommons.validateServiceConfigurationExists
-
 class ServiceCommonsSpec extends Specification {
     ConfiguratorSuite configuratorSuite
 
@@ -66,7 +64,7 @@ class ServiceCommonsSpec extends Specification {
         def report = serviceCommons.createManagedService([:], '')
 
         then:
-        report.messages().size() == 0
+        report.getErrorMessages().size() == 0
     }
 
     def 'Configurator fails to commit when creating managed service'() {
@@ -77,35 +75,35 @@ class ServiceCommonsSpec extends Specification {
         def report = serviceCommons.createManagedService([:], '')
 
         then:
-        report.messages().size() == 1
-        report.messages()[0].getCode() == DefaultMessages.FAILED_PERSIST
-        report.messages()[0].getPath() == []
+        report.getErrorMessages().size() == 1
+        report.getErrorMessages()[0].getCode() == DefaultMessages.FAILED_PERSIST
+        report.getErrorMessages()[0].getPath() == []
     }
 
     def 'Update service success'() {
         setup:
-        serviceActions.read(_) >> ['config':'exists']
+        serviceActions.read(_) >> ['config': 'exists']
         configurator.commit(_, _) >> mockReport(false)
 
         when:
         def report = serviceCommons.updateService(createTestField('testValue'), [:])
 
         then:
-        report.messages().size() == 0
+        report.getErrorMessages().size() == 0
     }
 
     def 'Configurator fails to commit when updating service'() {
         setup:
-        serviceActions.read(_) >> ['config':'exists']
+        serviceActions.read(_) >> ['config': 'exists']
         configurator.commit(_, _) >> mockReport(true)
 
         when:
         def report = serviceCommons.updateService(createTestField('testValue'), [:])
 
         then:
-        report.messages().size() == 1
-        report.messages()[0].getCode() == DefaultMessages.FAILED_PERSIST
-        report.messages()[0].getPath() == []
+        report.getErrorMessages().size() == 1
+        report.getErrorMessages()[0].getCode() == DefaultMessages.FAILED_PERSIST
+        report.getErrorMessages()[0].getPath() == []
     }
 
     def 'Delete service success'() {
@@ -116,7 +114,7 @@ class ServiceCommonsSpec extends Specification {
         def report = serviceCommons.deleteService(createTestField('testValue'))
 
         then:
-        report.messages().size() == 0
+        report.getErrorMessages().size() == 0
     }
 
     def 'Configurator fails to commit when deleting service'() {
@@ -127,20 +125,20 @@ class ServiceCommonsSpec extends Specification {
         def report = serviceCommons.deleteService(createTestField('testValue'))
 
         then:
-        report.messages().size() == 1
-        report.messages()[0].getCode() == DefaultMessages.FAILED_PERSIST
-        report.messages()[0].getPath() == []
+        report.getErrorMessages().size() == 1
+        report.getErrorMessages()[0].getCode() == DefaultMessages.FAILED_PERSIST
+        report.getErrorMessages()[0].getPath() == []
     }
 
     def 'Configuration exists'() {
         setup:
-        serviceActions.read(_) >> ['config':'exists']
+        serviceActions.read(_) >> ['config': 'exists']
 
         when:
         def report = serviceCommons.serviceConfigurationExists(createTestField('testValue'))
 
         then:
-        report.messages().size() == 0
+        report.getErrorMessages().size() == 0
     }
 
     def 'Configuration does not exist'() {
@@ -151,9 +149,9 @@ class ServiceCommonsSpec extends Specification {
         def report = serviceCommons.serviceConfigurationExists(createTestField('testValue'))
 
         then:
-        report.messages().size() == 1
-        report.messages()[0].getCode() == DefaultMessages.NO_EXISTING_CONFIG
-        report.messages()[0].getPath() == []
+        report.getErrorMessages().size() == 1
+        report.getErrorMessages()[0].getCode() == DefaultMessages.NO_EXISTING_CONFIG
+        report.getErrorMessages()[0].getPath() == []
     }
 
     def 'Service config builder does not have null values'() {

@@ -82,12 +82,12 @@ class LdapRecommendedSettingsSpec extends Specification {
         FunctionReport report = action.getValue()
 
         then:
-        report.messages().size() == 7
-        report.messages().count {
+        report.getErrorMessages().size() == 7
+        report.getErrorMessages().count {
             it.getCode() == DefaultMessages.MISSING_REQUIRED_FIELD
         } == 7
 
-        report.messages()*.getPath() as Set == [badPaths.missingHostPath,
+        report.getErrorMessages()*.getPath() as Set == [badPaths.missingHostPath,
                                                 badPaths.missingPortPath,
                                                 badPaths.missingEncryptPath,
                                                 badPaths.missingUsernamePath,
@@ -108,9 +108,9 @@ class LdapRecommendedSettingsSpec extends Specification {
         FunctionReport report = action.getValue()
 
         then:
-        report.messages().size() == 1
-        report.messages().get(0).getCode() == DefaultMessages.CANNOT_CONNECT
-        report.messages().get(0).getPath() == baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME]
+        report.getErrorMessages().size() == 1
+        report.getErrorMessages().get(0).getCode() == DefaultMessages.CANNOT_CONNECT
+        report.getErrorMessages().get(0).getPath() == baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME]
     }
 
     def 'fail to bind to LDAP'() {
@@ -125,9 +125,9 @@ class LdapRecommendedSettingsSpec extends Specification {
         FunctionReport report = action.getValue()
 
         then:
-        report.messages().size() == 1
-        report.messages().get(0).getCode() == LdapMessages.CANNOT_BIND
-        report.messages().get(0).getPath() == baseMsg + [LdapBindUserInfo.DEFAULT_FIELD_NAME]
+        report.getErrorMessages().size() == 1
+        report.getErrorMessages().get(0).getCode() == LdapMessages.CANNOT_BIND
+        report.getErrorMessages().get(0).getPath() == baseMsg + [LdapBindUserInfo.DEFAULT_FIELD_NAME]
     }
 
     def 'validate settings successfully'() {
@@ -139,8 +139,8 @@ class LdapRecommendedSettingsSpec extends Specification {
         action.setTestingUtils(utilsMock)
 
         when:
-        LdapRecommendedSettingsField recSettings = action.getValue().result()
-        ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().result().isClosed()
+        LdapRecommendedSettingsField recSettings = action.getValue().getResult()
+        ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().getResult().isClosed()
 
         then:
         recSettings.userDnsField().value.size() == 1
@@ -192,8 +192,8 @@ class LdapRecommendedSettingsSpec extends Specification {
 
         then:
         errorCodes.size() == 3
-        errorCodes.contains(cannotBindReport.messages().get(0).getCode())
-        errorCodes.contains(cannotConnectReport.messages().get(0).getCode())
+        errorCodes.contains(cannotBindReport.getErrorMessages().get(0).getCode())
+        errorCodes.contains(cannotConnectReport.getErrorMessages().get(0).getCode())
         errorCodes.contains(DefaultMessages.FAILED_TEST_SETUP)
     }
 }

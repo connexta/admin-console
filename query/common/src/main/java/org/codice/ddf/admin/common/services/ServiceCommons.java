@@ -26,8 +26,9 @@ import org.apache.commons.lang.text.StrSubstitutor;
 import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.api.Events;
 import org.codice.ddf.admin.api.Field;
+import org.codice.ddf.admin.api.report.Report;
 import org.codice.ddf.admin.common.fields.common.PidField;
-import org.codice.ddf.admin.common.report.ReportImpl;
+import org.codice.ddf.admin.common.report.Reports;
 import org.codice.ddf.admin.configurator.Configurator;
 import org.codice.ddf.admin.configurator.OperationReport;
 import org.osgi.framework.BundleContext;
@@ -67,9 +68,7 @@ public class ServiceCommons {
                 .collect(Collectors.toList());
     }
 
-    public ReportImpl createManagedService(Map<String, Object> serviceProps, String factoryPid) {
-        ReportImpl report = new ReportImpl();
-
+    public Report<Void> createManagedService(Map<String, Object> serviceProps, String factoryPid) {
         Configurator configurator = configuratorSuite.getConfiguratorFactory()
                 .getConfigurator();
         configurator.add(configuratorSuite.getManagedServiceActions()
@@ -78,17 +77,15 @@ public class ServiceCommons {
         // TODO RAP 13 Jul 17: Blank out password in the parameters passed here
         if (configurator.commit("Service saved with details [{}]", serviceProps.toString())
                 .containsFailedResults()) {
-            report.addResultMessage(failedPersistError());
+            return Reports.from(failedPersistError());
         }
 
-        return report;
+        return Reports.emptyReport();
     }
 
-    public ReportImpl updateService(PidField servicePid, Map<String, Object> newConfig) {
-        ReportImpl report = new ReportImpl();
-
-        report.addMessages(serviceConfigurationExists(servicePid));
-        if (report.containsErrorMsgs()) {
+    public Report<Void> updateService(PidField servicePid, Map<String, Object> newConfig) {
+        Report report = serviceConfigurationExists(servicePid);
+        if (report.containsErrorMessages()) {
             return report;
         }
 
@@ -104,24 +101,22 @@ public class ServiceCommons {
                 pid,
                 newConfig.toString());
         if (operationReport.containsFailedResults()) {
-            report.addResultMessage(failedPersistError());
+            report.addErrorMessage(failedPersistError());
         }
 
         return report;
     }
 
-    public ReportImpl deleteService(PidField servicePid) {
-        ReportImpl report = new ReportImpl();
-
+    public Report<Void> deleteService(PidField servicePid) {
         Configurator configurator = configuratorSuite.getConfiguratorFactory()
                 .getConfigurator();
         configurator.add(configuratorSuite.getManagedServiceActions()
                 .delete(servicePid.getValue()));
         if (configurator.commit("Deleted service with pid [{}].", servicePid.getValue())
                 .containsFailedResults()) {
-            report.addResultMessage(failedPersistError());
+            return Reports.from(failedPersistError());
         }
-        return report;
+        return Reports.emptyReport();
     }
 
     /**
@@ -130,12 +125,11 @@ public class ServiceCommons {
      * @param servicePid identifier of the service
      * @return
      */
-    public ReportImpl serviceConfigurationExists(PidField servicePid) {
-        ReportImpl report = new ReportImpl();
+    public Report<Void> serviceConfigurationExists(PidField servicePid) {
         if (!serviceConfigurationExists(servicePid.getValue())) {
-            report.addResultMessage(noExistingConfigError());
+            return Reports.from(noExistingConfigError());
         }
-        return report;
+        return Reports.emptyReport();
     }
 
     /**

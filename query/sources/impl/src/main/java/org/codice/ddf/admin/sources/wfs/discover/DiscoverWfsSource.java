@@ -19,10 +19,10 @@ import java.util.Set;
 import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.fields.FunctionField;
+import org.codice.ddf.admin.api.report.Report;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.common.AddressField;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
-import org.codice.ddf.admin.common.report.ReportWithResultImpl;
 import org.codice.ddf.admin.common.report.message.DefaultMessages;
 import org.codice.ddf.admin.sources.fields.type.WfsSourceConfigurationField;
 import org.codice.ddf.admin.sources.wfs.WfsSourceUtils;
@@ -62,19 +62,19 @@ public class DiscoverWfsSource extends BaseFunctionField<WfsSourceConfigurationF
 
     @Override
     public WfsSourceConfigurationField performFunction() {
-        ReportWithResultImpl<WfsSourceConfigurationField> configResult;
+        Report<WfsSourceConfigurationField> configResult;
         if (address.url() != null) {
             configResult = wfsSourceUtils.getWfsConfigFromUrl(address.urlField(), credentials);
         } else {
             configResult = wfsSourceUtils.getWfsConfigFromHost(address.host(), credentials);
         }
 
-        addMessages(configResult);
+        addErrorMessages(configResult);
         if (containsErrorMsgs()) {
             return null;
         }
 
-        return configResult.result();
+        return configResult.getResult();
     }
 
     @Override

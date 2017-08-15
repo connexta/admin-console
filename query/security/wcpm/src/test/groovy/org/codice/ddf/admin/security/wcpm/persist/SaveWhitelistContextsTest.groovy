@@ -15,7 +15,7 @@ package org.codice.ddf.admin.security.wcpm.persist
 
 import org.codice.ddf.admin.api.ConfiguratorSuite
 import org.codice.ddf.admin.api.fields.FunctionField
-import org.codice.ddf.admin.api.report.ReportWithResult
+import org.codice.ddf.admin.api.report.Report
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.configurator.Configurator
@@ -23,8 +23,6 @@ import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.configurator.OperationReport
 import org.codice.ddf.admin.security.common.services.PolicyManagerServiceProperties
 import org.codice.ddf.admin.security.wcpm.WcpmFieldProvider
-import org.codice.ddf.internal.admin.configurator.actions.BundleActions
-import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceReader
 import org.codice.ddf.security.policy.context.impl.PolicyManager
@@ -70,11 +68,11 @@ class SaveWhitelistContextsTest extends Specification {
 
         when:
         saveWhitelistContextsFunction.setValue(testMap)
-        ReportWithResult report = saveWhitelistContextsFunction.getValue()
+        Report report = saveWhitelistContextsFunction.getValue()
 
         then:
-        report.messages().size() == 0
-        report.result().getValue() == testMap.paths
+        report.getErrorMessages().size() == 0
+        report.getResult().getValue() == testMap.paths
     }
 
     def 'Fail if context path is invalid'() {
@@ -84,12 +82,12 @@ class SaveWhitelistContextsTest extends Specification {
 
         when:
         saveWhitelistContextsFunction.setValue(testMap)
-        ReportWithResult report = saveWhitelistContextsFunction.getValue()
+        Report report = saveWhitelistContextsFunction.getValue()
 
         then:
-        report.messages()[0].code == DefaultMessages.INVALID_CONTEXT_PATH
-        report.messages()[0].path == [WcpmFieldProvider.NAME, SaveWhitelistContexts.FIELD_NAME, BaseFunctionField.ARGUMENT, 'paths', '2']
-        report.result() == null
+        report.getErrorMessages()[0].code == DefaultMessages.INVALID_CONTEXT_PATH
+        report.getErrorMessages()[0].path == [WcpmFieldProvider.NAME, SaveWhitelistContexts.FIELD_NAME, BaseFunctionField.ARGUMENT, 'paths', '2']
+        report.getResult() == null
     }
 
     def 'Fail if context path is empty'() {
@@ -99,12 +97,12 @@ class SaveWhitelistContextsTest extends Specification {
 
         when:
         saveWhitelistContextsFunction.setValue(testMap)
-        ReportWithResult report = saveWhitelistContextsFunction.getValue()
+        Report report = saveWhitelistContextsFunction.getValue()
 
         then:
-        report.messages()[0].code == DefaultMessages.EMPTY_FIELD
-        report.messages()[0].path == [WcpmFieldProvider.NAME, SaveWhitelistContexts.FIELD_NAME, BaseFunctionField.ARGUMENT, 'paths', '2']
-        report.result() == null
+        report.getErrorMessages()[0].code == DefaultMessages.EMPTY_FIELD
+        report.getErrorMessages()[0].path == [WcpmFieldProvider.NAME, SaveWhitelistContexts.FIELD_NAME, BaseFunctionField.ARGUMENT, 'paths', '2']
+        report.getResult() == null
     }
 
     def 'Pass if list is empty (whitelist contexts not required)'() {
@@ -114,11 +112,11 @@ class SaveWhitelistContextsTest extends Specification {
 
         when:
         saveWhitelistContextsFunction.setValue(testMap)
-        ReportWithResult report = saveWhitelistContextsFunction.getValue()
+        Report report = saveWhitelistContextsFunction.getValue()
 
         then:
-        report.messages().size() == 0
-        report.result().getValue() == []
+        report.getErrorMessages().size() == 0
+        report.getResult().getValue() == []
     }
 
     def 'Fail when fail to persist'() {
@@ -128,12 +126,12 @@ class SaveWhitelistContextsTest extends Specification {
 
         when:
         saveWhitelistContextsFunction.setValue(testMap)
-        ReportWithResult report = saveWhitelistContextsFunction.getValue()
+        Report report = saveWhitelistContextsFunction.getValue()
 
         then:
-        report.messages()[0].code == DefaultMessages.FAILED_PERSIST
-        report.messages()[0].path == [wcpmFieldProvider.NAME, SaveWhitelistContexts.FIELD_NAME]
-        report.result() == null
+        report.getErrorMessages()[0].code == DefaultMessages.FAILED_PERSIST
+        report.getErrorMessages()[0].path == [wcpmFieldProvider.NAME, SaveWhitelistContexts.FIELD_NAME]
+        report.getResult() == null
     }
 
     def 'Returns all the possible error codes correctly'(){

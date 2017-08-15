@@ -77,12 +77,12 @@ class LdapQuerySpec extends Specification {
         FunctionReport report = ldapQueryFunction.getValue()
 
         then:
-        report.messages().size() == 8
-        report.messages().count {
+        report.getErrorMessages().size() == 8
+        report.getErrorMessages().count {
             it.getCode() == DefaultMessages.MISSING_REQUIRED_FIELD
         } == 8
 
-        report.messages()*.getPath() as Set == [missingHostMsgPath, missingPortMsgPath, missingEncryptMsgPath,
+        report.getErrorMessages()*.getPath() as Set == [missingHostMsgPath, missingPortMsgPath, missingEncryptMsgPath,
                                                 missingUsernameMsgPath, missingUserpasswordMsgPath, missingBindMethodMsgPath,
                                                 missingQueryBaseMsgPath, missingQueryMsgPath] as Set
     }
@@ -99,9 +99,9 @@ class LdapQuerySpec extends Specification {
         FunctionReport report = ldapQueryFunction.getValue()
 
         then:
-        report.messages().size() == 1
-        report.messages().get(0).getCode() == DefaultMessages.CANNOT_CONNECT
-        report.messages().get(0).getPath() == [LdapQuery.FIELD_NAME, BaseFunctionField.ARGUMENT, LdapConnectionField.DEFAULT_FIELD_NAME]
+        report.getErrorMessages().size() == 1
+        report.getErrorMessages().get(0).getCode() == DefaultMessages.CANNOT_CONNECT
+        report.getErrorMessages().get(0).getPath() == [LdapQuery.FIELD_NAME, BaseFunctionField.ARGUMENT, LdapConnectionField.DEFAULT_FIELD_NAME]
 
     }
 
@@ -118,9 +118,9 @@ class LdapQuerySpec extends Specification {
         FunctionReport report = ldapQueryFunction.getValue()
 
         then:
-        report.messages().size() == 1
-        report.messages().get(0).getCode() == LdapMessages.CANNOT_BIND
-        report.messages().get(0).getPath() == [LdapQuery.FIELD_NAME, BaseFunctionField.ARGUMENT, LdapBindUserInfo.DEFAULT_FIELD_NAME]
+        report.getErrorMessages().size() == 1
+        report.getErrorMessages().get(0).getCode() == LdapMessages.CANNOT_BIND
+        report.getErrorMessages().get(0).getPath() == [LdapQuery.FIELD_NAME, BaseFunctionField.ARGUMENT, LdapBindUserInfo.DEFAULT_FIELD_NAME]
     }
 
     def 'Successfully query with entries found (No encryption)'() {
@@ -135,10 +135,10 @@ class LdapQuerySpec extends Specification {
 
         when:
         FunctionReport report = ldapQueryFunction.getValue()
-        ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().result().isClosed()
+        ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().getResult().isClosed()
 
         then:
-        def entries = report.result().getList()
+        def entries = report.getResult().getList()
         entries.size() == 2
         entries*.getEntry('name')*.get()*.value() as Set ==
                 ['uid=tstark,ou=users,dc=example,dc=com', 'uid=bbanner,ou=users,dc=example,dc=com'] as Set
@@ -158,10 +158,10 @@ class LdapQuerySpec extends Specification {
 
         when:
         FunctionReport report = ldapQueryFunction.getValue()
-        ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().result().isClosed()
+        ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().getResult().isClosed()
 
         then:
-        def entries = report.result().getList()
+        def entries = report.getResult().getList()
         entries.size() == 2
         entries*.getEntry('name')*.get()*.value() as Set ==
                 ['uid=tstark,ou=users,dc=example,dc=com', 'uid=bbanner,ou=users,dc=example,dc=com'] as Set
@@ -181,10 +181,10 @@ class LdapQuerySpec extends Specification {
 
         when:
         FunctionReport report = ldapQueryFunction.getValue()
-        ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().result().isClosed()
+        ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().getResult().isClosed()
 
         then:
-        def entries = report.result().getList()
+        def entries = report.getResult().getList()
         entries.size() == 2
         entries*.getEntry('name')*.get()*.value() as Set ==
                 ['uid=tstark,ou=users,dc=example,dc=com', 'uid=bbanner,ou=users,dc=example,dc=com'] as Set
@@ -204,10 +204,10 @@ class LdapQuerySpec extends Specification {
 
         when:
         FunctionReport report = ldapQueryFunction.getValue()
-        ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().result().isClosed()
+        ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().getResult().isClosed()
 
         then:
-        def entries = report.result().getList()
+        def entries = report.getResult().getList()
         entries.size() == 0
         ldapConnectionIsClosed
     }
@@ -225,10 +225,10 @@ class LdapQuerySpec extends Specification {
 
         when:
         FunctionReport report = ldapQueryFunction.getValue()
-        ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().result().isClosed()
+        ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().getResult().isClosed()
 
         then:
-        def entries = report.result().getList()
+        def entries = report.getResult().getList()
         entries.size() == 1
         entries.first().getEntry('name').get().value() in
                 ['uid=tstark,ou=users,dc=example,dc=com', 'uid=bbanner,ou=users,dc=example,dc=com']
@@ -248,10 +248,10 @@ class LdapQuerySpec extends Specification {
 
         when:
         FunctionReport report = ldapQueryFunction.getValue()
-        ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().result().isClosed()
+        ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().getResult().isClosed()
 
         then:
-        def entries = report.result().getList()
+        def entries = report.getResult().getList()
         entries.size() == 2
         entries*.getEntry('name')*.get()*.value() as Set ==
                 ['uid=tstark,ou=users,dc=example,dc=com', 'uid=bbanner,ou=users,dc=example,dc=com'] as Set
@@ -286,8 +286,8 @@ class LdapQuerySpec extends Specification {
 
         then:
         errorCodes.size() == 3
-        errorCodes.contains(cannotConnectReport.messages().get(0).getCode())
-        errorCodes.contains(cannotBindReport.messages().get(0).getCode())
+        errorCodes.contains(cannotConnectReport.getErrorMessages().get(0).getCode())
+        errorCodes.contains(cannotBindReport.getErrorMessages().get(0).getCode())
         errorCodes.contains(DefaultMessages.FAILED_TEST_SETUP)
     }
 

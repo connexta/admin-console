@@ -26,6 +26,7 @@ import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.codice.ddf.admin.api.report.FunctionReport;
 import org.codice.ddf.admin.api.report.Report;
 import org.codice.ddf.admin.common.report.FunctionReportImpl;
+import org.codice.ddf.admin.common.report.message.ErrorMessageImpl;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -83,8 +84,8 @@ public abstract class BaseFunctionField<T extends DataType> extends BaseField<Ma
     @Override
     public FunctionReport<T> getValue() {
         validate();
-        if (!report.containsErrorMsgs()) {
-            report.result(performFunction());
+        if (!report.containsErrorMessages()) {
+            report.setResult(performFunction());
         }
 
         return report;
@@ -113,53 +114,30 @@ public abstract class BaseFunctionField<T extends DataType> extends BaseField<Ma
         getArguments().stream()
                 .map(DataType::validate)
                 .flatMap(Collection<ErrorMessage>::stream)
-                .forEach(this::addArgumentMessage);
+                .forEach(this::addErrorMessage);
     }
 
     protected boolean containsErrorMsgs() {
-        return report.containsErrorMsgs();
+        return report.containsErrorMessages();
     }
 
-    protected BaseFunctionField addArgumentMessages(List<ErrorMessage> msgs) {
-        msgs.forEach(this::addArgumentMessage);
+    protected BaseFunctionField addErrorMessages(List<ErrorMessage> msgs) {
+        msgs.forEach(this::addErrorMessage);
         return this;
     }
 
-    protected BaseFunctionField addArgumentMessage(ErrorMessage msg) {
-        ErrorMessage copy = msg.copy();
-        if(copy.getPath().isEmpty()) {
-            copy.setPath(path());
+    protected BaseFunctionField addErrorMessage(ErrorMessage msg) {
+        ErrorMessage message = new ErrorMessageImpl(msg.getCode(), msg.getPath());
+        if(message.getPath().isEmpty()) {
+            message.setPath(path());
         }
 
-        report.addArgumentMessage(copy);
+        report.addErrorMessage(message);
         return this;
     }
 
-    protected BaseFunctionField addResultMessages(List<ErrorMessage> msgs) {
-        msgs.forEach(this::addResultMessage);
-        return this;
-    }
-
-    protected BaseFunctionField addResultMessage(ErrorMessage msg) {
-        ErrorMessage copy = msg.copy();
-        List<String> copyMsgPath = copy.getPath();
-
-        //Remove first element of path because the return object's name will be included in the path
-        if(!copyMsgPath.isEmpty()) {
-            copyMsgPath.remove(0);
-        }
-
-        List<String> fullPath = new ImmutableList.Builder<String>().addAll(path())
-                .addAll(copyMsgPath)
-                .build();
-        copy.setPath(fullPath);
-        report.addResultMessage(copy);
-        return this;
-    }
-
-    protected BaseFunctionField addMessages(Report report) {
-        return addArgumentMessages(report.argumentMessages()).
-                addResultMessages(report.resultMessages());
+    protected BaseFunctionField addErrorMessages(Report report) {
+        return addErrorMessages(report.getErrorMessages());
     }
 
     private String formatErrorCodes(Set<String> errorCodes) {

@@ -64,7 +64,7 @@ public class DeleteLdapConfiguration extends BaseFunctionField<BooleanField> {
 
     @Override
     public BooleanField performFunction() {
-        addMessages(serviceCommons.deleteService(pid));
+        addErrorMessages(serviceCommons.deleteService(pid));
         return new BooleanField(!containsErrorMsgs());
     }
 
@@ -75,7 +75,7 @@ public class DeleteLdapConfiguration extends BaseFunctionField<BooleanField> {
             return;
         }
 
-        addMessages(serviceCommons.serviceConfigurationExists(pid));
+        addErrorMessages(serviceCommons.serviceConfigurationExists(pid));
     }
 
     @Override

@@ -73,12 +73,12 @@ class CreateLdapConfigurationSpec extends Specification {
         FunctionReport report = createConfigFunc.getValue()
 
         then:
-        report.messages().size() == 10
-        report.messages().count {
+        report.getErrorMessages().size() == 10
+        report.getErrorMessages().count {
             it.getCode() == DefaultMessages.MISSING_REQUIRED_FIELD
         } == 10
 
-        report.messages()*.getPath() as Set == [authBadPaths.missingHostPath,
+        report.getErrorMessages()*.getPath() as Set == [authBadPaths.missingHostPath,
                                                 authBadPaths.missingPortPath,
                                                 authBadPaths.missingEncryptPath,
                                                 authBadPaths.missingUsernamePath,
@@ -104,7 +104,7 @@ class CreateLdapConfigurationSpec extends Specification {
         FunctionReport report = createConfigFunc.getValue()
 
         then:
-        report.messages()*.getPath() as Set == [authBadPaths.missingHostPath,
+        report.getErrorMessages()*.getPath() as Set == [authBadPaths.missingHostPath,
                                                 authBadPaths.missingPortPath,
                                                 authBadPaths.missingEncryptPath,
                                                 authBadPaths.missingUsernamePath,
@@ -119,8 +119,8 @@ class CreateLdapConfigurationSpec extends Specification {
                                                 attributeStoreBadPaths.missingClaimsMappingPath
 
         ] as Set
-        report.messages().size() == 13
-        report.messages().count {
+        report.getErrorMessages().size() == 13
+        report.getErrorMessages().count {
             it.getCode() == DefaultMessages.MISSING_REQUIRED_FIELD
         } == 13
     }

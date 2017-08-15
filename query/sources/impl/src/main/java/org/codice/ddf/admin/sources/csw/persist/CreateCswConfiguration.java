@@ -74,11 +74,11 @@ public class CreateCswConfiguration extends BaseFunctionField<BooleanField> {
         OperationReport report = configurator.commit("Starting feature [{}]", CSW_FEATURE);
 
         if (report.containsFailedResults()) {
-            addResultMessage(failedPersistError());
+            addErrorMessage(failedPersistError());
             return new BooleanField(false);
         }
 
-        addMessages(serviceCommons.createManagedService(cswConfigToServiceProps(config),
+        addErrorMessages(serviceCommons.createManagedService(cswConfigToServiceProps(config),
                 cswProfileToFactoryPid(config.cswProfile())));
         return new BooleanField(!containsErrorMsgs());
     }
@@ -89,7 +89,7 @@ public class CreateCswConfiguration extends BaseFunctionField<BooleanField> {
         if (containsErrorMsgs()) {
             return;
         }
-        addMessages(sourceValidationUtils.duplicateSourceNameExists(config.sourceNameField()));
+        addErrorMessages(sourceValidationUtils.duplicateSourceNameExists(config.sourceNameField()));
     }
 
     @Override

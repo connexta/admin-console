@@ -16,7 +16,6 @@ const testBind = (conn, info) => ({
   variables: { conn, info }
 })
 
-import Stage from 'components/Stage'
 import Title from 'components/Title'
 import Description from 'components/Description'
 import Message from 'components/Message'
@@ -33,23 +32,34 @@ import {
 const BindSettings = (props) => {
   const {
     client,
+    onEdit,
     onError,
     onStartSubmit,
     onEndSubmit,
     next,
     // data
-    disabled,
-    submitting,
     configs: {
       ldapType
     },
     configs = {},
-    messages = [],
+    errors = [],
 
     // actions
     prev,
     setDefaults
   } = props
+
+  const keys = [
+    'bindUser',
+    'bindUserPassword',
+    'bindUserMethod',
+    'bindRealm'
+  ]
+
+  const messages = errors.filter((err) => {
+    const attr = err.path[err.path.length - 1]
+    return !keys.includes(attr)
+  })
 
   const { bindUserMethod, encryption } = configs
   let bindUserMethodOptions = ['Simple']
@@ -59,7 +69,7 @@ const BindSettings = (props) => {
   }
 
   return (
-    <Stage submitting={submitting}>
+    <div>
       <Mount
         on={setDefaults}
         bindUser={ldapType === 'activeDirectory' ? 'user@domain' : 'cn=admin'}
@@ -78,24 +88,34 @@ const BindSettings = (props) => {
       </Description>
 
       <Body>
-        <Input id='bindUser' disabled={disabled} label='Bind User' />
-        <Password id='bindUserPassword' disabled={disabled} label='Bind User Password' />
-        <Select id='bindUserMethod'
+        <Input
+          value={configs.bindUser}
+          onEdit={onEdit('bindUser')}
+          label='Bind User' />
+
+        <Password
+          value={configs.bindUserPassword}
+          onEdit={onEdit('bindUserPassword')}
+          label='Bind User Password' />
+
+        <Select
+          value={configs.bindUserMethod}
+          onEdit={onEdit('bindUserMethod')}
           label='Bind User Method'
-          disabled={disabled}
           options={bindUserMethodOptions} />
         {/* removed options: 'SASL', 'GSSAPI SASL' */}
         {/* TODO GSSAPI SASL only */}
         {/* <Input id='bindKdcAddress' disabled={disabled} label='KDC Address (for Kerberos authentication)' /> */}
         {/* TODO GSSAPI and Digest MD5 SASL only */}
         {/* Realm is needed for Kerberos and MD5 auth, currently only MD5 is supported by the wizard */}
-        <Input visible={bindUserMethod === 'DigestMD5SASL'} id='bindRealm'
-          disabled={disabled} label='Realm (for Digest MD5 authentication)' />
+        <Input
+          value={configs.bindRealm}
+          onEdit={onEdit('bindRealm')}
+          visible={bindUserMethod === 'DigestMD5SASL'}
+          label='Realm (for Digest MD5 authentication)' />
 
         <Navigation>
-          <Back
-            onClick={prev}
-            disabled={disabled} />
+          <Back onClick={prev} />
           <Next
             onClick={() => {
               onStartSubmit()
@@ -113,18 +133,18 @@ const BindSettings = (props) => {
               }))
                 .then(() => {
                   onEndSubmit()
-                  next({ nextStageId: 'directory-settings' })
+                  next('directory-settings')
                 })
                 .catch((err) => {
                   onEndSubmit()
                   onError(err.graphQLErrors)
                 })
             }}
-            disabled={disabled} />
+          />
         </Navigation>
         {messages.map((msg, i) => <Message key={i} {...msg} />)}
       </Body>
-    </Stage>
+    </div>
   )
 }
 

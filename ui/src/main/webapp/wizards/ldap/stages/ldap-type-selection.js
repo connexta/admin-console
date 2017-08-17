@@ -1,6 +1,5 @@
 import React from 'react'
 
-import Stage from 'components/Stage'
 import Title from 'components/Title'
 import Description from 'components/Description'
 
@@ -32,8 +31,8 @@ const LdapTypes = [
   }
 ]
 
-const LdapTypeSelection = ({ disabled, prev, next, configs: { ldapType } = {} }) => (
-  <Stage>
+const LdapTypeSelection = ({ onEdit, prev, next, configs: { ldapType } = {} }) => (
+  <div>
     <Title>What type of LDAP are you setting up?</Title>
     <Description>
       This will help us recommend the best options for setting up your LDAP connection.
@@ -42,22 +41,18 @@ const LdapTypeSelection = ({ disabled, prev, next, configs: { ldapType } = {} })
     </Description>
     <Body>
       <RadioSelection
-        id='ldapType'
+        value={ldapType}
+        onEdit={onEdit('ldapType')}
         options={LdapTypes}
-        name='LDAP Type Selections'
-        disabled={disabled} />
+        name='LDAP Type Selections' />
       <Navigation>
-        <Back
-          onClick={prev}
-          disabled={disabled} />
+        <Back onClick={prev} />
         <Next
-          onClick={() => next({
-            nextStageId: ldapType === 'embeddedLdap' ? 'configure-embedded-ldap' : 'network-settings'
-          })}
-          disabled={disabled || !ldapType} />
+          onClick={() => next(ldapType === 'embeddedLdap' ? 'configure-embedded-ldap' : 'network-settings')}
+          disabled={!ldapType} />
       </Navigation>
     </Body>
-  </Stage>
+  </div>
 )
 
 export default LdapTypeSelection

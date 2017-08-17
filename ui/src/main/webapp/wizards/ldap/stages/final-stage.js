@@ -2,7 +2,6 @@ import React from 'react'
 
 import { Link } from 'react-router'
 
-import Stage from 'components/Stage'
 import Title from 'components/Title'
 import Description from 'components/Description'
 import LargeStatusIndicator from 'components/LargeStatusIndicator'
@@ -10,7 +9,7 @@ import LargeStatusIndicator from 'components/LargeStatusIndicator'
 import Navigation, { Finish } from 'components/wizard/Navigation'
 
 export default () => (
-  <Stage>
+  <div>
     <Title>LDAP Configurations Have Been Successfully Saved!</Title>
 
     <LargeStatusIndicator success />
@@ -25,5 +24,5 @@ export default () => (
         <Finish label='Go to Web Context Policy Manager' />
       </Link>
     </Navigation>
-  </Stage>
+  </div>
 )

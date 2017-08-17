@@ -1,9 +1,5 @@
 import React from 'react'
 
-import { connect } from 'react-redux'
-import { getConfig } from './reducer'
-import { editConfig } from './actions'
-
 import TextField from 'material-ui/TextField'
 import { RadioButton, RadioButtonGroup } from 'material-ui/RadioButton'
 import MenuItem from 'material-ui/MenuItem'
@@ -16,12 +12,6 @@ import muiThemeable from 'material-ui/styles/muiThemeable'
 import visible from 'react-visible'
 
 import Flexbox from 'flexbox-react'
-
-const mapStateToProps = (state, { id, ...rest }) => ({ ...getConfig(state, id), ...rest })
-
-const mapDispatchToProps = (dispatch, { id }) => ({
-  onEdit: (value) => dispatch(editConfig(id, value))
-})
 
 const InputView = ({ value = '', label, onEdit, message = {}, tooltip, muiTheme, ...rest }) => {
   for (let key in rest) {
@@ -60,7 +50,7 @@ const InputView = ({ value = '', label, onEdit, message = {}, tooltip, muiTheme,
   )
 }
 
-const Input = visible(connect(mapStateToProps, mapDispatchToProps)(muiThemeable()(InputView)))
+const Input = visible(muiThemeable()(InputView))
 
 const Password = ({ label = 'Password', ...rest }) => (
   <Input type='password' label={label} {...rest} />
@@ -117,7 +107,7 @@ const InputAutoView = ({ value = '', options = [], type = 'text', message = {}, 
   )
 }
 
-const InputAuto = visible(connect(mapStateToProps, mapDispatchToProps)(muiThemeable()(InputAutoView)))
+const InputAuto = visible(muiThemeable()(InputAutoView))
 
 const Port = ({ label = 'Port', ...rest }) => (
   <InputAuto type='number' label={label} {...rest} />
@@ -164,7 +154,7 @@ const SelectView = ({ value = '', options = [], label = 'Select', onEdit, error,
   )
 }
 
-const Select = visible(connect(mapStateToProps, mapDispatchToProps)(SelectView))
+const Select = visible(SelectView)
 
 const RadioSelectionView = ({ value, disabled, options = [], onEdit, ...rest }) => {
   for (let key in rest) {
@@ -182,7 +172,7 @@ const RadioSelectionView = ({ value, disabled, options = [], onEdit, ...rest }) 
   )
 }
 
-const RadioSelection = visible(connect(mapStateToProps, mapDispatchToProps)(RadioSelectionView))
+const RadioSelection = visible(RadioSelectionView)
 
 export {
   Input,

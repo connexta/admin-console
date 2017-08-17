@@ -1,6 +1,5 @@
 import React from 'react'
 
-import Stage from 'components/Stage'
 import Title from 'components/Title'
 import Description from 'components/Description'
 
@@ -26,8 +25,8 @@ const LdapUseCases = [
 
 // TODO update description to described LDAP as a login or credential store
 // TODO Make the value selected from the radio button persist
-const UseCaseStage = ({ disabled, next, prev, configs: { ldapUseCase } = {} }) => (
-  <Stage>
+const UseCaseStage = ({ onEdit, next, prev, configs: { ldapUseCase } = {} }) => (
+  <div>
     <Title>How do you plan to use LDAP?</Title>
     <Description>
       LDAP can be configured as an authentication source for users to log in or it
@@ -36,20 +35,19 @@ const UseCaseStage = ({ disabled, next, prev, configs: { ldapUseCase } = {} }) =
     </Description>
     <Body>
       <RadioSelection
-        id='ldapUseCase'
+        value={ldapUseCase}
+        onEdit={onEdit('ldapUseCase')}
         options={LdapUseCases}
-        name='LDAP Use Cases'
-        disabled={disabled} />
+        name='LDAP Use Cases' />
       <Navigation>
         <Back
-          onClick={prev}
-          disabled={disabled} />
+          onClick={prev} />
         <Next
-          onClick={() => next({ nextStageId: 'ldap-type-selection' })}
-          disabled={disabled || !ldapUseCase} />
+          onClick={() => next('ldap-type-selection')}
+          disabled={!ldapUseCase} />
       </Navigation>
     </Body>
-  </Stage>
+  </div>
 )
 
 export default UseCaseStage

@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 
-import { groupResponses } from './source-discovery'
+import { groupResponses } from './queries'
 
 describe('Response Grouping', () => {
   describe('All Success', () => {

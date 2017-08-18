@@ -29,28 +29,12 @@ public interface FunctionField<T extends Field> {
 
     String ARGUMENT = "__argument";
 
-    /**
-     * Returns the name of this {@code FunctionField}.
-     *
-     * @return the name of this function field
-     */
     String getName();
 
-    /**
-     * @return a description describing this {@code FunctionField}
-     */
     String getDescription();
 
-    /**
-     * Returns the possible errors that could arise while validating the {@code FunctionField}.
-     *
-     * @return a {@code Set} of Strings containing the errors.
-     */
     Set<String> getErrorCodes();
 
-    /**
-     * @return argument definitions of this {@code FunctionField}
-     */
     List<Field> getArguments();
 
     T getReturnType();
@@ -61,22 +45,9 @@ public interface FunctionField<T extends Field> {
 
     FunctionField<T> newInstance();
 
-    /**
-     * Returns a path that uniquely identifies this {@code FunctionField}.
-     *
-     * @return a {@code List} of Strings identifying this {@code FunctionField}
-     */
     List<String> path();
 
-    /**
-     * @param functionFieldName the new name of the {@code FunctionField}
-     */
     void pathName(String functionFieldName);
 
-    /**
-     * Sets the unique sub-path to reach the {@code FunctionField}.
-     *
-     * @param subPath uniquely identifiable path
-     */
     void updatePath(List<String> subPath);
 }

@@ -441,11 +441,6 @@ public class TestFieldProvider extends BaseFieldProvider {
         }
 
         @Override
-        public List<Field> getFields() {
-            return ImmutableList.of();
-        }
-
-        @Override
         public List<FunctionField> getDiscoveryFunctions() {
             return ImmutableList.of(returnErrorsFunction);
         }

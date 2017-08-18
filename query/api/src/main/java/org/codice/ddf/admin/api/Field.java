@@ -25,37 +25,16 @@ import org.codice.ddf.admin.api.report.ErrorMessage;
  */
 public interface Field<T> {
 
-    /**
-     * Returns the name of this {@code Field}.
-     *
-     * @return the name of this data type
-     */
     String getName();
 
     String getTypeName();
 
-    /**
-     * @return a description describing this {@code Field}
-     */
     String getDescription();
 
-    /**
-     * Returns the possible errors that could arise while validating the {@code Field}.
-     *
-     * @return a {@code Set} of Strings containing the errors.
-     */
     Set<String> getErrorCodes();
 
-    /**
-     * @return the value of this {@code Field}
-     */
     T getValue();
 
-    /**
-     * Sets the value contained by this {@code Field}
-     *
-     * @param value the new value
-     */
     void setValue(T value);
 
     boolean isRequired();
@@ -64,23 +43,10 @@ public interface Field<T> {
 
     List<ErrorMessage> validate();
 
-    /**
-     * Returns a path that uniquely identifies this {@code Field}.
-     *
-     * @return a {@code List} of Strings identifying this {@code Field}
-     */
     List<String> path();
 
-    /**
-     * @param fieldName the new name of the {@code Field}
-     */
     void pathName(String fieldName);
 
-    /**
-     * Sets the unique sub-path to reach the {@code Field}.
-     *
-     * @param subPath uniquely identifiable path
-     */
     void updatePath(List<String> subPath);
 }
 

@@ -1,15 +1,21 @@
 import React from 'react'
 
-import { renderToString } from 'react-dom/server'
+import { renderToStaticMarkup } from 'react-dom/server'
 import { createMemoryHistory, RouterContext, match } from 'react-router'
 
-export default (routes) => ({ html, path }, done) => {
+import Html from './html'
+
+export default (routes) => ({ path, webpackStats }, done) => {
   const history = createMemoryHistory({ basename: '#' })
   match({ routes, location: path, history }, (err, redirectLocation, renderProps) => {
     if (err) {
       done(err)
     } else {
-      let root = renderToString(<RouterContext {...renderProps} />)
+      let root = renderToStaticMarkup(
+        <Html assets={Object.keys(webpackStats.compilation.assets)}>
+          <RouterContext {...renderProps} />
+        </Html>
+      )
 
       // fix issue with inline fallback styles and react
       // https://github.com/facebook/react/issues/2020
@@ -17,8 +23,7 @@ export default (routes) => ({ html, path }, done) => {
         (match, _, key, values) =>
           _ + values.split(',').map((v) => key + ':' + v).join(';') + ';')
 
-      const pattern = /.*{{{[\s\S]*}}}.*/
-      done(null, html.replace(pattern, root))
+      done(null, '<!DOCTYPE html>' + root)
     }
   })
 }

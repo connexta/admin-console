@@ -1,7 +1,6 @@
 var webpack = require('webpack')
 var merge = require('webpack-merge')
 var path = require('path')
-var fs = require('fs')
 var glob = require('glob')
 var HtmlWebpackPlugin = require('html-webpack-plugin')
 var ExtractTextPlugin = require('extract-text-webpack-plugin')
@@ -10,7 +9,7 @@ var StaticSiteGeneratorPlugin = require('static-site-generator-webpack-plugin')
 var config = {
   output: {
     publicPath: '/',
-    filename: 'bundle.js',
+    filename: 'bundle.[hash].js',
     path: path.resolve(__dirname, 'target', 'webapp')
   },
   devtool: 'source-map',
@@ -64,7 +63,6 @@ var config = {
 }
 
 if (process.env.NODE_ENV === 'production') {
-  var html = fs.readFileSync('./src/main/resources/index.html', { encoding: 'utf8' })
   var global = {
     window: {
       SERVER_RENDER: true,
@@ -121,8 +119,8 @@ if (process.env.NODE_ENV === 'production') {
           warnings: false
         }
       }),
-      new StaticSiteGeneratorPlugin('main', ['/'], { html: html }, global),
-      new ExtractTextPlugin({ filename: "[name].css" })
+      new StaticSiteGeneratorPlugin('main', ['/'], {}, global),
+      new ExtractTextPlugin({ filename: "[name].[contenthash].css" })
     ]
   })
 } else if (process.env.NODE_ENV === 'ci') {
@@ -242,6 +240,10 @@ if (process.env.NODE_ENV === 'production') {
       }
     },
     plugins: [
+      new HtmlWebpackPlugin({
+        inject: false,
+        template: './src/main/webapp/lib/static-site-generator/webpack'
+      }),
       new webpack.HotModuleReplacementPlugin(),
       new webpack.NamedModulesPlugin(),
       new webpack.NoEmitOnErrorsPlugin()

@@ -92,13 +92,13 @@ class UpdateWfsConfigurationSpec extends SourceCommonsSpec {
 
     def 'Successfully update WFS configuration'() {
         setup:
-        updateWfsConfiguration.setValue(createWfsUpdateArgs(FLAG_PASSWORD))
+        updateWfsConfiguration.setArguments(createWfsUpdateArgs(FLAG_PASSWORD))
         serviceActions.read(_ as String) >> [(ID): TEST_SOURCENAME]
         serviceReader.getServices(_, _) >> []
         configurator.commit(_, _) >> mockReport(false)
 
         when:
-        def report = updateWfsConfiguration.getValue()
+        def report = updateWfsConfiguration.execute()
 
         then:
         report.getResult().getValue()
@@ -106,13 +106,13 @@ class UpdateWfsConfigurationSpec extends SourceCommonsSpec {
 
     def 'Fail to update due to existing source name specified by pid'() {
         setup:
-        updateWfsConfiguration.setValue(createWfsUpdateArgs(FLAG_PASSWORD))
+        updateWfsConfiguration.setArguments(createWfsUpdateArgs(FLAG_PASSWORD))
         serviceActions.read(_) >> [(ID): 'updatedName']
         serviceReader.getServices(_, _) >> [new TestSource(S_PID, 'updatedName', false),
                                             new TestSource("existingSource", TEST_SOURCENAME, false)]
 
         when:
-        def report = updateWfsConfiguration.getValue()
+        def report = updateWfsConfiguration.execute()
 
         then:
         report.getResult() == null
@@ -123,12 +123,12 @@ class UpdateWfsConfigurationSpec extends SourceCommonsSpec {
 
     def 'Fail configuration update due to failure to commit'() {
         setup:
-        updateWfsConfiguration.setValue(createWfsUpdateArgs(FLAG_PASSWORD))
+        updateWfsConfiguration.setArguments(createWfsUpdateArgs(FLAG_PASSWORD))
         serviceActions.read(_) >> [(ID): TEST_SOURCENAME]
         serviceReader.getServices(_, _) >> []
 
         when:
-        def report = updateWfsConfiguration.getValue()
+        def report = updateWfsConfiguration.execute()
 
         then:
         1 * configurator.commit(_, _) >> mockReport(false)
@@ -141,11 +141,11 @@ class UpdateWfsConfigurationSpec extends SourceCommonsSpec {
 
     def 'Fail to update WFS config due to no existing config specified by pid'() {
         setup:
-        updateWfsConfiguration.setValue(createWfsUpdateArgs(FLAG_PASSWORD))
+        updateWfsConfiguration.setArguments(createWfsUpdateArgs(FLAG_PASSWORD))
         serviceActions.read(S_PID) >> [:]
 
         when:
-        def report = updateWfsConfiguration.getValue()
+        def report = updateWfsConfiguration.execute()
 
         then:
         report.getResult() == null
@@ -156,12 +156,12 @@ class UpdateWfsConfigurationSpec extends SourceCommonsSpec {
 
     def 'Return false when wfs feature fails to start'() {
         setup:
-        updateWfsConfiguration.setValue(createWfsUpdateArgs(FLAG_PASSWORD))
+        updateWfsConfiguration.setArguments(createWfsUpdateArgs(FLAG_PASSWORD))
         serviceReader.getServices(_, _) >> []
         serviceActions.read(_) >> [(ID): TEST_SOURCENAME]
 
         when:
-        def report = updateWfsConfiguration.getValue()
+        def report = updateWfsConfiguration.execute()
 
         then:
         1 * configurator.commit(_, _) >> mockReport(true)
@@ -173,7 +173,7 @@ class UpdateWfsConfigurationSpec extends SourceCommonsSpec {
 
     def 'Updating with flag password sends service properties without password'() {
         setup:
-        updateWfsConfiguration.setValue(createWfsUpdateArgs(FLAG_PASSWORD))
+        updateWfsConfiguration.setArguments(createWfsUpdateArgs(FLAG_PASSWORD))
         serviceActions.read(_ as String) >> [(ID): TEST_SOURCENAME]
         serviceReader.getServices(_, _) >> []
         configurator.commit(_, _) >> mockReport(false)
@@ -181,7 +181,7 @@ class UpdateWfsConfigurationSpec extends SourceCommonsSpec {
         def expectedUpdateConfig = WfsServiceProperties.wfsConfigToServiceProps(createWfsSourceConfig(FLAG_PASSWORD))
 
         when:
-        updateWfsConfiguration.getValue()
+        updateWfsConfiguration.execute()
 
         then:
         1 * serviceActions.build(S_PID, expectedUpdateConfig, true)
@@ -189,7 +189,7 @@ class UpdateWfsConfigurationSpec extends SourceCommonsSpec {
 
     def 'Updating with new password sends service properties with password'() {
         setup:
-        updateWfsConfiguration.setValue(createWfsUpdateArgs('notFlagPassword'))
+        updateWfsConfiguration.setArguments(createWfsUpdateArgs('notFlagPassword'))
         serviceActions.read(_ as String) >> [(ID): TEST_SOURCENAME]
         serviceReader.getServices(_, _) >> []
         configurator.commit(_, _) >> mockReport(false)
@@ -197,7 +197,7 @@ class UpdateWfsConfigurationSpec extends SourceCommonsSpec {
         def expectedUpdateConfig = WfsServiceProperties.wfsConfigToServiceProps(createWfsSourceConfig('notFlagPassword'))
 
         when:
-        updateWfsConfiguration.getValue()
+        updateWfsConfiguration.execute()
 
         then:
         1 * serviceActions.build(S_PID, expectedUpdateConfig, true)
@@ -205,7 +205,7 @@ class UpdateWfsConfigurationSpec extends SourceCommonsSpec {
 
     def 'Fail due to missing required fields'() {
         when:
-        def report = updateWfsConfiguration.getValue()
+        def report = updateWfsConfiguration.execute()
 
         then:
         report.getResult() == null

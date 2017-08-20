@@ -17,9 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.codice.ddf.admin.api.DataType;
+import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.api.fields.EnumField;
-import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.api.fields.ObjectField;
 import org.codice.ddf.admin.api.fields.ScalarField;
@@ -50,19 +49,19 @@ public class GraphQLTransformInput {
     }
 
 
-    public GraphQLArgument fieldToGraphQLArgument(DataType field) {
+    public GraphQLArgument fieldToGraphQLArgument(Field field) {
         GraphQLInputType graphqlInputType = fieldTypeToGraphQLInputType(field);
 
         return GraphQLArgument.newArgument()
-                .name(field.fieldName())
-                .description(field.description())
+                .name(field.getName())
+                .description(field.getDescription())
                 .type(field.isRequired() ? new GraphQLNonNull(graphqlInputType) : graphqlInputType)
                 .build();
     }
 
-    public GraphQLInputType fieldTypeToGraphQLInputType(DataType field) {
-        if(inputTypesProvider.isTypePresent(field.fieldTypeName())) {
-            return inputTypesProvider.getType(field.fieldTypeName());
+    public GraphQLInputType fieldTypeToGraphQLInputType(Field field) {
+        if(inputTypesProvider.isTypePresent(field.getTypeName())) {
+            return inputTypesProvider.getType(field.getTypeName());
         }
 
         GraphQLInputType type = null;
@@ -73,9 +72,9 @@ public class GraphQLTransformInput {
             type = transformEnum.enumFieldToGraphQLEnumType((EnumField) field);
         } else if(field instanceof ListField) {
             try {
-                type = new GraphQLList(fieldTypeToGraphQLInputType(((ListField<DataType>) field).createListEntry()));
+                type = new GraphQLList(fieldTypeToGraphQLInputType(((ListField<Field>) field).createListEntry()));
             } catch (Exception e) {
-                throw new RuntimeException("Unable to build field list content type for input type: " + field.fieldName());
+                throw new RuntimeException("Unable to build field list content type for input type: " + field.getName());
             }
         } else if(field instanceof ScalarField){
             type = transformScalars.resolveScalarType((ScalarField) field);
@@ -87,7 +86,7 @@ public class GraphQLTransformInput {
                             + field.getClass());
         }
 
-        inputTypesProvider.addType(field.fieldTypeName(), type);
+        inputTypesProvider.addType(field.getTypeName(), type);
         return type;
     }
 
@@ -97,22 +96,21 @@ public class GraphQLTransformInput {
         if (field.getFields() != null) {
             fieldDefinitions = field.getFields()
                     .stream()
-                    .filter(input -> !(input instanceof FunctionField))
-                    .map(input -> fieldToGraphQLInputObjectFieldDefinition((DataType) input))
+                    .map(this::fieldToGraphQLInputObjectFieldDefinition)
                     .collect(Collectors.toList());
         }
 
         return GraphQLInputObjectType.newInputObject()
-                .name(GraphQLTransformCommons.capitalize(field.fieldTypeName()))
-                .description(field.description())
+                .name(GraphQLTransformCommons.capitalize(field.getTypeName()))
+                .description(field.getDescription())
                 .fields(fieldDefinitions)
                 .build();
     }
 
-    public GraphQLInputObjectField fieldToGraphQLInputObjectFieldDefinition(DataType field) {
+    public GraphQLInputObjectField fieldToGraphQLInputObjectFieldDefinition(Field field) {
         return GraphQLInputObjectField.newInputObjectField()
-                .name(field.fieldName())
-                .description(field.description())
+                .name(field.getName())
+                .description(field.getDescription())
                 .type(fieldTypeToGraphQLInputType(field))
                 .build();
     }

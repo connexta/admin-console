@@ -16,13 +16,12 @@ package org.codice.ddf.admin.api.fields;
 import java.util.List;
 import java.util.Map;
 
-import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.Field;
 
 /**
  * Encapsulates a {@code List} of {@link Field}s.
  */
-public interface ObjectField extends DataType<Map<String, Object>> {
+public interface ObjectField extends Field<Map<String, Object>> {
 
     /**
      * Returns all the internal {@link Field}s held by this {@code ObjectField}.
@@ -30,13 +29,4 @@ public interface ObjectField extends DataType<Map<String, Object>> {
      * @return a {@code List} of this {@code ObjectField}'s {@link Field}s.
      */
     List<Field> getFields();
-
-    /**
-     * Sets all {@link Field}s in this {@code ObjectField}. When {@code false}, all {@link Field}s
-     * and this {@code ObjectField}'s requirements should be set {@code false}. Similarly for {@code true}.
-     *
-     * @param required whether or not all the fields are required
-     * @return the {@code ObjectField} whose {@link Field}s are being set.
-     */
-    ObjectField allFieldsRequired(boolean required);
 }

@@ -50,7 +50,7 @@ public class Realm extends BaseEnumField<String> {
                 FIELD_TYPE_NAME,
                 DESCRIPTION);
         this.serviceReader = serviceReader;
-        setValue(value.value());
+        setValue(value.getValue());
     }
 
     @Override

@@ -40,17 +40,17 @@ public class TestEnumField extends BaseEnumField<String> {
         public static final String ENUM_A = "ENUM_A";
 
         @Override
-        public String enumTitle() {
+        public String getEnumTitle() {
             return ENUM_A;
         }
 
         @Override
-        public String description() {
+        public String getDescription() {
             return DESCRIPTION;
         }
 
         @Override
-        public String value() {
+        public String getValue() {
             return ENUM_A;
         }
     }
@@ -60,17 +60,17 @@ public class TestEnumField extends BaseEnumField<String> {
         public static final String ENUM_B = "ENUM_B";
 
         @Override
-        public String enumTitle() {
+        public String getEnumTitle() {
             return ENUM_B;
         }
 
         @Override
-        public String description() {
+        public String getDescription() {
             return DESCRIPTION;
         }
 
         @Override
-        public String value() {
+        public String getValue() {
             return ENUM_B;
         }
     }

@@ -48,17 +48,17 @@ public class LdapTypeField extends BaseEnumField<String> {
         public static final String UNKNOWN = "unknown";
 
         @Override
-        public String enumTitle() {
+        public String getEnumTitle() {
             return UNKNOWN;
         }
 
         @Override
-        public String description() {
+        public String getDescription() {
             return DESCRIPTION;
         }
 
         @Override
-        public String value() {
+        public String getValue() {
             return UNKNOWN;
         }
     }
@@ -70,17 +70,17 @@ public class LdapTypeField extends BaseEnumField<String> {
         public static final String ACTIVE_DIRECTORY = "activeDirectory";
 
         @Override
-        public String enumTitle() {
+        public String getEnumTitle() {
             return ACTIVE_DIRECTORY;
         }
 
         @Override
-        public String description() {
+        public String getDescription() {
             return DESCRIPTION;
         }
 
         @Override
-        public String value() {
+        public String getValue() {
             return ACTIVE_DIRECTORY;
         }
     }
@@ -92,17 +92,17 @@ public class LdapTypeField extends BaseEnumField<String> {
         public static final String OPEN_LDAP = "openLdap";
 
         @Override
-        public String enumTitle() {
+        public String getEnumTitle() {
             return OPEN_LDAP;
         }
 
         @Override
-        public String description() {
+        public String getDescription() {
             return DESCRIPTION;
         }
 
         @Override
-        public String value() {
+        public String getValue() {
             return OPEN_LDAP;
         }
     }
@@ -114,17 +114,17 @@ public class LdapTypeField extends BaseEnumField<String> {
         public static final String OPEN_DJ = "openDj";
 
         @Override
-        public String enumTitle() {
+        public String getEnumTitle() {
             return OPEN_DJ;
         }
 
         @Override
-        public String description() {
+        public String getDescription() {
             return DESCRIPTION;
         }
 
         @Override
-        public String value() {
+        public String getValue() {
             return OPEN_DJ;
         }
     }
@@ -136,17 +136,17 @@ public class LdapTypeField extends BaseEnumField<String> {
         public static final String EMBEDDED = "embeddedLdap";
 
         @Override
-        public String enumTitle() {
+        public String getEnumTitle() {
             return EMBEDDED;
         }
 
         @Override
-        public String description() {
+        public String getDescription() {
             return DESCRIPTION;
         }
 
         @Override
-        public String value() {
+        public String getValue() {
             return EMBEDDED;
         }
     }

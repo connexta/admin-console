@@ -27,7 +27,7 @@ class GetRealmsSpec extends Specification {
 
     def 'Successfully retrieves realms from realm value poller'() {
         when:
-        Report report = getRealms.getValue()
+        Report report = getRealms.execute()
 
         then:
         report.getErrorMessages().isEmpty()

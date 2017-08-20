@@ -30,19 +30,19 @@ public class GraphQLTransformEnum {
 
     public GraphQLEnumType enumFieldToGraphQLEnumType(EnumField<Object, EnumValue<Object>> field) {
 
-        if(enumTypeProvider.isTypePresent(field.fieldTypeName())) {
-            return enumTypeProvider.getType(field.fieldTypeName());
+        if(enumTypeProvider.isTypePresent(field.getTypeName())) {
+            return enumTypeProvider.getType(field.getTypeName());
         }
 
         GraphQLEnumType.Builder builder = GraphQLEnumType.newEnum()
-                .name(GraphQLTransformCommons.capitalize(field.fieldTypeName()))
-                .description(field.description());
+                .name(GraphQLTransformCommons.capitalize(field.getTypeName()))
+                .description(field.getDescription());
 
         field.getEnumValues()
-                .forEach(val -> builder.value(val.enumTitle(), val.value(), val.description()));
+                .forEach(val -> builder.value(val.getEnumTitle(), val.getValue(), val.getDescription()));
 
         GraphQLEnumType newEnum = builder.build();
-        enumTypeProvider.addType(field.fieldTypeName(), newEnum);
+        enumTypeProvider.addType(field.getTypeName(), newEnum);
         return newEnum;
     }
 

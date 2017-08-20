@@ -16,61 +16,37 @@ package org.codice.ddf.admin.api;
 import java.util.List;
 import java.util.Set;
 
+import org.codice.ddf.admin.api.report.ErrorMessage;
+
 /**
- * Defines a container for setting and retrieving values.
  *
- * @param <S> The type of the value used for setting
- * @param <G> The type of the value to be returned
+ *
+ * @param <T> the type of the value contains by this {@code Field}
  */
-public interface Field<S, G> {
+public interface Field<T> {
 
-    /**
-     * Returns the name of this {@code Field}.
-     *
-     * @return the name of this field
-     */
-    String fieldName();
+    String getName();
 
-    /**
-     * @param fieldName the new name of the {@code Field}
-     */
-    void pathName(String fieldName);
+    String getTypeName();
 
-    /**
-     * @return a description describing this {@code Field}
-     */
-    String description();
+    String getDescription();
 
-    /**
-     * Sets the value contained by this {@code Field}
-     *
-     * @param value the new value
-     */
-    void setValue(S value);
+    Set<String> getErrorCodes();
 
-    /**
-     * @return the value of this field
-     */
-    G getValue();
+    T getValue();
 
-    /**
-     * Returns a path that uniquely identifies this {@code Field}.
-     *
-     * @return a {@code List} of Strings identifying this {@code Field}
-     */
+    void setValue(T value);
+
+    boolean isRequired();
+
+    Field<T> isRequired(boolean required);
+
+    List<ErrorMessage> validate();
+
     List<String> path();
 
-    /**
-     * Sets the unique sub-path to reach the {@code Field}.
-     *
-     * @param subPath uniquely identifiable path
-     */
-    void updatePath(List<String> subPath);
+    void pathName(String fieldName);
 
-    /**
-     * Returns the possible errors that could arise while validating the {@code Field}.
-     *
-     * @return a {@code Set} of Strings containing the errors.
-     */
-    Set<String> getErrorCodes();
+    void updatePath(List<String> subPath);
 }
+

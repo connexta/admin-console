@@ -93,10 +93,10 @@ class CreateCswConfigurationSpec extends SourceCommonsSpec {
 
     def 'Successfully create new CSW configuration'() {
         when:
-        createCswConfiguration.setValue(createCswArgs())
+        createCswConfiguration.setArguments(createCswArgs())
         serviceReader.getServices(_, _) >> []
         configurator.commit(_, _) >> mockReport(false)
-        def report = createCswConfiguration.getValue()
+        def report = createCswConfiguration.execute()
 
         then:
         report.getResult() != null
@@ -105,9 +105,9 @@ class CreateCswConfigurationSpec extends SourceCommonsSpec {
 
     def 'Fail to create new CSW config due to duplicate source name'() {
         when:
-        createCswConfiguration.setValue(createCswArgs())
+        createCswConfiguration.setArguments(createCswArgs())
         serviceReader.getServices(_, _) >> federatedSources
-        def report = createCswConfiguration.getValue()
+        def report = createCswConfiguration.execute()
 
         then:
         report.getResult() == null
@@ -118,9 +118,9 @@ class CreateCswConfigurationSpec extends SourceCommonsSpec {
 
     def 'Fail to create new CSW config due to failure to commit'() {
         when:
-        createCswConfiguration.setValue(createCswArgs())
+        createCswConfiguration.setArguments(createCswArgs())
         serviceReader.getServices(_, _) >> []
-        def report = createCswConfiguration.getValue()
+        def report = createCswConfiguration.execute()
 
         then:
         1 * configurator.commit(_, _) >> mockReport(false)
@@ -133,9 +133,9 @@ class CreateCswConfigurationSpec extends SourceCommonsSpec {
 
     def 'Return false when csw feature fails to start'() {
         when:
-        createCswConfiguration.setValue(createCswArgs())
+        createCswConfiguration.setArguments(createCswArgs())
         serviceReader.getServices(_, _) >> []
-        def report = createCswConfiguration.getValue()
+        def report = createCswConfiguration.execute()
 
         then:
         1 * configurator.commit(_, _) >> mockReport(true)
@@ -147,7 +147,7 @@ class CreateCswConfigurationSpec extends SourceCommonsSpec {
 
     def 'Fail when missing required fields'() {
         when:
-        def report = createCswConfiguration.getValue()
+        def report = createCswConfiguration.execute()
 
         then:
         report.getResult() == null
@@ -161,17 +161,17 @@ class CreateCswConfigurationSpec extends SourceCommonsSpec {
     def 'Returns all the possible error codes correctly'(){
         setup:
         CreateCswConfiguration createDuplicateNameConfig = new CreateCswConfiguration(configuratorSuite)
-        createDuplicateNameConfig.setValue(createCswArgs())
+        createDuplicateNameConfig.setArguments(createCswArgs())
         serviceReader.getServices(_, _) >> federatedSources
 
         CreateCswConfiguration createFailPersistConfig = new CreateCswConfiguration(configuratorSuite)
-        createFailPersistConfig.setValue(createCswArgs())
+        createFailPersistConfig.setArguments(createCswArgs())
         serviceReader.getServices(_, _) >> []
 
         when:
         def errorCodes = createCswConfiguration.getFunctionErrorCodes()
-        def duplicateNameReport = createDuplicateNameConfig.getValue()
-        def createFailPersistReport = createFailPersistConfig.getValue()
+        def duplicateNameReport = createDuplicateNameConfig.execute()
+        def createFailPersistReport = createFailPersistConfig.execute()
 
         then:
         errorCodes.size() == 2

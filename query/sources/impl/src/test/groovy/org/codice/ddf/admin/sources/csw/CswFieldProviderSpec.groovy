@@ -36,7 +36,7 @@ class CswFieldProviderSpec extends Specification {
 
     def 'Verify discovery fields immutability'() {
         when:
-        cswFieldProvider.getDiscoveryFields().add(Mock(FieldProvider))
+        cswFieldProvider.getDiscoveryFunctions().add(Mock(FieldProvider))
 
         then:
         thrown(UnsupportedOperationException)

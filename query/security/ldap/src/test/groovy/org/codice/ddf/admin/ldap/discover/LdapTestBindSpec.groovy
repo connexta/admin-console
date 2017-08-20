@@ -68,7 +68,7 @@ class LdapTestBindSpec extends Specification {
         def missingBindMethodMsgPath = baseMsg + [LdapBindUserInfo.DEFAULT_FIELD_NAME, LdapBindMethod.DEFAULT_FIELD_NAME]
 
         when:
-        FunctionReport report = ldapBindFunction.getValue()
+        FunctionReport report = ldapBindFunction.execute()
 
         then:
         report.getErrorMessages().size() == 6
@@ -84,10 +84,10 @@ class LdapTestBindSpec extends Specification {
         setup:
         args = [(LdapBindUserInfo.DEFAULT_FIELD_NAME)   : digestBindInfo().realm(null).getValue(),
                 (LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue()]
-        ldapBindFunction.setValue(args)
+        ldapBindFunction.setArguments(args)
 
         when:
-        FunctionReport report = ldapBindFunction.getValue()
+        FunctionReport report = ldapBindFunction.execute()
 
         then:
         report.getErrorMessages().size() == 1
@@ -99,10 +99,10 @@ class LdapTestBindSpec extends Specification {
         setup:
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().port(666).getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue()]
-        ldapBindFunction.setValue(args)
+        ldapBindFunction.setArguments(args)
 
         when:
-        FunctionReport report = ldapBindFunction.getValue()
+        FunctionReport report = ldapBindFunction.execute()
 
         then:
         report.getErrorMessages().size() == 1
@@ -115,11 +115,11 @@ class LdapTestBindSpec extends Specification {
         setup:
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue()]
-        ldapBindFunction.setValue(args)
+        ldapBindFunction.setArguments(args)
         ldapBindFunction.setTestingUtils(utilsMock)
 
         when:
-        FunctionReport report = ldapBindFunction.getValue()
+        FunctionReport report = ldapBindFunction.execute()
         ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().getResult().isClosed()
 
         then:
@@ -132,11 +132,11 @@ class LdapTestBindSpec extends Specification {
         setup:
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): ldapsLdapConnectionInfo().getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue()]
-        ldapBindFunction.setValue(args)
+        ldapBindFunction.setArguments(args)
         ldapBindFunction.setTestingUtils(utilsMock)
 
         when:
-        FunctionReport report = ldapBindFunction.getValue()
+        FunctionReport report = ldapBindFunction.execute()
         ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().getResult().isClosed()
 
         then:
@@ -149,10 +149,10 @@ class LdapTestBindSpec extends Specification {
         setup:
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : digestBindInfo().getValue()]
-        ldapBindFunction.setValue(args)
+        ldapBindFunction.setArguments(args)
 
         when:
-        FunctionReport report = ldapBindFunction.getValue()
+        FunctionReport report = ldapBindFunction.execute()
 
         then:
         report.getErrorMessages().size() == 1
@@ -167,11 +167,11 @@ class LdapTestBindSpec extends Specification {
         setup:
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): ldapsLdapConnectionInfo().getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : digestBindInfo().getValue()]
-        ldapBindFunction.setValue(args)
+        ldapBindFunction.setArguments(args)
         ldapBindFunction.setTestingUtils(utilsMock)
 
         when:
-        FunctionReport report = ldapBindFunction.getValue()
+        FunctionReport report = ldapBindFunction.execute()
         ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().getResult().isClosed()
 
         then:
@@ -186,11 +186,11 @@ class LdapTestBindSpec extends Specification {
         setup:
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : digestBindInfo().getValue()]
-        ldapBindFunction.setValue(args)
+        ldapBindFunction.setArguments(args)
         ldapBindFunction.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
         when:
-        FunctionReport report = ldapBindFunction.getValue()
+        FunctionReport report = ldapBindFunction.execute()
 
         then:
         report.getErrorMessages().size() == 1
@@ -203,10 +203,10 @@ class LdapTestBindSpec extends Specification {
         setup:
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().password("badPassword").getValue()]
-        ldapBindFunction.setValue(args)
+        ldapBindFunction.setArguments(args)
 
         when:
-        FunctionReport report = ldapBindFunction.getValue()
+        FunctionReport report = ldapBindFunction.execute()
 
         then:
         report.getErrorMessages().size() == 1
@@ -219,10 +219,10 @@ class LdapTestBindSpec extends Specification {
         setup:
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().username("badUsername").getValue()]
-        ldapBindFunction.setValue(args)
+        ldapBindFunction.setArguments(args)
 
         when:
-        FunctionReport report = ldapBindFunction.getValue()
+        FunctionReport report = ldapBindFunction.execute()
 
         then:
         report.getErrorMessages().size() == 1
@@ -247,22 +247,22 @@ class LdapTestBindSpec extends Specification {
         LdapTestBind cannotConnectBindFunc = new LdapTestBind()
         Map<String, Object> cannotConnectArgs = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().port(666).getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue()]
-        cannotConnectBindFunc.setValue(cannotConnectArgs)
+        cannotConnectBindFunc.setArguments(cannotConnectArgs)
 
         LdapTestBind cannotBindFunc = new LdapTestBind()
         Map<String, Object> cannotBindArgs = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : digestBindInfo().getValue()]
-        cannotBindFunc.setValue(cannotBindArgs)
+        cannotBindFunc.setArguments(cannotBindArgs)
 
         LdapTestBind md5NeededBindFunc = new LdapTestBind()
-        md5NeededBindFunc.setValue(cannotBindArgs)
+        md5NeededBindFunc.setArguments(cannotBindArgs)
         md5NeededBindFunc.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
         when:
         def errorCodes = ldapBindFunction.getFunctionErrorCodes()
-        def cannotConnectReport = cannotConnectBindFunc.getValue()
-        def cannotBindReport = cannotBindFunc.getValue()
-        def md5NeededReport = md5NeededBindFunc.getValue()
+        def cannotConnectReport = cannotConnectBindFunc.execute()
+        def cannotBindReport = cannotBindFunc.execute()
+        def md5NeededReport = md5NeededBindFunc.execute()
 
         then:
         errorCodes.size() == 4

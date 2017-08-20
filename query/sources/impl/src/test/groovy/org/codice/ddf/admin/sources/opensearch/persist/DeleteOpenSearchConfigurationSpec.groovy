@@ -50,8 +50,8 @@ class DeleteOpenSearchConfigurationSpec extends SourceCommonsSpec {
         when:
         serviceActions.read(S_PID) >> configToBeDeleted
         configurator.commit(_, _) >> mockReport(false)
-        deleteOpenSearchConfigurationFunction.setValue(functionArgs)
-        def report = deleteOpenSearchConfigurationFunction.getValue()
+        deleteOpenSearchConfigurationFunction.setArguments(functionArgs)
+        def report = deleteOpenSearchConfigurationFunction.execute()
 
         then:
         report.getResult() != null
@@ -61,8 +61,8 @@ class DeleteOpenSearchConfigurationSpec extends SourceCommonsSpec {
     def 'Fail delete when no existing configuration with the provided pid'() {
         when:
         serviceActions.read(S_PID) >> [:]
-        deleteOpenSearchConfigurationFunction.setValue(functionArgs)
-        def report = deleteOpenSearchConfigurationFunction.getValue()
+        deleteOpenSearchConfigurationFunction.setArguments(functionArgs)
+        def report = deleteOpenSearchConfigurationFunction.execute()
 
         then:
         report.getResult() == null
@@ -75,8 +75,8 @@ class DeleteOpenSearchConfigurationSpec extends SourceCommonsSpec {
         when:
         serviceActions.read(S_PID) >> configToBeDeleted
         configurator.commit(_, _) >> mockReport(true)
-        deleteOpenSearchConfigurationFunction.setValue(functionArgs)
-        def report = deleteOpenSearchConfigurationFunction.getValue()
+        deleteOpenSearchConfigurationFunction.setArguments(functionArgs)
+        def report = deleteOpenSearchConfigurationFunction.execute()
 
         then:
         !report.getResult().getValue()
@@ -87,7 +87,7 @@ class DeleteOpenSearchConfigurationSpec extends SourceCommonsSpec {
 
     def 'Fail when missing required fields'() {
         when:
-        def report = deleteOpenSearchConfigurationFunction.getValue()
+        def report = deleteOpenSearchConfigurationFunction.execute()
 
         then:
         report.getResult() == null
@@ -102,17 +102,17 @@ class DeleteOpenSearchConfigurationSpec extends SourceCommonsSpec {
         setup:
         DeleteOpenSearchConfiguration deleteOpenSearchNoExistingConfig = new DeleteOpenSearchConfiguration(configuratorSuite)
         serviceActions.read(S_PID) >> [:]
-        deleteOpenSearchNoExistingConfig.setValue(functionArgs)
+        deleteOpenSearchNoExistingConfig.setArguments(functionArgs)
 
         DeleteOpenSearchConfiguration deleteOpenSearchFailPersist = new DeleteOpenSearchConfiguration(configuratorSuite)
         serviceActions.read(S_PID) >> configToBeDeleted
         configurator.commit(_, _) >> mockReport(true)
-        deleteOpenSearchFailPersist.setValue(functionArgs)
+        deleteOpenSearchFailPersist.setArguments(functionArgs)
 
         when:
         def errorCodes = deleteOpenSearchConfigurationFunction.getFunctionErrorCodes()
-        def noExistingConfigReport = deleteOpenSearchNoExistingConfig.getValue()
-        def failedPersistReport = deleteOpenSearchFailPersist.getValue()
+        def noExistingConfigReport = deleteOpenSearchNoExistingConfig.execute()
+        def failedPersistReport = deleteOpenSearchFailPersist.execute()
 
         then:
         errorCodes.size() == 2

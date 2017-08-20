@@ -90,7 +90,7 @@ class LdapTestDirectorySettingsSpec extends Specification {
         action = new LdapTestDirectorySettings()
 
         when:
-        FunctionReport report = action.getValue()
+        FunctionReport report = action.execute()
 
         then:
         report.getErrorMessages().size() == 10
@@ -117,11 +117,11 @@ class LdapTestDirectorySettingsSpec extends Specification {
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME)       : noEncryptionLdapConnectionInfo().getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)          : simpleBindInfo().getValue(),
                 (LdapDirectorySettingsField.DEFAULT_FIELD_NAME): ldapSettings.getValue()]
-        action.setValue(args)
+        action.setArguments(args)
         action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
         when:
-        FunctionReport report = action.getValue()
+        FunctionReport report = action.execute()
 
         then:
         report.getErrorMessages().size() == 3
@@ -142,11 +142,11 @@ class LdapTestDirectorySettingsSpec extends Specification {
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME)       : noEncryptionLdapConnectionInfo().getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)          : simpleBindInfo().getValue(),
                 (LdapDirectorySettingsField.DEFAULT_FIELD_NAME): ldapSettings.getValue()]
-        action.setValue(args)
+        action.setArguments(args)
         action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
         when:
-        FunctionReport report = action.getValue()
+        FunctionReport report = action.execute()
 
         then:
         report.getErrorMessages().size() == 2
@@ -165,11 +165,11 @@ class LdapTestDirectorySettingsSpec extends Specification {
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME)       : noEncryptionLdapConnectionInfo().port(666).getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)          : simpleBindInfo().getValue(),
                 (LdapDirectorySettingsField.DEFAULT_FIELD_NAME): ldapSettings.getValue()]
-        action.setValue(args)
+        action.setArguments(args)
         action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
         when:
-        FunctionReport report = action.getValue()
+        FunctionReport report = action.execute()
 
         then:
         report.getErrorMessages().size() == 1
@@ -185,11 +185,11 @@ class LdapTestDirectorySettingsSpec extends Specification {
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME)       : noEncryptionLdapConnectionInfo().getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)          : simpleBindInfo().password('badPassword').getValue(),
                 (LdapDirectorySettingsField.DEFAULT_FIELD_NAME): ldapSettings.getValue()]
-        action.setValue(args)
+        action.setArguments(args)
         action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
         when:
-        FunctionReport report = action.getValue()
+        FunctionReport report = action.execute()
 
         then:
         report.getErrorMessages().size() == 1
@@ -207,11 +207,11 @@ class LdapTestDirectorySettingsSpec extends Specification {
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME)       : noEncryptionLdapConnectionInfo().getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)          : simpleBindInfo().getValue(),
                 (LdapDirectorySettingsField.DEFAULT_FIELD_NAME): ldapSettings.getValue()]
-        action.setValue(args)
+        action.setArguments(args)
         action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
         when:
-        FunctionReport report = action.getValue()
+        FunctionReport report = action.execute()
 
         then:
         report.getErrorMessages().size() == 2
@@ -231,11 +231,11 @@ class LdapTestDirectorySettingsSpec extends Specification {
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME)       : noEncryptionLdapConnectionInfo().getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)          : simpleBindInfo().getValue(),
                 (LdapDirectorySettingsField.DEFAULT_FIELD_NAME): ldapSettings.getValue()]
-        action.setValue(args)
+        action.setArguments(args)
         action.setTestingUtils(utilsMock)
 
         when:
-        FunctionReport report = action.getValue()
+        FunctionReport report = action.execute()
         ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().getResult().isClosed()
 
         then:
@@ -257,11 +257,11 @@ class LdapTestDirectorySettingsSpec extends Specification {
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME)       : noEncryptionLdapConnectionInfo().getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)          : simpleBindInfo().getValue(),
                 (LdapDirectorySettingsField.DEFAULT_FIELD_NAME): ldapSettings.getValue()]
-        action.setValue(args)
+        action.setArguments(args)
         action.setTestingUtils(utilsMock)
 
         when:
-        FunctionReport report = action.getValue()
+        FunctionReport report = action.execute()
         ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().getResult().isClosed()
 
         then:
@@ -283,11 +283,11 @@ class LdapTestDirectorySettingsSpec extends Specification {
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME)       : noEncryptionLdapConnectionInfo().getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)          : simpleBindInfo().getValue(),
                 (LdapDirectorySettingsField.DEFAULT_FIELD_NAME): ldapSettings.getValue()]
-        action.setValue(args)
+        action.setArguments(args)
         action.setTestingUtils(utilsMock)
 
         when:
-        FunctionReport report = action.getValue()
+        FunctionReport report = action.execute()
         ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().getResult().isClosed()
 
         then:
@@ -312,11 +312,11 @@ class LdapTestDirectorySettingsSpec extends Specification {
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME)       : noEncryptionLdapConnectionInfo().getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)          : simpleBindInfo().getValue(),
                 (LdapDirectorySettingsField.DEFAULT_FIELD_NAME): ldapSettings.getValue()]
-        action.setValue(args)
+        action.setArguments(args)
         action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
         when:
-        FunctionReport report = action.getValue()
+        FunctionReport report = action.execute()
 
         then:
         report.getErrorMessages().size() == 1
@@ -335,11 +335,11 @@ class LdapTestDirectorySettingsSpec extends Specification {
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME)       : noEncryptionLdapConnectionInfo().getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)          : simpleBindInfo().getValue(),
                 (LdapDirectorySettingsField.DEFAULT_FIELD_NAME): ldapSettings.getValue()]
-        action.setValue(args)
+        action.setArguments(args)
         action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
         when:
-        FunctionReport report = action.getValue()
+        FunctionReport report = action.execute()
 
         then:
         report.getErrorMessages().size() == 1
@@ -358,11 +358,11 @@ class LdapTestDirectorySettingsSpec extends Specification {
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME)       : noEncryptionLdapConnectionInfo().getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)          : simpleBindInfo().getValue(),
                 (LdapDirectorySettingsField.DEFAULT_FIELD_NAME): ldapSettings.getValue()]
-        action.setValue(args)
+        action.setArguments(args)
         action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
         when:
-        FunctionReport report = action.getValue()
+        FunctionReport report = action.execute()
 
         then:
         report.getErrorMessages().size() == 1
@@ -380,11 +380,11 @@ class LdapTestDirectorySettingsSpec extends Specification {
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME)       : noEncryptionLdapConnectionInfo().getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)          : simpleBindInfo().getValue(),
                 (LdapDirectorySettingsField.DEFAULT_FIELD_NAME): ldapSettings.getValue()]
-        action.setValue(args)
+        action.setArguments(args)
         action.setTestingUtils(utilsMock)
 
         when:
-        FunctionReport report = action.getValue()
+        FunctionReport report = action.execute()
         ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().getResult().isClosed()
 
         then:
@@ -400,11 +400,11 @@ class LdapTestDirectorySettingsSpec extends Specification {
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)          : simpleBindInfo().getValue(),
                 (LdapDirectorySettingsField.DEFAULT_FIELD_NAME): ldapSettings.getValue()]
         def action = Spy(LdapTestDirectorySettings)
-        action.setValue(args)
+        action.setArguments(args)
         action.setTestingUtils(utilsMock)
 
         when:
-        FunctionReport report = action.getValue()
+        FunctionReport report = action.execute()
 
         then:
         1 * action.checkUsersInDir(_)
@@ -420,11 +420,11 @@ class LdapTestDirectorySettingsSpec extends Specification {
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)          : simpleBindInfo().getValue(),
                 (LdapDirectorySettingsField.DEFAULT_FIELD_NAME): ldapSettings.getValue()]
         def action = Spy(LdapTestDirectorySettings)
-        action.setValue(args)
+        action.setArguments(args)
         action.setTestingUtils(utilsMock)
 
         when:
-        action.getValue()
+        action.execute()
 
         then:
         1 * action.checkUsersInDir(_)

@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.codice.ddf.admin.api.ConfiguratorSuite;
-import org.codice.ddf.admin.api.DataType;
+import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
@@ -102,7 +102,7 @@ public class UpdateOpenSearchConfiguration extends BaseFunctionField<BooleanFiel
     }
 
     @Override
-    public List<DataType> getArguments() {
+    public List<Field> getArguments() {
         return ImmutableList.of(config);
     }
 

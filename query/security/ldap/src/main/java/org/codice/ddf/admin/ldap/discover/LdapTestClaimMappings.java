@@ -21,7 +21,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.api.ConfiguratorSuite;
-import org.codice.ddf.admin.api.DataType;
+import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.function.TestFunctionField;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
@@ -95,7 +95,7 @@ public class LdapTestClaimMappings extends TestFunctionField {
     }
 
     @Override
-    public List<DataType> getArguments() {
+    public List<Field> getArguments() {
         return ImmutableList.of(conn, bindInfo, usernameAttribute, baseUserDn, claimMappings);
     }
 

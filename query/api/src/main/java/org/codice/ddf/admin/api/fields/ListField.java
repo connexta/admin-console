@@ -16,9 +16,9 @@ package org.codice.ddf.admin.api.fields;
 import java.util.Collection;
 import java.util.List;
 
-import org.codice.ddf.admin.api.DataType;
+import org.codice.ddf.admin.api.Field;
 
-public interface ListField<T extends DataType> extends DataType<List> {
+public interface ListField<T extends Field> extends Field<List> {
 
     T createListEntry();
 

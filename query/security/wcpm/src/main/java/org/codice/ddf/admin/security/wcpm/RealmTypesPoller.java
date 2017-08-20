@@ -40,17 +40,17 @@ public class RealmTypesPoller extends BaseEnumValuePoller<JaasRealm, String> {
     public EnumValue<String> realmToEnumValue(JaasRealm realm) {
         return new EnumValue<String>() {
             @Override
-            public String enumTitle() {
+            public String getEnumTitle() {
                 return realm.getName();
             }
 
             @Override
-            public String description() {
+            public String getDescription() {
                 return descriptionMap.get(realm.getName());
             }
 
             @Override
-            public String value() {
+            public String getValue() {
                 return realm.getName();
             }
         };

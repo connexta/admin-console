@@ -16,11 +16,12 @@ package org.codice.ddf.admin.common.fields.test;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.api.fields.ListField;
+import org.codice.ddf.admin.api.fields.ObjectField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
 import org.codice.ddf.admin.common.fields.base.function.BaseFieldProvider;
@@ -96,13 +97,12 @@ public class TestFieldProvider extends BaseFieldProvider {
     }
 
     @Override
-    public List<Field> getDiscoveryFields() {
+    public List<FunctionField> getDiscoveryFunctions() {
         return ImmutableList.of(getInt,
                 getBoolean,
                 getString,
                 getList,
                 getEnum,
-                errorsPath,
                 multiArgFunc,
                 reqArgFunc);
     }
@@ -110,6 +110,11 @@ public class TestFieldProvider extends BaseFieldProvider {
     @Override
     public List<FunctionField> getMutationFunctions() {
         return ImmutableList.of(sampleMutation);
+    }
+
+    @Override
+    public List<Field> getFields() {
+        return ImmutableList.of(errorsPath);
     }
 
     public static class GetInt extends GetFunctionField<IntegerField> {
@@ -290,8 +295,23 @@ public class TestFieldProvider extends BaseFieldProvider {
         public RequiredArgsFunction() {
             super(REQUIRED_ARG_FUNCTION_NAME, "Returns the object passed as an argument");
             objArg = new TestObjectField();
-            objArg.allFieldsRequired(true);
+            allFieldsRequired(true);
             updateArgumentPaths();
+        }
+
+        /**
+         * Updating all field's requirement
+         */
+        private void allFieldsRequired(boolean required) {
+            objArg.isRequired(required);
+            objArg.getFields()
+                    .forEach(field -> field.isRequired(required));
+            List<Object> objectFields = objArg.getFields()
+                    .stream()
+                    .filter(field -> field instanceof ObjectField)
+                    .collect(Collectors.toList());
+
+            objectFields.forEach(o -> ((ObjectField)o).getFields().forEach(field -> field.isRequired(required)));
         }
 
         @Override
@@ -300,7 +320,7 @@ public class TestFieldProvider extends BaseFieldProvider {
         }
 
         @Override
-        public List<DataType> getArguments() {
+        public List<Field> getArguments() {
             return ImmutableList.of(objArg);
         }
 
@@ -354,7 +374,7 @@ public class TestFieldProvider extends BaseFieldProvider {
         }
 
         @Override
-        public List<DataType> getArguments() {
+        public List<Field> getArguments() {
             return ImmutableList.of(stringArg, integerArg, booleanArg, listArg, enumArg);
         }
 
@@ -410,7 +430,7 @@ public class TestFieldProvider extends BaseFieldProvider {
         }
     }
 
-    public static class PathField3 extends BaseObjectField {
+    public static class PathField3 extends BaseFieldProvider {
 
         private ReturnErrorsFunction returnErrorsFunction;
 
@@ -421,8 +441,13 @@ public class TestFieldProvider extends BaseFieldProvider {
         }
 
         @Override
-        public List<Field> getFields() {
+        public List<FunctionField> getDiscoveryFunctions() {
             return ImmutableList.of(returnErrorsFunction);
+        }
+
+        @Override
+        public List<FunctionField> getMutationFunctions() {
+            return ImmutableList.of();
         }
     }
 
@@ -445,7 +470,7 @@ public class TestFieldProvider extends BaseFieldProvider {
         }
 
         @Override
-        public List<DataType> getArguments() {
+        public List<Field> getArguments() {
             return ImmutableList.of(objectFieldArg);
         }
 
@@ -503,7 +528,7 @@ public class TestFieldProvider extends BaseFieldProvider {
         }
 
         @Override
-        public List<DataType> getArguments() {
+        public List<Field> getArguments() {
             return ImmutableList.of(objFieldArg);
         }
 

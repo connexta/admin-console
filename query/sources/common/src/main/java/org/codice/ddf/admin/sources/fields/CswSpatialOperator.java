@@ -60,17 +60,17 @@ public class CswSpatialOperator extends BaseEnumField<String> {
                 "Indicates that no spatial operators should be applied.";
 
         @Override
-        public String enumTitle() {
+        public String getEnumTitle() {
             return ENUM_TITLE;
         }
 
         @Override
-        public String description() {
+        public String getDescription() {
             return DESCRIPTION;
         }
 
         @Override
-        public String value() {
+        public String getValue() {
             return OPERATOR;
         }
     }
@@ -83,17 +83,17 @@ public class CswSpatialOperator extends BaseEnumField<String> {
                 "Identifies all geometries that spatially interact with a bounding box.";
 
         @Override
-        public String enumTitle() {
+        public String getEnumTitle() {
             return BBOX;
         }
 
         @Override
-        public String description() {
+        public String getDescription() {
             return DESCRIPTION;
         }
 
         @Override
-        public String value() {
+        public String getValue() {
             return BBOX;
         }
     }
@@ -106,17 +106,17 @@ public class CswSpatialOperator extends BaseEnumField<String> {
                 "Tests whether the value of a geometric property A is beyond a specified distance d of the specified literal geometric value B.";
 
         @Override
-        public String enumTitle() {
+        public String getEnumTitle() {
             return BEYOND;
         }
 
         @Override
-        public String description() {
+        public String getDescription() {
             return DESCRIPTION;
         }
 
         @Override
-        public String value() {
+        public String getValue() {
             return BEYOND;
         }
     }
@@ -129,17 +129,17 @@ public class CswSpatialOperator extends BaseEnumField<String> {
                 "Determines whether the second geometry is completely within the first geometry. Contain tests the exact opposite result of within.";
 
         @Override
-        public String enumTitle() {
+        public String getEnumTitle() {
             return CONTAINS;
         }
 
         @Override
-        public String description() {
+        public String getDescription() {
             return DESCRIPTION;
         }
 
         @Override
-        public String value() {
+        public String getValue() {
             return CONTAINS;
         }
     }
@@ -152,17 +152,17 @@ public class CswSpatialOperator extends BaseEnumField<String> {
                 "Determines whether two geometric properties cross each other.";
 
         @Override
-        public String enumTitle() {
+        public String getEnumTitle() {
             return CROSSES;
         }
 
         @Override
-        public String description() {
+        public String getDescription() {
             return DESCRIPTION;
         }
 
         @Override
-        public String value() {
+        public String getValue() {
             return CROSSES;
         }
     }
@@ -175,17 +175,17 @@ public class CswSpatialOperator extends BaseEnumField<String> {
                 "Determines whether two geometric properties do not intersect.";
 
         @Override
-        public String enumTitle() {
+        public String getEnumTitle() {
             return DISJOINT;
         }
 
         @Override
-        public String description() {
+        public String getDescription() {
             return DESCRIPTION;
         }
 
         @Override
-        public String value() {
+        public String getValue() {
             return DISJOINT;
         }
     }
@@ -198,17 +198,17 @@ public class CswSpatialOperator extends BaseEnumField<String> {
                 "Determines whether the value of a geometric property A is within a specified distance d of the specified literal geometric value B.";
 
         @Override
-        public String enumTitle() {
+        public String getEnumTitle() {
             return DWITHIN;
         }
 
         @Override
-        public String description() {
+        public String getDescription() {
             return DESCRIPTION;
         }
 
         @Override
-        public String value() {
+        public String getValue() {
             return DWITHIN;
         }
     }
@@ -221,17 +221,17 @@ public class CswSpatialOperator extends BaseEnumField<String> {
                 "Determines whether two geometric properties are identical.";
 
         @Override
-        public String enumTitle() {
+        public String getEnumTitle() {
             return EQUALS;
         }
 
         @Override
-        public String description() {
+        public String getDescription() {
             return DESCRIPTION;
         }
 
         @Override
-        public String value() {
+        public String getValue() {
             return EQUALS;
         }
     }
@@ -244,17 +244,17 @@ public class CswSpatialOperator extends BaseEnumField<String> {
                 "Determines whether two geometric properties intersect with each other.";
 
         @Override
-        public String enumTitle() {
+        public String getEnumTitle() {
             return INTERSECTS;
         }
 
         @Override
-        public String description() {
+        public String getDescription() {
             return DESCRIPTION;
         }
 
         @Override
-        public String value() {
+        public String getValue() {
             return INTERSECTS;
         }
     }
@@ -267,17 +267,17 @@ public class CswSpatialOperator extends BaseEnumField<String> {
                 "Determines whether two geometries of the same dimensions overlap. If their intersection produces a geometry different from both and of the same dimension, they overlap.";
 
         @Override
-        public String enumTitle() {
+        public String getEnumTitle() {
             return OVERLAPS;
         }
 
         @Override
-        public String description() {
+        public String getDescription() {
             return DESCRIPTION;
         }
 
         @Override
-        public String value() {
+        public String getValue() {
             return OVERLAPS;
         }
     }
@@ -290,17 +290,17 @@ public class CswSpatialOperator extends BaseEnumField<String> {
                 "Determines if the points of two geometric properties touch, but do not intersect the interiors of each geometry.";
 
         @Override
-        public String enumTitle() {
+        public String getEnumTitle() {
             return TOUCHES;
         }
 
         @Override
-        public String description() {
+        public String getDescription() {
             return DESCRIPTION;
         }
 
         @Override
-        public String value() {
+        public String getValue() {
             return TOUCHES;
         }
     }
@@ -313,17 +313,17 @@ public class CswSpatialOperator extends BaseEnumField<String> {
                 "Determines whether the first geometry is completely within the second geometry. Within tests the exact opposite result of contains.";
 
         @Override
-        public String enumTitle() {
+        public String getEnumTitle() {
             return WITHIN;
         }
 
         @Override
-        public String description() {
+        public String getDescription() {
             return DESCRIPTION;
         }
 
         @Override
-        public String value() {
+        public String getValue() {
             return WITHIN;
         }
     }

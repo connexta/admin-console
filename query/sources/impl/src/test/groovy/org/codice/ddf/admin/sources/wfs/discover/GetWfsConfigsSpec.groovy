@@ -79,7 +79,7 @@ class GetWfsConfigsSpec extends SourceCommonsSpec {
         serviceReader.getServices(_, _) >> []
 
         when:
-        def report = getWfsConfigsFunction.getValue()
+        def report = getWfsConfigsFunction.execute()
         def list = ((ListField) report.getResult())
 
         then:
@@ -95,10 +95,10 @@ class GetWfsConfigsSpec extends SourceCommonsSpec {
 
     def 'Pid filter returns 1 result'() {
         setup:
-        getWfsConfigsFunction.setValue(functionArgs)
+        getWfsConfigsFunction.setArguments(functionArgs)
 
         when:
-        def report = getWfsConfigsFunction.getValue()
+        def report = getWfsConfigsFunction.execute()
         def list = ((ListField) report.getResult())
 
         then:
@@ -113,11 +113,11 @@ class GetWfsConfigsSpec extends SourceCommonsSpec {
     def 'Fail due to no existing config with specified pid'() {
         setup:
         functionArgs.put(PID, S_PID)
-        getWfsConfigsFunction.setValue(functionArgs)
+        getWfsConfigsFunction.setArguments(functionArgs)
         serviceActions.read(S_PID) >> [:]
 
         when:
-        def report = getWfsConfigsFunction.getValue()
+        def report = getWfsConfigsFunction.execute()
 
         then:
         report.getResult() == null
@@ -148,12 +148,12 @@ class GetWfsConfigsSpec extends SourceCommonsSpec {
     def 'Returns all the possible error codes correctly'(){
         setup:
         functionArgs.put(PID, S_PID)
-        getWfsConfigsFunction.setValue(functionArgs)
+        getWfsConfigsFunction.setArguments(functionArgs)
         serviceActions.read(S_PID) >> [:]
 
         when:
         def errorCodes = getWfsConfigsFunction.getFunctionErrorCodes()
-        def noExistingConfigReport = getWfsConfigsFunction.getValue()
+        def noExistingConfigReport = getWfsConfigsFunction.execute()
 
         then:
         errorCodes.size() == 1

@@ -72,7 +72,7 @@ class LdapTestConnectionSpec extends Specification {
         ldapConnectFunction = new LdapTestConnection()
 
         when:
-        FunctionReport report = ldapConnectFunction.getValue()
+        FunctionReport report = ldapConnectFunction.execute()
 
         then:
         report.getErrorMessages().size() == 3
@@ -87,11 +87,11 @@ class LdapTestConnectionSpec extends Specification {
         setup:
         utilsMock = new LdapTestingUtilsMock()
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue()]
-        ldapConnectFunction.setValue(args)
+        ldapConnectFunction.setArguments(args)
         ldapConnectFunction.setTestingUtils(utilsMock)
 
         when:
-        FunctionReport report = ldapConnectFunction.getValue()
+        FunctionReport report = ldapConnectFunction.execute()
         ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().getResult().isClosed()
 
         then:
@@ -104,11 +104,11 @@ class LdapTestConnectionSpec extends Specification {
         setup:
         utilsMock = new LdapTestingUtilsMock()
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): ldapsLdapConnectionInfo().getValue()]
-        ldapConnectFunction.setValue(args)
+        ldapConnectFunction.setArguments(args)
         ldapConnectFunction.setTestingUtils(utilsMock)
 
         when:
-        FunctionReport report = ldapConnectFunction.getValue()
+        FunctionReport report = ldapConnectFunction.execute()
         ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().getResult().isClosed()
 
         then:
@@ -121,11 +121,11 @@ class LdapTestConnectionSpec extends Specification {
         setup:
         utilsMock = new LdapTestingUtilsMock()
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): startTlsLdapConnectionInfo(server.getLdapPort()).getValue()]
-        ldapConnectFunction.setValue(args)
+        ldapConnectFunction.setArguments(args)
         ldapConnectFunction.setTestingUtils(utilsMock)
 
         when:
-        FunctionReport report = ldapConnectFunction.getValue()
+        FunctionReport report = ldapConnectFunction.execute()
         ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().getResult().isClosed()
 
         then:
@@ -137,11 +137,11 @@ class LdapTestConnectionSpec extends Specification {
     def 'Fail to startTls over LDAPS port'() {
         setup:
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): startTlsLdapConnectionInfo(server.getLdapSecurePort()).getValue()]
-        ldapConnectFunction.setValue(args)
+        ldapConnectFunction.setArguments(args)
         ldapConnectFunction.setTestingUtils(new LdapTestingUtilsMock())
 
         when:
-        FunctionReport report = ldapConnectFunction.getValue()
+        FunctionReport report = ldapConnectFunction.execute()
 
         then:
         report.getErrorMessages().size() == 1
@@ -153,10 +153,10 @@ class LdapTestConnectionSpec extends Specification {
     def 'Fail to connect to LDAP (Bad hostname)'() {
         setup:
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): ldapsLdapConnectionInfo().hostname("badHostname").getValue()]
-        ldapConnectFunction.setValue(args)
+        ldapConnectFunction.setArguments(args)
 
         when:
-        FunctionReport report = ldapConnectFunction.getValue()
+        FunctionReport report = ldapConnectFunction.execute()
 
         then:
         report.getErrorMessages().size() == 1
@@ -168,10 +168,10 @@ class LdapTestConnectionSpec extends Specification {
     def 'Fail to connect to LDAP (Bad port)'() {
         setup:
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): ldapsLdapConnectionInfo().port(666).getValue()]
-        ldapConnectFunction.setValue(args)
+        ldapConnectFunction.setArguments(args)
 
         when:
-        FunctionReport report = ldapConnectFunction.getValue()
+        FunctionReport report = ldapConnectFunction.execute()
 
         then:
         report.getErrorMessages().size() == 1
@@ -183,11 +183,11 @@ class LdapTestConnectionSpec extends Specification {
     def 'Fail to setup connection test'() {
         setup:
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): ldapsLdapConnectionInfo().getValue()]
-        ldapConnectFunction.setValue(args)
+        ldapConnectFunction.setArguments(args)
         ldapConnectFunction.setTestingUtils(new LdapTestingUtilsMock(true))
 
         when:
-        FunctionReport report = ldapConnectFunction.getValue()
+        FunctionReport report = ldapConnectFunction.execute()
 
         then:
         report.getErrorMessages().size() == 1
@@ -200,17 +200,17 @@ class LdapTestConnectionSpec extends Specification {
         setup:
         LdapTestConnection cannotConnectLdapFunc = new LdapTestConnection()
         Map<String, Object> cannotConnectArgs = [(LdapConnectionField.DEFAULT_FIELD_NAME): ldapsLdapConnectionInfo().hostname("badHostname").getValue()]
-        cannotConnectLdapFunc.setValue(cannotConnectArgs)
+        cannotConnectLdapFunc.setArguments(cannotConnectArgs)
 
         LdapTestConnection failedSetupLdapFunc = new LdapTestConnection()
         Map<String, Object> failedSetupArgs = [(LdapConnectionField.DEFAULT_FIELD_NAME): ldapsLdapConnectionInfo().getValue()]
-        failedSetupLdapFunc.setValue(failedSetupArgs)
+        failedSetupLdapFunc.setArguments(failedSetupArgs)
         failedSetupLdapFunc.setTestingUtils(new LdapTestingUtilsMock(true))
 
         when:
         def errorCodes = ldapConnectFunction.getFunctionErrorCodes()
-        def cannotConnectReport = cannotConnectLdapFunc.getValue()
-        def failedSetupReport = failedSetupLdapFunc.getValue()
+        def cannotConnectReport = cannotConnectLdapFunc.execute()
+        def failedSetupReport = failedSetupLdapFunc.execute()
 
         then:
         errorCodes.size() == 2

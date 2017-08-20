@@ -16,7 +16,6 @@ package org.codice.ddf.admin.sources.wfs;
 import java.util.List;
 
 import org.codice.ddf.admin.api.ConfiguratorSuite;
-import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.function.BaseFieldProvider;
 import org.codice.ddf.admin.sources.wfs.discover.DiscoverWfsSource;
@@ -58,7 +57,7 @@ public class WfsFieldProvider extends BaseFieldProvider {
     }
 
     @Override
-    public List<Field> getDiscoveryFields() {
+    public List<FunctionField> getDiscoveryFunctions() {
         return ImmutableList.of(discoverWfsSource, getWfsConfigs);
     }
 

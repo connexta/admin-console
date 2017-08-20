@@ -13,16 +13,24 @@
  **/
 package org.codice.ddf.admin.common.fields.base;
 
+import static org.codice.ddf.admin.common.report.message.DefaultMessages.missingRequiredFieldError;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.codice.ddf.admin.api.Field;
+import org.codice.ddf.admin.api.report.ErrorMessage;
+import org.codice.ddf.admin.common.report.message.DefaultMessages;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
-public abstract class BaseField<S, G> implements Field<S, G> {
+public class BaseField<T> implements Field<T> {
 
-    private String fieldName;
+    private String name;
+
+    private String typeName;
 
     private String description;
 
@@ -30,26 +38,73 @@ public abstract class BaseField<S, G> implements Field<S, G> {
 
     private String pathName;
 
-    public BaseField(String fieldName, String description) {
-        this.fieldName = fieldName;
+    private boolean isRequired;
+
+    private T value;
+
+    public BaseField(String name, String typeName, String description) {
+        this.name = name;
+        this.typeName = typeName;
         this.description = description;
+        pathName = name;
         subpath = new ArrayList<>();
-        pathName = fieldName;
+        isRequired = false;
     }
 
     @Override
-    public String fieldName() {
-        return fieldName;
+    public String getName() {
+        return name;
     }
 
     @Override
-    public void pathName(String pathName) {
-        this.pathName = pathName;
+    public String getTypeName() {
+        return typeName;
     }
 
     @Override
-    public String description() {
+    public String getDescription() {
         return description;
+    }
+
+    @Override
+    public Set<String> getErrorCodes() {
+        return ImmutableSet.of(DefaultMessages.MISSING_REQUIRED_FIELD);
+    }
+
+    @Override
+    public T getValue() {
+        return value;
+    }
+
+    @Override
+    public void setValue(T value) {
+        this.value = value;
+    }
+
+    @Override
+    public boolean isRequired() {
+        return isRequired;
+    }
+
+    @Override
+    public BaseField<T> isRequired(boolean required) {
+        isRequired = required;
+        return this;
+    }
+
+    @Override
+    public List<ErrorMessage> validate() {
+        List<ErrorMessage> errors = new ArrayList<>();
+
+        if (isRequired()) {
+            if (getValue() == null) {
+                errors.add(missingRequiredFieldError(path()));
+            } else if (getValue() instanceof List && ((List) getValue()).isEmpty()) {
+                errors.add(missingRequiredFieldError(path()));
+            }
+        }
+
+        return errors;
     }
 
     @Override
@@ -57,6 +112,11 @@ public abstract class BaseField<S, G> implements Field<S, G> {
         return new ImmutableList.Builder().addAll(subpath)
                 .add(pathName)
                 .build();
+    }
+
+    @Override
+    public void pathName(String pathName) {
+        this.pathName = pathName;
     }
 
     @Override

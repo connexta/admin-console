@@ -79,7 +79,7 @@ class LdapRecommendedSettingsSpec extends Specification {
         action = new LdapRecommendedSettings()
 
         when:
-        FunctionReport report = action.getValue()
+        FunctionReport report = action.execute()
 
         then:
         report.getErrorMessages().size() == 7
@@ -101,11 +101,11 @@ class LdapRecommendedSettingsSpec extends Specification {
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().port(666).getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue(),
                 (LdapTypeField.DEFAULT_FIELD_NAME)      : LdapTypeField.Unknown.UNKNOWN]
-        action.setValue(args)
+        action.setArguments(args)
         action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
         when:
-        FunctionReport report = action.getValue()
+        FunctionReport report = action.execute()
 
         then:
         report.getErrorMessages().size() == 1
@@ -118,11 +118,11 @@ class LdapRecommendedSettingsSpec extends Specification {
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().password('badPassword').getValue(),
                 (LdapTypeField.DEFAULT_FIELD_NAME)      : LdapTypeField.Unknown.UNKNOWN]
-        action.setValue(args)
+        action.setArguments(args)
         action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
         when:
-        FunctionReport report = action.getValue()
+        FunctionReport report = action.execute()
 
         then:
         report.getErrorMessages().size() == 1
@@ -135,11 +135,11 @@ class LdapRecommendedSettingsSpec extends Specification {
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue(),
                 (LdapTypeField.DEFAULT_FIELD_NAME)      : LdapTypeField.Unknown.UNKNOWN]
-        action.setValue(args)
+        action.setArguments(args)
         action.setTestingUtils(utilsMock)
 
         when:
-        LdapRecommendedSettingsField recSettings = action.getValue().getResult()
+        LdapRecommendedSettingsField recSettings = action.execute().getResult()
         ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().getResult().isClosed()
 
         then:
@@ -175,20 +175,20 @@ class LdapRecommendedSettingsSpec extends Specification {
         Map<String, Object> cannotBindArgs = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().password('badPassword').getValue(),
                 (LdapTypeField.DEFAULT_FIELD_NAME)      : LdapTypeField.Unknown.UNKNOWN]
-        cannotBindSettings.setValue(cannotBindArgs)
+        cannotBindSettings.setArguments(cannotBindArgs)
         cannotBindSettings.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
         LdapRecommendedSettings cannotConnectSettings = new LdapRecommendedSettings()
         Map<String, Object> cannotConnectArgs = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().port(666).getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue(),
                 (LdapTypeField.DEFAULT_FIELD_NAME)      : LdapTypeField.Unknown.UNKNOWN]
-        cannotConnectSettings.setValue(cannotConnectArgs)
+        cannotConnectSettings.setArguments(cannotConnectArgs)
         cannotConnectSettings.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
         when:
         def errorCodes = action.getFunctionErrorCodes()
-        def cannotBindReport = cannotBindSettings.getValue()
-        def cannotConnectReport = cannotConnectSettings.getValue()
+        def cannotBindReport = cannotBindSettings.execute()
+        def cannotConnectReport = cannotConnectSettings.execute()
 
         then:
         errorCodes.size() == 3

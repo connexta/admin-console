@@ -15,8 +15,8 @@ package org.codice.ddf.admin.api.fields;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import org.codice.ddf.admin.api.DataType;
 import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.api.report.FunctionReport;
 
@@ -25,21 +25,29 @@ import org.codice.ddf.admin.api.report.FunctionReport;
  *
  * @param <T> the return type
  */
-public interface FunctionField<T extends DataType> extends Field<Map<String, Object>, FunctionReport<T>> {
+public interface FunctionField<T extends Field> {
 
     String ARGUMENT = "__argument";
 
-    /**
-     * Returns a field definition of the return type from the {@link #getValue()} method.
-     *
-     * @return the return type of this {@code FunctionField}
-     */
+    String getName();
+
+    String getDescription();
+
+    Set<String> getErrorCodes();
+
+    List<Field> getArguments();
+
     T getReturnType();
 
-    /**
-     * @return argument definitions of this {@code FunctionField}
-     */
-    List<DataType> getArguments();
+    void setArguments(Map<String, Object> value);
+
+    FunctionReport<T> execute();
 
     FunctionField<T> newInstance();
+
+    List<String> path();
+
+    void pathName(String functionFieldName);
+
+    void updatePath(List<String> subPath);
 }

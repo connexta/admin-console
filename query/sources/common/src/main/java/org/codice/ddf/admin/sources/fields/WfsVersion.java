@@ -51,17 +51,17 @@ public class WfsVersion extends BaseEnumField<String> {
                 "Indicates a server implements version 1.0.0 of the WFS specification.";
 
         @Override
-        public String enumTitle() {
+        public String getEnumTitle() {
             return ENUM_TITLE;
         }
 
         @Override
-        public String description() {
+        public String getDescription() {
             return DESCRIPTION;
         }
 
         @Override
-        public String value() {
+        public String getValue() {
             return WFS_VERSION_1;
         }
     }
@@ -76,17 +76,17 @@ public class WfsVersion extends BaseEnumField<String> {
                 "Indicates a server implements version 2.0.0 of the WFS specification.";
 
         @Override
-        public String enumTitle() {
+        public String getEnumTitle() {
             return ENUM_TITLE;
         }
 
         @Override
-        public String description() {
+        public String getDescription() {
             return DESCRIPTION;
         }
 
         @Override
-        public String value() {
+        public String getValue() {
             return WFS_VERSION_2;
         }
     }

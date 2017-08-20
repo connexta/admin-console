@@ -13,10 +13,8 @@
  **/
 package org.codice.ddf.admin.common.fields.base.function;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.Objects;
 
 import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.api.FieldProvider;
@@ -25,6 +23,8 @@ import org.codice.ddf.admin.common.fields.base.BaseObjectField;
 import org.codice.ddf.admin.common.services.ServiceCommons;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.ImmutableList;
 
 public abstract class BaseFieldProvider extends BaseObjectField implements FieldProvider {
 
@@ -39,34 +39,41 @@ public abstract class BaseFieldProvider extends BaseObjectField implements Field
 
     @Override
     public List<Field> getFields() {
-        List<FunctionField> mutations = getMutationFunctions() == null ? new ArrayList() : getMutationFunctions();
-        List<Field> discoveryFields = getDiscoveryFields() == null ? new ArrayList() : getDiscoveryFields();
-
-        return Stream.concat(mutations.stream(), discoveryFields.stream())
-                .collect(Collectors.toList());
+        return ImmutableList.of();
     }
 
-    public Field getDiscoveryField(String fieldName) {
-        return getDiscoveryFields().stream()
-                .filter(field -> field.fieldName()
-                        .equals(fieldName))
+    @Override
+    public void updateInnerFieldPaths() {
+        super.updateInnerFieldPaths();
+        getDiscoveryFunctions().stream()
+                .filter(Objects::nonNull)
+                .forEach(child -> child.updatePath(path()));
+        getMutationFunctions().stream()
+                .filter(Objects::nonNull)
+                .forEach(child -> child.updatePath(path()));
+    }
+
+    public FunctionField getDiscoveryFunction(String name) {
+        return getDiscoveryFunctions().stream()
+                .filter(funcField -> funcField.getName()
+                        .equals(name))
                 .findFirst()
                 .orElse(null);
     }
 
-    public Field getMutationFunction(String fieldName) {
+    public FunctionField getMutationFunction(String name) {
         return getMutationFunctions().stream()
-                .filter(field -> field.fieldName()
-                        .equals(fieldName))
+                .filter(funcField -> funcField.getName()
+                        .equals(name))
                 .findFirst()
                 .orElse(null);
     }
 
-    public void bindField(Field field) {
-        ServiceCommons.updateGraphQLSchema(getClass(), String.format(BINDING_FUNCTION, fieldTypeName()));
+    public void bindField(FunctionField functionField) {
+        ServiceCommons.updateGraphQLSchema(getClass(), String.format(BINDING_FUNCTION, getTypeName()));
     }
 
-    public void unbindField(Field field) {
-        ServiceCommons.updateGraphQLSchema(getClass(), String.format(UNBINDING_FUNCTION, fieldTypeName()));
+    public void unbindField(FunctionField functionField) {
+        ServiceCommons.updateGraphQLSchema(getClass(), String.format(UNBINDING_FUNCTION, getTypeName()));
     }
 }

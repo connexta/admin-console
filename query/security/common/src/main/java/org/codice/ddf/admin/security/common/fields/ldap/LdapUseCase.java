@@ -59,17 +59,17 @@ public class LdapUseCase extends BaseEnumField<String> {
         public static final String AUTHENTICATION = "Authentication";
 
         @Override
-        public String enumTitle() {
+        public String getEnumTitle() {
             return AUTHENTICATION;
         }
 
         @Override
-        public String description() {
+        public String getDescription() {
             return DESCRIPTION;
         }
 
         @Override
-        public String value() {
+        public String getValue() {
             return AUTHENTICATION;
         }
     }
@@ -81,17 +81,17 @@ public class LdapUseCase extends BaseEnumField<String> {
         public static final String ATTRIBUTE_STORE = "AttributeStore";
 
         @Override
-        public String enumTitle() {
+        public String getEnumTitle() {
             return ATTRIBUTE_STORE;
         }
 
         @Override
-        public String description() {
+        public String getDescription() {
             return DESCRIPTION;
         }
 
         @Override
-        public String value() {
+        public String getValue() {
             return ATTRIBUTE_STORE;
         }
     }
@@ -104,17 +104,17 @@ public class LdapUseCase extends BaseEnumField<String> {
                 "AuthenticationAndAttributeStore";
 
         @Override
-        public String enumTitle() {
+        public String getEnumTitle() {
             return AUTHENTICATION_AND_ATTRIBUTE_STORE;
         }
 
         @Override
-        public String description() {
+        public String getDescription() {
             return DESCRIPTION;
         }
 
         @Override
-        public String value() {
+        public String getValue() {
             return AUTHENTICATION_AND_ATTRIBUTE_STORE;
         }
     }

@@ -13,8 +13,8 @@
  **/
 package org.codice.ddf.admin.api.report;
 
-import org.codice.ddf.admin.api.DataType;
+import org.codice.ddf.admin.api.Field;
 
-public interface FunctionReport<T extends DataType> extends Report<T> {
+public interface FunctionReport<T extends Field> extends Report<T> {
 
 }

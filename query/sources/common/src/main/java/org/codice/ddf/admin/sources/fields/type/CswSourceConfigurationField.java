@@ -103,12 +103,6 @@ public class CswSourceConfigurationField extends SourceConfigField {
     }
 
     @Override
-    public CswSourceConfigurationField allFieldsRequired(boolean required) {
-        super.allFieldsRequired(required);
-        return this;
-    }
-
-    @Override
     public List<Field> getFields() {
         return new ImmutableList.Builder<Field>().addAll(super.getFields())
                 .add(outputSchema)

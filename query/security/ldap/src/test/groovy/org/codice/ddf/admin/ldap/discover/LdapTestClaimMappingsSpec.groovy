@@ -108,7 +108,7 @@ class LdapTestClaimMappingsSpec extends Specification {
         setup:
 
         when:
-        FunctionReport report = action.getValue()
+        FunctionReport report = action.execute()
 
         then:
         report.getErrorMessages().size() == badPaths.size()
@@ -128,10 +128,10 @@ class LdapTestClaimMappingsSpec extends Specification {
                 (LdapTestClaimMappings.USER_NAME_ATTRIBUTE): userAttribute.getValue(),
                 (LdapTestClaimMappings.BASE_USER_DN)       : baseDn.getValue(),
                 (CLAIMS_MAPPING)                           : createClaimsMapping(ImmutableMap.of("claim1", "cn")).getValue()]
-        action.setValue(args)
+        action.setArguments(args)
 
         when:
-        FunctionReport report = action.getValue()
+        FunctionReport report = action.execute()
 
         then:
         report.getErrorMessages().size() == 1
@@ -151,10 +151,10 @@ class LdapTestClaimMappingsSpec extends Specification {
                 (LdapTestClaimMappings.BASE_USER_DN)       : baseDn.getValue(),
                 (CLAIMS_MAPPING)                           : createClaimsMapping(ImmutableMap.of("claim1", "cn")).getValue()]
 
-        action.setValue(args)
+        action.setArguments(args)
 
         when:
-        FunctionReport report = action.getValue()
+        FunctionReport report = action.execute()
 
         then:
         report.getErrorMessages().size() == 1
@@ -172,10 +172,10 @@ class LdapTestClaimMappingsSpec extends Specification {
                 (LdapTestClaimMappings.BASE_USER_DN)       : baseDn.getValue(),
                 (CLAIMS_MAPPING)                           : createClaimsMapping(ImmutableMap.of("claim1", "cn")).getValue()]
 
-        action.setValue(args)
+        action.setArguments(args)
 
         when:
-        FunctionReport report = action.getValue()
+        FunctionReport report = action.execute()
 
         then:
         report.getErrorMessages().size() == 1
@@ -194,10 +194,10 @@ class LdapTestClaimMappingsSpec extends Specification {
                 (LdapTestClaimMappings.BASE_USER_DN)       : baseDn.getValue(),
                 (CLAIMS_MAPPING)                           : createClaimsMapping(ImmutableMap.of("claim1", "cn")).getValue()]
 
-        action.setValue(args)
+        action.setArguments(args)
 
         when:
-        FunctionReport report = action.getValue()
+        FunctionReport report = action.execute()
 
         then:
         report.getErrorMessages().size() == 1
@@ -222,10 +222,10 @@ class LdapTestClaimMappingsSpec extends Specification {
                 (LdapTestClaimMappings.BASE_USER_DN)       : baseDn.getValue(),
                 (CLAIMS_MAPPING)                           : claimsMapping.getValue()]
 
-        action.setValue(args)
+        action.setArguments(args)
 
         when:
-        FunctionReport report = action.getValue()
+        FunctionReport report = action.execute()
 
         then:
         report.getErrorMessages().size() == 2
@@ -251,10 +251,10 @@ class LdapTestClaimMappingsSpec extends Specification {
                 (LdapTestClaimMappings.BASE_USER_DN)       : baseDn.getValue(),
                 (CLAIMS_MAPPING)                           : claimsMapping.getValue()]
 
-        action.setValue(args)
+        action.setArguments(args)
 
         when:
-        FunctionReport report = action.getValue()
+        FunctionReport report = action.execute()
 
         then:
         report.getErrorMessages().size() == 2
@@ -284,10 +284,10 @@ class LdapTestClaimMappingsSpec extends Specification {
                 (LdapTestClaimMappings.BASE_USER_DN)       : baseDn.getValue(),
                 (CLAIMS_MAPPING)                           : claimsMapping.getValue()]
 
-        action.setValue(args)
+        action.setArguments(args)
 
         when:
-        FunctionReport report = action.getValue()
+        FunctionReport report = action.execute()
 
         then:
         report.getErrorMessages().size() == 3
@@ -314,10 +314,10 @@ class LdapTestClaimMappingsSpec extends Specification {
                 (LdapTestClaimMappings.BASE_USER_DN)       : baseDn.getValue(),
                 (CLAIMS_MAPPING)                           : claimsMapping.getValue()]
 
-        action.setValue(args)
+        action.setArguments(args)
 
         when:
-        FunctionReport report = action.getValue()
+        FunctionReport report = action.execute()
 
         then:
         report.getErrorMessages().size() == 1
@@ -340,11 +340,11 @@ class LdapTestClaimMappingsSpec extends Specification {
                 (LdapTestClaimMappings.BASE_USER_DN)       : baseDn.getValue(),
                 (CLAIMS_MAPPING)                           : claimsMapping.getValue()]
 
-        action.setValue(args)
+        action.setArguments(args)
         action.setTestingUtils(utilsMock)
 
         when:
-        FunctionReport report = action.getValue()
+        FunctionReport report = action.execute()
         ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().getResult().isClosed()
 
         then:

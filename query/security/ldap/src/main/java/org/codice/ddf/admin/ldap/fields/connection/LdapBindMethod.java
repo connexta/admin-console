@@ -44,17 +44,17 @@ public class LdapBindMethod extends BaseEnumField<String> {
                 "Authenticates a client to a server, using a plaintext password";
 
         @Override
-        public String enumTitle() {
+        public String getEnumTitle() {
             return SIMPLE;
         }
 
         @Override
-        public String description() {
+        public String getDescription() {
             return DESCRIPTION;
         }
 
         @Override
-        public String value() {
+        public String getValue() {
             return SIMPLE;
         }
     }
@@ -66,17 +66,17 @@ public class LdapBindMethod extends BaseEnumField<String> {
                 "Allows for password-based authentication without exposing the password in the clear (although it does require that both the client and the server have access to the clear-text password).";
 
         @Override
-        public String enumTitle() {
+        public String getEnumTitle() {
             return DIGEST_MD5_SASL;
         }
 
         @Override
-        public String description() {
+        public String getDescription() {
             return DESCRIPTION;
         }
 
         @Override
-        public String value() {
+        public String getValue() {
             return DIGEST_MD5_SASL;
         }
     }

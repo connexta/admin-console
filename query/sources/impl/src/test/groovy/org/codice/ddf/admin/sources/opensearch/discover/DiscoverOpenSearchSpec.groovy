@@ -48,10 +48,10 @@ class DiscoverOpenSearchSpec extends SourceCommonsSpec {
     def 'Successfully discover OpenSearch configuration using URL'() {
         setup:
         discoverOpenSearch.setOpenSearchSourceUtils(prepareOpenSearchSourceUtils(200, osResponseBody, true))
-        discoverOpenSearch.setValue(getBaseDiscoverByUrlArgs(TEST_OPEN_SEARCH_URL))
+        discoverOpenSearch.setArguments(getBaseDiscoverByUrlArgs(TEST_OPEN_SEARCH_URL))
 
         when:
-        def report = discoverOpenSearch.getValue()
+        def report = discoverOpenSearch.execute()
         def config = report.getResult()
 
         then:
@@ -62,10 +62,10 @@ class DiscoverOpenSearchSpec extends SourceCommonsSpec {
     def 'Successfully discover OpenSearch Configuration using hostname and port'() {
         setup:
         discoverOpenSearch.setOpenSearchSourceUtils(prepareOpenSearchSourceUtils(200, osResponseBody, true))
-        discoverOpenSearch.setValue(getBaseDiscoverByAddressArgs())
+        discoverOpenSearch.setArguments(getBaseDiscoverByAddressArgs())
 
         when:
-        def report = discoverOpenSearch.getValue()
+        def report = discoverOpenSearch.execute()
         def config = report.getResult()
 
         then:
@@ -76,10 +76,10 @@ class DiscoverOpenSearchSpec extends SourceCommonsSpec {
     def 'Failure to discover OpenSearch configuration due to unrecognized response when using URL'() {
         setup:
         discoverOpenSearch.setOpenSearchSourceUtils(prepareOpenSearchSourceUtils(200, badResponseBody, true))
-        discoverOpenSearch.setValue(getBaseDiscoverByUrlArgs(TEST_OPEN_SEARCH_URL))
+        discoverOpenSearch.setArguments(getBaseDiscoverByUrlArgs(TEST_OPEN_SEARCH_URL))
 
         when:
-        def report = discoverOpenSearch.getValue()
+        def report = discoverOpenSearch.execute()
 
         then:
         report.getErrorMessages().size() == 1
@@ -90,10 +90,10 @@ class DiscoverOpenSearchSpec extends SourceCommonsSpec {
     def 'Unknown endpoint with bad HTTP status code received'() {
         setup:
         discoverOpenSearch.setOpenSearchSourceUtils(prepareOpenSearchSourceUtils(500, osResponseBody, true))
-        discoverOpenSearch.setValue(getBaseDiscoverByUrlArgs(TEST_OPEN_SEARCH_URL))
+        discoverOpenSearch.setArguments(getBaseDiscoverByUrlArgs(TEST_OPEN_SEARCH_URL))
 
         when:
-        def report = discoverOpenSearch.getValue()
+        def report = discoverOpenSearch.execute()
 
         then:
         report.getErrorMessages().size() == 1
@@ -104,10 +104,10 @@ class DiscoverOpenSearchSpec extends SourceCommonsSpec {
     def 'Unknown endpoint if no pre-formatted URLs work when discovering with host+port'() {
         setup:
         discoverOpenSearch.setOpenSearchSourceUtils(prepareOpenSearchSourceUtils(200, osResponseBody, false))
-        discoverOpenSearch.setValue(getBaseDiscoverByAddressArgs())
+        discoverOpenSearch.setArguments(getBaseDiscoverByAddressArgs())
 
         when:
-        def report = discoverOpenSearch.getValue()
+        def report = discoverOpenSearch.execute()
 
         then:
         report.getErrorMessages().size() == 1
@@ -117,7 +117,7 @@ class DiscoverOpenSearchSpec extends SourceCommonsSpec {
 
     def 'Fail when missing required fields'() {
         when:
-        def report = discoverOpenSearch.getValue()
+        def report = discoverOpenSearch.execute()
 
         then:
         report.getResult() == null
@@ -132,16 +132,16 @@ class DiscoverOpenSearchSpec extends SourceCommonsSpec {
         setup:
         DiscoverOpenSearchSource cannotConnectOpenSearch = new DiscoverOpenSearchSource(Mock(ConfiguratorSuite))
         cannotConnectOpenSearch.setOpenSearchSourceUtils(prepareOpenSearchSourceUtils(200, osResponseBody, false))
-        cannotConnectOpenSearch.setValue(getBaseDiscoverByAddressArgs())
+        cannotConnectOpenSearch.setArguments(getBaseDiscoverByAddressArgs())
 
         DiscoverOpenSearchSource unknownEndpointOpenSearch = new DiscoverOpenSearchSource(Mock(ConfiguratorSuite))
         unknownEndpointOpenSearch.setOpenSearchSourceUtils(prepareOpenSearchSourceUtils(200, badResponseBody, true))
-        unknownEndpointOpenSearch.setValue(getBaseDiscoverByUrlArgs(TEST_OPEN_SEARCH_URL))
+        unknownEndpointOpenSearch.setArguments(getBaseDiscoverByUrlArgs(TEST_OPEN_SEARCH_URL))
 
         when:
         def errorCodes = discoverOpenSearch.getFunctionErrorCodes()
-        def cannotConnectReport = cannotConnectOpenSearch.getValue()
-        def unknownEndpointReport = unknownEndpointOpenSearch.getValue()
+        def cannotConnectReport = cannotConnectOpenSearch.execute()
+        def unknownEndpointReport = unknownEndpointOpenSearch.execute()
 
         then:
         errorCodes.size() == 2

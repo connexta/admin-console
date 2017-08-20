@@ -79,7 +79,7 @@ class LdapUserAttributesSpec extends Specification {
         action = new LdapUserAttributes()
 
         when:
-        FunctionReport report = action.getValue()
+        FunctionReport report = action.execute()
 
         then:
         report.getErrorMessages().size() == badPaths.size()
@@ -97,11 +97,11 @@ class LdapUserAttributesSpec extends Specification {
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().port(666).getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue(),
                 (LdapUserAttributes.BASE_USER_DN)  : LdapTestingCommons.LDAP_SERVER_BASE_GROUP_DN]
-        action.setValue(args)
+        action.setArguments(args)
         action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
         when:
-        FunctionReport report = action.getValue()
+        FunctionReport report = action.execute()
 
         then:
         report.getErrorMessages().size() == 1
@@ -115,11 +115,11 @@ class LdapUserAttributesSpec extends Specification {
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().password('badPassword').getValue(),
                 (LdapUserAttributes.BASE_USER_DN)  : LdapTestingCommons.LDAP_SERVER_BASE_GROUP_DN]
-        action.setValue(args)
+        action.setArguments(args)
         action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
         when:
-        FunctionReport report = action.getValue()
+        FunctionReport report = action.execute()
 
         then:
         report.getErrorMessages().size() == 1
@@ -133,11 +133,12 @@ class LdapUserAttributesSpec extends Specification {
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue(),
                 (LdapUserAttributes.BASE_USER_DN)  : LdapTestingCommons.LDAP_SERVER_BASE_GROUP_DN]
-        action.setValue(args)
+        action.setArguments(args)
         action.setTestingUtils(utilsMock)
 
         when:
-        ListField<StringField> report = action.getValue().getResult()
+        ListField<StringField> report = action.execute().getResult()
+
         ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().getResult().isClosed()
 
         then:
@@ -154,20 +155,20 @@ class LdapUserAttributesSpec extends Specification {
         Map<String, Object> cannotConnectArgs = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().port(666).getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue(),
                 (LdapUserAttributes.BASE_USER_DN)  : LdapTestingCommons.LDAP_SERVER_BASE_GROUP_DN]
-        cannotConnectAction.setValue(cannotConnectArgs)
+        cannotConnectAction.setArguments(cannotConnectArgs)
         cannotConnectAction.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
         LdapUserAttributes cannotBindAction = new LdapUserAttributes()
         Map<String, Object> cannotBindArgs = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().password('badPassword').getValue(),
                 (LdapUserAttributes.BASE_USER_DN)  : LdapTestingCommons.LDAP_SERVER_BASE_GROUP_DN]
-        cannotBindAction.setValue(cannotBindArgs)
+        cannotBindAction.setArguments(cannotBindArgs)
         cannotBindAction.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
         when:
         def errorCodes = action.getFunctionErrorCodes()
-        def cannotConnectReport = cannotConnectAction.getValue()
-        def cannotBindReport = cannotBindAction.getValue()
+        def cannotConnectReport = cannotConnectAction.execute()
+        def cannotBindReport = cannotBindAction.execute()
 
         then:
         errorCodes.size() == 3

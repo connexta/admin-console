@@ -17,7 +17,7 @@ import static org.codice.ddf.admin.api.fields.ScalarField.ScalarType.STRING;
 
 import org.codice.ddf.admin.common.fields.base.scalar.BaseScalarField;
 
-public class TestDataType<T> extends BaseScalarField<T> {
+public class TestField<T> extends BaseScalarField<T> {
 
     public static final String FIELD_NAME = "testFieldName";
 
@@ -27,11 +27,11 @@ public class TestDataType<T> extends BaseScalarField<T> {
 
     private T value;
 
-    public TestDataType() {
+    public TestField() {
         this(FIELD_NAME);
     }
 
-    public TestDataType(String fieldName) {
+    public TestField(String fieldName) {
         super(fieldName, FIELD_TYPE_NAME, DESCRIPTION, STRING);
     }
 

@@ -21,7 +21,7 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
-import org.codice.ddf.admin.api.DataType;
+import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.slf4j.Logger;
@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableSet;
 
-public abstract class BaseListField<T extends DataType> extends BaseDataType<List>
+public abstract class BaseListField<T extends Field> extends BaseField<List>
         implements ListField<T> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseListField.class);
@@ -74,7 +74,7 @@ public abstract class BaseListField<T extends DataType> extends BaseDataType<Lis
         try {
             return getCreateListEntryCallable().call();
         } catch (Exception e) {
-            throw new RuntimeException("Unable to create new instance of list content for field: " + fieldName());
+            throw new RuntimeException("Unable to create new instance of list content for field: " + getName());
         }
     }
 

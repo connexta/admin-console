@@ -73,8 +73,8 @@ class DeleteCswConfigurationSpec extends SourceCommonsSpec {
         when:
         serviceActions.read(S_PID) >> configToDelete
         configurator.commit(_, _) >> mockReport(false)
-        deleteCswConfiguration.setValue(functionArgs)
-        def report = deleteCswConfiguration.getValue()
+        deleteCswConfiguration.setArguments(functionArgs)
+        def report = deleteCswConfiguration.execute()
 
         then:
         report.getResult() != null
@@ -84,8 +84,8 @@ class DeleteCswConfigurationSpec extends SourceCommonsSpec {
     def 'Fail with no existing config found with provided pid'() {
         when:
         serviceActions.read(_ as String) >> [:]
-        deleteCswConfiguration.setValue(functionArgs)
-        def report = deleteCswConfiguration.getValue()
+        deleteCswConfiguration.setArguments(functionArgs)
+        def report = deleteCswConfiguration.execute()
 
         then:
         report.getResult() == null
@@ -98,8 +98,8 @@ class DeleteCswConfigurationSpec extends SourceCommonsSpec {
         when:
         serviceActions.read(S_PID) >> configToDelete
         configurator.commit(_, _) >> mockReport(true)
-        deleteCswConfiguration.setValue(functionArgs)
-        def report = deleteCswConfiguration.getValue()
+        deleteCswConfiguration.setArguments(functionArgs)
+        def report = deleteCswConfiguration.execute()
 
         then:
         !report.getResult().getValue()
@@ -110,7 +110,7 @@ class DeleteCswConfigurationSpec extends SourceCommonsSpec {
 
     def 'Fail when missing required fields'() {
         when:
-        def report = deleteCswConfiguration.getValue()
+        def report = deleteCswConfiguration.execute()
 
         then:
         report.getResult() == null
@@ -125,17 +125,17 @@ class DeleteCswConfigurationSpec extends SourceCommonsSpec {
         setup:
         DeleteCswConfiguration deleteCswNoExistingConfig = new DeleteCswConfiguration(configuratorSuite)
         serviceActions.read(_ as String) >> [:]
-        deleteCswNoExistingConfig.setValue(functionArgs)
+        deleteCswNoExistingConfig.setArguments(functionArgs)
 
         DeleteCswConfiguration deleteCswFailPersist = new DeleteCswConfiguration(configuratorSuite)
         serviceActions.read(S_PID) >> configToDelete
         configurator.commit(_, _) >> mockReport(true)
-        deleteCswFailPersist.setValue(functionArgs)
+        deleteCswFailPersist.setArguments(functionArgs)
 
         when:
         def errorCodes = deleteCswConfiguration.getFunctionErrorCodes()
-        def noExistingConfigReport = deleteCswNoExistingConfig.getValue()
-        def failedPersistReport = deleteCswFailPersist.getValue()
+        def noExistingConfigReport = deleteCswNoExistingConfig.execute()
+        def failedPersistReport = deleteCswFailPersist.execute()
 
         then:
         errorCodes.size() == 2

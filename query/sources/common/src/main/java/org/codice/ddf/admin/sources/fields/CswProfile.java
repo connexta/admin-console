@@ -49,17 +49,17 @@ public class CswProfile extends BaseEnumField<String> {
         public static final String CSW_SPEC_PROFILE_FEDERATED_SOURCE = "CswFederatedSource";
 
         @Override
-        public String enumTitle() {
+        public String getEnumTitle() {
             return CSW_SPEC_PROFILE_FEDERATED_SOURCE;
         }
 
         @Override
-        public String description() {
+        public String getDescription() {
             return DESCRIPTION;
         }
 
         @Override
-        public String value() {
+        public String getValue() {
             return CSW_SPEC_PROFILE_FEDERATED_SOURCE;
         }
     }
@@ -72,17 +72,17 @@ public class CswProfile extends BaseEnumField<String> {
         public static final String CSW_FEDERATION_PROFILE_SOURCE = "DDFCswFederatedSource";
 
         @Override
-        public String enumTitle() {
+        public String getEnumTitle() {
             return CSW_FEDERATION_PROFILE_SOURCE;
         }
 
         @Override
-        public String description() {
+        public String getDescription() {
             return DESCRIPTION;
         }
 
         @Override
-        public String value() {
+        public String getValue() {
             return CSW_FEDERATION_PROFILE_SOURCE;
         }
     }
@@ -95,17 +95,17 @@ public class CswProfile extends BaseEnumField<String> {
         public static final String GMD_CSW_ISO_FEDERATED_SOURCE = "GmdCswFederatedSource";
 
         @Override
-        public String enumTitle() {
+        public String getEnumTitle() {
             return GMD_CSW_ISO_FEDERATED_SOURCE;
         }
 
         @Override
-        public String description() {
+        public String getDescription() {
             return DESCRIPTION;
         }
 
         @Override
-        public String value() {
+        public String getValue() {
             return GMD_CSW_ISO_FEDERATED_SOURCE;
         }
     }

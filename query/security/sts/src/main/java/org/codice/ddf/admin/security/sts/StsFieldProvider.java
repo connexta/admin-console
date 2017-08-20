@@ -16,7 +16,6 @@ package org.codice.ddf.admin.security.sts;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.function.BaseFieldProvider;
 import org.codice.ddf.admin.security.sts.discover.GetStsClaimsFunctionField;
@@ -42,7 +41,7 @@ public class StsFieldProvider extends BaseFieldProvider {
     }
 
     @Override
-    public List<Field> getDiscoveryFields() {
+    public List<FunctionField> getDiscoveryFunctions() {
         return ImmutableList.of(getStsClaims);
     }
 

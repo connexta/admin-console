@@ -1,0 +1,11 @@
+mutation CreateWfsSource {
+  createWfsSource(source: {
+    wfsVersion: WFS_2
+    sourceName: "testWfs"
+    endpointUrl: "http://localhost:8993/geoserver/ows"
+    creds: {
+      username: "admin"
+      password: "admin"
+    }
+  })
+}

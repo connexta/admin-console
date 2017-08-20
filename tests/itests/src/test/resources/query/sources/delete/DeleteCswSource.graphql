@@ -1,0 +1,3 @@
+mutation deleteCswSource ($pid: Pid!) {
+  deleteCswSource (pid: $pid)
+}

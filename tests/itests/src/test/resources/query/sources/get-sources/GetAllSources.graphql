@@ -1,0 +1,46 @@
+query getAllSources {
+  csw {
+    sources {
+      isAvailable
+      source {
+        pid
+        sourceName
+        endpointUrl
+        cswOutputSchema
+        cswProfile
+        creds {
+          username
+          password
+        }
+      }
+    }
+  }
+  openSearch {
+    sources {
+      isAvailable
+      source {
+        pid
+        sourceName
+        endpointUrl
+        creds {
+          username
+          password
+        }
+      }
+    }
+  }
+  wfs {
+    sources {
+      isAvailable
+      source {
+        pid
+        sourceName
+        wfsVersion
+        creds {
+          username
+          password
+        }
+      }
+    }
+  }
+}

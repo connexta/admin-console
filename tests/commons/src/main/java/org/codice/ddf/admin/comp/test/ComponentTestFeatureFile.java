@@ -33,6 +33,10 @@ public class ComponentTestFeatureFile extends Feature {
 
     public static final String LDAP_LOGIN = "security-sts-ldaplogin-dependencies";
 
+    public static final String CATALOG_CORE_API = "catalog-core-api-dependencies";
+
+    public static final String SPATIAL_CSW_SOURCE = "spatial-csw-source-dependencies";
+
     protected ComponentTestFeatureFile(String featureName) {
         super(featureName);
     }
@@ -63,6 +67,14 @@ public class ComponentTestFeatureFile extends Feature {
 
     public static Feature commonTestDependenciesFeature() {
         return new ComponentTestFeatureFile(COMMON_TEST_DEPENDENCIES_FEATURE);
+    }
+
+    public static Feature catalogCoreApiFeature() {
+        return new ComponentTestFeatureFile(CATALOG_CORE_API);
+    }
+
+    public static Feature spatialCswSource() {
+        return new ComponentTestFeatureFile(SPATIAL_CSW_SOURCE);
     }
 
     @Override

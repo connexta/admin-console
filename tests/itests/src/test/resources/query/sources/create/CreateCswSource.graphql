@@ -1,0 +1,14 @@
+mutation CreateCswSource {
+  createCswSource ( source: {
+    creds: {
+      username: "admin"
+      password: "admin"
+    },
+    cswProfile: DDFCswFederatedSource
+    sourceName: "testCsw"
+    endpointUrl: "https://localhost:8993/services/csw"
+    cswOutputSchema: "urn:catalog:metacard"
+    cswSpatialOperator: None
+    }
+  )
+}

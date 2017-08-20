@@ -1,0 +1,12 @@
+mutation UpdateWfsSource($pid: Pid) {
+  updateWfsSource(source: {
+    wfsVersion: WFS_2
+    sourceName: "testWfsUpdated"
+    endpointUrl: "http://localhost:8993/geoserver/ows"
+    creds: {
+      username: "admin"
+      password: "admin"
+    }
+    pid: $pid
+  })
+}

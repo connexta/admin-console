@@ -1,0 +1,11 @@
+mutation UpdateOpenSearchSource($pid: Pid) {
+  updateOpenSearchSource(source: {
+    creds: {
+      username: "admin"
+      password: "admin"
+    }
+    endpointUrl: "https://localhost:8993/services/catalog/query"
+    sourceName: "testOpenSearchUpdated"
+    pid: $pid
+  })
+}

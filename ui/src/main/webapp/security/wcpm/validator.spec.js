@@ -44,6 +44,12 @@ describe('validators', () => {
       const errors = policyValidator(policy)
       expect(errors.isEmpty()).to.equal(true)
     })
+    it('should not allow trailing slashes in context path', () => {
+      const policy = createPolicy({ paths: ['/test/'], authTypes: ['GUEST'] })
+      const errors = policyValidator(policy)
+      expect(errors.isEmpty()).to.equal(false)
+      expect(errors.getIn(['paths', 0])).to.not.equal(undefined)
+    })
   })
   describe('validator(whitelist)', () => {
     it('should not allow invalid context paths', () => {
@@ -74,6 +80,14 @@ describe('validators', () => {
       const policies = [{ paths: ['/world'] }]
       const errors = whitelistValidator(whitelist, { policies })
       expect(errors.isEmpty()).to.equal(true)
+    })
+    it('should not allow trailing slashes in context path', () => {
+      const whitelist = ['/hello', '/world', '/test/']
+      const errors = whitelistValidator(whitelist)
+      expect(errors.isEmpty()).to.equal(false)
+      expect(errors.get(0)).to.equal(undefined)
+      expect(errors.get(1)).to.equal(undefined)
+      expect(errors.get(2)).to.not.equal(undefined)
     })
   })
 })

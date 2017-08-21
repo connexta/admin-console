@@ -52,12 +52,18 @@ const isValidContextPath = (path) => {
   return /^(\/[A-Za-z0-9-._~:/?#[\]@!$&'()*+,;=`.%]*)+$/g.test(path)
 }
 
+const hasTrailingSlash = (path) => {
+  return /.+\/$/.test(path)
+}
+
 export const validator = (whitelist, { policies = [] } = {}) => {
   let errors = IList()
 
   whitelist.forEach((path, i) => {
     if (!isValidContextPath(path)) {
       errors = errors.set(i, 'Invalid context path')
+    } else if (hasTrailingSlash(path)) {
+      errors = errors.set(i, 'No trailing slashes allowed')
     } else if (whitelist.slice(0, i).includes(path)) {
       errors = errors.set(i, 'Path already included in the whitelist')
     } else {

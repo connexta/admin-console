@@ -30,6 +30,10 @@ public abstract class BaseScalarField<T> extends BaseField<T> implements ScalarF
         return value;
     }
 
+    @Override
+    public T getSanitizedValue() {
+        return getValue();
+    }
 
     @Override
     public void setValue(T value) {

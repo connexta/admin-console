@@ -46,6 +46,17 @@ public abstract class BaseObjectField extends BaseField<Map<String, Object>>
     }
 
     @Override
+    public Map<String, Object> getSanitizedValue() {
+        Map<String, Object> values = new HashMap<>();
+
+        for (Field field : getFields()) {
+            values.put(field.getName(), field.getSanitizedValue());
+        }
+
+        return values;
+    }
+
+    @Override
     public void setValue(Map<String, Object> values) {
         if(values == null || values.isEmpty()) {
             return;

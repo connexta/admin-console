@@ -26,7 +26,7 @@ import org.codice.ddf.admin.common.report.message.DefaultMessages;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
-public class BaseField<T> implements Field<T> {
+public abstract class BaseField<T> implements Field<T> {
 
     private String name;
 

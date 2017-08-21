@@ -11,15 +11,22 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.api.fields;
+package org.codice.ddf.admin.common.fields.test;
 
-import org.codice.ddf.admin.api.Field;
+import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 
-public interface ScalarField<S> extends Field<S> {
+public class TestHiddenField extends StringField {
 
-    ScalarType getScalarType();
+    public static final String HIDDEN_FIELD_NAME = "testHidden";
 
-    enum ScalarType {
-        STRING, INTEGER, FLOAT, BOOLEAN
+    public static final String HIDDEN_FLAG = "*****";
+
+    public TestHiddenField() {
+        super(HIDDEN_FIELD_NAME);
+    }
+
+    @Override
+    public String getSanitizedValue() {
+        return HIDDEN_FLAG;
     }
 }

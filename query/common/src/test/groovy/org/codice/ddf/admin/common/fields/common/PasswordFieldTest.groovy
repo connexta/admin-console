@@ -11,15 +11,21 @@
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
-package org.codice.ddf.admin.api.fields;
+package org.codice.ddf.admin.common.fields.common
 
-import org.codice.ddf.admin.api.Field;
+import org.codice.ddf.admin.common.fields.base.BaseField
+import spock.lang.Specification
 
-public interface ScalarField<S> extends Field<S> {
+class PasswordFieldTest extends Specification{
 
-    ScalarType getScalarType();
+    private static String REAL_VALUE = "admin"
 
-    enum ScalarType {
-        STRING, INTEGER, FLOAT, BOOLEAN
+    def 'Successfully masks hidden fields'(){
+        when:
+        PasswordField passwordField = new PasswordField()
+        passwordField.setValue(REAL_VALUE)
+
+        then:
+        passwordField.getSanitizedValue() == PasswordField.HIDDEN_FLAG
     }
 }

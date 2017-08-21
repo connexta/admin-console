@@ -16,8 +16,7 @@ package org.codice.ddf.admin.query;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
-import static org.ops4j.pax.exam.CoreOptions.wrappedBundle;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFilePut;
 import static com.jayway.restassured.RestAssured.given;
 import static junit.framework.TestCase.fail;
 
@@ -39,7 +38,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
-import org.ops4j.pax.exam.options.WrappedUrlProvisionOption;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 
@@ -60,42 +58,18 @@ public class AdminSourcesIT extends AbstractComponentTest {
 
     public int wfsPid;
 
-
-    //mvn:ddf.catalog.core/catalog-core-standardframework/2.11.0-SNAPSHOT
-//
-//    @ProbeBuilder
-//    public TestProbeBuilder probe(TestProbeBuilder defaultProbe) {
-//        defaultProbe.setHeader("Export-Package", "org.codice.ddf.catalog.resource.cache");
-//        return defaultProbe;
-//    }
-//
     @Override
     public List<Option> customSettings() {
-        return super.customSettings();
-//        return Arrays.asList(wrappedBundle(mavenBundle().groupId("ddf.catalog.core")
-//                .artifactId("catalog-core-downloadaction")
-//                .version("2.11.0-SNAPSHOT")).instructions("Import-Package=*;resolution:=optional")
-//                .bundleSymbolicName("wrapped-catalog-core-downloadaction")
-//                .overwriteManifest(WrappedUrlProvisionOption.OverwriteMode.FULL));
-
-//        return Arrays.asList(wrappedBundle(mavenBundle().groupId("ddf.catalog.core")
-//                .artifactId("catalog-core-standardframework")
-//                .version("2.11.0-SNAPSHOT")).instructions("DynamicImport-Package=*", "Export-Package=*", "-removeheaders=Export-Service,Import-Service").bundleSymbolicName("wrapped-standardframework")
-//                .overwriteManifest(
-//                WrappedUrlProvisionOption.OverwriteMode.FULL));
-
-//        return Arrays.asList(wrappedBundle(mavenBundle().groupId("ddf.catalog.core")
-//                .artifactId("catalog-core-standardframework")
-//                .version("2.11.0-SNAPSHOT")).instructions("DynamicImport-Package=*", "Export-Package=*", "-removeheaders=Export-Service,Import-Service").bundleSymbolicName("wrapped-standardframework")
-//                .overwriteManifest(
-//                        WrappedUrlProvisionOption.OverwriteMode.FULL));
-
-
-    }
-
-    @BeforeExam
-    public static void beforeClass() {
-        // this is where the hard part is
+        //The catalog framework won't start until it is able to point a client to a solr instance over http.
+        //This configuration points the client to the embeddedSolr instead so fewer dependencies have to be started up
+        return Arrays.asList(editConfigurationFilePut("etc/system.properties",
+                "solr.client",
+                "EmbeddedSolrServer"),
+                editConfigurationFilePut("etc/system.properties", "solr.http.url", ""),
+                editConfigurationFilePut("etc/system.properties",
+                        "solr.data.dir",
+                        "${karaf.home}/data/solr"),
+                editConfigurationFilePut("etc/system.properties", "solr.cloud.zookeeper", ""));
     }
 
     @Override
@@ -127,15 +101,7 @@ public class AdminSourcesIT extends AbstractComponentTest {
     @Override
     public void beforeExam() throws Exception {
         super.beforeExam();
-        //        ServiceUtils.registerService(CatalogFramework.class, mock(CatalogFramework.class));
-//        ServiceUtils.registerService(ResourceCacheServiceMBean.class, mock(ResourceCacheServiceMBean.class));
-
         serviceManager.startFeature(true, ComponentTestFeatureFile.spatialCswSource().getFeatureName());
-        //        serviceManager.startFeature(true, ComponentTestFeatureFile.spatialCswSource().getFeatureName());
-        //
-        //        // TODO: 8/17/17 phuffer - Make a convenience method that takes a feature and mock class?
-        //        serviceManager.startFeature(true,
-        //                ComponentTestFeatureFile.spatialCswSource().getFeatureName());
     }
 
     @Test

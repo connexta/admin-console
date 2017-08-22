@@ -29,8 +29,8 @@ public abstract class Feature {
         return featureName;
     }
 
-    public Feature bootFeature(boolean bootFeature) {
-        this.bootFeature = bootFeature;
+    public Feature bootFeature() {
+        this.bootFeature = true;
         return this;
     }
 

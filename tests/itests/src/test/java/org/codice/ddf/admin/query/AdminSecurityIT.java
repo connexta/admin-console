@@ -101,16 +101,16 @@ public class AdminSecurityIT extends AbstractComponentTest {
         return Arrays.asList(PlatformAppFeatureFile.featureFile(),
                 SecurityAppFeatureFile.featureFile(),
                 ComponentTestFeatureFile.thirdPartyFeature()
-                        .bootFeature(true),
+                        .bootFeature(),
                 ComponentTestFeatureFile.commonTestDependenciesFeature()
-                        .bootFeature(true),
+                        .bootFeature(),
                 AdminQueryAppFeatureFile.adminCoreFeature()
-                        .bootFeature(true),
+                        .bootFeature(),
                 //  add so pax exam has access to data type api before being started
 
                 //Added a boot feature because the tests need the ServiceManager running before we can startFeatures
                 ComponentTestFeatureFile.securityAll()
-                        .bootFeature(true),
+                        .bootFeature(),
                 ComponentTestFeatureFile.configuratorFeature(),
                 ComponentTestFeatureFile.configSecurityPolicy(),
                 ComponentTestFeatureFile.ldapClaimsHandlerFeature(),
@@ -121,7 +121,8 @@ public class AdminSecurityIT extends AbstractComponentTest {
     }
 
     @BeforeExam
-    public void beforeTest() throws Exception {
+    @Override
+    public void beforeExam() throws Exception {
         super.beforeExam();
         securityPolicyConfigurator.configureRestForBasic();
 
@@ -165,6 +166,7 @@ public class AdminSecurityIT extends AbstractComponentTest {
     @Test
     public void savePolicies() throws IOException {
 
+        // TODO: tbatie - 8/22/17 - Testing whether the bins collapse should be done at the unit test level.  
         try {
             Map<String, Object> newPolicy1 = new ContextPolicyBin(serviceReader).addContextPath(
                     TEST_CONTEXT_PATH)

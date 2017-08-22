@@ -19,18 +19,12 @@ import org.ops4j.pax.exam.options.MavenArtifactUrlReference;
 
 public class SecurityAppFeatureFile extends Feature {
 
-    private static final String SECURITY_ALL = "security-securityAll-fix";
-
     protected SecurityAppFeatureFile(String featureName) {
         super(featureName);
     }
 
     public static SecurityAppFeatureFile featureFile() {
         return new SecurityAppFeatureFile(null);
-    }
-
-    public Feature securityAll() {
-        return new SecurityAppFeatureFile(SECURITY_ALL);
     }
 
     @Override

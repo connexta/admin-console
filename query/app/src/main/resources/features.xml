@@ -56,7 +56,7 @@
     </feature>
 
     <feature name="admin-query-wcpm-dependencies" install="manual" version="${project.version}"
-             description="DDF :: Admin Console :: Query :: Security :: Web Context Policy Manager Dependencies">        <bundle>mvn:commons-collections/commons-collections/3.2.2</bundle>
+             description="DDF :: Admin Console :: Query :: Security :: Web Context Policy Manager Dependencies">
         <bundle>mvn:commons-collections/commons-collections/3.2.2</bundle>
         <bundle>mvn:ddf.admin/admin-configurator-api/${ddf.version}</bundle>
         <bundle>mvn:ddf.admin/admin-configurator-actions-api/${ddf.version}</bundle>

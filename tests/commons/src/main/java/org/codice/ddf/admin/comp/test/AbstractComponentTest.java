@@ -79,7 +79,7 @@ public abstract class AbstractComponentTest {
      *
      * @return
      */
-    public abstract List<Feature> features();
+    protected abstract List<Feature> features();
 
     @Configuration
     public Option[] config() throws Exception {
@@ -98,11 +98,11 @@ public abstract class AbstractComponentTest {
                 .toArray(Option[]::new);
     }
 
-    public List<Option> customSettings() {
+    protected List<Option> customSettings() {
         return new ArrayList<>();
     }
 
-    public List<Option> distributionSettings() {
+    protected List<Option> distributionSettings() {
         return Arrays.asList(debugConfiguration("50005", Boolean.getBoolean("isDebugEnabled")),
                 karafDistributionConfiguration().frameworkUrl(maven().groupId("org.codice.ddf")
                         .artifactId("kernel")
@@ -113,7 +113,7 @@ public abstract class AbstractComponentTest {
                 cleanCaches());
     }
 
-    public List<Option> configurableSettings() throws Exception {
+    protected List<Option> configurableSettings() throws Exception {
         return Arrays.asList(keepRuntimeFolder(),
                 logLevel(LogLevelOption.LogLevel.INFO),
 
@@ -157,15 +157,16 @@ public abstract class AbstractComponentTest {
 
     protected List<Option> configureVmOptions() {
         return Arrays.asList(vmOption("-Xmx4096M"),
+                vmOption("-Xms2048M"),
                 // avoid integration tests stealing focus on OS X
                 vmOption("-Djava.awt.headless=true"), vmOption("-Dfile.encoding=UTF8"));
     }
 
-    public void startFeatures() throws Exception {
+    protected void startFeatures() throws Exception {
         features().stream()
+                .parallel()
                 .filter(f -> !f.isBootFeature() && f.getFeatureName() != null)
                 .map(Feature::getFeatureName)
-                .parallel()
                 .forEach(feature -> {
                     try {
                         serviceManager.startFeature(true, feature);

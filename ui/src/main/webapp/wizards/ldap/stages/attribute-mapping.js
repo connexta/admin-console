@@ -10,7 +10,7 @@ import Navigation, { Back, Next } from 'components/wizard/Navigation'
 
 import Message from 'components/Message'
 
-import {Select, InputAuto} from 'admin-wizard/inputs'
+import { Select, InputAuto } from 'admin-wizard/inputs'
 
 import { Card, CardHeader } from 'material-ui/Card'
 
@@ -24,6 +24,20 @@ import {
 } from 'material-ui/Table'
 
 import RaisedButton from 'material-ui/RaisedButton'
+
+import Error from 'material-ui/svg-icons/alert/error'
+
+import muiThemeable from 'material-ui/styles/muiThemeable'
+
+const AttrError = muiThemeable()(
+  ({ error, muiTheme }) => (
+    error !== undefined
+    ? <span title={error}>
+      <Error color={muiTheme.palette.errorColor} />
+    </span>
+    : null
+  )
+)
 
 class AttributeMapper extends Component {
   constructor (props) {
@@ -57,10 +71,11 @@ class AttributeMapper extends Component {
       attributes,
       configs: {
         attributeMappings = {},
-        subjectClaims,
-        userAttributes
+        subjectClaims = '',
+        userAttributes = ''
       } = {},
-      onEdit
+      onEdit,
+      errors
     } = this.props
 
     return (
@@ -75,15 +90,26 @@ class AttributeMapper extends Component {
         <InputAuto
           label='LDAP User Attribute'
           value={userAttributes}
-          onEdit={onEdit('userAttributes')}
+          onEdit={(value) => {
+            onEdit('userAttributes')(value.replace(/\s/g, ''))
+          }}
           options={attributes} />
 
         <RaisedButton
           primary
           style={{margin: '0 auto', marginBottom: '30px', marginTop: '10px', display: 'block'}}
           label='Add Mapping'
-          onClick={() => onEdit('attributeMappings')({ ...attributeMappings, [subjectClaims]: userAttributes })}
-          disabled={subjectClaims === undefined || userAttributes === undefined} />
+          onClick={() => {
+            onEdit({
+              subjectClaims: '',
+              userAttributes: '',
+              attributeMappings: {
+                ...attributeMappings,
+                [subjectClaims]: userAttributes
+              }
+            })
+          }}
+          disabled={subjectClaims === undefined || userAttributes === undefined || userAttributes === ''} />
 
         <Card expanded style={{ width: '100%' }}>
           <CardHeader style={{ fontSize: '0.80em' }}>
@@ -97,6 +123,7 @@ class AttributeMapper extends Component {
               <TableRow>
                 <TableHeaderColumn>STS Claim</TableHeaderColumn>
                 <TableHeaderColumn style={{ width: 120 }}>LDAP User Attribute</TableHeaderColumn>
+                <TableHeaderColumn style={{ width: 32 }}>Errors</TableHeaderColumn>
               </TableRow>
             </TableHeader>
             <TableBody showRowHover deselectOnClickaway={false}>
@@ -106,6 +133,9 @@ class AttributeMapper extends Component {
                     <span style={{cursor: 'help'}} title={subjectClaim}>{subjectClaim}</span>
                   </TableRowColumn>
                   <TableRowColumn style={{ width: 120 }}>{attributeMappings[subjectClaim]}</TableRowColumn>
+                  <TableRowColumn style={{ width: 32 }}>
+                    <AttrError error={errors[i]} />
+                  </TableRowColumn>
                 </TableRow>
               )}
             </TableBody>
@@ -115,7 +145,7 @@ class AttributeMapper extends Component {
         <RaisedButton
           label='Remove Selected Mappings'
           primary
-          style={{display: 'block'}}
+          style={{ display: 'block', marginTop: 20 }}
           disabled={this.state.selected.length === 0}
           onClick={this.filterUpdateMappings.bind(this)} />
       </div>
@@ -161,12 +191,28 @@ const LdapAttributeMappingStage = (props) => {
     } = {},
     onEdit,
 
-    messages = [],
+    errors,
 
     data: { sts = {}, ldap = {} },
 
     prev
   } = props
+
+  const keys = [ 'claimsMapping' ]
+
+  const claimErrors = errors
+    .filter((err) => keys.some((key) => err.path.includes(key)))
+    .reduce((acc, err) => {
+      const index = parseInt(err.path[err.path.length - 2])
+      acc[index] = err.message
+      return acc
+    }, [])
+
+  // filter out unique messages
+  const messages = errors.filter((err, i) => {
+    const before = errors.slice(0, i).map((err) => err.message)
+    return !before.includes(err.message)
+  })
 
   const conn = {
     hostname: configs.hostname,
@@ -197,6 +243,7 @@ const LdapAttributeMappingStage = (props) => {
       </Description>
 
       <AttributeMapper
+        errors={claimErrors}
         onEdit={onEdit}
         claims={sts.claims}
         attributes={ldap.userAttributes}

@@ -10,7 +10,13 @@ import Paper from 'material-ui/Paper'
 export const withConfigs = (Component) => ({ state, setState, props }) => {
   state = Map(state)
 
-  const onEdit = (id) => (value) => setState(state.set(id, value))
+  const onEdit = (id) => {
+    if (typeof id === 'string') {
+      return (value) => setState(state.set(id, value))
+    } else if (typeof id === 'object') {
+      setState(state.merge(id))
+    }
+  }
   const setDefaults = (config) =>
     setState(fromJS(config).merge(state.filter((v) => v !== undefined && v !== '')))
 

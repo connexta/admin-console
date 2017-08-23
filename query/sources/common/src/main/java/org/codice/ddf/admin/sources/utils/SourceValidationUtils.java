@@ -42,8 +42,8 @@ public class SourceValidationUtils {
         Source source = sourceUtilCommons.getAllSourceReferences()
                 .stream()
                 .map(ConfiguredService.class::cast)
-                .filter(configuredService -> configuredService.getConfigurationPid()
-                        .equals(servicePid))
+                // TODO: 8/22/17 phuffer - this doesn't work for OpenSearch
+                .filter(configuredService -> servicePid.equals(configuredService.getConfigurationPid()))
                 .findFirst()
                 .map(Source.class::cast)
                 .orElse(null);
@@ -83,7 +83,7 @@ public class SourceValidationUtils {
      * @return a {@link Report} containing an {@link org.codice.ddf.admin.api.report.ErrorMessage}s on failure.
      */
     public Report<Void> duplicateSourceNameExists(StringField sourceName, PidField pid) {
-        Report sourceNameReport = Reports.emptyReport();
+        Report<Void> sourceNameReport = Reports.emptyReport();
         if (pid.getValue() != null) {
             sourceNameReport = serviceCommons.serviceConfigurationExists(pid);
             if (!sourceNameReport.containsErrorMessages() && !findSourceNameMatch(pid.getValue(),

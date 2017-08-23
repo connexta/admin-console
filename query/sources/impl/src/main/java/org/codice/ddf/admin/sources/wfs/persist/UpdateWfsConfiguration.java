@@ -13,10 +13,7 @@
  */
 package org.codice.ddf.admin.sources.wfs.persist;
 
-import static org.codice.ddf.admin.common.report.message.DefaultMessages.failedPersistError;
 import static org.codice.ddf.admin.common.services.ServiceCommons.FLAG_PASSWORD;
-import static org.codice.ddf.admin.sources.services.WfsServiceProperties.WFS1_FEATURE;
-import static org.codice.ddf.admin.sources.services.WfsServiceProperties.WFS2_FEATURE;
 import static org.codice.ddf.admin.sources.services.WfsServiceProperties.wfsConfigToServiceProps;
 
 import java.util.List;
@@ -29,10 +26,7 @@ import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.common.report.message.DefaultMessages;
 import org.codice.ddf.admin.common.services.ServiceCommons;
-import org.codice.ddf.admin.configurator.Configurator;
-import org.codice.ddf.admin.configurator.OperationReport;
 import org.codice.ddf.admin.sources.SourceMessages;
-import org.codice.ddf.admin.sources.fields.WfsVersion;
 import org.codice.ddf.admin.sources.fields.type.WfsSourceConfigurationField;
 import org.codice.ddf.admin.sources.utils.SourceValidationUtils;
 
@@ -73,25 +67,6 @@ public class UpdateWfsConfiguration extends BaseFunctionField<BooleanField> {
 
     @Override
     public BooleanField performFunction() {
-        Configurator configurator = configuratorSuite.getConfiguratorFactory()
-                .getConfigurator();
-        OperationReport report = null;
-        if (config.wfsVersion()
-                .equals(WfsVersion.Wfs2.WFS_VERSION_2)) {
-            configurator.add(configuratorSuite.getFeatureActions()
-                    .start(WFS2_FEATURE));
-            report = configurator.commit("Starting feature [{}].", WFS2_FEATURE);
-        } else if (config.wfsVersion()
-                .equals(WfsVersion.Wfs1.WFS_VERSION_1)) {
-            configurator.add(configuratorSuite.getFeatureActions()
-                    .start(WFS1_FEATURE));
-            report = configurator.commit("Starting feature [{}].", WFS1_FEATURE);
-        }
-
-        if (report != null && report.containsFailedResults()) {
-            addErrorMessage(failedPersistError());
-            return new BooleanField(false);
-        }
         addErrorMessages(serviceCommons.updateService(config.pidField(),
                 wfsConfigToServiceProps(config)));
         return new BooleanField(!containsErrorMsgs());

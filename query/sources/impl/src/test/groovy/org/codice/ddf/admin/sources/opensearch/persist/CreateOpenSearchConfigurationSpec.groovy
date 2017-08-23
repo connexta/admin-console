@@ -120,22 +120,7 @@ class CreateOpenSearchConfigurationSpec extends SourceCommonsSpec {
         def report = createOpenSearchConfiguration.execute()
 
         then:
-        1 * configurator.commit(_, _) >> mockReport(false)
-        1 * configurator.commit(_, _) >> mockReport(true)
-        !report.getResult().getValue()
-        report.getErrorMessages().size() == 1
-        report.getErrorMessages().get(0).path == RESULT_ARGUMENT_PATH
-        report.getErrorMessages().get(0).code == DefaultMessages.FAILED_PERSIST
-    }
-
-    def 'Return false when opensearch feature fails to start'() {
-        when:
-        createOpenSearchConfiguration.setArguments(createFunctionArgs())
-        serviceReader.getServices(_, _) >> []
-        def report = createOpenSearchConfiguration.execute()
-
-        then:
-        1 * configurator.commit(_, _) >> mockReport(true)
+        configurator.commit(_, _) >> mockReport(true)
         !report.getResult().getValue()
         report.getErrorMessages().size() == 1
         report.getErrorMessages().get(0).path == RESULT_ARGUMENT_PATH

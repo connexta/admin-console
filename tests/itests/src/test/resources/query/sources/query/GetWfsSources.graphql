@@ -1,0 +1,17 @@
+query wfsSources {
+  wfs {
+    sources {
+      isAvailable
+      source {
+        pid
+        sourceName
+        endpointUrl
+        wfsVersion
+        creds {
+          username
+          password
+        }
+      }
+    }
+  }
+}

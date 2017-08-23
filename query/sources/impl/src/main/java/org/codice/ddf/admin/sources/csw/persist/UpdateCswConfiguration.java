@@ -13,9 +13,7 @@
  **/
 package org.codice.ddf.admin.sources.csw.persist;
 
-import static org.codice.ddf.admin.common.report.message.DefaultMessages.failedPersistError;
 import static org.codice.ddf.admin.common.services.ServiceCommons.FLAG_PASSWORD;
-import static org.codice.ddf.admin.sources.services.CswServiceProperties.CSW_FEATURE;
 import static org.codice.ddf.admin.sources.services.CswServiceProperties.cswConfigToServiceProps;
 
 import java.util.List;
@@ -28,8 +26,6 @@ import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.common.report.message.DefaultMessages;
 import org.codice.ddf.admin.common.services.ServiceCommons;
-import org.codice.ddf.admin.configurator.Configurator;
-import org.codice.ddf.admin.configurator.OperationReport;
 import org.codice.ddf.admin.sources.SourceMessages;
 import org.codice.ddf.admin.sources.fields.type.CswSourceConfigurationField;
 import org.codice.ddf.admin.sources.utils.SourceValidationUtils;
@@ -71,17 +67,6 @@ public class UpdateCswConfiguration extends BaseFunctionField<BooleanField> {
 
     @Override
     public BooleanField performFunction() {
-        Configurator configurator = configuratorSuite.getConfiguratorFactory()
-                .getConfigurator();
-        configurator.add(configuratorSuite.getFeatureActions()
-                .start(CSW_FEATURE));
-        OperationReport report = configurator.commit("Starting feature [{}]", CSW_FEATURE);
-
-        if (report.containsFailedResults()) {
-            addErrorMessage(failedPersistError());
-            return new BooleanField(false);
-        }
-
         addErrorMessages(serviceCommons.updateService(config.pidField(),
                 cswConfigToServiceProps(config)));
         return new BooleanField(!containsErrorMsgs());

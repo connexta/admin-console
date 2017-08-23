@@ -123,22 +123,7 @@ class CreateCswConfigurationSpec extends SourceCommonsSpec {
         def report = createCswConfiguration.execute()
 
         then:
-        1 * configurator.commit(_, _) >> mockReport(false)
-        1 * configurator.commit(_, _) >> mockReport(true)
-        !report.getResult().getValue()
-        report.getErrorMessages().size() == 1
-        report.getErrorMessages().get(0).path == RESULT_ARGUMENT_PATH
-        report.getErrorMessages().get(0).code == DefaultMessages.FAILED_PERSIST
-    }
-
-    def 'Return false when csw feature fails to start'() {
-        when:
-        createCswConfiguration.setArguments(createCswArgs())
-        serviceReader.getServices(_, _) >> []
-        def report = createCswConfiguration.execute()
-
-        then:
-        1 * configurator.commit(_, _) >> mockReport(true)
+        configurator.commit(_, _) >> mockReport(true)
         !report.getResult().getValue()
         report.getErrorMessages().size() == 1
         report.getErrorMessages().get(0).path == RESULT_ARGUMENT_PATH

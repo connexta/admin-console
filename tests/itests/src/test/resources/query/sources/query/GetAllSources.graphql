@@ -8,6 +8,7 @@ query getAllSources {
         endpointUrl
         cswOutputSchema
         cswProfile
+        cswSpatialOperator
         creds {
           username
           password

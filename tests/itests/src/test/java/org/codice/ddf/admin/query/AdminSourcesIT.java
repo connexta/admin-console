@@ -1,4 +1,3 @@
-package org.codice.ddf.admin.query;
 /**
  * Copyright (c) Codice Foundation
  * <p>
@@ -12,27 +11,35 @@ package org.codice.ddf.admin.query;
  * is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  **/
+package org.codice.ddf.admin.query;
 
+import static org.codice.ddf.admin.query.request.SourcesRequestHelper.MASKED_PASSWORD;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.empty;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFilePut;
-import static com.jayway.restassured.RestAssured.given;
-import static junit.framework.TestCase.fail;
+import static junit.framework.TestCase.assertEquals;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
-import org.apache.commons.io.IOUtils;
-import org.boon.Boon;
+import org.apache.commons.lang3.StringUtils;
+import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.comp.test.AbstractComponentTest;
+import org.codice.ddf.admin.comp.test.AdminQueryAppFeatureFile;
 import org.codice.ddf.admin.comp.test.ComponentTestFeatureFile;
 import org.codice.ddf.admin.comp.test.Feature;
 import org.codice.ddf.admin.comp.test.PlatformAppFeatureFile;
 import org.codice.ddf.admin.comp.test.SecurityAppFeatureFile;
+import org.codice.ddf.admin.query.request.SourcesRequestHelper;
+import org.codice.ddf.admin.sources.fields.WfsVersion;
+import org.codice.ddf.admin.sources.fields.type.CswSourceConfigurationField;
+import org.codice.ddf.admin.sources.fields.type.OpenSearchSourceConfigurationField;
+import org.codice.ddf.admin.sources.fields.type.SourceConfigField;
+import org.codice.ddf.admin.sources.fields.type.WfsSourceConfigurationField;
 import org.codice.ddf.itests.common.annotations.BeforeExam;
-import org.hamcrest.MatcherAssert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,22 +48,58 @@ import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 
-import com.google.common.collect.ImmutableMap;
-import com.jayway.restassured.response.ExtractableResponse;
-
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
 public class AdminSourcesIT extends AbstractComponentTest {
 
-    public static final String GRAPHQL_ENDPOINT = "http://localhost:9993/admin/hub/graphql";
+    // TODO: 8/20/17 phuffer - fix dynamic port once refactored.
+    public static final String GRAPHQL_ENDPOINT = "https://localhost:9993/admin/hub/graphql";
 
-    public static final String QUERY_RESOURCE_BASE_PATH = "/query/sources";
+    public static final String PID = PidField.DEFAULT_FIELD_NAME;
 
-    public int cswPid;
+    public static final String WFS_NAME = WfsSourceConfigurationField.DEFAULT_FIELD_NAME;
 
-    public int openSearchPid;
+    public static final String OPEN_SEARCH_NAME =
+            OpenSearchSourceConfigurationField.DEFAULT_FIELD_NAME;
 
-    public int wfsPid;
+    public static final String CSW_NAME = CswSourceConfigurationField.DEFAULT_FIELD_NAME;
+
+    private static final SourcesRequestHelper SOURCES_REQUEST_HELPER = new SourcesRequestHelper(
+            GRAPHQL_ENDPOINT);
+
+    public static final String TEST_SOURCE_NAME = "testSourceName";
+
+    @Override
+    public List<Feature> features() {
+        return Arrays.asList(PlatformAppFeatureFile.featureFile(),
+                SecurityAppFeatureFile.featureFile(),
+
+                ComponentTestFeatureFile.thirdPartyFeature()
+                        .bootFeature(),
+                ComponentTestFeatureFile.commonTestDependenciesFeature()
+                        .bootFeature(),
+                AdminQueryAppFeatureFile.adminCoreFeature()
+                        .bootFeature(),
+
+                //Added a boot feature because the tests need the ServiceManager running before we can startFeatures
+                ComponentTestFeatureFile.securityAll()
+                        .bootFeature(),
+                ComponentTestFeatureFile.catalogCoreApiFeature()
+                        .bootFeature(),
+
+                ComponentTestFeatureFile.configuratorFeature(),
+                ComponentTestFeatureFile.configSecurityPolicy(),
+
+                ComponentTestFeatureFile.spatialWfs20Source(),
+                ComponentTestFeatureFile.spatialWfs10Source(),
+                ComponentTestFeatureFile.catalogOpenSearchSource(),
+                // TODO: 8/23/17 phuffer - Feature requires a change in DDF to start correctly
+                //                ComponentTestFeatureFile.spatialCswSource(),
+
+                AdminQueryAppFeatureFile.adminUtilsFeature(),
+                AdminQueryAppFeatureFile.adminSourceFeature(),
+                AdminQueryAppFeatureFile.adminGraphQlFeature());
+    }
 
     @Override
     public List<Option> customSettings() {
@@ -72,262 +115,204 @@ public class AdminSourcesIT extends AbstractComponentTest {
                 editConfigurationFilePut("etc/system.properties", "solr.cloud.zookeeper", ""));
     }
 
-    @Override
-    public List<Feature> features() {
-        return Arrays.asList(
-                PlatformAppFeatureFile.featureFile(),
-                SecurityAppFeatureFile.featureFile(),
-
-                ComponentTestFeatureFile.thirdPartyFeature().bootFeature(true),
-                ComponentTestFeatureFile.commonTestDependenciesFeature().bootFeature(true),
-
-                //Added a boot feature because the tests need the ServiceManager running before we can startFeatures
-                ComponentTestFeatureFile.securityAll().bootFeature(true),
-                ComponentTestFeatureFile.catalogCoreApiFeature()
-//                ComponentTestFeatureFile.spatialCswSource()
-//                ComponentTestFeatureFile.spatialWfs10(),
-//                ComponentTestFeatureFile.spatialWfs20()
-
-//                ComponentTestFeatureFile.spatialCswSource()
-//                ComponentTestFeatureFile.configuratorFeature(),
-//                ComponentTestFeatureFile.configSecurityPolicy(),
-//
-//                AdminQueryAppFeatureFile.adminSecurityFeature(),
-//                AdminQueryAppFeatureFile.adminGraphQlFeature()
-        );
-    }
-
     @BeforeExam
     @Override
     public void beforeExam() throws Exception {
         super.beforeExam();
-        serviceManager.startFeature(true, ComponentTestFeatureFile.spatialCswSource().getFeatureName());
+        securityPolicyConfigurator.configureRestForBasic();
+
+        SOURCES_REQUEST_HELPER.waitForSourcesInSchema();
     }
 
     @Test
-    public void createCsw() throws Exception {
-//        ExtractableResponse response = sendGraphQlQuery("/create/CreateCswSource.graphql");
-//        MatcherAssert.assertThat("Error creating CSW source.",
-//                response.jsonPath()
-//                        .getBoolean("data.createCswSource"));
+    public void testWfs20() {
+        // create wfs source
+        Map<String, Object> configToSave = SOURCES_REQUEST_HELPER.createWfsArgs(TEST_SOURCE_NAME,
+                null,
+                WfsVersion.Wfs2.ENUM_TITLE)
+                .getValue();
 
-        assertThat("I am", true);
+        boolean createSuccess =
+                SOURCES_REQUEST_HELPER.createSource(SourcesRequestHelper.SourceType.WFS,
+                        configToSave);
+        assertThat("Error creating WFS source.", createSuccess, is(true));
 
-        // TODO: 8/3/17 phuffer - Clean this up so tests dont leak over into each other
+        SOURCES_REQUEST_HELPER.waitForWfsSource(configToSave, true);
+
+        // get created wfs source
+        List<Map<String, Object>> wfsSources = SOURCES_REQUEST_HELPER.getSources(
+                SourcesRequestHelper.SourceType.WFS);
+        assertThat(wfsSources, is(not(empty())));
+
+        Map<String, String> sourceProperties = (Map) wfsSources.get(0)
+                .get(WFS_NAME);
+        String pid = sourceProperties.get(PID);
+        assertThat("Error getting WFS source.", StringUtils.isNotEmpty(pid));
+
+        //update wfs source
+        Map<String, Object> updateArgs = SOURCES_REQUEST_HELPER.createWfsArgs("updatedName",
+                pid,
+                WfsVersion.Wfs2.ENUM_TITLE)
+                .getValue();
+
+        boolean updateSuccess =
+                SOURCES_REQUEST_HELPER.updateSource(SourcesRequestHelper.SourceType.WFS,
+                        updateArgs);
+        assertThat("Error updating WFS source", updateSuccess, is(true));
+
+        SOURCES_REQUEST_HELPER.waitForWfsSource(updateArgs, false);
+
+        // get updated wfs source
+        wfsSources = SOURCES_REQUEST_HELPER.getSources(SourcesRequestHelper.SourceType.WFS);
+        assertThat(wfsSources, is(not(empty())));
+
+        sourceProperties = (Map) wfsSources.get(0)
+                .get(WFS_NAME);
+        String updatedName = sourceProperties.get(SourceConfigField.SOURCE_NAME_FIELD_NAME);
+        assertEquals("Error updating WFS source.", "updatedName", updatedName);
+
+        // delete wfs source
+        boolean deleteSuccess =
+                SOURCES_REQUEST_HELPER.deleteSource(SourcesRequestHelper.SourceType.WFS, pid);
+        assertThat("Error deleting WFS source.", deleteSuccess, is(true));
+    }
+
+    @Test
+    public void testWfs10() {
+        // create wfs source
+        Map<String, Object> configToSave = SOURCES_REQUEST_HELPER.createWfsArgs(TEST_SOURCE_NAME,
+                null,
+                WfsVersion.Wfs1.ENUM_TITLE)
+                .getValue();
+
+        boolean createSuccess =
+                SOURCES_REQUEST_HELPER.createSource(SourcesRequestHelper.SourceType.WFS,
+                        configToSave);
+        assertThat("Error creating WFS source.", createSuccess, is(true));
+
+        SOURCES_REQUEST_HELPER.waitForWfsSource(configToSave, true);
+
+        // get created wfs source
+        List<Map<String, Object>> wfsSources = SOURCES_REQUEST_HELPER.getSources(
+                SourcesRequestHelper.SourceType.WFS);
+        assertThat(wfsSources, is(not(empty())));
+
+        Map<String, String> sourceProperties = (Map) wfsSources.get(0)
+                .get(WFS_NAME);
+        String pid = sourceProperties.get(PID);
+        assertThat("Error getting WFS source.", StringUtils.isNotEmpty(pid));
+
+        // delete wfs source
+        boolean deleteSuccess =
+                SOURCES_REQUEST_HELPER.deleteSource(SourcesRequestHelper.SourceType.WFS, pid);
+        assertThat("Error deleting WFS source.", deleteSuccess, is(true));
+    }
+
+    @Test
+    public void testOpenSearch() {
+        // create openSearch source
+        Map<String, Object> configToSave = SOURCES_REQUEST_HELPER.createOpenSearchArgs(
+                TEST_SOURCE_NAME,
+                null)
+                .getValue();
+
+        boolean createSuccess =
+                SOURCES_REQUEST_HELPER.createSource(SourcesRequestHelper.SourceType.OPEN_SEARCH,
+                        configToSave);
+        assertThat("Error creating OpenSearch source.", createSuccess, is(true));
+
+        SOURCES_REQUEST_HELPER.waitForOpenSearch(configToSave, true);
+
+        // get created openSearch source
+        List<Map<String, Object>> openSearchSources = SOURCES_REQUEST_HELPER.getSources(
+                SourcesRequestHelper.SourceType.OPEN_SEARCH);
+        assertThat(openSearchSources, is(not(empty())));
+
+        Map<String, String> sourceProperties = (Map) openSearchSources.get(0)
+                .get(OPEN_SEARCH_NAME);
+        String pid = sourceProperties.get(PID);
+        assertThat("Error getting OpenSearch source.", StringUtils.isNotEmpty(pid));
+
+        //update openSearch source
+        Map<String, Object> updateArgs = SOURCES_REQUEST_HELPER.createOpenSearchArgs("updatedName",
+                pid)
+                .getValue();
+        boolean updateSuccess =
+                SOURCES_REQUEST_HELPER.updateSource(SourcesRequestHelper.SourceType.OPEN_SEARCH,
+                        updateArgs);
+        assertThat("Error updating OpenSearch source", updateSuccess, is(true));
+
+        SOURCES_REQUEST_HELPER.waitForOpenSearch(updateArgs, false);
+
+        // get updated openSearch source
+        openSearchSources =
+                SOURCES_REQUEST_HELPER.getSources(SourcesRequestHelper.SourceType.OPEN_SEARCH);
+        assertThat(openSearchSources, is(not(empty())));
+
+        sourceProperties = (Map) openSearchSources.get(0)
+                .get(OPEN_SEARCH_NAME);
+        String updatedName = sourceProperties.get(SourceConfigField.SOURCE_NAME_FIELD_NAME);
+        assertEquals("Error updating OpenSearch source.", "updatedName", updatedName);
+
+        // delete openSearch source
+        boolean deleteSuccess =
+                SOURCES_REQUEST_HELPER.deleteSource(SourcesRequestHelper.SourceType.OPEN_SEARCH,
+                        pid);
+        assertThat("Error deleting OpenSearch source.", deleteSuccess, is(true));
     }
 
     @Ignore
     @Test
-    public void createOpenSearch() throws IOException {
-        ExtractableResponse response = sendGraphQlQuery("/create/CreateOpenSearchSource.graphql");
-        MatcherAssert.assertThat("Error creating OpenSearch source.",
-                response.jsonPath()
-                        .getBoolean("data.createOpenSearchSource"));
+    // TODO: 8/23/17 phuffer - In order for the CSW feature to start, the ActionProvider must be removed
+    //                         from the spatial-csw-transformer blueprint.
+    public void testCsw() {
+        // create CSW source
+        Map<String, Object> cswConfigToSave = SOURCES_REQUEST_HELPER.createCswArgs(TEST_SOURCE_NAME,
+                null,
+                MASKED_PASSWORD)
+                .getValue();
+
+        boolean createSuccess =
+                SOURCES_REQUEST_HELPER.createSource(SourcesRequestHelper.SourceType.CSW,
+                        cswConfigToSave);
+        assertThat("Error creating CSW source.", createSuccess, is(true));
+
+        SOURCES_REQUEST_HELPER.waitForCswSource(cswConfigToSave, true);
+
+        // get created CSW source
+        List<Map<String, Object>> cswSources = SOURCES_REQUEST_HELPER.getSources(
+                SourcesRequestHelper.SourceType.CSW);
+        assertThat(cswSources, is(not(empty())));
+
+        Map<String, String> sourceProperties = (Map) cswSources.get(0)
+                .get(CSW_NAME);
+        String pid = sourceProperties.get(PID);
+        assertThat("Error getting CSW source.", StringUtils.isNotEmpty(pid));
+
+        //update CSW source
+        Map<String, Object> updateArgs = SOURCES_REQUEST_HELPER.createCswArgs("updatedName",
+                pid,
+                MASKED_PASSWORD)
+                .getValue();
+        boolean updateSuccess =
+                SOURCES_REQUEST_HELPER.updateSource(SourcesRequestHelper.SourceType.CSW,
+                        updateArgs);
+        assertThat("Error updating CSW source", updateSuccess, is(true));
+
+        SOURCES_REQUEST_HELPER.waitForCswSource(updateArgs, false);
+
+        // get updated CSW source
+        cswSources = SOURCES_REQUEST_HELPER.getSources(SourcesRequestHelper.SourceType.CSW);
+        assertThat(cswSources, is(not(empty())));
+
+        sourceProperties = (Map) cswSources.get(0)
+                .get(OPEN_SEARCH_NAME);
+        String updatedName = sourceProperties.get(SourceConfigField.SOURCE_NAME_FIELD_NAME);
+        assertEquals("Error updating CSW source.", "updatedName", updatedName);
+
+        // delete CSW source
+        boolean deleteSuccess =
+                SOURCES_REQUEST_HELPER.deleteSource(SourcesRequestHelper.SourceType.CSW, pid);
+        assertThat("Error deleting CSW source.", deleteSuccess, is(true));
     }
-
-    @Ignore
-    @Test
-    public void createWfs() throws IOException {
-        ExtractableResponse response = sendGraphQlQuery("/create/CreateWfsSource.graphql");
-        MatcherAssert.assertThat("Error creating WFS source.",
-                response.jsonPath()
-                        .getBoolean("data.createOpenSearchSource"));
-    }
-
-    @Ignore
-    @Test
-    public void verifySourceCreationsPersist() throws IOException {
-        ExtractableResponse response = sendGraphQlQuery("/get-sources/GetAllSources.graphql");
-
-        assertThat(response.jsonPath()
-                .getList("data.csw.sources")
-                .size(), is(equalTo(1)));
-        assertThat(response.jsonPath()
-                .getList("data.openSearch.sources")
-                .size(), is(equalTo(1)));
-        assertThat(response.jsonPath()
-                .getList("data.wfs.sources")
-                .size(), is(equalTo(1)));
-
-        cswPid = response.jsonPath()
-                .getInt("data.csw.sources[0].pid");
-        openSearchPid = response.jsonPath()
-                .getInt("data.openSearch.sources[0].pid");
-        wfsPid = response.jsonPath()
-                .getInt("data.wfs.sources[0].pid");
-    }
-
-    @Ignore
-    @Test
-    public void updateCsw() throws IOException {
-        ExtractableResponse response = sendGraphQlQuery("/update/UpdateCswSource.graphql",
-                ImmutableMap.of("pid", cswPid));
-        MatcherAssert.assertThat("Error updating CSW source.",
-                response.jsonPath()
-                        .getBoolean("data.updateCswSource"));
-    }
-
-    @Ignore
-    @Test
-    public void updateOpenSearch() throws IOException {
-        ExtractableResponse response = sendGraphQlQuery("/update/UpdateOpenSearchSource.graphql",
-                ImmutableMap.of("pid", openSearchPid));
-        MatcherAssert.assertThat("Error updating OpenSearch source.",
-                response.jsonPath()
-                        .getBoolean("data.updateOpenSearchSource"));
-    }
-
-    @Ignore
-    @Test
-    public void updateWfs() throws IOException {
-        ExtractableResponse response = sendGraphQlQuery("/update/UpdateWfsSource.graphql",
-                ImmutableMap.of("pid", wfsPid));
-        MatcherAssert.assertThat("Error updating WFS source.",
-                response.jsonPath()
-                        .getBoolean("data.updateWfsSource"));
-    }
-
-    @Ignore
-    @Test
-    public void verifySourceUpdatesPersist() throws IOException {
-        ExtractableResponse response = sendGraphQlQuery("/get-sources/GetAllSources.graphql");
-
-        assertThat(response.jsonPath()
-                .getList("data.csw.sources")
-                .size(), is(equalTo(1)));
-        assertThat(response.jsonPath()
-                .getList("data.csw.sources[0].source.sourceName"), is(equalTo("testCswUpdated")));
-
-        assertThat(response.jsonPath()
-                .getList("data.openSearch.sources")
-                .size(), is(equalTo(1)));
-        assertThat(response.jsonPath()
-                        .getList("data.openSearch.sources[0].source.sourceName"),
-                is(equalTo("testOpenSearchUpdated")));
-
-        assertThat(response.jsonPath()
-                .getList("data.wfs.sources")
-                .size(), is(equalTo(1)));
-        assertThat(response.jsonPath()
-                .getList("data.wfs.sources[0].source.sourceName"), is(equalTo("testWfsUpdated")));
-    }
-
-    @Ignore
-    @Test
-    public void deleteCswSource() throws IOException {
-        ExtractableResponse response = sendGraphQlQuery("/delete/DeleteCswSource.graphql",
-                ImmutableMap.of("pid", cswPid));
-
-        MatcherAssert.assertThat("Error deleting CSW source.",
-                response.jsonPath()
-                        .getBoolean("data.deleteCswSource"));
-    }
-
-    @Ignore
-    @Test
-    public void verifyCswDeleted() throws IOException {
-        ExtractableResponse response = sendGraphQlQuery("/get-sources/GetAllSources.graphql");
-
-        assertThat(response.jsonPath()
-                .getList("data.csw.sources")
-                .size(), is(equalTo(0)));
-        assertThat(response.jsonPath()
-                .getList("data.openSearch.sources")
-                .size(), is(equalTo(1)));
-        assertThat(response.jsonPath()
-                .getList("data.wfs.sources")
-                .size(), is(equalTo(1)));
-    }
-
-    @Ignore
-    @Test
-    public void deleteOpenSearchSource() throws IOException {
-        ExtractableResponse response = sendGraphQlQuery("/delete/DeleteCswSource.graphql",
-                ImmutableMap.of("pid", openSearchPid));
-
-        MatcherAssert.assertThat("Error deleting OpenSearch source.",
-                response.jsonPath()
-                        .getBoolean("data.deleteOpenSearchSource"));
-    }
-
-    @Ignore
-    @Test
-    public void verifyOpenSearchDeleted() throws IOException {
-        ExtractableResponse response = sendGraphQlQuery("/get-sources/GetAllSources.graphql");
-
-        assertThat(response.jsonPath()
-                .getList("data.csw.sources")
-                .size(), is(equalTo(0)));
-        assertThat(response.jsonPath()
-                .getList("data.openSearch.sources")
-                .size(), is(equalTo(0)));
-        assertThat(response.jsonPath()
-                .getList("data.wfs.sources")
-                .size(), is(equalTo(1)));
-    }
-
-    @Ignore
-    @Test
-    public void deleteWfsSource() throws IOException {
-        ExtractableResponse response = sendGraphQlQuery("/delete/DeleteCswSource.graphql",
-                ImmutableMap.of("pid", wfsPid));
-        MatcherAssert.assertThat("Error deleting WFS source.",
-                response.jsonPath()
-                        .getBoolean("data.deleteWfsSource"));
-    }
-
-    @Ignore
-    @Test
-    public void verifyWfsDeleted() throws IOException {
-        ExtractableResponse response = sendGraphQlQuery("/get-sources/GetAllSources.graphql");
-
-        assertThat(response.jsonPath()
-                .getList("data.csw.sources")
-                .size(), is(equalTo(0)));
-        assertThat(response.jsonPath()
-                .getList("data.openSearch.sources")
-                .size(), is(equalTo(0)));
-        assertThat(response.jsonPath()
-                .getList("data.wfs.sources")
-                .size(), is(equalTo(0)));
-    }
-
-    public static String getResourceAsString(String filePath) {
-        try {
-            return IOUtils.toString(AdminSourcesIT.class.getClassLoader()
-                    .getResourceAsStream(filePath), "UTF-8");
-        } catch (IOException e) {
-            fail("Unable to retrieve resource: " + filePath);
-        }
-
-        return null;
-    }
-
-    public ExtractableResponse sendGraphQlQuery(String queryFileName) {
-        String jsonBody = Boon.toJson(ImmutableMap.of("query",
-                getResourceAsString(QUERY_RESOURCE_BASE_PATH + queryFileName)));
-
-        System.out.println("\nRequest: \n" + jsonBody);
-        return given().when()
-                .body(jsonBody)
-                .post(GRAPHQL_ENDPOINT)
-                .then()
-                .extract();
-    }
-
-    public ExtractableResponse sendGraphQlQuery(String queryFileName, ImmutableMap variables) {
-        String jsonBody = Boon.toJson(ImmutableMap.of("query",
-                getResourceAsString(QUERY_RESOURCE_BASE_PATH + queryFileName),
-                "variables",
-                Boon.toJson(variables)));
-
-        System.out.println("\nRequest: \n" + jsonBody);
-        return given().when()
-                .body(jsonBody)
-                .post(GRAPHQL_ENDPOINT)
-                .then()
-                .extract();
-    }
-
-
 }

@@ -127,26 +127,11 @@ class CreateWfsConfigurationSpec extends SourceCommonsSpec {
         def report = createWfsConfiguration.execute()
 
         then:
-        1 * configurator.commit(_, _) >> mockReport(false)
-        1 * configurator.commit(_, _) >> mockReport(true)
+        configurator.commit(_, _) >> mockReport(true)
         !report.getResult().getValue()
         report.getErrorMessages().size() == 1
         report.getErrorMessages().get(0).code == DefaultMessages.FAILED_PERSIST
         report.getErrorMessages().get(0).path == RESULT_ARGUMENT_PATH
-    }
-
-    def 'Return false when wfs feature fails to start'() {
-        when:
-        createWfsConfiguration.setArguments(createWfsArgs())
-        serviceReader.getServices(_, _) >> []
-        def report = createWfsConfiguration.execute()
-
-        then:
-        1 * configurator.commit(_, _) >> mockReport(true)
-        !report.getResult().getValue()
-        report.getErrorMessages().size() == 1
-        report.getErrorMessages().get(0).path == RESULT_ARGUMENT_PATH
-        report.getErrorMessages().get(0).code == DefaultMessages.FAILED_PERSIST
     }
 
     def 'Fail due to missing required fields'() {

@@ -138,8 +138,7 @@ class UpdateCswConfigurationSpec extends SourceCommonsSpec {
         def report = updateCswConfiguration.execute()
 
         then:
-        1 * configurator.commit(_, _) >> mockReport(false)
-        1 * configurator.commit(_, _) >> mockReport(true)
+        configurator.commit(_, _) >> mockReport(true)
         !report.getResult().getValue()
         report.getErrorMessages().size() == 1
         report.getErrorMessages().get(0).path == RESULT_ARGUMENT_PATH
@@ -159,23 +158,6 @@ class UpdateCswConfigurationSpec extends SourceCommonsSpec {
         report.getErrorMessages().size() == 1
         report.getErrorMessages().get(0).path == RESULT_ARGUMENT_PATH
         report.getErrorMessages().get(0).code == DefaultMessages.NO_EXISTING_CONFIG
-    }
-
-    def 'Return false when csw feature fails to start'() {
-        setup:
-        updateCswConfiguration.setArguments(createCswUpdateArgs(TEST_PASSWORD))
-        serviceReader.getServices(_, _) >> []
-        serviceActions.read(_ as String) >> [(ID): TEST_SOURCENAME]
-
-        when:
-        def report = updateCswConfiguration.execute()
-
-        then:
-        1 * configurator.commit(_, _) >> mockReport(true)
-        !report.getResult().getValue()
-        report.getErrorMessages().size() == 1
-        report.getErrorMessages().get(0).path == RESULT_ARGUMENT_PATH
-        report.getErrorMessages().get(0).code == DefaultMessages.FAILED_PERSIST
     }
 
     def 'Updating with flag password sends service properties without password'() {

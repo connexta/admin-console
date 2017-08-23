@@ -106,6 +106,12 @@
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.codice.ddf.admin.query</groupId>
+            <artifactId>admin-query-sources-common</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
 
         <dependency>
             <groupId>ddf.catalog.core</groupId>
@@ -178,6 +184,14 @@
                                 <artifactItem>
                                     <groupId>org.codice.ddf.admin.query</groupId>
                                     <artifactId>admin-query-security-common</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>jar</type>
+                                    <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
+                                    <excludes>**/META-INF/**,**/OSGI-INF/**</excludes>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.codice.ddf.admin.query</groupId>
+                                    <artifactId>admin-query-sources-common</artifactId>
                                     <version>${project.version}</version>
                                     <type>jar</type>
                                     <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>

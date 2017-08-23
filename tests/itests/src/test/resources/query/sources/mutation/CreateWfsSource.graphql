@@ -1,0 +1,3 @@
+mutation CreateWfsSource($source: WfsSourceConfiguration!){
+    createWfsSource(source : $source)
+}

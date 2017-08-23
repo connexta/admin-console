@@ -1,0 +1,16 @@
+query openSearchSources {
+  openSearch {
+    sources {
+      isAvailable
+      source {
+        pid
+        sourceName
+        endpointUrl
+        creds {
+          username
+          password
+        }
+      }
+    }
+  }
+}

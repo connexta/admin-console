@@ -14,6 +14,7 @@
 package org.codice.ddf.admin.security.wcpm.persist;
 
 import static org.codice.ddf.admin.common.report.message.DefaultMessages.failedPersistError;
+import static org.codice.ddf.admin.common.report.message.DefaultMessages.invalidPathTrailingSlash;
 import static org.codice.ddf.admin.security.common.SecurityMessages.noRootContextError;
 import static org.codice.ddf.admin.security.common.services.PolicyManagerServiceProperties.POLICY_MANAGER_PID;
 import static org.codice.ddf.admin.security.common.services.PolicyManagerServiceProperties.ROOT_CONTEXT_PATH;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.codice.ddf.admin.api.ConfiguratorSuite;
@@ -48,6 +50,8 @@ public class SaveContextPolices extends BaseFunctionField<ContextPolicyBin.ListI
 
     public static final String DESCRIPTION =
             "Saves a list of policies to be applied to their corresponding context paths.";
+
+    private static final Pattern TRAILING_SLASH_PATTERN = Pattern.compile("^.+/$");
 
     private ContextPolicyBin.ListImpl returnType;
 
@@ -93,6 +97,7 @@ public class SaveContextPolices extends BaseFunctionField<ContextPolicyBin.ListI
     @Override
     public void validate() {
         super.validate();
+        checkForTrailingSlashes();
         checkRootPathExists();
 
         if (containsErrorMsgs()) {
@@ -111,6 +116,16 @@ public class SaveContextPolices extends BaseFunctionField<ContextPolicyBin.ListI
         addErrorMessages(SecurityValidation.validateStsClaimsExist(claimArgs,
                 configuratorSuite.getServiceActions(),
                 stsServiceProps));
+    }
+
+    private void checkForTrailingSlashes() {
+        contextPolicies.getList()
+                .forEach(contextPolicyBin -> contextPolicyBin.contextFields()
+                        .getList()
+                        .stream()
+                        .filter(contextPath -> TRAILING_SLASH_PATTERN.matcher(contextPath.getValue())
+                                .matches())
+                        .forEach(contextPath -> addErrorMessage(invalidPathTrailingSlash(contextPath.path()))));
     }
 
     private void checkRootPathExists() {
@@ -141,6 +156,7 @@ public class SaveContextPolices extends BaseFunctionField<ContextPolicyBin.ListI
     @Override
     public Set<String> getFunctionErrorCodes() {
         return ImmutableSet.of(DefaultMessages.FAILED_PERSIST,
+                DefaultMessages.INVALID_PATH_TRAILING_SLASH,
                 SecurityMessages.INVALID_CLAIM_TYPE,
                 SecurityMessages.NO_ROOT_CONTEXT);
     }

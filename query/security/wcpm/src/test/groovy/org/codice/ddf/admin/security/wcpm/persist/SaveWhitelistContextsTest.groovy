@@ -105,6 +105,21 @@ class SaveWhitelistContextsTest extends Specification {
         report.getResult() == null
     }
 
+    def 'Fail if context path has a trailing slash'() {
+        setup:
+        def testMap = ['paths': ['/test', '/path', '/test/']]
+        operationReport.containsFailedResults() >> false
+
+        when:
+        saveWhitelistContextsFunction.setArguments(testMap)
+        Report report = saveWhitelistContextsFunction.execute()
+
+        then:
+        report.getErrorMessages()[0].code == DefaultMessages.INVALID_PATH_TRAILING_SLASH
+        report.getErrorMessages()[0].path == [WcpmFieldProvider.NAME, SaveWhitelistContexts.FIELD_NAME, BaseFunctionField.ARGUMENT, 'paths', '2']
+        report.getResult() == null
+    }
+
     def 'Pass if list is empty (whitelist contexts not required)'() {
         setup:
         def testMap = ['paths': []]
@@ -139,10 +154,11 @@ class SaveWhitelistContextsTest extends Specification {
         def errorCodes = saveWhitelistContextsFunction.getErrorCodes()
 
         then:
-        errorCodes.size() == 4
+        errorCodes.size() == 5
         errorCodes.contains(DefaultMessages.FAILED_PERSIST)
         errorCodes.contains(DefaultMessages.INVALID_CONTEXT_PATH)
         errorCodes.contains(DefaultMessages.MISSING_REQUIRED_FIELD)
         errorCodes.contains(DefaultMessages.EMPTY_FIELD)
+        errorCodes.contains(DefaultMessages.INVALID_PATH_TRAILING_SLASH)
     }
 }

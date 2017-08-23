@@ -281,18 +281,45 @@ class SaveContextPoliciesSpec extends Specification {
         report.getResult() == null
     }
 
+    def 'Fail when context path has a trailing slash'(){
+        setup:
+        operationReport.containsFailedResults() >> false
+        testData.policies[1].paths = ['/test/', '/test', 'wrong/', '/invalid/']
+
+        when:
+        saveContextPoliciesFunction.setArguments(testData)
+        Report report = saveContextPoliciesFunction.execute()
+
+        then:
+        report.getErrorMessages().size() == 4
+
+        report.getErrorMessages()[0].code == DefaultMessages.INVALID_CONTEXT_PATH
+        report.getErrorMessages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, BaseFunctionField.ARGUMENT, 'policies', '1', 'paths', '2']
+
+        report.getErrorMessages()[1].code == DefaultMessages.INVALID_PATH_TRAILING_SLASH
+        report.getErrorMessages()[1].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, BaseFunctionField.ARGUMENT, 'policies', '1', 'paths', '0']
+
+        report.getErrorMessages()[2].code == DefaultMessages.INVALID_PATH_TRAILING_SLASH
+        report.getErrorMessages()[2].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, BaseFunctionField.ARGUMENT, 'policies', '1', 'paths', '2']
+
+        report.getErrorMessages()[3].code == DefaultMessages.INVALID_PATH_TRAILING_SLASH
+        report.getErrorMessages()[3].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, BaseFunctionField.ARGUMENT, 'policies', '1', 'paths', '3']
+        report.getResult() == null
+    }
+
     def 'Returns all the possible error codes correctly'(){
         when:
         def errorCodes = saveContextPoliciesFunction.getErrorCodes()
 
         then:
-        errorCodes.size() == 8
+        errorCodes.size() == 9
         errorCodes.contains(DefaultMessages.FAILED_PERSIST)
         errorCodes.contains(DefaultMessages.INVALID_CONTEXT_PATH)
         errorCodes.contains(DefaultMessages.MISSING_REQUIRED_FIELD)
         errorCodes.contains(DefaultMessages.EMPTY_FIELD)
         errorCodes.contains(DefaultMessages.MISSING_KEY_VALUE)
         errorCodes.contains(DefaultMessages.UNSUPPORTED_ENUM)
+        errorCodes.contains(DefaultMessages.INVALID_PATH_TRAILING_SLASH)
         errorCodes.contains(SecurityMessages.INVALID_CLAIM_TYPE)
         errorCodes.contains(SecurityMessages.NO_ROOT_CONTEXT)
     }

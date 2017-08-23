@@ -26,11 +26,6 @@
     <name>DDF :: Admin Console :: Query :: Security :: Common</name>
     <packaging>jar</packaging>
 
-    <!--TODO - tbatie - replace with ddf karaf version-->
-    <properties>
-        <karaf.version>4.0.7</karaf.version>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.codice.ddf.admin.query</groupId>

@@ -47,7 +47,7 @@ public class LdapConfigurationField extends BaseObjectField {
 
     private LdapDirectorySettingsField settings;
 
-    private ClaimsMapEntry.ListImpl claimMappings;
+    private ListField<ClaimsMapEntry> claimMappings;
 
     public LdapConfigurationField() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
@@ -79,6 +79,11 @@ public class LdapConfigurationField extends BaseObjectField {
 
     public ListField<ClaimsMapEntry> claimMappingsField() {
         return claimMappings;
+    }
+
+    public LdapConfigurationField claimMappingsField(ListField<ClaimsMapEntry> entries) {
+        claimMappings = entries;
+        return this;
     }
 
     //Value getters

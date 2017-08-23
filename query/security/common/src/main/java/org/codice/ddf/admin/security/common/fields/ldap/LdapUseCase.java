@@ -25,6 +25,12 @@ public class LdapUseCase extends BaseEnumField<String> {
 
     public static final String DESCRIPTION = "Describes the intended use of the LDAP settings.";
 
+    public static final EnumValue<String> AUTHENTICATION = new Authentication();
+
+    public static final EnumValue<String> ATTRIBUTE_STORE = new AttributeStore();
+
+    public static final EnumValue<String> AUTHENTICATION_AND_ATTRIBUTE_STORE = new AuthenticationAndAttributeStore();
+
     public LdapUseCase() {
         this(null);
     }

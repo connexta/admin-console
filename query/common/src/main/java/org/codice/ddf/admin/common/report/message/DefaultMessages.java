@@ -53,6 +53,8 @@ public class DefaultMessages {
 
     public static final String SIMILAR_SERVICE_EXISTS = "SIMILAR_SERVICE_EXISTS";
 
+    public static final String INVALID_PATH_TRAILING_SLASH = "INVALID_PATH_TRAILING_SLASH";
+
     public static ErrorMessage failedTestSetup() {
         return new ErrorMessageImpl(FAILED_TEST_SETUP);
     }
@@ -135,5 +137,9 @@ public class DefaultMessages {
 
     public static ErrorMessage similarServiceExists(List<String> path) {
         return new ErrorMessageImpl(SIMILAR_SERVICE_EXISTS, path);
+    }
+
+    public static ErrorMessage invalidPathTrailingSlash(List<String> path) {
+        return new ErrorMessageImpl(INVALID_PATH_TRAILING_SLASH, path);
     }
 }

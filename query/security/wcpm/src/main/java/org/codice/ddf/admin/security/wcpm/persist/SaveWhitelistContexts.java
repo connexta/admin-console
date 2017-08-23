@@ -14,9 +14,11 @@
 package org.codice.ddf.admin.security.wcpm.persist;
 
 import static org.codice.ddf.admin.common.report.message.DefaultMessages.failedPersistError;
+import static org.codice.ddf.admin.common.report.message.DefaultMessages.invalidPathTrailingSlash;
 
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.api.Field;
@@ -39,6 +41,8 @@ public class SaveWhitelistContexts extends BaseFunctionField<ContextPath.ListImp
 
     public static final ContextPath.ListImpl RETURN_TYPE = new ContextPath.ListImpl();
 
+    private static final Pattern TRAILING_SLASH_PATTERN = Pattern.compile("^.+/$");
+
     private ContextPath.ListImpl contexts;
 
     private final ConfiguratorSuite configuratorSuite;
@@ -52,7 +56,15 @@ public class SaveWhitelistContexts extends BaseFunctionField<ContextPath.ListImp
     }
 
     @Override
+    public void validate() {
+        super.validate();
+        checkForTrailingSlashes();
+    }
+
+    @Override
     public ContextPath.ListImpl performFunction() {
+        checkForTrailingSlashes();
+
         Configurator configurator = configuratorSuite.getConfiguratorFactory()
                 .getConfigurator();
         configurator.add(configuratorSuite.getServiceActions()
@@ -88,6 +100,14 @@ public class SaveWhitelistContexts extends BaseFunctionField<ContextPath.ListImp
 
     @Override
     public Set<String> getFunctionErrorCodes() {
-        return ImmutableSet.of(DefaultMessages.FAILED_PERSIST);
+        return ImmutableSet.of(DefaultMessages.FAILED_PERSIST, DefaultMessages.INVALID_PATH_TRAILING_SLASH);
+    }
+
+    private void checkForTrailingSlashes() {
+        contexts.getList()
+                .stream()
+                .filter(contextPath -> TRAILING_SLASH_PATTERN.matcher(contextPath.getValue())
+                        .matches())
+                .forEach(contextPath -> addErrorMessage(invalidPathTrailingSlash(contextPath.path())));
     }
 }

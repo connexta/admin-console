@@ -63,6 +63,18 @@ public class CreateOpenSearchConfiguration extends BaseFunctionField<BooleanFiel
 
     @Override
     public BooleanField performFunction() {
+        // TODO: 8/23/17 phuffer - Uncomment once OS feature starts correctly
+        //        Configurator configurator = configuratorSuite.getConfiguratorFactory()
+        //                .getConfigurator();
+        //        configurator.add(configuratorSuite.getFeatureActions()
+        //                .start(OPENSEARCH_FEATURE));
+        //        OperationReport report = configurator.commit("Starting feature [{}]", OPENSEARCH_FEATURE);
+        //
+        //        if (report.containsFailedResults()) {
+        //            addErrorMessage(failedPersistError());
+        //            return new BooleanField(false);
+        //        }
+
         addErrorMessages(serviceCommons.createManagedService(openSearchConfigToServiceProps(config),
                 OPENSEARCH_FACTORY_PID));
         return new BooleanField(!containsErrorMsgs());

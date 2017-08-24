@@ -67,6 +67,18 @@ public class UpdateOpenSearchConfiguration extends BaseFunctionField<BooleanFiel
 
     @Override
     public BooleanField performFunction() {
+        // TODO: 8/23/17 phuffer - Uncommnt once feature starts correctly
+        //        Configurator configurator = configuratorSuite.getConfiguratorFactory()
+        //                .getConfigurator();
+        //        configurator.add(configuratorSuite.getFeatureActions()
+        //                .start(OPENSEARCH_FEATURE));
+        //        OperationReport report = configurator.commit("Starting feature [{}]", OPENSEARCH_FEATURE);
+        //
+        //        if (report.containsFailedResults()) {
+        //            addErrorMessage(failedPersistError());
+        //            return new BooleanField(false);
+        //        }
+
         addErrorMessages(serviceCommons.updateService(config.pidField(),
                 openSearchConfigToServiceProps(config)));
         return new BooleanField(!containsErrorMsgs());

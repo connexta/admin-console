@@ -34,6 +34,8 @@ import org.codice.ddf.admin.comp.test.Feature;
 import org.codice.ddf.admin.comp.test.PlatformAppFeatureFile;
 import org.codice.ddf.admin.comp.test.SecurityAppFeatureFile;
 import org.codice.ddf.admin.query.request.SourcesRequestHelper;
+import org.codice.ddf.admin.sources.fields.CswProfile;
+import org.codice.ddf.admin.sources.fields.CswSpatialOperator;
 import org.codice.ddf.admin.sources.fields.WfsVersion;
 import org.codice.ddf.admin.sources.fields.type.CswSourceConfigurationField;
 import org.codice.ddf.admin.sources.fields.type.OpenSearchSourceConfigurationField;
@@ -68,6 +70,8 @@ public class AdminSourcesIT extends AbstractComponentTest {
             GRAPHQL_ENDPOINT);
 
     public static final String TEST_SOURCE_NAME = "testSourceName";
+
+    public static final String TEST_USERNAME = "testUsername";
 
     @Override
     public List<Feature> features() {
@@ -127,10 +131,9 @@ public class AdminSourcesIT extends AbstractComponentTest {
     @Test
     public void testWfs20() {
         // create wfs source
-        Map<String, Object> configToSave = SOURCES_REQUEST_HELPER.createWfsArgs(TEST_SOURCE_NAME,
+        Map<String, Object> configToSave = createWfsArgs(TEST_SOURCE_NAME,
                 null,
-                WfsVersion.Wfs2.ENUM_TITLE)
-                .getValue();
+                WfsVersion.Wfs2.ENUM_TITLE).getValue();
 
         boolean createSuccess =
                 SOURCES_REQUEST_HELPER.createSource(SourcesRequestHelper.SourceType.WFS,
@@ -150,10 +153,9 @@ public class AdminSourcesIT extends AbstractComponentTest {
         assertThat("Error getting WFS source.", StringUtils.isNotEmpty(pid));
 
         //update wfs source
-        Map<String, Object> updateArgs = SOURCES_REQUEST_HELPER.createWfsArgs("updatedName",
+        Map<String, Object> updateArgs = createWfsArgs("updatedName",
                 pid,
-                WfsVersion.Wfs2.ENUM_TITLE)
-                .getValue();
+                WfsVersion.Wfs2.ENUM_TITLE).getValue();
 
         boolean updateSuccess =
                 SOURCES_REQUEST_HELPER.updateSource(SourcesRequestHelper.SourceType.WFS,
@@ -180,10 +182,9 @@ public class AdminSourcesIT extends AbstractComponentTest {
     @Test
     public void testWfs10() {
         // create wfs source
-        Map<String, Object> configToSave = SOURCES_REQUEST_HELPER.createWfsArgs(TEST_SOURCE_NAME,
+        Map<String, Object> configToSave = createWfsArgs(TEST_SOURCE_NAME,
                 null,
-                WfsVersion.Wfs1.ENUM_TITLE)
-                .getValue();
+                WfsVersion.Wfs1.ENUM_TITLE).getValue();
 
         boolean createSuccess =
                 SOURCES_REQUEST_HELPER.createSource(SourcesRequestHelper.SourceType.WFS,
@@ -211,10 +212,7 @@ public class AdminSourcesIT extends AbstractComponentTest {
     @Test
     public void testOpenSearch() {
         // create openSearch source
-        Map<String, Object> configToSave = SOURCES_REQUEST_HELPER.createOpenSearchArgs(
-                TEST_SOURCE_NAME,
-                null)
-                .getValue();
+        Map<String, Object> configToSave = createOpenSearchArgs(TEST_SOURCE_NAME, null).getValue();
 
         boolean createSuccess =
                 SOURCES_REQUEST_HELPER.createSource(SourcesRequestHelper.SourceType.OPEN_SEARCH,
@@ -234,9 +232,7 @@ public class AdminSourcesIT extends AbstractComponentTest {
         assertThat("Error getting OpenSearch source.", StringUtils.isNotEmpty(pid));
 
         //update openSearch source
-        Map<String, Object> updateArgs = SOURCES_REQUEST_HELPER.createOpenSearchArgs("updatedName",
-                pid)
-                .getValue();
+        Map<String, Object> updateArgs = createOpenSearchArgs("updatedName", pid).getValue();
         boolean updateSuccess =
                 SOURCES_REQUEST_HELPER.updateSource(SourcesRequestHelper.SourceType.OPEN_SEARCH,
                         updateArgs);
@@ -267,10 +263,9 @@ public class AdminSourcesIT extends AbstractComponentTest {
     //                         from the spatial-csw-transformer blueprint.
     public void testCsw() {
         // create CSW source
-        Map<String, Object> cswConfigToSave = SOURCES_REQUEST_HELPER.createCswArgs(TEST_SOURCE_NAME,
+        Map<String, Object> cswConfigToSave = createCswArgs(TEST_SOURCE_NAME,
                 null,
-                MASKED_PASSWORD)
-                .getValue();
+                MASKED_PASSWORD).getValue();
 
         boolean createSuccess =
                 SOURCES_REQUEST_HELPER.createSource(SourcesRequestHelper.SourceType.CSW,
@@ -290,10 +285,9 @@ public class AdminSourcesIT extends AbstractComponentTest {
         assertThat("Error getting CSW source.", StringUtils.isNotEmpty(pid));
 
         //update CSW source
-        Map<String, Object> updateArgs = SOURCES_REQUEST_HELPER.createCswArgs("updatedName",
+        Map<String, Object> updateArgs = createCswArgs("updatedName",
                 pid,
-                MASKED_PASSWORD)
-                .getValue();
+                MASKED_PASSWORD).getValue();
         boolean updateSuccess =
                 SOURCES_REQUEST_HELPER.updateSource(SourcesRequestHelper.SourceType.CSW,
                         updateArgs);
@@ -314,5 +308,56 @@ public class AdminSourcesIT extends AbstractComponentTest {
         boolean deleteSuccess =
                 SOURCES_REQUEST_HELPER.deleteSource(SourcesRequestHelper.SourceType.CSW, pid);
         assertThat("Error deleting CSW source.", deleteSuccess, is(true));
+    }
+
+    public WfsSourceConfigurationField createWfsArgs(String sourceName, String pid,
+            String wfsVersion) {
+        WfsSourceConfigurationField config = new WfsSourceConfigurationField();
+        config.wfsVersion(wfsVersion)
+                .endpointUrl("https://localhost:8993/geoserver/wfs")
+                .sourceName(sourceName)
+                .credentials()
+                .username(TEST_USERNAME)
+                .password(MASKED_PASSWORD);
+
+        if (org.apache.commons.lang.StringUtils.isNotEmpty(pid)) {
+            config.pid(pid);
+        }
+
+        return config;
+    }
+
+    public OpenSearchSourceConfigurationField createOpenSearchArgs(String sourceName, String pid) {
+        OpenSearchSourceConfigurationField config = new OpenSearchSourceConfigurationField();
+        config.endpointUrl("https://localhost:8993/services/csw")
+                .sourceName(sourceName)
+                .credentials()
+                .username(TEST_USERNAME)
+                .password(MASKED_PASSWORD);
+
+        if (org.apache.commons.lang.StringUtils.isNotEmpty(pid)) {
+            config.pid(pid);
+        }
+
+        return config;
+    }
+
+    public CswSourceConfigurationField createCswArgs(String sourceName, String pid,
+            String password) {
+        CswSourceConfigurationField config = new CswSourceConfigurationField();
+        config.outputSchema("testOutputSchema")
+                .spatialOperator(CswSpatialOperator.NoFilter.ENUM_TITLE)
+                .cswProfile(CswProfile.DDFCswFederatedSource.CSW_FEDERATION_PROFILE_SOURCE)
+                .endpointUrl("https://localhost:8993/services/csw")
+                .sourceName(sourceName)
+                .credentials()
+                .username(TEST_USERNAME)
+                .password(password);
+
+        if (org.apache.commons.lang.StringUtils.isNotEmpty(pid)) {
+            config.pid(pid);
+        }
+
+        return config;
     }
 }

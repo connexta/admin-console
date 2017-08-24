@@ -19,10 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.lang.StringUtils;
 import org.codice.ddf.admin.common.fields.common.PidField;
-import org.codice.ddf.admin.sources.fields.CswProfile;
-import org.codice.ddf.admin.sources.fields.CswSpatialOperator;
 import org.codice.ddf.admin.sources.fields.type.CswSourceConfigurationField;
 import org.codice.ddf.admin.sources.fields.type.OpenSearchSourceConfigurationField;
 import org.codice.ddf.admin.sources.fields.type.WfsSourceConfigurationField;
@@ -41,8 +38,6 @@ public class SourcesRequestHelper {
     public static final String SOURCES_MUTATION_RESOURCE_PATH = "/query/sources/mutation/";
 
     public static final String MASKED_PASSWORD = "*****";
-
-    public static final String TEST_USERNAME = "testUsername";
 
     private GraphQlHelper requestFactory;
 
@@ -258,57 +253,6 @@ public class SourcesRequestHelper {
     private <T> T extractResponse(ExtractableResponse response, String jsonPath) {
         return response.jsonPath()
                 .get(jsonPath);
-    }
-
-    public WfsSourceConfigurationField createWfsArgs(String sourceName, String pid,
-            String wfsVersion) {
-        WfsSourceConfigurationField config = new WfsSourceConfigurationField();
-        config.wfsVersion(wfsVersion)
-                .endpointUrl("https://localhost:8993/geoserver/wfs")
-                .sourceName(sourceName)
-                .credentials()
-                .username(TEST_USERNAME)
-                .password(MASKED_PASSWORD);
-
-        if (StringUtils.isNotEmpty(pid)) {
-            config.pid(pid);
-        }
-
-        return config;
-    }
-
-    public OpenSearchSourceConfigurationField createOpenSearchArgs(String sourceName, String pid) {
-        OpenSearchSourceConfigurationField config = new OpenSearchSourceConfigurationField();
-        config.endpointUrl("https://localhost:8993/services/csw")
-                .sourceName(sourceName)
-                .credentials()
-                .username(TEST_USERNAME)
-                .password(MASKED_PASSWORD);
-
-        if (StringUtils.isNotEmpty(pid)) {
-            config.pid(pid);
-        }
-
-        return config;
-    }
-
-    public CswSourceConfigurationField createCswArgs(String sourceName, String pid,
-            String password) {
-        CswSourceConfigurationField config = new CswSourceConfigurationField();
-        config.outputSchema("testOutputSchema")
-                .spatialOperator(CswSpatialOperator.NoFilter.ENUM_TITLE)
-                .cswProfile(CswProfile.DDFCswFederatedSource.CSW_FEDERATION_PROFILE_SOURCE)
-                .endpointUrl("https://localhost:8993/services/csw")
-                .sourceName(sourceName)
-                .credentials()
-                .username(TEST_USERNAME)
-                .password(password);
-
-        if (StringUtils.isNotEmpty(pid)) {
-            config.pid(pid);
-        }
-
-        return config;
     }
 
     public enum SourceType {

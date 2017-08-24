@@ -63,6 +63,18 @@ public class CreateCswConfiguration extends BaseFunctionField<BooleanField> {
 
     @Override
     public BooleanField performFunction() {
+        // TODO: 8/23/17 phuffer - Uncomment when feature starts correctly
+        //        Configurator configurator = configuratorSuite.getConfiguratorFactory()
+        //                .getConfigurator();
+        //        configurator.add(configuratorSuite.getFeatureActions()
+        //                .start(CSW_FEATURE));
+        //        OperationReport report = configurator.commit("Starting feature [{}]", CSW_FEATURE);
+        //
+        //        if (report.containsFailedResults()) {
+        //            addErrorMessage(failedPersistError());
+        //            return new BooleanField(false);
+        //        }
+
         addErrorMessages(serviceCommons.createManagedService(cswConfigToServiceProps(config),
                 cswProfileToFactoryPid(config.cswProfile())));
         return new BooleanField(!containsErrorMsgs());

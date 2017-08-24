@@ -116,7 +116,7 @@
         <dependency>
             <groupId>ddf.catalog.core</groupId>
             <artifactId>catalog-core-standardframework</artifactId>
-            <version>2.11.0-SNAPSHOT</version>
+            <version>${ddf.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

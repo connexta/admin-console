@@ -67,6 +67,27 @@ public class UpdateWfsConfiguration extends BaseFunctionField<BooleanField> {
 
     @Override
     public BooleanField performFunction() {
+        // TODO: 8/23/17 phuffer - Uncomment when features startup correctly
+//        Configurator configurator = configuratorSuite.getConfiguratorFactory()
+//                .getConfigurator();
+//        OperationReport report = null;
+//        if (config.wfsVersion()
+//                .equals(WfsVersion.Wfs2.WFS_VERSION_2)) {
+//            configurator.add(configuratorSuite.getFeatureActions()
+//                    .start(WFS2_FEATURE));
+//            report = configurator.commit("Starting feature [{}].", WFS2_FEATURE);
+//        } else if (config.wfsVersion()
+//                .equals(WfsVersion.Wfs1.WFS_VERSION_1)) {
+//            configurator.add(configuratorSuite.getFeatureActions()
+//                    .start(WFS1_FEATURE));
+//            report = configurator.commit("Starting feature [{}].", WFS1_FEATURE);
+//        }
+//
+//        if (report != null && report.containsFailedResults()) {
+//            addErrorMessage(failedPersistError());
+//            return new BooleanField(false);
+//        }
+
         addErrorMessages(serviceCommons.updateService(config.pidField(),
                 wfsConfigToServiceProps(config)));
         return new BooleanField(!containsErrorMsgs());

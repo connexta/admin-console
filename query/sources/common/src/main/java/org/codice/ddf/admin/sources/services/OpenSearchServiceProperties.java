@@ -39,6 +39,8 @@ public class OpenSearchServiceProperties {
 
     public static final String OPENSEARCH_FACTORY_PID = "OpenSearchSource";
 
+    public static final String OPENSEARCH_FEATURE = "catalog-opensearch-source";
+
     public static final List<String> OPENSEARCH_FACTORY_PIDS = Collections.singletonList(
             OPENSEARCH_FACTORY_PID);
 

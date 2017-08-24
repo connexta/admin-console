@@ -49,8 +49,12 @@ import org.ops4j.pax.exam.karaf.options.KarafDistributionOption;
 import org.ops4j.pax.exam.karaf.options.LogLevelOption;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.metatype.MetaTypeService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractComponentTest {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractComponentTest.class);
 
     @Rule
     public PaxExamRule paxExamRule = new PaxExamRule(this);
@@ -171,6 +175,7 @@ public abstract class AbstractComponentTest {
                     try {
                         serviceManager.startFeature(true, feature);
                     } catch (Exception e) {
+                        LOGGER.error("Failed to start up feature: " + feature, e);
                         fail("Failed to start feature: " + feature);
                     }
                 });

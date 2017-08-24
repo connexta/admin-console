@@ -32,6 +32,8 @@ import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.sources.fields.type.SourceConfigField;
 import org.codice.ddf.platform.util.XMLUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -42,6 +44,8 @@ import ddf.catalog.source.FederatedSource;
 import ddf.catalog.source.Source;
 
 public class SourceUtilCommons {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SourceUtilCommons.class);
 
     private static final XMLUtils XML_UTILS = XMLUtils.getInstance();
 
@@ -141,9 +145,15 @@ public class SourceUtilCommons {
         for (Source source : getAllSourceReferences()) {
             if (source instanceof ConfiguredService) {
                 ConfiguredService service = (ConfiguredService) source;
-                if (service.getConfigurationPid()
-                        .equals(pid.getValue())) {
+                String servicePid = service.getConfigurationPid();
+                // TODO: 8/22/17 phuffer - opensearch can't get availability this way
+                if (servicePid != null && servicePid.equals(pid.getValue())) {
                     availability.setValue(source.isAvailable());
+                    break;
+                } else {
+                    LOGGER.debug("Unable to determine availability for source with pid [{}]",
+                            pid.getValue());
+                    availability.setValue(false);
                     break;
                 }
             }

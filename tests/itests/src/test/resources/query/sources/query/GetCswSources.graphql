@@ -1,0 +1,19 @@
+query cswSources {
+  csw {
+    sources {
+      isAvailable
+      source {
+        pid
+        sourceName
+        endpointUrl
+        cswOutputSchema
+        cswProfile
+        cswSpatialOperator
+        creds {
+          username
+          password
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,3 @@
+mutation deleteWfsSource ($pid: Pid!) {
+  deleteWfsSource (pid: $pid)
+}

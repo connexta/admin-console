@@ -106,6 +106,25 @@
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.codice.ddf.admin.query</groupId>
+            <artifactId>admin-query-sources-common</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>ddf.catalog.core</groupId>
+            <artifactId>catalog-core-standardframework</artifactId>
+            <version>${ddf.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>2.1.0</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -165,6 +184,14 @@
                                 <artifactItem>
                                     <groupId>org.codice.ddf.admin.query</groupId>
                                     <artifactId>admin-query-security-common</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>jar</type>
+                                    <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
+                                    <excludes>**/META-INF/**,**/OSGI-INF/**</excludes>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.codice.ddf.admin.query</groupId>
+                                    <artifactId>admin-query-sources-common</artifactId>
                                     <version>${project.version}</version>
                                     <type>jar</type>
                                     <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>

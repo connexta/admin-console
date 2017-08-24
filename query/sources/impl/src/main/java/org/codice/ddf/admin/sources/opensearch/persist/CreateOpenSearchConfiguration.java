@@ -13,9 +13,7 @@
  */
 package org.codice.ddf.admin.sources.opensearch.persist;
 
-import static org.codice.ddf.admin.common.report.message.DefaultMessages.failedPersistError;
 import static org.codice.ddf.admin.sources.services.OpenSearchServiceProperties.OPENSEARCH_FACTORY_PID;
-import static org.codice.ddf.admin.sources.services.OpenSearchServiceProperties.OPENSEARCH_FEATURE;
 import static org.codice.ddf.admin.sources.services.OpenSearchServiceProperties.openSearchConfigToServiceProps;
 
 import java.util.List;
@@ -28,8 +26,6 @@ import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.common.report.message.DefaultMessages;
 import org.codice.ddf.admin.common.services.ServiceCommons;
-import org.codice.ddf.admin.configurator.Configurator;
-import org.codice.ddf.admin.configurator.OperationReport;
 import org.codice.ddf.admin.sources.SourceMessages;
 import org.codice.ddf.admin.sources.fields.type.OpenSearchSourceConfigurationField;
 import org.codice.ddf.admin.sources.utils.SourceValidationUtils;
@@ -67,16 +63,18 @@ public class CreateOpenSearchConfiguration extends BaseFunctionField<BooleanFiel
 
     @Override
     public BooleanField performFunction() {
-        Configurator configurator = configuratorSuite.getConfiguratorFactory()
-                .getConfigurator();
-        configurator.add(configuratorSuite.getFeatureActions()
-                .start(OPENSEARCH_FEATURE));
-        OperationReport report = configurator.commit("Starting feature [{}]", OPENSEARCH_FEATURE);
+        // TODO: 8/23/17 phuffer - Uncomment once OS feature starts correctly
+        //        Configurator configurator = configuratorSuite.getConfiguratorFactory()
+        //                .getConfigurator();
+        //        configurator.add(configuratorSuite.getFeatureActions()
+        //                .start(OPENSEARCH_FEATURE));
+        //        OperationReport report = configurator.commit("Starting feature [{}]", OPENSEARCH_FEATURE);
+        //
+        //        if (report.containsFailedResults()) {
+        //            addErrorMessage(failedPersistError());
+        //            return new BooleanField(false);
+        //        }
 
-        if (report.containsFailedResults()) {
-            addErrorMessage(failedPersistError());
-            return new BooleanField(false);
-        }
         addErrorMessages(serviceCommons.createManagedService(openSearchConfigToServiceProps(config),
                 OPENSEARCH_FACTORY_PID));
         return new BooleanField(!containsErrorMsgs());

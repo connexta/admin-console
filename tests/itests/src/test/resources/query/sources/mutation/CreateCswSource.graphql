@@ -1,0 +1,3 @@
+mutation CreateCswSource($source: CswSourceConfiguration!) {
+  createCswSource (source: $source)
+}

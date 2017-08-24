@@ -1,0 +1,3 @@
+mutation deleteOpenSearchSource ($pid: Pid!) {
+  deleteOpenSearchSource (pid: $pid)
+}

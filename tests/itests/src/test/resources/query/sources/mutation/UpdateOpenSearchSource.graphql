@@ -1,0 +1,3 @@
+mutation UpdateOpenSearchSource($source: OpenSearchConfiguration!) {
+  updateOpenSearchSource(source: $source)
+}

@@ -1,0 +1,3 @@
+mutation CreateOpenSearchSource($source: OpenSearchConfiguration!) {
+    createOpenSearchSource(source: $source)
+}

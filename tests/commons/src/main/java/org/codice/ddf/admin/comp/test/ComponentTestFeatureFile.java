@@ -33,6 +33,16 @@ public class ComponentTestFeatureFile extends Feature {
 
     public static final String LDAP_LOGIN = "security-sts-ldaplogin-dependencies";
 
+    public static final String CATALOG_CORE_API = "catalog-core-api-dependencies";
+
+    public static final String SPATIAL_CSW_SOURCE = "spatial-csw-source-dependencies";
+
+    public static final String SPATIAL_WFS_V2_0_0_SOURCE = "spatial-wfs-v2_0_0-source-dependencies";
+
+    public static final String CATALOG_OPENSEARCH_SOURCE = "catalog-opensearch-source-dependencies";
+
+    public static final String SPATIAL_WFS_V1_0_0_SOURCE = "spatial-wfs-v1_0_0-source-dependencies";
+
     protected ComponentTestFeatureFile(String featureName) {
         super(featureName);
     }
@@ -63,6 +73,26 @@ public class ComponentTestFeatureFile extends Feature {
 
     public static Feature commonTestDependenciesFeature() {
         return new ComponentTestFeatureFile(COMMON_TEST_DEPENDENCIES_FEATURE);
+    }
+
+    public static Feature catalogCoreApiFeature() {
+        return new ComponentTestFeatureFile(CATALOG_CORE_API);
+    }
+
+    public static Feature spatialCswSource() {
+        return new ComponentTestFeatureFile(SPATIAL_CSW_SOURCE);
+    }
+
+    public static Feature spatialWfs20Source() {
+        return new ComponentTestFeatureFile(SPATIAL_WFS_V2_0_0_SOURCE);
+    }
+
+    public static Feature spatialWfs10Source() {
+        return new ComponentTestFeatureFile(SPATIAL_WFS_V1_0_0_SOURCE);
+    }
+
+    public static Feature catalogOpenSearchSource() {
+        return new ComponentTestFeatureFile(CATALOG_OPENSEARCH_SOURCE);
     }
 
     @Override

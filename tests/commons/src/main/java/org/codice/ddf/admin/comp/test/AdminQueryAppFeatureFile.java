@@ -29,6 +29,7 @@ public class AdminQueryAppFeatureFile extends Feature {
 
     public static final String ADMIN_CORE_API = "admin-query-core";
 
+    public static final String ADMIN_QUERY_FEDERATION = "admin-query-federation";
 
     protected  AdminQueryAppFeatureFile(String featureName) {
         super(featureName);
@@ -46,7 +47,11 @@ public class AdminQueryAppFeatureFile extends Feature {
         return new AdminQueryAppFeatureFile(ADMIN_SECURITY_FEATURE);
     }
 
-    public Feature adminUtilsFeature() {
+    public static Feature adminSourceFeature() {
+        return new AdminQueryAppFeatureFile(ADMIN_QUERY_FEDERATION);
+    }
+
+    public static Feature adminUtilsFeature() {
         return new AdminQueryAppFeatureFile(ADMIN_UTILS_FEATURE);
     }
 

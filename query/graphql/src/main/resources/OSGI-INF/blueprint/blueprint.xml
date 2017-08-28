@@ -37,4 +37,13 @@
             </entry>
         </service-properties>
     </service>
+
+    <service id="DoSFilter" interface="javax.servlet.Filter">
+        <service-properties>
+            <entry key="filter-name" value="DoSFilter"/>
+            <entry key="urlPatterns" value="/admin/hub/graphql/*"/>
+            <entry key="maxRequestsPerSec" value="10"/>
+        </service-properties>
+        <bean class="org.eclipse.jetty.servlets.DoSFilter"/>
+    </service>
 </blueprint>

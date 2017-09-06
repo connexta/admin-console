@@ -17,11 +17,13 @@ import GraphiQL from 'admin-graphiql'
 import DevTools from 'admin-redux-devtools'
 import MuiThemeProvider from 'admin-app-bar/MuiThemeProvider'
 
+import fonts from 'webpack-fonts'
+
 const App = ({ children }) => (
   <Provider store={store}>
     <ApolloProvider client={client}>
       <MuiThemeProvider>
-        <div>
+        <div className={fonts.roboto}>
           <Backdrop>
             <AdminAppBar />
             <div style={{ maxWidth: 960, margin: '0 auto', padding: '0 20px' }}>{children}</div>

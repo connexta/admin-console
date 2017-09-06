@@ -1,13 +1,6 @@
 import React from 'react'
 
 const globalStyles = `
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-    font-size: 18px;
-    margin: 0;
-    color: #333333;
-    background: #ffffff;
-  }
   a {
     text-decoration: none;
   }
@@ -17,6 +10,9 @@ const globalStyles = `
 `
 
 const styles = {
+  body: {
+    margin: 0
+  },
   loading: {
     position: 'absolute',
     left: 0,
@@ -55,7 +51,7 @@ export default ({ assets, children }) => {
         {css.map((name) =>
           <link rel='stylesheet' type='text/css' href={name} />)}
       </head>
-      <body>
+      <body style={styles.body}>
         <div id='root'>
           {children === undefined
             ? <div style={styles.loading}>

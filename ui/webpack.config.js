@@ -8,7 +8,6 @@ var StaticSiteGeneratorPlugin = require('static-site-generator-webpack-plugin')
 
 var config = {
   output: {
-    publicPath: '/',
     filename: 'bundle.[hash].js',
     path: path.resolve(__dirname, 'target', 'webapp')
   },
@@ -46,6 +45,14 @@ var config = {
           'style-loader',
           'css-loader'
         ]
+      },
+      {
+        test: /\.ttf$/,
+        loader: 'file-loader',
+        options: {
+          name: 'fonts/[name].[ext]',
+          useRelativePath: true
+        }
       }
     ]
   },

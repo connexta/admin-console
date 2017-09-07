@@ -13,9 +13,9 @@
  **/
 package org.codice.ddf.admin.common.fields.common;
 
-import org.codice.ddf.admin.common.fields.base.scalar.BaseHiddenField;
+import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 
-public class PasswordField extends BaseHiddenField {
+public class PasswordField extends StringField {
 
     public static final String DEFAULT_FIELD_NAME = "password";
 
@@ -23,11 +23,18 @@ public class PasswordField extends BaseHiddenField {
 
     public static final String DESCRIPTION = "Password used for authentication.";
 
+    public static final String HIDDEN_FLAG = "*****";
+
     public PasswordField() {
         super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
     }
 
     public PasswordField(String fieldName) {
         super(fieldName, FIELD_TYPE_NAME, DESCRIPTION);
+    }
+
+    @Override
+    public String getSanitizedValue() {
+        return HIDDEN_FLAG;
     }
 }

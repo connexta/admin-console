@@ -51,6 +51,10 @@ public class TestObjectField extends BaseObjectField {
 
     public static final String SUB_FIELD_OF_INNER_FIELD_NAME = "testSubField";
 
+    public static final String HIDDEN_FIELD_NAME = "testHidden";
+
+    public static final String SAMPLE_HIDDEN_FIELD_VALUE = "SAMPLE_HIDDEN_FIELD";
+
     public static final String INNER_OBJECT_FIELD_NAME = "innerObjectField";
 
     public static final String OBJECT_FIELD_TEST_ERROR = "OBJECT_FIELD_TEST_ERROR";
@@ -67,6 +71,8 @@ public class TestObjectField extends BaseObjectField {
 
     private TestEnumField enumField;
 
+    private TestHiddenField hiddenField;
+
     public TestObjectField() {
         super(FIELD_NAME, "TestObjectField", "A sample object containing all supported base types.");
         integerField = new IntegerField();
@@ -75,6 +81,7 @@ public class TestObjectField extends BaseObjectField {
         listField = new StringField.ListImpl(LIST_FIELD_NAME).useDefaultRequired();
         enumField = new TestEnumField();
         innerTestObjectField = new InnerTestObjectField();
+        hiddenField = new TestHiddenField();
         updateInnerFieldPaths();
     }
 
@@ -100,6 +107,10 @@ public class TestObjectField extends BaseObjectField {
 
     public ObjectField getInnerObjectField() {
         return innerTestObjectField;
+    }
+
+    public TestHiddenField getHiddenField() {
+        return hiddenField;
     }
 
     public TestObjectField setInteger(Integer val) {
@@ -132,15 +143,21 @@ public class TestObjectField extends BaseObjectField {
         return this;
     }
 
+    public TestObjectField setHiddenField(String value) {
+        hiddenField.setValue(value);
+        return this;
+    }
+
     public static TestObjectField createSampleTestObject() {
         return new TestObjectField().setInteger(SAMPLE_INTEGER_VALUE)
                 .setBoolean(SAMPLE_BOOLEAN_VALUE)
                 .setString(SAMPLE_STRING_VALUE)
                 .setList(SAMPLE_LIST_VALUE)
                 .setEnum(SAMPLE_ENUM)
-                .setInnerObject(new ImmutableMap.Builder().put(SUB_FIELD_OF_INNER_FIELD_NAME,
-                        InnerTestObjectField.TEST_VALUE)
-                        .build());
+                .setInnerObject(ImmutableMap.of(SUB_FIELD_OF_INNER_FIELD_NAME,
+                        InnerTestObjectField.TEST_VALUE, HIDDEN_FIELD_NAME,
+                        InnerTestObjectField.TEST_HIDDEN_FIELD_VALUE))
+                .setHiddenField(SAMPLE_HIDDEN_FIELD_VALUE);
     }
 
     @Override
@@ -150,7 +167,8 @@ public class TestObjectField extends BaseObjectField {
                 stringField,
                 listField,
                 enumField,
-                innerTestObjectField);
+                innerTestObjectField,
+                hiddenField);
     }
 
     @Override
@@ -169,9 +187,13 @@ public class TestObjectField extends BaseObjectField {
 
         public static final String TEST_VALUE = "testValue";
 
+        public static final String TEST_HIDDEN_FIELD_VALUE = "testValue";
+
         public static final String INNER_OBJECT_FIELD_TEST_ERROR = "INNER_OBJECT_FIELD_TEST_ERROR";
 
         public StringField subFieldOfInnerField;
+
+        public TestHiddenField subHiddenField;
 
         InnerTestObjectField() {
             this(INNER_OBJECT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
@@ -180,6 +202,7 @@ public class TestObjectField extends BaseObjectField {
         InnerTestObjectField(String fieldName, String fieldTypeName, String description) {
             super(fieldName, fieldTypeName, description);
             subFieldOfInnerField = new StringField(SUB_FIELD_OF_INNER_FIELD_NAME);
+            subHiddenField = new TestHiddenField();
             updateInnerFieldPaths();
         }
 
@@ -188,9 +211,14 @@ public class TestObjectField extends BaseObjectField {
             return this;
         }
 
+        public InnerTestObjectField setHiddenField(String value) {
+            subHiddenField.setValue(value);
+            return this;
+        }
+
         @Override
         public List<Field> getFields() {
-            return ImmutableList.of(subFieldOfInnerField);
+            return ImmutableList.of(subFieldOfInnerField, subHiddenField);
         }
 
         @Override

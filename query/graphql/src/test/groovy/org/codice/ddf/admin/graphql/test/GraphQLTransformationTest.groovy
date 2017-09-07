@@ -12,6 +12,7 @@ import org.codice.ddf.admin.common.fields.base.scalar.IntegerField
 import org.codice.ddf.admin.common.fields.base.scalar.StringField
 import org.codice.ddf.admin.common.fields.test.TestEnumField
 import org.codice.ddf.admin.common.fields.test.TestFieldProvider
+import org.codice.ddf.admin.common.fields.test.TestHiddenField
 import org.codice.ddf.admin.common.fields.test.TestObjectField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.graphql.servlet.ExtendedOsgiGraphQLServlet
@@ -42,7 +43,19 @@ class GraphQLTransformationTest extends Specification {
 
     static ENUM_ARG_VALUE = TestEnumField.EnumA.ENUM_A
 
-    static INNER_OBJECT_ARG_VALUE = [(TestObjectField.SUB_FIELD_OF_INNER_FIELD_NAME) : TestObjectField.InnerTestObjectField.TEST_VALUE]
+    static HIDDEN_FIELD_ARG_VALUE = TestObjectField.SAMPLE_HIDDEN_FIELD_VALUE
+
+    static HIDDEN_FIELD_RETURN_VALUE = TestHiddenField.HIDDEN_FLAG
+
+    static INNER_OBJECT_ARG_VALUE = [
+            (TestObjectField.SUB_FIELD_OF_INNER_FIELD_NAME): TestObjectField.InnerTestObjectField.TEST_VALUE,
+            (TestObjectField.HIDDEN_FIELD_NAME)            : TestObjectField.InnerTestObjectField.TEST_HIDDEN_FIELD_VALUE
+    ]
+
+    static INNER_OBJECT_RETURN_VALUE = [
+            (TestObjectField.SUB_FIELD_OF_INNER_FIELD_NAME): TestObjectField.InnerTestObjectField.TEST_VALUE,
+            (TestObjectField.HIDDEN_FIELD_NAME)            : HIDDEN_FIELD_RETURN_VALUE
+    ]
 
     static STRING = StringField.DEFAULT_FIELD_NAME
 
@@ -55,6 +68,8 @@ class GraphQLTransformationTest extends Specification {
     static ENUMERATION = TestEnumField.DEFAULT_FIELD_NAME
 
     static INNER_OBJECT = TestObjectField.INNER_OBJECT_FIELD_NAME
+
+    static HIDDEN_FIELD = TestHiddenField.HIDDEN_FIELD_NAME
 
     static FUNCTION_NAME = TestFieldProvider.TEST_FUNCTION_NAME
 
@@ -83,7 +98,8 @@ class GraphQLTransformationTest extends Specification {
                     booleanArg    : BOOLEAN_ARG_VALUE,
                     listArg       : LIST_ARG_VALUE,
                     enumArg       : ENUM_ARG_VALUE,
-                    innerObjectArg: INNER_OBJECT_ARG_VALUE
+                    innerObjectArg: INNER_OBJECT_ARG_VALUE,
+                    hiddenFieldArg: HIDDEN_FIELD_ARG_VALUE
             ]
 
     def setup() {
@@ -125,9 +141,9 @@ class GraphQLTransformationTest extends Specification {
                                 (TestFieldProvider.GET_BOOL_FUNCTION_NAME)  : TestFieldProvider.GetBoolean.GET_BOOLEAN_VALUE,
                                 (TestFieldProvider.GET_STRING_FUNCTION_NAME): TestFieldProvider.GetString.GET_STRING_VALUE,
                                 (TestFieldProvider.GET_LIST_FUNCTION_NAME)  : [
-                                        TestFieldProvider.GetList.ENTRY_1_VALUE.getValue(),
-                                        TestFieldProvider.GetList.ENTRY_2_VALUE.getValue(),
-                                        TestFieldProvider.GetList.ENTRY_3_VALUE.getValue()
+                                        TestFieldProvider.GetList.ENTRY_1_VALUE.getSanitizedValue(),
+                                        TestFieldProvider.GetList.ENTRY_2_VALUE.getSanitizedValue(),
+                                        TestFieldProvider.GetList.ENTRY_3_VALUE.getSanitizedValue()
                                 ],
                                 (TestFieldProvider.GET_ENUM_FUNCTION_NAME)  : TestFieldProvider.GetEnum.GET_ENUM_VALUE
                         ]
@@ -229,7 +245,9 @@ class GraphQLTransformationTest extends Specification {
                 createMissingRequiredFieldError(requiredArgFunctionPath, [TEST_OBJECT_NAME, STRING]),
                 createMissingRequiredFieldError(requiredArgFunctionPath, [TEST_OBJECT_NAME, ENUMERATION]),
                 createMissingRequiredFieldError(requiredArgFunctionPath, [TEST_OBJECT_NAME, LIST]),
-                createMissingRequiredFieldError(requiredArgFunctionPath, [TEST_OBJECT_NAME, INNER_OBJECT, TestObjectField.SUB_FIELD_OF_INNER_FIELD_NAME])
+                createMissingRequiredFieldError(requiredArgFunctionPath, [TEST_OBJECT_NAME, INNER_OBJECT, TestObjectField.SUB_FIELD_OF_INNER_FIELD_NAME]),
+                createMissingRequiredFieldError(requiredArgFunctionPath, [TEST_OBJECT_NAME, INNER_OBJECT, HIDDEN_FIELD]),
+                createMissingRequiredFieldError(requiredArgFunctionPath, [TEST_OBJECT_NAME, HIDDEN_FIELD]),
         ] as Set)
     }
 
@@ -248,12 +266,13 @@ class GraphQLTransformationTest extends Specification {
                 [
                         (FUNCTION_NAME): [
                                 (TestFieldProvider.REQUIRED_ARG_FUNCTION_NAME): [
-                                        (STRING)          : STRING_ARG_VALUE,
-                                        (INTEGER)         : INTEGER_ARG_VALUE,
-                                        (BOOLEAN)         : BOOLEAN_ARG_VALUE,
-                                        (LIST)            : LIST_ARG_VALUE,
-                                        (ENUMERATION)     : ENUM_ARG_VALUE,
-                                        (INNER_OBJECT): INNER_OBJECT_ARG_VALUE
+                                        (STRING)      : STRING_ARG_VALUE,
+                                        (INTEGER)     : INTEGER_ARG_VALUE,
+                                        (BOOLEAN)     : BOOLEAN_ARG_VALUE,
+                                        (LIST)        : LIST_ARG_VALUE,
+                                        (ENUMERATION) : ENUM_ARG_VALUE,
+                                        (INNER_OBJECT): INNER_OBJECT_RETURN_VALUE,
+                                        (HIDDEN_FIELD): HIDDEN_FIELD_RETURN_VALUE
                                 ]
                         ]
                 ]
@@ -280,12 +299,13 @@ class GraphQLTransformationTest extends Specification {
         getResponseContentAsList()[0].data == [
                 (FUNCTION_NAME): [
                         (TestFieldProvider.REQUIRED_ARG_FUNCTION_NAME): [
-                                (STRING)          : STRING_ARG_VALUE,
-                                (INTEGER)         : INTEGER_ARG_VALUE,
-                                (BOOLEAN)         : BOOLEAN_ARG_VALUE,
-                                (LIST)            : LIST_ARG_VALUE,
-                                (ENUMERATION)     : ENUM_ARG_VALUE,
-                                (INNER_OBJECT): INNER_OBJECT_ARG_VALUE
+                                (STRING)      : STRING_ARG_VALUE,
+                                (INTEGER)     : INTEGER_ARG_VALUE,
+                                (BOOLEAN)     : BOOLEAN_ARG_VALUE,
+                                (LIST)        : LIST_ARG_VALUE,
+                                (ENUMERATION) : ENUM_ARG_VALUE,
+                                (INNER_OBJECT): INNER_OBJECT_RETURN_VALUE,
+                                (HIDDEN_FIELD): HIDDEN_FIELD_RETURN_VALUE
                         ]
                 ]
         ]
@@ -317,12 +337,13 @@ class GraphQLTransformationTest extends Specification {
         getResponseContentAsList()[0].data == [
                 (FUNCTION_NAME): [
                         (TestFieldProvider.REQUIRED_ARG_FUNCTION_NAME): [
-                                (STRING)          : STRING_ARG_VALUE,
-                                (INTEGER)         : INTEGER_ARG_VALUE,
-                                (BOOLEAN)         : BOOLEAN_ARG_VALUE,
-                                (LIST)            : LIST_ARG_VALUE,
-                                (ENUMERATION)     : ENUM_ARG_VALUE,
-                                (INNER_OBJECT): INNER_OBJECT_ARG_VALUE
+                                (STRING)      : STRING_ARG_VALUE,
+                                (INTEGER)     : INTEGER_ARG_VALUE,
+                                (BOOLEAN)     : BOOLEAN_ARG_VALUE,
+                                (LIST)        : LIST_ARG_VALUE,
+                                (ENUMERATION) : ENUM_ARG_VALUE,
+                                (INNER_OBJECT): INNER_OBJECT_RETURN_VALUE,
+                                (HIDDEN_FIELD): HIDDEN_FIELD_RETURN_VALUE
                         ]
                 ]
         ]
@@ -333,7 +354,9 @@ class GraphQLTransformationTest extends Specification {
                 createMissingRequiredFieldError(requiredArgFunctionPath, [TEST_OBJECT_NAME, STRING]),
                 createMissingRequiredFieldError(requiredArgFunctionPath, [TEST_OBJECT_NAME, ENUMERATION]),
                 createMissingRequiredFieldError(requiredArgFunctionPath, [TEST_OBJECT_NAME, LIST]),
-                createMissingRequiredFieldError(requiredArgFunctionPath, [TEST_OBJECT_NAME, INNER_OBJECT, TestObjectField.SUB_FIELD_OF_INNER_FIELD_NAME])
+                createMissingRequiredFieldError(requiredArgFunctionPath, [TEST_OBJECT_NAME, INNER_OBJECT, TestObjectField.SUB_FIELD_OF_INNER_FIELD_NAME]),
+                createMissingRequiredFieldError(requiredArgFunctionPath, [TEST_OBJECT_NAME, INNER_OBJECT, TestObjectField.HIDDEN_FIELD_NAME]),
+                createMissingRequiredFieldError(requiredArgFunctionPath, [TEST_OBJECT_NAME, HIDDEN_FIELD])
         ] as Set)
 
         getResponseContentAsList()[1].data == [

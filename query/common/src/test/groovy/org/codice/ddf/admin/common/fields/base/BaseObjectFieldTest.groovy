@@ -15,11 +15,14 @@ package org.codice.ddf.admin.common.fields.base
 
 import org.codice.ddf.admin.api.Field
 import org.codice.ddf.admin.api.fields.ObjectField
+import org.codice.ddf.admin.common.fields.test.TestHiddenField
 import org.codice.ddf.admin.common.fields.test.TestObjectField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import spock.lang.Specification
 
 class BaseObjectFieldTest extends Specification {
+
+    private static String REAL_VALUE = "admin"
 
     TestObjectField topLevelField
 
@@ -115,5 +118,28 @@ class BaseObjectFieldTest extends Specification {
         errorCodes.containsAll(field4)
         errorCodes.containsAll(field5)
         errorCodes.containsAll(field6)
+    }
+
+    def 'Successfully masks hidden fields'() {
+        when:
+        topLevelField.setHiddenField(REAL_VALUE)
+
+        then:
+        topLevelField.getSanitizedValue().find {
+            (it.getKey() == TestHiddenField.HIDDEN_FIELD_NAME)
+        }.value == TestHiddenField.HIDDEN_FLAG
+    }
+
+    def 'Successfully masks inner hidden fields'() {
+        when:
+        TestObjectField.InnerTestObjectField innerField = topLevelField.getFields().find {
+            (it.getName() == TestObjectField.INNER_OBJECT_FIELD_NAME)
+        }
+        innerField.setHiddenField(REAL_VALUE)
+
+        then:
+        innerField.getSanitizedValue().find {
+            (it.getKey() == TestHiddenField.HIDDEN_FIELD_NAME)
+        }.value == TestHiddenField.HIDDEN_FLAG
     }
 }

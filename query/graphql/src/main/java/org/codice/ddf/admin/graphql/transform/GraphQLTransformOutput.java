@@ -188,12 +188,12 @@ public class GraphQLTransformOutput {
             throw new FunctionDataFetcherException(funcField.getName(),
                     funcField.getArguments()
                             .stream()
-                            .map(Field::getValue)
+                            .map(Field::getSanitizedValue)
                             .collect(Collectors.toList()),
                     result.getErrorMessages());
         } else if (result.isResultPresent()) {
             return result.getResult()
-                    .getValue();
+                    .getSanitizedValue();
         }
 
         return null;
@@ -208,7 +208,7 @@ public class GraphQLTransformOutput {
             }
         }
 
-        return field.getValue();
+        return field.getSanitizedValue();
     }
 
 

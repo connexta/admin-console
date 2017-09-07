@@ -67,6 +67,11 @@ public abstract class BaseEnumField<S> extends BaseField<S>
     }
 
     @Override
+    public S getSanitizedValue() {
+        return getValue();
+    }
+
+    @Override
     public void setValue(S value) {
         if(value != null) {
             enumValue = getEnumValues().stream()

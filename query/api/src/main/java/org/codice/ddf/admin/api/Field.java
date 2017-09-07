@@ -35,6 +35,8 @@ public interface Field<T> {
 
     T getValue();
 
+    T getSanitizedValue();
+
     void setValue(T value);
 
     boolean isRequired();

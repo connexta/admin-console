@@ -51,7 +51,14 @@ public abstract class BaseListField<T extends Field> extends BaseField<List>
     @Override
     public List getValue() {
         return elements.stream()
-                .map(field -> field.getValue())
+                .map(Field::getValue)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List getSanitizedValue() {
+        return elements.stream()
+                .map(Field::getSanitizedValue)
                 .collect(Collectors.toList());
     }
 

@@ -81,6 +81,10 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet implements Ev
 
     private static final int MAX_REQUEST_SIZE = 1_000_000;
 
+    private static final int MAX_QUERY_SIZE = 10;
+
+    public static final String INVALID_BATCH_SIZE_MSG = "Invalid batch request size. The batch request size must be an integer less than or equal to " + MAX_QUERY_SIZE;
+
     public static final String INVALID_CONTENT_LENGTH_MSG = "Invalid Content-Length header value. The Content-Length must be an integer less than or equal to " + MAX_REQUEST_SIZE + " bytes";
 
     public static final String MISSING_CONTENT_LENGTH_HEADER_MSG = "Content-Length header is required.";
@@ -160,6 +164,14 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet implements Ev
 
         try {
             List<String> splitReqs = splitQueries(originalReqContent);
+
+            if(splitReqs.size() > MAX_QUERY_SIZE){
+                originalResponse.getWriter()
+                        .write(INVALID_BATCH_SIZE_MSG);
+                originalResponse.setStatus(429);
+                return;
+            }
+
             for (String reqStr : splitReqs) {
                 DelegateResponse response = new DelegateResponse(originalResponse);
                 super.doPost(new DelegateRequest(originalRequest, reqStr), response);

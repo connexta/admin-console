@@ -126,6 +126,16 @@
             <version>${osgi.compendium.version}</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-servlets</artifactId>
+            <version>9.3.14.v20161028</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-util</artifactId>
+            <version>9.4.6.v20170531</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -139,7 +149,8 @@
                         <Import-Package>
                             !com.sun.tools.javac*,
                             !org.apache.tools.ant*,
-                            !org.eclipse.*,
+                            !org.eclipse.core.runtime,
+                            !org.eclipse.jdt.*,
                             *
                         </Import-Package>
                         <Embed-Dependency>

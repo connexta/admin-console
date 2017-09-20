@@ -84,7 +84,7 @@ public class LdapDirectorySettingsField extends BaseObjectField {
         useCase);
   }
 
-  //Field getters
+  // Field getters
   public LdapAttributeName usernameAttributeField() {
     return usernameAttribute;
   }
@@ -113,7 +113,7 @@ public class LdapDirectorySettingsField extends BaseObjectField {
     return memberAttributeReferencedInGroup;
   }
 
-  //Value getters
+  // Value getters
   public String baseUserDn() {
     return baseUserDn.getValue();
   }
@@ -159,7 +159,7 @@ public class LdapDirectorySettingsField extends BaseObjectField {
     return useCase.getValue();
   }
 
-  //Value setters
+  // Value setters
   public LdapDirectorySettingsField baseUserDn(String baseUserDn) {
     this.baseUserDn.setValue(baseUserDn);
     return this;

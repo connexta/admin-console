@@ -142,7 +142,7 @@ public abstract class BaseFunctionField<T extends DataType>
     ErrorMessage copy = msg.copy();
     List<String> copyMsgPath = copy.getPath();
 
-    //Remove first element of path because the return object's name will be included in the path
+    // Remove first element of path because the return object's name will be included in the path
     if (!copyMsgPath.isEmpty()) {
       copyMsgPath.remove(0);
     }

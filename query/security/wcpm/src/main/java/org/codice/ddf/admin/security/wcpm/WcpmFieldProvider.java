@@ -34,7 +34,7 @@ public class WcpmFieldProvider extends BaseFieldProvider {
 
   public static final String DESCRIPTION = "Manages policies for the system's endpoints";
 
-  //Discovery functions
+  // Discovery functions
   private GetAuthTypes getAuthTypes;
 
   private GetRealms getRealms;
@@ -43,7 +43,7 @@ public class WcpmFieldProvider extends BaseFieldProvider {
 
   private GetContextPolicies getContextPolicies;
 
-  //Mutation functions
+  // Mutation functions
   private SaveContextPolices saveContextPolices;
 
   private SaveWhitelistContexts saveWhitelistContexts;

@@ -121,7 +121,9 @@ public class LdapTestClaimMappings extends TestFunctionField {
         SecurityValidation.validateStsClaimsExist(
             claimArgs, configuratorSuite.getServiceActions(), stsServiceProperties));
 
-    // TODO: 7/7/17 - tbatie - Currently the ClaimsMapEntry contains a StringField as a value. It really should be a LdapAttributeName. Fix this once there is a generic way to create MapField objects that contain different value field.
+    // TODO: 7/7/17 - tbatie - Currently the ClaimsMapEntry contains a StringField as a value. It
+    // really should be a LdapAttributeName. Fix this once there is a generic way to create MapField
+    // objects that contain different value field.
 
     claimMappings
         .getList()

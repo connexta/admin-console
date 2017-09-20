@@ -93,24 +93,24 @@ public class GraphQLTransformOutput {
   }
 
   public GraphQLOutputType fieldToGraphQLObjectType(ObjectField field) {
-    //Check if the objectField is recursive, if so bail early
+    // Check if the objectField is recursive, if so bail early
     if (referenceTypeProvider.isTypePresent(field.fieldTypeName())) {
       return referenceTypeProvider.getType(field.fieldTypeName());
     }
 
-    //Field provider names should be unique and looks pretty without "Payload" added to the name
+    // Field provider names should be unique and looks pretty without "Payload" added to the name
     String typeName =
         field instanceof FieldProvider
             ? field.fieldTypeName()
             : createOutputObjectFieldTypeName(field.fieldTypeName());
 
-    //Skip mutations on field provider
+    // Skip mutations on field provider
     List<Field> innerFields =
         field instanceof FieldProvider
             ? ((FieldProvider) field).getDiscoveryFields()
             : field.getFields();
 
-    //Add a GraphQLTypeReference to support recursion
+    // Add a GraphQLTypeReference to support recursion
     referenceTypeProvider.addType(field.fieldTypeName(), new GraphQLTypeReference(typeName));
     return GraphQLObjectType.newObject()
         .name(typeName)
@@ -162,7 +162,7 @@ public class GraphQLTransformOutput {
 
     FunctionField<DataType> funcField = field.newInstance();
 
-    //Remove the field name of the function from that path since the update is using a subpath
+    // Remove the field name of the function from that path since the update is using a subpath
     List<String> fixedPath = Lists.newArrayList(field.path());
     fixedPath.remove(fixedPath.size() - 1);
     funcField.updatePath(fixedPath);
@@ -183,7 +183,8 @@ public class GraphQLTransformOutput {
 
   public Object dataTypeDataFetcher(DataFetchingEnvironment env, DataType field) {
     Object source = env.getSource();
-    //If no values are passed for the source, return a field definition to continue the execution strategy instead of returning null. This is an expansion of the PropertyDataFetcher
+    // If no values are passed for the source, return a field definition to continue the execution
+    // strategy instead of returning null. This is an expansion of the PropertyDataFetcher
     if (source instanceof Map) {
       if (!((Map) source).isEmpty()) {
         return ((Map<?, ?>) source).get(field.fieldName());
@@ -193,12 +194,13 @@ public class GraphQLTransformOutput {
     return field.getValue();
   }
 
-  //Add on Payload to avoid collision between an input and output field type name;
+  // Add on Payload to avoid collision between an input and output field type name;
   public String createOutputObjectFieldTypeName(String fieldTypeName) {
     return GraphQLTransformCommons.capitalize(fieldTypeName) + "Payload";
   }
 
-  //Omit the referenceTypeProvider intentionally since all the types should already be defined by the other providers
+  // Omit the referenceTypeProvider intentionally since all the types should already be defined by
+  // the other providers
   public List<GraphQLTypesProvider> getTypeProviders() {
     return ImmutableList.of(
         inputTransformer.getInputTypeProvider(),

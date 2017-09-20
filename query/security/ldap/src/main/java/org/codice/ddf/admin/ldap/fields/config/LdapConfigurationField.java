@@ -58,7 +58,7 @@ public class LdapConfigurationField extends BaseObjectField {
     updateInnerFieldPaths();
   }
 
-  //Field getters
+  // Field getters
   public LdapConnectionField connectionField() {
     return connection;
   }
@@ -79,7 +79,7 @@ public class LdapConfigurationField extends BaseObjectField {
     return claimMappings;
   }
 
-  //Value getters
+  // Value getters
   public String pid() {
     return pid.getValue();
   }
@@ -91,7 +91,7 @@ public class LdapConfigurationField extends BaseObjectField {
         .collect(Collectors.toMap(ClaimsMapEntry::key, ClaimsMapEntry::value));
   }
 
-  //Value setters
+  // Value setters
   public LdapConfigurationField pid(String pid) {
     this.pid.setValue(pid);
     return this;

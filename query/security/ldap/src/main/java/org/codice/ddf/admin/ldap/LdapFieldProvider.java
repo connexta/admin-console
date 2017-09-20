@@ -38,7 +38,7 @@ public class LdapFieldProvider extends BaseFieldProvider {
 
   private static final String TYPE_NAME = "Ldap";
 
-  //Discovery
+  // Discovery
   private LdapTestConnection testConnection;
 
   private LdapTestBind testBind;
@@ -55,7 +55,7 @@ public class LdapFieldProvider extends BaseFieldProvider {
 
   private GetLdapConfigurations getConfigs;
 
-  //Mutate
+  // Mutate
   private CreateLdapConfiguration createConfig;
 
   private DeleteLdapConfiguration deleteConfig;

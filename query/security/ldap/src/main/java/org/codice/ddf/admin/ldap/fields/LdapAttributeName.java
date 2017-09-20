@@ -61,7 +61,8 @@ public class LdapAttributeName extends StringField {
     return errors;
   }
 
-  // TODO: 7/7/17 - tbatie - This validate should be reformatted once there is a generic way to create MapField objects that contain different value field.
+  // TODO: 7/7/17 - tbatie - This validate should be reformatted once there is a generic way to
+  // create MapField objects that contain different value field.
   public static List<ErrorMessage> validate(String attribute, List<String> path) {
     List<ErrorMessage> errors = new ArrayList<>();
 

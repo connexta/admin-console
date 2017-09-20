@@ -62,7 +62,8 @@ public class ArtifactSizeEnforcerRule implements EnforcerRule {
   public static final String UNKNOWN_ARTIFACT_SIZE_UNIT_MSG =
       "Unknown artifact size unit. The artifactSize property must end with either: %n\t%s: Bytes%n\t%s: KiloBytes%n\t%s: MegaBytes";
 
-  //Rule arguments. These properties are set through reflection when running as a rule via the enforcer-plugin, not through setters.
+  // Rule arguments. These properties are set through reflection when running as a rule via the
+  // enforcer-plugin, not through setters.
   protected String maxArtifactSize;
   protected String artifactLocation;
   protected boolean skip;

@@ -108,7 +108,8 @@ public class PolicyManagerServiceProperties {
                       ContextAttributeMapping::getAttributeName,
                       ContextAttributeMapping::getAttributeValue));
 
-      //Check if bin containing an identical context policy exists already, if so add the context path to it
+      // Check if bin containing an identical context policy exists already, if so add the context
+      // path to it
       for (ContextPolicyBin bin : policies) {
         if (bin.realm().equals(policy.getRealm())
             && ListUtils.isEqualList(bin.authTypes(), policy.getAuthenticationMethods())

@@ -79,7 +79,7 @@ public class LdapTestingUtils {
           LDAPConnectionFactory.SSL_ENABLED_PROTOCOLS,
           Arrays.asList(System.getProperty(HTTP_PROTOCOLS_SYS_PROP).split(",")));
 
-      //sets the classloader so it can find the grizzly protocol handler class
+      // sets the classloader so it can find the grizzly protocol handler class
       ldapOptions.set(
           LDAPConnectionFactory.TRANSPORT_PROVIDER_CLASS_LOADER,
           LdapTestingUtils.class.getClassLoader());

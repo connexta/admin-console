@@ -236,7 +236,8 @@ public class LdapServiceCommons {
     URI ldapUri = getUriFromProperty(mapValue(props, ldapUrl));
 
     if (ldapUri != null && ldapUri.getScheme() != null) {
-      // TODO: tbatie - 8/17/17 - It'd be great if we had some sort of match method in the EnumValue instead of doing little checks like this
+      // TODO: tbatie - 8/17/17 - It'd be great if we had some sort of match method in the EnumValue
+      // instead of doing little checks like this
       connection
           .encryptionMethod(
               ldapUri.getScheme().equals("ldap")

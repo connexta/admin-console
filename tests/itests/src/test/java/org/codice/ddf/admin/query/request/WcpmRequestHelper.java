@@ -111,7 +111,8 @@ public class WcpmRequestHelper {
       Map<String, Object> copyPolicyToMatch = new HashMap<>(policyToMatch);
       Map<String, Object> copyPolicy = new HashMap<>(policy);
 
-      //It's possible for paths to be rearranged on persist, order does not matter in terms of context paths
+      // It's possible for paths to be rearranged on persist, order does not matter in terms of
+      // context paths
       List<String> pathsToMatch =
           (List<String>) copyPolicyToMatch.get(ContextPath.ListImpl.DEFAULT_NAME);
       List<String> paths = (List<String>) copyPolicy.get(ContextPath.ListImpl.DEFAULT_NAME);

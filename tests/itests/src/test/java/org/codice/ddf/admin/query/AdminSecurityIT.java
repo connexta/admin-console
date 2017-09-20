@@ -95,7 +95,8 @@ public class AdminSecurityIT extends AbstractComponentTest {
 
   @Override
   public List<Feature> features() {
-    // TODO: tbatie - 8/19/17 - Fix all these features once they've been fixed in DDF. We should only have to call our admin-console-app feature
+    // TODO: tbatie - 8/19/17 - Fix all these features once they've been fixed in DDF. We should
+    // only have to call our admin-console-app feature
     return Arrays.asList(
         PlatformAppFeatureFile.featureFile(),
         SecurityAppFeatureFile.featureFile(),
@@ -104,7 +105,8 @@ public class AdminSecurityIT extends AbstractComponentTest {
         AdminQueryAppFeatureFile.adminCoreFeature().bootFeature(),
         //  add so pax exam has access to data type api before being started
 
-        //Added a boot feature because the tests need the ServiceManager running before we can startFeatures
+        // Added a boot feature because the tests need the ServiceManager running before we can
+        // startFeatures
         ComponentTestFeatureFile.securityAll().bootFeature(),
         ComponentTestFeatureFile.configuratorFeature(),
         ComponentTestFeatureFile.configSecurityPolicy(),
@@ -158,7 +160,8 @@ public class AdminSecurityIT extends AbstractComponentTest {
   @Test
   public void savePolicies() throws IOException {
 
-    // TODO: tbatie - 8/22/17 - Testing whether the bins collapse should be done at the unit test level.
+    // TODO: tbatie - 8/22/17 - Testing whether the bins collapse should be done at the unit test
+    // level.
     try {
       Map<String, Object> newPolicy1 =
           new ContextPolicyBin(serviceReader)

@@ -115,8 +115,9 @@ public class PolicyManagerServiceProperties {
               .addContextPath(policy.getContextPath()));
     }
 
-    //Check if bin containing an identical context policy exists already, if so add the context path to it
-    //Do this after pulling the configuration so that values are matched to their appropriate enums
+    // Check if bin containing an identical context policy exists already, if so add the context
+    // path to it
+    // Do this after pulling the configuration so that values are matched to their appropriate enums
     List<ContextPolicyBin> collapsedBins = new ArrayList<>();
 
     for (ContextPolicyBin bin : policies) {

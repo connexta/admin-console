@@ -158,7 +158,9 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet implements Ev
       return;
     }
 
-    // TODO: tbatie - 6/9/17 - GraphQLServlet does not support batched requests even though a BatchedExecutionStrategy exists. This should be fixed in the GraphQLServlet and contributed back to graphql-java-servlet
+    // TODO: tbatie - 6/9/17 - GraphQLServlet does not support batched requests even though a
+    // BatchedExecutionStrategy exists. This should be fixed in the GraphQLServlet and contributed
+    // back to graphql-java-servlet
     List<String> responses = new ArrayList<>();
     String originalReqContent = IOUtils.toString(originalRequest.getInputStream());
     boolean isBatchRequest = isBatchRequest(originalReqContent);
@@ -224,8 +226,9 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet implements Ev
     }
   }
 
-  //Synchronized just in case the schema is still updating when another refresh is called
-  //The performance decrease by the `synchronized` is negligible because of the periodic cache invalidation implementation
+  // Synchronized just in case the schema is still updating when another refresh is called
+  // The performance decrease by the `synchronized` is negligible because of the periodic cache
+  // invalidation implementation
   private synchronized void refreshSchema() {
     LOGGER.trace("Refreshing GraphQL schema.");
 

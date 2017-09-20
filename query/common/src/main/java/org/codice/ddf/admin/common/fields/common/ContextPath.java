@@ -142,7 +142,8 @@ public class ContextPath extends StringField {
 
     @Override
     public ListImpl add(ContextPath value) {
-      // TODO: tbatie - 8/17/17 - Temporary work around, there should be SetField implemented here instead
+      // TODO: tbatie - 8/17/17 - Temporary work around, there should be SetField implemented here
+      // instead
       boolean match = elements.stream().anyMatch(path -> path.getValue().equals(value.getValue()));
       if (!match) {
         super.add(value);

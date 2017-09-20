@@ -42,7 +42,8 @@ public class SourceValidationUtils {
             .getAllSourceReferences()
             .stream()
             .map(ConfiguredService.class::cast)
-            // TODO: 8/22/17 phuffer - this doesn't work for OpenSearch - opensearch sources get null pids back
+            // TODO: 8/22/17 phuffer - this doesn't work for OpenSearch - opensearch sources get
+            // null pids back
             .filter(configuredService -> servicePid.equals(configuredService.getConfigurationPid()))
             .findFirst()
             .map(Source.class::cast)

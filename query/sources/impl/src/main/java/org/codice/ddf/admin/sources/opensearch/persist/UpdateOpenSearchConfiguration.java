@@ -70,7 +70,8 @@ public class UpdateOpenSearchConfiguration extends BaseFunctionField<BooleanFiel
     //                .getConfigurator();
     //        configurator.add(configuratorSuite.getFeatureActions()
     //                .start(OPENSEARCH_FEATURE));
-    //        OperationReport report = configurator.commit("Starting feature [{}]", OPENSEARCH_FEATURE);
+    //        OperationReport report = configurator.commit("Starting feature [{}]",
+    // OPENSEARCH_FEATURE);
     //
     //        if (report.containsFailedResults()) {
     //            addErrorMessage(failedPersistError());

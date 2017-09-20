@@ -81,7 +81,8 @@ public class AdminSourcesIT extends AbstractComponentTest {
         ComponentTestFeatureFile.commonTestDependenciesFeature().bootFeature(),
         AdminQueryAppFeatureFile.adminCoreFeature().bootFeature(),
 
-        //Added a boot feature because the tests need the ServiceManager running before we can startFeatures
+        // Added a boot feature because the tests need the ServiceManager running before we can
+        // startFeatures
         ComponentTestFeatureFile.securityAll().bootFeature(),
         ComponentTestFeatureFile.catalogCoreApiFeature().bootFeature(),
         ComponentTestFeatureFile.configuratorFeature(),
@@ -99,8 +100,10 @@ public class AdminSourcesIT extends AbstractComponentTest {
 
   @Override
   public List<Option> customSettings() {
-    //The catalog framework won't start until it is able to point a client to a solr instance over http.
-    //This configuration points the client to the embeddedSolr instead so fewer dependencies have to be started up
+    // The catalog framework won't start until it is able to point a client to a solr instance over
+    // http.
+    // This configuration points the client to the embeddedSolr instead so fewer dependencies have
+    // to be started up
     return Arrays.asList(
         editConfigurationFilePut("etc/system.properties", "solr.client", "EmbeddedSolrServer"),
         editConfigurationFilePut("etc/system.properties", "solr.http.url", ""),
@@ -139,7 +142,7 @@ public class AdminSourcesIT extends AbstractComponentTest {
     String pid = sourceProperties.get(PID);
     assertThat("Error getting WFS source.", StringUtils.isNotEmpty(pid));
 
-    //update wfs source
+    // update wfs source
     Map<String, Object> updateArgs =
         createWfsArgs("updatedName", pid, WfsVersion.Wfs2.ENUM_TITLE).getValue();
 
@@ -211,7 +214,7 @@ public class AdminSourcesIT extends AbstractComponentTest {
     String pid = sourceProperties.get(PID);
     assertThat("Error getting OpenSearch source.", StringUtils.isNotEmpty(pid));
 
-    //update openSearch source
+    // update openSearch source
     Map<String, Object> updateArgs = createOpenSearchArgs("updatedName", pid).getValue();
     boolean updateSuccess =
         SOURCES_REQUEST_HELPER.updateSource(
@@ -237,7 +240,8 @@ public class AdminSourcesIT extends AbstractComponentTest {
 
   @Ignore
   @Test
-  // TODO: 8/23/17 phuffer - In order for the CSW feature to start, the ActionProvider must be removed
+  // TODO: 8/23/17 phuffer - In order for the CSW feature to start, the ActionProvider must be
+  // removed
   //                         from the spatial-csw-transformer blueprint.
   public void testCsw() {
     // create CSW source
@@ -259,7 +263,7 @@ public class AdminSourcesIT extends AbstractComponentTest {
     String pid = sourceProperties.get(PID);
     assertThat("Error getting CSW source.", StringUtils.isNotEmpty(pid));
 
-    //update CSW source
+    // update CSW source
     Map<String, Object> updateArgs = createCswArgs("updatedName", pid, MASKED_PASSWORD).getValue();
     boolean updateSuccess =
         SOURCES_REQUEST_HELPER.updateSource(SourcesRequestHelper.SourceType.CSW, updateArgs);

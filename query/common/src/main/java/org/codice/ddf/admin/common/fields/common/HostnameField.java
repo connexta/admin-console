@@ -1,73 +1,73 @@
 /**
  * Copyright (c) Codice Foundation
- * <p>
- * This is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser
- * General Public License as published by the Free Software Foundation, either version 3 of the
- * License, or any later version.
- * <p>
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details. A copy of the GNU Lesser General Public License
- * is distributed along with this program and can be found at
+ *
+ * <p>This is free software: you can redistribute it and/or modify it under the terms of the GNU
+ * Lesser General Public License as published by the Free Software Foundation, either version 3 of
+ * the License, or any later version.
+ *
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details. A copy of the GNU Lesser General Public
+ * License is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
- **/
+ */
 package org.codice.ddf.admin.common.fields.common;
 
 import static org.codice.ddf.admin.common.report.message.DefaultMessages.invalidHostnameError;
 
+import com.google.common.collect.ImmutableSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
-
 import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 import org.codice.ddf.admin.common.report.message.DefaultMessages;
 
-import com.google.common.collect.ImmutableSet;
-
 public class HostnameField extends StringField {
 
-    public static final String DEFAULT_FIELD_NAME = "hostname";
+  public static final String DEFAULT_FIELD_NAME = "hostname";
 
-    public static final String FIELD_TYPE_NAME = "Hostname";
+  public static final String FIELD_TYPE_NAME = "Hostname";
 
-    public static final String DESCRIPTION =
-            "Must be between 1 and 63 characters long, and the entire hostname (including the delimiting dots but not a trailing dot)"
-                    + " has a maximum of 253 ASCII characters.";
+  public static final String DESCRIPTION =
+      "Must be between 1 and 63 characters long, and the entire hostname (including the delimiting dots but not a trailing dot)"
+          + " has a maximum of 253 ASCII characters.";
 
-    private static final Pattern HOST_NAME_PATTERN = Pattern.compile("^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])$");
+  private static final Pattern HOST_NAME_PATTERN =
+      Pattern.compile(
+          "^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])$");
 
-    public HostnameField(String fieldName) {
-        super(fieldName, FIELD_TYPE_NAME, DESCRIPTION);
+  public HostnameField(String fieldName) {
+    super(fieldName, FIELD_TYPE_NAME, DESCRIPTION);
+  }
+
+  public HostnameField() {
+    super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
+  }
+
+  @Override
+  public List<ErrorMessage> validate() {
+    List<ErrorMessage> validationMsgs = super.validate();
+    if (!validationMsgs.isEmpty()) {
+      return validationMsgs;
     }
 
-    public HostnameField() {
-        super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
+    if (getValue() != null && !validHostname(getValue())) {
+      validationMsgs.add(invalidHostnameError(path()));
     }
 
-    @Override
-    public List<ErrorMessage> validate() {
-        List<ErrorMessage> validationMsgs = super.validate();
-        if(!validationMsgs.isEmpty()) {
-            return validationMsgs;
-        }
+    return validationMsgs;
+  }
 
-        if(getValue() != null && !validHostname(getValue())) {
-            validationMsgs.add(invalidHostnameError(path()));
-        }
+  public boolean validHostname(String hostname) {
+    return HOST_NAME_PATTERN.matcher(hostname).matches();
+  }
 
-        return validationMsgs;
-    }
-
-    public boolean validHostname(String hostname) {
-        return HOST_NAME_PATTERN.matcher(hostname).matches();
-    }
-
-    @Override
-    public Set<String> getErrorCodes() {
-        return new ImmutableSet.Builder<String>()
-                .addAll(super.getErrorCodes())
-                .add(DefaultMessages.INVALID_HOSTNAME)
-                .build();
-    }
+  @Override
+  public Set<String> getErrorCodes() {
+    return new ImmutableSet.Builder<String>()
+        .addAll(super.getErrorCodes())
+        .add(DefaultMessages.INVALID_HOSTNAME)
+        .build();
+  }
 }

@@ -1,330 +1,331 @@
 /**
  * Copyright (c) Codice Foundation
- * <p>
- * This is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser
- * General Public License as published by the Free Software Foundation, either version 3 of the
- * License, or any later version.
- * <p>
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details. A copy of the GNU Lesser General Public License
- * is distributed along with this program and can be found at
+ *
+ * <p>This is free software: you can redistribute it and/or modify it under the terms of the GNU
+ * Lesser General Public License as published by the Free Software Foundation, either version 3 of
+ * the License, or any later version.
+ *
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details. A copy of the GNU Lesser General Public
+ * License is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  */
 package org.codice.ddf.admin.sources.fields;
 
+import com.google.common.collect.ImmutableList;
 import org.codice.ddf.admin.api.fields.EnumValue;
 import org.codice.ddf.admin.common.fields.base.BaseEnumField;
 
-import com.google.common.collect.ImmutableList;
-
 public class CswSpatialOperator extends BaseEnumField<String> {
 
-    public static final String DEFAULT_FIELD_NAME = "cswSpatialOperator";
+  public static final String DEFAULT_FIELD_NAME = "cswSpatialOperator";
 
-    public static final String TYPE_NAME = "CswSpatialOperator";
+  public static final String TYPE_NAME = "CswSpatialOperator";
+
+  public static final String DESCRIPTION =
+      "A spatial operator determines whether its geometric arguments satisfy the stated spatial relationship.";
+
+  public CswSpatialOperator() {
+    this(new NoFilter());
+  }
+
+  public CswSpatialOperator(EnumValue<String> spatialOperator) {
+    super(
+        DEFAULT_FIELD_NAME,
+        TYPE_NAME,
+        DESCRIPTION,
+        ImmutableList.of(
+            new NoFilter(),
+            new Bbox(),
+            new Beyond(),
+            new Contains(),
+            new Crosses(),
+            new Disjoint(),
+            new DWithin(),
+            new Equals(),
+            new Intersects(),
+            new Overlaps(),
+            new Touches(),
+            new Within()),
+        spatialOperator);
+  }
+
+  public static final class NoFilter implements EnumValue<String> {
+
+    public static final String ENUM_TITLE = "None";
+
+    public static final String OPERATOR = "NO_FILTER";
 
     public static final String DESCRIPTION =
-            "A spatial operator determines whether its geometric arguments satisfy the stated spatial relationship.";
+        "Indicates that no spatial operators should be applied.";
 
-    public CswSpatialOperator() {
-        this(new NoFilter());
+    @Override
+    public String enumTitle() {
+      return ENUM_TITLE;
     }
 
-    public CswSpatialOperator(EnumValue<String> spatialOperator) {
-        super(DEFAULT_FIELD_NAME,
-                TYPE_NAME,
-                DESCRIPTION,
-                ImmutableList.of(new NoFilter(),
-                        new Bbox(),
-                        new Beyond(),
-                        new Contains(),
-                        new Crosses(),
-                        new Disjoint(),
-                        new DWithin(),
-                        new Equals(),
-                        new Intersects(),
-                        new Overlaps(),
-                        new Touches(),
-                        new Within()),
-                spatialOperator);
+    @Override
+    public String description() {
+      return DESCRIPTION;
     }
 
-    public static final class NoFilter implements EnumValue<String> {
+    @Override
+    public String value() {
+      return OPERATOR;
+    }
+  }
 
-        public static final String ENUM_TITLE = "None";
+  public static final class Bbox implements EnumValue<String> {
 
-        public static final String OPERATOR = "NO_FILTER";
+    public static final String BBOX = "BBOX";
 
-        public static final String DESCRIPTION =
-                "Indicates that no spatial operators should be applied.";
+    public static final String DESCRIPTION =
+        "Identifies all geometries that spatially interact with a bounding box.";
 
-        @Override
-        public String enumTitle() {
-            return ENUM_TITLE;
-        }
-
-        @Override
-        public String description() {
-            return DESCRIPTION;
-        }
-
-        @Override
-        public String value() {
-            return OPERATOR;
-        }
+    @Override
+    public String enumTitle() {
+      return BBOX;
     }
 
-    public static final class Bbox implements EnumValue<String> {
-
-        public static final String BBOX = "BBOX";
-
-        public static final String DESCRIPTION =
-                "Identifies all geometries that spatially interact with a bounding box.";
-
-        @Override
-        public String enumTitle() {
-            return BBOX;
-        }
-
-        @Override
-        public String description() {
-            return DESCRIPTION;
-        }
-
-        @Override
-        public String value() {
-            return BBOX;
-        }
+    @Override
+    public String description() {
+      return DESCRIPTION;
     }
 
-    public static final class Beyond implements EnumValue<String> {
+    @Override
+    public String value() {
+      return BBOX;
+    }
+  }
 
-        public static final String BEYOND = "Beyond";
+  public static final class Beyond implements EnumValue<String> {
 
-        public static final String DESCRIPTION =
-                "Tests whether the value of a geometric property A is beyond a specified distance d of the specified literal geometric value B.";
+    public static final String BEYOND = "Beyond";
 
-        @Override
-        public String enumTitle() {
-            return BEYOND;
-        }
+    public static final String DESCRIPTION =
+        "Tests whether the value of a geometric property A is beyond a specified distance d of the specified literal geometric value B.";
 
-        @Override
-        public String description() {
-            return DESCRIPTION;
-        }
-
-        @Override
-        public String value() {
-            return BEYOND;
-        }
+    @Override
+    public String enumTitle() {
+      return BEYOND;
     }
 
-    public static final class Contains implements EnumValue<String> {
-
-        public static final String CONTAINS = "Contains";
-
-        public static final String DESCRIPTION =
-                "Determines whether the second geometry is completely within the first geometry. Contain tests the exact opposite result of within.";
-
-        @Override
-        public String enumTitle() {
-            return CONTAINS;
-        }
-
-        @Override
-        public String description() {
-            return DESCRIPTION;
-        }
-
-        @Override
-        public String value() {
-            return CONTAINS;
-        }
+    @Override
+    public String description() {
+      return DESCRIPTION;
     }
 
-    public static final class Crosses implements EnumValue<String> {
+    @Override
+    public String value() {
+      return BEYOND;
+    }
+  }
 
-        public static final String CROSSES = "Crosses";
+  public static final class Contains implements EnumValue<String> {
 
-        public static final String DESCRIPTION =
-                "Determines whether two geometric properties cross each other.";
+    public static final String CONTAINS = "Contains";
 
-        @Override
-        public String enumTitle() {
-            return CROSSES;
-        }
+    public static final String DESCRIPTION =
+        "Determines whether the second geometry is completely within the first geometry. Contain tests the exact opposite result of within.";
 
-        @Override
-        public String description() {
-            return DESCRIPTION;
-        }
-
-        @Override
-        public String value() {
-            return CROSSES;
-        }
+    @Override
+    public String enumTitle() {
+      return CONTAINS;
     }
 
-    public static final class Disjoint implements EnumValue<String> {
-
-        public static final String DISJOINT = "Disjoint";
-
-        public static final String DESCRIPTION =
-                "Determines whether two geometric properties do not intersect.";
-
-        @Override
-        public String enumTitle() {
-            return DISJOINT;
-        }
-
-        @Override
-        public String description() {
-            return DESCRIPTION;
-        }
-
-        @Override
-        public String value() {
-            return DISJOINT;
-        }
+    @Override
+    public String description() {
+      return DESCRIPTION;
     }
 
-    public static final class DWithin implements EnumValue<String> {
+    @Override
+    public String value() {
+      return CONTAINS;
+    }
+  }
 
-        public static final String DWITHIN = "DWithin";
+  public static final class Crosses implements EnumValue<String> {
 
-        public static final String DESCRIPTION =
-                "Determines whether the value of a geometric property A is within a specified distance d of the specified literal geometric value B.";
+    public static final String CROSSES = "Crosses";
 
-        @Override
-        public String enumTitle() {
-            return DWITHIN;
-        }
+    public static final String DESCRIPTION =
+        "Determines whether two geometric properties cross each other.";
 
-        @Override
-        public String description() {
-            return DESCRIPTION;
-        }
-
-        @Override
-        public String value() {
-            return DWITHIN;
-        }
+    @Override
+    public String enumTitle() {
+      return CROSSES;
     }
 
-    public static final class Equals implements EnumValue<String> {
-
-        public static final String EQUALS = "Equals";
-
-        public static final String DESCRIPTION =
-                "Determines whether two geometric properties are identical.";
-
-        @Override
-        public String enumTitle() {
-            return EQUALS;
-        }
-
-        @Override
-        public String description() {
-            return DESCRIPTION;
-        }
-
-        @Override
-        public String value() {
-            return EQUALS;
-        }
+    @Override
+    public String description() {
+      return DESCRIPTION;
     }
 
-    public static final class Intersects implements EnumValue<String> {
+    @Override
+    public String value() {
+      return CROSSES;
+    }
+  }
 
-        public static final String INTERSECTS = "Intersects";
+  public static final class Disjoint implements EnumValue<String> {
 
-        public static final String DESCRIPTION =
-                "Determines whether two geometric properties intersect with each other.";
+    public static final String DISJOINT = "Disjoint";
 
-        @Override
-        public String enumTitle() {
-            return INTERSECTS;
-        }
+    public static final String DESCRIPTION =
+        "Determines whether two geometric properties do not intersect.";
 
-        @Override
-        public String description() {
-            return DESCRIPTION;
-        }
-
-        @Override
-        public String value() {
-            return INTERSECTS;
-        }
+    @Override
+    public String enumTitle() {
+      return DISJOINT;
     }
 
-    public static final class Overlaps implements EnumValue<String> {
-
-        public static final String OVERLAPS = "Overlaps";
-
-        public static final String DESCRIPTION =
-                "Determines whether two geometries of the same dimensions overlap. If their intersection produces a geometry different from both and of the same dimension, they overlap.";
-
-        @Override
-        public String enumTitle() {
-            return OVERLAPS;
-        }
-
-        @Override
-        public String description() {
-            return DESCRIPTION;
-        }
-
-        @Override
-        public String value() {
-            return OVERLAPS;
-        }
+    @Override
+    public String description() {
+      return DESCRIPTION;
     }
 
-    public static final class Touches implements EnumValue<String> {
+    @Override
+    public String value() {
+      return DISJOINT;
+    }
+  }
 
-        public static final String TOUCHES = "Touches";
+  public static final class DWithin implements EnumValue<String> {
 
-        public static final String DESCRIPTION =
-                "Determines if the points of two geometric properties touch, but do not intersect the interiors of each geometry.";
+    public static final String DWITHIN = "DWithin";
 
-        @Override
-        public String enumTitle() {
-            return TOUCHES;
-        }
+    public static final String DESCRIPTION =
+        "Determines whether the value of a geometric property A is within a specified distance d of the specified literal geometric value B.";
 
-        @Override
-        public String description() {
-            return DESCRIPTION;
-        }
-
-        @Override
-        public String value() {
-            return TOUCHES;
-        }
+    @Override
+    public String enumTitle() {
+      return DWITHIN;
     }
 
-    public static final class Within implements EnumValue<String> {
-
-        public static final String WITHIN = "Within";
-
-        public static final String DESCRIPTION =
-                "Determines whether the first geometry is completely within the second geometry. Within tests the exact opposite result of contains.";
-
-        @Override
-        public String enumTitle() {
-            return WITHIN;
-        }
-
-        @Override
-        public String description() {
-            return DESCRIPTION;
-        }
-
-        @Override
-        public String value() {
-            return WITHIN;
-        }
+    @Override
+    public String description() {
+      return DESCRIPTION;
     }
+
+    @Override
+    public String value() {
+      return DWITHIN;
+    }
+  }
+
+  public static final class Equals implements EnumValue<String> {
+
+    public static final String EQUALS = "Equals";
+
+    public static final String DESCRIPTION =
+        "Determines whether two geometric properties are identical.";
+
+    @Override
+    public String enumTitle() {
+      return EQUALS;
+    }
+
+    @Override
+    public String description() {
+      return DESCRIPTION;
+    }
+
+    @Override
+    public String value() {
+      return EQUALS;
+    }
+  }
+
+  public static final class Intersects implements EnumValue<String> {
+
+    public static final String INTERSECTS = "Intersects";
+
+    public static final String DESCRIPTION =
+        "Determines whether two geometric properties intersect with each other.";
+
+    @Override
+    public String enumTitle() {
+      return INTERSECTS;
+    }
+
+    @Override
+    public String description() {
+      return DESCRIPTION;
+    }
+
+    @Override
+    public String value() {
+      return INTERSECTS;
+    }
+  }
+
+  public static final class Overlaps implements EnumValue<String> {
+
+    public static final String OVERLAPS = "Overlaps";
+
+    public static final String DESCRIPTION =
+        "Determines whether two geometries of the same dimensions overlap. If their intersection produces a geometry different from both and of the same dimension, they overlap.";
+
+    @Override
+    public String enumTitle() {
+      return OVERLAPS;
+    }
+
+    @Override
+    public String description() {
+      return DESCRIPTION;
+    }
+
+    @Override
+    public String value() {
+      return OVERLAPS;
+    }
+  }
+
+  public static final class Touches implements EnumValue<String> {
+
+    public static final String TOUCHES = "Touches";
+
+    public static final String DESCRIPTION =
+        "Determines if the points of two geometric properties touch, but do not intersect the interiors of each geometry.";
+
+    @Override
+    public String enumTitle() {
+      return TOUCHES;
+    }
+
+    @Override
+    public String description() {
+      return DESCRIPTION;
+    }
+
+    @Override
+    public String value() {
+      return TOUCHES;
+    }
+  }
+
+  public static final class Within implements EnumValue<String> {
+
+    public static final String WITHIN = "Within";
+
+    public static final String DESCRIPTION =
+        "Determines whether the first geometry is completely within the second geometry. Within tests the exact opposite result of contains.";
+
+    @Override
+    public String enumTitle() {
+      return WITHIN;
+    }
+
+    @Override
+    public String description() {
+      return DESCRIPTION;
+    }
+
+    @Override
+    public String value() {
+      return WITHIN;
+    }
+  }
 }

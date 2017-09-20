@@ -36,7 +36,7 @@
         <maven.compiler.target>1.8</maven.compiler.target>
 
         <ddf.version>2.11.0-SNAPSHOT</ddf.version>
-        <ddf.support.version>2.3.6</ddf.support.version>
+        <ddf.support.version>2.3.9</ddf.support.version>
         <guava.version>18.0</guava.version>
         <karaf.version>4.1.1</karaf.version>
         <groovy.version>2.4.7</groovy.version>
@@ -323,6 +323,19 @@
             </plugins>
         </pluginManagement>
         <plugins>
+            <plugin>
+                <groupId>com.coveo</groupId>
+                <artifactId>fmt-maven-plugin</artifactId>
+                <version>1.8.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>

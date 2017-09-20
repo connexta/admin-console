@@ -1,14 +1,14 @@
 /**
  * Copyright (c) Codice Foundation
- * <p>
- * This is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser
- * General Public License as published by the Free Software Foundation, either version 3 of the
- * License, or any later version.
- * <p>
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details. A copy of the GNU Lesser General Public License
- * is distributed along with this program and can be found at
+ *
+ * <p>This is free software: you can redistribute it and/or modify it under the terms of the GNU
+ * Lesser General Public License as published by the Free Software Foundation, either version 3 of
+ * the License, or any later version.
+ *
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details. A copy of the GNU Lesser General Public
+ * License is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  */
 package org.codice.ddf.admin.sources.wfs;
@@ -18,16 +18,16 @@ import static org.codice.ddf.admin.common.report.message.DefaultMessages.unknown
 import static org.codice.ddf.admin.common.services.ServiceCommons.FLAG_PASSWORD;
 import static org.codice.ddf.admin.sources.utils.SourceUtilCommons.SOURCES_NAMESPACE_CONTEXT;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
-
 import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.api.report.Report;
 import org.codice.ddf.admin.common.PrioritizedBatchExecutor;
@@ -46,161 +46,152 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-
 public class WfsSourceUtils {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(WfsSourceUtils.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(WfsSourceUtils.class);
 
-    public static final Map<String, Object> GET_CAPABILITIES_PARAMS = ImmutableMap.of("service",
-            "WFS",
-            "request",
-            "GetCapabilities",
-            "AcceptVersions",
-            "2.0.0,1.0.0");
+  public static final Map<String, Object> GET_CAPABILITIES_PARAMS =
+      ImmutableMap.of(
+          "service", "WFS", "request", "GetCapabilities", "AcceptVersions", "2.0.0,1.0.0");
 
-    private static final List<List<String>> URL_FORMATS = ImmutableList.of(ImmutableList.of(
-            "https://%s:%d/services/wfs",
-            "https://%s:%d/wfs"),
-            ImmutableList.of("http://%s:%d/services/wfs", "http://%s:%d/wfs"));
+  private static final List<List<String>> URL_FORMATS =
+      ImmutableList.of(
+          ImmutableList.of("https://%s:%d/services/wfs", "https://%s:%d/wfs"),
+          ImmutableList.of("http://%s:%d/services/wfs", "http://%s:%d/wfs"));
 
-    private static final String WFS_VERSION_EXP = "/wfs:WFS_Capabilities/attribute::version";
+  private static final String WFS_VERSION_EXP = "/wfs:WFS_Capabilities/attribute::version";
 
-    private static final int THREAD_POOL_SIZE = 4;
+  private static final int THREAD_POOL_SIZE = 4;
 
-    private SourceUtilCommons sourceUtilCommons;
+  private SourceUtilCommons sourceUtilCommons;
 
-    private RequestUtils requestUtils;
+  private RequestUtils requestUtils;
 
-    public WfsSourceUtils(ConfiguratorSuite configuratorSuite) {
-        this.requestUtils = new RequestUtils();
-        this.sourceUtilCommons = new SourceUtilCommons(configuratorSuite);
+  public WfsSourceUtils(ConfiguratorSuite configuratorSuite) {
+    this.requestUtils = new RequestUtils();
+    this.sourceUtilCommons = new SourceUtilCommons(configuratorSuite);
+  }
+
+  /**
+   * Attempts to discover a WFS endpoint at a given hostname and port.
+   *
+   * <p>Possible Error Codes to be returned - {@link
+   * org.codice.ddf.admin.common.report.message.DefaultMessages#UNKNOWN_ENDPOINT}
+   *
+   * @param hostField address to probe for WFS capabilities
+   * @param creds optional username to add to Basic Auth header
+   * @return a {@link Report} containing the {@link WfsSourceConfigurationField} or an {@link
+   *     org.codice.ddf.admin.api.report.ErrorMessage} on failure.
+   */
+  public Report<WfsSourceConfigurationField> getWfsConfigFromHost(
+      HostField hostField, CredentialsField creds) {
+    List<List<SourceTaskCallable<WfsSourceConfigurationField>>> taskList = new ArrayList<>();
+
+    for (List<String> urlFormats : URL_FORMATS) {
+      List<SourceTaskCallable<WfsSourceConfigurationField>> callables =
+          urlFormats
+              .stream()
+              .map(
+                  urlFormat ->
+                      new SourceTaskCallable<>(
+                          urlFormat, hostField, creds, this::getWfsConfigFromUrl))
+              .collect(Collectors.toList());
+      taskList.add(callables);
     }
 
-    /**
-     * Attempts to discover a WFS endpoint at a given hostname and port.
-     * <p>
-     * Possible Error Codes to be returned
-     * - {@link org.codice.ddf.admin.common.report.message.DefaultMessages#UNKNOWN_ENDPOINT}
-     *
-     * @param hostField address to probe for WFS capabilities
-     * @param creds     optional username to add to Basic Auth header
-     * @return a {@link Report} containing the {@link WfsSourceConfigurationField} or an {@link org.codice.ddf.admin.api.report.ErrorMessage} on failure.
-     */
-    public Report<WfsSourceConfigurationField> getWfsConfigFromHost(
-            HostField hostField, CredentialsField creds) {
-        List<List<SourceTaskCallable<WfsSourceConfigurationField>>> taskList = new ArrayList<>();
+    PrioritizedBatchExecutor<
+            Report<WfsSourceConfigurationField>, Report<WfsSourceConfigurationField>>
+        prioritizedExecutor =
+            new PrioritizedBatchExecutor(
+                THREAD_POOL_SIZE, taskList, new SourceTaskHandler<WfsSourceConfigurationField>());
 
-        for (List<String> urlFormats : URL_FORMATS) {
-            List<SourceTaskCallable<WfsSourceConfigurationField>> callables = urlFormats.stream()
-                    .map(urlFormat -> new SourceTaskCallable<>(urlFormat,
-                            hostField,
-                            creds,
-                            this::getWfsConfigFromUrl))
-                    .collect(Collectors.toList());
-            taskList.add(callables);
-        }
+    Optional<Report<WfsSourceConfigurationField>> result = prioritizedExecutor.getFirst();
 
-        PrioritizedBatchExecutor<Report<WfsSourceConfigurationField>, Report<WfsSourceConfigurationField>>
-                prioritizedExecutor = new PrioritizedBatchExecutor(THREAD_POOL_SIZE,
-                taskList,
-                new SourceTaskHandler<WfsSourceConfigurationField>());
+    if (result.isPresent()) {
+      return result.get();
+    } else {
+      return Reports.from(unknownEndpointError(hostField.path()));
+    }
+  }
 
-        Optional<Report<WfsSourceConfigurationField>> result =
-                prioritizedExecutor.getFirst();
+  public Report<WfsSourceConfigurationField> getWfsConfigFromUrl(
+      UrlField urlField, CredentialsField creds) {
+    Report<ResponseField> responseResult =
+        requestUtils.sendGetRequest(urlField, creds, GET_CAPABILITIES_PARAMS);
 
-        if (result.isPresent()) {
-            return result.get();
-        } else {
-            return Reports.from(unknownEndpointError(hostField.path()));
-        }
+    if (responseResult.containsErrorMessages()) {
+      return Reports.from(responseResult.getErrorMessages());
     }
 
-    public Report<WfsSourceConfigurationField> getWfsConfigFromUrl(UrlField urlField,
-            CredentialsField creds) {
-        Report<ResponseField> responseResult = requestUtils.sendGetRequest(urlField,
-                creds,
-                GET_CAPABILITIES_PARAMS);
+    return getWfsConfigFromResult(responseResult.getResult(), creds);
+  }
 
-        if (responseResult.containsErrorMessages()) {
-            return Reports.from(responseResult.getErrorMessages());
-        }
+  /**
+   * Attempts to create a WFS configuration from the given WFS GetCapabilities response.
+   *
+   * <p>Possible Error Codes to be returned - {@link
+   * org.codice.ddf.admin.common.report.message.DefaultMessages#UNKNOWN_ENDPOINT}
+   *
+   * @param responseField WFS URL to probe for a configuration
+   * @param creds optional username to add to Basic Auth header used in the original request
+   * @return a {@link Report} containing the preferred {@link WfsSourceConfigurationField}, or
+   *     containing {@link org.codice.ddf.admin.api.report.ErrorMessage}s on failure.
+   */
+  private Report<WfsSourceConfigurationField> getWfsConfigFromResult(
+      ResponseField responseField, CredentialsField creds) {
 
-        return getWfsConfigFromResult(responseResult.getResult(), creds);
+    String responseBody = responseField.responseBody();
+    UrlField requestUrl = responseField.requestUrlField();
+
+    if (responseField.statusCode() != HTTP_OK || responseBody.length() < 1) {
+      return Reports.from(unknownEndpointError(responseField.requestUrlField().path()));
     }
 
-    /**
-     * Attempts to create a WFS configuration from the given WFS GetCapabilities response.
-     * <p>
-     * Possible Error Codes to be returned
-     * - {@link org.codice.ddf.admin.common.report.message.DefaultMessages#UNKNOWN_ENDPOINT}
-     *
-     * @param responseField WFS URL to probe for a configuration
-     * @param creds         optional username to add to Basic Auth header used in the original request
-     * @return a {@link Report} containing the preferred {@link WfsSourceConfigurationField}, or containing {@link org.codice.ddf.admin.api.report.ErrorMessage}s on failure.
-     */
-    private Report<WfsSourceConfigurationField> getWfsConfigFromResult(
-            ResponseField responseField, CredentialsField creds) {
-
-        String responseBody = responseField.responseBody();
-        UrlField requestUrl = responseField.requestUrlField();
-
-        if (responseField.statusCode() != HTTP_OK || responseBody.length() < 1) {
-            return Reports.from(unknownEndpointError(responseField.requestUrlField()
-                    .path()));
-        }
-
-        Document capabilitiesXml;
-        try {
-            capabilitiesXml = sourceUtilCommons.createDocument(responseBody);
-        } catch (Exception e) {
-            LOGGER.debug("Failed to read response from WFS endpoint.");
-            return Reports.from(unknownEndpointError(responseField.requestUrlField()
-                    .path()));
-        }
-
-        WfsSourceConfigurationField preferredConfig = new WfsSourceConfigurationField();
-        preferredConfig.endpointUrl(requestUrl.getValue())
-                .credentials()
-                .username(creds.username())
-                .password(FLAG_PASSWORD);
-
-        XPath xpath = XPathFactory.newInstance()
-                .newXPath();
-        xpath.setNamespaceContext(SOURCES_NAMESPACE_CONTEXT);
-        String wfsVersion;
-        try {
-            wfsVersion = xpath.compile(WFS_VERSION_EXP)
-                    .evaluate(capabilitiesXml);
-        } catch (XPathExpressionException e) {
-            LOGGER.debug("Failed to parse XML response.");
-            return Reports.from(unknownEndpointError(responseField.requestUrlField()
-                    .path()));
-        }
-
-        WfsVersion wfsVersionToCheck = new WfsVersion();
-        wfsVersionToCheck.isRequired(true);
-        wfsVersionToCheck.setValue(wfsVersion);
-        if(!wfsVersionToCheck.validate().isEmpty()) {
-            return Reports.from(unknownEndpointError(responseField.requestUrlField()
-                    .path()));
-        }
-
-        WfsSourceConfigurationField wfsSourceConfigurationField =
-                new WfsSourceConfigurationField().wfsVersion(wfsVersion);
-        wfsSourceConfigurationField.endpointUrl(requestUrl.getValue())
-                .credentials()
-                .username(creds.username())
-                .password(FLAG_PASSWORD);
-
-        return Reports.from(wfsSourceConfigurationField);
+    Document capabilitiesXml;
+    try {
+      capabilitiesXml = sourceUtilCommons.createDocument(responseBody);
+    } catch (Exception e) {
+      LOGGER.debug("Failed to read response from WFS endpoint.");
+      return Reports.from(unknownEndpointError(responseField.requestUrlField().path()));
     }
 
-    /**
-     * For testing purposes only. Groovy can access private methods
-     */
-    private void setRequestUtils(RequestUtils requestUtils) {
-        this.requestUtils = requestUtils;
+    WfsSourceConfigurationField preferredConfig = new WfsSourceConfigurationField();
+    preferredConfig
+        .endpointUrl(requestUrl.getValue())
+        .credentials()
+        .username(creds.username())
+        .password(FLAG_PASSWORD);
+
+    XPath xpath = XPathFactory.newInstance().newXPath();
+    xpath.setNamespaceContext(SOURCES_NAMESPACE_CONTEXT);
+    String wfsVersion;
+    try {
+      wfsVersion = xpath.compile(WFS_VERSION_EXP).evaluate(capabilitiesXml);
+    } catch (XPathExpressionException e) {
+      LOGGER.debug("Failed to parse XML response.");
+      return Reports.from(unknownEndpointError(responseField.requestUrlField().path()));
     }
+
+    WfsVersion wfsVersionToCheck = new WfsVersion();
+    wfsVersionToCheck.isRequired(true);
+    wfsVersionToCheck.setValue(wfsVersion);
+    if (!wfsVersionToCheck.validate().isEmpty()) {
+      return Reports.from(unknownEndpointError(responseField.requestUrlField().path()));
+    }
+
+    WfsSourceConfigurationField wfsSourceConfigurationField =
+        new WfsSourceConfigurationField().wfsVersion(wfsVersion);
+    wfsSourceConfigurationField
+        .endpointUrl(requestUrl.getValue())
+        .credentials()
+        .username(creds.username())
+        .password(FLAG_PASSWORD);
+
+    return Reports.from(wfsSourceConfigurationField);
+  }
+
+  /** For testing purposes only. Groovy can access private methods */
+  private void setRequestUtils(RequestUtils requestUtils) {
+    this.requestUtils = requestUtils;
+  }
 }

@@ -51,7 +51,6 @@ public class ResponseField extends BaseObjectField {
     responseBody = new StringField(RESPONSE_BODY_FIELD_NAME);
     requestUrl = new UrlField(REQUEST_URL_FIELD_NAME);
     contentType = new StringField(CONTENT_TYPE_FIELD_NAME);
-    updateInnerFieldPaths();
   }
 
   public ResponseField statusCode(Integer statusCode) {

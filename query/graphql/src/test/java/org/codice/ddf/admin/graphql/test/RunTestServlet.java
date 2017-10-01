@@ -27,10 +27,14 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
  */
 public class RunTestServlet {
 
+  public static final int TEST_SERVLET_PORT = 8994;
+
   public static void main(String[] args) throws Exception {
-    Server server = new Server(8994);
+    Server server = new Server(TEST_SERVLET_PORT);
     ServletContextHandler context = new ServletContextHandler(server, "/");
     context.addServlet(TestServlet.class, "/*");
+    System.out.println(
+        "Running servlet. Graphql endpoint at http://localhost:" + TEST_SERVLET_PORT + "/graphql");
     server.start();
   }
 

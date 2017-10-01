@@ -45,6 +45,7 @@ class LdapAttributeNameSpec extends Specification {
     def 'Invalid attribute names'() {
         setup:
         ldapAttributeName.setValue(attribute)
+        ldapAttributeName.setPath([LdapAttributeName.DEFAULT_FIELD_NAME])
 
         when:
         def errors = ldapAttributeName.validate()

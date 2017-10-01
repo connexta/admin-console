@@ -111,7 +111,7 @@ public class OpenSearchSourceUtils {
     if (result.isPresent()) {
       return result.get();
     } else {
-      return Reports.from(unknownEndpointError(hostField.path()));
+      return Reports.from(unknownEndpointError(hostField.getPath()));
     }
   }
 
@@ -145,7 +145,7 @@ public class OpenSearchSourceUtils {
     int statusCode = responseField.statusCode();
 
     if (statusCode != HTTP_OK || responseBody.length() < 1) {
-      return Reports.from(unknownEndpointError(responseField.requestUrlField().path()));
+      return Reports.from(unknownEndpointError(responseField.requestUrlField().getPath()));
     }
 
     Document capabilitiesXml;
@@ -153,7 +153,7 @@ public class OpenSearchSourceUtils {
       capabilitiesXml = sourceUtilCommons.createDocument(responseBody);
     } catch (Exception e) {
       LOGGER.debug("Failed to read response from OpenSearch endpoint.");
-      return Reports.from(unknownEndpointError(responseField.requestUrlField().path()));
+      return Reports.from(unknownEndpointError(responseField.requestUrlField().getPath()));
     }
 
     XPath xpath = XPathFactory.newInstance().newXPath();
@@ -171,11 +171,11 @@ public class OpenSearchSourceUtils {
 
         return Reports.from(config);
       } else {
-        return Reports.from(unknownEndpointError(responseField.requestUrlField().path()));
+        return Reports.from(unknownEndpointError(responseField.requestUrlField().getPath()));
       }
     } catch (XPathExpressionException e) {
       LOGGER.debug("Failed to compile OpenSearch totalResults XPath.");
-      return Reports.from(unknownEndpointError(responseField.requestUrlField().path()));
+      return Reports.from(unknownEndpointError(responseField.requestUrlField().getPath()));
     }
   }
 

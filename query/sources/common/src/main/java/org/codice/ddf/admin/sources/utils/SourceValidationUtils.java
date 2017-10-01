@@ -64,7 +64,7 @@ public class SourceValidationUtils {
         sources.stream().map(Describable::getId).anyMatch(id -> id.equals(sourceName.getValue()));
 
     if (matchFound) {
-      return Reports.from(SourceMessages.duplicateSourceNameError(sourceName.path()));
+      return Reports.from(SourceMessages.duplicateSourceNameError(sourceName.getPath()));
     }
     return Reports.emptyReport();
   }

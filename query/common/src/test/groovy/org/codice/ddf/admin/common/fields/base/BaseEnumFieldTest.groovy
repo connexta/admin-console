@@ -24,6 +24,7 @@ class BaseEnumFieldTest extends Specification {
 
     def setup() {
         enumField = new TestEnumField()
+        enumField.setPath([TestEnumField.DEFAULT_FIELD_NAME])
     }
 
     def 'Validation success'() {

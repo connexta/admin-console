@@ -24,6 +24,8 @@ import org.codice.ddf.internal.admin.configurator.actions.ServiceActions
 
 class DeleteWfsConfigurationSpec extends SourceCommonsSpec {
 
+    static final List<Object> FUNCTION_PATH = [DeleteWfsConfiguration.FIELD_NAME]
+
     DeleteWfsConfiguration deleteWfsConfiguration
 
     ConfiguratorFactory configuratorFactory
@@ -36,7 +38,7 @@ class DeleteWfsConfigurationSpec extends SourceCommonsSpec {
 
     static RESULT_ARGUMENT_PATH = [DeleteWfsConfiguration.FIELD_NAME]
 
-    static BASE_PATH = [RESULT_ARGUMENT_PATH, FunctionField.ARGUMENT].flatten()
+    static BASE_PATH = [RESULT_ARGUMENT_PATH].flatten()
 
     static PID_PATH = [BASE_PATH, PID].flatten()
 
@@ -63,10 +65,9 @@ class DeleteWfsConfigurationSpec extends SourceCommonsSpec {
         setup:
         serviceActions.read(S_PID) >> configToBeDeleted
         configurator.commit(_, _) >> mockReport(false)
-        deleteWfsConfiguration.setArguments(functionArgs)
 
         when:
-        def report = deleteWfsConfiguration.execute()
+        def report = deleteWfsConfiguration.execute(functionArgs, FUNCTION_PATH)
 
         then:
         report.getResult() != null
@@ -76,10 +77,9 @@ class DeleteWfsConfigurationSpec extends SourceCommonsSpec {
     def 'Fail to discover WFS config when no existing config found with provided pid'() {
         setup:
         serviceActions.read(S_PID) >> [:]
-        deleteWfsConfiguration.setArguments(functionArgs)
 
         when:
-        def report = deleteWfsConfiguration.execute()
+        def report = deleteWfsConfiguration.execute(functionArgs, FUNCTION_PATH)
 
         then:
         report.getResult() == null
@@ -92,8 +92,7 @@ class DeleteWfsConfigurationSpec extends SourceCommonsSpec {
         when:
         serviceActions.read(S_PID) >> configToBeDeleted
         configurator.commit(_, _) >> mockReport(true)
-        deleteWfsConfiguration.setArguments(functionArgs)
-        def report = deleteWfsConfiguration.execute()
+        def report = deleteWfsConfiguration.execute(functionArgs, FUNCTION_PATH)
 
         then:
         !report.getResult().getValue()
@@ -104,7 +103,7 @@ class DeleteWfsConfigurationSpec extends SourceCommonsSpec {
 
     def 'Fail when missing required fields'() {
         when:
-        def report = deleteWfsConfiguration.execute()
+        def report = deleteWfsConfiguration.execute(null, FUNCTION_PATH)
 
         then:
         report.getResult() == null
@@ -119,17 +118,15 @@ class DeleteWfsConfigurationSpec extends SourceCommonsSpec {
         setup:
         DeleteWfsConfiguration deleteWfsNoExistingConfig = new DeleteWfsConfiguration(configuratorSuite)
         serviceActions.read(S_PID) >> [:]
-        deleteWfsNoExistingConfig.setArguments(functionArgs)
 
         DeleteWfsConfiguration deleteWfsFailPersist = new DeleteWfsConfiguration(configuratorSuite)
         serviceActions.read(S_PID) >> configToBeDeleted
         configurator.commit(_, _) >> mockReport(true)
-        deleteWfsFailPersist.setArguments(functionArgs)
 
         when:
         def errorCodes = deleteWfsConfiguration.getFunctionErrorCodes()
-        def noExistingConfigReport = deleteWfsNoExistingConfig.execute()
-        def failedPersistReport = deleteWfsFailPersist.execute()
+        def noExistingConfigReport = deleteWfsNoExistingConfig.execute(functionArgs, FUNCTION_PATH)
+        def failedPersistReport = deleteWfsFailPersist.execute(functionArgs, FUNCTION_PATH)
 
         then:
         errorCodes.size() == 2

@@ -78,7 +78,6 @@ public class TestObjectField extends BaseObjectField {
     enumField = new TestEnumField();
     innerTestObjectField = new InnerTestObjectField();
     hiddenField = new TestHiddenField();
-    updateInnerFieldPaths();
   }
 
   public IntegerField getIntegerField() {
@@ -204,7 +203,6 @@ public class TestObjectField extends BaseObjectField {
       super(fieldName, fieldTypeName, description);
       subFieldOfInnerField = new StringField(SUB_FIELD_OF_INNER_FIELD_NAME);
       subHiddenField = new TestHiddenField();
-      updateInnerFieldPaths();
     }
 
     public InnerTestObjectField setSubField(String value) {

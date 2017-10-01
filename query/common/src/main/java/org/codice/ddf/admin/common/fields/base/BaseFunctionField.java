@@ -38,20 +38,17 @@ public abstract class BaseFunctionField<T extends Field> implements FunctionFiel
 
   private String description;
 
-  private List<String> subpath;
-
-  private String pathName;
+  private List<Object> path;
 
   public BaseFunctionField(String name, String description) {
     this.name = name;
     this.description = description;
-    pathName = name;
-    subpath = new ArrayList<>();
+    path = new ArrayList<>();
     report = new FunctionReportImpl<>();
   }
 
   @Override
-  public String getName() {
+  public String getFunctionName() {
     return name;
   }
 
@@ -81,20 +78,21 @@ public abstract class BaseFunctionField<T extends Field> implements FunctionFiel
         .build();
   }
 
-  @Override
-  public void setArguments(Map<String, Object> args) {
+  protected void setArguments(Map<String, Object> args) {
     if (args == null || args.isEmpty()) {
       return;
     }
 
     getArguments()
         .stream()
-        .filter(field -> args.containsKey(field.getName()))
-        .forEach(field -> field.setValue(args.get(field.getName())));
+        .filter(field -> args.containsKey(field.getFieldName()))
+        .forEach(field -> field.setValue(args.get(field.getFieldName())));
   }
 
   @Override
-  public FunctionReport<T> execute() {
+  public FunctionReport<T> execute(Map<String, Object> args, List<Object> functionPath) {
+    setArguments(args);
+    setPath(functionPath);
     validate();
     if (!report.containsErrorMessages()) {
       report.setResult(performFunction());
@@ -104,26 +102,24 @@ public abstract class BaseFunctionField<T extends Field> implements FunctionFiel
   }
 
   @Override
-  public List<String> path() {
-    return new ImmutableList.Builder().addAll(subpath).add(pathName).build();
+  public List<Object> getPath() {
+    return new ImmutableList.Builder<>().addAll(path).build();
   }
 
-  @Override
-  public void pathName(String pathName) {
-    this.pathName = pathName;
-    updateArgumentPaths();
-  }
-
-  @Override
-  public void updatePath(List<String> subPath) {
-    subpath.clear();
-    subpath.addAll(subPath);
-    updateArgumentPaths();
-  }
-
-  public void updateArgumentPaths() {
-    List<String> argPath = new ImmutableList.Builder<String>().addAll(path()).add(ARGUMENT).build();
-    getArguments().forEach(arg -> arg.updatePath(argPath));
+  protected void setPath(List<Object> path) {
+    if (path == null) {
+      return;
+    }
+    this.path.clear();
+    this.path.addAll(path);
+    getArguments()
+        .forEach(
+            arg ->
+                arg.setPath(
+                    new ImmutableList.Builder<>()
+                        .addAll(getPath())
+                        .add(arg.getFieldName())
+                        .build()));
   }
 
   public void validate() {
@@ -146,7 +142,7 @@ public abstract class BaseFunctionField<T extends Field> implements FunctionFiel
   protected BaseFunctionField addErrorMessage(ErrorMessage msg) {
     ErrorMessage message = new ErrorMessageImpl(msg.getCode(), msg.getPath());
     if (message.getPath().isEmpty()) {
-      message.setPath(path());
+      message.setPath(getPath());
     }
 
     report.addErrorMessage(message);

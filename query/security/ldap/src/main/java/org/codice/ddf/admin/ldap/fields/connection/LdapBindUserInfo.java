@@ -41,7 +41,6 @@ public class LdapBindUserInfo extends BaseObjectField {
     creds = new CredentialsField();
     bindMethod = new LdapBindMethod();
     realm = new LdapRealm();
-    updateInnerFieldPaths();
   }
 
   public LdapBindUserInfo useDefaultRequired() {

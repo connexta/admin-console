@@ -46,7 +46,6 @@ public class DeleteOpenSearchConfiguration extends BaseFunctionField<BooleanFiel
 
     pid = new PidField();
     pid.isRequired(true);
-    updateArgumentPaths();
 
     serviceCommons = new ServiceCommons(configuratorSuite);
   }

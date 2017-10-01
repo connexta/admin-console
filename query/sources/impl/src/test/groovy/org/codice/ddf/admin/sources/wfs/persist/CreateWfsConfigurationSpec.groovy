@@ -15,7 +15,6 @@ package org.codice.ddf.admin.sources.wfs.persist
 
 import ddf.catalog.source.FederatedSource
 import org.codice.ddf.admin.api.ConfiguratorSuite
-import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.configurator.Configurator
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
@@ -31,9 +30,11 @@ import org.junit.Ignore
 
 class CreateWfsConfigurationSpec extends SourceCommonsSpec {
 
+    static final List<Object> FUNCTION_PATH = [CreateWfsConfiguration.FIELD_NAME]
+
     static RESULT_ARGUMENT_PATH = [CreateWfsConfiguration.FIELD_NAME]
 
-    static BASE_PATH = [RESULT_ARGUMENT_PATH, FunctionField.ARGUMENT].flatten()
+    static BASE_PATH = [RESULT_ARGUMENT_PATH].flatten()
 
     static CONFIG_PATH = [BASE_PATH, WfsSourceConfigurationField.DEFAULT_FIELD_NAME].flatten()
 
@@ -92,12 +93,11 @@ class CreateWfsConfigurationSpec extends SourceCommonsSpec {
 
     def 'Successfully create new WFS configuration'() {
         setup:
-        createWfsConfiguration.setArguments(createWfsArgs())
         serviceReader.getServices(_, _) >> []
         configurator.commit(_, _) >> mockReport(false)
 
         when:
-        def report = createWfsConfiguration.execute()
+        def report = createWfsConfiguration.execute(createWfsArgs(), FUNCTION_PATH)
 
         then:
         report.getResult() != null
@@ -106,11 +106,10 @@ class CreateWfsConfigurationSpec extends SourceCommonsSpec {
 
     def 'Fail to create new WFS config due to duplicate source name'() {
         setup:
-        createWfsConfiguration.setArguments(createWfsArgs())
         serviceReader.getServices(_, _) >> federatedSources
 
         when:
-        def report = createWfsConfiguration.execute()
+        def report = createWfsConfiguration.execute(createWfsArgs(), FUNCTION_PATH)
 
         then:
         report.getResult() == null
@@ -121,11 +120,10 @@ class CreateWfsConfigurationSpec extends SourceCommonsSpec {
 
     def 'Fail to create new WFS config due to failure to commit'() {
         setup:
-        createWfsConfiguration.setArguments(createWfsArgs())
         serviceReader.getServices(_, _) >> []
 
         when:
-        def report = createWfsConfiguration.execute()
+        def report = createWfsConfiguration.execute(createWfsArgs(), FUNCTION_PATH)
 
         then:
         configurator.commit(_, _) >> mockReport(true)
@@ -139,9 +137,8 @@ class CreateWfsConfigurationSpec extends SourceCommonsSpec {
     // TODO: 8/23/17 phuffer - Remove ignore when feature starts correctly
     def 'Return false when wfs feature fails to start'() {
         when:
-        createWfsConfiguration.setArguments(createWfsArgs())
         serviceReader.getServices(_, _) >> []
-        def report = createWfsConfiguration.execute()
+        def report = createWfsConfiguration.execute(createWfsArgs(), FUNCTION_PATH)
 
         then:
         1 * configurator.commit(_, _) >> mockReport(true)
@@ -153,7 +150,7 @@ class CreateWfsConfigurationSpec extends SourceCommonsSpec {
 
     def 'Fail due to missing required fields'() {
         when:
-        def report = createWfsConfiguration.execute()
+        def report = createWfsConfiguration.execute(null, FUNCTION_PATH)
 
         then:
         report.getResult() == null
@@ -167,17 +164,15 @@ class CreateWfsConfigurationSpec extends SourceCommonsSpec {
     def 'Returns all the possible error codes correctly'(){
         setup:
         CreateWfsConfiguration createDuplicateNameConfig = new CreateWfsConfiguration(configuratorSuite)
-        createDuplicateNameConfig.setArguments(createWfsArgs())
         serviceReader.getServices(_, _) >> federatedSources
 
         CreateWfsConfiguration createFailPersistConfig = new CreateWfsConfiguration(configuratorSuite)
-        createFailPersistConfig.setArguments(createWfsArgs())
         serviceReader.getServices(_, _) >> []
 
         when:
         def errorCodes = createWfsConfiguration.getFunctionErrorCodes()
-        def duplicateNameReport = createDuplicateNameConfig.execute()
-        def createFailPersistReport = createFailPersistConfig.execute()
+        def duplicateNameReport = createDuplicateNameConfig.execute(createWfsArgs(), FUNCTION_PATH)
+        def createFailPersistReport = createFailPersistConfig.execute(createWfsArgs(), FUNCTION_PATH)
 
         then:
         errorCodes.size() == 2

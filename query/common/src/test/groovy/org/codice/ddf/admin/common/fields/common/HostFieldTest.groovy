@@ -26,6 +26,7 @@ class HostFieldTest extends Specification {
 
     def setup() {
         hostField = new HostField()
+        hostField.setPath([HostField.DEFAULT_FIELD_NAME])
     }
 
     def 'Fail validation when missing required fields'() {

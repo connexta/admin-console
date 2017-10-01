@@ -13,6 +13,7 @@ import static groovy.org.codice.ddf.admin.security.wcpm.persist.WcpmTestingCommo
 
 class GetRealmsSpec extends Specification {
 
+    static final List<Object> FUNCTION_PATH = [GetRealms.FIELD_NAME]
     ServiceReader serviceReader
     RealmTypesPoller realmTypesPoller
     GetRealms getRealms
@@ -27,7 +28,7 @@ class GetRealmsSpec extends Specification {
 
     def 'Successfully retrieves realms from realm value poller'() {
         when:
-        Report report = getRealms.execute()
+        Report report = getRealms.execute(null, FUNCTION_PATH)
 
         then:
         report.getErrorMessages().isEmpty()

@@ -58,7 +58,7 @@ public class UrlField extends StringField {
       try {
         new URI(getValue()).toURL();
       } catch (URISyntaxException | MalformedURLException | IllegalArgumentException e) {
-        validationMsgs.add(invalidUrlError(path()));
+        validationMsgs.add(invalidUrlError(getPath()));
       }
     }
     return validationMsgs;

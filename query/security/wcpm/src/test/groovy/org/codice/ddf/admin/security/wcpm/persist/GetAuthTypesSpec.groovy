@@ -12,6 +12,7 @@ import static groovy.org.codice.ddf.admin.security.wcpm.persist.WcpmTestingCommo
 
 class GetAuthTypesSpec extends Specification {
 
+    static final List<Object> FUNCTION_PATH = [GetAuthTypes.FIELD_NAME]
     ServiceReader serviceReader
     AuthTypesPoller authTypesPoller
     GetAuthTypes getAuthTypes
@@ -26,7 +27,7 @@ class GetAuthTypesSpec extends Specification {
 
     def 'Successfully retrieve auth type definitions from the auth type poller'() {
         when:
-        Report report = getAuthTypes.execute()
+        Report report = getAuthTypes.execute(null, FUNCTION_PATH)
 
         then:
         report.getErrorMessages().isEmpty()

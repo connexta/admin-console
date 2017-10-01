@@ -57,7 +57,6 @@ public class UpdateWfsConfiguration extends BaseFunctionField<BooleanField> {
     config = new WfsSourceConfigurationField();
     config.useDefaultRequired();
     config.pidField().isRequired(true);
-    updateArgumentPaths();
 
     sourceValidationUtils = new SourceValidationUtils(configuratorSuite);
     serviceCommons = new ServiceCommons(configuratorSuite);

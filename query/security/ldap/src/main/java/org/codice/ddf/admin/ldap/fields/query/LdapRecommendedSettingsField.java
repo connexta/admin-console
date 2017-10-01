@@ -68,7 +68,6 @@ public class LdapRecommendedSettingsField extends BaseObjectField {
     memberAttributesReferencedInGroup =
         new StringField.ListImpl(MEMBER_ATTRIBUTES_REFERENCED_IN_GROUP);
     queryBases = new LdapDistinguishedName.ListImpl(QUERY_BASES);
-    updateInnerFieldPaths();
   }
 
   // Field getters

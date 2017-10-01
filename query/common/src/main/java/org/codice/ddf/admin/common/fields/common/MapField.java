@@ -42,7 +42,6 @@ public class MapField extends BaseObjectField {
   public MapField() {
     super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
     entries = new PairField.ListImpl();
-    updateInnerFieldPaths();
   }
 
   @Override
@@ -96,7 +95,7 @@ public class MapField extends BaseObjectField {
               .collect(Collectors.toList());
 
       if (duplicatePairs.size() > 1) {
-        validationMsgs.add(duplicateMapKeyError(duplicatePairs.get(1).path()));
+        validationMsgs.add(duplicateMapKeyError(duplicatePairs.get(1).getPath()));
         break;
       }
     }

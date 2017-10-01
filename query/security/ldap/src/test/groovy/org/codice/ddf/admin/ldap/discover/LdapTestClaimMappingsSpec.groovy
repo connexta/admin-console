@@ -42,6 +42,7 @@ import static org.codice.ddf.admin.ldap.LdapTestingCommons.*
 import static org.codice.ddf.admin.ldap.fields.config.LdapConfigurationField.CLAIMS_MAPPING
 
 class LdapTestClaimMappingsSpec extends Specification {
+    static final List<Object> FUNCTION_PATH = [LdapTestClaimMappings.FIELD_NAME]
     static TestLdapServer server
     LdapTestClaimMappings action
     ServiceActions serviceActions
@@ -87,7 +88,7 @@ class LdapTestClaimMappingsSpec extends Specification {
         claimMappings = new ClaimsMapEntry.ListImpl()
 
         // Initialize bad paths
-        baseMsg = [LdapTestClaimMappings.FIELD_NAME, FunctionField.ARGUMENT]
+        baseMsg = [LdapTestClaimMappings.FIELD_NAME]
         badPaths = [badOrMissingUserNameAttrPath: baseMsg + [LdapDirectorySettingsField.USER_NAME_ATTRIBUTE],
                     missingUserPath             : baseMsg + [LdapDirectorySettingsField.BASE_USER_DN],
                     missingHostPath             : baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME, HostnameField.DEFAULT_FIELD_NAME],
@@ -108,7 +109,7 @@ class LdapTestClaimMappingsSpec extends Specification {
         setup:
 
         when:
-        FunctionReport report = action.execute()
+        FunctionReport report = action.execute(null, FUNCTION_PATH)
 
         then:
         report.getErrorMessages().size() == badPaths.size()
@@ -128,10 +129,9 @@ class LdapTestClaimMappingsSpec extends Specification {
                 (LdapTestClaimMappings.USER_NAME_ATTRIBUTE): userAttribute.getValue(),
                 (LdapTestClaimMappings.BASE_USER_DN)       : baseDn.getValue(),
                 (CLAIMS_MAPPING)                           : createClaimsMapping(ImmutableMap.of("claim1", "cn")).getValue()]
-        action.setArguments(args)
 
         when:
-        FunctionReport report = action.execute()
+        FunctionReport report = action.execute(args, FUNCTION_PATH)
 
         then:
         report.getErrorMessages().size() == 1
@@ -151,10 +151,8 @@ class LdapTestClaimMappingsSpec extends Specification {
                 (LdapTestClaimMappings.BASE_USER_DN)       : baseDn.getValue(),
                 (CLAIMS_MAPPING)                           : createClaimsMapping(ImmutableMap.of("claim1", "cn")).getValue()]
 
-        action.setArguments(args)
-
         when:
-        FunctionReport report = action.execute()
+        FunctionReport report = action.execute(args, FUNCTION_PATH)
 
         then:
         report.getErrorMessages().size() == 1
@@ -172,10 +170,8 @@ class LdapTestClaimMappingsSpec extends Specification {
                 (LdapTestClaimMappings.BASE_USER_DN)       : baseDn.getValue(),
                 (CLAIMS_MAPPING)                           : createClaimsMapping(ImmutableMap.of("claim1", "cn")).getValue()]
 
-        action.setArguments(args)
-
         when:
-        FunctionReport report = action.execute()
+        FunctionReport report = action.execute(args, FUNCTION_PATH)
 
         then:
         report.getErrorMessages().size() == 1
@@ -194,10 +190,8 @@ class LdapTestClaimMappingsSpec extends Specification {
                 (LdapTestClaimMappings.BASE_USER_DN)       : baseDn.getValue(),
                 (CLAIMS_MAPPING)                           : createClaimsMapping(ImmutableMap.of("claim1", "cn")).getValue()]
 
-        action.setArguments(args)
-
         when:
-        FunctionReport report = action.execute()
+        FunctionReport report = action.execute(args, FUNCTION_PATH)
 
         then:
         report.getErrorMessages().size() == 1
@@ -210,8 +204,8 @@ class LdapTestClaimMappingsSpec extends Specification {
 
     def 'fail when bad sts claim keys are supplied for mapping'() {
         setup:
-        def failedPaths = [badPaths.badClaimMappingPath + '0' + ClaimsMapEntry.KEY_FIELD_NAME,
-                           badPaths.badClaimMappingPath + '1' + ClaimsMapEntry.KEY_FIELD_NAME] as Set
+        def failedPaths = [badPaths.badClaimMappingPath + 0 + ClaimsMapEntry.KEY_FIELD_NAME,
+                           badPaths.badClaimMappingPath + 1 + ClaimsMapEntry.KEY_FIELD_NAME] as Set
 
         def claimsMapping = createClaimsMapping(ImmutableMap.of("badclaim1", "cn",
                 "badclaim2", "employeetype",
@@ -222,10 +216,8 @@ class LdapTestClaimMappingsSpec extends Specification {
                 (LdapTestClaimMappings.BASE_USER_DN)       : baseDn.getValue(),
                 (CLAIMS_MAPPING)                           : claimsMapping.getValue()]
 
-        action.setArguments(args)
-
         when:
-        FunctionReport report = action.execute()
+        FunctionReport report = action.execute(args, FUNCTION_PATH)
 
         then:
         report.getErrorMessages().size() == 2
@@ -238,8 +230,8 @@ class LdapTestClaimMappingsSpec extends Specification {
 
     def 'fail when missing user attributes are supplied for mapping'() {
         setup:
-        def failedPaths = [badPaths.badClaimMappingPath + '0' + ClaimsMapEntry.VALUE_FIELD_NAME,
-                           badPaths.badClaimMappingPath + '2' + ClaimsMapEntry.VALUE_FIELD_NAME] as Set
+        def failedPaths = [badPaths.badClaimMappingPath + 0 + ClaimsMapEntry.VALUE_FIELD_NAME,
+                           badPaths.badClaimMappingPath + 2 + ClaimsMapEntry.VALUE_FIELD_NAME] as Set
 
         def claimsMapping = createClaimsMapping(ImmutableMap.of("claim1", "XXX",
                 "claim2", "cn",
@@ -251,10 +243,8 @@ class LdapTestClaimMappingsSpec extends Specification {
                 (LdapTestClaimMappings.BASE_USER_DN)       : baseDn.getValue(),
                 (CLAIMS_MAPPING)                           : claimsMapping.getValue()]
 
-        action.setArguments(args)
-
         when:
-        FunctionReport report = action.execute()
+        FunctionReport report = action.execute(args, FUNCTION_PATH)
 
         then:
         report.getErrorMessages().size() == 2
@@ -268,9 +258,9 @@ class LdapTestClaimMappingsSpec extends Specification {
 
     def 'fail when claimsMapping value formats are incorrect'() {
         setup:
-        def failedPaths = [badPaths.badClaimMappingPath + '0' + ClaimsMapEntry.VALUE_FIELD_NAME,
-                           badPaths.badClaimMappingPath + '2' + ClaimsMapEntry.VALUE_FIELD_NAME,
-                           badPaths.badClaimMappingPath + '3' + ClaimsMapEntry.VALUE_FIELD_NAME] as Set
+        def failedPaths = [badPaths.badClaimMappingPath + 0 + ClaimsMapEntry.VALUE_FIELD_NAME,
+                           badPaths.badClaimMappingPath + 2 + ClaimsMapEntry.VALUE_FIELD_NAME,
+                           badPaths.badClaimMappingPath + 3 + ClaimsMapEntry.VALUE_FIELD_NAME] as Set
 
         def claimsMapping = createClaimsMapping(ImmutableMap.of("claim1", "space in between",
                 "claim2", "correct-format",
@@ -284,10 +274,8 @@ class LdapTestClaimMappingsSpec extends Specification {
                 (LdapTestClaimMappings.BASE_USER_DN)       : baseDn.getValue(),
                 (CLAIMS_MAPPING)                           : claimsMapping.getValue()]
 
-        action.setArguments(args)
-
         when:
-        FunctionReport report = action.execute()
+        FunctionReport report = action.execute(args, FUNCTION_PATH)
 
         then:
         report.getErrorMessages().size() == 3
@@ -314,10 +302,8 @@ class LdapTestClaimMappingsSpec extends Specification {
                 (LdapTestClaimMappings.BASE_USER_DN)       : baseDn.getValue(),
                 (CLAIMS_MAPPING)                           : claimsMapping.getValue()]
 
-        action.setArguments(args)
-
         when:
-        FunctionReport report = action.execute()
+        FunctionReport report = action.execute(args, FUNCTION_PATH)
 
         then:
         report.getErrorMessages().size() == 1
@@ -340,11 +326,10 @@ class LdapTestClaimMappingsSpec extends Specification {
                 (LdapTestClaimMappings.BASE_USER_DN)       : baseDn.getValue(),
                 (CLAIMS_MAPPING)                           : claimsMapping.getValue()]
 
-        action.setArguments(args)
         action.setTestingUtils(utilsMock)
 
         when:
-        FunctionReport report = action.execute()
+        FunctionReport report = action.execute(args, FUNCTION_PATH)
         ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().getResult().isClosed()
 
         then:

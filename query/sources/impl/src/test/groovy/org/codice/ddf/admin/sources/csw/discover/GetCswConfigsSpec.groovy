@@ -15,7 +15,6 @@ package org.codice.ddf.admin.sources.csw.discover
 
 import org.codice.ddf.admin.api.ConfiguratorSuite
 import org.codice.ddf.admin.api.Field
-import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.api.fields.ListField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
@@ -29,6 +28,8 @@ import org.codice.ddf.internal.admin.configurator.actions.ServiceReader
 
 class GetCswConfigsSpec extends SourceCommonsSpec {
 
+    static final List<Object> FUNCTION_PATH = [GetCswConfigurations.FIELD_NAME]
+
     static EVENT_SERVICE_ADDRESS = 'eventServiceAddress'
 
     static TEST_URL = "testCswUrl"
@@ -37,7 +38,7 @@ class GetCswConfigsSpec extends SourceCommonsSpec {
 
     static TEST_FACTORY_PID = CswServiceProperties.CSW_PROFILE_FACTORY_PID
 
-    static BASE_PATH = [GetCswConfigurations.FIELD_NAME, FunctionField.ARGUMENT]
+    static BASE_PATH = [GetCswConfigurations.FIELD_NAME]
 
     GetCswConfigurations getCswConfigsFunction
 
@@ -51,7 +52,7 @@ class GetCswConfigsSpec extends SourceCommonsSpec {
 
     ConfiguratorSuite configuratorSuite
 
-    def functionArgs = [
+    def args = [
             (PID): S_PID_2
     ]
 
@@ -74,7 +75,7 @@ class GetCswConfigsSpec extends SourceCommonsSpec {
 
     def 'No pid argument returns all configs'() {
         when:
-        def report = getCswConfigsFunction.execute()
+        def report = getCswConfigsFunction.execute(null, FUNCTION_PATH)
         def list = ((ListField) report.getResult())
 
         then:
@@ -84,14 +85,13 @@ class GetCswConfigsSpec extends SourceCommonsSpec {
         2 * serviceReader.getServices(_, _) >> [new TestSource(S_PID_2, false)]
         report.getResult() != null
         list.getList().size() == 2
-        assertConfig(list.getList().get(0), 0, managedServiceConfigs.get(S_PID_1), SOURCE_ID_1, S_PID_1, true)
-        assertConfig(list.getList().get(1), 1, managedServiceConfigs.get(S_PID_2), SOURCE_ID_2, S_PID_2, false)
+        assertConfig(list.getList().get(0), managedServiceConfigs.get(S_PID_1), SOURCE_ID_1, S_PID_1, true)
+        assertConfig(list.getList().get(1), managedServiceConfigs.get(S_PID_2), SOURCE_ID_2, S_PID_2, false)
     }
 
     def 'Sending pid filter returns 1 result'() {
         when:
-        getCswConfigsFunction.setArguments(functionArgs)
-        def report = getCswConfigsFunction.execute()
+        def report = getCswConfigsFunction.execute(args, FUNCTION_PATH)
         def list = ((ListField) report.getResult())
 
         then:
@@ -100,17 +100,16 @@ class GetCswConfigsSpec extends SourceCommonsSpec {
         serviceActions.read(S_PID_2) >> managedServiceConfigs.get(S_PID_2)
         report.getResult() != null
         list.getList().size() == 1
-        assertConfig(list.getList().get(0), 0, managedServiceConfigs.get(S_PID_2), SOURCE_ID_2, S_PID_2, false)
+        assertConfig(list.getList().get(0), managedServiceConfigs.get(S_PID_2), SOURCE_ID_2, S_PID_2, false)
     }
 
     def 'Fail when there is no existing configuration for the service specified by the pid'() {
         setup:
-        functionArgs.put(PID, S_PID)
-        getCswConfigsFunction.setArguments(functionArgs)
+        args.put(PID, S_PID)
         serviceActions.read(S_PID) >> [:]
 
         when:
-        def report = getCswConfigsFunction.execute()
+        def report = getCswConfigsFunction.execute(args, FUNCTION_PATH)
 
         then:
         report.getResult() == null
@@ -119,9 +118,8 @@ class GetCswConfigsSpec extends SourceCommonsSpec {
         report.getErrorMessages().get(0).path == [GetCswConfigurations.FIELD_NAME]
     }
 
-    def assertConfig(Field field, int index, Map<String, Object> properties, String sourceName, String pid, boolean availability) {
+    def assertConfig(Field field, Map<String, Object> properties, String sourceName, String pid, boolean availability) {
         def sourceInfo = (CswSourceInfoField) field
-        assert sourceInfo.path()[-1] == index.toString()
         assert sourceInfo.isAvailable() == availability
         assert sourceInfo.config().endpointUrl() == properties.get(CswServiceProperties.CSW_URL)
         assert sourceInfo.config().credentials().password() == FLAG_PASSWORD
@@ -146,13 +144,12 @@ class GetCswConfigsSpec extends SourceCommonsSpec {
     def 'Returns all the possible error codes correctly'(){
         setup:
         GetCswConfigurations noExistingConfigFunc = new GetCswConfigurations(configuratorSuite)
-        functionArgs.put(PID, S_PID)
-        noExistingConfigFunc.setArguments(functionArgs)
+        args.put(PID, S_PID)
         serviceActions.read(S_PID) >> [:]
 
         when:
         def errorCodes = getCswConfigsFunction.getFunctionErrorCodes()
-        def noExistingConfigReport = noExistingConfigFunc.execute()
+        def noExistingConfigReport = noExistingConfigFunc.execute(args, FUNCTION_PATH)
 
         then:
         errorCodes.size() == 1

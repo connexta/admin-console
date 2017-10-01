@@ -91,7 +91,6 @@ public class TestFieldProvider extends BaseFieldProvider {
     multiArgFunc = new MultiArgFunction();
     reqArgFunc = new RequiredArgsFunction();
     sampleMutation = new SampleMutation();
-    updateInnerFieldPaths();
   }
 
   @Override
@@ -285,7 +284,6 @@ public class TestFieldProvider extends BaseFieldProvider {
       super(REQUIRED_ARG_FUNCTION_NAME, "Returns the object passed as an argument");
       objArg = new TestObjectField();
       allFieldsRequired(true);
-      updateArgumentPaths();
     }
 
     /** Updating all field's requirement */
@@ -355,7 +353,6 @@ public class TestFieldProvider extends BaseFieldProvider {
       booleanArg = new BooleanField();
       listArg = new StringField.ListImpl(LIST_FIELD_NAME);
       enumArg = new TestEnumField();
-      updateArgumentPaths();
     }
 
     @Override
@@ -396,7 +393,6 @@ public class TestFieldProvider extends BaseFieldProvider {
     public PathField() {
       super(PATH_1, "Path", "Sample path");
       subPath = new PathField2();
-      updateInnerFieldPaths();
     }
 
     @Override
@@ -412,7 +408,6 @@ public class TestFieldProvider extends BaseFieldProvider {
     public PathField2() {
       super(PATH_2, "Path2", "Sample path");
       subPath = new PathField3();
-      updateInnerFieldPaths();
     }
 
     @Override
@@ -428,7 +423,6 @@ public class TestFieldProvider extends BaseFieldProvider {
     public PathField3() {
       super(PATH_3, "Path3", "Sample path");
       returnErrorsFunction = new ReturnErrorsFunction();
-      updateInnerFieldPaths();
     }
 
     @Override
@@ -453,7 +447,6 @@ public class TestFieldProvider extends BaseFieldProvider {
           RETURN_ERRORS_FUNCTION_NAME,
           "Return a set of errors about the argument, return value, and general errors.");
       objectFieldArg = new TestObjectField();
-      updateArgumentPaths();
     }
 
     @Override
@@ -468,13 +461,13 @@ public class TestFieldProvider extends BaseFieldProvider {
 
     @Override
     public TestObjectField performFunction() {
-      addErrorMessage(sampleError(objectFieldArg.path()));
-      addErrorMessage(sampleError(objectFieldArg.getIntegerField().path()));
-      addErrorMessage(sampleError(objectFieldArg.getBooleanField().path()));
-      addErrorMessage(sampleError(objectFieldArg.getStringField().path()));
-      addErrorMessage(sampleError(objectFieldArg.getListField().path()));
-      addErrorMessage(sampleError(objectFieldArg.getListField().getList().get(0).path()));
-      addErrorMessage(sampleError(objectFieldArg.getEnumField().path()));
+      addErrorMessage(sampleError(objectFieldArg.getPath()));
+      addErrorMessage(sampleError(objectFieldArg.getIntegerField().getPath()));
+      addErrorMessage(sampleError(objectFieldArg.getBooleanField().getPath()));
+      addErrorMessage(sampleError(objectFieldArg.getStringField().getPath()));
+      addErrorMessage(sampleError(objectFieldArg.getListField().getPath()));
+      addErrorMessage(sampleError(objectFieldArg.getListField().getList().get(0).getPath()));
+      addErrorMessage(sampleError(objectFieldArg.getEnumField().getPath()));
       return objectFieldArg;
     }
 
@@ -489,7 +482,7 @@ public class TestFieldProvider extends BaseFieldProvider {
     }
   }
 
-  public static ErrorMessageImpl sampleError(List<String> path) {
+  public static ErrorMessageImpl sampleError(List<Object> path) {
     return new ErrorMessageImpl(ERROR_MSG, path);
   }
 
@@ -504,7 +497,6 @@ public class TestFieldProvider extends BaseFieldProvider {
           "sampleMutation",
           "Returns the argument. Also returns an error about the argument and an error about the return value.");
       objFieldArg = new TestObjectField();
-      updateArgumentPaths();
     }
 
     @Override
@@ -519,7 +511,7 @@ public class TestFieldProvider extends BaseFieldProvider {
 
     @Override
     public TestObjectField performFunction() {
-      addErrorMessage(sampleError(objFieldArg.path()));
+      addErrorMessage(sampleError(objFieldArg.getPath()));
       return objFieldArg;
     }
 

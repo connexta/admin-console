@@ -54,7 +54,6 @@ public class ContextPolicyBin extends BaseObjectField {
     authTypes = new AuthType.ListImpl(serviceReader);
     realm = new Realm(serviceReader);
     claimsMapping = new ClaimsMapEntry.ListImpl();
-    updateInnerFieldPaths();
   }
 
   public ContextPolicyBin realm(String realm) {

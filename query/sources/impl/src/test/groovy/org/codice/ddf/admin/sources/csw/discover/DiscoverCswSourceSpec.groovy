@@ -24,11 +24,13 @@ import spock.lang.Shared
 
 class DiscoverCswSourceSpec extends SourceCommonsSpec {
 
+    static final List<Object> FUNCTION_PATH = [DiscoverCswSource.FIELD_NAME]
+
     static TEST_CSW_URL = 'https://testHostName:12345/services/csw'
 
     static NO_FILTER = 'NO_FILTER'
 
-    static BASE_PATH = [DiscoverCswSource.FIELD_NAME, FunctionField.ARGUMENT]
+    static BASE_PATH = [DiscoverCswSource.FIELD_NAME]
 
     static ADDRESS_FIELD_PATH = [BASE_PATH, ADDRESS].flatten()
 
@@ -63,10 +65,9 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
     def 'Successfully discover DDF federation profile with URL'() {
         setup:
         discoverCsw.setCswSourceUtils(prepareCswSourceUtils(200, ddfCswResponse, true))
-        discoverCsw.setArguments(getBaseDiscoverByUrlArgs(TEST_CSW_URL))
 
         when:
-        def report = discoverCsw.execute()
+        def report = discoverCsw.execute(getBaseDiscoverByUrlArgs(TEST_CSW_URL), FUNCTION_PATH)
         def config = report.getResult()
 
         then:
@@ -80,10 +81,9 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
     def 'Successfully discover CSWSpecification federation profile with URL'() {
         setup:
         discoverCsw.setCswSourceUtils(prepareCswSourceUtils(200, specCswResponse, true))
-        discoverCsw.setArguments(getBaseDiscoverByUrlArgs(TEST_CSW_URL))
 
         when:
-        def report = discoverCsw.execute()
+        def report = discoverCsw.execute(getBaseDiscoverByUrlArgs(TEST_CSW_URL), FUNCTION_PATH)
         def config = report.getResult()
 
         then:
@@ -97,10 +97,9 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
     def 'Successfully discover GMD CSW federation profile with URL'() {
         setup:
         discoverCsw.setCswSourceUtils(prepareCswSourceUtils(200, gmdCswResponse, true))
-        discoverCsw.setArguments(getBaseDiscoverByUrlArgs(TEST_CSW_URL))
 
         when:
-        def report = discoverCsw.execute()
+        def report = discoverCsw.execute(getBaseDiscoverByUrlArgs(TEST_CSW_URL), FUNCTION_PATH)
         def config = report.getResult()
 
         then:
@@ -114,10 +113,9 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
     def 'Successfully discover DDF federation profile using hostname and port'() {
         setup:
         discoverCsw.setCswSourceUtils(prepareCswSourceUtils(200, ddfCswResponse, true))
-        discoverCsw.setArguments(getBaseDiscoverByAddressArgs())
 
         when:
-        def report = discoverCsw.execute()
+        def report = discoverCsw.execute(getBaseDiscoverByAddressArgs(), FUNCTION_PATH)
         def config = report.getResult()
 
         then:
@@ -132,10 +130,9 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
     def 'Successfully discover CSWSpecification federation profile using hostname and port'() {
         setup:
         discoverCsw.setCswSourceUtils(prepareCswSourceUtils(200, specCswResponse, true))
-        discoverCsw.setArguments(getBaseDiscoverByAddressArgs())
 
         when:
-        def report = discoverCsw.execute()
+        def report = discoverCsw.execute(getBaseDiscoverByAddressArgs(), FUNCTION_PATH)
         def config = report.getResult()
 
         then:
@@ -149,10 +146,9 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
     def 'Successfully discover GMD CSW federation profile using hostname and port'() {
         setup:
         discoverCsw.setCswSourceUtils(prepareCswSourceUtils(200, gmdCswResponse, true))
-        discoverCsw.setArguments(getBaseDiscoverByAddressArgs())
 
         when:
-        def report = discoverCsw.execute()
+        def report = discoverCsw.execute(getBaseDiscoverByAddressArgs(), FUNCTION_PATH)
         def config = report.getResult()
 
         then:
@@ -166,10 +162,9 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
     def 'Unknown endpoint error with bad HTTP status'() {
         setup:
         discoverCsw.setCswSourceUtils(prepareCswSourceUtils(500, gmdCswResponse, true))
-        discoverCsw.setArguments(getBaseDiscoverByUrlArgs(TEST_CSW_URL))
 
         when:
-        def report = discoverCsw.execute()
+        def report = discoverCsw.execute(getBaseDiscoverByUrlArgs(TEST_CSW_URL), FUNCTION_PATH)
 
         then:
         report.getErrorMessages().size() == 1
@@ -180,10 +175,9 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
     def 'Unknown endpoint error with unrecognized response when using URL'() {
         setup:
         discoverCsw.setCswSourceUtils(prepareCswSourceUtils(200, badResponseBody, true))
-        discoverCsw.setArguments(getBaseDiscoverByUrlArgs(TEST_CSW_URL))
 
         when:
-        def report = discoverCsw.execute()
+        def report = discoverCsw.execute(getBaseDiscoverByUrlArgs(TEST_CSW_URL), FUNCTION_PATH)
 
         then:
         report.getErrorMessages().size() == 1
@@ -194,10 +188,9 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
     def 'Unknown endpoint error with unrecognized response when using hostname+port'() {
         setup:
         discoverCsw.setCswSourceUtils(prepareCswSourceUtils(200, badResponseBody, true))
-        discoverCsw.setArguments(getBaseDiscoverByAddressArgs())
 
         when:
-        def report = discoverCsw.execute()
+        def report = discoverCsw.execute(getBaseDiscoverByAddressArgs(), FUNCTION_PATH)
 
         then:
         report.getErrorMessages().size() == 1
@@ -208,10 +201,9 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
     def 'Unknown endpoint if no pre-formatted URLs work when discovering with host+port'() {
         setup:
         discoverCsw.setCswSourceUtils(prepareCswSourceUtils(200, badResponseBody, false))
-        discoverCsw.setArguments(getBaseDiscoverByAddressArgs())
 
         when:
-        def report = discoverCsw.execute()
+        def report = discoverCsw.execute(getBaseDiscoverByAddressArgs(), FUNCTION_PATH)
 
         then:
         report.getErrorMessages().size() == 1
@@ -222,10 +214,9 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
     def 'Unrecognized CSW output schema defaults to CSW 2.0.2 schema'() {
         setup:
         discoverCsw.setCswSourceUtils(prepareCswSourceUtils(200, unrecognizedCswResponse, true))
-        discoverCsw.setArguments(getBaseDiscoverByUrlArgs(TEST_CSW_URL))
 
         when:
-        def report = discoverCsw.execute()
+        def report = discoverCsw.execute(getBaseDiscoverByUrlArgs(TEST_CSW_URL), FUNCTION_PATH)
         def config = report.getResult()
 
         then:
@@ -239,10 +230,9 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
     def 'Unknown endpoint error when there is no output schema'() {
         setup:
         discoverCsw.setCswSourceUtils(prepareCswSourceUtils(200, noOutputSchemaCswResponse, true))
-        discoverCsw.setArguments(getBaseDiscoverByUrlArgs(TEST_CSW_URL))
 
         when:
-        def report = discoverCsw.execute()
+        def report = discoverCsw.execute(getBaseDiscoverByUrlArgs(TEST_CSW_URL), FUNCTION_PATH)
 
         then:
         report.getResult() == null
@@ -253,7 +243,7 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
 
     def 'Fail when missing required fields'() {
         when:
-        def report = discoverCsw.execute()
+        def report = discoverCsw.execute(null, FUNCTION_PATH)
 
         then:
         report.getResult() == null
@@ -268,16 +258,14 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
         setup:
         DiscoverCswSource cannotConnectCsw = new DiscoverCswSource(Mock(ConfiguratorSuite))
         cannotConnectCsw.setCswSourceUtils(prepareCswSourceUtils(200, badResponseBody, false))
-        cannotConnectCsw.setArguments(getBaseDiscoverByAddressArgs())
 
         DiscoverCswSource unknownEndpointCsw = new DiscoverCswSource(Mock(ConfiguratorSuite))
         unknownEndpointCsw.setCswSourceUtils(prepareCswSourceUtils(200, noOutputSchemaCswResponse, true))
-        unknownEndpointCsw.setArguments(getBaseDiscoverByUrlArgs(TEST_CSW_URL))
 
         when:
         def errorCodes = discoverCsw.getFunctionErrorCodes()
-        def cannotConnectReport = cannotConnectCsw.execute()
-        def unknownEndpointReport = unknownEndpointCsw.execute()
+        def cannotConnectReport = cannotConnectCsw.execute(getBaseDiscoverByAddressArgs(), FUNCTION_PATH)
+        def unknownEndpointReport = unknownEndpointCsw.execute(getBaseDiscoverByUrlArgs(TEST_CSW_URL), FUNCTION_PATH)
 
         then:
         errorCodes.size() == 2

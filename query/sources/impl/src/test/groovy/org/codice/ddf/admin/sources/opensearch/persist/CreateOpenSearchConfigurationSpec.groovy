@@ -31,9 +31,11 @@ import org.junit.Ignore
 
 class CreateOpenSearchConfigurationSpec extends SourceCommonsSpec {
 
+    static final List<Object> FUNCTION_PATH = [CreateOpenSearchConfiguration.FIELD_NAME]
+
     static RESULT_ARGUMENT_PATH = [CreateOpenSearchConfiguration.FIELD_NAME]
 
-    static BASE_PATH = [RESULT_ARGUMENT_PATH, FunctionField.ARGUMENT].flatten()
+    static BASE_PATH = [RESULT_ARGUMENT_PATH].flatten()
 
     static CONFIG_PATH = [BASE_PATH, OpenSearchSourceConfigurationField.DEFAULT_FIELD_NAME].flatten()
 
@@ -86,12 +88,11 @@ class CreateOpenSearchConfigurationSpec extends SourceCommonsSpec {
 
     def 'Successfully create new OpenSearch configuration'() {
         setup:
-        createOpenSearchConfiguration.setArguments(createFunctionArgs())
         serviceReader.getServices(_, _) >> []
         configurator.commit(_, _) >> mockReport(false)
 
         when:
-        def report = createOpenSearchConfiguration.execute()
+        def report = createOpenSearchConfiguration.execute(createFunctionArgs(), FUNCTION_PATH)
 
         then:
         report.getResult().getValue()
@@ -99,11 +100,10 @@ class CreateOpenSearchConfigurationSpec extends SourceCommonsSpec {
 
     def 'Fail to create new OpenSearch config due to duplicate source name'() {
         setup:
-        createOpenSearchConfiguration.setArguments(createFunctionArgs())
         serviceReader.getServices(_, _) >> federatedSources
 
         when:
-        def report = createOpenSearchConfiguration.execute()
+        def report = createOpenSearchConfiguration.execute(createFunctionArgs(), FUNCTION_PATH)
 
         then:
         report.getResult() == null
@@ -114,11 +114,10 @@ class CreateOpenSearchConfigurationSpec extends SourceCommonsSpec {
 
     def 'Fail to create new OpenSearch config due to failure to commit'() {
         setup:
-        createOpenSearchConfiguration.setArguments(createFunctionArgs())
         serviceReader.getServices(_, _) >> []
 
         when:
-        def report = createOpenSearchConfiguration.execute()
+        def report = createOpenSearchConfiguration.execute(createFunctionArgs(), FUNCTION_PATH)
 
         then:
         configurator.commit(_, _) >> mockReport(true)
@@ -132,9 +131,8 @@ class CreateOpenSearchConfigurationSpec extends SourceCommonsSpec {
     // TODO: 8/23/17 phuffer - Remove ignore when feature starts correctly
     def 'Return false when opensearch feature fails to start'() {
         when:
-        createOpenSearchConfiguration.setArguments(createFunctionArgs())
         serviceReader.getServices(_, _) >> []
-        def report = createOpenSearchConfiguration.execute()
+        def report = createOpenSearchConfiguration.execute(createFunctionArgs(), FUNCTION_PATH)
 
         then:
         1 * configurator.commit(_, _) >> mockReport(true)
@@ -146,7 +144,7 @@ class CreateOpenSearchConfigurationSpec extends SourceCommonsSpec {
 
     def 'Fail when missing required fields'() {
         when:
-        def report = createOpenSearchConfiguration.execute()
+        def report = createOpenSearchConfiguration.execute(null, FUNCTION_PATH)
 
         then:
         report.getResult() == null
@@ -160,17 +158,15 @@ class CreateOpenSearchConfigurationSpec extends SourceCommonsSpec {
     def 'Returns all the possible error codes correctly'(){
         setup:
         CreateOpenSearchConfiguration createDuplicateNameConfig = new CreateOpenSearchConfiguration(configuratorSuite)
-        createDuplicateNameConfig.setArguments(createFunctionArgs())
         serviceReader.getServices(_, _) >> federatedSources
 
         CreateOpenSearchConfiguration createFailPersistConfig = new CreateOpenSearchConfiguration(configuratorSuite)
-        createFailPersistConfig.setArguments(createFunctionArgs())
         serviceReader.getServices(_, _) >> []
 
         when:
         def errorCodes = createOpenSearchConfiguration.getFunctionErrorCodes()
-        def duplicateNameReport = createDuplicateNameConfig.execute()
-        def createFailPersistReport = createFailPersistConfig.execute()
+        def duplicateNameReport = createDuplicateNameConfig.execute(createFunctionArgs(), FUNCTION_PATH)
+        def createFailPersistReport = createFailPersistConfig.execute(createFunctionArgs(), FUNCTION_PATH)
 
         then:
         errorCodes.size() == 2

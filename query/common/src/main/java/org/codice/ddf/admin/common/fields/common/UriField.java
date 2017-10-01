@@ -61,7 +61,7 @@ public class UriField extends StringField {
       try {
         new URI(getValue());
       } catch (URISyntaxException e) {
-        validationMsgs.add(invalidUriError(path()));
+        validationMsgs.add(invalidUriError(getPath()));
       }
     }
     return validationMsgs;

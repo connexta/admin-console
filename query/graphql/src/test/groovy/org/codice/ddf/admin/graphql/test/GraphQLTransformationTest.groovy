@@ -193,7 +193,7 @@ class GraphQLTransformationTest extends Specification {
                 createError([TEST_OBJECT_NAME, STRING]),
                 createError([TEST_OBJECT_NAME, ENUMERATION]),
                 createError([TEST_OBJECT_NAME, LIST]),
-                createError([TEST_OBJECT_NAME, LIST, '0'])
+                createError([TEST_OBJECT_NAME, LIST, 0])
         ] as Set
 
         getResponseContentAsMap().data ==
@@ -434,7 +434,7 @@ class GraphQLTransformationTest extends Specification {
     }
 
     def createPath(String functionPath, String additionalPath, boolean isArg) {
-        return isArg ? functionPath + FunctionField.ARGUMENT + additionalPath : functionPath + additionalPath;
+        return isArg ? functionPath + additionalPath : functionPath + additionalPath;
     }
 
     def createError(List<String> argPath) {
@@ -446,13 +446,14 @@ class GraphQLTransformationTest extends Specification {
     }
 
     def createMessage(String code, List<String> functionPath, List<String> additionalPath) {
-        List<String> path = functionPath + FunctionField.ARGUMENT + additionalPath
+        List<String> path = functionPath + additionalPath
 
         return [
                 path: path,
                 message: code,
                 "locations": null,
-                "errorType": "DataFetchingException"
+                "errorType": "DataFetchingException",
+                "extensions": null
         ]
     }
 }

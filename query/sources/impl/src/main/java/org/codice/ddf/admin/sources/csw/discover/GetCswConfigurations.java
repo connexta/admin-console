@@ -54,7 +54,6 @@ public class GetCswConfigurations extends BaseFunctionField<ListField<CswSourceI
     this.configuratorSuite = configuratorSuite;
 
     pid = new PidField();
-    updateArgumentPaths();
 
     sourceUtilCommons = new SourceUtilCommons(configuratorSuite);
 

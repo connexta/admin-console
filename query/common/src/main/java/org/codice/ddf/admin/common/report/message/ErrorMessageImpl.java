@@ -15,12 +15,13 @@ package org.codice.ddf.admin.common.report.message;
 
 import java.util.LinkedList;
 import java.util.List;
+import org.codice.ddf.admin.api.report.ErrorMessage;
 
-public class ErrorMessageImpl implements org.codice.ddf.admin.api.report.ErrorMessage {
+public class ErrorMessageImpl implements ErrorMessage {
 
   private String code;
 
-  private List<String> path;
+  private List<Object> path;
 
   public ErrorMessageImpl(String code) {
     this.code = code;
@@ -32,7 +33,7 @@ public class ErrorMessageImpl implements org.codice.ddf.admin.api.report.ErrorMe
     path.add(pathOrigin);
   }
 
-  public ErrorMessageImpl(String code, List<String> path) {
+  public ErrorMessageImpl(String code, List<Object> path) {
     this(code);
     this.path.addAll(path);
   }
@@ -43,12 +44,12 @@ public class ErrorMessageImpl implements org.codice.ddf.admin.api.report.ErrorMe
   }
 
   @Override
-  public List<String> getPath() {
+  public List<Object> getPath() {
     return path;
   }
 
   @Override
-  public org.codice.ddf.admin.api.report.ErrorMessage setPath(List<String> path) {
+  public ErrorMessage setPath(List<Object> path) {
     this.path = path;
     return this;
   }

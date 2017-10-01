@@ -53,7 +53,6 @@ public class DiscoverWfsSource extends BaseFunctionField<WfsSourceConfigurationF
     credentials = new CredentialsField();
     address = new AddressField();
     address.isRequired(true);
-    updateArgumentPaths();
 
     wfsSourceUtils = new WfsSourceUtils(configuratorSuite);
   }

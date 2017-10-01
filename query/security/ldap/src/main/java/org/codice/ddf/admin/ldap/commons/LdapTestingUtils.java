@@ -96,7 +96,7 @@ public class LdapTestingUtils {
     } catch (Exception e) {
       LOGGER.debug(
           "Error opening LDAP connection to [{}:{}]", connection.hostname(), connection.port());
-      return new LdapConnectionAttempt().addErrorMessage(cannotConnectError(connection.path()));
+      return new LdapConnectionAttempt().addErrorMessage(cannotConnectError(connection.getPath()));
     }
 
     return new LdapConnectionAttempt(ldapConnection);
@@ -140,7 +140,7 @@ public class LdapTestingUtils {
         LOGGER.warn("Error closing LDAP connection", closeException);
       }
       return new LdapConnectionAttempt()
-          .addErrorMessage(LdapMessages.cannotBindError(bindInfo.path()));
+          .addErrorMessage(LdapMessages.cannotBindError(bindInfo.getPath()));
     }
 
     return new LdapConnectionAttempt(connection);
@@ -249,7 +249,7 @@ public class LdapTestingUtils {
             .isEmpty();
 
     if (!dirExists) {
-      return Reports.from(dnDoesNotExistError(dirDn.path()));
+      return Reports.from(dnDoesNotExistError(dirDn.getPath()));
     }
 
     return Reports.emptyReport();

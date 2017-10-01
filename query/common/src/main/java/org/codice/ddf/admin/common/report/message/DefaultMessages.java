@@ -74,71 +74,71 @@ public class DefaultMessages {
     return new ErrorMessageImpl(UNKNOWN_ENDPOINT);
   }
 
-  public static ErrorMessage failedPersistError(List<String> path) {
+  public static ErrorMessage failedPersistError(List<Object> path) {
     return new ErrorMessageImpl(FAILED_PERSIST, path);
   }
 
-  public static ErrorMessage unsupportedEnum(List<String> path) {
+  public static ErrorMessage unsupportedEnum(List<Object> path) {
     return new ErrorMessageImpl(UNSUPPORTED_ENUM, path);
   }
 
-  public static ErrorMessage missingKeyValue(List<String> path) {
+  public static ErrorMessage missingKeyValue(List<Object> path) {
     return new ErrorMessageImpl(MISSING_KEY_VALUE, path);
   }
 
-  public static ErrorMessage invalidPortRangeError(List<String> path) {
+  public static ErrorMessage invalidPortRangeError(List<Object> path) {
     return new ErrorMessageImpl(INVALID_PORT_RANGE, path);
   }
 
-  public static ErrorMessage missingRequiredFieldError(List<String> path) {
+  public static ErrorMessage missingRequiredFieldError(List<Object> path) {
     return new ErrorMessageImpl(MISSING_REQUIRED_FIELD, path);
   }
 
-  public static ErrorMessage emptyFieldError(List<String> path) {
+  public static ErrorMessage emptyFieldError(List<Object> path) {
     return new ErrorMessageImpl(EMPTY_FIELD, path);
   }
 
-  public static ErrorMessage invalidHostnameError(List<String> path) {
+  public static ErrorMessage invalidHostnameError(List<Object> path) {
     return new ErrorMessageImpl(INVALID_HOSTNAME, path);
   }
 
-  public static ErrorMessage invalidContextPathError(List<String> path) {
+  public static ErrorMessage invalidContextPathError(List<Object> path) {
     return new ErrorMessageImpl(INVALID_CONTEXT_PATH, path);
   }
 
-  public static ErrorMessage unknownEndpointError(List<String> path) {
+  public static ErrorMessage unknownEndpointError(List<Object> path) {
     return new ErrorMessageImpl(UNKNOWN_ENDPOINT, path);
   }
 
-  public static ErrorMessage cannotConnectError(List<String> path) {
+  public static ErrorMessage cannotConnectError(List<Object> path) {
     return new ErrorMessageImpl(CANNOT_CONNECT, path);
   }
 
-  public static ErrorMessage invalidUrlError(List<String> path) {
+  public static ErrorMessage invalidUrlError(List<Object> path) {
     return new ErrorMessageImpl(INVALID_URL, path);
   }
 
-  public static ErrorMessage invalidUriError(List<String> path) {
+  public static ErrorMessage invalidUriError(List<Object> path) {
     return new ErrorMessageImpl(INVALID_URI, path);
   }
 
-  public static ErrorMessage noExistingConfigError(List<String> path) {
+  public static ErrorMessage noExistingConfigError(List<Object> path) {
     return new ErrorMessageImpl(NO_EXISTING_CONFIG, path);
   }
 
-  public static ErrorMessage unauthorizedError(List<String> path) {
+  public static ErrorMessage unauthorizedError(List<Object> path) {
     return new ErrorMessageImpl(UNAUTHORIZED, path);
   }
 
-  public static ErrorMessage duplicateMapKeyError(List<String> path) {
+  public static ErrorMessage duplicateMapKeyError(List<Object> path) {
     return new ErrorMessageImpl(DUPLICATE_MAP_KEY, path);
   }
 
-  public static ErrorMessage similarServiceExists(List<String> path) {
+  public static ErrorMessage similarServiceExists(List<Object> path) {
     return new ErrorMessageImpl(SIMILAR_SERVICE_EXISTS, path);
   }
 
-  public static ErrorMessage invalidPathTrailingSlash(List<String> path) {
+  public static ErrorMessage invalidPathTrailingSlash(List<Object> path) {
     return new ErrorMessageImpl(INVALID_PATH_TRAILING_SLASH, path);
   }
 }

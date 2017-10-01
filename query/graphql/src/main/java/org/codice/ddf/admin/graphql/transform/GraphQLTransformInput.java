@@ -51,15 +51,15 @@ public class GraphQLTransformInput {
     GraphQLInputType graphqlInputType = fieldTypeToGraphQLInputType(field);
 
     return GraphQLArgument.newArgument()
-        .name(field.getName())
+        .name(field.getFieldName())
         .description(field.getDescription())
         .type(field.isRequired() ? new GraphQLNonNull(graphqlInputType) : graphqlInputType)
         .build();
   }
 
   public GraphQLInputType fieldTypeToGraphQLInputType(Field field) {
-    if (inputTypesProvider.isTypePresent(field.getTypeName())) {
-      return inputTypesProvider.getType(field.getTypeName());
+    if (inputTypesProvider.isTypePresent(field.getFieldTypeName())) {
+      return inputTypesProvider.getType(field.getFieldTypeName());
     }
 
     GraphQLInputType type = null;
@@ -75,7 +75,7 @@ public class GraphQLTransformInput {
                 fieldTypeToGraphQLInputType(((ListField<Field>) field).createListEntry()));
       } catch (Exception e) {
         throw new RuntimeException(
-            "Unable to build field list content type for input type: " + field.getName());
+            "Unable to build field list content type for input type: " + field.getFieldName());
       }
     } else if (field instanceof ScalarField) {
       type = transformScalars.resolveScalarType((ScalarField) field);
@@ -87,7 +87,7 @@ public class GraphQLTransformInput {
               + field.getClass());
     }
 
-    inputTypesProvider.addType(field.getTypeName(), type);
+    inputTypesProvider.addType(field.getFieldTypeName(), type);
     return type;
   }
 
@@ -104,7 +104,7 @@ public class GraphQLTransformInput {
     }
 
     return GraphQLInputObjectType.newInputObject()
-        .name(GraphQLTransformCommons.capitalize(field.getTypeName()))
+        .name(GraphQLTransformCommons.capitalize(field.getFieldTypeName()))
         .description(field.getDescription())
         .fields(fieldDefinitions)
         .build();
@@ -112,7 +112,7 @@ public class GraphQLTransformInput {
 
   public GraphQLInputObjectField fieldToGraphQLInputObjectFieldDefinition(Field field) {
     return GraphQLInputObjectField.newInputObjectField()
-        .name(field.getName())
+        .name(field.getFieldName())
         .description(field.getDescription())
         .type(fieldTypeToGraphQLInputType(field))
         .build();

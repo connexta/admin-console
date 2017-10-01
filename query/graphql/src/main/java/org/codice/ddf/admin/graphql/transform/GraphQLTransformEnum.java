@@ -29,13 +29,13 @@ public class GraphQLTransformEnum {
 
   public GraphQLEnumType enumFieldToGraphQLEnumType(EnumField<Object, EnumValue<Object>> field) {
 
-    if (enumTypeProvider.isTypePresent(field.getTypeName())) {
-      return enumTypeProvider.getType(field.getTypeName());
+    if (enumTypeProvider.isTypePresent(field.getFieldTypeName())) {
+      return enumTypeProvider.getType(field.getFieldTypeName());
     }
 
     GraphQLEnumType.Builder builder =
         GraphQLEnumType.newEnum()
-            .name(GraphQLTransformCommons.capitalize(field.getTypeName()))
+            .name(GraphQLTransformCommons.capitalize(field.getFieldTypeName()))
             .description(field.getDescription());
 
     field
@@ -43,7 +43,7 @@ public class GraphQLTransformEnum {
         .forEach(val -> builder.value(val.getEnumTitle(), val.getValue(), val.getDescription()));
 
     GraphQLEnumType newEnum = builder.build();
-    enumTypeProvider.addType(field.getTypeName(), newEnum);
+    enumTypeProvider.addType(field.getFieldTypeName(), newEnum);
     return newEnum;
   }
 

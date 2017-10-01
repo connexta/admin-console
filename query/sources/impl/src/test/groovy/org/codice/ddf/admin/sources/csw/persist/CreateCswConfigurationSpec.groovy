@@ -32,6 +32,8 @@ import org.junit.Ignore
 
 class CreateCswConfigurationSpec extends SourceCommonsSpec {
 
+    static final List<Object> FUNCTION_PATH = [CreateCswConfiguration.FIELD_NAME]
+
     static TEST_OUTPUT_SCHEMA = 'testOutputSchema'
 
     static TEST_CSW_PROFILE = CswProfile.DDFCswFederatedSource.CSW_FEDERATION_PROFILE_SOURCE
@@ -40,7 +42,7 @@ class CreateCswConfigurationSpec extends SourceCommonsSpec {
 
     static RESULT_ARGUMENT_PATH = [CreateCswConfiguration.FIELD_NAME]
 
-    static BASE_PATH = [RESULT_ARGUMENT_PATH, FunctionField.ARGUMENT].flatten()
+    static BASE_PATH = [RESULT_ARGUMENT_PATH].flatten()
 
     static CONFIG_PATH = [BASE_PATH, CswSourceConfigurationField.DEFAULT_FIELD_NAME].flatten()
 
@@ -94,10 +96,9 @@ class CreateCswConfigurationSpec extends SourceCommonsSpec {
 
     def 'Successfully create new CSW configuration'() {
         when:
-        createCswConfiguration.setArguments(createCswArgs())
         serviceReader.getServices(_, _) >> []
         configurator.commit(_, _) >> mockReport(false)
-        def report = createCswConfiguration.execute()
+        def report = createCswConfiguration.execute(createCswArgs(), FUNCTION_PATH)
 
         then:
         report.getResult() != null
@@ -106,9 +107,8 @@ class CreateCswConfigurationSpec extends SourceCommonsSpec {
 
     def 'Fail to create new CSW config due to duplicate source name'() {
         when:
-        createCswConfiguration.setArguments(createCswArgs())
         serviceReader.getServices(_, _) >> federatedSources
-        def report = createCswConfiguration.execute()
+        def report = createCswConfiguration.execute(createCswArgs(), FUNCTION_PATH)
 
         then:
         report.getResult() == null
@@ -119,9 +119,8 @@ class CreateCswConfigurationSpec extends SourceCommonsSpec {
 
     def 'Fail to create new CSW config due to failure to commit'() {
         when:
-        createCswConfiguration.setArguments(createCswArgs())
         serviceReader.getServices(_, _) >> []
-        def report = createCswConfiguration.execute()
+        def report = createCswConfiguration.execute(createCswArgs(), FUNCTION_PATH)
 
         then:
         configurator.commit(_, _) >> mockReport(true)
@@ -135,9 +134,8 @@ class CreateCswConfigurationSpec extends SourceCommonsSpec {
     // TODO: 8/23/17 phuffer - Remove ignore when feature starts correctly
     def 'Return false when csw feature fails to start'() {
         when:
-        createCswConfiguration.setArguments(createCswArgs())
         serviceReader.getServices(_, _) >> []
-        def report = createCswConfiguration.execute()
+        def report = createCswConfiguration.execute(createCswArgs(), FUNCTION_PATH)
 
         then:
         1 * configurator.commit(_, _) >> mockReport(true)
@@ -149,7 +147,7 @@ class CreateCswConfigurationSpec extends SourceCommonsSpec {
 
     def 'Fail when missing required fields'() {
         when:
-        def report = createCswConfiguration.execute()
+        def report = createCswConfiguration.execute(null, FUNCTION_PATH)
 
         then:
         report.getResult() == null
@@ -163,17 +161,15 @@ class CreateCswConfigurationSpec extends SourceCommonsSpec {
     def 'Returns all the possible error codes correctly'(){
         setup:
         CreateCswConfiguration createDuplicateNameConfig = new CreateCswConfiguration(configuratorSuite)
-        createDuplicateNameConfig.setArguments(createCswArgs())
         serviceReader.getServices(_, _) >> federatedSources
 
         CreateCswConfiguration createFailPersistConfig = new CreateCswConfiguration(configuratorSuite)
-        createFailPersistConfig.setArguments(createCswArgs())
         serviceReader.getServices(_, _) >> []
 
         when:
         def errorCodes = createCswConfiguration.getFunctionErrorCodes()
-        def duplicateNameReport = createDuplicateNameConfig.execute()
-        def createFailPersistReport = createFailPersistConfig.execute()
+        def duplicateNameReport = createDuplicateNameConfig.execute(createCswArgs(), FUNCTION_PATH)
+        def createFailPersistReport = createFailPersistConfig.execute(createCswArgs(), FUNCTION_PATH)
 
         then:
         errorCodes.size() == 2

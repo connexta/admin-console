@@ -41,7 +41,6 @@ public class OpenSearchSourceInfoField extends BaseObjectField {
     super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
     config = new OpenSearchSourceConfigurationField();
     isAvailable = new BooleanField(IS_AVAILABLE_FIELD_NAME);
-    updateInnerFieldPaths();
   }
 
   public OpenSearchSourceInfoField config(OpenSearchSourceConfigurationField config) {

@@ -44,7 +44,7 @@ public class PortField extends IntegerField {
     }
 
     if (getValue() != null && !validPortRange(getValue())) {
-      validationMsgs.add(invalidPortRangeError(path()));
+      validationMsgs.add(invalidPortRangeError(getPath()));
     }
 
     return validationMsgs;

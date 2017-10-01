@@ -47,7 +47,6 @@ public class DeleteWfsConfiguration extends BaseFunctionField<BooleanField> {
 
     pid = new PidField();
     pid.isRequired(true);
-    updateArgumentPaths();
 
     serviceCommons = new ServiceCommons(configuratorSuite);
   }

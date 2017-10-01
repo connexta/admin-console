@@ -50,7 +50,6 @@ public class CswSourceConfigurationField extends SourceConfigField {
     outputSchema = new CswOutputSchemaField(OUTPUT_SCHEMA_FIELD_NAME);
     cswProfile = new CswProfile();
     spatialOperator = new CswSpatialOperator();
-    updateInnerFieldPaths();
   }
 
   public CswSourceConfigurationField outputSchema(String outputSchema) {

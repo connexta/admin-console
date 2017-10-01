@@ -41,7 +41,6 @@ public class PairField extends BaseObjectField {
     super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
     key = new StringField(KEY_FIELD_NAME);
     value = new StringField(VALUE_FIELD_NAME);
-    updateInnerFieldPaths();
   }
 
   @Override

@@ -48,7 +48,6 @@ public class ClaimsMapEntry extends BaseObjectField {
     super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
     key = new StringField(KEY_FIELD_NAME);
     value = new StringField(VALUE_FIELD_NAME);
-    updateInnerFieldPaths();
   }
 
   public ClaimsMapEntry key(String key) {
@@ -92,7 +91,7 @@ public class ClaimsMapEntry extends BaseObjectField {
 
     if (key.getValue() != null) {
       if (value.getValue() == null || value.getValue().isEmpty()) {
-        validationMsgs.add(missingKeyValue(value.path()));
+        validationMsgs.add(missingKeyValue(value.getPath()));
       }
     }
 

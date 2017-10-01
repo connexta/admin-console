@@ -56,14 +56,14 @@ public class LdapAttributeName extends StringField {
     }
 
     if (getValue() != null) {
-      errors.addAll(validate(getValue(), path()));
+      errors.addAll(validate(getValue(), getPath()));
     }
     return errors;
   }
 
   // TODO: 7/7/17 - tbatie - This validate should be reformatted once there is a generic way to
   // create MapField objects that contain different value field.
-  public static List<ErrorMessage> validate(String attribute, List<String> path) {
+  public static List<ErrorMessage> validate(String attribute, List<Object> path) {
     List<ErrorMessage> errors = new ArrayList<>();
 
     if (!ATTRIBUTE_NAME_PATTERN.matcher(attribute).matches()) {

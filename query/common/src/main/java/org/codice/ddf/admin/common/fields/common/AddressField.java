@@ -37,7 +37,6 @@ public class AddressField extends BaseObjectField {
     super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
     host = new HostField();
     url = new UrlField();
-    updateInnerFieldPaths();
   }
 
   public AddressField hostname(String hostname) {

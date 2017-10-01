@@ -28,6 +28,8 @@ import spock.lang.Specification
 
 class GetLdapConfigurationsSpec extends Specification {
 
+    static final List<Object> FUNCTION_PATH = [GetLdapConfigurations.FIELD_NAME]
+
     BaseFunctionField getLdapConfigurations
 
     ManagedServiceActions managedServiceActions
@@ -51,7 +53,7 @@ class GetLdapConfigurationsSpec extends Specification {
         managedServiceActions.read(LdapClaimsHandlerServiceProperties.LDAP_CLAIMS_HANDLER_MANAGED_SERVICE_FACTORY_PID) >> getTestLdapServiceProps()
 
         when:
-        def report = getLdapConfigurations.execute()
+        def report = getLdapConfigurations.execute(null, FUNCTION_PATH)
         def configs = (ListField<LdapConfigurationField>) report.getResult()
 
         then:

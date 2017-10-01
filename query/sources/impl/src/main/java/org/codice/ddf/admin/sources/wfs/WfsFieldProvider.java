@@ -51,7 +51,6 @@ public class WfsFieldProvider extends BaseFieldProvider {
     createWfsConfig = new CreateWfsConfiguration(configuratorSuite);
     updateWfsConfig = new UpdateWfsConfiguration(configuratorSuite);
     deleteWfsConfig = new DeleteWfsConfiguration(configuratorSuite);
-    updateInnerFieldPaths();
   }
 
   @Override

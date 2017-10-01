@@ -48,7 +48,7 @@ public class LdapQueryField extends StringField {
     }
 
     if (getValue() != null && !validQuery(getValue())) {
-      validationMsgs.add(invalidQueryError(path()));
+      validationMsgs.add(invalidQueryError(getPath()));
     }
 
     return validationMsgs;

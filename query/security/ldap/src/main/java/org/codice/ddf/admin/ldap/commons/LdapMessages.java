@@ -40,47 +40,47 @@ public class LdapMessages {
 
   public static final String INVALID_USER_ATTRIBUTE = "INVALID_USER_ATTRIBUTE";
 
-  public static ErrorMessage invalidDnFormatError(List<String> path) {
+  public static ErrorMessage invalidDnFormatError(List<Object> path) {
     return new ErrorMessageImpl(INVALID_DN, path);
   }
 
-  public static ErrorMessage invalidQueryError(List<String> path) {
+  public static ErrorMessage invalidQueryError(List<Object> path) {
     return new ErrorMessageImpl(INVALID_QUERY, path);
   }
 
-  public static ErrorMessage dnDoesNotExistError(List<String> pathOrigin) {
+  public static ErrorMessage dnDoesNotExistError(List<Object> pathOrigin) {
     return new ErrorMessageImpl(DN_DOES_NOT_EXIST, pathOrigin);
   }
 
-  public static ErrorMessage noUsersInBaseUserDnError(List<String> path) {
+  public static ErrorMessage noUsersInBaseUserDnError(List<Object> path) {
     return new ErrorMessageImpl(NO_USERS_IN_BASE_USER_DN, path);
   }
 
-  public static ErrorMessage noGroupsInBaseGroupDnError(List<String> path) {
+  public static ErrorMessage noGroupsInBaseGroupDnError(List<Object> path) {
     return new ErrorMessageImpl(NO_GROUPS_IN_BASE_GROUP_DN, path);
   }
 
-  public static ErrorMessage noGroupsWithMembersError(List<String> path) {
+  public static ErrorMessage noGroupsWithMembersError(List<Object> path) {
     return new ErrorMessageImpl(NO_GROUPS_WITH_MEMBERS, path);
   }
 
-  public static ErrorMessage noReferencedMemberError(List<String> path) {
+  public static ErrorMessage noReferencedMemberError(List<Object> path) {
     return new ErrorMessageImpl(NO_REFERENCED_MEMBER, path);
   }
 
-  public static ErrorMessage userAttributeNotFoundError(List<String> path) {
+  public static ErrorMessage userAttributeNotFoundError(List<Object> path) {
     return new ErrorMessageImpl(USER_ATTRIBUTE_NOT_FOUND, path);
   }
 
-  public static ErrorMessage md5NeedsEncryptedError(List<String> path) {
+  public static ErrorMessage md5NeedsEncryptedError(List<Object> path) {
     return new ErrorMessageImpl(MD5_NEEDS_ENCRYPTED, path);
   }
 
-  public static ErrorMessage invalidUserAttribute(List<String> path) {
+  public static ErrorMessage invalidUserAttribute(List<Object> path) {
     return new ErrorMessageImpl(INVALID_USER_ATTRIBUTE, path);
   }
 
-  static ErrorMessage cannotBindError(List<String> path) {
+  static ErrorMessage cannotBindError(List<Object> path) {
     return new ErrorMessageImpl(CANNOT_BIND, path);
   }
 }

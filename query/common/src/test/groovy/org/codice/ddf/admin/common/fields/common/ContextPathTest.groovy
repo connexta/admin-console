@@ -22,6 +22,7 @@ class ContextPathTest extends Specification {
 
     def setup() {
         contextPath = new ContextPath()
+        contextPath.setPath(Arrays.asList(ContextPath.DEFAULT_FIELD_NAME))
     }
 
     def 'Valid context paths'() {

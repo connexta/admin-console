@@ -58,7 +58,7 @@ public class ContextPath extends StringField {
     } else if (getValue() != null && !getValue().isEmpty()) {
       final UriPathValidator validator = new UriPathValidator();
       if (!validator.isValidPath(getValue())) {
-        msgs.add(invalidContextPathError(path()));
+        msgs.add(invalidContextPathError(getPath()));
       }
     }
 

@@ -49,7 +49,7 @@ public class StringField extends BaseScalarField<String> {
     }
 
     if (getValue() != null && getValue().isEmpty()) {
-      validationMsgs.add(emptyFieldError(path()));
+      validationMsgs.add(emptyFieldError(getPath()));
     }
 
     return validationMsgs;

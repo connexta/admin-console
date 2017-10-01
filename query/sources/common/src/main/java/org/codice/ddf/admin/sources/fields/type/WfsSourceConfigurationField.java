@@ -32,7 +32,6 @@ public class WfsSourceConfigurationField extends SourceConfigField {
   public WfsSourceConfigurationField() {
     super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
     wfsVersion = new WfsVersion();
-    updateInnerFieldPaths();
   }
 
   public WfsSourceConfigurationField wfsVersion(String wfsVersion) {

@@ -39,7 +39,6 @@ public class CredentialsField extends BaseObjectField {
     super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
     this.username = new StringField(USERNAME_FIELD_NAME);
     this.password = new PasswordField(PASSWORD_FIELD_NAME);
-    updateInnerFieldPaths();
   }
 
   public CredentialsField username(String username) {

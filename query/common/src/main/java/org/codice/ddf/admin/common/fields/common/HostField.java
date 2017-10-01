@@ -37,7 +37,6 @@ public class HostField extends BaseObjectField {
     super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
     hostname = new HostnameField();
     port = new PortField();
-    updateInnerFieldPaths();
   }
 
   public HostField hostname(String hostname) {

@@ -32,7 +32,6 @@ public class ConnectionFieldProvider extends BaseFieldProvider {
   public ConnectionFieldProvider() {
     super(NAME, TYPE_NAME, DESCRIPTION);
     pingByAddress = new PingByAddress();
-    updateInnerFieldPaths();
   }
 
   @Override

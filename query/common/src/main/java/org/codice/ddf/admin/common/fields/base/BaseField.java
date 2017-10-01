@@ -32,9 +32,7 @@ public abstract class BaseField<T> implements Field<T> {
 
   private String description;
 
-  private List<String> subpath;
-
-  private String pathName;
+  private List<Object> path;
 
   private boolean isRequired;
 
@@ -44,18 +42,17 @@ public abstract class BaseField<T> implements Field<T> {
     this.name = name;
     this.typeName = typeName;
     this.description = description;
-    pathName = name;
-    subpath = new ArrayList<>();
+    path = new ArrayList<>();
     isRequired = false;
   }
 
   @Override
-  public String getName() {
+  public String getFieldName() {
     return name;
   }
 
   @Override
-  public String getTypeName() {
+  public String getFieldTypeName() {
     return typeName;
   }
 
@@ -96,9 +93,9 @@ public abstract class BaseField<T> implements Field<T> {
 
     if (isRequired()) {
       if (getValue() == null) {
-        errors.add(missingRequiredFieldError(path()));
+        errors.add(missingRequiredFieldError(getPath()));
       } else if (getValue() instanceof List && ((List) getValue()).isEmpty()) {
-        errors.add(missingRequiredFieldError(path()));
+        errors.add(missingRequiredFieldError(getPath()));
       }
     }
 
@@ -106,18 +103,13 @@ public abstract class BaseField<T> implements Field<T> {
   }
 
   @Override
-  public List<String> path() {
-    return new ImmutableList.Builder().addAll(subpath).add(pathName).build();
+  public List<Object> getPath() {
+    return new ImmutableList.Builder().addAll(path).build();
   }
 
   @Override
-  public void pathName(String pathName) {
-    this.pathName = pathName;
-  }
-
-  @Override
-  public void updatePath(List<String> subPath) {
-    subpath.clear();
-    subpath.addAll(subPath);
+  public void setPath(List<Object> path) {
+    this.path.clear();
+    this.path.addAll(path);
   }
 }

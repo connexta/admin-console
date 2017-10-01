@@ -54,7 +54,7 @@ public class LdapDistinguishedName extends StringField {
     }
 
     if (getValue() != null && !isValidDN(getValue())) {
-      validationMsgs.add(invalidDnFormatError(path()));
+      validationMsgs.add(invalidDnFormatError(getPath()));
     }
 
     return validationMsgs;

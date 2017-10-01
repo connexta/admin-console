@@ -57,7 +57,6 @@ public class UpdateCswConfiguration extends BaseFunctionField<BooleanField> {
     config = new CswSourceConfigurationField();
     config.useDefaultRequired();
     config.pidField().isRequired(true);
-    updateArgumentPaths();
 
     sourceValidationUtils = new SourceValidationUtils(configuratorSuite);
     serviceCommons = new ServiceCommons(configuratorSuite);

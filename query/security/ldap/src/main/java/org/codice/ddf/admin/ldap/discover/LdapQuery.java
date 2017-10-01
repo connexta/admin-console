@@ -77,7 +77,6 @@ public class LdapQuery extends BaseFunctionField<MapField.ListImpl> {
     queryBase.isRequired(true);
     query = new LdapQueryField();
     query.isRequired(true);
-    updateArgumentPaths();
 
     utils = new LdapTestingUtils();
   }

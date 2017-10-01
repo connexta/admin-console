@@ -1,7 +1,6 @@
 package org.codice.ddf.admin.sources.opensearch.persist
 
 import org.codice.ddf.admin.api.ConfiguratorSuite
-import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.configurator.Configurator
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
@@ -10,6 +9,8 @@ import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions
 
 class DeleteOpenSearchConfigurationSpec extends SourceCommonsSpec {
+
+    static final List<Object> FUNCTION_PATH = [DeleteOpenSearchConfiguration.FIELD_NAME]
 
     DeleteOpenSearchConfiguration deleteOpenSearchConfigurationFunction
 
@@ -21,11 +22,11 @@ class DeleteOpenSearchConfigurationSpec extends SourceCommonsSpec {
 
     static RESULT_ARGUMENT_PATH = [DeleteOpenSearchConfiguration.FIELD_NAME]
 
-    static BASE_PATH = [RESULT_ARGUMENT_PATH, FunctionField.ARGUMENT].flatten()
+    static BASE_PATH = [RESULT_ARGUMENT_PATH].flatten()
 
     static PID_PATH = [BASE_PATH, PID].flatten()
 
-    def functionArgs = [
+    def args = [
             (PID): S_PID
     ]
     private ServiceActions serviceActions
@@ -50,8 +51,7 @@ class DeleteOpenSearchConfigurationSpec extends SourceCommonsSpec {
         when:
         serviceActions.read(S_PID) >> configToBeDeleted
         configurator.commit(_, _) >> mockReport(false)
-        deleteOpenSearchConfigurationFunction.setArguments(functionArgs)
-        def report = deleteOpenSearchConfigurationFunction.execute()
+        def report = deleteOpenSearchConfigurationFunction.execute(args, FUNCTION_PATH)
 
         then:
         report.getResult() != null
@@ -61,8 +61,7 @@ class DeleteOpenSearchConfigurationSpec extends SourceCommonsSpec {
     def 'Fail delete when no existing configuration with the provided pid'() {
         when:
         serviceActions.read(S_PID) >> [:]
-        deleteOpenSearchConfigurationFunction.setArguments(functionArgs)
-        def report = deleteOpenSearchConfigurationFunction.execute()
+        def report = deleteOpenSearchConfigurationFunction.execute(args, FUNCTION_PATH)
 
         then:
         report.getResult() == null
@@ -75,8 +74,7 @@ class DeleteOpenSearchConfigurationSpec extends SourceCommonsSpec {
         when:
         serviceActions.read(S_PID) >> configToBeDeleted
         configurator.commit(_, _) >> mockReport(true)
-        deleteOpenSearchConfigurationFunction.setArguments(functionArgs)
-        def report = deleteOpenSearchConfigurationFunction.execute()
+        def report = deleteOpenSearchConfigurationFunction.execute(args, FUNCTION_PATH)
 
         then:
         !report.getResult().getValue()
@@ -87,7 +85,7 @@ class DeleteOpenSearchConfigurationSpec extends SourceCommonsSpec {
 
     def 'Fail when missing required fields'() {
         when:
-        def report = deleteOpenSearchConfigurationFunction.execute()
+        def report = deleteOpenSearchConfigurationFunction.execute(null, FUNCTION_PATH)
 
         then:
         report.getResult() == null
@@ -102,17 +100,15 @@ class DeleteOpenSearchConfigurationSpec extends SourceCommonsSpec {
         setup:
         DeleteOpenSearchConfiguration deleteOpenSearchNoExistingConfig = new DeleteOpenSearchConfiguration(configuratorSuite)
         serviceActions.read(S_PID) >> [:]
-        deleteOpenSearchNoExistingConfig.setArguments(functionArgs)
 
         DeleteOpenSearchConfiguration deleteOpenSearchFailPersist = new DeleteOpenSearchConfiguration(configuratorSuite)
         serviceActions.read(S_PID) >> configToBeDeleted
         configurator.commit(_, _) >> mockReport(true)
-        deleteOpenSearchFailPersist.setArguments(functionArgs)
 
         when:
         def errorCodes = deleteOpenSearchConfigurationFunction.getFunctionErrorCodes()
-        def noExistingConfigReport = deleteOpenSearchNoExistingConfig.execute()
-        def failedPersistReport = deleteOpenSearchFailPersist.execute()
+        def noExistingConfigReport = deleteOpenSearchNoExistingConfig.execute(args, FUNCTION_PATH)
+        def failedPersistReport = deleteOpenSearchFailPersist.execute(args, FUNCTION_PATH)
 
         then:
         errorCodes.size() == 2

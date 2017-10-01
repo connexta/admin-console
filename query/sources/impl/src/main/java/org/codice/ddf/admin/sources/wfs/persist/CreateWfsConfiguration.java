@@ -53,7 +53,6 @@ public class CreateWfsConfiguration extends BaseFunctionField<BooleanField> {
 
     config = new WfsSourceConfigurationField();
     config.useDefaultRequired();
-    updateArgumentPaths();
 
     sourceValidationUtils = new SourceValidationUtils(configuratorSuite);
     serviceCommons = new ServiceCommons(configuratorSuite);

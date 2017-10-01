@@ -41,7 +41,6 @@ public class CswSourceInfoField extends BaseObjectField {
     super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
     config = new CswSourceConfigurationField();
     isAvailable = new BooleanField(IS_AVAILABLE_FIELD_NAME);
-    updateInnerFieldPaths();
   }
 
   public CswSourceInfoField config(CswSourceConfigurationField config) {

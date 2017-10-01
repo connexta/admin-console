@@ -13,7 +13,6 @@
  **/
 package org.codice.ddf.admin.ldap.discover
 
-import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.api.report.FunctionReport
 import org.codice.ddf.admin.common.fields.common.CredentialsField
 import org.codice.ddf.admin.common.fields.common.HostnameField
@@ -35,6 +34,8 @@ import static org.codice.ddf.admin.ldap.LdapTestingCommons.noEncryptionLdapConne
 import static org.codice.ddf.admin.ldap.LdapTestingCommons.simpleBindInfo
 
 class LdapRecommendedSettingsSpec extends Specification {
+
+    static final List<Object> FUNCTION_PATH = [LdapRecommendedSettings.FUNCTION_NAME]
     static TestLdapServer server
     LdapRecommendedSettings action
     Map<String, Object> args
@@ -59,7 +60,7 @@ class LdapRecommendedSettingsSpec extends Specification {
         action = new LdapRecommendedSettings()
 
         // Initialize bad paths
-        baseMsg = [LdapRecommendedSettings.FIELD_NAME, FunctionField.ARGUMENT]
+        baseMsg = [LdapRecommendedSettings.FUNCTION_NAME]
         badPaths = [missingHostPath        : baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME, HostnameField.DEFAULT_FIELD_NAME],
                     missingPortPath        : baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME, PortField.DEFAULT_FIELD_NAME],
                     missingEncryptPath     : baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME, LdapEncryptionMethodField.DEFAULT_FIELD_NAME],
@@ -79,7 +80,7 @@ class LdapRecommendedSettingsSpec extends Specification {
         action = new LdapRecommendedSettings()
 
         when:
-        FunctionReport report = action.execute()
+        FunctionReport report = action.execute(null, FUNCTION_PATH)
 
         then:
         report.getErrorMessages().size() == 7
@@ -101,11 +102,10 @@ class LdapRecommendedSettingsSpec extends Specification {
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().port(666).getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue(),
                 (LdapTypeField.DEFAULT_FIELD_NAME)      : LdapTypeField.Unknown.UNKNOWN]
-        action.setArguments(args)
         action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
         when:
-        FunctionReport report = action.execute()
+        FunctionReport report = action.execute(args, FUNCTION_PATH)
 
         then:
         report.getErrorMessages().size() == 1
@@ -118,11 +118,10 @@ class LdapRecommendedSettingsSpec extends Specification {
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().password('badPassword').getValue(),
                 (LdapTypeField.DEFAULT_FIELD_NAME)      : LdapTypeField.Unknown.UNKNOWN]
-        action.setArguments(args)
         action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
         when:
-        FunctionReport report = action.execute()
+        FunctionReport report = action.execute(args, FUNCTION_PATH)
 
         then:
         report.getErrorMessages().size() == 1
@@ -135,11 +134,10 @@ class LdapRecommendedSettingsSpec extends Specification {
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue(),
                 (LdapTypeField.DEFAULT_FIELD_NAME)      : LdapTypeField.Unknown.UNKNOWN]
-        action.setArguments(args)
         action.setTestingUtils(utilsMock)
 
         when:
-        LdapRecommendedSettingsField recSettings = action.execute().getResult()
+        LdapRecommendedSettingsField recSettings = action.execute(args, FUNCTION_PATH).getResult()
         ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().getResult().isClosed()
 
         then:
@@ -175,20 +173,18 @@ class LdapRecommendedSettingsSpec extends Specification {
         Map<String, Object> cannotBindArgs = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().password('badPassword').getValue(),
                 (LdapTypeField.DEFAULT_FIELD_NAME)      : LdapTypeField.Unknown.UNKNOWN]
-        cannotBindSettings.setArguments(cannotBindArgs)
         cannotBindSettings.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
         LdapRecommendedSettings cannotConnectSettings = new LdapRecommendedSettings()
         Map<String, Object> cannotConnectArgs = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().port(666).getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue(),
                 (LdapTypeField.DEFAULT_FIELD_NAME)      : LdapTypeField.Unknown.UNKNOWN]
-        cannotConnectSettings.setArguments(cannotConnectArgs)
         cannotConnectSettings.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
         when:
         def errorCodes = action.getFunctionErrorCodes()
-        def cannotBindReport = cannotBindSettings.execute()
-        def cannotConnectReport = cannotConnectSettings.execute()
+        def cannotBindReport = cannotBindSettings.execute(cannotBindArgs, FUNCTION_PATH)
+        def cannotConnectReport = cannotConnectSettings.execute(cannotConnectArgs, FUNCTION_PATH)
 
         then:
         errorCodes.size() == 3

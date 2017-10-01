@@ -58,7 +58,6 @@ public class CreateLdapConfiguration extends BaseFunctionField<BooleanField> {
     this.configuratorSuite = configuratorSuite;
 
     config = new LdapConfigurationField().useDefaultRequired();
-    updateArgumentPaths();
 
     this.ldapServiceCommons = new LdapServiceCommons(configuratorSuite);
   }

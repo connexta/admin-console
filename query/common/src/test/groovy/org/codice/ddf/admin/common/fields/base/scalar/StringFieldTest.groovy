@@ -22,6 +22,7 @@ class StringFieldTest extends Specification {
         setup:
         def stringField = new StringField()
         stringField.setValue('')
+        stringField.setPath([StringField.DEFAULT_FIELD_NAME])
 
         when:
         def validationMsgs = stringField.validate()
@@ -36,9 +37,11 @@ class StringFieldTest extends Specification {
         setup:
         def emptyStringField = new StringField()
         emptyStringField.setValue('')
+        emptyStringField.setPath([StringField.DEFAULT_FIELD_NAME])
 
         def missingStringField = new StringField()
         missingStringField.isRequired(true)
+        missingStringField.setPath([StringField.DEFAULT_FIELD_NAME])
 
         when:
         def errorCodes = emptyStringField.getErrorCodes()

@@ -53,7 +53,6 @@ public class CreateCswConfiguration extends BaseFunctionField<BooleanField> {
 
     config = new CswSourceConfigurationField();
     config.useDefaultRequired();
-    updateArgumentPaths();
 
     sourceValidationUtils = new SourceValidationUtils(configuratorSuite);
     serviceCommons = new ServiceCommons(configuratorSuite);

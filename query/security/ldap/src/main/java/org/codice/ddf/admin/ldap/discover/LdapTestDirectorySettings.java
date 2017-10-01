@@ -64,7 +64,6 @@ public class LdapTestDirectorySettings extends TestFunctionField {
     conn = new LdapConnectionField().useDefaultRequired();
     bindInfo = new LdapBindUserInfo().useDefaultRequired();
     settings = new LdapDirectorySettingsField().useDefaultRequiredForAuthentication();
-    updateArgumentPaths();
 
     utils = new LdapTestingUtils();
   }
@@ -163,8 +162,8 @@ public class LdapTestDirectorySettings extends TestFunctionField {
             1);
 
     if (baseUsersResults.isEmpty()) {
-      addErrorMessage(noUsersInBaseUserDnError(settings.baseUserDnField().path()));
-      addErrorMessage(userAttributeNotFoundError(settings.usernameAttributeField().path()));
+      addErrorMessage(noUsersInBaseUserDnError(settings.baseUserDnField().getPath()));
+      addErrorMessage(userAttributeNotFoundError(settings.usernameAttributeField().getPath()));
     }
   }
 
@@ -183,8 +182,8 @@ public class LdapTestDirectorySettings extends TestFunctionField {
             1);
 
     if (baseGroupResults.isEmpty()) {
-      addErrorMessage(noGroupsInBaseGroupDnError(settings.baseGroupDnField().path()));
-      addErrorMessage(noGroupsInBaseGroupDnError(settings.groupObjectClassField().path()));
+      addErrorMessage(noGroupsInBaseGroupDnError(settings.baseGroupDnField().getPath()));
+      addErrorMessage(noGroupsInBaseGroupDnError(settings.groupObjectClassField().getPath()));
     }
   }
 
@@ -201,7 +200,8 @@ public class LdapTestDirectorySettings extends TestFunctionField {
             1);
 
     if (groups.isEmpty()) {
-      addErrorMessage(noGroupsWithMembersError(settings.groupAttributeHoldingMemberField().path()));
+      addErrorMessage(
+          noGroupsWithMembersError(settings.groupAttributeHoldingMemberField().getPath()));
     } else {
       checkReferencedUser(ldapConnection, groups.get(0));
     }
@@ -228,11 +228,11 @@ public class LdapTestDirectorySettings extends TestFunctionField {
 
       if (foundMember.isEmpty()) {
         addErrorMessage(
-            noReferencedMemberError(settings.memberAttributeReferencedInGroupField().path()));
+            noReferencedMemberError(settings.memberAttributeReferencedInGroupField().getPath()));
       }
     } else {
       addErrorMessage(
-          noReferencedMemberError(settings.memberAttributeReferencedInGroupField().path()));
+          noReferencedMemberError(settings.memberAttributeReferencedInGroupField().getPath()));
     }
   }
 

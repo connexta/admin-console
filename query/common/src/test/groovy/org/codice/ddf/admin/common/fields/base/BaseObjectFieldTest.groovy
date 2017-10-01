@@ -28,6 +28,7 @@ class BaseObjectFieldTest extends Specification {
 
     def setup() {
         topLevelField = new TestObjectField()
+        topLevelField.setPath([TestObjectField.FIELD_NAME])
     }
 
     def 'ObjectFields inner fields correctly validated'() {
@@ -46,32 +47,16 @@ class BaseObjectFieldTest extends Specification {
     def 'Field paths of nested ObjectFields are correct order'() {
         when:
         def innerField = topLevelField.getFields().find {
-            (it.getName() == TestObjectField.INNER_OBJECT_FIELD_NAME)
+            (it.getFieldName() == TestObjectField.INNER_OBJECT_FIELD_NAME)
         }
         def subFieldOfInnerField = ((ObjectField) innerField).getFields()[0]
 
-        List<String> topLevelFieldPath = topLevelField.path()
-        List<String> innerFieldPath = innerField.path()
-        List<String> subFieldOfInnerFieldPath = subFieldOfInnerField.path()
+        List<String> topLevelFieldPath = topLevelField.getPath()
+        List<String> innerFieldPath = innerField.getPath()
+        List<String> subFieldOfInnerFieldPath = subFieldOfInnerField.getPath()
 
         then:
         topLevelFieldPath == [TestObjectField.FIELD_NAME]
-        innerFieldPath == [topLevelFieldPath, TestObjectField.INNER_OBJECT_FIELD_NAME].flatten()
-        subFieldOfInnerFieldPath == [innerFieldPath, TestObjectField.SUB_FIELD_OF_INNER_FIELD_NAME].flatten()
-    }
-
-    def 'Changing ObjectField name correctly updates inner fields paths'() {
-        when:
-        topLevelField.pathName('newFieldName')
-        def innerField = topLevelField.getFields()[5]
-        def subFieldOfInnerField = ((ObjectField) innerField).getFields()[0]
-
-        def topLevelFieldPath = topLevelField.path()
-        def innerFieldPath = innerField.path()
-        def subFieldOfInnerFieldPath = subFieldOfInnerField.path()
-
-        then:
-        topLevelFieldPath == ['newFieldName']
         innerFieldPath == [topLevelFieldPath, TestObjectField.INNER_OBJECT_FIELD_NAME].flatten()
         subFieldOfInnerFieldPath == [innerFieldPath, TestObjectField.SUB_FIELD_OF_INNER_FIELD_NAME].flatten()
     }
@@ -133,7 +118,7 @@ class BaseObjectFieldTest extends Specification {
     def 'Successfully masks inner hidden fields'() {
         when:
         TestObjectField.InnerTestObjectField innerField = topLevelField.getFields().find {
-            (it.getName() == TestObjectField.INNER_OBJECT_FIELD_NAME)
+            (it.getFieldName() == TestObjectField.INNER_OBJECT_FIELD_NAME)
         }
         innerField.setHiddenField(REAL_VALUE)
 

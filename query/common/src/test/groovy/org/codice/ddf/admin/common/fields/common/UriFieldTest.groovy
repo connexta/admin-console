@@ -22,6 +22,7 @@ class UriFieldTest extends Specification {
 
     def setup() {
         uriField = new UriField()
+        uriField.setPath([UriField.DEFAULT_FIELD_NAME])
     }
 
     def 'Valid URI field'() {

@@ -13,7 +13,6 @@
  **/
 package org.codice.ddf.admin.ldap.discover
 
-import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.api.report.FunctionReport
 import org.codice.ddf.admin.common.fields.common.CredentialsField
 import org.codice.ddf.admin.common.fields.common.HostnameField
@@ -30,6 +29,9 @@ import org.codice.ddf.admin.security.common.fields.ldap.LdapUseCase
 import spock.lang.Specification
 
 class CreateLdapConfigurationSpec extends Specification {
+
+    static final List<Object> FUNCTION_PATH = [CreateLdapConfiguration.FIELD_NAME]
+
     def authBadPaths
     def attributeStoreBadPaths
     def baseMsg
@@ -37,7 +39,7 @@ class CreateLdapConfigurationSpec extends Specification {
 
     def setup() {
         // Initialize bad paths
-        baseMsg = [CreateLdapConfiguration.FIELD_NAME, FunctionField.ARGUMENT, LdapConfigurationField.DEFAULT_FIELD_NAME]
+        baseMsg = [CreateLdapConfiguration.FIELD_NAME, LdapConfigurationField.DEFAULT_FIELD_NAME]
         authBadPaths = [missingHostPath    : baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME, HostnameField.DEFAULT_FIELD_NAME],
                         missingPortPath    : baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME, PortField.DEFAULT_FIELD_NAME],
                         missingEncryptPath : baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME, LdapEncryptionMethodField.DEFAULT_FIELD_NAME],
@@ -70,7 +72,7 @@ class CreateLdapConfigurationSpec extends Specification {
         createConfigFunc = new CreateLdapConfiguration(null)
 
         when:
-        FunctionReport report = createConfigFunc.execute()
+        FunctionReport report = createConfigFunc.execute(null, FUNCTION_PATH)
 
         then:
         report.getErrorMessages().size() == 10
@@ -99,9 +101,8 @@ class CreateLdapConfigurationSpec extends Specification {
                 (LdapConfigurationField.DEFAULT_FIELD_NAME): configArg.getValue()
         ]
 
-        createConfigFunc.setArguments(args)
         when:
-        FunctionReport report = createConfigFunc.execute()
+        FunctionReport report = createConfigFunc.execute(args, FUNCTION_PATH)
 
         then:
         report.getErrorMessages()*.getPath() as Set == [authBadPaths.missingHostPath,

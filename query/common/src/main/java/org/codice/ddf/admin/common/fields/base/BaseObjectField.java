@@ -13,6 +13,7 @@
  */
 package org.codice.ddf.admin.common.fields.base;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.util.Collection;
 import java.util.HashMap;
@@ -37,7 +38,7 @@ public abstract class BaseObjectField extends BaseField<Map<String, Object>>
     Map<String, Object> values = new HashMap<>();
 
     for (Field field : getFields()) {
-      values.put(field.getName(), field.getValue());
+      values.put(field.getFieldName(), field.getValue());
     }
 
     return values;
@@ -48,7 +49,7 @@ public abstract class BaseObjectField extends BaseField<Map<String, Object>>
     Map<String, Object> values = new HashMap<>();
 
     for (Field field : getFields()) {
-      values.put(field.getName(), field.getSanitizedValue());
+      values.put(field.getFieldName(), field.getSanitizedValue());
     }
 
     return values;
@@ -62,8 +63,8 @@ public abstract class BaseObjectField extends BaseField<Map<String, Object>>
 
     getFields()
         .stream()
-        .filter(field -> values.containsKey(field.getName()))
-        .forEach(field -> field.setValue(values.get(field.getName())));
+        .filter(field -> values.containsKey(field.getFieldName()))
+        .forEach(field -> field.setValue(values.get(field.getFieldName())));
   }
 
   @Override
@@ -84,15 +85,12 @@ public abstract class BaseObjectField extends BaseField<Map<String, Object>>
   }
 
   @Override
-  public void updatePath(List<String> subPath) {
-    super.updatePath(subPath);
-    updateInnerFieldPaths();
-  }
-
-  @Override
-  public void pathName(String pathName) {
-    super.pathName(pathName);
-    updateInnerFieldPaths();
+  public void setPath(List<Object> path) {
+    super.setPath(path);
+    getFields()
+        .stream()
+        .filter(Objects::nonNull)
+        .forEach(child -> child.setPath(createInnerFieldPath(getPath(), child.getFieldName())));
   }
 
   @Override
@@ -108,7 +106,7 @@ public abstract class BaseObjectField extends BaseField<Map<String, Object>>
         .build();
   }
 
-  public void updateInnerFieldPaths() {
-    getFields().stream().filter(Objects::nonNull).forEach(child -> child.updatePath(path()));
+  private List<Object> createInnerFieldPath(List<Object> path, String childName) {
+    return new ImmutableList.Builder<>().addAll(path).add(childName).build();
   }
 }

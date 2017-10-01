@@ -59,7 +59,6 @@ public class InstallEmbeddedLdap extends BaseFunctionField<BooleanField> {
     this.featureActions = configuratorSuite.getFeatureActions();
     useCase = new LdapUseCase();
     useCase.isRequired(true);
-    updateArgumentPaths();
   }
 
   @Override

@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
 public class LdapTestBind extends TestFunctionField {
   private static final Logger LOGGER = LoggerFactory.getLogger(LdapTestBind.class);
 
-  public static final String FIELD_NAME = "testBind";
+  public static final String FUNCTION_NAME = "testBind";
 
   public static final String DESCRIPTION =
       "Attempts to bind a user to the given ldap connection given the ldap bind user credentials.";
@@ -51,10 +51,9 @@ public class LdapTestBind extends TestFunctionField {
   private LdapTestingUtils utils;
 
   public LdapTestBind() {
-    super(FIELD_NAME, DESCRIPTION);
+    super(FUNCTION_NAME, DESCRIPTION);
     conn = new LdapConnectionField().useDefaultRequired();
     creds = new LdapBindUserInfo().useDefaultRequired();
-    updateArgumentPaths();
 
     utils = new LdapTestingUtils();
   }
@@ -93,7 +92,7 @@ public class LdapTestBind extends TestFunctionField {
       // To use MD5, we require an encrypted connection
       if (!(START_TLS.equals(conn.encryptionMethod()) //
           || LDAPS.equals(conn.encryptionMethod()))) {
-        addErrorMessage(md5NeedsEncryptedError(creds.bindMethodField().path()));
+        addErrorMessage(md5NeedsEncryptedError(creds.bindMethodField().getPath()));
       }
     }
   }

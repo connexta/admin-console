@@ -18,10 +18,12 @@ import spock.lang.Specification
 
 class PortFieldTest extends Specification {
 
+    List<String> PORT_FIELD_PATH = [PortField.DEFAULT_FIELD_NAME]
     PortField portField
 
     def setup() {
         portField = new PortField()
+        portField.setPath(PORT_FIELD_PATH)
     }
 
     def 'Valid port range'() {
@@ -58,8 +60,10 @@ class PortFieldTest extends Specification {
     def 'Returns all the possible error codes correctly'(){
         PortField invalidPortField = new PortField()
         invalidPortField.setValue(0)
+        invalidPortField.setPath(PORT_FIELD_PATH)
 
         PortField missingPortField = new PortField().isRequired(true)
+        missingPortField.setPath(PORT_FIELD_PATH)
 
         when:
         def errorCodes = invalidPortField.getErrorCodes()

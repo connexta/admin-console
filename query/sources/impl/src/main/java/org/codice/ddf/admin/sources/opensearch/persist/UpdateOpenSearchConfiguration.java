@@ -57,7 +57,6 @@ public class UpdateOpenSearchConfiguration extends BaseFunctionField<BooleanFiel
     config = new OpenSearchSourceConfigurationField();
     config.useDefaultRequired();
     config.pidField().isRequired(true);
-    updateArgumentPaths();
 
     sourceValidationUtils = new SourceValidationUtils(configuratorSuite);
     serviceCommons = new ServiceCommons(configuratorSuite);

@@ -35,6 +35,7 @@ import static org.codice.ddf.admin.ldap.LdapTestingCommons.*
 import static org.codice.ddf.admin.security.common.fields.ldap.LdapUseCase.AttributeStore.ATTRIBUTE_STORE
 
 class LdapUserAttributesSpec extends Specification {
+    static final List<Object> FUNCTION_PATH = [LdapUserAttributes.FIELD_NAME]
     static TestLdapServer server
     LdapUserAttributes action
     Map<String, Object> args
@@ -59,7 +60,7 @@ class LdapUserAttributesSpec extends Specification {
         action = new LdapUserAttributes()
 
         // Initialize bad paths
-        baseMsg = [LdapUserAttributes.FIELD_NAME, FunctionField.ARGUMENT]
+        baseMsg = [LdapUserAttributes.FIELD_NAME]
         badPaths = [missingHostPath                     : baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME, HostnameField.DEFAULT_FIELD_NAME],
                     missingPortPath                     : baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME, PortField.DEFAULT_FIELD_NAME],
                     missingEncryptPath                  : baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME, LdapEncryptionMethodField.DEFAULT_FIELD_NAME],
@@ -79,7 +80,7 @@ class LdapUserAttributesSpec extends Specification {
         action = new LdapUserAttributes()
 
         when:
-        FunctionReport report = action.execute()
+        FunctionReport report = action.execute(null, FUNCTION_PATH)
 
         then:
         report.getErrorMessages().size() == badPaths.size()
@@ -97,11 +98,10 @@ class LdapUserAttributesSpec extends Specification {
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().port(666).getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue(),
                 (LdapUserAttributes.BASE_USER_DN)  : LdapTestingCommons.LDAP_SERVER_BASE_GROUP_DN]
-        action.setArguments(args)
         action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
         when:
-        FunctionReport report = action.execute()
+        FunctionReport report = action.execute(args, FUNCTION_PATH)
 
         then:
         report.getErrorMessages().size() == 1
@@ -115,11 +115,10 @@ class LdapUserAttributesSpec extends Specification {
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().password('badPassword').getValue(),
                 (LdapUserAttributes.BASE_USER_DN)  : LdapTestingCommons.LDAP_SERVER_BASE_GROUP_DN]
-        action.setArguments(args)
         action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
         when:
-        FunctionReport report = action.execute()
+        FunctionReport report = action.execute(args, FUNCTION_PATH)
 
         then:
         report.getErrorMessages().size() == 1
@@ -133,11 +132,10 @@ class LdapUserAttributesSpec extends Specification {
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue(),
                 (LdapUserAttributes.BASE_USER_DN)  : LdapTestingCommons.LDAP_SERVER_BASE_GROUP_DN]
-        action.setArguments(args)
         action.setTestingUtils(utilsMock)
 
         when:
-        ListField<StringField> report = action.execute().getResult()
+        ListField<StringField> report = action.execute(args, FUNCTION_PATH).getResult()
 
         ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().getResult().isClosed()
 
@@ -155,20 +153,18 @@ class LdapUserAttributesSpec extends Specification {
         Map<String, Object> cannotConnectArgs = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().port(666).getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue(),
                 (LdapUserAttributes.BASE_USER_DN)  : LdapTestingCommons.LDAP_SERVER_BASE_GROUP_DN]
-        cannotConnectAction.setArguments(cannotConnectArgs)
         cannotConnectAction.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
         LdapUserAttributes cannotBindAction = new LdapUserAttributes()
         Map<String, Object> cannotBindArgs = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().password('badPassword').getValue(),
                 (LdapUserAttributes.BASE_USER_DN)  : LdapTestingCommons.LDAP_SERVER_BASE_GROUP_DN]
-        cannotBindAction.setArguments(cannotBindArgs)
         cannotBindAction.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
         when:
         def errorCodes = action.getFunctionErrorCodes()
-        def cannotConnectReport = cannotConnectAction.execute()
-        def cannotBindReport = cannotBindAction.execute()
+        def cannotConnectReport = cannotConnectAction.execute(cannotConnectArgs, FUNCTION_PATH)
+        def cannotBindReport = cannotBindAction.execute(cannotBindArgs, FUNCTION_PATH)
 
         then:
         errorCodes.size() == 3

@@ -64,7 +64,6 @@ public class LdapUserAttributes extends BaseFunctionField<StringField.ListImpl> 
     bindInfo = new LdapBindUserInfo().useDefaultRequired();
     baseUserDn = new LdapDistinguishedName(BASE_USER_DN);
     baseUserDn.isRequired(true);
-    updateArgumentPaths();
 
     utils = new LdapTestingUtils();
   }

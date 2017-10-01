@@ -68,8 +68,6 @@ public class LdapDirectorySettingsField extends BaseObjectField {
     this.memberAttributeReferencedInGroup =
         new LdapAttributeName(MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP);
     this.useCase = new LdapUseCase();
-
-    updateInnerFieldPaths();
   }
 
   @Override

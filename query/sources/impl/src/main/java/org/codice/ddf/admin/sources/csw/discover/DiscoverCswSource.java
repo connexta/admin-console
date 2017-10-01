@@ -53,7 +53,6 @@ public class DiscoverCswSource extends BaseFunctionField<CswSourceConfigurationF
     credentials = new CredentialsField();
     address = new AddressField();
     address.isRequired(true);
-    updateArgumentPaths();
 
     cswSourceUtils = new CswSourceUtils(configuratorSuite);
   }

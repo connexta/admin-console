@@ -15,7 +15,6 @@ package org.codice.ddf.admin.sources.opensearch.discover
 
 import org.codice.ddf.admin.api.ConfiguratorSuite
 import org.codice.ddf.admin.api.Field
-import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.api.fields.ListField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
@@ -27,6 +26,7 @@ import org.codice.ddf.internal.admin.configurator.actions.ServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceReader
 
 class GetOpenSearchConfigsSpec extends SourceCommonsSpec {
+    static final List<Object> FUNCTION_PATH = [GetOpenSearchConfigurations.FIELD_NAME]
 
     static SHORT_NAME = OpenSearchServiceProperties.SHORTNAME
 
@@ -34,7 +34,7 @@ class GetOpenSearchConfigsSpec extends SourceCommonsSpec {
 
     static RESULT_ARGUMENT_PATH = [GetOpenSearchConfigurations.FIELD_NAME]
 
-    static BASE_PATH = [RESULT_ARGUMENT_PATH, FunctionField.ARGUMENT].flatten()
+    static BASE_PATH = [RESULT_ARGUMENT_PATH].flatten()
 
     GetOpenSearchConfigurations getOpenSearchConfigsFunction
 
@@ -48,7 +48,7 @@ class GetOpenSearchConfigsSpec extends SourceCommonsSpec {
 
     def managedServiceConfigs
 
-    def functionArgs = [
+    def args = [
             (PID): S_PID_2
     ]
 
@@ -69,7 +69,7 @@ class GetOpenSearchConfigsSpec extends SourceCommonsSpec {
 
     def 'No pid argument returns all configs'() {
         when:
-        def report = getOpenSearchConfigsFunction.execute()
+        def report = getOpenSearchConfigsFunction.execute(null, FUNCTION_PATH)
         def list = ((ListField) report.getResult())
 
         then:
@@ -78,16 +78,13 @@ class GetOpenSearchConfigsSpec extends SourceCommonsSpec {
         2 * serviceReader.getServices(_, _) >> [new TestSource(S_PID_2, false)]
         report.getResult() != null
         list.getList().size() == 2
-        assertConfig(list.getList().get(0), 0, TEST_SHORT_NAME, S_PID_1, true)
-        assertConfig(list.getList().get(1), 1, TEST_SHORT_NAME, S_PID_2, false)
+        assertConfig(list.getList().get(0), TEST_SHORT_NAME, S_PID_1, true)
+        assertConfig(list.getList().get(1), TEST_SHORT_NAME, S_PID_2, false)
     }
 
     def 'Pid filter returns 1 result'() {
-        setup:
-        getOpenSearchConfigsFunction.setArguments(functionArgs)
-
         when:
-        def report = getOpenSearchConfigsFunction.execute()
+        def report = getOpenSearchConfigsFunction.execute(args, FUNCTION_PATH)
         def list = ((ListField) report.getResult())
 
         then:
@@ -96,17 +93,16 @@ class GetOpenSearchConfigsSpec extends SourceCommonsSpec {
         serviceActions.read(S_PID_2) >> baseManagedServiceConfigs.get(S_PID_2)
         report.getResult() != null
         list.getList().size() == 1
-        assertConfig(list.getList().get(0), 0, TEST_SHORT_NAME, S_PID_2, false)
+        assertConfig(list.getList().get(0), TEST_SHORT_NAME, S_PID_2, false)
     }
 
     def 'Fail due to no existing config with specified pid'() {
         setup:
-        functionArgs.put(PID, S_PID)
-        getOpenSearchConfigsFunction.setArguments(functionArgs)
+        args.put(PID, S_PID)
         serviceActions.read(S_PID) >> [:]
 
         when:
-        def report = getOpenSearchConfigsFunction.execute()
+        def report = getOpenSearchConfigsFunction.execute(args, FUNCTION_PATH)
 
         then:
         report.getResult() == null
@@ -122,9 +118,8 @@ class GetOpenSearchConfigsSpec extends SourceCommonsSpec {
         return managedServiceConfigs
     }
 
-    def assertConfig(Field field, int index, String sourceName, String pid, boolean availability) {
+    def assertConfig(Field field, String sourceName, String pid, boolean availability) {
         def sourceInfo = (OpenSearchSourceInfoField) field
-        assert sourceInfo.path()[-1] == index.toString()
         assert sourceInfo.isAvailable() == availability
         assert sourceInfo.config().credentials().password() == FLAG_PASSWORD
         assert sourceInfo.config().credentials().username() == TEST_USERNAME
@@ -135,13 +130,12 @@ class GetOpenSearchConfigsSpec extends SourceCommonsSpec {
 
     def 'Returns all the possible error codes correctly'(){
         setup:
-        functionArgs.put(PID, S_PID)
-        getOpenSearchConfigsFunction.setArguments(functionArgs)
+        args.put(PID, S_PID)
         serviceActions.read(S_PID) >> [:]
 
         when:
         def errorCodes = getOpenSearchConfigsFunction.getFunctionErrorCodes()
-        def noExistingConfigReport = getOpenSearchConfigsFunction.execute()
+        def noExistingConfigReport = getOpenSearchConfigsFunction.execute(args, FUNCTION_PATH)
 
         then:
         errorCodes.size() == 1

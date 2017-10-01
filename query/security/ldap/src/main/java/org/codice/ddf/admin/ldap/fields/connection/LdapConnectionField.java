@@ -39,7 +39,6 @@ public class LdapConnectionField extends BaseObjectField {
     hostname = new HostnameField();
     port = new PortField();
     encryptionMethod = new LdapEncryptionMethodField();
-    updateInnerFieldPaths();
   }
 
   public LdapConnectionField useDefaultRequired() {

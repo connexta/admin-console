@@ -53,7 +53,7 @@ public class HostnameField extends StringField {
     }
 
     if (getValue() != null && !validHostname(getValue())) {
-      validationMsgs.add(invalidHostnameError(path()));
+      validationMsgs.add(invalidHostnameError(getPath()));
     }
 
     return validationMsgs;

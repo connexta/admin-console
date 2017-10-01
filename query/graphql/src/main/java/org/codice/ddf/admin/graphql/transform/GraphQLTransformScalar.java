@@ -27,8 +27,8 @@ public class GraphQLTransformScalar {
   }
 
   public GraphQLScalarType resolveScalarType(ScalarField field) {
-    if (scalarTypesProvider.isTypePresent(field.getTypeName())) {
-      return scalarTypesProvider.getType(field.getTypeName());
+    if (scalarTypesProvider.isTypePresent(field.getFieldTypeName())) {
+      return scalarTypesProvider.getType(field.getFieldTypeName());
     }
 
     GraphQLScalarType type = null;
@@ -36,42 +36,44 @@ public class GraphQLTransformScalar {
     switch (field.getScalarType()) {
       case INTEGER:
         type =
-            field.getTypeName() == null
+            field.getFieldTypeName() == null
                 ? Scalars.GraphQLInt
                 : new GraphQLScalarType(
-                    field.getTypeName(), field.getDescription(), Scalars.GraphQLInt.getCoercing());
+                    field.getFieldTypeName(),
+                    field.getDescription(),
+                    Scalars.GraphQLInt.getCoercing());
         break;
 
       case BOOLEAN:
         type =
-            field.getTypeName() == null
+            field.getFieldTypeName() == null
                 ? Scalars.GraphQLBoolean
                 : new GraphQLScalarType(
-                    field.getTypeName(),
+                    field.getFieldTypeName(),
                     field.getDescription(),
                     Scalars.GraphQLBoolean.getCoercing());
         break;
 
       case STRING:
         type =
-            field.getTypeName() == null
+            field.getFieldTypeName() == null
                 ? Scalars.GraphQLString
                 : new GraphQLScalarType(
-                    field.getTypeName(),
+                    field.getFieldTypeName(),
                     field.getDescription(),
                     Scalars.GraphQLString.getCoercing());
         break;
       case FLOAT:
         type =
-            field.getTypeName() == null
+            field.getFieldTypeName() == null
                 ? Scalars.GraphQLFloat
                 : new GraphQLScalarType(
-                    field.getTypeName(),
+                    field.getFieldTypeName(),
                     field.getDescription(),
                     Scalars.GraphQLFloat.getCoercing());
     }
 
-    scalarTypesProvider.addType(field.getTypeName(), type);
+    scalarTypesProvider.addType(field.getFieldTypeName(), type);
     return type;
   }
 

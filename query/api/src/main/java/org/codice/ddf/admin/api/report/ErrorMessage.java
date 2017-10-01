@@ -19,7 +19,7 @@ public interface ErrorMessage {
 
   String getCode();
 
-  List<String> getPath();
+  List<Object> getPath();
 
-  ErrorMessage setPath(List<String> path);
+  ErrorMessage setPath(List<Object> path);
 }

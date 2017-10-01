@@ -17,6 +17,7 @@ import static graphql.ErrorType.DataFetchingException;
 
 import graphql.ErrorType;
 import graphql.GraphQLError;
+import graphql.execution.ExecutionPath;
 import graphql.language.SourceLocation;
 import java.util.List;
 import org.codice.ddf.admin.api.report.ErrorMessage;
@@ -24,11 +25,11 @@ import org.codice.ddf.admin.api.report.ErrorMessage;
 public class DataFetchingGraphQLError implements GraphQLError {
 
   private String code;
-  private List<String> path;
+  private List<Object> path;
 
-  public DataFetchingGraphQLError(ErrorMessage msg) {
+  public DataFetchingGraphQLError(ErrorMessage msg, ExecutionPath path) {
     this.code = msg.getCode();
-    this.path = msg.getPath();
+    this.path = path.toList();
   }
 
   @Override
@@ -36,7 +37,8 @@ public class DataFetchingGraphQLError implements GraphQLError {
     return code;
   }
 
-  public List<String> getPath() {
+  @Override
+  public List<Object> getPath() {
     return path;
   }
 

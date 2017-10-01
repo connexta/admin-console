@@ -24,6 +24,8 @@ import spock.lang.Shared
 
 class DiscoverWfsSourcesSpec extends SourceCommonsSpec {
 
+    static final List<Object> FUNCTION_PATH = [DiscoverWfsSource.FIELD_NAME]
+
     @Shared
             wfs10ResponseBody = this.getClass().getClassLoader().getResource('responses/wfs/wfs10GetCapabilities.xml').text
 
@@ -40,7 +42,7 @@ class DiscoverWfsSourcesSpec extends SourceCommonsSpec {
 
     static TEST_WFS_URL = 'https://testHostName:12345/services/wfs'
 
-    static BASE_PATH = [DiscoverWfsSource.FIELD_NAME, FunctionField.ARGUMENT]
+    static BASE_PATH = [DiscoverWfsSource.FIELD_NAME]
 
     static ADDRESS_FIELD_PATH = [BASE_PATH, ADDRESS].flatten()
 
@@ -55,10 +57,9 @@ class DiscoverWfsSourcesSpec extends SourceCommonsSpec {
     def 'Successfully discover WFS 1.0.0 configuration using URL'() {
         setup:
         discoverWfs.setWfsSourceUtils(prepareOpenSearchSourceUtils(200, wfs10ResponseBody, true))
-        discoverWfs.setArguments(getBaseDiscoverByUrlArgs(TEST_WFS_URL))
 
         when:
-        def report = discoverWfs.execute()
+        def report = discoverWfs.execute(getBaseDiscoverByUrlArgs(TEST_WFS_URL), FUNCTION_PATH)
         def config = report.getResult()
 
         then:
@@ -70,10 +71,9 @@ class DiscoverWfsSourcesSpec extends SourceCommonsSpec {
     def 'Successfully discover WFS 2.0.0 configuration using URL'() {
         setup:
         discoverWfs.setWfsSourceUtils(prepareOpenSearchSourceUtils(200, wfs20ResponseBody, true))
-        discoverWfs.setArguments(getBaseDiscoverByUrlArgs(TEST_WFS_URL))
 
         when:
-        def report = discoverWfs.execute()
+        def report = discoverWfs.execute(getBaseDiscoverByUrlArgs(TEST_WFS_URL), FUNCTION_PATH)
         def config = report.getResult()
 
         then:
@@ -85,10 +85,9 @@ class DiscoverWfsSourcesSpec extends SourceCommonsSpec {
     def 'Successfully discover WFS 1.0.0 configuration using hostname and port'() {
         setup:
         discoverWfs.setWfsSourceUtils(prepareOpenSearchSourceUtils(200, wfs10ResponseBody, true))
-        discoverWfs.setArguments(getBaseDiscoverByAddressArgs())
 
         when:
-        def report = discoverWfs.execute()
+        def report = discoverWfs.execute(getBaseDiscoverByAddressArgs(), FUNCTION_PATH)
         def config = report.getResult()
 
         then:
@@ -100,10 +99,9 @@ class DiscoverWfsSourcesSpec extends SourceCommonsSpec {
     def 'Successfully discover WFS 2.0.0 configuration using hostname and port'() {
         setup:
         discoverWfs.setWfsSourceUtils(prepareOpenSearchSourceUtils(200, wfs20ResponseBody, true))
-        discoverWfs.setArguments(getBaseDiscoverByAddressArgs())
 
         when:
-        def report = discoverWfs.execute()
+        def report = discoverWfs.execute(getBaseDiscoverByAddressArgs(), FUNCTION_PATH)
         def config = report.getResult()
 
         then:
@@ -115,10 +113,9 @@ class DiscoverWfsSourcesSpec extends SourceCommonsSpec {
     def 'Unknown endpoint error when unrecognized WFS version is received'() {
         setup:
         discoverWfs.setWfsSourceUtils(prepareOpenSearchSourceUtils(200, wfsUnrecognizedResponseBody, true))
-        discoverWfs.setArguments(getBaseDiscoverByUrlArgs(TEST_WFS_URL))
 
         when:
-        def report = discoverWfs.execute()
+        def report = discoverWfs.execute(getBaseDiscoverByUrlArgs(TEST_WFS_URL), FUNCTION_PATH)
 
         then:
         report.getErrorMessages().size() == 1
@@ -129,10 +126,9 @@ class DiscoverWfsSourcesSpec extends SourceCommonsSpec {
     def 'Unknown endpoint error when bad HTTP code received'() {
         setup:
         discoverWfs.setWfsSourceUtils(prepareOpenSearchSourceUtils(500, wfs20ResponseBody, true))
-        discoverWfs.setArguments(getBaseDiscoverByUrlArgs(TEST_WFS_URL))
 
         when:
-        def report = discoverWfs.execute()
+        def report = discoverWfs.execute(getBaseDiscoverByUrlArgs(TEST_WFS_URL), FUNCTION_PATH)
 
         then:
         report.getErrorMessages().size() == 1
@@ -143,10 +139,9 @@ class DiscoverWfsSourcesSpec extends SourceCommonsSpec {
     def 'Unknown endpoint error when unrecognized response received'() {
         setup:
         discoverWfs.setWfsSourceUtils(prepareOpenSearchSourceUtils(200, badResponseBody, true))
-        discoverWfs.setArguments(getBaseDiscoverByUrlArgs(TEST_WFS_URL))
 
         when:
-        def report = discoverWfs.execute()
+        def report = discoverWfs.execute(getBaseDiscoverByUrlArgs(TEST_WFS_URL), FUNCTION_PATH)
 
         then:
         report.getErrorMessages().size() == 1
@@ -157,10 +152,9 @@ class DiscoverWfsSourcesSpec extends SourceCommonsSpec {
     def 'Unknown endpoint if no pre-formatted URLs work when discovering with host+port'() {
         setup:
         discoverWfs.setWfsSourceUtils(prepareOpenSearchSourceUtils(200, badResponseBody, false))
-        discoverWfs.setArguments(getBaseDiscoverByAddressArgs())
 
         when:
-        def report = discoverWfs.execute()
+        def report = discoverWfs.execute(getBaseDiscoverByAddressArgs(), FUNCTION_PATH)
 
         then:
         report.getErrorMessages().size() == 1
@@ -170,7 +164,7 @@ class DiscoverWfsSourcesSpec extends SourceCommonsSpec {
 
     def 'Fail when missing required fields'() {
         when:
-        def report = discoverWfs.execute()
+        def report = discoverWfs.execute(null, FUNCTION_PATH)
 
         then:
         report.getResult() == null
@@ -185,16 +179,14 @@ class DiscoverWfsSourcesSpec extends SourceCommonsSpec {
         setup:
         DiscoverWfsSource cannotConnectWfs = new DiscoverWfsSource(Mock(ConfiguratorSuite))
         cannotConnectWfs.setWfsSourceUtils(prepareOpenSearchSourceUtils(200, badResponseBody, false))
-        cannotConnectWfs.setArguments(getBaseDiscoverByAddressArgs())
 
         DiscoverWfsSource unknownEndpointWfs = new DiscoverWfsSource(Mock(ConfiguratorSuite))
         unknownEndpointWfs.setWfsSourceUtils(prepareOpenSearchSourceUtils(200, badResponseBody, true))
-        unknownEndpointWfs.setArguments(getBaseDiscoverByUrlArgs(TEST_WFS_URL))
 
         when:
         def errorCodes = discoverWfs.getFunctionErrorCodes()
-        def cannotConnectReport = cannotConnectWfs.execute()
-        def unknownEndpointReport = unknownEndpointWfs.execute()
+        def cannotConnectReport = cannotConnectWfs.execute(getBaseDiscoverByAddressArgs(), FUNCTION_PATH)
+        def unknownEndpointReport = unknownEndpointWfs.execute(getBaseDiscoverByUrlArgs(TEST_WFS_URL), FUNCTION_PATH)
 
         then:
         errorCodes.size() == 2

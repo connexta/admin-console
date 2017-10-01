@@ -19,90 +19,53 @@ import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.common.fields.base.scalar.StringField
 import org.codice.ddf.admin.common.fields.test.TestObjectField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
-import org.codice.ddf.admin.common.report.message.ErrorMessageImpl
 import spock.lang.Specification
 
 class BaseFunctionFieldTest extends Specification {
 
-    BaseFunctionField functionField
+    final List<Object> FUNCTION_FIELD_PATH = [TestBaseFunctionField.DEFAULT_FIELD_NAME]
 
-    def 'Argument paths are updated when function field name is updated'() {
-        setup:
-        functionField = new TestBaseFunctionField(true)
+    TestBaseFunctionField functionField
 
-        expect:
-        functionField.path() == [TestBaseFunctionField.DEFAULT_NAME]
-        functionField.getArguments()[0].path() == [TestBaseFunctionField.DEFAULT_NAME, BaseFunctionField.ARGUMENT, StringField.DEFAULT_FIELD_NAME]
-
-        when:
-        functionField.pathName('newName')
-
-        then:
-        functionField.path() == ['newName']
-        functionField.getArguments()[0].path() == ['newName', BaseFunctionField.ARGUMENT, StringField.DEFAULT_FIELD_NAME]
-
+    def setup() {
+        functionField = new TestBaseFunctionField()
     }
 
     def 'Function field validates arguments'() {
         setup:
-        functionField = new TestBaseFunctionField(true)
+        functionField.failValidation(true)
 
         when:
-        def report = functionField.execute()
+        def report = functionField.execute(null, FUNCTION_FIELD_PATH)
 
         then:
         report.getErrorMessages().size() == 1
         report.getErrorMessages()[0].getCode() == DefaultMessages.EMPTY_FIELD
-        report.getErrorMessages()[0].getPath() == [TestBaseFunctionField.DEFAULT_NAME, BaseFunctionField.ARGUMENT, StringField.DEFAULT_FIELD_NAME]
-    }
-
-    def 'Adding result message has correct path on added message'() {
-        setup:
-        functionField = new TestBaseFunctionField(false)
-        functionField.addErrorMessage(new ErrorMessageImpl('test'))
-
-        when:
-        def report = functionField.execute()
-
-        then:
-        report.getErrorMessages().size() == 1
-        report.getErrorMessages()[0].getPath() == [TestBaseFunctionField.DEFAULT_NAME]
+        report.getErrorMessages()[0].getPath() == [TestBaseFunctionField.DEFAULT_FIELD_NAME, StringField.DEFAULT_FIELD_NAME]
     }
 
     def 'Setting function arguments populates argument values correctly'() {
         setup:
-        functionField = new TestBaseFunctionField(false)
+        functionField.failValidation(false)
 
         when:
         def value = [
                 (StringField.DEFAULT_FIELD_NAME): 'test1',
                 (TestObjectField.FIELD_NAME)    : [(StringField.DEFAULT_FIELD_NAME): 'test2', (TestObjectField.INNER_OBJECT_FIELD_NAME): [(TestObjectField.SUB_FIELD_OF_INNER_FIELD_NAME): 'test3']]
         ]
-        functionField.setArguments(value)
+        functionField.execute(value, FUNCTION_FIELD_PATH)
 
         then:
         functionField.getStringArg().getValue() == 'test1'
         ((TestObjectField) functionField.getArguments()[1]).getStringField().getValue() == 'test2'
         ((TestObjectField) functionField.getArguments()[1]).getFields().find {
-            (it.getName() == TestObjectField.INNER_OBJECT_FIELD_NAME)
+            (it.getFieldName() == TestObjectField.INNER_OBJECT_FIELD_NAME)
         }.getFields()[0].getValue() == 'test3'
-    }
-
-    def 'Updating path updates arguments paths'() {
-        setup:
-        functionField = new TestBaseFunctionField(false)
-
-        when:
-        functionField.updatePath(['test'])
-
-        then:
-        functionField.path() == ['test', TestBaseFunctionField.DEFAULT_NAME]
-        functionField.getArguments()[0].path() == ['test', TestBaseFunctionField.DEFAULT_NAME, FunctionField.ARGUMENT, StringField.DEFAULT_FIELD_NAME]
     }
 
     def 'Returns all the possible error codes correctly from all arguments'(){
         setup:
-        functionField = new TestBaseFunctionField(false)
+        functionField.failValidation(false)
 
         when:
         def errorCodes = functionField.getErrorCodes()
@@ -127,7 +90,7 @@ class BaseFunctionFieldTest extends Specification {
 
     class TestBaseFunctionField extends BaseFunctionField<StringField> {
 
-        static String DEFAULT_NAME = 'testBaseFunctionField'
+        static String DEFAULT_FIELD_NAME = 'testBaseFunctionField'
 
         static String ARG_VALUE = 'valid'
 
@@ -139,20 +102,22 @@ class BaseFunctionFieldTest extends Specification {
 
         TestObjectField testObjectField
 
-        TestBaseFunctionField(boolean failValidation) {
-            this(DEFAULT_NAME, failValidation)
+        TestBaseFunctionField() {
+            this(DEFAULT_FIELD_NAME)
         }
 
-        TestBaseFunctionField(String functionName, boolean failValidation) {
+        TestBaseFunctionField(String functionName) {
             super(functionName, 'description')
             stringArg = new StringField()
             testObjectField = new TestObjectField()
+        }
+
+        void failValidation(boolean failValidation) {
             if (failValidation) {
                 stringArg.setValue('')
             } else {
                 stringArg.setValue(ARG_VALUE)
             }
-            updateArgumentPaths()
         }
 
         @Override
@@ -167,7 +132,7 @@ class BaseFunctionFieldTest extends Specification {
 
         @Override
         FunctionField<StringField> newInstance() {
-            return new TestBaseFunctionField(DEFAULT_NAME)
+            return new TestBaseFunctionField(DEFAULT_FIELD_NAME)
         }
 
         @Override

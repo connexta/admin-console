@@ -22,6 +22,7 @@ class UrlFieldTest extends Specification {
 
     def setup() {
         urlField = new UrlField()
+        urlField.setPath([UrlField.DEFAULT_FIELD_NAME])
     }
 
     def 'Valid url'() {

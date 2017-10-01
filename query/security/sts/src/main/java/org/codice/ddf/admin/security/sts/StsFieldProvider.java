@@ -35,7 +35,6 @@ public class StsFieldProvider extends BaseFieldProvider {
   public StsFieldProvider(ServiceActions serviceActions) {
     super(NAME, TYPE_NAME, DESCRIPTION);
     getStsClaims = new GetStsClaimsFunctionField(serviceActions);
-    updateInnerFieldPaths();
   }
 
   @Override

@@ -51,7 +51,6 @@ public class CswFieldProvider extends BaseFieldProvider {
     createCswConfiguration = new CreateCswConfiguration(configuratorSuite);
     updateCswConfiguration = new UpdateCswConfiguration(configuratorSuite);
     deleteCswConfiguration = new DeleteCswConfiguration(configuratorSuite);
-    updateInnerFieldPaths();
   }
 
   @Override

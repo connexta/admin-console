@@ -110,7 +110,7 @@ public class WfsSourceUtils {
     if (result.isPresent()) {
       return result.get();
     } else {
-      return Reports.from(unknownEndpointError(hostField.path()));
+      return Reports.from(unknownEndpointError(hostField.getPath()));
     }
   }
 
@@ -144,7 +144,7 @@ public class WfsSourceUtils {
     UrlField requestUrl = responseField.requestUrlField();
 
     if (responseField.statusCode() != HTTP_OK || responseBody.length() < 1) {
-      return Reports.from(unknownEndpointError(responseField.requestUrlField().path()));
+      return Reports.from(unknownEndpointError(responseField.requestUrlField().getPath()));
     }
 
     Document capabilitiesXml;
@@ -152,7 +152,7 @@ public class WfsSourceUtils {
       capabilitiesXml = sourceUtilCommons.createDocument(responseBody);
     } catch (Exception e) {
       LOGGER.debug("Failed to read response from WFS endpoint.");
-      return Reports.from(unknownEndpointError(responseField.requestUrlField().path()));
+      return Reports.from(unknownEndpointError(responseField.requestUrlField().getPath()));
     }
 
     WfsSourceConfigurationField preferredConfig = new WfsSourceConfigurationField();
@@ -169,14 +169,14 @@ public class WfsSourceUtils {
       wfsVersion = xpath.compile(WFS_VERSION_EXP).evaluate(capabilitiesXml);
     } catch (XPathExpressionException e) {
       LOGGER.debug("Failed to parse XML response.");
-      return Reports.from(unknownEndpointError(responseField.requestUrlField().path()));
+      return Reports.from(unknownEndpointError(responseField.requestUrlField().getPath()));
     }
 
     WfsVersion wfsVersionToCheck = new WfsVersion();
     wfsVersionToCheck.isRequired(true);
     wfsVersionToCheck.setValue(wfsVersion);
     if (!wfsVersionToCheck.validate().isEmpty()) {
-      return Reports.from(unknownEndpointError(responseField.requestUrlField().path()));
+      return Reports.from(unknownEndpointError(responseField.requestUrlField().getPath()));
     }
 
     WfsSourceConfigurationField wfsSourceConfigurationField =

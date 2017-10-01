@@ -29,6 +29,7 @@ import org.codice.ddf.security.policy.context.impl.PolicyManager
 import spock.lang.Specification
 
 class SaveWhitelistContextsTest extends Specification {
+    static final List<Object> FUNCTION_PATH = [WcpmFieldProvider.NAME, SaveWhitelistContexts.FIELD_NAME]
     WcpmFieldProvider wcpmFieldProvider
     ConfiguratorFactory configuratorFactory
     ServiceActions serviceActions
@@ -67,8 +68,7 @@ class SaveWhitelistContextsTest extends Specification {
         operationReport.containsFailedResults() >> false
 
         when:
-        saveWhitelistContextsFunction.setArguments(testMap)
-        Report report = saveWhitelistContextsFunction.execute()
+        Report report = saveWhitelistContextsFunction.execute(testMap, FUNCTION_PATH)
 
         then:
         report.getErrorMessages().size() == 0
@@ -81,12 +81,11 @@ class SaveWhitelistContextsTest extends Specification {
         operationReport.containsFailedResults() >> false
 
         when:
-        saveWhitelistContextsFunction.setArguments(testMap)
-        Report report = saveWhitelistContextsFunction.execute()
+        Report report = saveWhitelistContextsFunction.execute(testMap, FUNCTION_PATH)
 
         then:
         report.getErrorMessages()[0].code == DefaultMessages.INVALID_CONTEXT_PATH
-        report.getErrorMessages()[0].path == [WcpmFieldProvider.NAME, SaveWhitelistContexts.FIELD_NAME, BaseFunctionField.ARGUMENT, 'paths', '2']
+        report.getErrorMessages()[0].path == [WcpmFieldProvider.NAME, SaveWhitelistContexts.FIELD_NAME, 'paths', 2]
         report.getResult() == null
     }
 
@@ -96,12 +95,11 @@ class SaveWhitelistContextsTest extends Specification {
         operationReport.containsFailedResults() >> false
 
         when:
-        saveWhitelistContextsFunction.setArguments(testMap)
-        Report report = saveWhitelistContextsFunction.execute()
+        Report report = saveWhitelistContextsFunction.execute(testMap, FUNCTION_PATH)
 
         then:
         report.getErrorMessages()[0].code == DefaultMessages.EMPTY_FIELD
-        report.getErrorMessages()[0].path == [WcpmFieldProvider.NAME, SaveWhitelistContexts.FIELD_NAME, BaseFunctionField.ARGUMENT, 'paths', '2']
+        report.getErrorMessages()[0].path == [WcpmFieldProvider.NAME, SaveWhitelistContexts.FIELD_NAME, 'paths', 2]
         report.getResult() == null
     }
 
@@ -111,12 +109,11 @@ class SaveWhitelistContextsTest extends Specification {
         operationReport.containsFailedResults() >> false
 
         when:
-        saveWhitelistContextsFunction.setArguments(testMap)
-        Report report = saveWhitelistContextsFunction.execute()
+        Report report = saveWhitelistContextsFunction.execute(testMap, FUNCTION_PATH)
 
         then:
         report.getErrorMessages()[0].code == DefaultMessages.INVALID_PATH_TRAILING_SLASH
-        report.getErrorMessages()[0].path == [WcpmFieldProvider.NAME, SaveWhitelistContexts.FIELD_NAME, BaseFunctionField.ARGUMENT, 'paths', '2']
+        report.getErrorMessages()[0].path == [WcpmFieldProvider.NAME, SaveWhitelistContexts.FIELD_NAME, 'paths', 2]
         report.getResult() == null
     }
 
@@ -126,8 +123,7 @@ class SaveWhitelistContextsTest extends Specification {
         operationReport.containsFailedResults() >> false
 
         when:
-        saveWhitelistContextsFunction.setArguments(testMap)
-        Report report = saveWhitelistContextsFunction.execute()
+        Report report = saveWhitelistContextsFunction.execute(testMap, FUNCTION_PATH)
 
         then:
         report.getErrorMessages().size() == 0
@@ -140,8 +136,7 @@ class SaveWhitelistContextsTest extends Specification {
         operationReport.containsFailedResults() >> true
 
         when:
-        saveWhitelistContextsFunction.setArguments(testMap)
-        Report report = saveWhitelistContextsFunction.execute()
+        Report report = saveWhitelistContextsFunction.execute(testMap, FUNCTION_PATH)
 
         then:
         report.getErrorMessages()[0].code == DefaultMessages.FAILED_PERSIST

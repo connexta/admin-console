@@ -29,6 +29,8 @@ import org.codice.ddf.internal.admin.configurator.actions.ServiceReader
 
 class GetWfsConfigsSpec extends SourceCommonsSpec {
 
+    static final List<Object> FUNCTION_PATH = [GetWfsConfigurations.FIELD_NAME]
+
     GetWfsConfigurations getWfsConfigsFunction
 
     ConfiguratorFactory configuratorFactory
@@ -51,7 +53,7 @@ class GetWfsConfigsSpec extends SourceCommonsSpec {
 
     static RESULT_ARGUMENT_PATH = [GetWfsConfigurations.FIELD_NAME]
 
-    static BASE_PATH = [RESULT_ARGUMENT_PATH, FunctionField.ARGUMENT].flatten()
+    static BASE_PATH = [RESULT_ARGUMENT_PATH].flatten()
 
     def managedServiceConfigs
 
@@ -79,7 +81,7 @@ class GetWfsConfigsSpec extends SourceCommonsSpec {
         serviceReader.getServices(_, _) >> []
 
         when:
-        def report = getWfsConfigsFunction.execute()
+        def report = getWfsConfigsFunction.execute(null, FUNCTION_PATH)
         def list = ((ListField) report.getResult())
 
         then:
@@ -89,16 +91,13 @@ class GetWfsConfigsSpec extends SourceCommonsSpec {
         2 * serviceReader.getServices(_, _) >> [new TestSource(S_PID_2, false)]
         report.getResult() != null
         list.getList().size() == 2
-        assertConfig(list.getList().get(0), 0, SOURCE_ID_1, S_PID_1, true, TEST_WFS_VERSION_1)
-        assertConfig(list.getList().get(1), 1, SOURCE_ID_2, S_PID_2, false, TEST_WFS_VERSION_2)
+        assertConfig(list.getList().get(0), SOURCE_ID_1, S_PID_1, true, TEST_WFS_VERSION_1)
+        assertConfig(list.getList().get(1), SOURCE_ID_2, S_PID_2, false, TEST_WFS_VERSION_2)
     }
 
     def 'Pid filter returns 1 result'() {
-        setup:
-        getWfsConfigsFunction.setArguments(functionArgs)
-
         when:
-        def report = getWfsConfigsFunction.execute()
+        def report = getWfsConfigsFunction.execute(functionArgs, FUNCTION_PATH)
         def list = ((ListField) report.getResult())
 
         then:
@@ -107,17 +106,16 @@ class GetWfsConfigsSpec extends SourceCommonsSpec {
         serviceActions.read(S_PID_2) >> managedServiceConfigs.get(S_PID_2)
         report.getResult() != null
         list.getList().size() == 1
-        assertConfig(list.getList().get(0), 0, SOURCE_ID_2, S_PID_2, false, TEST_WFS_VERSION_2)
+        assertConfig(list.getList().get(0), SOURCE_ID_2, S_PID_2, false, TEST_WFS_VERSION_2)
     }
 
     def 'Fail due to no existing config with specified pid'() {
         setup:
         functionArgs.put(PID, S_PID)
-        getWfsConfigsFunction.setArguments(functionArgs)
         serviceActions.read(S_PID) >> [:]
 
         when:
-        def report = getWfsConfigsFunction.execute()
+        def report = getWfsConfigsFunction.execute(functionArgs, FUNCTION_PATH)
 
         then:
         report.getResult() == null
@@ -126,9 +124,8 @@ class GetWfsConfigsSpec extends SourceCommonsSpec {
         report.getErrorMessages().get(0).path == RESULT_ARGUMENT_PATH
     }
 
-    def assertConfig(Field field, int index, String sourceName, String pid, boolean availability, String wfsVersion) {
+    def assertConfig(Field field, String sourceName, String pid, boolean availability, String wfsVersion) {
         def sourceInfo = (WfsSourceInfoField) field
-        assert sourceInfo.path()[-1] == index.toString()
         assert sourceInfo.isAvailable() == availability
         assert sourceInfo.config().credentials().password() == FLAG_PASSWORD
         assert sourceInfo.config().credentials().username() == TEST_USERNAME
@@ -148,12 +145,11 @@ class GetWfsConfigsSpec extends SourceCommonsSpec {
     def 'Returns all the possible error codes correctly'(){
         setup:
         functionArgs.put(PID, S_PID)
-        getWfsConfigsFunction.setArguments(functionArgs)
         serviceActions.read(S_PID) >> [:]
 
         when:
         def errorCodes = getWfsConfigsFunction.getFunctionErrorCodes()
-        def noExistingConfigReport = getWfsConfigsFunction.execute()
+        def noExistingConfigReport = getWfsConfigsFunction.execute(functionArgs, FUNCTION_PATH)
 
         then:
         errorCodes.size() == 1

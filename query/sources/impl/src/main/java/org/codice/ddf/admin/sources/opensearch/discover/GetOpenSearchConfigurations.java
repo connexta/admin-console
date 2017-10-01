@@ -56,7 +56,6 @@ public class GetOpenSearchConfigurations
     this.configuratorSuite = configuratorSuite;
 
     pid = new PidField();
-    updateArgumentPaths();
 
     sourceUtilCommons = new SourceUtilCommons(configuratorSuite);
     serviceCommons = new ServiceCommons(configuratorSuite);

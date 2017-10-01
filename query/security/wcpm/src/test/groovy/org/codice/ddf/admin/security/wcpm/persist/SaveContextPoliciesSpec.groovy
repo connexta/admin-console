@@ -42,6 +42,7 @@ import static groovy.org.codice.ddf.admin.security.wcpm.persist.WcpmTestingCommo
 
 class SaveContextPoliciesSpec extends Specification {
 
+    static final List<Object> FUNCTION_PATH = [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME]
     FieldProvider queryProvider
     ConfiguratorFactory configuratorFactory
     ServiceActions serviceActions
@@ -131,8 +132,7 @@ class SaveContextPoliciesSpec extends Specification {
         operationReport.containsFailedResults() >> false
 
         when:
-        saveContextPoliciesFunction.setArguments(testData)
-        Report report = saveContextPoliciesFunction.execute()
+        Report report = saveContextPoliciesFunction.execute(testData, FUNCTION_PATH)
 
         then:
         report.getErrorMessages().isEmpty()
@@ -144,8 +144,7 @@ class SaveContextPoliciesSpec extends Specification {
         operationReport.containsFailedResults() >> true
 
         when:
-        saveContextPoliciesFunction.setArguments(testData)
-        Report report = saveContextPoliciesFunction.execute()
+        Report report = saveContextPoliciesFunction.execute(testData, FUNCTION_PATH)
 
         then:
         report.getErrorMessages().size() == 1
@@ -160,13 +159,12 @@ class SaveContextPoliciesSpec extends Specification {
         testData.policies[0].paths = ['/test']
 
         when:
-        saveContextPoliciesFunction.setArguments(testData)
-        Report report = saveContextPoliciesFunction.execute()
+        Report report = saveContextPoliciesFunction.execute(testData, FUNCTION_PATH)
 
         then:
         report.getErrorMessages().size() == 1
         report.getErrorMessages()[0].code == SecurityMessages.NO_ROOT_CONTEXT
-        report.getErrorMessages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, BaseFunctionField.ARGUMENT, 'policies']
+        report.getErrorMessages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, 'policies']
         report.getResult() == null
     }
 
@@ -176,13 +174,12 @@ class SaveContextPoliciesSpec extends Specification {
         testData.policies[0].authTypes = [PKI, 'COFFEE']
 
         when:
-        saveContextPoliciesFunction.setArguments(testData)
-        Report report = saveContextPoliciesFunction.execute()
+        Report report = saveContextPoliciesFunction.execute(testData, FUNCTION_PATH)
 
         then:
         report.getErrorMessages().size() == 1
         report.getErrorMessages()[0].code == DefaultMessages.UNSUPPORTED_ENUM
-        report.getErrorMessages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, BaseFunctionField.ARGUMENT, 'policies', '0', 'authTypes', '1']
+        report.getErrorMessages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, 'policies', 0, 'authTypes', 1]
         report.getResult() == null
     }
 
@@ -192,13 +189,12 @@ class SaveContextPoliciesSpec extends Specification {
         testData.policies[0].authTypes = []
 
         when:
-        saveContextPoliciesFunction.setArguments(testData)
-        Report report = saveContextPoliciesFunction.execute()
+        Report report = saveContextPoliciesFunction.execute(testData, FUNCTION_PATH)
 
         then:
         report.getErrorMessages().size() == 1
         report.getErrorMessages()[0].code == DefaultMessages.MISSING_REQUIRED_FIELD
-        report.getErrorMessages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, BaseFunctionField.ARGUMENT, 'policies', '0', 'authTypes']
+        report.getErrorMessages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, 'policies', 0, 'authTypes']
         report.getResult() == null
 
     }
@@ -209,13 +205,12 @@ class SaveContextPoliciesSpec extends Specification {
         testData.policies[0].realm = 'COFFEE'
 
         when:
-        saveContextPoliciesFunction.setArguments(testData)
-        Report report = saveContextPoliciesFunction.execute()
+        Report report = saveContextPoliciesFunction.execute(testData, FUNCTION_PATH)
 
         then:
         report.getErrorMessages().size() == 1
         report.getErrorMessages()[0].code == DefaultMessages.UNSUPPORTED_ENUM
-        report.getErrorMessages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, BaseFunctionField.ARGUMENT, 'policies', '0', Realm.DEFAULT_FIELD_NAME]
+        report.getErrorMessages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, 'policies', 0, Realm.DEFAULT_FIELD_NAME]
         report.getResult() == null
     }
 
@@ -225,13 +220,12 @@ class SaveContextPoliciesSpec extends Specification {
         testData.policies[0].realm = null
 
         when:
-        saveContextPoliciesFunction.setArguments(testData)
-        Report report = saveContextPoliciesFunction.execute()
+        Report report = saveContextPoliciesFunction.execute(testData, FUNCTION_PATH)
 
         then:
         report.getErrorMessages().size() == 1
         report.getErrorMessages()[0].code == DefaultMessages.MISSING_REQUIRED_FIELD
-        report.getErrorMessages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, BaseFunctionField.ARGUMENT, 'policies', '0', Realm.DEFAULT_FIELD_NAME]
+        report.getErrorMessages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, 'policies', 0, Realm.DEFAULT_FIELD_NAME]
         report.getResult() == null
     }
 
@@ -241,8 +235,7 @@ class SaveContextPoliciesSpec extends Specification {
         testData.policies[0].claimsMapping = []
 
         when:
-        saveContextPoliciesFunction.setArguments(testData)
-        Report report = saveContextPoliciesFunction.execute()
+        Report report = saveContextPoliciesFunction.execute(testData, FUNCTION_PATH)
 
         then:
         report.getErrorMessages().isEmpty()
@@ -255,13 +248,12 @@ class SaveContextPoliciesSpec extends Specification {
         testData.policies[0].claimsMapping[0][ClaimsMapEntry.VALUE_FIELD_NAME] = null
 
         when:
-        saveContextPoliciesFunction.setArguments(testData)
-        Report report = saveContextPoliciesFunction.execute()
+        Report report = saveContextPoliciesFunction.execute(testData, FUNCTION_PATH)
 
         then:
         report.getErrorMessages().size() == 1
         report.getErrorMessages()[0].code == DefaultMessages.MISSING_REQUIRED_FIELD
-        report.getErrorMessages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, BaseFunctionField.ARGUMENT, 'policies', '0', 'claimsMapping', '0', ClaimsMapEntry.VALUE_FIELD_NAME]
+        report.getErrorMessages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, 'policies', 0, 'claimsMapping', 0, ClaimsMapEntry.VALUE_FIELD_NAME]
         report.getResult() == null
     }
 
@@ -271,13 +263,12 @@ class SaveContextPoliciesSpec extends Specification {
         testData.policies[0].claimsMapping[0][ClaimsMapEntry.KEY_FIELD_NAME] = 'unsupportedClaim'
 
         when:
-        saveContextPoliciesFunction.setArguments(testData)
-        Report report = saveContextPoliciesFunction.execute()
+        Report report = saveContextPoliciesFunction.execute(testData, FUNCTION_PATH)
 
         then:
         report.getErrorMessages().size() == 1
         report.getErrorMessages()[0].code == SecurityMessages.INVALID_CLAIM_TYPE
-        report.getErrorMessages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, BaseFunctionField.ARGUMENT, 'policies', '0', 'claimsMapping', '0', ClaimsMapEntry.KEY_FIELD_NAME]
+        report.getErrorMessages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, 'policies', 0, 'claimsMapping', 0, ClaimsMapEntry.KEY_FIELD_NAME]
         report.getResult() == null
     }
 
@@ -287,23 +278,22 @@ class SaveContextPoliciesSpec extends Specification {
         testData.policies[1].paths = ['/test/', '/test', 'wrong/', '/invalid/']
 
         when:
-        saveContextPoliciesFunction.setArguments(testData)
-        Report report = saveContextPoliciesFunction.execute()
+        Report report = saveContextPoliciesFunction.execute(testData, FUNCTION_PATH)
 
         then:
         report.getErrorMessages().size() == 4
 
         report.getErrorMessages()[0].code == DefaultMessages.INVALID_CONTEXT_PATH
-        report.getErrorMessages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, BaseFunctionField.ARGUMENT, 'policies', '1', 'paths', '2']
+        report.getErrorMessages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, 'policies', 1, 'paths', 2]
 
         report.getErrorMessages()[1].code == DefaultMessages.INVALID_PATH_TRAILING_SLASH
-        report.getErrorMessages()[1].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, BaseFunctionField.ARGUMENT, 'policies', '1', 'paths', '0']
+        report.getErrorMessages()[1].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, 'policies', 1, 'paths', 0]
 
         report.getErrorMessages()[2].code == DefaultMessages.INVALID_PATH_TRAILING_SLASH
-        report.getErrorMessages()[2].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, BaseFunctionField.ARGUMENT, 'policies', '1', 'paths', '2']
+        report.getErrorMessages()[2].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, 'policies', 1, 'paths', 2]
 
         report.getErrorMessages()[3].code == DefaultMessages.INVALID_PATH_TRAILING_SLASH
-        report.getErrorMessages()[3].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, BaseFunctionField.ARGUMENT, 'policies', '1', 'paths', '3']
+        report.getErrorMessages()[3].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, 'policies', 1, 'paths', 3]
         report.getResult() == null
     }
 

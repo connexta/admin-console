@@ -14,16 +14,21 @@
 package org.codice.ddf.admin.common.fields.base
 
 import org.codice.ddf.admin.common.fields.test.TestField
+import org.codice.ddf.admin.common.fields.test.TestObjectField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import spock.lang.Specification
 
 class BaseFieldTest extends Specification {
 
-    BaseField testField
+    TestField testField
+
+    def setup() {
+        testField = new TestField()
+        testField.setPath([TestField.FIELD_NAME])
+    }
 
     def 'Missing required field when required value is not provided'() {
         setup:
-        testField = new TestField<String>()
         testField.isRequired(true)
         testField.setValue(null)
 
@@ -38,7 +43,6 @@ class BaseFieldTest extends Specification {
 
     def 'Missing required field if value is List and is empty'() {
         setup:
-        testField = new TestField<List>()
         testField.isRequired(true)
         testField.setValue([])
 
@@ -51,28 +55,13 @@ class BaseFieldTest extends Specification {
         validationMsgs.get(0).getPath() == [TestField.FIELD_NAME]
     }
 
-    def 'Updating field name updates path'() {
-        setup:
-        testField = new TestField<String>()
-
-        expect:
-        testField.path() == [TestField.FIELD_NAME]
-
-        when:
-        testField.pathName('updatedName')
-
-        then:
-        testField.path() == ['updatedName']
-    }
-
     def 'Returns all the possible error codes correctly'(){
         setup:
-        TestField missingTestField = new TestField<String>()
-        missingTestField.isRequired(true)
+        testField.isRequired(true)
 
         when:
-        def errorCodes = missingTestField.getErrorCodes()
-        def validationMsgs = missingTestField.validate()
+        def errorCodes = testField.getErrorCodes()
+        def validationMsgs = testField.validate()
 
         then:
         errorCodes.size() == 1

@@ -44,7 +44,6 @@ public class LdapTestConnection extends TestFunctionField {
   public LdapTestConnection() {
     super(FIELD_NAME, DESCRIPTION);
     connection = new LdapConnectionField().useDefaultRequired();
-    updateArgumentPaths();
 
     utils = new LdapTestingUtils();
   }

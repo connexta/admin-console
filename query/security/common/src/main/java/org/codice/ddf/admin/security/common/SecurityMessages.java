@@ -22,11 +22,11 @@ public class SecurityMessages {
 
   public static final String INVALID_CLAIM_TYPE = "INVALID_CLAIM_TYPE";
 
-  public static ErrorMessageImpl noRootContextError(List<String> path) {
+  public static ErrorMessageImpl noRootContextError(List<Object> path) {
     return new ErrorMessageImpl(NO_ROOT_CONTEXT, path);
   }
 
-  public static ErrorMessageImpl invalidClaimType(List<String> path) {
+  public static ErrorMessageImpl invalidClaimType(List<Object> path) {
     return new ErrorMessageImpl(INVALID_CLAIM_TYPE, path);
   }
 }

@@ -56,7 +56,6 @@ public class WcpmFieldProvider extends BaseFieldProvider {
 
     saveContextPolices = new SaveContextPolices(configuratorSuite);
     saveWhitelistContexts = new SaveWhitelistContexts(configuratorSuite);
-    updateInnerFieldPaths();
   }
 
   @Override

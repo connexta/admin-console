@@ -15,7 +15,6 @@ package org.codice.ddf.admin.common.fields.base.function;
 
 import com.google.common.collect.ImmutableList;
 import java.util.List;
-import java.util.Objects;
 import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.api.FieldProvider;
 import org.codice.ddf.admin.api.fields.FunctionField;
@@ -40,23 +39,10 @@ public abstract class BaseFieldProvider extends BaseObjectField implements Field
     return ImmutableList.of();
   }
 
-  @Override
-  public void updateInnerFieldPaths() {
-    super.updateInnerFieldPaths();
-    getDiscoveryFunctions()
-        .stream()
-        .filter(Objects::nonNull)
-        .forEach(child -> child.updatePath(path()));
-    getMutationFunctions()
-        .stream()
-        .filter(Objects::nonNull)
-        .forEach(child -> child.updatePath(path()));
-  }
-
   public FunctionField getDiscoveryFunction(String name) {
     return getDiscoveryFunctions()
         .stream()
-        .filter(funcField -> funcField.getName().equals(name))
+        .filter(funcField -> funcField.getFunctionName().equals(name))
         .findFirst()
         .orElse(null);
   }
@@ -64,17 +50,18 @@ public abstract class BaseFieldProvider extends BaseObjectField implements Field
   public FunctionField getMutationFunction(String name) {
     return getMutationFunctions()
         .stream()
-        .filter(funcField -> funcField.getName().equals(name))
+        .filter(funcField -> funcField.getFunctionName().equals(name))
         .findFirst()
         .orElse(null);
   }
 
   public void bindField(FunctionField functionField) {
-    ServiceCommons.updateGraphQLSchema(getClass(), String.format(BINDING_FUNCTION, getTypeName()));
+    ServiceCommons.updateGraphQLSchema(
+        getClass(), String.format(BINDING_FUNCTION, getFieldTypeName()));
   }
 
   public void unbindField(FunctionField functionField) {
     ServiceCommons.updateGraphQLSchema(
-        getClass(), String.format(UNBINDING_FUNCTION, getTypeName()));
+        getClass(), String.format(UNBINDING_FUNCTION, getFieldTypeName()));
   }
 }

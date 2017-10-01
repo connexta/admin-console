@@ -32,6 +32,7 @@ class AddressFieldTest extends Specification {
 
     def setup() {
         address = new AddressField()
+        address.setPath(Arrays.asList(AddressField.DEFAULT_FIELD_NAME))
     }
 
     def 'Successful validation when address is required and URL is provided and the host is not'() {

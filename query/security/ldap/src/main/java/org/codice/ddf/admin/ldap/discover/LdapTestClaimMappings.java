@@ -86,8 +86,6 @@ public class LdapTestClaimMappings extends TestFunctionField {
     claimMappings.useDefaultRequired();
     claimMappings.isRequired(true);
 
-    updateArgumentPaths();
-
     stsServiceProperties = new StsServiceProperties();
     utils = new LdapTestingUtils();
   }
@@ -129,7 +127,7 @@ public class LdapTestClaimMappings extends TestFunctionField {
         .getList()
         .stream()
         .map(ClaimsMapEntry::claimValueField)
-        .map(claim -> LdapAttributeName.validate(claim.getValue(), claim.path()))
+        .map(claim -> LdapAttributeName.validate(claim.getValue(), claim.getPath()))
         .forEach(this::addErrorMessages);
   }
 
@@ -156,7 +154,7 @@ public class LdapTestClaimMappings extends TestFunctionField {
           .stream()
           .map(ClaimsMapEntry::claimValueField)
           .filter(claim -> !mappingAttributeFound(ldapConnection, claim.getValue()))
-          .forEach(claim -> addErrorMessage(userAttributeNotFoundError(claim.path())));
+          .forEach(claim -> addErrorMessage(userAttributeNotFoundError(claim.getPath())));
     } catch (IOException e) {
       LOGGER.warn("Error closing LDAP connection", e);
     }

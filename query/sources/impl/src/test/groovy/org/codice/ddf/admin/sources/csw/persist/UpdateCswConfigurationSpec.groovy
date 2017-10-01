@@ -33,6 +33,8 @@ import org.junit.Ignore
 
 class UpdateCswConfigurationSpec extends SourceCommonsSpec {
 
+    static final List<Object> FUNCTION_PATH = [UpdateCswConfiguration.FIELD_NAME]
+
     static TEST_OUTPUT_SCHEMA = 'testOutputSchema'
 
     static TEST_URL = 'https://localhost:8993'
@@ -43,7 +45,7 @@ class UpdateCswConfigurationSpec extends SourceCommonsSpec {
 
     static RESULT_ARGUMENT_PATH = [UpdateCswConfiguration.FIELD_NAME]
 
-    static BASE_PATH = [RESULT_ARGUMENT_PATH, FunctionField.ARGUMENT].flatten()
+    static BASE_PATH = [RESULT_ARGUMENT_PATH].flatten()
 
     static CONFIG_PATH = [BASE_PATH, CswSourceConfigurationField.DEFAULT_FIELD_NAME].flatten()
 
@@ -98,13 +100,12 @@ class UpdateCswConfigurationSpec extends SourceCommonsSpec {
 
     def 'Successfully update CSW configuration'() {
         setup:
-        updateCswConfiguration.setArguments(createCswUpdateArgs(TEST_PASSWORD))
         serviceActions.read(_) >> [(ID): TEST_SOURCENAME]
         serviceReader.getServices(_, _) >> []
         configurator.commit(_, _) >> mockReport(false)
 
         when:
-        def report = updateCswConfiguration.execute()
+        def report = updateCswConfiguration.execute(createCswUpdateArgs(TEST_PASSWORD), FUNCTION_PATH)
 
         then:
         report.getResult() != null
@@ -113,14 +114,13 @@ class UpdateCswConfigurationSpec extends SourceCommonsSpec {
 
     def 'Fail CSW configuration update due to existing source name'() {
         setup:
-        updateCswConfiguration.setArguments(createCswUpdateArgs(TEST_PASSWORD))
         serviceActions.read(_) >> [(ID): 'updatedName']
         serviceReader.getServices(_, _) >>
                 [new TestSource(S_PID, 'updatedName', false),
                  new TestSource("existingSource", TEST_SOURCENAME, false)]
 
         when:
-        def report = updateCswConfiguration.execute()
+        def report = updateCswConfiguration.execute(createCswUpdateArgs(TEST_PASSWORD), FUNCTION_PATH)
 
         then:
         report.getResult() == null
@@ -131,12 +131,11 @@ class UpdateCswConfigurationSpec extends SourceCommonsSpec {
 
     def 'Fail to update CSW config due to failure to commit'() {
         setup:
-        updateCswConfiguration.setArguments(createCswUpdateArgs(TEST_PASSWORD))
         serviceActions.read(_) >> [(ID): TEST_SOURCENAME]
         serviceReader.getServices(_, _) >> []
 
         when:
-        def report = updateCswConfiguration.execute()
+        def report = updateCswConfiguration.execute(createCswUpdateArgs(TEST_PASSWORD), FUNCTION_PATH)
 
         then:
         configurator.commit(_, _) >> mockReport(true)
@@ -148,11 +147,10 @@ class UpdateCswConfigurationSpec extends SourceCommonsSpec {
 
     def 'Fail to update CSW Configuration due to no existing source config'() {
         setup:
-        updateCswConfiguration.setArguments(createCswUpdateArgs(TEST_PASSWORD))
         serviceActions.read(S_PID) >> [:]
 
         when:
-        def report = updateCswConfiguration.execute()
+        def report = updateCswConfiguration.execute(createCswUpdateArgs(TEST_PASSWORD), FUNCTION_PATH)
 
         then:
         report.getResult() == null
@@ -165,12 +163,11 @@ class UpdateCswConfigurationSpec extends SourceCommonsSpec {
     // TODO: 8/23/17 phuffer - Remove ignore when feature starts correctly
     def 'Return false when csw feature fails to start'() {
         setup:
-        updateCswConfiguration.setArguments(createCswUpdateArgs(TEST_PASSWORD))
         serviceReader.getServices(_, _) >> []
         serviceActions.read(_ as String) >> [(ID): TEST_SOURCENAME]
 
         when:
-        def report = updateCswConfiguration.execute()
+        def report = updateCswConfiguration.execute(createCswUpdateArgs(TEST_PASSWORD), FUNCTION_PATH)
 
         then:
         1 * configurator.commit(_, _) >> mockReport(true)
@@ -182,7 +179,6 @@ class UpdateCswConfigurationSpec extends SourceCommonsSpec {
 
     def 'Updating with flag password sends service properties without password'() {
         setup:
-        updateCswConfiguration.setArguments(createCswUpdateArgs(FLAG_PASSWORD))
         serviceActions.read(_ as String) >> [(ID): TEST_SOURCENAME]
         serviceReader.getServices(_, _) >> []
         configurator.commit(_, _) >> mockReport(false)
@@ -190,7 +186,7 @@ class UpdateCswConfigurationSpec extends SourceCommonsSpec {
         def expectedUpdateConfig = CswServiceProperties.cswConfigToServiceProps(createCswSourceConfig(FLAG_PASSWORD))
 
         when:
-        updateCswConfiguration.execute()
+        updateCswConfiguration.execute(createCswUpdateArgs(FLAG_PASSWORD), FUNCTION_PATH)
 
         then:
         1 * serviceActions.build(S_PID, expectedUpdateConfig, true)
@@ -198,7 +194,6 @@ class UpdateCswConfigurationSpec extends SourceCommonsSpec {
 
     def 'Updating with new password sends service properties with password'() {
         setup:
-        updateCswConfiguration.setArguments(createCswUpdateArgs('notFlagPassword'))
         serviceActions.read(_ as String) >> [(ID): TEST_SOURCENAME]
         serviceReader.getServices(_, _) >> []
         configurator.commit(_, _) >> mockReport(false)
@@ -206,7 +201,7 @@ class UpdateCswConfigurationSpec extends SourceCommonsSpec {
         def expectedUpdateConfig = CswServiceProperties.cswConfigToServiceProps(createCswSourceConfig('notFlagPassword'))
 
         when:
-        updateCswConfiguration.execute()
+        updateCswConfiguration.execute(createCswUpdateArgs('notFlagPassword'), FUNCTION_PATH)
 
         then:
         1 * serviceActions.build(S_PID, expectedUpdateConfig, true)
@@ -214,7 +209,7 @@ class UpdateCswConfigurationSpec extends SourceCommonsSpec {
 
     def 'Fail when missing required fields'() {
         when:
-        def report = updateCswConfiguration.execute()
+        def report = updateCswConfiguration.execute(null, FUNCTION_PATH)
 
         then:
         report.getResult() == null

@@ -34,7 +34,7 @@ public class SecurityValidation {
     claimArgs
         .stream()
         .filter(claimArg -> !supportedClaims.contains(claimArg.getValue()))
-        .forEach(claimArg -> report.addErrorMessage(invalidClaimType(claimArg.path())));
+        .forEach(claimArg -> report.addErrorMessage(invalidClaimType(claimArg.getPath())));
 
     return report;
   }

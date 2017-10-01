@@ -20,9 +20,9 @@ import org.codice.ddf.admin.api.report.ErrorMessage;
 /** @param <T> the type of the value contains by this {@code Field} */
 public interface Field<T> {
 
-  String getName();
+  String getFieldName();
 
-  String getTypeName();
+  String getFieldTypeName();
 
   String getDescription();
 
@@ -40,9 +40,7 @@ public interface Field<T> {
 
   List<ErrorMessage> validate();
 
-  List<String> path();
+  List<Object> getPath();
 
-  void pathName(String fieldName);
-
-  void updatePath(List<String> subPath);
+  void setPath(List<Object> path);
 }

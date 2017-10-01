@@ -54,8 +54,6 @@ public class LdapConfigurationField extends BaseObjectField {
     bindUserInfo = new LdapBindUserInfo();
     settings = new LdapDirectorySettingsField();
     claimMappings = new ClaimsMapEntry.ListImpl();
-
-    updateInnerFieldPaths();
   }
 
   // Field getters

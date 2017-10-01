@@ -13,6 +13,7 @@
  */
 package org.codice.ddf.admin.common.fields.base;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -75,7 +76,7 @@ public abstract class BaseListField<T extends Field> extends BaseField<List>
       return getCreateListEntryCallable().call();
     } catch (Exception e) {
       throw new RuntimeException(
-          "Unable to create new instance of list content for field: " + getName());
+          "Unable to create new instance of list content for field: " + getFieldName());
     }
   }
 
@@ -83,8 +84,6 @@ public abstract class BaseListField<T extends Field> extends BaseField<List>
   public BaseListField<T> add(T value) {
     T newElem = createListEntry();
     newElem.setValue(value.getValue());
-    newElem.pathName(Integer.toString(elements.size()));
-    newElem.updatePath(path());
     elements.add(newElem);
     return this;
   }
@@ -119,15 +118,11 @@ public abstract class BaseListField<T extends Field> extends BaseField<List>
   }
 
   @Override
-  public void updatePath(List<String> subPath) {
-    super.updatePath(subPath);
-    getList().forEach(field -> field.updatePath(path()));
-  }
-
-  @Override
-  public void pathName(String pathName) {
-    super.pathName(pathName);
-    getList().forEach(field -> field.updatePath(path()));
+  public void setPath(List<Object> path) {
+    super.setPath(path);
+    for (int i = 0; i < getList().size(); i++) {
+      getList().get(i).setPath(createElemPath(getPath(), i));
+    }
   }
 
   @Override
@@ -136,6 +131,10 @@ public abstract class BaseListField<T extends Field> extends BaseField<List>
         .addAll(super.getErrorCodes())
         .addAll(createListEntry().getErrorCodes())
         .build();
+  }
+
+  private List<Object> createElemPath(List<Object> path, int index) {
+    return new ImmutableList.Builder<>().addAll(path).add(index).build();
   }
 
   public BaseListField<T> useDefaultRequired() {

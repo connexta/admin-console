@@ -50,7 +50,6 @@ public class SaveWhitelistContexts extends BaseFunctionField<ContextPath.ListImp
     this.configuratorSuite = configuratorSuite;
 
     contexts = new ContextPath.ListImpl();
-    updateArgumentPaths();
   }
 
   @Override
@@ -108,6 +107,6 @@ public class SaveWhitelistContexts extends BaseFunctionField<ContextPath.ListImp
         .getList()
         .stream()
         .filter(contextPath -> TRAILING_SLASH_PATTERN.matcher(contextPath.getValue()).matches())
-        .forEach(contextPath -> addErrorMessage(invalidPathTrailingSlash(contextPath.path())));
+        .forEach(contextPath -> addErrorMessage(invalidPathTrailingSlash(contextPath.getPath())));
   }
 }

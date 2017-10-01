@@ -26,6 +26,7 @@ class CredentialsFieldTest extends Specification {
 
     def setup() {
         credentialsField = new CredentialsField()
+        credentialsField.setPath([CredentialsField.DEFAULT_FIELD_NAME])
     }
 
     def 'Fail validation when missing required fields'() {

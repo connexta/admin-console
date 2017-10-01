@@ -14,7 +14,6 @@
 package org.codice.ddf.admin.graphql.transform;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLArgument;
 import graphql.schema.GraphQLFieldDefinition;
@@ -58,8 +57,8 @@ public class GraphQLTransformOutput {
   }
 
   public GraphQLOutputType fieldToGraphQLOutputType(Field field) {
-    if (outputTypeProvider.isTypePresent(field.getTypeName())) {
-      return outputTypeProvider.getType(field.getTypeName());
+    if (outputTypeProvider.isTypePresent(field.getFieldTypeName())) {
+      return outputTypeProvider.getType(field.getFieldTypeName());
     }
 
     GraphQLOutputType type = null;
@@ -74,7 +73,7 @@ public class GraphQLTransformOutput {
             new GraphQLList(fieldToGraphQLOutputType(((ListField<Field>) field).createListEntry()));
       } catch (Exception e) {
         throw new RuntimeException(
-            "Unable to build field list content type for output type: " + field.getName());
+            "Unable to build field list content type for output type: " + field.getFieldName());
       }
     } else if (field instanceof ScalarField) {
       type = transformScalar.resolveScalarType((ScalarField) field);
@@ -86,21 +85,21 @@ public class GraphQLTransformOutput {
               + field.getClass());
     }
 
-    outputTypeProvider.addType(field.getTypeName(), type);
+    outputTypeProvider.addType(field.getFieldTypeName(), type);
     return type;
   }
 
   public GraphQLOutputType fieldToGraphQLObjectType(ObjectField field) {
     // Check if the objectField is recursive, if so bail early
-    if (referenceTypeProvider.isTypePresent(field.getTypeName())) {
-      return referenceTypeProvider.getType(field.getTypeName());
+    if (referenceTypeProvider.isTypePresent(field.getFieldTypeName())) {
+      return referenceTypeProvider.getType(field.getFieldTypeName());
     }
 
     // Field provider names should be unique and looks pretty without "Payload" added to the name
     String typeName =
         field instanceof FieldProvider
-            ? field.getTypeName()
-            : createOutputObjectFieldTypeName(field.getTypeName());
+            ? field.getFieldTypeName()
+            : createOutputObjectFieldTypeName(field.getFieldTypeName());
 
     List<GraphQLFieldDefinition> innerFields = fieldsToGraphQLFieldDefinition(field.getFields());
 
@@ -111,7 +110,7 @@ public class GraphQLTransformOutput {
     }
 
     // Add a GraphQLTypeReference to support recursion
-    referenceTypeProvider.addType(field.getTypeName(), new GraphQLTypeReference(typeName));
+    referenceTypeProvider.addType(field.getFieldTypeName(), new GraphQLTypeReference(typeName));
     return GraphQLObjectType.newObject()
         .name(typeName)
         .description(field.getDescription())
@@ -141,7 +140,7 @@ public class GraphQLTransformOutput {
     List<GraphQLArgument> graphQLArgs = new ArrayList<>();
 
     return GraphQLFieldDefinition.newFieldDefinition()
-        .name(field.getName())
+        .name(field.getFieldName())
         .description(field.getDescription())
         .type(fieldToGraphQLOutputType(field))
         .argument(graphQLArgs)
@@ -159,7 +158,7 @@ public class GraphQLTransformOutput {
     }
 
     return GraphQLFieldDefinition.newFieldDefinition()
-        .name(function.getName())
+        .name(function.getFunctionName())
         .description(function.getDescription())
         .type(fieldToGraphQLOutputType(function.getReturnType()))
         .argument(graphQLArgs)
@@ -174,17 +173,12 @@ public class GraphQLTransformOutput {
     }
 
     FunctionField<Field> funcField = field.newInstance();
-
-    // Remove the field name of the function from that path since the update is using a subpath
-    List<String> fixedPath = Lists.newArrayList(field.path());
-    fixedPath.remove(fixedPath.size() - 1);
-    funcField.updatePath(fixedPath);
-    funcField.setArguments(args);
-    FunctionReport<Field> result = funcField.execute();
+    FunctionReport<Field> result =
+        funcField.execute(args, env.getFieldTypeInfo().getPath().toList());
 
     if (!result.getErrorMessages().isEmpty()) {
       throw new FunctionDataFetcherException(
-          funcField.getName(),
+          funcField.getFunctionName(),
           funcField
               .getArguments()
               .stream()
@@ -204,7 +198,7 @@ public class GraphQLTransformOutput {
     // strategy instead of returning null. This is an expansion of the PropertyDataFetcher
     if (source instanceof Map) {
       if (!((Map) source).isEmpty()) {
-        return ((Map<?, ?>) source).get(field.getName());
+        return ((Map<?, ?>) source).get(field.getFieldName());
       }
     }
 

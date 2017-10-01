@@ -52,12 +52,12 @@
         <dependency>
             <groupId>com.graphql-java</groupId>
             <artifactId>graphql-java</artifactId>
-            <version>3.0.0</version>
+            <version>4.2</version>
         </dependency>
         <dependency>
             <groupId>com.graphql-java</groupId>
             <artifactId>graphql-java-servlet</artifactId>
-            <version>4.1.0</version>
+            <version>4.4.0</version>
         </dependency>
         <dependency>
             <groupId>com.graphql-java</groupId>
@@ -129,15 +129,14 @@
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-servlets</artifactId>
-            <version>9.3.14.v20161028</version>
+            <version>9.2.19.v20160908</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-util</artifactId>
-            <version>9.4.6.v20170531</version>
+            <version>9.3.14.v20161028</version>
         </dependency>
     </dependencies>
-
     <build>
         <plugins>
             <plugin>

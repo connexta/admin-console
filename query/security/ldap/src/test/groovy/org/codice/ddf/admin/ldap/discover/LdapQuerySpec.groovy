@@ -35,6 +35,8 @@ import static org.codice.ddf.admin.ldap.LdapTestingCommons.noEncryptionLdapConne
 import static org.codice.ddf.admin.ldap.LdapTestingCommons.simpleBindInfo
 
 class LdapQuerySpec extends Specification {
+
+    static final List<Object> FUNCTION_PATH = [LdapQuery.FIELD_NAME]
     static TestLdapServer server
     Map<String, Object> args
     LdapQuery ldapQueryFunction
@@ -63,7 +65,7 @@ class LdapQuerySpec extends Specification {
 
     def 'Fail on missing required fields'() {
         setup:
-        def baseMsg = [LdapQuery.FIELD_NAME, BaseFunctionField.ARGUMENT]
+        def baseMsg = [LdapQuery.FIELD_NAME]
         def missingHostMsgPath = baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME, HostnameField.DEFAULT_FIELD_NAME]
         def missingPortMsgPath = baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME, PortField.DEFAULT_FIELD_NAME]
         def missingEncryptMsgPath = baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME, LdapEncryptionMethodField.DEFAULT_FIELD_NAME]
@@ -74,7 +76,7 @@ class LdapQuerySpec extends Specification {
         def missingQueryMsgPath = baseMsg + [LdapQueryField.DEFAULT_FIELD_NAME]
 
         when:
-        FunctionReport report = ldapQueryFunction.execute()
+        FunctionReport report = ldapQueryFunction.execute(null, FUNCTION_PATH)
 
         then:
         report.getErrorMessages().size() == 8
@@ -93,15 +95,14 @@ class LdapQuerySpec extends Specification {
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue(),
                 (LdapQuery.QUERY_BASE_FIELD_NAME)       : exampleQueryBase().getValue(),
                 (LdapQueryField.DEFAULT_FIELD_NAME)     : exampleLdapQuery().getValue()]
-        ldapQueryFunction.setArguments(args)
 
         when:
-        FunctionReport report = ldapQueryFunction.execute()
+        FunctionReport report = ldapQueryFunction.execute(args, FUNCTION_PATH)
 
         then:
         report.getErrorMessages().size() == 1
         report.getErrorMessages().get(0).getCode() == DefaultMessages.CANNOT_CONNECT
-        report.getErrorMessages().get(0).getPath() == [LdapQuery.FIELD_NAME, BaseFunctionField.ARGUMENT, LdapConnectionField.DEFAULT_FIELD_NAME]
+        report.getErrorMessages().get(0).getPath() == [LdapQuery.FIELD_NAME, LdapConnectionField.DEFAULT_FIELD_NAME]
 
     }
 
@@ -112,15 +113,13 @@ class LdapQuerySpec extends Specification {
                 (LdapQuery.QUERY_BASE_FIELD_NAME)       : exampleQueryBase().getValue(),
                 (LdapQueryField.DEFAULT_FIELD_NAME)     : exampleLdapQuery().getValue()]
 
-        ldapQueryFunction.setArguments(args)
-
         when:
-        FunctionReport report = ldapQueryFunction.execute()
+        FunctionReport report = ldapQueryFunction.execute(args, FUNCTION_PATH)
 
         then:
         report.getErrorMessages().size() == 1
         report.getErrorMessages().get(0).getCode() == LdapMessages.CANNOT_BIND
-        report.getErrorMessages().get(0).getPath() == [LdapQuery.FIELD_NAME, BaseFunctionField.ARGUMENT, LdapBindUserInfo.DEFAULT_FIELD_NAME]
+        report.getErrorMessages().get(0).getPath() == [LdapQuery.FIELD_NAME, LdapBindUserInfo.DEFAULT_FIELD_NAME]
     }
 
     def 'Successfully query with entries found (No encryption)'() {
@@ -130,11 +129,10 @@ class LdapQuerySpec extends Specification {
                 (LdapQuery.QUERY_BASE_FIELD_NAME)       : exampleQueryBase().getValue(),
                 (LdapQueryField.DEFAULT_FIELD_NAME)     : ldapQuery("(objectClass=person)").getValue()]
 
-        ldapQueryFunction.setArguments(args)
         ldapQueryFunction.setTestingUtils(utilsMock)
 
         when:
-        FunctionReport report = ldapQueryFunction.execute()
+        FunctionReport report = ldapQueryFunction.execute(args, FUNCTION_PATH)
         ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().getResult().isClosed()
 
         then:
@@ -153,11 +151,10 @@ class LdapQuerySpec extends Specification {
                 (LdapQuery.QUERY_BASE_FIELD_NAME)       : exampleQueryBase().getValue(),
                 (LdapQueryField.DEFAULT_FIELD_NAME)     : ldapQuery("(objectClass=person)").getValue()]
 
-        ldapQueryFunction.setArguments(args)
         ldapQueryFunction.setTestingUtils(utilsMock)
 
         when:
-        FunctionReport report = ldapQueryFunction.execute()
+        FunctionReport report = ldapQueryFunction.execute(args, FUNCTION_PATH)
         ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().getResult().isClosed()
 
         then:
@@ -176,11 +173,10 @@ class LdapQuerySpec extends Specification {
                 (LdapQuery.QUERY_BASE_FIELD_NAME)       : exampleQueryBase().getValue(),
                 (LdapQueryField.DEFAULT_FIELD_NAME)     : ldapQuery("(objectClass=person)").getValue()]
 
-        ldapQueryFunction.setArguments(args)
         ldapQueryFunction.setTestingUtils(utilsMock)
 
         when:
-        FunctionReport report = ldapQueryFunction.execute()
+        FunctionReport report = ldapQueryFunction.execute(args, FUNCTION_PATH)
         ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().getResult().isClosed()
 
         then:
@@ -199,11 +195,10 @@ class LdapQuerySpec extends Specification {
                 (LdapQuery.QUERY_BASE_FIELD_NAME)       : exampleQueryBase().getValue(),
                 (LdapQueryField.DEFAULT_FIELD_NAME)     : ldapQuery("(uid=NOT_REAL)").getValue()]
 
-        ldapQueryFunction.setArguments(args)
         ldapQueryFunction.setTestingUtils(utilsMock)
 
         when:
-        FunctionReport report = ldapQueryFunction.execute()
+        FunctionReport report = ldapQueryFunction.execute(args, FUNCTION_PATH)
         ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().getResult().isClosed()
 
         then:
@@ -220,11 +215,10 @@ class LdapQuerySpec extends Specification {
                 (LdapQuery.MAX_QUERY_FIELD_NAME)        : 1,
                 (LdapQueryField.DEFAULT_FIELD_NAME)     : ldapQuery("(objectClass=person)").getValue()]
 
-        ldapQueryFunction.setArguments(args)
         ldapQueryFunction.setTestingUtils(utilsMock)
 
         when:
-        FunctionReport report = ldapQueryFunction.execute()
+        FunctionReport report = ldapQueryFunction.execute(args, FUNCTION_PATH)
         ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().getResult().isClosed()
 
         then:
@@ -243,11 +237,10 @@ class LdapQuerySpec extends Specification {
                 (LdapQuery.QUERY_BASE_FIELD_NAME)       : exampleQueryBase().getValue(),
                 (LdapQueryField.DEFAULT_FIELD_NAME)     : ldapQuery("(objectClass=person)").getValue()]
 
-        ldapQueryFunction.setArguments(args)
         ldapQueryFunction.setTestingUtils(utilsMock)
 
         when:
-        FunctionReport report = ldapQueryFunction.execute()
+        FunctionReport report = ldapQueryFunction.execute(args, FUNCTION_PATH)
         ldapConnectionIsClosed = utilsMock.getLdapConnectionAttempt().getResult().isClosed()
 
         then:
@@ -269,7 +262,6 @@ class LdapQuerySpec extends Specification {
                 (LdapQuery.QUERY_BASE_FIELD_NAME)       : exampleQueryBase().getValue(),
                 (LdapQueryField.DEFAULT_FIELD_NAME)     : exampleLdapQuery().getValue()]
         LdapQuery cannotConnectQuery = new LdapQuery()
-        cannotConnectQuery.setArguments(cannotConnectArgs)
 
 
         Map<String, Object> cannotBindArgs = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue(),
@@ -277,12 +269,11 @@ class LdapQuerySpec extends Specification {
                 (LdapQuery.QUERY_BASE_FIELD_NAME)       : exampleQueryBase().getValue(),
                 (LdapQueryField.DEFAULT_FIELD_NAME)     : exampleLdapQuery().getValue()]
         LdapQuery cannotBindQuery = new LdapQuery()
-        cannotBindQuery.setArguments(cannotBindArgs)
 
         when:
         def errorCodes = ldapQueryFunction.getFunctionErrorCodes()
-        def cannotConnectReport = cannotConnectQuery.execute()
-        def cannotBindReport = cannotBindQuery.execute()
+        def cannotConnectReport = cannotConnectQuery.execute(cannotConnectArgs, FUNCTION_PATH)
+        def cannotBindReport = cannotBindQuery.execute(cannotBindArgs, FUNCTION_PATH)
 
         then:
         errorCodes.size() == 3

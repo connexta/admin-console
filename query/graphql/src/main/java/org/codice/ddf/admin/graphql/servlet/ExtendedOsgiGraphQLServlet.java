@@ -21,9 +21,11 @@ import com.google.common.cache.RemovalCause;
 import com.google.common.cache.RemovalNotification;
 import com.google.common.net.HttpHeaders;
 import graphql.GraphQLError;
-import graphql.annotations.EnhancedExecutionStrategy;
-import graphql.execution.ExecutionContext;
+import graphql.execution.AsyncExecutionStrategy;
+import graphql.execution.DataFetcherExceptionHandlerParameters;
+import graphql.execution.ExecutionPath;
 import graphql.execution.ExecutionStrategy;
+import graphql.execution.SimpleDataFetcherExceptionHandler;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.servlet.DefaultGraphQLErrorHandler;
 import graphql.servlet.ExecutionStrategyProvider;
@@ -36,7 +38,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -256,13 +257,14 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet implements Ev
   }
 
   public void bindFieldProvider(FieldProvider fieldProvider) {
-    triggerSchemaRefresh(String.format(BINDING_FIELD_PROVIDER, fieldProvider.getTypeName()));
+    triggerSchemaRefresh(String.format(BINDING_FIELD_PROVIDER, fieldProvider.getFieldTypeName()));
   }
 
   public void unbindFieldProvider(FieldProvider fieldProvider) {
     triggerSchemaRefresh(
         String.format(
-            UNBINDING_FIELD_PROVIDER, fieldProvider == null ? "" : fieldProvider.getTypeName()));
+            UNBINDING_FIELD_PROVIDER,
+            fieldProvider == null ? "" : fieldProvider.getFieldTypeName()));
   }
 
   public void setFieldProviders(List<FieldProvider> fieldProviders) {
@@ -292,23 +294,44 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet implements Ev
     }
   }
 
-  private static class ExtendedEnhancedExecutionStrategy extends EnhancedExecutionStrategy {
+  private static class DataFetcherExceptionHandlerImpl extends SimpleDataFetcherExceptionHandler {
 
     @Override
-    protected void handleDataFetchingException(
-        ExecutionContext executionContext,
-        GraphQLFieldDefinition fieldDef,
-        Map<String, Object> argumentValues,
-        Exception e) {
+    public void accept(
+        DataFetcherExceptionHandlerParameters dataFetcherExceptionHandlerParameters) {
+      Throwable e = dataFetcherExceptionHandlerParameters.getException();
+
       if (e instanceof FunctionDataFetcherException) {
         for (ErrorMessage msg : ((FunctionDataFetcherException) e).getCustomMessages()) {
           LOGGER.trace("Unsuccessful GraphQL request:\n", e);
-          executionContext.addError(new DataFetchingGraphQLError(msg));
+          ExecutionPath executionPath = listToExecutionPath(msg.getPath());
+          dataFetcherExceptionHandlerParameters
+              .getExecutionContext()
+              .addError(new DataFetchingGraphQLError(msg, executionPath), executionPath);
         }
       } else {
         LOGGER.debug("Internal error.", e);
-        super.handleDataFetchingException(executionContext, fieldDef, argumentValues, e);
+        super.accept(dataFetcherExceptionHandlerParameters);
       }
+    }
+  }
+
+  public static ExecutionPath listToExecutionPath(List<Object> path) {
+    ExecutionPath transformedPath = ExecutionPath.rootPath();
+    for (Object seg : path) {
+      if (seg instanceof String) {
+        transformedPath = transformedPath.segment((String) seg);
+      } else {
+        transformedPath = transformedPath.segment((Integer) seg);
+      }
+    }
+    return transformedPath;
+  }
+
+  private static class ExtendedEnhancedExecutionStrategy extends AsyncExecutionStrategy {
+
+    public ExtendedEnhancedExecutionStrategy() {
+      super(new DataFetcherExceptionHandlerImpl());
     }
   }
 

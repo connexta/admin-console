@@ -19,17 +19,21 @@ import spock.lang.Specification
 
 class MapFieldTest extends Specification {
 
+    List<Object> MAP_FIELD_PATH = [MapField.DEFAULT_FIELD_NAME]
+
     MapField mapField
 
     static ENTRIES = PairField.ListImpl.DEFAULT_FIELD_NAME
 
     def setup() {
         mapField = new MapField()
+        mapField.setPath(MAP_FIELD_PATH)
     }
 
     def 'Putting the same key twice overrides the key\'s original value'() {
         when:
         mapField.put('key', 'value1')
+        mapField.setPath(MAP_FIELD_PATH)
 
         then:
         mapField.getValue().get(ENTRIES).get(0).get('value') == 'value1'
@@ -47,6 +51,7 @@ class MapFieldTest extends Specification {
     def 'Contains key and value'() {
         when:
         mapField.put('key1', 'value1')
+        mapField.setPath([MapField.DEFAULT_FIELD_NAME])
 
         then:
         mapField.containsKey('key1')
@@ -56,6 +61,7 @@ class MapFieldTest extends Specification {
     def 'Does not contain key or value'() {
         when:
         mapField.put('key1', 'value1')
+        mapField.setPath([MapField.DEFAULT_FIELD_NAME])
 
         then:
         !mapField.containsKey('notMyKey')
@@ -70,6 +76,7 @@ class MapFieldTest extends Specification {
                 createEntry('key1', 'value3')
         ]]
         mapField.setValue(value)
+        mapField.setPath([MapField.DEFAULT_FIELD_NAME])
 
         when:
         List<ErrorMessage> validationMsgs = mapField.validate()
@@ -77,7 +84,7 @@ class MapFieldTest extends Specification {
         then:
         validationMsgs.size() == 1
         validationMsgs.get(0).getCode() == DefaultMessages.DUPLICATE_MAP_KEY
-        validationMsgs.get(0).getPath() == [MapField.DEFAULT_FIELD_NAME, ENTRIES, '2']
+        validationMsgs.get(0).getPath() == [MapField.DEFAULT_FIELD_NAME, ENTRIES, 2]
     }
 
     def 'Returns all the possible error codes correctly'(){
@@ -86,14 +93,17 @@ class MapFieldTest extends Specification {
                                           createEntry('key1', 'value2')]]
         MapField duplicateValueMapField = new MapField()
         duplicateValueMapField.setValue(duplicateValue)
+        duplicateValueMapField.setPath(MAP_FIELD_PATH)
 
         def emptyValue = [(ENTRIES): [createEntry('', '')]]
         MapField emptyValueMapField = new MapField()
         emptyValueMapField.setValue(emptyValue)
+        emptyValueMapField.setPath(MAP_FIELD_PATH)
 
         def missingValue = [(ENTRIES): [createEntry('', null)]]
         MapField missingValueMapField = new MapField().isRequired(true)
         missingValueMapField.setValue(missingValue)
+        missingValueMapField.setPath(MAP_FIELD_PATH)
 
         when:
         def errorCodes = mapField.getErrorCodes()

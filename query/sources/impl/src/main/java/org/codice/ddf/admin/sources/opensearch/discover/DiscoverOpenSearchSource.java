@@ -55,7 +55,6 @@ public class DiscoverOpenSearchSource
     credentials = new CredentialsField();
     address = new AddressField();
     address.isRequired(true);
-    updateArgumentPaths();
 
     openSearchSourceUtils = new OpenSearchSourceUtils(configuratorSuite);
   }

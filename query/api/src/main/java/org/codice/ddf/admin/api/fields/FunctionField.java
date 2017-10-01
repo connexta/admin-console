@@ -26,9 +26,7 @@ import org.codice.ddf.admin.api.report.FunctionReport;
  */
 public interface FunctionField<T extends Field> {
 
-  String ARGUMENT = "__argument";
-
-  String getName();
+  String getFunctionName();
 
   String getDescription();
 
@@ -38,15 +36,9 @@ public interface FunctionField<T extends Field> {
 
   T getReturnType();
 
-  void setArguments(Map<String, Object> value);
-
-  FunctionReport<T> execute();
+  FunctionReport<T> execute(Map<String, Object> value, List<Object> path);
 
   FunctionField<T> newInstance();
 
-  List<String> path();
-
-  void pathName(String functionFieldName);
-
-  void updatePath(List<String> subPath);
+  List<Object> getPath();
 }

@@ -125,7 +125,7 @@ public class CswSourceUtils {
     if (result.isPresent()) {
       return result.get();
     } else {
-      return Reports.from(unknownEndpointError(hostField.path()));
+      return Reports.from(unknownEndpointError(hostField.getPath()));
     }
   }
 
@@ -157,7 +157,7 @@ public class CswSourceUtils {
 
     String responseBody = responseField.responseBody();
     if (responseField.statusCode() != HTTP_OK || responseBody.length() < 1) {
-      return Reports.from(unknownEndpointError(responseField.requestUrlField().path()));
+      return Reports.from(unknownEndpointError(responseField.requestUrlField().getPath()));
     }
 
     Document capabilitiesXml;
@@ -165,7 +165,7 @@ public class CswSourceUtils {
       capabilitiesXml = sourceUtilCommons.createDocument(responseBody);
     } catch (Exception e) {
       LOGGER.debug("Failed to create XML document from response.");
-      return Reports.from(unknownEndpointError(responseField.requestUrlField().path()));
+      return Reports.from(unknownEndpointError(responseField.requestUrlField().getPath()));
     }
 
     String requestUrl = responseField.requestUrlField().getValue();
@@ -217,7 +217,7 @@ public class CswSourceUtils {
     LOGGER.debug(
         "URL [{}] responded to GetCapabilities request, but response was not readable.",
         requestUrl);
-    return Reports.from(unknownEndpointError(responseField.requestUrlField().path()));
+    return Reports.from(unknownEndpointError(responseField.requestUrlField().getPath()));
   }
 
   /** For testing purposes only. Groovy can access private methods */

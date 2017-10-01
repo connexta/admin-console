@@ -38,7 +38,6 @@ public class GetLdapConfigurations extends GetFunctionField<ListField<LdapConfig
   public GetLdapConfigurations(ConfiguratorSuite configuratorSuite) {
     super(FIELD_NAME, DESCRIPTION);
     this.configuratorSuite = configuratorSuite;
-    updateArgumentPaths();
 
     serviceCommons = new LdapServiceCommons(configuratorSuite);
   }

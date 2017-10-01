@@ -50,7 +50,6 @@ public class OpenSearchFieldProvider extends BaseFieldProvider {
     createOpenSearchConfigs = new CreateOpenSearchConfiguration(configuratorSuite);
     updateOpenSearchConfigs = new UpdateOpenSearchConfiguration(configuratorSuite);
     deleteOpenSearchConfig = new DeleteOpenSearchConfiguration(configuratorSuite);
-    updateInnerFieldPaths();
   }
 
   @Override

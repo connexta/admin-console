@@ -53,7 +53,6 @@ public class GetWfsConfigurations extends BaseFunctionField<ListField<WfsSourceI
     this.configuratorSuite = configuratorSuite;
 
     pid = new PidField();
-    updateArgumentPaths();
 
     sourceUtilCommons = new SourceUtilCommons(configuratorSuite);
     serviceCommons = new ServiceCommons(configuratorSuite);

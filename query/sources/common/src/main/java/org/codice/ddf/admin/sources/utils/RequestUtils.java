@@ -82,7 +82,7 @@ public class RequestUtils {
       return Reports.from(responseFieldFromResponse(response, urlField));
 
     } catch (ProcessingException e) {
-      return Reports.from(cannotConnectError(urlField.path()));
+      return Reports.from(cannotConnectError(urlField.getPath()));
     }
   }
 
@@ -132,7 +132,7 @@ public class RequestUtils {
       return Reports.from(responseFieldFromResponse(response, urlField));
 
     } catch (ProcessingException e) {
-      return Reports.from(cannotConnectError(urlField.path()));
+      return Reports.from(cannotConnectError(urlField.getPath()));
     }
   }
 
@@ -155,7 +155,7 @@ public class RequestUtils {
       LOGGER.debug("Successfully reached {}.", urlField);
     } catch (IOException e) {
       LOGGER.debug("Failed to reach {}, returning an error.", urlField, e);
-      return Reports.from(cannotConnectError(urlField.path()));
+      return Reports.from(cannotConnectError(urlField.getPath()));
     } finally {
       try {
         if (urlConnection != null) {

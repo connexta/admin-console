@@ -24,6 +24,7 @@ class HostnameFieldTest extends Specification {
 
     def setup() {
         hostnameField = new HostnameField()
+        hostnameField.setPath(HOSTNAME_FIELD_PATH)
     }
 
     def 'Valid hostnames'() {

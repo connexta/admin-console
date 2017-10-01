@@ -32,9 +32,11 @@ import org.junit.Ignore
 
 class UpdateOpenSearchConfigurationSpec extends SourceCommonsSpec {
 
+    static final List<Object> FUNCTION_PATH = [UpdateOpenSearchConfiguration.FIELD_NAME]
+
     static RESULT_ARGUMENT_PATH = [UpdateOpenSearchConfiguration.FIELD_NAME]
 
-    static BASE_PATH = [RESULT_ARGUMENT_PATH, FunctionField.ARGUMENT].flatten()
+    static BASE_PATH = [RESULT_ARGUMENT_PATH].flatten()
 
     static CONFIG_PATH = [BASE_PATH, OpenSearchSourceConfigurationField.DEFAULT_FIELD_NAME].flatten()
 
@@ -87,13 +89,12 @@ class UpdateOpenSearchConfigurationSpec extends SourceCommonsSpec {
 
     def 'Successfully update existing OpenSearch configuration'() {
         setup:
-        updateOpenSearchConfiguration.setArguments(createUpdateFunctionArgs(FLAG_PASSWORD))
         serviceActions.read(_) >> [(ID): TEST_SOURCENAME]
         serviceReader.getServices(_, _) >> []
         configurator.commit(_, _) >> mockReport(false)
 
         when:
-        def report = updateOpenSearchConfiguration.execute()
+        def report = updateOpenSearchConfiguration.execute(createUpdateFunctionArgs(FLAG_PASSWORD), FUNCTION_PATH)
 
         then:
         report.getResult().getValue()
@@ -101,12 +102,11 @@ class UpdateOpenSearchConfigurationSpec extends SourceCommonsSpec {
 
     def 'Fail to update config due to existing source name'() {
         setup:
-        updateOpenSearchConfiguration.setArguments(createUpdateFunctionArgs(FLAG_PASSWORD))
         serviceActions.read(_) >> [(ID): 'updatedName']
         serviceReader.getServices(_, _) >> [new TestSource(S_PID, 'updatedName', false), new TestSource("existingSource", TEST_SOURCENAME, false)]
 
         when:
-        def report = updateOpenSearchConfiguration.execute()
+        def report = updateOpenSearchConfiguration.execute(createUpdateFunctionArgs(FLAG_PASSWORD), FUNCTION_PATH)
 
         then:
         report.getResult() == null
@@ -117,13 +117,12 @@ class UpdateOpenSearchConfigurationSpec extends SourceCommonsSpec {
 
     def 'Fail to update config due to failure to commit'() {
         setup:
-        updateOpenSearchConfiguration.setArguments(createUpdateFunctionArgs(FLAG_PASSWORD))
         serviceActions.read(_) >> [(ID): TEST_SOURCENAME]
         serviceReader.getServices(_, _) >> []
         configurator.commit(_, _) >> mockReport(true)
 
         when:
-        def report = updateOpenSearchConfiguration.execute()
+        def report = updateOpenSearchConfiguration.execute(createUpdateFunctionArgs(FLAG_PASSWORD), FUNCTION_PATH)
 
         then:
         configurator.commit(_, _) >> mockReport(true)
@@ -135,11 +134,10 @@ class UpdateOpenSearchConfigurationSpec extends SourceCommonsSpec {
 
     def 'Fail to update config due to no existing source specified by the pid'() {
         setup:
-        updateOpenSearchConfiguration.setArguments(createUpdateFunctionArgs(FLAG_PASSWORD))
         serviceActions.read(S_PID) >> [:]
 
         when:
-        def report = updateOpenSearchConfiguration.execute()
+        def report = updateOpenSearchConfiguration.execute(createUpdateFunctionArgs(FLAG_PASSWORD), FUNCTION_PATH)
 
         then:
         report.getResult() == null
@@ -152,12 +150,11 @@ class UpdateOpenSearchConfigurationSpec extends SourceCommonsSpec {
     // TODO: 8/23/17 phuffer - Remove ignore when feature starts correctly
     def 'Return false when opensearch feature fails to start'() {
         setup:
-        updateOpenSearchConfiguration.setArguments(createUpdateFunctionArgs(FLAG_PASSWORD))
         serviceReader.getServices(_, _) >> []
         serviceActions.read(_) >> [(ID): TEST_SOURCENAME]
 
         when:
-        def report = updateOpenSearchConfiguration.execute()
+        def report = updateOpenSearchConfiguration.execute(createUpdateFunctionArgs(FLAG_PASSWORD), FUNCTION_PATH)
 
         then:
         1 * configurator.commit(_, _) >> mockReport(true)
@@ -169,7 +166,6 @@ class UpdateOpenSearchConfigurationSpec extends SourceCommonsSpec {
 
     def 'Updating with flag password sends service properties without password'() {
         setup:
-        updateOpenSearchConfiguration.setArguments(createUpdateFunctionArgs(FLAG_PASSWORD))
         serviceActions.read(_ as String) >> [(ID): TEST_SOURCENAME]
         serviceReader.getServices(_, _) >> []
         configurator.commit(_, _) >> mockReport(false)
@@ -177,7 +173,7 @@ class UpdateOpenSearchConfigurationSpec extends SourceCommonsSpec {
         def expectedUpdateConfig = OpenSearchServiceProperties.openSearchConfigToServiceProps(createOpenSearchSourceConfig(FLAG_PASSWORD))
 
         when:
-        updateOpenSearchConfiguration.execute()
+        updateOpenSearchConfiguration.execute(createUpdateFunctionArgs(FLAG_PASSWORD), FUNCTION_PATH)
 
         then:
         1 * serviceActions.build(S_PID, expectedUpdateConfig, true)
@@ -185,7 +181,6 @@ class UpdateOpenSearchConfigurationSpec extends SourceCommonsSpec {
 
     def 'Updating with new password sends service properties with password'() {
         setup:
-        updateOpenSearchConfiguration.setArguments(createUpdateFunctionArgs('notFlagPassword'))
         serviceActions.read(_ as String) >> [(ID): TEST_SOURCENAME]
         serviceReader.getServices(_, _) >> []
         configurator.commit(_, _) >> mockReport(false)
@@ -193,7 +188,7 @@ class UpdateOpenSearchConfigurationSpec extends SourceCommonsSpec {
         def expectedUpdateConfig = OpenSearchServiceProperties.openSearchConfigToServiceProps(createOpenSearchSourceConfig('notFlagPassword'))
 
         when:
-        updateOpenSearchConfiguration.execute()
+        updateOpenSearchConfiguration.execute(createUpdateFunctionArgs('notFlagPassword'), FUNCTION_PATH)
 
         then:
         1 * serviceActions.build(S_PID, expectedUpdateConfig, true)
@@ -201,7 +196,7 @@ class UpdateOpenSearchConfigurationSpec extends SourceCommonsSpec {
 
     def 'Fail when missing required fields'() {
         when:
-        def report = updateOpenSearchConfiguration.execute()
+        def report = updateOpenSearchConfiguration.execute(null, FUNCTION_PATH)
 
         then:
         report.getResult() == null

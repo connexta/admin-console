@@ -14,7 +14,6 @@
 package org.codice.ddf.admin.sources.csw.persist
 
 import org.codice.ddf.admin.api.ConfiguratorSuite
-import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.configurator.Configurator
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
@@ -24,6 +23,7 @@ import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions
 
 class DeleteCswConfigurationSpec extends SourceCommonsSpec {
+    static final List<Object> FUNCTION_PATH = [DeleteCswConfiguration.FIELD_NAME]
 
     DeleteCswConfiguration deleteCswConfiguration
 
@@ -43,11 +43,11 @@ class DeleteCswConfigurationSpec extends SourceCommonsSpec {
 
     static RESULT_ARGUMENT_PATH = [DeleteCswConfiguration.FIELD_NAME]
 
-    static BASE_PATH = [DeleteCswConfiguration.FIELD_NAME, FunctionField.ARGUMENT]
+    static BASE_PATH = [DeleteCswConfiguration.FIELD_NAME]
 
     static SERVICE_PID_PATH = [BASE_PATH, PID].flatten()
 
-    def functionArgs = [
+    def args = [
             (PID): S_PID
     ]
 
@@ -73,8 +73,7 @@ class DeleteCswConfigurationSpec extends SourceCommonsSpec {
         when:
         serviceActions.read(S_PID) >> configToDelete
         configurator.commit(_, _) >> mockReport(false)
-        deleteCswConfiguration.setArguments(functionArgs)
-        def report = deleteCswConfiguration.execute()
+        def report = deleteCswConfiguration.execute(args, FUNCTION_PATH)
 
         then:
         report.getResult() != null
@@ -84,8 +83,7 @@ class DeleteCswConfigurationSpec extends SourceCommonsSpec {
     def 'Fail with no existing config found with provided pid'() {
         when:
         serviceActions.read(_ as String) >> [:]
-        deleteCswConfiguration.setArguments(functionArgs)
-        def report = deleteCswConfiguration.execute()
+        def report = deleteCswConfiguration.execute(args, FUNCTION_PATH)
 
         then:
         report.getResult() == null
@@ -98,8 +96,7 @@ class DeleteCswConfigurationSpec extends SourceCommonsSpec {
         when:
         serviceActions.read(S_PID) >> configToDelete
         configurator.commit(_, _) >> mockReport(true)
-        deleteCswConfiguration.setArguments(functionArgs)
-        def report = deleteCswConfiguration.execute()
+        def report = deleteCswConfiguration.execute(args, FUNCTION_PATH)
 
         then:
         !report.getResult().getValue()
@@ -110,7 +107,7 @@ class DeleteCswConfigurationSpec extends SourceCommonsSpec {
 
     def 'Fail when missing required fields'() {
         when:
-        def report = deleteCswConfiguration.execute()
+        def report = deleteCswConfiguration.execute(null, FUNCTION_PATH)
 
         then:
         report.getResult() == null
@@ -125,17 +122,15 @@ class DeleteCswConfigurationSpec extends SourceCommonsSpec {
         setup:
         DeleteCswConfiguration deleteCswNoExistingConfig = new DeleteCswConfiguration(configuratorSuite)
         serviceActions.read(_ as String) >> [:]
-        deleteCswNoExistingConfig.setArguments(functionArgs)
 
         DeleteCswConfiguration deleteCswFailPersist = new DeleteCswConfiguration(configuratorSuite)
         serviceActions.read(S_PID) >> configToDelete
         configurator.commit(_, _) >> mockReport(true)
-        deleteCswFailPersist.setArguments(functionArgs)
 
         when:
         def errorCodes = deleteCswConfiguration.getFunctionErrorCodes()
-        def noExistingConfigReport = deleteCswNoExistingConfig.execute()
-        def failedPersistReport = deleteCswFailPersist.execute()
+        def noExistingConfigReport = deleteCswNoExistingConfig.execute(args, FUNCTION_PATH)
+        def failedPersistReport = deleteCswFailPersist.execute(args, FUNCTION_PATH)
 
         then:
         errorCodes.size() == 2

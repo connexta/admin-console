@@ -66,7 +66,6 @@ public class SaveContextPolices extends BaseFunctionField<ContextPolicyBin.ListI
     this.returnType = new ContextPolicyBin.ListImpl(configuratorSuite.getServiceReader());
     contextPolicies =
         new ContextPolicyBin.ListImpl(configuratorSuite.getServiceReader()).useDefaultRequired();
-    updateArgumentPaths();
 
     stsServiceProps = new StsServiceProperties();
   }
@@ -133,7 +132,7 @@ public class SaveContextPolices extends BaseFunctionField<ContextPolicyBin.ListI
                             TRAILING_SLASH_PATTERN.matcher(contextPath.getValue()).matches())
                     .forEach(
                         contextPath ->
-                            addErrorMessage(invalidPathTrailingSlash(contextPath.path()))));
+                            addErrorMessage(invalidPathTrailingSlash(contextPath.getPath()))));
   }
 
   private void checkRootPathExists() {
@@ -143,7 +142,7 @@ public class SaveContextPolices extends BaseFunctionField<ContextPolicyBin.ListI
         .map(ContextPolicyBin::contexts)
         .flatMap(Collection::stream)
         .noneMatch(ROOT_CONTEXT_PATH::equals)) {
-      addErrorMessage(noRootContextError(contextPolicies.path()));
+      addErrorMessage(noRootContextError(contextPolicies.getPath()));
     }
   }
 

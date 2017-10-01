@@ -34,7 +34,6 @@ public class PingByAddress extends TestFunctionField {
     super(NAME, DESCRIPTION);
     address = new AddressField();
     address.isRequired(true);
-    updateArgumentPaths();
   }
 
   @Override

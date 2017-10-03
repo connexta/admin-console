@@ -152,7 +152,6 @@ const configInputs = [
     optionKey: 'userDns',
     label: 'Base User DN',
     tooltip: 'Distinguished name of the LDAP directory in which users can be found.'
-
   },
   {
     key: 'userNameAttribute',
@@ -164,7 +163,8 @@ const configInputs = [
     key: 'memberAttributeReferencedInGroup',
     optionKey: 'memberAttributesReferencedInGroup',
     label: 'Member Attribute Referenced in Groups',
-    tooltip: 'The attribute of the user entry that, when combined with the Base User DN, forms the reference value, e.g. XXX=jsmith,ou=users,dc=example,dc=com'
+    tooltip: 'The attribute of the user entry that, when combined with the Base User DN, forms the reference value, e.g. XXX=jsmith,ou=users,dc=example,dc=com',
+    attrStoreOnly: true
   },
   {
     key: 'baseGroupDn',
@@ -176,13 +176,15 @@ const configInputs = [
     key: 'groupObjectClass',
     optionKey: 'groupObjectClasses',
     label: 'LDAP Group ObjectClass',
-    tooltip: 'ObjectClass that defines the structure for group membership in LDAP. Typically groupOfNames.'
+    tooltip: 'ObjectClass that defines the structure for group membership in LDAP. Typically groupOfNames.',
+    attrStoreOnly: true
   },
   {
     key: 'groupAttributeHoldingMember',
     optionKey: 'groupAttributesHoldingMember',
     label: 'Group Attribute Holding Member References',
-    tooltip: 'Multivalued-attribute on the group entry that holds references to users.'
+    tooltip: 'Multivalued-attribute on the group entry that holds references to users.',
+    attrStoreOnly: true
   },
   {
     key: 'queryBase',
@@ -313,7 +315,7 @@ const DirectorySettings = (props) => {
       <Body>
         {configInputs
           .filter(({ label }) => label !== undefined)
-          .map(({ key, optionKey, label, tooltip }) => {
+          .map(({ key, optionKey, label, tooltip, attrStoreOnly = false }) => {
             const error = errors.find((err) => key === err.path[err.path.length - 1]) || {}
 
             return (
@@ -324,6 +326,7 @@ const DirectorySettings = (props) => {
                 errorText={error.message}
                 label={label}
                 tooltip={tooltip}
+                visible={!attrStoreOnly || isAttrStore}
                 options={options[optionKey]} />
             )
           })}

@@ -324,6 +324,7 @@ const DirectorySettings = (props) => {
             return (
               <InputAuto
                 key={key}
+                id={key}
                 value={configs[key]}
                 onEdit={onEdit(key)}
                 errorText={error.message}
@@ -368,5 +369,7 @@ const DirectorySettings = (props) => {
     </div>
   )
 }
+
+export { DirectorySettings }
 
 export default withApollo(DirectorySettings)

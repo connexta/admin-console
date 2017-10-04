@@ -42,7 +42,7 @@
     "flexbox-react": "4.2.1",
     "graphql": "^0.9.1",
     "immutable": "^3.8.1",
-    "material-ui": "^0.19.1",
+    "material-ui": "^0.19.3",
     "prop-types": "^15.5.8",
     "react": "^15.1.0",
     "react-apollo": "^1.4.2",

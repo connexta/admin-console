@@ -52,10 +52,16 @@ const ConfirmStage = (props) => {
     onEndSubmit,
     next,
 
+    configs: {
+      ldapUseCase
+    } = {},
+
     prev,
     messages = [],
     configs
   } = props
+
+  const isAttrStore = ldapUseCase === 'AuthenticationAndAttributeStore' || ldapUseCase === 'AttributeStore'
 
   const conn = {
     hostname: configs.hostname,
@@ -76,10 +82,13 @@ const ConfirmStage = (props) => {
     userNameAttribute: configs.userNameAttribute,
     baseUserDn: configs.baseUserDn,
     baseGroupDn: configs.baseGroupDn,
-    groupObjectClass: configs.groupObjectClass,
-    groupAttributeHoldingMember: configs.groupAttributeHoldingMember,
-    memberAttributeReferencedInGroup: configs.memberAttributeReferencedInGroup,
     useCase: configs.ldapUseCase
+  }
+
+  if (isAttrStore) {
+    settings.memberAttributeReferencedInGroup = configs.memberAttributeReferencedInGroup
+    settings.groupObjectClass = configs.groupObjectClass
+    settings.groupAttributeHoldingMember = configs.groupAttributeHoldingMember
   }
 
   const mapping = Object.keys(configs.attributeMappings || {}).map((key) => ({ key, value: configs.attributeMappings[key] }))
@@ -96,22 +105,49 @@ const ConfirmStage = (props) => {
       <Flexbox flexDirection='column'>
         <Flexbox flexDirection='row' justifyContent='space-between'>
           <Flexbox style={confirmationInfo} flexDirection='column'>
-            <Info label='LDAP Function' value={useCaseMapping[configs.ldapUseCase]} />
-            <Info label='Hostname' value={configs.hostname} />
-            <Info label='Port' value={configs.port} />
-            <Info label='Encryption Method' value={configs.encryption} />
-            <Info label='Base User DN' value={configs.baseUserDn} />
-            <Info label='User Name Attribute' value={configs.userNameAttribute} />
+            <Info
+              label='LDAP Function'
+              value={useCaseMapping[configs.ldapUseCase]} />
+            <Info
+              label='Hostname'
+              value={configs.hostname} />
+            <Info
+              label='Port'
+              value={configs.port} />
+            <Info
+              label='Encryption Method'
+              value={configs.encryption} />
+            <Info
+              label='Base User DN'
+              value={configs.baseUserDn} />
+            <Info
+              label='User Name Attribute'
+              value={configs.userNameAttribute} />
           </Flexbox>
           <Flexbox style={confirmationInfo} flexDirection='column'>
-            <Info label='Base Group DN' value={configs.baseGroupDn} />
-            <Info label='Bind User' value={configs.bindUser} />
-            <Info label='Bind User Password' value='*****' />
-            <Info label='Bind User Method' value={configs.bindUserMethod} />
-            <Info label='LDAP Group Object Class' value={configs.groupObjectClass} />
-            <Info label='Group Attribute Holding Member References'
+            <Info
+              label='Base Group DN'
+              value={configs.baseGroupDn} />
+            <Info
+              label='Bind User'
+              value={configs.bindUser} />
+            <Info
+              label='Bind User Password'
+              value='*****' />
+            <Info
+              label='Bind User Method'
+              value={configs.bindUserMethod} />
+            <Info
+              visible={isAttrStore}
+              label='LDAP Group Object Class'
+              value={configs.groupObjectClass} />
+            <Info
+              visible={isAttrStore}
+              label='Group Attribute Holding Member References'
               value={configs.groupAttributeHoldingMember} />
-            <Info label='Member Attribute Referenced in Groups'
+            <Info
+              visible={isAttrStore}
+              label='Member Attribute Referenced in Groups'
               value={configs.memberAttributeReferencedInGroup} />
           </Flexbox>
         </Flexbox>

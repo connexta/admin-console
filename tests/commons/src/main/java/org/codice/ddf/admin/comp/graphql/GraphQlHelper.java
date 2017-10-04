@@ -11,7 +11,7 @@
  * License is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  */
-package org.codice.ddf.admin.query.request;
+package org.codice.ddf.admin.comp.graphql;
 
 import static com.jayway.restassured.RestAssured.given;
 import static junit.framework.TestCase.fail;
@@ -30,6 +30,8 @@ import org.slf4j.LoggerFactory;
 public class GraphQlHelper {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(GraphQlHelper.class);
+  public static final String USERNAME = "admin";
+  public static final String PASSWORD = "admin";
 
   private Class resourceClass;
 
@@ -66,7 +68,7 @@ public class GraphQlHelper {
                 return given()
                         .when()
                         .auth()
-                        .basic("admin", "admin")
+                        .basic(USERNAME, PASSWORD)
                         .get(graphQlSchemaEndpoint)
                         .then()
                         .extract()
@@ -78,6 +80,16 @@ public class GraphQlHelper {
                 return false;
               }
             });
+  }
+
+  public GraphQlResponse sendMutationRequest(String usingMutation, Map<String, Object> arguments) {
+    return new GraphQlResponse(
+        createRequest().usingMutation(usingMutation).addArguments(arguments).send().getResponse());
+  }
+
+  public GraphQlResponse sendQueryRequest(String usingQuery, Map<String, Object> arguments) {
+    return new GraphQlResponse(
+        createRequest().usingQuery(usingQuery).addArguments(arguments).send().getResponse());
   }
 
   private String getResourceAsString(String filePath) {
@@ -118,6 +130,13 @@ public class GraphQlHelper {
       return this;
     }
 
+    public GraphQLRequest addArguments(Map<String, Object> args) {
+      for (String key : args.keySet()) {
+        addArgument(key, args.get(key));
+      }
+      return this;
+    }
+
     public GraphQLRequest usingQuery(String queryFileName) {
       this.queryFile = queryFileName;
       return this;
@@ -154,7 +173,7 @@ public class GraphQlHelper {
           given()
               .when()
               .auth()
-              .basic("admin", "admin")
+              .basic(USERNAME, PASSWORD)
               .body(queryStr)
               .post(graphQlEndpoint)
               .then()

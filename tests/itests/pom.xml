@@ -197,6 +197,14 @@
                                     <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
                                     <excludes>**/META-INF/**,**/OSGI-INF/**</excludes>
                                 </artifactItem>
+                                <artifactItem>
+                                    <groupId>ddf.security</groupId>
+                                    <artifactId>ddf-security-common</artifactId>
+                                    <version>${ddf.version}</version>
+                                    <type>jar</type>
+                                    <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
+                                    <excludes>**/META-INF/**,**/OSGI-INF/**</excludes>
+                                </artifactItem>
                             </artifactItems>
                         </configuration>
                     </execution>

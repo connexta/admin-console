@@ -19,12 +19,14 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.fail;
 
 import com.jayway.restassured.response.ExtractableResponse;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import org.boon.Boon;
 import org.codice.ddf.admin.common.fields.common.ContextPath;
+import org.codice.ddf.admin.comp.graphql.GraphQlHelper;
 import org.codice.ddf.itests.common.WaitCondition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -156,23 +158,25 @@ public class WcpmRequestHelper {
   }
 
   public List<String> getWhiteListContexts() {
-    return requestFactory
-        .createRequest()
-        .usingQuery("GetWhiteListed.graphql")
-        .send()
-        .getResponse()
-        .jsonPath()
-        .get("data.wcpm.whitelisted");
+    ExtractableResponse response =
+        requestFactory.createRequest().usingQuery("GetWhiteListed.graphql").send().getResponse();
+
+    if (responseHasErrors(response)) {
+      return Collections.emptyList();
+    }
+
+    return response.jsonPath().get("data.wcpm.whitelisted");
   }
 
   public List<Map<String, Object>> getContextPolicies() {
-    return requestFactory
-        .createRequest()
-        .usingQuery("GetPolicies.graphql")
-        .send()
-        .getResponse()
-        .jsonPath()
-        .get("data.wcpm.policies");
+    ExtractableResponse response =
+        requestFactory.createRequest().usingQuery("GetPolicies.graphql").send().getResponse();
+
+    if (responseHasErrors(response)) {
+      return Collections.emptyList();
+    }
+
+    return response.jsonPath().get("data.wcpm.policies");
   }
 
   public void saveWhiteListContexts(List<String> toSaveWhiteList) {
@@ -215,23 +219,29 @@ public class WcpmRequestHelper {
   }
 
   public List<String> getAuthType() {
-    return requestFactory
-        .createRequest()
-        .usingQuery("GetAuthTypes.graphql")
-        .send()
-        .getResponse()
-        .jsonPath()
-        .get("data.wcpm.authTypes");
+    ExtractableResponse response =
+        requestFactory.createRequest().usingQuery("GetAuthTypes.graphql").send().getResponse();
+
+    if (responseHasErrors(response)) {
+      return Collections.emptyList();
+    }
+
+    return response.jsonPath().get("data.wcpm.authTypes");
   }
 
   public List<String> getRealms() {
-    return requestFactory
-        .createRequest()
-        .usingQuery("GetRealms.graphql")
-        .send()
-        .getResponse()
-        .jsonPath()
-        .get("data.wcpm.realms");
+    ExtractableResponse response =
+        requestFactory.createRequest().usingQuery("GetRealms.graphql").send().getResponse();
+
+    if (responseHasErrors(response)) {
+      return Collections.emptyList();
+    }
+
+    return response.jsonPath().get("data.wcpm.realms");
+  }
+
+  private boolean responseHasErrors(ExtractableResponse response) {
+    return response != null && response.jsonPath().get("errors") != null;
   }
 
   public List<String> getInitialWhiteList() {

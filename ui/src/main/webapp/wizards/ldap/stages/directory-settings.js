@@ -273,10 +273,13 @@ const DirectorySettings = (props) => {
     userNameAttribute: configs.userNameAttribute,
     baseUserDn: configs.baseUserDn,
     baseGroupDn: configs.baseGroupDn,
-    groupObjectClass: configs.groupObjectClass,
-    groupAttributeHoldingMember: configs.groupAttributeHoldingMember,
-    memberAttributeReferencedInGroup: configs.memberAttributeReferencedInGroup,
     useCase: configs.ldapUseCase
+  }
+
+  if (isAttrStore) {
+    settings.memberAttributeReferencedInGroup = configs.memberAttributeReferencedInGroup
+    settings.groupObjectClass = configs.groupObjectClass
+    settings.groupAttributeHoldingMember = configs.groupAttributeHoldingMember
   }
 
   return (

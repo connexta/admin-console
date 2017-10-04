@@ -1,5 +1,6 @@
 import React from 'react'
 import muiThemeable from 'material-ui/styles/muiThemeable'
+import visible from 'react-visible'
 
 const styles = {
   div: {
@@ -49,4 +50,4 @@ const Information = ({ id, label, value, muiTheme }) => (
   </div>
 )
 
-export default muiThemeable()(Information)
+export default visible(muiThemeable()(Information))

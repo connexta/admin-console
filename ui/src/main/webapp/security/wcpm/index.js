@@ -224,8 +224,7 @@ const queries = compose(
             const policies = mutationResult.data.saveContextPolicies
             return fromJS(prev).setIn(['wcpm', 'policies'], policies).toJS()
           }
-        },
-        optimisticResponse: { saveContextPolicies: policies }
+        }
       })
       .then(onCancel)
       .catch((err) =>
@@ -241,8 +240,7 @@ const queries = compose(
             const whitelisted = mutationResult.data.saveWhitelistContexts
             return fromJS(prev).setIn(['wcpm', 'whitelisted'], whitelisted).toJS()
           }
-        },
-        optimisticResponse: { saveWhitelistContexts: whitelisted }
+        }
       })
       .then(onCancel)
       .catch((err) =>

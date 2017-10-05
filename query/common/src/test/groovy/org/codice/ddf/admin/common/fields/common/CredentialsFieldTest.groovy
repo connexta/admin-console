@@ -20,13 +20,15 @@ class CredentialsFieldTest extends Specification {
 
     CredentialsField credentialsField
 
-    static USERNAME_FIELD_PATH = [CredentialsField.DEFAULT_FIELD_NAME, CredentialsField.USERNAME_FIELD_NAME]
+    static CREDENTIALS_FIELD_PATH = [CredentialsField.DEFAULT_FIELD_NAME]
 
-    static PASSWORD_FIELD_PATH = [CredentialsField.DEFAULT_FIELD_NAME, CredentialsField.PASSWORD_FIELD_NAME]
+    static USERNAME_FIELD_PATH = CREDENTIALS_FIELD_PATH + CredentialsField.USERNAME_FIELD_NAME
+
+    static PASSWORD_FIELD_PATH = CREDENTIALS_FIELD_PATH + CredentialsField.PASSWORD_FIELD_NAME
 
     def setup() {
         credentialsField = new CredentialsField()
-        credentialsField.setPath([CredentialsField.DEFAULT_FIELD_NAME])
+        credentialsField.setPath(CREDENTIALS_FIELD_PATH)
     }
 
     def 'Fail validation when missing required fields'() {

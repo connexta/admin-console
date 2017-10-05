@@ -20,11 +20,13 @@ import spock.lang.Specification
 
 class BaseEnumFieldTest extends Specification {
 
+    List<Object> FIELD_PATH = [TestEnumField.DEFAULT_FIELD_NAME]
+
     Field enumField
 
     def setup() {
         enumField = new TestEnumField()
-        enumField.setPath([TestEnumField.DEFAULT_FIELD_NAME])
+        enumField.setPath(FIELD_PATH)
     }
 
     def 'Validation success'() {
@@ -48,7 +50,7 @@ class BaseEnumFieldTest extends Specification {
         then:
         validationMsgs.size() == 1
         validationMsgs.get(0).getCode() == DefaultMessages.UNSUPPORTED_ENUM
-        validationMsgs.get(0).getPath() == [TestEnumField.DEFAULT_FIELD_NAME]
+        validationMsgs.get(0).getPath() == FIELD_PATH
     }
 
     def 'Returns all the possible error codes correctly'(){

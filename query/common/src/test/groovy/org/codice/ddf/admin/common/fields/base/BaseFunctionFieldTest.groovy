@@ -23,7 +23,7 @@ import spock.lang.Specification
 
 class BaseFunctionFieldTest extends Specification {
 
-    final List<Object> FUNCTION_FIELD_PATH = [TestBaseFunctionField.DEFAULT_FIELD_NAME]
+    final List<Object> FUNCTION_PATH = [TestBaseFunctionField.DEFAULT_FIELD_NAME]
 
     TestBaseFunctionField functionField
 
@@ -36,7 +36,7 @@ class BaseFunctionFieldTest extends Specification {
         functionField.failValidation(true)
 
         when:
-        def report = functionField.execute(null, FUNCTION_FIELD_PATH)
+        def report = functionField.execute(null, FUNCTION_PATH)
 
         then:
         report.getErrorMessages().size() == 1
@@ -53,7 +53,7 @@ class BaseFunctionFieldTest extends Specification {
                 (StringField.DEFAULT_FIELD_NAME): 'test1',
                 (TestObjectField.FIELD_NAME)    : [(StringField.DEFAULT_FIELD_NAME): 'test2', (TestObjectField.INNER_OBJECT_FIELD_NAME): [(TestObjectField.SUB_FIELD_OF_INNER_FIELD_NAME): 'test3']]
         ]
-        functionField.execute(value, FUNCTION_FIELD_PATH)
+        functionField.execute(value, FUNCTION_PATH)
 
         then:
         functionField.getStringArg().getValue() == 'test1'

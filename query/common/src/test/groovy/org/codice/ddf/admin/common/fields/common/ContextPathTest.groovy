@@ -18,11 +18,13 @@ import spock.lang.Specification
 
 class ContextPathTest extends Specification {
 
+    static FIELD_PATH = [ContextPath.DEFAULT_FIELD_NAME]
+
     ContextPath contextPath
 
     def setup() {
         contextPath = new ContextPath()
-        contextPath.setPath(Arrays.asList(ContextPath.DEFAULT_FIELD_NAME))
+        contextPath.setPath(FIELD_PATH)
     }
 
     def 'Valid context paths'() {
@@ -50,10 +52,10 @@ class ContextPathTest extends Specification {
 
         where:
         path           | fieldPath                        | errorCode
-        '/..'          | [ContextPath.DEFAULT_FIELD_NAME] | DefaultMessages.INVALID_CONTEXT_PATH
-        '/../'         | [ContextPath.DEFAULT_FIELD_NAME] | DefaultMessages.INVALID_CONTEXT_PATH
-        '/..//file'    | [ContextPath.DEFAULT_FIELD_NAME] | DefaultMessages.INVALID_CONTEXT_PATH
-        '/test1//file' | [ContextPath.DEFAULT_FIELD_NAME] | DefaultMessages.INVALID_CONTEXT_PATH
+        '/..'          | FIELD_PATH | DefaultMessages.INVALID_CONTEXT_PATH
+        '/../'         | FIELD_PATH | DefaultMessages.INVALID_CONTEXT_PATH
+        '/..//file'    | FIELD_PATH | DefaultMessages.INVALID_CONTEXT_PATH
+        '/test1//file' | FIELD_PATH | DefaultMessages.INVALID_CONTEXT_PATH
     }
 
     def 'Empty field error when context path not provided'() {
@@ -66,7 +68,7 @@ class ContextPathTest extends Specification {
         then:
         validationMsgs.size() == 1
         validationMsgs.get(0).getCode() == DefaultMessages.EMPTY_FIELD
-        validationMsgs.get(0).getPath() == [ContextPath.DEFAULT_FIELD_NAME]
+        validationMsgs.get(0).getPath() == FIELD_PATH
     }
 
     def 'Returns all the possible error codes correctly'(){

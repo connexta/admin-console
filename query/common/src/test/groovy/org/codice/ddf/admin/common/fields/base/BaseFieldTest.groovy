@@ -20,11 +20,12 @@ import spock.lang.Specification
 
 class BaseFieldTest extends Specification {
 
+    List<Object> FIELD_PATH = [TestField.FIELD_NAME]
     TestField testField
 
     def setup() {
         testField = new TestField()
-        testField.setPath([TestField.FIELD_NAME])
+        testField.setPath(FIELD_PATH)
     }
 
     def 'Missing required field when required value is not provided'() {
@@ -38,7 +39,7 @@ class BaseFieldTest extends Specification {
         then:
         validationMsgs.size() == 1
         validationMsgs.get(0).getCode() == DefaultMessages.MISSING_REQUIRED_FIELD
-        validationMsgs.get(0).getPath() == [TestField.FIELD_NAME]
+        validationMsgs.get(0).getPath() == FIELD_PATH
     }
 
     def 'Missing required field if value is List and is empty'() {
@@ -52,7 +53,7 @@ class BaseFieldTest extends Specification {
         then:
         validationMsgs.size() == 1
         validationMsgs.get(0).getCode() == DefaultMessages.MISSING_REQUIRED_FIELD
-        validationMsgs.get(0).getPath() == [TestField.FIELD_NAME]
+        validationMsgs.get(0).getPath() == FIELD_PATH
     }
 
     def 'Returns all the possible error codes correctly'(){

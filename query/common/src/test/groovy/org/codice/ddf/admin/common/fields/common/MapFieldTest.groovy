@@ -33,7 +33,6 @@ class MapFieldTest extends Specification {
     def 'Putting the same key twice overrides the key\'s original value'() {
         when:
         mapField.put('key', 'value1')
-        mapField.setPath(MAP_FIELD_PATH)
 
         then:
         mapField.getValue().get(ENTRIES).get(0).get('value') == 'value1'
@@ -51,7 +50,6 @@ class MapFieldTest extends Specification {
     def 'Contains key and value'() {
         when:
         mapField.put('key1', 'value1')
-        mapField.setPath([MapField.DEFAULT_FIELD_NAME])
 
         then:
         mapField.containsKey('key1')
@@ -61,7 +59,6 @@ class MapFieldTest extends Specification {
     def 'Does not contain key or value'() {
         when:
         mapField.put('key1', 'value1')
-        mapField.setPath([MapField.DEFAULT_FIELD_NAME])
 
         then:
         !mapField.containsKey('notMyKey')
@@ -76,7 +73,7 @@ class MapFieldTest extends Specification {
                 createEntry('key1', 'value3')
         ]]
         mapField.setValue(value)
-        mapField.setPath([MapField.DEFAULT_FIELD_NAME])
+        mapField.setPath(MAP_FIELD_PATH)
 
         when:
         List<ErrorMessage> validationMsgs = mapField.validate()

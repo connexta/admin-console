@@ -58,8 +58,8 @@ public class GraphQLTransformInput {
   }
 
   public GraphQLInputType fieldTypeToGraphQLInputType(Field field) {
-    if (inputTypesProvider.isTypePresent(field.getFieldTypeName())) {
-      return inputTypesProvider.getType(field.getFieldTypeName());
+    if (inputTypesProvider.isTypePresent(field.getFieldType())) {
+      return inputTypesProvider.getType(field.getFieldType());
     }
 
     GraphQLInputType type = null;
@@ -87,7 +87,7 @@ public class GraphQLTransformInput {
               + field.getClass());
     }
 
-    inputTypesProvider.addType(field.getFieldTypeName(), type);
+    inputTypesProvider.addType(field.getFieldType(), type);
     return type;
   }
 
@@ -104,7 +104,7 @@ public class GraphQLTransformInput {
     }
 
     return GraphQLInputObjectType.newInputObject()
-        .name(GraphQLTransformCommons.capitalize(field.getFieldTypeName()))
+        .name(GraphQLTransformCommons.capitalize(field.getFieldType()))
         .description(field.getDescription())
         .fields(fieldDefinitions)
         .build();

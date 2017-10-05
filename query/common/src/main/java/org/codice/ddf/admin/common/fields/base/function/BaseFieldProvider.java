@@ -57,11 +57,11 @@ public abstract class BaseFieldProvider extends BaseObjectField implements Field
 
   public void bindField(FunctionField functionField) {
     ServiceCommons.updateGraphQLSchema(
-        getClass(), String.format(BINDING_FUNCTION, getFieldTypeName()));
+        getClass(), String.format(BINDING_FUNCTION, getFieldType()));
   }
 
   public void unbindField(FunctionField functionField) {
     ServiceCommons.updateGraphQLSchema(
-        getClass(), String.format(UNBINDING_FUNCTION, getFieldTypeName()));
+        getClass(), String.format(UNBINDING_FUNCTION, getFieldType()));
   }
 }

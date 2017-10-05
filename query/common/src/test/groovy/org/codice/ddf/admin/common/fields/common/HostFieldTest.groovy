@@ -20,13 +20,15 @@ class HostFieldTest extends Specification {
 
     HostField hostField
 
-    static PORT_FIELD_PATH = [HostField.DEFAULT_FIELD_NAME, PortField.DEFAULT_FIELD_NAME]
+    static HOST_FIELD_PATH = [HostField.DEFAULT_FIELD_NAME]
 
-    static HOSTFIELD_FIELD_PATH = [HostField.DEFAULT_FIELD_NAME, HostnameField.DEFAULT_FIELD_NAME]
+    static PORT_FIELD_PATH = HOST_FIELD_PATH + PortField.DEFAULT_FIELD_NAME
+
+    static HOSTFIELD_FIELD_PATH = HOST_FIELD_PATH + HostnameField.DEFAULT_FIELD_NAME
 
     def setup() {
         hostField = new HostField()
-        hostField.setPath([HostField.DEFAULT_FIELD_NAME])
+        hostField.setPath(HOST_FIELD_PATH)
     }
 
     def 'Fail validation when missing required fields'() {

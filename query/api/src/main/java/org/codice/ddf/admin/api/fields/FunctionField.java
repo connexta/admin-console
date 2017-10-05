@@ -36,7 +36,7 @@ public interface FunctionField<T extends Field> {
 
   T getReturnType();
 
-  FunctionReport<T> execute(Map<String, Object> value, List<Object> path);
+  FunctionReport<T> execute(Map<String, Object> args, List<Object> functionPath);
 
   FunctionField<T> newInstance();
 

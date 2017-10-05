@@ -4,6 +4,6 @@ check:
     global:
         statements: 50
         branches: 40
-        lines: 55
+        lines: 50
         functions: 40
         excludes: []

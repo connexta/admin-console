@@ -52,7 +52,7 @@ public abstract class BaseField<T> implements Field<T> {
   }
 
   @Override
-  public String getFieldTypeName() {
+  public String getFieldType() {
     return typeName;
   }
 

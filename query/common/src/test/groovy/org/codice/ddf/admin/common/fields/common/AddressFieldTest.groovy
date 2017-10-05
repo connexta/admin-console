@@ -18,9 +18,9 @@ import spock.lang.Specification
 
 class AddressFieldTest extends Specification {
 
-    AddressField address
+    List<Object> FIELD_PATH = [AddressField.DEFAULT_FIELD_NAME]
 
-    static ADDRESS_FIELD_NAME = AddressField.DEFAULT_FIELD_NAME
+    AddressField address
 
     static URL_FIELD_NAME = UrlField.DEFAULT_FIELD_NAME
 
@@ -32,7 +32,7 @@ class AddressFieldTest extends Specification {
 
     def setup() {
         address = new AddressField()
-        address.setPath(Arrays.asList(AddressField.DEFAULT_FIELD_NAME))
+        address.setPath(FIELD_PATH)
     }
 
     def 'Successful validation when address is required and URL is provided and the host is not'() {
@@ -70,7 +70,7 @@ class AddressFieldTest extends Specification {
         then:
         validationMsgs.size() == 1
         validationMsgs.get(0).getCode() == DefaultMessages.MISSING_REQUIRED_FIELD
-        validationMsgs.get(0).getPath() == [ADDRESS_FIELD_NAME, URL_FIELD_NAME]
+        validationMsgs.get(0).getPath() == FIELD_PATH +  URL_FIELD_NAME
     }
 
     def 'Missing required port field when address is required and hostname is provided but URL is not'() {
@@ -85,7 +85,7 @@ class AddressFieldTest extends Specification {
         address.host().isRequired()
         validationMsgs.size() == 1
         validationMsgs.get(0).getCode() == DefaultMessages.MISSING_REQUIRED_FIELD
-        validationMsgs.get(0).getPath() == [ADDRESS_FIELD_NAME, HOST_FIELD_NAME, PORT_FIELD_NAME]
+        validationMsgs.get(0).getPath() == FIELD_PATH + HOST_FIELD_NAME + PORT_FIELD_NAME
     }
 
     def 'Missing required hostname field when address is required and port is provided but URL is not'() {
@@ -100,6 +100,6 @@ class AddressFieldTest extends Specification {
         address.host().isRequired()
         validationMsgs.size() == 1
         validationMsgs.get(0).getCode() == DefaultMessages.MISSING_REQUIRED_FIELD
-        validationMsgs.get(0).getPath() == [ADDRESS_FIELD_NAME, HOST_FIELD_NAME, HOSTNAME_FIELD_NAME]
+        validationMsgs.get(0).getPath() == FIELD_PATH + HOST_FIELD_NAME + HOSTNAME_FIELD_NAME
     }
 }

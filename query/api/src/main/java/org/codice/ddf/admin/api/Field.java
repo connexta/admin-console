@@ -22,7 +22,7 @@ public interface Field<T> {
 
   String getFieldName();
 
-  String getFieldTypeName();
+  String getFieldType();
 
   String getDescription();
 

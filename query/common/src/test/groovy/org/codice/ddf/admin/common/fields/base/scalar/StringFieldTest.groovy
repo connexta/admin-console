@@ -18,11 +18,13 @@ import spock.lang.Specification;
 
 class StringFieldTest extends Specification {
 
+    List<Object> FIELD_PATH = [StringField.DEFAULT_FIELD_NAME]
+
     def 'Empty field error when empty string provided'() {
         setup:
         def stringField = new StringField()
         stringField.setValue('')
-        stringField.setPath([StringField.DEFAULT_FIELD_NAME])
+        stringField.setPath(FIELD_PATH)
 
         when:
         def validationMsgs = stringField.validate()
@@ -30,18 +32,18 @@ class StringFieldTest extends Specification {
         then:
         validationMsgs.size() == 1
         validationMsgs[0].getCode() == DefaultMessages.EMPTY_FIELD
-        validationMsgs[0].getPath() == [StringField.DEFAULT_FIELD_NAME]
+        validationMsgs[0].getPath() == FIELD_PATH
     }
 
     def 'Returns all the possible error codes correctly'(){
         setup:
         def emptyStringField = new StringField()
         emptyStringField.setValue('')
-        emptyStringField.setPath([StringField.DEFAULT_FIELD_NAME])
+        emptyStringField.setPath(FIELD_PATH)
 
         def missingStringField = new StringField()
         missingStringField.isRequired(true)
-        missingStringField.setPath([StringField.DEFAULT_FIELD_NAME])
+        missingStringField.setPath(FIELD_PATH)
 
         when:
         def errorCodes = emptyStringField.getErrorCodes()

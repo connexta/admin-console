@@ -18,11 +18,13 @@ import spock.lang.Specification
 
 class UrlFieldTest extends Specification {
 
+    static URL_FIELD_PATH = [UrlField.DEFAULT_FIELD_NAME]
+
     UrlField urlField
 
     def setup() {
         urlField = new UrlField()
-        urlField.setPath([UrlField.DEFAULT_FIELD_NAME])
+        urlField.setPath(URL_FIELD_PATH)
     }
 
     def 'Valid url'() {
@@ -60,7 +62,7 @@ class UrlFieldTest extends Specification {
         then:
         validationMsgs.size() == 1
         validationMsgs[0].getCode() == code
-        validationMsgs[0].getPath() == [UrlField.DEFAULT_FIELD_NAME]
+        validationMsgs[0].getPath() == URL_FIELD_PATH
 
         where:
         url                       | code

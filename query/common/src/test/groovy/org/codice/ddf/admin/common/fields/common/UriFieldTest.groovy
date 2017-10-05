@@ -18,11 +18,13 @@ import spock.lang.Specification
 
 class UriFieldTest extends Specification {
 
+    static URI_FIELD_PATH = [UriField.DEFAULT_FIELD_NAME]
+
     UriField uriField
 
     def setup() {
         uriField = new UriField()
-        uriField.setPath([UriField.DEFAULT_FIELD_NAME])
+        uriField.setPath(URI_FIELD_PATH)
     }
 
     def 'Valid URI field'() {
@@ -60,7 +62,7 @@ class UriFieldTest extends Specification {
         then:
         validationMsgs.size() == 1
         validationMsgs[0].getCode() == DefaultMessages.INVALID_URI
-        validationMsgs[0].getPath() == [UriField.DEFAULT_FIELD_NAME]
+        validationMsgs[0].getPath() == URI_FIELD_PATH
 
         where:
         uri << ['42SchemaStartsWithNum:test',

@@ -50,7 +50,7 @@ class PortFieldTest extends Specification {
         then:
         validationMsgs.size() == 1
         validationMsgs[0].getCode() == DefaultMessages.INVALID_PORT_RANGE
-        validationMsgs[0].getPath() == [PortField.DEFAULT_FIELD_NAME]
+        validationMsgs[0].getPath() == PORT_FIELD_PATH
 
         where:
         port << [0, 65536]

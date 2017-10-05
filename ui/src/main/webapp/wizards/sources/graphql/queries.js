@@ -1,30 +1,30 @@
 const discoverSources = ({ query, configs, discoveryType }) => {
-  let queryObject = {
-    query,
-    variables: {},
-    fetchPolicy: 'network-only'
-  }
+  const variables = {}
 
   if (discoveryType === 'hostnamePort') {
-    queryObject.variables.address = {
+    variables.address = {
       host: {
         hostname: configs.sourceHostName,
         port: configs.sourcePort
       }
     }
   } else {
-    queryObject.variables.address = {
+    variables.address = {
       url: configs.endpointUrl
     }
   }
 
   if (configs.sourceUserName && configs.sourceUserPassword) {
-    queryObject.variables.creds = {
+    variables.creds = {
       username: configs.sourceUserName,
       password: configs.sourceUserPassword
     }
   }
-  return queryObject
+
+  return {
+    fetchPolicy: 'network-only',
+    ...query(variables)
+  }
 }
 
 const nonFatalErrors = [

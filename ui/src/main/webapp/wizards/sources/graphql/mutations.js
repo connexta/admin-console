@@ -21,5 +21,5 @@ export const saveSource = (props) => {
     }
   }
 
-  return client.mutate({ mutation, variables })
+  return client.mutate(mutation(variables))
 }

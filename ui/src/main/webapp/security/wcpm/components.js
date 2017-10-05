@@ -94,12 +94,12 @@ export const CancelButton = ({ onClick }) => (
 
 const ConfirmDelete = confirmable(IconButton)
 
-export const DeleteButton = ({ onClick }) => (
-  <div style={{ position: 'absolute', right: '0px', bottom: '0px' }}>
+export const DeleteButton = ({ onClick, style }) => (
+  <div style={style}>
     <ConfirmDelete
       onClick={onClick}
       confirmableMessage='Confirm policy deletion?'
-      confirmableStyle={{ margin: '5px' }}
+      confirmableStyle={{ margin: '-10px 5px' }}
       tooltip='Delete'
       tooltipPosition='top-center'>
       <DeleteIcon />
@@ -107,16 +107,15 @@ export const DeleteButton = ({ onClick }) => (
   </div>
 )
 
-const VisibleDeleteButton = visible(DeleteButton)
+export const VisibleDeleteButton = visible(DeleteButton)
 
-export const ConfirmationPanel = ({ onSave, onCancel, allowDelete = false, onDelete }) => (
+export const ConfirmationPanel = ({ onSave, onCancel }) => (
   <Flexbox flexDirection='row' justifyContent='center' style={{ padding: '35px 0px 5px' }}>
     <CancelButton onClick={onCancel} />
     <RaisedButton
       primary
       label='Save'
       onClick={onSave} />
-    <VisibleDeleteButton visible={allowDelete} onClick={onDelete} />
   </Flexbox>
 )
 

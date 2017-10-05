@@ -8,7 +8,7 @@ import Flexbox from 'flexbox-react'
 
 import { Record, Map, List } from 'immutable'
 
-import { ConfirmationPanel, EditRegion, Header, ServerErrors } from './components'
+import { ConfirmationPanel, EditRegion, Header, ServerErrors, VisibleDeleteButton } from './components'
 
 import Divider from 'material-ui/Divider'
 
@@ -20,7 +20,7 @@ import Realms, { RealmsView } from './realms'
 import RequiredClaims, { RequiredClaimsView } from './required-claims'
 
 const Layout = ({ children, number }) => (
-  <div>
+  <div style={{ position: 'relative' }}>
     <div style={{ padding: 8 }}>
       <Header>Policy #{number}</Header>
     </div>
@@ -49,6 +49,7 @@ const PolicyEdit = (props) => {
 
   return (
     <Layout number={number}>
+      <VisibleDeleteButton style={{ position: 'absolute', right: '0px', top: '0px' }} onClick={onDelete} />
       <Spinner submitting={loading}>
         <ContextPaths
           paths={policy.paths}
@@ -77,9 +78,7 @@ const PolicyEdit = (props) => {
         <ServerErrors errors={serverErrors.claimsMapping} />
         <ConfirmationPanel
           onCancel={onCancel}
-          onSave={() => { onSave(policy) }}
-          allowDelete
-          onDelete={onDelete} />
+          onSave={() => { onSave(policy) }} />
         <ServerErrors errors={serverErrors.all} />
       </Spinner>
     </Layout>

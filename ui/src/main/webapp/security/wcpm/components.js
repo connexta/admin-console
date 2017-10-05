@@ -62,6 +62,10 @@ export const Subtitle = muiThemeable()(({ muiTheme, children }) => (
   <h4 style={{ margin: 0, color: muiTheme.palette.primary1Color }}>{children}</h4>
 ))
 
+const DeleteIconThemed = muiThemeable()(({ muiTheme }) => (
+  <DeleteIcon style={{ color: muiTheme.palette.errorColor }} />
+))
+
 export const EditRegion = ({ children, onEdit }) => (
   <div className={editRegion} style={{ position: 'relative' }}>
     <FloatingActionButton className={editButton} onClick={onEdit}>
@@ -102,7 +106,7 @@ export const DeleteButton = ({ onClick, style }) => (
       confirmableStyle={{ margin: '-10px 5px' }}
       tooltip='Delete'
       tooltipPosition='top-center'>
-      <DeleteIcon />
+      <DeleteIconThemed />
     </ConfirmDelete>
   </div>
 )

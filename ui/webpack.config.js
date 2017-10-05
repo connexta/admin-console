@@ -182,8 +182,10 @@ if (process.env.NODE_ENV === 'production') {
     entry: [
       'stack-source-map/register'
     ].concat(
-      glob.sync('./src/main/webapp/**/*spec.js')
-          .map(function (spec) { return path.resolve(spec) })
+      [].concat(
+        glob.sync('./src/main/webapp/**/*spec.js'),
+        glob.sync('./src/main/webapp/**/*e2e.js')
+      ).map(function (spec) { return path.resolve(spec) })
     ).concat('mocha-html-reporter/register'),
     devServer: {
       noInfo: true,
@@ -191,7 +193,13 @@ if (process.env.NODE_ENV === 'production') {
       inline: true,
       compress: true,
       hot: true,
-      host: '0.0.0.0'
+      host: '0.0.0.0',
+      proxy: {
+        '/admin': {
+          target: 'https://localhost:8993',
+          secure: false
+        }
+      }
     },
     plugins: [
       new HtmlWebpackPlugin(),
@@ -201,7 +209,7 @@ if (process.env.NODE_ENV === 'production') {
     module: {
       rules: [
         {
-          test: /spec\.js$/,
+          test: /(spec|e2e)\.js$/,
           use: [
             'mocha-loader',
             path.resolve(__dirname, 'spec-loader.js'),

@@ -40,12 +40,12 @@ If you want the application state to persist across page reloads, add the
 
     http://localhost:8080?debug_session=my-session-name/#/
 
-## tests
+## unit tests
 
-A test file can be located anywhere in `./src/main/webapp/`, as long as it
-ends with `spec.js`. It is beneficial to co-locate tests near code they
-exercise to suggest a close relationship, as well as making the `import`
-statements much simpler.
+A unit test file can be located anywhere in `./src/main/webapp/`, as long
+as it ends with `spec.js`. It is beneficial to co-locate tests near code
+they exercise to suggest a close relationship, as well as making the
+`import` statements much simpler.
 
 To develop/debug tests in a browser, do:
 
@@ -59,6 +59,22 @@ After all tests have passed, coverage checks are run. The thresholds for
 coverage are specified in `.istanbul.yml`. To view an html report, do:
 
     yarn run coverage:report
+
+## e2e tests
+
+A e2e test file can be located anywhere in `./src/main/webapp/`, as long
+as it ends with `e2e.js`. They are very similar to unit tests except that
+they may require some manual environment setup, as such they will be
+excluded from the CI build.
+
+To develop/debug tests in a browser, do:
+
+    yarn run start:test
+
+If you want more information about the e2e test execution, add the `debug`
+query parameter to the url. Example:
+
+    http://localhost:8080?debug
 
 ## helpful links
 

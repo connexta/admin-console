@@ -48,7 +48,7 @@ const SourceSelectionStage = (props) => {
           <Navigation>
             <Back onClick={prev} />
             <Next
-              disabled={chosenEndpoint === ''}
+              disabled={chosenEndpoint === undefined || chosenEndpoint === ''}
               onClick={() => next('confirmationStage')} />
           </Navigation>
         </Body>

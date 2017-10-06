@@ -187,7 +187,7 @@ if (process.env.NODE_ENV === 'production') {
     ].concat(
       glob.sync('./src/main/webapp/**/*spec.js')
           .map(function (spec) { return path.resolve(spec) })
-    ),
+    ).concat('mocha-html-reporter/register'),
     devServer: {
       noInfo: true,
       contentBase: 'src/main/resources/',
@@ -198,6 +198,7 @@ if (process.env.NODE_ENV === 'production') {
     },
     plugins: [
       new HtmlWebpackPlugin(),
+      new webpack.NamedModulesPlugin(),
       new webpack.HotModuleReplacementPlugin()
     ],
     module: {

@@ -194,8 +194,7 @@ if (process.env.NODE_ENV === 'production') {
       inline: true,
       compress: true,
       hot: true,
-      host: '0.0.0.0',
-      port: 8181
+      host: '0.0.0.0'
     },
     plugins: [
       new HtmlWebpackPlugin(),

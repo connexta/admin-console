@@ -50,6 +50,16 @@ describe('validators', () => {
       expect(errors.isEmpty()).to.equal(false)
       expect(errors.getIn(['paths', 0])).to.not.equal(undefined)
     })
+    it('should not allow removing the root context path', () => {
+      const policy = createPolicy({ paths: ['/test'], authTypes: ['GUEST'] })
+      const errors = policyValidator(policy, {
+        policies: [
+              { editing: true }
+        ]
+      })
+      expect(errors.isEmpty()).to.equal(false)
+      expect(errors.get('hasRootContextError')).to.equal(true)
+    })
   })
   describe('validator(whitelist)', () => {
     it('should not allow invalid context paths', () => {

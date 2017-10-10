@@ -49,7 +49,10 @@ const PolicyEdit = (props) => {
 
   return (
     <Layout number={number}>
-      <VisibleDeleteButton style={{ position: 'absolute', right: '0px', top: '0px' }} onClick={onDelete} />
+      <VisibleDeleteButton
+        style={{ position: 'absolute', right: '0px', top: '0px' }}
+        visible={!policy.paths.includes('/') && !errors.hasRootContextError}
+        onClick={onDelete} />
       <Spinner submitting={loading}>
         <ContextPaths
           paths={policy.paths}
@@ -185,6 +188,13 @@ export const validator = (policy, { whitelisted = [], policies = [] } = {}) => {
 
   if (policy.realm === undefined || policy.realm === '') {
     errors = errors.set('realm', 'Must specify the realm')
+  }
+
+  const all = policies.filter(policy => !policy.editing).concat(policy)
+
+  if (!all.some((policy) => policy.paths.includes('/'))) {
+    errors = errors.setIn(['paths', policy.paths.size], 'A policy must contain the root context path')
+    errors = errors.setIn(['hasRootContextError'], true)
   }
 
   return errors

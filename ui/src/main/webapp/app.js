@@ -9,6 +9,7 @@ import Ldap from './wizards/ldap'
 import Sources from './wizards/sources'
 import { Home } from './home'
 import Wcpm from './security/wcpm'
+import Config from './config'
 
 import ddfSources from 'ddf-sources'
 import Backdrop from 'components/Backdrop'
@@ -43,7 +44,8 @@ export const routes = {
     { path: 'ldap', component: Ldap },
     { path: 'sources', component: Sources(ddfSources) },
     { path: 'web-context-policy-manager', component: Wcpm },
-    { path: 'graphiql', component: GraphiQL }
+    { path: 'graphiql', component: GraphiQL },
+    { path: 'config', component: Config }
   ]
 }
 

@@ -5,12 +5,14 @@ import client from '../client'
 import wizard, { submarine as wizardSubmarine } from 'admin-wizard/reducer'
 import wcpm, { submarine as wcpmSubmarine } from '../security/wcpm/reducer'
 import theme, { submarine as themeSubmarine } from 'admin-app-bar/reducer'
+import config from '../config/reducer'
 
 export default combineReducers({
   apollo: client.reducer(),
   wizard,
   wcpm,
-  theme
+  theme,
+  config
 })
 
 // Submarines patch redux selectors which causes issues running unit tests.

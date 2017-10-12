@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import org.boon.Boon;
+import org.codice.ddf.admin.comp.GraphQlHelper;
 import org.codice.ddf.admin.ldap.fields.config.LdapConfigurationField;
 import org.codice.ddf.itests.common.WaitCondition;
 import org.slf4j.Logger;

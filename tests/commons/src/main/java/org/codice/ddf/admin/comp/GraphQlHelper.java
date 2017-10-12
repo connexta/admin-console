@@ -11,7 +11,7 @@
  * License is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  */
-package org.codice.ddf.admin.query.request;
+package org.codice.ddf.admin.comp;
 
 import static com.jayway.restassured.RestAssured.given;
 import static junit.framework.TestCase.fail;
@@ -20,6 +20,7 @@ import com.jayway.restassured.response.ExtractableResponse;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import org.apache.commons.io.IOUtils;
 import org.boon.Boon;
@@ -30,6 +31,8 @@ import org.slf4j.LoggerFactory;
 public class GraphQlHelper {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(GraphQlHelper.class);
+  public static final String USERNAME = "admin";
+  public static final String PASSWORD = "admin";
 
   private Class resourceClass;
 
@@ -57,6 +60,14 @@ public class GraphQlHelper {
     return new GraphQLRequest(queryResourcePath, mutationResourcePath, graphQlEndpoint);
   }
 
+  public GraphQLRequest createMutationRequest(String usingMutation, Map<String, Object> arguments) {
+    return populateRequestArgs(createRequest().usingMutation(usingMutation), arguments);
+  }
+
+  public GraphQLRequest createQueryRequest(String usingQuery, Map<String, Object> arguments) {
+    return populateRequestArgs(createRequest().usingQuery(usingQuery), arguments);
+  }
+
   public void waitForGraphQLSchema() {
     WaitCondition.expect("GraphQL Schema responds")
         .within(30L, TimeUnit.SECONDS)
@@ -66,7 +77,7 @@ public class GraphQlHelper {
                 return given()
                         .when()
                         .auth()
-                        .basic("admin", "admin")
+                        .basic(USERNAME, PASSWORD)
                         .get(graphQlSchemaEndpoint)
                         .then()
                         .extract()
@@ -80,6 +91,34 @@ public class GraphQlHelper {
             });
   }
 
+  public <T> Optional<T> mutationRequest(
+      String usingMutation, String jsonResultPath, Map<String, Object> arguments) {
+    return sendAndExtract(createMutationRequest(usingMutation, arguments), jsonResultPath);
+  }
+
+  public <T> Optional<T> queryRequest(
+      String usingQuery, String jsonResultPath, Map<String, Object> arguments) {
+    return sendAndExtract(createQueryRequest(usingQuery, arguments), jsonResultPath);
+  }
+
+  private <T> Optional<T> sendAndExtract(GraphQLRequest request, String jsonPath) {
+    ExtractableResponse response = doSend(request);
+    if (responseHasErrors(response)) {
+      LOGGER.debug("GraphQL response had errors.\n{}", response.body().asString());
+      return Optional.empty();
+    }
+
+    return Optional.of(response.jsonPath().get(jsonPath));
+  }
+
+  private boolean responseHasErrors(ExtractableResponse response) {
+    return response != null && response.jsonPath().get("errors") != null;
+  }
+
+  private ExtractableResponse doSend(GraphQLRequest request) {
+    return request.send().getResponse();
+  }
+
   private String getResourceAsString(String filePath) {
     try {
       return IOUtils.toString(resourceClass.getResourceAsStream(filePath), "UTF-8");
@@ -88,6 +127,13 @@ public class GraphQlHelper {
     }
 
     return null;
+  }
+
+  private GraphQLRequest populateRequestArgs(GraphQLRequest request, Map<String, Object> args) {
+    for (String key : args.keySet()) {
+      request.addArgument(key, args.get(key));
+    }
+    return request;
   }
 
   public class GraphQLRequest {
@@ -154,7 +200,7 @@ public class GraphQlHelper {
           given()
               .when()
               .auth()
-              .basic("admin", "admin")
+              .basic(USERNAME, PASSWORD)
               .body(queryStr)
               .post(graphQlEndpoint)
               .then()

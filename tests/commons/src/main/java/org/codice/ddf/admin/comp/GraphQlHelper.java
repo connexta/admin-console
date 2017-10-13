@@ -102,21 +102,20 @@ public class GraphQlHelper {
   }
 
   private <T> Optional<T> sendAndExtract(GraphQLRequest request, String jsonPath) {
-    ExtractableResponse response = doSend(request);
-    if (responseHasErrors(response)) {
-      LOGGER.debug("GraphQL response had errors.\n{}", response.body().asString());
+    try {
+      ExtractableResponse response = request.send().getResponse();
+      if (response != null && response.jsonPath().get("errors") != null) {
+        LOGGER.debug("GraphQL response had errors.\n{}", response.body().asString());
+        return Optional.empty();
+      }
+
+      return Optional.of(response.jsonPath().get(jsonPath));
+    } catch (Exception e) {
+      LOGGER.debug(
+          "Error sending GraphQL request or parsing the JSON response. Double check the jsonResultPath maps to a key in the JSON response.",
+          e);
       return Optional.empty();
     }
-
-    return Optional.of(response.jsonPath().get(jsonPath));
-  }
-
-  private boolean responseHasErrors(ExtractableResponse response) {
-    return response != null && response.jsonPath().get("errors") != null;
-  }
-
-  private ExtractableResponse doSend(GraphQLRequest request) {
-    return request.send().getResponse();
   }
 
   private String getResourceAsString(String filePath) {

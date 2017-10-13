@@ -140,7 +140,6 @@ public class SourceUtilCommons {
       if (source instanceof ConfiguredService) {
         ConfiguredService service = (ConfiguredService) source;
         String servicePid = service.getConfigurationPid();
-        // TODO: 8/22/17 phuffer - opensearch can't get availability this way
         if (servicePid != null && servicePid.equals(pid.getValue())) {
           availability.setValue(source.isAvailable());
           break;

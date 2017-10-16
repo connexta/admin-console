@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import org.codice.ddf.admin.common.fields.common.PidField;
-import org.codice.ddf.admin.comp.GraphQlHelper;
+import org.codice.ddf.admin.comp.graphql.GraphQlHelper;
 import org.codice.ddf.admin.sources.fields.type.CswSourceConfigurationField;
 import org.codice.ddf.admin.sources.fields.type.OpenSearchSourceConfigurationField;
 import org.codice.ddf.admin.sources.fields.type.WfsSourceConfigurationField;

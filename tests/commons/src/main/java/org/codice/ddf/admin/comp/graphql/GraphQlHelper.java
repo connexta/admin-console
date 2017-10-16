@@ -11,7 +11,7 @@
  * License is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  */
-package org.codice.ddf.admin.comp;
+package org.codice.ddf.admin.comp.graphql;
 
 import static com.jayway.restassured.RestAssured.given;
 import static junit.framework.TestCase.fail;
@@ -20,7 +20,6 @@ import com.jayway.restassured.response.ExtractableResponse;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import org.apache.commons.io.IOUtils;
 import org.boon.Boon;
@@ -91,31 +90,18 @@ public class GraphQlHelper {
             });
   }
 
-  public <T> Optional<T> mutationRequest(
+  public <T> GraphQlResponse<T> mutationRequest(
       String usingMutation, String jsonResultPath, Map<String, Object> arguments) {
     return sendAndExtract(createMutationRequest(usingMutation, arguments), jsonResultPath);
   }
 
-  public <T> Optional<T> queryRequest(
+  public <T> GraphQlResponse<T> queryRequest(
       String usingQuery, String jsonResultPath, Map<String, Object> arguments) {
     return sendAndExtract(createQueryRequest(usingQuery, arguments), jsonResultPath);
   }
 
-  private <T> Optional<T> sendAndExtract(GraphQLRequest request, String jsonPath) {
-    try {
-      ExtractableResponse response = request.send().getResponse();
-      if (response != null && response.jsonPath().get("errors") != null) {
-        LOGGER.debug("GraphQL response had errors.\n{}", response.body().asString());
-        return Optional.empty();
-      }
-
-      return Optional.of(response.jsonPath().get(jsonPath));
-    } catch (Exception e) {
-      LOGGER.debug(
-          "Error sending GraphQL request or parsing the JSON response. Double check the jsonResultPath maps to a key in the JSON response.",
-          e);
-      return Optional.empty();
-    }
+  private <T> GraphQlResponse<T> sendAndExtract(GraphQLRequest request, String jsonPath) {
+    return new GraphQlResponse<>(request.send().getResponse(), jsonPath);
   }
 
   private String getResourceAsString(String filePath) {

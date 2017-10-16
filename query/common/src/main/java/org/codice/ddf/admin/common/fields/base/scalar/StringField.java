@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import org.apache.commons.lang.StringUtils;
 import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.codice.ddf.admin.common.fields.base.BaseListField;
 import org.codice.ddf.admin.common.report.message.DefaultMessages;
@@ -48,7 +49,7 @@ public class StringField extends BaseScalarField<String> {
       return validationMsgs;
     }
 
-    if (getValue() != null && getValue().isEmpty()) {
+    if (getValue() != null && StringUtils.isBlank(getValue())) {
       validationMsgs.add(emptyFieldError(getPath()));
     }
 

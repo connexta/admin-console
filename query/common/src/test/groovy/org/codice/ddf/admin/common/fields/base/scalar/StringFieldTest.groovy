@@ -23,7 +23,7 @@ class StringFieldTest extends Specification {
     def 'Empty field error when empty string provided'() {
         setup:
         def stringField = new StringField()
-        stringField.setValue('')
+        stringField.setValue(value)
         stringField.setPath(FIELD_PATH)
 
         when:
@@ -33,6 +33,9 @@ class StringFieldTest extends Specification {
         validationMsgs.size() == 1
         validationMsgs[0].getCode() == DefaultMessages.EMPTY_FIELD
         validationMsgs[0].getPath() == FIELD_PATH
+
+        where:
+        value << ['', ' ']
     }
 
     def 'Returns all the possible error codes correctly'(){

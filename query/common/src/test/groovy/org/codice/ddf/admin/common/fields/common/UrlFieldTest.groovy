@@ -72,7 +72,6 @@ class UrlFieldTest extends Specification {
         'htps://test.com'         | DefaultMessages.INVALID_URL
         '://google.com'           | DefaultMessages.INVALID_URL
         'http://localhost:8993  ' | DefaultMessages.INVALID_URL
-        '  '                      | DefaultMessages.INVALID_URL
     }
 
     def 'Returns all the possible error codes correctly'(){

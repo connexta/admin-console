@@ -144,8 +144,17 @@ public class LdapServiceCommons {
       ldapStsConfig.put(LdapLoginServiceProperties.REALM, config.bindUserInfoField().realm());
 
       ldapStsConfig.put(
-          LdapLoginServiceProperties.USER_NAME_ATTRIBUTE,
+          LdapLoginServiceProperties.LOGIN_USER_ATTRIBUTE,
           config.settingsField().usernameAttribute());
+
+      // TODO: oconnormi - 10/02/17 The ui needs to be updated to include a field for the group
+      // member user attribute
+      ldapStsConfig.put(
+          LdapLoginServiceProperties.MEMBERSHIP_USER_ATTRIBUTE,
+          config.settingsField().groupAttributeHoldingMember() == null
+              ? config.settingsField().usernameAttribute()
+              : config.settingsField().groupAttributeHoldingMember());
+
       ldapStsConfig.put(
           LdapLoginServiceProperties.USER_BASE_DN, config.settingsField().baseUserDn());
       ldapStsConfig.put(
@@ -218,7 +227,9 @@ public class LdapServiceCommons {
 
     LdapDirectorySettingsField settings =
         new LdapDirectorySettingsField()
-            .usernameAttribute(mapValue(props, LdapLoginServiceProperties.USER_NAME_ATTRIBUTE))
+            .usernameAttribute(mapValue(props, LdapLoginServiceProperties.LOGIN_USER_ATTRIBUTE))
+            .groupAttributeHoldingMember(
+                mapValue(props, LdapLoginServiceProperties.MEMBERSHIP_USER_ATTRIBUTE))
             .baseUserDn(mapValue(props, LdapLoginServiceProperties.USER_BASE_DN))
             .baseGroupDn(mapValue(props, LdapLoginServiceProperties.GROUP_BASE_DN))
             .useCase(AUTHENTICATION);

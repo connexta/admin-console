@@ -32,7 +32,9 @@ public class LdapLoginServiceProperties {
   //    public static final String KDC_ADDRESS = "kdcAddress";
   public static final String REALM = "realm";
 
-  public static final String USER_NAME_ATTRIBUTE = "userNameAttribute";
+  public static final String LOGIN_USER_ATTRIBUTE = "loginUserAtttribute";
+
+  public static final String MEMBERSHIP_USER_ATTRIBUTE = "membershipUserAttribute";
 
   public static final String USER_BASE_DN = "userBaseDn";
 

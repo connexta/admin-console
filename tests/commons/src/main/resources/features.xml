@@ -163,7 +163,6 @@
     <feature name="common-test-dependencies" install="manual" version="${project.version}"
       description="Web Context policy manager">
         <bundle>wrap:mvn:org.awaitility/awaitility/3.0.0</bundle>
-        <!--<bundle>wrap:mvn:org.ops4j.pax.exam/pax-exam-container-karaf/4.11.0$Bundle-SymbolicName=pax-exam-karaf</bundle>-->
         <bundle>mvn:org.apache.httpcomponents/httpcore-osgi/4.4.5</bundle>
         <bundle>mvn:org.apache.httpcomponents/httpclient-osgi/4.5.2</bundle>
         <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.hamcrest/1.3_1</bundle>
@@ -173,23 +172,12 @@
         <bundle>mvn:io.fastjson/boon/0.34</bundle>
 
         <feature>security-policy-api-dependencies</feature>
-        <!--TODO - can we unpack this instead?-->
-        <bundle>
-            wrap:mvn:ddf.security/ddf-security-common/${ddf.version}$Bundle-SymbolicName=itest-test-security-common
-        </bundle>
-        <!--TODO - do we need this?-->
-        <bundle>
-            wrap:mvn:ddf.security.policy/security-policy-context/${ddf.version}$Bundle-SymbolicName=itest-test-policy-manager
-        </bundle>
-
         <feature>admin-core-appservice-dependencies</feature>
         <feature>json-path</feature>
-
         <bundle>mvn:org.mockito/mockito-core/1.10.19</bundle>
         <bundle>mvn:org.objenesis/objenesis/2.5.1</bundle>
     </feature>
 
-    <!--TODO remove this one test-itests-common has been refactored and an appropiate feature is made for it-->
     <feature name="admin-core-appservice-dependencies" install="manual" version="${project.version}"
       description="Auto generated feature for artifact 'admin-core-appservice' imports.">
         <feature>branding-api-dependencies</feature>

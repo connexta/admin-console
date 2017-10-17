@@ -24,11 +24,7 @@ import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * @param <T> the expected return type of the object in the json response identified by the
- *     jsonResultPath parameter
- */
-public class GraphQlResponse<T> {
+public class GraphQlResponse {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(GraphQlResponse.class);
 
@@ -36,32 +32,25 @@ public class GraphQlResponse<T> {
 
   private final List<ErrorMessage> errors;
 
-  private T result;
+  private final ExtractableResponse response;
 
   /**
    * Creates a GraphQL response from an {@link ExtractableResponse}. If there are errors in the
-   * response, the jsonResultPath will be ignored and errors in the {@code GraphQlResponse} will be
-   * populated.
+   * response, errors in the {@code GraphQlResponse} will be populated.
    *
-   * @param response response of the GraphQL request
-   * @param jsonResultPath json path to the expected result of the GraphQL response
+   * @param response {@link ExtractableResponse} of the GraphQL request
    */
-  public GraphQlResponse(
-      @Nonnull final ExtractableResponse response, @Nonnull final String jsonResultPath) {
+  public GraphQlResponse(@Nonnull final ExtractableResponse response) {
     errors = new ArrayList<>();
+    this.response = response;
 
     try {
       if (response.jsonPath().get(GRAPHQL_ERRORS) != null) {
         LOGGER.debug("GraphQL response had errors.\n{}", response.body().asString());
         populateErrors(response);
-        return;
       }
-
-      result = response.jsonPath().get(jsonResultPath);
     } catch (Exception e) {
-      LOGGER.debug(
-          "Error parsing the JSON response. Verify the jsonResultPath maps to a key in the JSON response.",
-          e);
+      LOGGER.debug("Error parsing the JSON response. No error key in the response.", e);
     }
   }
 
@@ -73,13 +62,23 @@ public class GraphQlResponse<T> {
     return ImmutableList.copyOf(errors);
   }
 
-  public T getResult() {
-    return result;
+  public <T> T getResult(String jsonPath) {
+    try {
+      return response.jsonPath().get(jsonPath);
+    } catch (Exception e) {
+      LOGGER.debug(
+          "Error parsing the JSON response. Verify the jsonPath maps to a key in the JSON response.",
+          e);
+    }
+    return null;
+  }
+
+  public ExtractableResponse getResponse() {
+    return response;
   }
 
   private void populateErrors(ExtractableResponse response) {
     List<Map<String, Object>> errors = response.jsonPath().get(GRAPHQL_ERRORS);
-
     for (Map<String, Object> error : errors) {
       String errorCode = (String) error.get("message");
       List<Object> path = (List<Object>) error.get("path");

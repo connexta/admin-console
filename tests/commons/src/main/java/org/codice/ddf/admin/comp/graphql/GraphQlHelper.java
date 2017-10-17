@@ -59,14 +59,6 @@ public class GraphQlHelper {
     return new GraphQLRequest(queryResourcePath, mutationResourcePath, graphQlEndpoint);
   }
 
-  public GraphQLRequest createMutationRequest(String usingMutation, Map<String, Object> arguments) {
-    return populateRequestArgs(createRequest().usingMutation(usingMutation), arguments);
-  }
-
-  public GraphQLRequest createQueryRequest(String usingQuery, Map<String, Object> arguments) {
-    return populateRequestArgs(createRequest().usingQuery(usingQuery), arguments);
-  }
-
   public void waitForGraphQLSchema() {
     WaitCondition.expect("GraphQL Schema responds")
         .within(30L, TimeUnit.SECONDS)
@@ -90,18 +82,14 @@ public class GraphQlHelper {
             });
   }
 
-  public <T> GraphQlResponse<T> mutationRequest(
-      String usingMutation, String jsonResultPath, Map<String, Object> arguments) {
-    return sendAndExtract(createMutationRequest(usingMutation, arguments), jsonResultPath);
+  public GraphQlResponse sendMutationRequest(String usingMutation, Map<String, Object> arguments) {
+    return new GraphQlResponse(
+        createRequest().usingMutation(usingMutation).addArguments(arguments).send().getResponse());
   }
 
-  public <T> GraphQlResponse<T> queryRequest(
-      String usingQuery, String jsonResultPath, Map<String, Object> arguments) {
-    return sendAndExtract(createQueryRequest(usingQuery, arguments), jsonResultPath);
-  }
-
-  private <T> GraphQlResponse<T> sendAndExtract(GraphQLRequest request, String jsonPath) {
-    return new GraphQlResponse<>(request.send().getResponse(), jsonPath);
+  public GraphQlResponse sendQueryRequest(String usingQuery, Map<String, Object> arguments) {
+    return new GraphQlResponse(
+        createRequest().usingQuery(usingQuery).addArguments(arguments).send().getResponse());
   }
 
   private String getResourceAsString(String filePath) {
@@ -112,13 +100,6 @@ public class GraphQlHelper {
     }
 
     return null;
-  }
-
-  private GraphQLRequest populateRequestArgs(GraphQLRequest request, Map<String, Object> args) {
-    for (String key : args.keySet()) {
-      request.addArgument(key, args.get(key));
-    }
-    return request;
   }
 
   public class GraphQLRequest {
@@ -146,6 +127,13 @@ public class GraphQlHelper {
 
     public GraphQLRequest addArgument(String argName, Object argValue) {
       reqArgs.put(argName, argValue);
+      return this;
+    }
+
+    public GraphQLRequest addArguments(Map<String, Object> args) {
+      for (String key : args.keySet()) {
+        addArgument(key, args.get(key));
+      }
       return this;
     }
 

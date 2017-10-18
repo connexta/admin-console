@@ -43,6 +43,7 @@
             <entry key="filter-name" value="DoSFilter"/>
             <entry key="urlPatterns" value="/admin/hub/graphql/*"/>
             <entry key="maxRequestsPerSec" value="10"/>
+            <entry key="maxRequestMs" value="3600000"/>
         </service-properties>
         <bean class="org.eclipse.jetty.servlets.DoSFilter"/>
     </service>

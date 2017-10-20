@@ -11,17 +11,17 @@
  * License is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  */
-package org.codice.ddf.admin.ldap.embedded;
+package org.codice.ddf.admin.security.common.services;
 
 public class EmbeddedLdapServiceProperties {
 
-  static final String EMBEDDED_LDAP_FEATURE = "opendj-embedded";
+  public static final String EMBEDDED_LDAP_FEATURE = "opendj-embedded";
 
-  static final String ALL_DEFAULT_EMBEDDED_LDAP_CONFIG_FEATURE = "ldap-embedded-default-configs";
+  public static final String ALL_DEFAULT_EMBEDDED_LDAP_CONFIG_FEATURE = "ldap-embedded-default-configs";
 
-  static final String DEFAULT_EMBEDDED_LDAP_LOGIN_CONFIG_FEATURE =
+  public static final String DEFAULT_EMBEDDED_LDAP_LOGIN_CONFIG_FEATURE =
       "ldap-embedded-default-stslogin-config";
 
-  static final String DEFAULT_EMBEDDED_LDAP_CLAIMS_HANDLER_CONFIG_FEATURE =
+  public static final String DEFAULT_EMBEDDED_LDAP_CLAIMS_HANDLER_CONFIG_FEATURE =
       "ldap-embedded-default-claimshandler-config";
 }

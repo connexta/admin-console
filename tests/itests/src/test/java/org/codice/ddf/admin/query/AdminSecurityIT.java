@@ -261,6 +261,7 @@ public class AdminSecurityIT extends AbstractComponentTest {
         new LdapDirectorySettingsField()
             .baseUserDn(TEST_DN)
             .usernameAttribute(TEST_ATTRIBUTE)
+            .groupAttributeHoldingMember(TEST_ATTRIBUTE)
             .baseGroupDn(TEST_DN)
             .useCase(ldapUseCase.getValue());
 
@@ -269,7 +270,6 @@ public class AdminSecurityIT extends AbstractComponentTest {
             .getValue()
             .equals(LdapUseCase.AUTHENTICATION_AND_ATTRIBUTE_STORE.getValue())) {
       dirSettings
-          .groupAttributeHoldingMember(TEST_ATTRIBUTE)
           .groupObjectClass(TEST_ATTRIBUTE)
           .memberAttributeReferencedInGroup(TEST_ATTRIBUTE);
 

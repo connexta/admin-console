@@ -110,10 +110,10 @@ const LdapQueryToolView = (props) => {
             onClick={() => {
               client.query(query(conn, info, configs.queryBase, configs.query))
                 .then(({ data }) => {
-                  onError([])
+                  onError()
                   setState(data.ldap.query)
                 })
-                .catch((err) => onError(err.graphQLErrors))
+                .catch(onError)
             }} />
         </div>
 
@@ -295,7 +295,7 @@ const DirectorySettings = (props) => {
           })
           .catch((err) => {
             onEndSubmit()
-            onError(err.graphQLErrors)
+            onError(err)
           })
       }} />
 
@@ -348,7 +348,7 @@ const DirectorySettings = (props) => {
                 })
                 .catch((err) => {
                   onEndSubmit()
-                  onError(err.graphQLErrors)
+                  onError(err)
                 })
             }}
           />

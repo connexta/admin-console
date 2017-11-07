@@ -57,7 +57,7 @@ const ConfigureEmbeddedLdap = (props) => {
                 })
                 .catch((err) => {
                   onEndSubmit()
-                  onError(err.graphQLErrors)
+                  onError(err)
                 })
             }}
           />

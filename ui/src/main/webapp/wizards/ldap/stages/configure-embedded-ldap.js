@@ -29,7 +29,7 @@ const ConfigureEmbeddedLdap = (props) => {
     configs: {
       ldapUseCase
     } = {},
-    messages = [],
+    errors: messages = [],
 
     prev
   } = props

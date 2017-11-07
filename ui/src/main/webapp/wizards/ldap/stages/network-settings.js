@@ -17,6 +17,8 @@ import {
   Select
 } from 'admin-wizard/inputs'
 
+import { groupErrors } from './errors'
+
 const testConnect = (conn) => ({
   fetchPolicy: 'network-only',
   query: gql`
@@ -29,12 +31,6 @@ const testConnect = (conn) => ({
   variables: { conn }
 })
 
-const keys = {
-  hostname: true,
-  port: true,
-  encryption: true
-}
-
 const NetworkSettings = (props) => {
   const {
     client,
@@ -45,14 +41,14 @@ const NetworkSettings = (props) => {
     onEdit,
     onError,
     onStartSubmit,
-    onEndSubmit,
-    errors
+    onEndSubmit
   } = props
 
-  const messages = errors.filter((err) => {
-    const attr = err.path[err.path.length - 1]
-    return !keys[attr]
-  })
+  const { messages, ...errors } = groupErrors([
+    'hostname',
+    'port',
+    'encryption'
+  ], props.errors)
 
   return (
     <div>
@@ -72,16 +68,19 @@ const NetworkSettings = (props) => {
       <Body>
         <Hostname
           value={configs.hostname}
+          errorText={errors.hostname}
           onEdit={onEdit('hostname')}
           autoFocus />
 
         <Port
           value={configs.port}
+          errorText={errors.port}
           onEdit={onEdit('port')}
           options={[389, 636]} />
 
         <Select
           value={configs.encryption}
+          errorText={errors.encryption}
           onEdit={onEdit('encryption')}
           label='Encryption Method'
           options={[ 'none', 'ldaps', 'startTls' ]} />

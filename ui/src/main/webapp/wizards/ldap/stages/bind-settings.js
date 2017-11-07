@@ -29,6 +29,8 @@ import {
   Select
 } from 'admin-wizard/inputs'
 
+import { groupErrors } from './errors'
+
 const BindSettings = (props) => {
   const {
     client,
@@ -42,24 +44,18 @@ const BindSettings = (props) => {
       ldapType
     },
     configs = {},
-    errors = [],
 
     // actions
     prev,
     setDefaults
   } = props
 
-  const keys = [
-    'bindUser',
-    'bindUserPassword',
-    'bindUserMethod',
-    'bindRealm'
-  ]
-
-  const messages = errors.filter((err) => {
-    const attr = err.path[err.path.length - 1]
-    return !keys.includes(attr)
-  })
+  const { messages, ...errors } = groupErrors([
+    'username',
+    'password',
+    'bindMethod',
+    'realm'
+  ], props.errors)
 
   const { bindUserMethod, encryption } = configs
   let bindUserMethodOptions = ['Simple']
@@ -90,16 +86,19 @@ const BindSettings = (props) => {
       <Body>
         <Input
           value={configs.bindUser}
+          errorText={errors.username}
           onEdit={onEdit('bindUser')}
           label='Bind User' />
 
         <Password
           value={configs.bindUserPassword}
+          errorText={errors.password}
           onEdit={onEdit('bindUserPassword')}
           label='Bind User Password' />
 
         <Select
           value={configs.bindUserMethod}
+          errorText={errors.bindMethod}
           onEdit={onEdit('bindUserMethod')}
           label='Bind User Method'
           options={bindUserMethodOptions} />
@@ -110,6 +109,7 @@ const BindSettings = (props) => {
         {/* Realm is needed for Kerberos and MD5 auth, currently only MD5 is supported by the wizard */}
         <Input
           value={configs.bindRealm}
+          errorText={errors.realm}
           onEdit={onEdit('bindRealm')}
           visible={bindUserMethod === 'DigestMD5SASL'}
           label='Realm (for Digest MD5 authentication)' />

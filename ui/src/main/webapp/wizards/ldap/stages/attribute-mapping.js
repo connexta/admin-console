@@ -262,7 +262,7 @@ const LdapAttributeMappingStage = (props) => {
                 })
                 .catch((err) => {
                   onEndSubmit()
-                  onError(err.graphQLErrors)
+                  onError(err)
                 })
             }}
             disabled={Object.keys(attributeMappings).length === 0} />

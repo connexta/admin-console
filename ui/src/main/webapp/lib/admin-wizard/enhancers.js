@@ -44,13 +44,19 @@ export const withOptions = (Component) => ({ state, setState, props }) => {
 }
 
 export const withErrors = (Component) => ({ state = [], setState, props }) => {
-  const onError = (messages = []) => {
-    const errors = messages.map(({ message: code, ...rest }) => ({
-      message: getFriendlyMessage(code),
-      ...rest
-    }))
+  const onError = (err = {}) => {
+    if (Array.isArray(err.graphQLErrors) && err.graphQLErrors.length > 0) {
+      const errors = err.graphQLErrors.map(({ message: code, ...rest }) => ({
+        message: getFriendlyMessage(code),
+        ...rest
+      }))
 
-    setState(errors)
+      setState(errors)
+    } else if (typeof err.message === 'string') {
+      setState([{ path: [], message: err.message }])
+    } else {
+      setState([])
+    }
   }
 
   return (

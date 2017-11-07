@@ -61,9 +61,9 @@ const ConfirmationStage = (props) => {
                   onEndSubmit()
                   next('completedStage')
                 })
-                .catch((e) => {
+                .catch((err) => {
                   onEndSubmit()
-                  onError(e.graphQLErrors)
+                  onError(err)
                 })
             }}
           />

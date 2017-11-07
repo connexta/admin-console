@@ -56,8 +56,8 @@ const Password = ({ label = 'Password', ...rest }) => (
   <Input type='password' label={label} {...rest} />
 )
 
-const Hostname = ({ label = 'Hostname', ...rest }) => (
-  <Input label={label} {...rest} />
+const Hostname = ({ label = 'Hostname', onEdit, ...rest }) => (
+  <Input label={label} onEdit={(value) => onEdit(value.replace(/\s/g, ''))} {...rest} />
 )
 
 const InputAutoView = ({ value = '', options = [], type = 'text', message = {}, onEdit, label, tooltip, muiTheme, ...rest }) => {

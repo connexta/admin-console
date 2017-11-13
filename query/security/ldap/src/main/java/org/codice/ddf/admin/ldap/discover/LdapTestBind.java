@@ -18,6 +18,7 @@ import static org.codice.ddf.admin.ldap.fields.connection.LdapBindMethod.DigestM
 import static org.codice.ddf.admin.ldap.fields.connection.LdapEncryptionMethodField.LdapsEncryption.LDAPS;
 import static org.codice.ddf.admin.ldap.fields.connection.LdapEncryptionMethodField.StartTlsEncryption.START_TLS;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.io.IOException;
@@ -88,12 +89,11 @@ public class LdapTestBind extends TestFunctionField {
       return;
     }
 
-    if (DIGEST_MD5_SASL.equals(creds.bindMethod())) {
-      // To use MD5, we require an encrypted connection
-      if (!(START_TLS.equals(conn.encryptionMethod()) //
-          || LDAPS.equals(conn.encryptionMethod()))) {
-        addErrorMessage(md5NeedsEncryptedError(creds.bindMethodField().getPath()));
-      }
+    // To use MD5, we require an encrypted connection
+    if (DIGEST_MD5_SASL.equals(creds.bindMethod())
+        && (!(START_TLS.equals(conn.encryptionMethod())
+            || LDAPS.equals(conn.encryptionMethod())))) {
+      addErrorMessage(md5NeedsEncryptedError(creds.bindMethodField().getPath()));
     }
   }
 
@@ -106,13 +106,7 @@ public class LdapTestBind extends TestFunctionField {
         DefaultMessages.CANNOT_CONNECT);
   }
 
-  /**
-   * Intentionally scoped as private. This is a test support method to be invoked by Spock tests
-   * which will elevate scope as needed in order to execute. If Java-based unit tests are ever
-   * needed, this scope will need to be updated to package-private.
-   *
-   * @param utils Ldap support utilities
-   */
+  @VisibleForTesting
   private void setTestingUtils(LdapTestingUtils utils) {
     this.utils = utils;
   }

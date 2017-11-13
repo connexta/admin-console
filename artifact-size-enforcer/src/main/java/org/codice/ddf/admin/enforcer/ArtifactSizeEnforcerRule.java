@@ -13,8 +13,8 @@
  */
 package org.codice.ddf.admin.enforcer;
 
+import com.google.common.collect.ImmutableList;
 import java.io.File;
-import java.util.Arrays;
 import java.util.List;
 import org.apache.maven.enforcer.rule.api.EnforcerRule;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
@@ -50,7 +50,7 @@ public class ArtifactSizeEnforcerRule implements EnforcerRule {
 
   public static final String JAR = "jar";
   public static final String BUNDLE = "bundle";
-  public static final List<String> SUPPORTED_PACKAGE_TYPES = Arrays.asList(JAR, BUNDLE);
+  public static final List<String> SUPPORTED_PACKAGE_TYPES = ImmutableList.of(JAR, BUNDLE);
 
   public static final String MAX_FILE_SIZE_EXCEEDED_MSG =
       "The specified artifact is larger than the set maximum artifact size. %n%n\tArtifact: %s%n\tArtifact Size: %d Bytes%n\tMax Artifact Size: %d Bytes%n."

@@ -18,7 +18,7 @@ import spock.lang.Specification
 
 class UriFieldTest extends Specification {
 
-    static URI_FIELD_PATH = [UriField.DEFAULT_FIELD_NAME]
+    static URI_FIELD_PATH = [UriField.DEFAULT_URI_FIELD_NAME]
 
     UriField uriField
 

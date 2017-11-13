@@ -34,11 +34,15 @@ public class LdapTypeField extends BaseEnumField<String> {
         FIELD_TYPE_NAME,
         DESCRIPTION,
         ImmutableList.of(
-            new Unknown(), new ActiveDirectory(), new OpenLdap(), new OpenDJ(), new EmbeddedLdap()),
+            new UnknownEnumValue(),
+            new ActiveDirectory(),
+            new OpenLdap(),
+            new OpenDJ(),
+            new EmbeddedLdap()),
         ldapType);
   }
 
-  public static final class Unknown implements EnumValue<String> {
+  public static final class UnknownEnumValue implements EnumValue<String> {
     public static final String DESCRIPTION =
         "Use if the type of LDAP is unknown/is not listed in this enum set.";
 

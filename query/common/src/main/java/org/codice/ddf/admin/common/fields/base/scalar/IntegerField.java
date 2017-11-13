@@ -16,15 +16,14 @@ package org.codice.ddf.admin.common.fields.base.scalar;
 import static org.codice.ddf.admin.api.fields.ScalarField.ScalarType.INTEGER;
 
 import java.util.concurrent.Callable;
-
 import org.codice.ddf.admin.common.fields.base.BaseListField;
 
 public class IntegerField extends BaseScalarField<Integer> {
 
-  public static final String DEFAULT_FIELD_NAME = "integer";
+  public static final String DEFAULT_INTEGER_FIELD_NAME = "integer";
 
   public IntegerField() {
-    this(DEFAULT_FIELD_NAME);
+    this(DEFAULT_INTEGER_FIELD_NAME);
   }
 
   public IntegerField(int value) {
@@ -62,11 +61,11 @@ public class IntegerField extends BaseScalarField<Integer> {
     @Override
     public ListImpl useDefaultRequired() {
       newInteger =
-              () -> {
-                IntegerField newIntegerField = new IntegerField();
-                newIntegerField.isRequired(true);
-                return newIntegerField;
-              };
+          () -> {
+            IntegerField newIntegerField = new IntegerField();
+            newIntegerField.isRequired(true);
+            return newIntegerField;
+          };
 
       return this;
     }

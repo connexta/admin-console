@@ -88,6 +88,7 @@ public abstract class BaseField<T> implements Field<T> {
   }
 
   @Override
+  @SuppressWarnings("squid:S3923" /* Not combining if and else if statements for clarity */)
   public List<ErrorMessage> validate() {
     List<ErrorMessage> errors = new ArrayList<>();
 

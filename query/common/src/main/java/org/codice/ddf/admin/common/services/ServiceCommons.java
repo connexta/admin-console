@@ -35,12 +35,8 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ServiceCommons {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(ServiceCommons.class);
 
   public static final String SERVICE_PID_KEY = "service.pid";
 
@@ -48,6 +44,7 @@ public class ServiceCommons {
 
   // A flag to indicate if a service being updated has a password of "secret". If so, the
   // password will not be updated.
+  @SuppressWarnings("squid:S2068" /* Placeholder not a hard-coded password */)
   public static final String FLAG_PASSWORD = "secret";
 
   private final ConfiguratorSuite configuratorSuite;
@@ -68,10 +65,7 @@ public class ServiceCommons {
     Configurator configurator = configuratorSuite.getConfiguratorFactory().getConfigurator();
     configurator.add(configuratorSuite.getManagedServiceActions().create(factoryPid, serviceProps));
 
-    // TODO RAP 13 Jul 17: Blank out password in the parameters passed here
-    if (configurator
-        .commit("Service saved with details [{}]", serviceProps.toString())
-        .containsFailedResults()) {
+    if (configurator.commit("Service saved for [{}]", factoryPid).containsFailedResults()) {
       return Reports.from(failedPersistError());
     }
 
@@ -88,12 +82,7 @@ public class ServiceCommons {
     Configurator configurator = configuratorSuite.getConfiguratorFactory().getConfigurator();
     configurator.add(configuratorSuite.getServiceActions().build(pid, newConfig, true));
 
-    // TODO RAP 13 Jul 17: Blank out password in the parameters passed here
-    OperationReport operationReport =
-        configurator.commit(
-            "Updated config with pid [{}] and new service properties [{}]",
-            pid,
-            newConfig.toString());
+    OperationReport operationReport = configurator.commit("Updated config with pid [{}]", pid);
     if (operationReport.containsFailedResults()) {
       report.addErrorMessage(failedPersistError());
     }

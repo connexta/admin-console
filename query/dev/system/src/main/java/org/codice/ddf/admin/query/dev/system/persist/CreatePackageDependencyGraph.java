@@ -55,7 +55,8 @@ public class CreatePackageDependencyGraph extends BaseFunctionField<BooleanField
           + "By default, the graph save path is under ddf.home. The file format is in graphml. Look here for more information: http://graphml.graphdrawing.org/";
 
   private static final BooleanField RETURN_TYPE = new BooleanField();
-  private static final Set<String> ERROR_CODES = ImmutableSet.of(DIRECTORY_DOES_NOT_EXIST, FAILED_PERSIST);
+  private static final Set<String> ERROR_CODES =
+      ImmutableSet.of(DIRECTORY_DOES_NOT_EXIST, FAILED_PERSIST);
 
   public static final String SAVE_DIR = "saveDir";
 

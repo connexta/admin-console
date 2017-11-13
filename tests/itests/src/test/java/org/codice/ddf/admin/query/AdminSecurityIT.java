@@ -33,7 +33,7 @@ import org.codice.ddf.admin.comp.test.PlatformAppFeatureFile;
 import org.codice.ddf.admin.comp.test.SecurityAppFeatureFile;
 import org.codice.ddf.admin.ldap.fields.config.LdapConfigurationField;
 import org.codice.ddf.admin.ldap.fields.config.LdapDirectorySettingsField;
-import org.codice.ddf.admin.ldap.fields.connection.LdapBindMethod;
+import org.codice.ddf.admin.ldap.fields.connection.LdapBindMethod.SimpleEnumValue;
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindUserInfo;
 import org.codice.ddf.admin.ldap.fields.connection.LdapConnectionField;
 import org.codice.ddf.admin.ldap.fields.connection.LdapEncryptionMethodField;
@@ -249,7 +249,7 @@ public class AdminSecurityIT extends AbstractComponentTest {
     CredentialsField creds = new CredentialsField().username(TEST_USERNAME).password(TEST_PASSWORD);
 
     LdapBindUserInfo bindUserInfo =
-        new LdapBindUserInfo().bindMethod(LdapBindMethod.Simple.SIMPLE).credentialsField(creds);
+        new LdapBindUserInfo().bindMethod(SimpleEnumValue.SIMPLE).credentialsField(creds);
 
     LdapConnectionField connection =
         new LdapConnectionField()
@@ -269,9 +269,7 @@ public class AdminSecurityIT extends AbstractComponentTest {
         || ldapUseCase
             .getValue()
             .equals(LdapUseCase.AUTHENTICATION_AND_ATTRIBUTE_STORE.getValue())) {
-      dirSettings
-          .groupObjectClass(TEST_ATTRIBUTE)
-          .memberAttributeReferencedInGroup(TEST_ATTRIBUTE);
+      dirSettings.groupObjectClass(TEST_ATTRIBUTE).memberAttributeReferencedInGroup(TEST_ATTRIBUTE);
 
       newConfig.claimMappingsField(
           new ClaimsMapEntry.ListImpl()

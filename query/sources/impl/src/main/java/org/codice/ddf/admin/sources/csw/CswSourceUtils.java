@@ -21,6 +21,7 @@ import static org.codice.ddf.admin.sources.fields.CswProfile.DDFCswFederatedSour
 import static org.codice.ddf.admin.sources.fields.CswProfile.GmdCswFederatedSource.GMD_CSW_ISO_FEDERATED_SOURCE;
 import static org.codice.ddf.admin.sources.utils.SourceUtilCommons.SOURCES_NAMESPACE_CONTEXT;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import java.util.ArrayList;
@@ -220,7 +221,7 @@ public class CswSourceUtils {
     return Reports.from(unknownEndpointError(responseField.requestUrlField().getPath()));
   }
 
-  /** For testing purposes only. Groovy can access private methods */
+  @VisibleForTesting
   private void setRequestUtils(RequestUtils requestUtils) {
     this.requestUtils = requestUtils;
   }

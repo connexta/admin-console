@@ -17,10 +17,10 @@ import static org.codice.ddf.admin.api.fields.ScalarField.ScalarType.FLOAT;
 
 public class FloatField extends BaseScalarField<Float> {
 
-  public static final String DEFAULT_FIELD_NAME = "float";
+  public static final String DEFAULT_FLOAT_FIELD_NAME = "float";
 
   public FloatField() {
-    this(DEFAULT_FIELD_NAME);
+    this(DEFAULT_FLOAT_FIELD_NAME);
   }
 
   public FloatField(String fieldName) {

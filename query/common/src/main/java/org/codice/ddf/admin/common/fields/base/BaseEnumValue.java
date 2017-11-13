@@ -15,7 +15,7 @@ package org.codice.ddf.admin.common.fields.base;
 
 import org.codice.ddf.admin.api.fields.EnumValue;
 
-public abstract  class BaseEnumValue<S> implements EnumValue<S> {
+public abstract class BaseEnumValue<S> implements EnumValue<S> {
 
   private String title;
   private String description;

@@ -43,6 +43,7 @@ public class CswServiceProperties {
 
   public static final String USERNAME = "username";
 
+  @SuppressWarnings("squid:S2068" /* Used as a key, not a hard-coded password */)
   public static final String PASSWORD = "password";
 
   public static final String ID = "id";
@@ -55,6 +56,8 @@ public class CswServiceProperties {
   public static final String CSW_SPEC_FACTORY_PID = "Csw_Federated_Source";
 
   public static final String CSW_FEATURE = "spatial-csw";
+
+  private CswServiceProperties() {}
 
   public static final List<String> CSW_FACTORY_PIDS =
       ImmutableList.of(CSW_PROFILE_FACTORY_PID, CSW_GMD_FACTORY_PID, CSW_SPEC_FACTORY_PID);

@@ -105,7 +105,7 @@ public class ContextPolicyBin extends BaseObjectField {
   }
 
   public ContextPolicyBin authTypes(Collection<String> authTypes) {
-    authTypes.forEach(authType -> addAuthType(authType));
+    authTypes.forEach(this::addAuthType);
     return this;
   }
 

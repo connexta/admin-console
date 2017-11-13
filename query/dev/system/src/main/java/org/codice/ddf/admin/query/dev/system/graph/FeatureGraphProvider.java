@@ -13,17 +13,15 @@
  */
 package org.codice.ddf.admin.query.dev.system.graph;
 
+import com.google.common.collect.ImmutableList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.query.dev.system.fields.BundleField;
 import org.codice.ddf.admin.query.dev.system.fields.FeatureField;
 import org.jgrapht.ext.ComponentAttributeProvider;
 import org.jgrapht.ext.GraphMLExporter;
-
-import com.google.common.collect.ImmutableList;
 
 public class FeatureGraphProvider {
 

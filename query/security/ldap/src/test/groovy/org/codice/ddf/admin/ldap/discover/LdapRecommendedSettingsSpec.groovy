@@ -101,7 +101,7 @@ class LdapRecommendedSettingsSpec extends Specification {
         setup:
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().port(666).getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue(),
-                (LdapTypeField.DEFAULT_FIELD_NAME)      : LdapTypeField.Unknown.UNKNOWN]
+                (LdapTypeField.DEFAULT_FIELD_NAME)      : LdapTypeField.UnknownEnumValue.UNKNOWN]
         action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
         when:
@@ -117,7 +117,7 @@ class LdapRecommendedSettingsSpec extends Specification {
         setup:
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().password('badPassword').getValue(),
-                (LdapTypeField.DEFAULT_FIELD_NAME)      : LdapTypeField.Unknown.UNKNOWN]
+                (LdapTypeField.DEFAULT_FIELD_NAME)      : LdapTypeField.UnknownEnumValue.UNKNOWN]
         action.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
         when:
@@ -133,7 +133,7 @@ class LdapRecommendedSettingsSpec extends Specification {
         setup:
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue(),
-                (LdapTypeField.DEFAULT_FIELD_NAME)      : LdapTypeField.Unknown.UNKNOWN]
+                (LdapTypeField.DEFAULT_FIELD_NAME)      : LdapTypeField.UnknownEnumValue.UNKNOWN]
         action.setTestingUtils(utilsMock)
 
         when:
@@ -172,13 +172,13 @@ class LdapRecommendedSettingsSpec extends Specification {
         LdapRecommendedSettings cannotBindSettings = new LdapRecommendedSettings()
         Map<String, Object> cannotBindArgs = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().password('badPassword').getValue(),
-                (LdapTypeField.DEFAULT_FIELD_NAME)      : LdapTypeField.Unknown.UNKNOWN]
+                (LdapTypeField.DEFAULT_FIELD_NAME)      : LdapTypeField.UnknownEnumValue.UNKNOWN]
         cannotBindSettings.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
         LdapRecommendedSettings cannotConnectSettings = new LdapRecommendedSettings()
         Map<String, Object> cannotConnectArgs = [(LdapConnectionField.DEFAULT_FIELD_NAME): noEncryptionLdapConnectionInfo().port(666).getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)   : simpleBindInfo().getValue(),
-                (LdapTypeField.DEFAULT_FIELD_NAME)      : LdapTypeField.Unknown.UNKNOWN]
+                (LdapTypeField.DEFAULT_FIELD_NAME)      : LdapTypeField.UnknownEnumValue.UNKNOWN]
         cannotConnectSettings.setTestingUtils(new LdapTestConnectionSpec.LdapTestingUtilsMock())
 
         when:

@@ -37,17 +37,17 @@ public class CswSpatialOperator extends BaseEnumField<String> {
         DESCRIPTION,
         ImmutableList.of(
             new NoFilter(),
-            new Bbox(),
-            new Beyond(),
-            new Contains(),
-            new Crosses(),
-            new Disjoint(),
-            new DWithin(),
-            new Equals(),
-            new Intersects(),
-            new Overlaps(),
-            new Touches(),
-            new Within()),
+            new BboxEnumValue(),
+            new BeyondEnumValue(),
+            new ContainsEnumValue(),
+            new CrossesEnumValue(),
+            new DisjointEnumValue(),
+            new DWithinEnumValue(),
+            new EqualsEnumValue(),
+            new IntersectsEnumValue(),
+            new OverlapsEnumValue(),
+            new TouchesEnumValue(),
+            new WithinEnumValue()),
         spatialOperator);
   }
 
@@ -76,7 +76,7 @@ public class CswSpatialOperator extends BaseEnumField<String> {
     }
   }
 
-  public static final class Bbox implements EnumValue<String> {
+  public static final class BboxEnumValue implements EnumValue<String> {
 
     public static final String BBOX = "BBOX";
 
@@ -99,7 +99,7 @@ public class CswSpatialOperator extends BaseEnumField<String> {
     }
   }
 
-  public static final class Beyond implements EnumValue<String> {
+  public static final class BeyondEnumValue implements EnumValue<String> {
 
     public static final String BEYOND = "Beyond";
 
@@ -122,7 +122,7 @@ public class CswSpatialOperator extends BaseEnumField<String> {
     }
   }
 
-  public static final class Contains implements EnumValue<String> {
+  public static final class ContainsEnumValue implements EnumValue<String> {
 
     public static final String CONTAINS = "Contains";
 
@@ -145,7 +145,7 @@ public class CswSpatialOperator extends BaseEnumField<String> {
     }
   }
 
-  public static final class Crosses implements EnumValue<String> {
+  public static final class CrossesEnumValue implements EnumValue<String> {
 
     public static final String CROSSES = "Crosses";
 
@@ -168,7 +168,7 @@ public class CswSpatialOperator extends BaseEnumField<String> {
     }
   }
 
-  public static final class Disjoint implements EnumValue<String> {
+  public static final class DisjointEnumValue implements EnumValue<String> {
 
     public static final String DISJOINT = "Disjoint";
 
@@ -191,7 +191,7 @@ public class CswSpatialOperator extends BaseEnumField<String> {
     }
   }
 
-  public static final class DWithin implements EnumValue<String> {
+  public static final class DWithinEnumValue implements EnumValue<String> {
 
     public static final String DWITHIN = "DWithin";
 
@@ -214,16 +214,16 @@ public class CswSpatialOperator extends BaseEnumField<String> {
     }
   }
 
-  public static final class Equals implements EnumValue<String> {
+  public static final class EqualsEnumValue implements EnumValue<String> {
 
-    public static final String EQUALS = "Equals";
+    public static final String EQUALS_ENUM = "Equals";
 
     public static final String DESCRIPTION =
         "Determines whether two geometric properties are identical.";
 
     @Override
     public String getEnumTitle() {
-      return EQUALS;
+      return EQUALS_ENUM;
     }
 
     @Override
@@ -233,11 +233,11 @@ public class CswSpatialOperator extends BaseEnumField<String> {
 
     @Override
     public String getValue() {
-      return EQUALS;
+      return EQUALS_ENUM;
     }
   }
 
-  public static final class Intersects implements EnumValue<String> {
+  public static final class IntersectsEnumValue implements EnumValue<String> {
 
     public static final String INTERSECTS = "Intersects";
 
@@ -260,7 +260,7 @@ public class CswSpatialOperator extends BaseEnumField<String> {
     }
   }
 
-  public static final class Overlaps implements EnumValue<String> {
+  public static final class OverlapsEnumValue implements EnumValue<String> {
 
     public static final String OVERLAPS = "Overlaps";
 
@@ -283,7 +283,7 @@ public class CswSpatialOperator extends BaseEnumField<String> {
     }
   }
 
-  public static final class Touches implements EnumValue<String> {
+  public static final class TouchesEnumValue implements EnumValue<String> {
 
     public static final String TOUCHES = "Touches";
 
@@ -306,7 +306,7 @@ public class CswSpatialOperator extends BaseEnumField<String> {
     }
   }
 
-  public static final class Within implements EnumValue<String> {
+  public static final class WithinEnumValue implements EnumValue<String> {
 
     public static final String WITHIN = "Within";
 

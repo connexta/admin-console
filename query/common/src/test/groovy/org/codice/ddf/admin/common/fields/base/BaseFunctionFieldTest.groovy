@@ -41,7 +41,9 @@ class BaseFunctionFieldTest extends Specification {
         then:
         report.getErrorMessages().size() == 1
         report.getErrorMessages()[0].getCode() == DefaultMessages.EMPTY_FIELD
-        report.getErrorMessages()[0].getPath() == [TestBaseFunctionField.DEFAULT_FIELD_NAME, StringField.DEFAULT_FIELD_NAME]
+        report.getErrorMessages()[0].getPath() == [
+                TestBaseFunctionField.DEFAULT_FIELD_NAME, StringField.DEFAULT_STING_FIELD_NAME
+        ]
     }
 
     def 'Setting function arguments populates argument values correctly'() {
@@ -50,8 +52,13 @@ class BaseFunctionFieldTest extends Specification {
 
         when:
         def value = [
-                (StringField.DEFAULT_FIELD_NAME): 'test1',
-                (TestObjectField.FIELD_NAME)    : [(StringField.DEFAULT_FIELD_NAME): 'test2', (TestObjectField.INNER_OBJECT_FIELD_NAME): [(TestObjectField.SUB_FIELD_OF_INNER_FIELD_NAME): 'test3']]
+                (StringField.DEFAULT_STING_FIELD_NAME): 'test1',
+                (TestObjectField.FIELD_NAME)          : [
+                        (StringField.DEFAULT_STING_FIELD_NAME)   : 'test2',
+                        (TestObjectField.INNER_OBJECT_FIELD_NAME): [
+                                (TestObjectField.SUB_FIELD_OF_INNER_FIELD_NAME): 'test3'
+                        ]
+                ]
         ]
         functionField.execute(value, FUNCTION_PATH)
 

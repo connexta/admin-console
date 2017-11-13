@@ -24,7 +24,7 @@ public class LdapUseCase extends BaseEnumField<String> {
 
   public static final String DESCRIPTION = "Describes the intended use of the LDAP settings.";
 
-  public static final EnumValue<String> AUTHENTICATION = new Authentication();
+  public static final EnumValue<String> AUTHENTICATION = new AuthenticationEnumValue();
 
   public static final EnumValue<String> ATTRIBUTE_STORE = new AttributeStore();
 
@@ -41,12 +41,14 @@ public class LdapUseCase extends BaseEnumField<String> {
         FIELD_TYPE_NAME,
         DESCRIPTION,
         ImmutableList.of(
-            new Authentication(), new AttributeStore(), new AuthenticationAndAttributeStore()),
+            new AuthenticationEnumValue(),
+            new AttributeStore(),
+            new AuthenticationAndAttributeStore()),
         bindMethod);
   }
 
   public boolean isAuthentication() {
-    return Authentication.AUTHENTICATION.equals(getValue())
+    return AuthenticationEnumValue.AUTHENTICATION.equals(getValue())
         || AuthenticationAndAttributeStore.AUTHENTICATION_AND_ATTRIBUTE_STORE.equals(getValue());
   }
 
@@ -55,7 +57,7 @@ public class LdapUseCase extends BaseEnumField<String> {
         || AuthenticationAndAttributeStore.AUTHENTICATION_AND_ATTRIBUTE_STORE.equals(getValue());
   }
 
-  public static final class Authentication implements EnumValue<String> {
+  public static final class AuthenticationEnumValue implements EnumValue<String> {
 
     public static final String DESCRIPTION =
         "Indicates the LDAP is intended to be used as a source to login into.";

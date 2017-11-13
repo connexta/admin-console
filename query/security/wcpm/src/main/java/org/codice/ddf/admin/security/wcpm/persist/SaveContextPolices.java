@@ -82,9 +82,7 @@ public class SaveContextPolices extends BaseFunctionField<ContextPolicyBin.ListI
                     .contextPoliciesToPolicyManagerProps(contextPolicies.getList()),
                 true));
 
-    OperationReport configReport =
-        configurator.commit(
-            "Web Context Policy saved with details: {}", contextPolicies.toString());
+    OperationReport configReport = configurator.commit("Web Context Policy saved.");
 
     if (configReport.containsFailedResults()) {
       addErrorMessage(failedPersistError());

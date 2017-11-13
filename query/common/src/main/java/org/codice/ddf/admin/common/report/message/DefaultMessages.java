@@ -56,6 +56,8 @@ public class DefaultMessages {
 
   public static final String DIRECTORY_DOES_NOT_EXIST = "DIRECTORY_DOES_NOT_EXIST";
 
+  private DefaultMessages() {}
+
   public static ErrorMessage failedTestSetup() {
     return new ErrorMessageImpl(FAILED_TEST_SETUP);
   }

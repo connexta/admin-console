@@ -46,7 +46,8 @@ public class GraphQlResponse {
 
     try {
       if (response.jsonPath().get(GRAPHQL_ERRORS) != null) {
-        LOGGER.debug("GraphQL response had errors.\n{}", response.body().asString());
+        String responseBody = response.body().asString();
+        LOGGER.debug("GraphQL response had errors.\n{}", responseBody);
         populateErrors(response);
       }
     } catch (Exception e) {
@@ -78,8 +79,8 @@ public class GraphQlResponse {
   }
 
   private void populateErrors(ExtractableResponse response) {
-    List<Map<String, Object>> errors = response.jsonPath().get(GRAPHQL_ERRORS);
-    for (Map<String, Object> error : errors) {
+    List<Map<String, Object>> responseErrors = response.jsonPath().get(GRAPHQL_ERRORS);
+    for (Map<String, Object> error : responseErrors) {
       String errorCode = (String) error.get("message");
       List<Object> path = (List<Object>) error.get("path");
       this.errors.add(new Error(errorCode, path));

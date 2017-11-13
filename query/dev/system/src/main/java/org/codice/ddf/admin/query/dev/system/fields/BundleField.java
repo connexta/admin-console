@@ -13,18 +13,16 @@
  */
 package org.codice.ddf.admin.query.dev.system.fields;
 
+import com.google.common.collect.ImmutableList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Callable;
-
 import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.common.fields.base.BaseListField;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
 import org.codice.ddf.admin.common.fields.base.scalar.IntegerField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 import org.osgi.framework.Bundle;
-
-import com.google.common.collect.ImmutableList;
 
 public class BundleField extends BaseObjectField {
 

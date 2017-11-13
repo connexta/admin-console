@@ -94,10 +94,9 @@ public abstract class BaseEnumField<S> extends BaseField<S> implements EnumField
   public List<ErrorMessage> validate() {
     List<ErrorMessage> validationMsgs = super.validate();
 
-    if (validationMsgs.isEmpty() && getValue() != null) {
-      if (getEnumValues().stream().map(EnumValue::getValue).noneMatch(v -> v.equals(getValue()))) {
-        validationMsgs.add(unsupportedEnum(getPath()));
-      }
+    if ((validationMsgs.isEmpty() && getValue() != null)
+        && getEnumValues().stream().map(EnumValue::getValue).noneMatch(v -> v.equals(getValue()))) {
+      validationMsgs.add(unsupportedEnum(getPath()));
     }
     return validationMsgs;
   }

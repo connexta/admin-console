@@ -24,13 +24,9 @@ import java.util.stream.Collectors;
 import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.api.report.ErrorMessage;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public abstract class BaseListField<T extends Field> extends BaseField<List>
     implements ListField<T> {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(BaseListField.class);
 
   protected List<T> elements;
 
@@ -71,6 +67,7 @@ public abstract class BaseListField<T extends Field> extends BaseField<List>
   }
 
   @Override
+  @SuppressWarnings("squid:S00112" /* Throwing RuntimeException intentionally */)
   public T createListEntry() {
     try {
       return getCreateListEntryCallable().call();
@@ -90,7 +87,7 @@ public abstract class BaseListField<T extends Field> extends BaseField<List>
 
   @Override
   public BaseListField<T> addAll(Collection<T> values) {
-    values.forEach(field -> add(field));
+    values.forEach(this::add);
     return this;
   }
 

@@ -18,6 +18,7 @@ import static org.codice.ddf.admin.common.report.message.DefaultMessages.unknown
 import static org.codice.ddf.admin.common.services.ServiceCommons.FLAG_PASSWORD;
 import static org.codice.ddf.admin.sources.utils.SourceUtilCommons.SOURCES_NAMESPACE_CONTEXT;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import java.util.ArrayList;
@@ -179,7 +180,7 @@ public class OpenSearchSourceUtils {
     }
   }
 
-  /** For testing purposes only. Groovy can access private methods */
+  @VisibleForTesting
   private void setRequestUtils(RequestUtils requestUtils) {
     this.requestUtils = requestUtils;
   }

@@ -26,6 +26,7 @@ public class GraphQLTransformScalar {
     scalarTypesProvider = new GraphQLTypesProviderImpl<>();
   }
 
+  @SuppressWarnings("squid:SwitchLastCaseIsDefaultCheck" /* No default case in switch statement*/)
   public GraphQLScalarType resolveScalarType(ScalarField field) {
     if (scalarTypesProvider.isTypePresent(field.getFieldType())) {
       return scalarTypesProvider.getType(field.getFieldType());
@@ -39,9 +40,7 @@ public class GraphQLTransformScalar {
             field.getFieldType() == null
                 ? Scalars.GraphQLInt
                 : new GraphQLScalarType(
-                    field.getFieldType(),
-                    field.getDescription(),
-                    Scalars.GraphQLInt.getCoercing());
+                    field.getFieldType(), field.getDescription(), Scalars.GraphQLInt.getCoercing());
         break;
 
       case BOOLEAN:

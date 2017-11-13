@@ -18,7 +18,7 @@ import spock.lang.Specification;
 
 class StringFieldTest extends Specification {
 
-    List<Object> FIELD_PATH = [StringField.DEFAULT_FIELD_NAME]
+    List<Object> FIELD_PATH = [StringField.DEFAULT_STING_FIELD_NAME]
 
     def 'Empty field error when empty string provided'() {
         setup:

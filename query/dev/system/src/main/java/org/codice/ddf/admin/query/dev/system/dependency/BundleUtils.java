@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 import org.apache.aries.blueprint.PassThroughMetadata;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -51,7 +50,8 @@ import org.slf4j.LoggerFactory;
 public class BundleUtils {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(BundleUtils.class);
-  public static final String BLUEPRINT_BUNDLE_IDENTIFIER = "org.osgi.service.blueprint.container.BlueprintContainer";
+  public static final String BLUEPRINT_BUNDLE_IDENTIFIER =
+      "org.osgi.service.blueprint.container.BlueprintContainer";
   public static final String EXPORT_PACKAGE_HEADER = "Export-Package";
   private BundleService bundleService;
 
@@ -128,10 +128,13 @@ public class BundleUtils {
           populateServiceRefLists((ReferenceListMetadata) meta, bundle, toPopulate);
         } else if (meta instanceof ReferenceMetadata) {
           populateServiceRef((ReferenceMetadata) meta, bundle, toPopulate);
-        } else if(meta instanceof BeanMetadata || meta instanceof ServiceMetadata || meta instanceof PassThroughMetadata) {
+        } else if (meta instanceof BeanMetadata
+            || meta instanceof ServiceMetadata
+            || meta instanceof PassThroughMetadata) {
           continue;
         } else {
-          LOGGER.warn("Unable to handle blueprint metadata of type {} for bundle {}.",
+          LOGGER.warn(
+              "Unable to handle blueprint metadata of type {} for bundle {}.",
               meta.getClass(),
               bundle.getSymbolicName());
         }
@@ -242,6 +245,7 @@ public class BundleUtils {
   }
 
   @VisibleForTesting
+  @SuppressWarnings("squid:S1452" /* Using a wildcard type intentionally */)
   protected List<ServiceReference<?>> getRegisteredServices(Bundle bundle) {
     ServiceReference<?>[] refs = bundle.getRegisteredServices();
     if (refs == null || refs.length == 0) {

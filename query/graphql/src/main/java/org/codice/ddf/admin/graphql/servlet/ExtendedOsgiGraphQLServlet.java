@@ -59,6 +59,7 @@ import org.osgi.service.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@SuppressWarnings("squid:S2226" /* private variables need to remain non-static and/or non-final */)
 public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet implements EventHandler {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ExtendedOsgiGraphQLServlet.class);
@@ -137,6 +138,10 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet implements Ev
   }
 
   @Override
+  @SuppressWarnings({
+    "squid:S1181" /* Catching throwable intentionally */,
+    "squid:S1989" /* Throwing exception in servlet intentionally */
+  })
   protected void doPost(HttpServletRequest originalRequest, HttpServletResponse originalResponse)
       throws ServletException, IOException {
 
@@ -194,7 +199,7 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet implements Ev
     }
   }
 
-  private List<String> splitQueries(String requestContent) throws Exception {
+  private List<String> splitQueries(String requestContent) throws IOException {
     List<String> splitElements = new ArrayList<>();
     JsonNode jsonNode = new ObjectMapper().readTree(requestContent);
     if (jsonNode.isArray()) {
@@ -251,7 +256,7 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet implements Ev
 
     transformedProviders.forEach(this::bindProvider);
 
-    if(errorCodeProvider != null) {
+    if (errorCodeProvider != null) {
       bindProvider(errorCodeProvider);
     }
 
@@ -265,8 +270,7 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet implements Ev
   public void unbindFieldProvider(FieldProvider fieldProvider) {
     triggerSchemaRefresh(
         String.format(
-            UNBINDING_FIELD_PROVIDER,
-            fieldProvider == null ? "" : fieldProvider.getFieldType()));
+            UNBINDING_FIELD_PROVIDER, fieldProvider == null ? "" : fieldProvider.getFieldType()));
   }
 
   public void setFieldProviders(List<FieldProvider> fieldProviders) {

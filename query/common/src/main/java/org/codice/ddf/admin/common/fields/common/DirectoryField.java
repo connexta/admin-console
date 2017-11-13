@@ -16,14 +16,12 @@ package org.codice.ddf.admin.common.fields.common;
 import static org.codice.ddf.admin.common.report.message.DefaultMessages.DIRECTORY_DOES_NOT_EXIST;
 import static org.codice.ddf.admin.common.report.message.DefaultMessages.directoryDoesNotExist;
 
+import com.google.common.collect.ImmutableSet;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Set;
-
 import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
-
-import com.google.common.collect.ImmutableSet;
 
 public class DirectoryField extends StringField {
 
@@ -51,11 +49,11 @@ public class DirectoryField extends StringField {
   @Override
   public List<ErrorMessage> validate() {
     List<ErrorMessage> errors = super.validate();
-    if(!errors.isEmpty()) {
+    if (!errors.isEmpty()) {
       return errors;
     }
 
-    if(getValue() != null && validateDirExists && !Paths.get(getValue()).toFile().exists()) {
+    if (getValue() != null && validateDirExists && !Paths.get(getValue()).toFile().exists()) {
       errors.add(directoryDoesNotExist(getPath()));
     }
 

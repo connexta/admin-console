@@ -57,7 +57,7 @@ const ConfirmStage = (props) => {
     } = {},
 
     prev,
-    messages = [],
+    errors: messages = [],
     configs
   } = props
 
@@ -169,7 +169,7 @@ const ConfirmStage = (props) => {
                 })
                 .catch((err) => {
                   onEndSubmit()
-                  onError(err.graphQLErrors)
+                  onError(err)
                 })
             }}
           />

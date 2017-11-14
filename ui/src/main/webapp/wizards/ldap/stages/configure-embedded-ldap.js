@@ -29,7 +29,7 @@ const ConfigureEmbeddedLdap = (props) => {
     configs: {
       ldapUseCase
     } = {},
-    messages = [],
+    errors: messages = [],
 
     prev
   } = props
@@ -57,7 +57,7 @@ const ConfigureEmbeddedLdap = (props) => {
                 })
                 .catch((err) => {
                   onEndSubmit()
-                  onError(err.graphQLErrors)
+                  onError(err)
                 })
             }}
           />

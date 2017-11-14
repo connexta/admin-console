@@ -17,6 +17,8 @@ import Navigation, { Back, Next } from 'components/wizard/Navigation'
 
 import { InputAuto } from 'admin-wizard/inputs'
 
+import { groupErrors } from './errors'
+
 import muiThemeable from 'material-ui/styles/muiThemeable'
 
 const QueryResultView = (props) => {
@@ -76,8 +78,6 @@ const LdapQueryToolView = (props) => {
     onError
   } = props
 
-  const findError = (key) => errors.find((err) => key === err.path[err.path.length - 1]) || {}
-
   return (
     <Card>
       <CardHeader style={{textAlign: 'center', fontSize: '1.1em'}}
@@ -93,14 +93,14 @@ const LdapQueryToolView = (props) => {
           label='Query'
           value={configs.query}
           onEdit={onEdit('query')}
-          errorText={findError('query').message}
+          errorText={errors.query}
           options={['(objectClass=*)']} />
 
         <InputAuto
           label='Query Base DN'
           value={configs.queryBase}
           onEdit={onEdit('queryBase')}
-          errorText={findError('queryBase').message}
+          errorText={errors.queryBase}
           options={options.queryBases} />
 
         <div style={{textAlign: 'right', marginTop: 20}}>
@@ -110,10 +110,10 @@ const LdapQueryToolView = (props) => {
             onClick={() => {
               client.query(query(conn, info, configs.queryBase, configs.query))
                 .then(({ data }) => {
-                  onError([])
+                  onError()
                   setState(data.ldap.query)
                 })
-                .catch((err) => onError(err.graphQLErrors))
+                .catch(onError)
             }} />
         </div>
 
@@ -195,10 +195,7 @@ const configInputs = [
   }
 ]
 
-const keys = configInputs.reduce((o, { key }) => {
-  o[key] = true
-  return o
-}, {})
+const keys = configInputs.map(({ key }) => key)
 
 const remapKeys = configInputs
   .filter(({ optionKey }) => optionKey !== undefined)
@@ -238,7 +235,6 @@ const DirectorySettings = (props) => {
     onEdit,
     setOptions,
     setDefaults,
-    errors,
 
     results,
     onQuery,
@@ -246,13 +242,10 @@ const DirectorySettings = (props) => {
     prev
   } = props
 
+  const { messages, ...errors } = groupErrors(keys, props.errors)
+
   const isAttrStore = ldapUseCase === 'AuthenticationAndAttributeStore' || ldapUseCase === 'AttributeStore'
   const nextStageId = isAttrStore ? 'attribute-mapping' : 'confirm'
-
-  const messages = errors.filter((err) => {
-    const attr = err.path[err.path.length - 1]
-    return !keys[attr]
-  })
 
   const conn = {
     hostname: configs.hostname,
@@ -302,7 +295,7 @@ const DirectorySettings = (props) => {
           })
           .catch((err) => {
             onEndSubmit()
-            onError(err.graphQLErrors)
+            onError(err)
           })
       }} />
 
@@ -318,22 +311,18 @@ const DirectorySettings = (props) => {
       <Body>
         {configInputs
           .filter(({ label }) => label !== undefined)
-          .map(({ key, optionKey, label, tooltip, attrStoreOnly = false }) => {
-            const error = errors.find((err) => key === err.path[err.path.length - 1]) || {}
-
-            return (
-              <InputAuto
-                key={key}
-                id={key}
-                value={configs[key]}
-                onEdit={onEdit(key)}
-                errorText={error.message}
-                label={label}
-                tooltip={tooltip}
-                visible={!attrStoreOnly || isAttrStore}
-                options={options[optionKey]} />
-            )
-          })}
+          .map(({ key, optionKey, label, tooltip, attrStoreOnly = false }) => (
+            <InputAuto
+              key={key}
+              id={key}
+              value={configs[key]}
+              onEdit={onEdit(key)}
+              errorText={errors[key]}
+              label={label}
+              tooltip={tooltip}
+              visible={!attrStoreOnly || isAttrStore}
+              options={options[optionKey]} />
+          ))}
 
         <LdapQueryTool
           errors={errors}
@@ -359,7 +348,7 @@ const DirectorySettings = (props) => {
                 })
                 .catch((err) => {
                   onEndSubmit()
-                  onError(err.graphQLErrors)
+                  onError(err)
                 })
             }}
           />

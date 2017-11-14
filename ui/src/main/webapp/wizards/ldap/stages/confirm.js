@@ -57,7 +57,7 @@ const ConfirmStage = (props) => {
     } = {},
 
     prev,
-    messages = [],
+    errors: messages = [],
     configs
   } = props
 

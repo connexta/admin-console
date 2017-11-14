@@ -29,7 +29,7 @@ public class LdapLoginServiceProperties {
 
   public static final String BIND_METHOD = "bindMethod";
 
-  //    public static final String KDC_ADDRESS = "kdcAddress";
+  //    public static final String KDC_ADDRESS = "kdcAddress"
   public static final String REALM = "realm";
 
   public static final String LOGIN_USER_ATTRIBUTE = "loginUserAtttribute";

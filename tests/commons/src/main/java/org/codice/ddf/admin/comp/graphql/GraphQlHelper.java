@@ -31,6 +31,8 @@ public class GraphQlHelper {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(GraphQlHelper.class);
   public static final String USERNAME = "admin";
+
+  @SuppressWarnings("squid:S2068" /* Password used internally */)
   public static final String PASSWORD = "admin";
 
   private Class resourceClass;
@@ -92,16 +94,6 @@ public class GraphQlHelper {
         createRequest().usingQuery(usingQuery).addArguments(arguments).send().getResponse());
   }
 
-  private String getResourceAsString(String filePath) {
-    try {
-      return IOUtils.toString(resourceClass.getResourceAsStream(filePath), "UTF-8");
-    } catch (IOException e) {
-      fail("Unable to retrieve resource: " + filePath);
-    }
-
-    return null;
-  }
-
   public class GraphQLRequest {
     private String queryResourcePath;
 
@@ -131,8 +123,8 @@ public class GraphQlHelper {
     }
 
     public GraphQLRequest addArguments(Map<String, Object> args) {
-      for (String key : args.keySet()) {
-        addArgument(key, args.get(key));
+      for (Map.Entry<String, Object> arg : args.entrySet()) {
+        addArgument(arg.getKey(), arg.getValue());
       }
       return this;
     }
@@ -145,6 +137,16 @@ public class GraphQlHelper {
     public GraphQLRequest usingMutation(String mutationFileName) {
       this.mutationFile = mutationFileName;
       return this;
+    }
+
+    private String getResourceAsString(String filePath) {
+      try {
+        return IOUtils.toString(resourceClass.getResourceAsStream(filePath), "UTF-8");
+      } catch (IOException e) {
+        fail("Unable to retrieve resource: " + filePath);
+      }
+
+      return null;
     }
 
     public GraphQLRequest send() {
@@ -179,7 +181,8 @@ public class GraphQlHelper {
               .then()
               .extract();
 
-      LOGGER.debug("\nReplied with:\n{}", response.body().asString());
+      String responseBody = response.body().asString();
+      LOGGER.debug("\nReplied with:\n{}", responseBody);
 
       return this;
     }

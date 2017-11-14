@@ -100,7 +100,7 @@ public abstract class BaseObjectField extends BaseField<Map<String, Object>>
         .addAll(
             getFields()
                 .stream()
-                .map(field -> field.getErrorCodes())
+                .map(Field::getErrorCodes)
                 .flatMap(Collection<String>::stream)
                 .collect(Collectors.toList()))
         .build();

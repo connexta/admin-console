@@ -117,67 +117,91 @@ public class PrioritizedBatchExecutor<T, R> {
       long endTime = System.currentTimeMillis() + totalWaitTimeMillis;
 
       for (int i = 0; i < tasks.size(); i++) {
-        LOGGER.debug("Executing batch {}.", i + 1);
-
-        CompletionService<T> completionService = prioritizedCompletionServices.get(i);
-        int currentBatchSize = tasks.get(i).size();
-
-        long lastBatchPollTime = System.currentTimeMillis();
-        for (int j = 0; j < currentBatchSize; j++) {
-
-          Future<T> taskFuture;
-
-          if (lastBatchPollTime >= endTime) {
-            LOGGER.debug(
-                "\tExceeded max wait time of {} {}. Polling remaining batches.",
-                totalWaitTime,
-                timeUnit.toString());
-
-            while ((taskFuture = completionService.poll()) != null) {
-              Optional<R> result = handleTaskResult(taskFuture);
-              if (result.isPresent()) {
-                LOGGER.debug(
-                    "\tReturning valid task result {} of {} tasks.", j + 1, currentBatchSize);
-
-                return result;
-              }
-            }
-          }
-
-          if (lastBatchPollTime < endTime) {
-            long pollTime = endTime - lastBatchPollTime;
-
-            try {
-              LOGGER.debug(
-                  "\tPolling completion service for batch {} for {} milliseconds.",
-                  i + 1,
-                  pollTime);
-
-              taskFuture = completionService.poll(pollTime, TimeUnit.MILLISECONDS);
-              lastBatchPollTime = System.currentTimeMillis();
-            } catch (InterruptedException e) {
-              LOGGER.debug(
-                  "\tThread interrupted while polling completionService. Interrupting thread.", e);
-
-              Thread.currentThread().interrupt();
-              continue;
-            }
-
-            Optional<R> result = handleTaskResult(taskFuture);
-            if (result.isPresent()) {
-              LOGGER.debug(
-                  "\tReturning valid task result {} of {} tasks.", j + 1, currentBatchSize);
-
-              return result;
-            }
-          }
-        }
+        Optional<R> result =
+            getResult(totalWaitTime, timeUnit, prioritizedCompletionServices, endTime, i);
+        if (result.isPresent()) return result;
       }
 
       return Optional.empty();
     } finally {
       cleanUp();
     }
+  }
+
+  private Optional<R> getResult(
+      long totalWaitTime,
+      TimeUnit timeUnit,
+      List<CompletionService<T>> prioritizedCompletionServices,
+      long endTime,
+      int index) {
+    LOGGER.debug("Executing batch {}.", index + 1);
+
+    CompletionService<T> completionService = prioritizedCompletionServices.get(index);
+    int currentBatchSize = tasks.get(index).size();
+
+    long lastBatchPollTime = System.currentTimeMillis();
+    for (int j = 0; j < currentBatchSize; j++) {
+
+      Future<T> taskFuture;
+
+      if (lastBatchPollTime >= endTime) {
+        Optional<R> result =
+            pollRemainingBatches(totalWaitTime, timeUnit, completionService, currentBatchSize, j);
+        if (result.isPresent()) return result;
+      }
+
+      if (lastBatchPollTime < endTime) {
+        long pollTime = endTime - lastBatchPollTime;
+
+        try {
+          LOGGER.debug(
+              "\tPolling completion service for batch {} for {} milliseconds.",
+              index + 1,
+              pollTime);
+
+          taskFuture = completionService.poll(pollTime, TimeUnit.MILLISECONDS);
+          lastBatchPollTime = System.currentTimeMillis();
+        } catch (InterruptedException e) {
+          LOGGER.debug(
+              "\tThread interrupted while polling completionService. Interrupting thread.", e);
+
+          Thread.currentThread().interrupt();
+          continue;
+        }
+
+        Optional<R> result = handleTaskResult(taskFuture);
+        if (result.isPresent()) {
+          LOGGER.debug("\tReturning valid task result {} of {} tasks.", j + 1, currentBatchSize);
+
+          return result;
+        }
+      }
+    }
+    return Optional.empty();
+  }
+
+  private Optional<R> pollRemainingBatches(
+      long totalWaitTime,
+      TimeUnit timeUnit,
+      CompletionService<T> completionService,
+      int currentBatchSize,
+      int index) {
+    Future<T> taskFuture;
+    String timeUnitString = timeUnit.toString();
+    LOGGER.debug(
+        "\tExceeded max wait time of {} {}. Polling remaining batches.",
+        totalWaitTime,
+        timeUnitString);
+
+    while ((taskFuture = completionService.poll()) != null) {
+      Optional<R> result = handleTaskResult(taskFuture);
+      if (result.isPresent()) {
+        LOGGER.debug("\tReturning valid task result {} of {} tasks.", index + 1, currentBatchSize);
+
+        return result;
+      }
+    }
+    return Optional.empty();
   }
 
   private List<CompletionService<T>> getPrioritizedCompletionServices() {

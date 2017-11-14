@@ -24,6 +24,8 @@ import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
 
 public class SecurityValidation {
 
+  private SecurityValidation() {}
+
   public static Report validateStsClaimsExist(
       List<StringField> claimArgs,
       ServiceActions serviceActions,

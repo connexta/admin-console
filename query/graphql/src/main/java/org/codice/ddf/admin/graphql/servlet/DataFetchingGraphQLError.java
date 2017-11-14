@@ -19,6 +19,7 @@ import graphql.ErrorType;
 import graphql.GraphQLError;
 import graphql.execution.ExecutionPath;
 import graphql.language.SourceLocation;
+import java.util.Collections;
 import java.util.List;
 import org.codice.ddf.admin.api.report.ErrorMessage;
 
@@ -44,7 +45,7 @@ public class DataFetchingGraphQLError implements GraphQLError {
 
   @Override
   public List<SourceLocation> getLocations() {
-    return null;
+    return Collections.emptyList();
   }
 
   @Override

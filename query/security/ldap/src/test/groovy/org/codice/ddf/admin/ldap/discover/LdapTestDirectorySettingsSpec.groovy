@@ -13,7 +13,6 @@
  **/
 package org.codice.ddf.admin.ldap.discover
 
-import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.api.report.FunctionReport
 import org.codice.ddf.admin.common.fields.common.CredentialsField
 import org.codice.ddf.admin.common.fields.common.HostnameField
@@ -32,7 +31,7 @@ import spock.lang.Specification
 
 import static org.codice.ddf.admin.ldap.LdapTestingCommons.*
 import static org.codice.ddf.admin.security.common.fields.ldap.LdapUseCase.AttributeStore.ATTRIBUTE_STORE
-import static org.codice.ddf.admin.security.common.fields.ldap.LdapUseCase.Authentication.AUTHENTICATION
+import static org.codice.ddf.admin.security.common.fields.ldap.LdapUseCase.AuthenticationEnumValue.AUTHENTICATION
 
 class LdapTestDirectorySettingsSpec extends Specification {
     static final List<Object> FUNCTION_PATH = [LdapTestDirectorySettings.FIELD_NAME]

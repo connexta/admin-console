@@ -13,6 +13,7 @@
  */
 package org.codice.ddf.admin.sources.csw.discover;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.util.List;
@@ -94,7 +95,7 @@ public class DiscoverCswSource extends BaseFunctionField<CswSourceConfigurationF
     return ImmutableSet.of(DefaultMessages.CANNOT_CONNECT, DefaultMessages.UNKNOWN_ENDPOINT);
   }
 
-  /** For testing purposes only. Groovy can access private methods */
+  @VisibleForTesting
   private void setCswSourceUtils(CswSourceUtils cswSourceUtils) {
     this.cswSourceUtils = cswSourceUtils;
   }

@@ -17,10 +17,10 @@ import static org.codice.ddf.admin.api.fields.ScalarField.ScalarType.INTEGER;
 
 public class IntegerField extends BaseScalarField<Integer> {
 
-  public static final String DEFAULT_FIELD_NAME = "integer";
+  public static final String DEFAULT_INTEGER_FIELD_NAME = "integer";
 
   public IntegerField() {
-    this(DEFAULT_FIELD_NAME);
+    this(DEFAULT_INTEGER_FIELD_NAME);
   }
 
   public IntegerField(String fieldName) {

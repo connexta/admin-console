@@ -58,8 +58,14 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class ServerGuesser {
   private static final Logger LOGGER = LoggerFactory.getLogger(ServerGuesser.class);
+  private static final String ROOT_DOMAIN_NAMING_CONTEXT = "rootDomainNamingContext";
+  private static final String NAMING_CONTEXTS = "namingContexts";
+  private static final String MEMBER = "member";
 
-  @SuppressWarnings("StaticInitializerReferencesSubClass")
+  @SuppressWarnings({
+    "StaticInitializerReferencesSubClass",
+    "squid:S2390" /* Accessing sub-methods */
+  })
   private static final Map<String, Function<Connection, ServerGuesser>> GUESSER_LOOKUP =
       ImmutableMap.of(
           LdapTypeField.ActiveDirectory.ACTIVE_DIRECTORY,
@@ -70,7 +76,7 @@ public abstract class ServerGuesser {
           ServerGuesser.OpenLdapGuesser::new,
           LdapTypeField.OpenDJ.OPEN_DJ,
           ServerGuesser.OpenDjGuesser::new,
-          LdapTypeField.Unknown.UNKNOWN,
+          LdapTypeField.UnknownEnumValue.UNKNOWN,
           DefaultGuesser::new);
 
   protected final Connection connection;
@@ -95,13 +101,13 @@ public abstract class ServerGuesser {
   public List<String> getBaseContexts() {
     try {
       ConnectionEntryReader reader =
-          connection.search("", SearchScope.BASE_OBJECT, "(objectClass=*)", "namingContexts");
+          connection.search("", SearchScope.BASE_OBJECT, "(objectClass=*)", NAMING_CONTEXTS);
 
       ArrayList<String> contexts = new ArrayList<>();
       while (reader.hasNext()) {
         SearchResultEntry entry = reader.readEntry();
-        if (entry.containsAttribute("namingContexts")) {
-          contexts.add(entry.getAttribute("namingContexts").firstValueAsString());
+        if (entry.containsAttribute(NAMING_CONTEXTS)) {
+          contexts.add(entry.getAttribute(NAMING_CONTEXTS).firstValueAsString());
         }
       }
 
@@ -124,7 +130,7 @@ public abstract class ServerGuesser {
   }
 
   public List<String> getGroupAttributeHoldingMember() {
-    return ImmutableList.of("member", "uniqueMember", "memberUid");
+    return ImmutableList.of(MEMBER, "uniqueMember", "memberUid");
   }
 
   public List<String> getMemberAttributeReferencedInGroup() {
@@ -139,36 +145,41 @@ public abstract class ServerGuesser {
     return getChoices("(|(ou=group*)(name=group*)(cn=group*)(objectClass=groupOfUniqueNames))");
   }
 
-  public Set<String> getClaimAttributeOptions(String baseUserDn)
-      throws SearchResultReferenceIOException, LdapException {
-    // Find all object classes with names like *person* in the core schema;
-    // this will catch person, organizationalPerson, inetOrgPerson, etc. if present
-    SortedSet<String> attributes =
-        extractAttributes(
-            Schema.getCoreSchema().getObjectClasses(),
-            oc -> oc.getNameOrOID().toLowerCase().matches(".*person.*"));
+  public Set<String> getClaimAttributeOptions(String baseUserDn) {
+    try {
+      // Find all object classes with names like *person* in the core schema
+      // this will catch person, organizationalPerson, inetOrgPerson, etc. if present
+      SortedSet<String> attributes =
+          extractAttributes(
+              Schema.getCoreSchema().getObjectClasses(),
+              oc -> oc.getNameOrOID().toLowerCase().matches(".*person.*"));
 
-    // Find any given user with the clearance attribute
-    SearchRequest clearanceReq =
-        Requests.newSearchRequest(
-            DN.valueOf(baseUserDn),
-            SearchScope.WHOLE_SUBTREE,
-            Filter.present("2.16.840.1.101.2.2.1.203"),
-            "objectClass");
-    ConnectionEntryReader clearanceReader = connection.search(clearanceReq);
+      // Find any given user with the clearance attribute
+      SearchRequest clearanceReq =
+          Requests.newSearchRequest(
+              DN.valueOf(baseUserDn),
+              SearchScope.WHOLE_SUBTREE,
+              Filter.present("2.16.840.1.101.2.2.1.203"),
+              "objectClass");
+      ConnectionEntryReader clearanceReader = connection.search(clearanceReq);
 
-    if (clearanceReader.hasNext()) {
-      SearchResultEntry entry = clearanceReader.readEntry();
-      RootDSE rootDSE = RootDSE.readRootDSE(connection);
-      DN subschemaDN = rootDSE.getSubschemaSubentry();
-      Schema subschema = Schema.readSchema(connection, subschemaDN);
+      if (clearanceReader.hasNext()) {
+        SearchResultEntry entry = clearanceReader.readEntry();
+        RootDSE rootDSE = RootDSE.readRootDSE(connection);
+        DN subschemaDN = rootDSE.getSubschemaSubentry();
+        Schema subschema = Schema.readSchema(connection, subschemaDN);
 
-      // Check against both the subschema and the default schema
-      attributes.addAll(
-          extractAttributes(Entries.getObjectClasses(entry, subschema), STRUCT_OR_AUX));
-      attributes.addAll(extractAttributes(Entries.getObjectClasses(entry), STRUCT_OR_AUX));
+        // Check against both the subschema and the default schema
+        attributes.addAll(
+            extractAttributes(Entries.getObjectClasses(entry, subschema), STRUCT_OR_AUX));
+        attributes.addAll(extractAttributes(Entries.getObjectClasses(entry), STRUCT_OR_AUX));
+      }
+      return attributes;
+    } catch (SearchResultReferenceIOException | LdapException e) {
+      LOGGER.warn(
+          "Error retrieving attributes from LDAP server; this may indicate a configuration issue with config.");
+      return Collections.emptySet();
     }
-    return attributes;
   }
 
   private SortedSet<String> extractAttributes(
@@ -223,6 +234,7 @@ public abstract class ServerGuesser {
             .asPredicate()
             .negate();
 
+    @SuppressWarnings("squid:UnusedPrivateMethod" /* Constructor used in the GUESSER_LOOKUP map */)
     private ADGuesser(Connection connection) {
       super(connection);
     }
@@ -232,13 +244,13 @@ public abstract class ServerGuesser {
       try {
         ConnectionEntryReader reader =
             connection.search(
-                "", SearchScope.BASE_OBJECT, "(objectClass=*)", "rootDomainNamingContext");
+                "", SearchScope.BASE_OBJECT, "(objectClass=*)", ROOT_DOMAIN_NAMING_CONTEXT);
 
         if (reader.hasNext()) {
           SearchResultEntry entry = reader.readEntry();
-          if (entry.containsAttribute("rootDomainNamingContext")) {
+          if (entry.containsAttribute(ROOT_DOMAIN_NAMING_CONTEXT)) {
             return Collections.singletonList(
-                entry.getAttribute("rootDomainNamingContext").firstValueAsString());
+                entry.getAttribute(ROOT_DOMAIN_NAMING_CONTEXT).firstValueAsString());
           } else {
             return Collections.singletonList("");
           }
@@ -263,7 +275,7 @@ public abstract class ServerGuesser {
 
     @Override
     public List<String> getGroupAttributeHoldingMember() {
-      return Collections.singletonList("member");
+      return Collections.singletonList(MEMBER);
     }
 
     @Override
@@ -278,6 +290,7 @@ public abstract class ServerGuesser {
   }
 
   private static class EmbeddedGuesser extends ServerGuesser {
+    @SuppressWarnings("squid:UnusedPrivateMethod" /* Constructor used in the GUESSER_LOOKUP map */)
     private EmbeddedGuesser(Connection connection) {
       super(connection);
     }
@@ -299,17 +312,19 @@ public abstract class ServerGuesser {
 
     @Override
     public List<String> getGroupAttributeHoldingMember() {
-      return Collections.singletonList("member");
+      return Collections.singletonList(MEMBER);
     }
   }
 
   private static class OpenLdapGuesser extends ServerGuesser {
+    @SuppressWarnings("squid:UnusedPrivateMethod" /* Constructor used in the GUESSER_LOOKUP map */)
     private OpenLdapGuesser(Connection connection) {
       super(connection);
     }
   }
 
   private static class OpenDjGuesser extends ServerGuesser {
+    @SuppressWarnings("squid:UnusedPrivateMethod" /* Constructor used in the GUESSER_LOOKUP map */)
     private OpenDjGuesser(Connection connection) {
       super(connection);
     }

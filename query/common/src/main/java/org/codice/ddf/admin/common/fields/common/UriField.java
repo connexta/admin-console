@@ -26,19 +26,19 @@ import org.codice.ddf.admin.common.report.message.DefaultMessages;
 
 public class UriField extends StringField {
 
-  public static final String DEFAULT_FIELD_NAME = "uri";
+  public static final String DEFAULT_URI_FIELD_NAME = "uri";
 
-  public static final String FIELD_TYPE_NAME = "URI";
+  public static final String URI_FIELD_TYPE_NAME = "URI";
 
-  public static final String DESCRIPTION =
+  public static final String URI_FIELD_DESCRIPTION =
       "A Universal Resource Indicator used to identify a name or resource on the internet. Formatted according to RFC 3986.";
 
   public UriField() {
-    this(DEFAULT_FIELD_NAME);
+    this(DEFAULT_URI_FIELD_NAME);
   }
 
   public UriField(String fieldName) {
-    super(fieldName, FIELD_TYPE_NAME, DESCRIPTION);
+    super(fieldName, URI_FIELD_TYPE_NAME, URI_FIELD_DESCRIPTION);
   }
 
   protected UriField(String fieldName, String fieldTypeName, String description) {

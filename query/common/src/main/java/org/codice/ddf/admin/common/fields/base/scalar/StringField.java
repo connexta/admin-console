@@ -26,7 +26,7 @@ import org.codice.ddf.admin.common.report.message.DefaultMessages;
 
 public class StringField extends BaseScalarField<String> {
 
-  public static final String DEFAULT_FIELD_NAME = "string";
+  public static final String DEFAULT_STRING_FIELD_NAME = "string";
 
   protected StringField(String fieldName, String fieldTypeName, String description) {
     super(fieldName, fieldTypeName, description, STRING);
@@ -37,7 +37,7 @@ public class StringField extends BaseScalarField<String> {
   }
 
   public StringField() {
-    this(DEFAULT_FIELD_NAME);
+    this(DEFAULT_STRING_FIELD_NAME);
   }
 
   @Override
@@ -71,7 +71,7 @@ public class StringField extends BaseScalarField<String> {
 
   public static class ListImpl extends BaseListField<StringField> {
 
-    public static final String DEFAULT_FIELD_NAME = "strings";
+    public static final String DEFAULT_STRING_FIELD_NAME = "strings";
     private Callable<StringField> newString;
 
     public ListImpl(String fieldName) {
@@ -80,7 +80,7 @@ public class StringField extends BaseScalarField<String> {
     }
 
     public ListImpl() {
-      this(DEFAULT_FIELD_NAME);
+      this(DEFAULT_STRING_FIELD_NAME);
     }
 
     @Override

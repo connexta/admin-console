@@ -16,7 +16,7 @@ package org.codice.ddf.admin.ldap;
 import java.io.IOException;
 import java.util.Properties;
 import org.codice.ddf.admin.ldap.fields.config.LdapDirectorySettingsField;
-import org.codice.ddf.admin.ldap.fields.connection.LdapBindMethod;
+import org.codice.ddf.admin.ldap.fields.connection.LdapBindMethod.SimpleEnumValue;
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindUserInfo;
 import org.codice.ddf.admin.ldap.fields.connection.LdapConnectionField;
 import org.codice.ddf.admin.ldap.fields.connection.LdapEncryptionMethodField;
@@ -43,7 +43,7 @@ public class LdapTestingCommons {
 
   public static LdapBindUserInfo simpleBindInfo() {
     return new LdapBindUserInfo()
-        .bindMethod(LdapBindMethod.Simple.SIMPLE)
+        .bindMethod(SimpleEnumValue.SIMPLE)
         .username(TestLdapServer.getBasicAuthDn())
         .password(TestLdapServer.getBasicAuthPassword());
   }

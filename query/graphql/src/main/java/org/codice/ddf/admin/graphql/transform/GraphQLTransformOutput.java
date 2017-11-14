@@ -36,12 +36,9 @@ import org.codice.ddf.admin.api.fields.ObjectField;
 import org.codice.ddf.admin.api.fields.ScalarField;
 import org.codice.ddf.admin.api.report.FunctionReport;
 import org.codice.ddf.admin.graphql.GraphQLTypesProviderImpl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class GraphQLTransformOutput {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(GraphQLTransformOutput.class);
   private GraphQLTransformInput inputTransformer;
   private GraphQLTransformScalar transformScalar;
   private GraphQLTransformEnum transformEnum;
@@ -56,6 +53,7 @@ public class GraphQLTransformOutput {
     referenceTypeProvider = new GraphQLTypesProviderImpl<>();
   }
 
+  @SuppressWarnings("squid:S00112" /* Throwing Runtime exception intentionally */)
   public GraphQLOutputType fieldToGraphQLOutputType(Field field) {
     if (outputTypeProvider.isTypePresent(field.getFieldType())) {
       return outputTypeProvider.getType(field.getFieldType());
@@ -196,16 +194,13 @@ public class GraphQLTransformOutput {
     Object source = env.getSource();
     // If no values are passed for the source, return a field definition to continue the execution
     // strategy instead of returning null. This is an expansion of the PropertyDataFetcher
-    if (source instanceof Map) {
-      if (!((Map) source).isEmpty()) {
-        return ((Map<?, ?>) source).get(field.getFieldName());
-      }
+    if (source instanceof Map && !((Map) source).isEmpty()) {
+      return ((Map<?, ?>) source).get(field.getFieldName());
     }
-
     return field.getSanitizedValue();
   }
 
-  // Add on Payload to avoid collision between an input and output field type name;
+  // Add on Payload to avoid collision between an input and output field type name
   public String createOutputObjectFieldTypeName(String fieldTypeName) {
     return GraphQLTransformCommons.capitalize(fieldTypeName) + "Payload";
   }

@@ -46,11 +46,6 @@ public class ContextPath extends StringField {
   }
 
   @Override
-  public void setValue(String value) {
-    super.setValue(value);
-  }
-
-  @Override
   public List<ErrorMessage> validate() {
     List<ErrorMessage> msgs = super.validate();
     if (!msgs.isEmpty()) {
@@ -110,7 +105,7 @@ public class ContextPath extends StringField {
       }
 
       int slash2Count = countToken(path);
-      return !(slash2Count > 0);
+      return slash2Count <= 0;
     }
 
     private int countToken(String target) {

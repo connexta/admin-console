@@ -35,6 +35,7 @@ public class WfsServiceProperties {
 
   public static final String USERNAME = "username";
 
+  @SuppressWarnings("squid:S2068" /* Used as a key, not a hard-coded password */)
   public static final String PASSWORD = "password";
 
   public static final String ID = "id";
@@ -50,6 +51,8 @@ public class WfsServiceProperties {
 
   public static final List<String> WFS_FACTORY_PIDS =
       ImmutableList.of(WFS1_FACTORY_PID, WFS2_FACTORY_PID);
+
+  private WfsServiceProperties() {}
 
   public static final Function<Map<String, Object>, WfsSourceConfigurationField>
       SERVICE_PROPS_TO_WFS_CONFIG = WfsServiceProperties::servicePropsToWfsConfig;
@@ -86,11 +89,11 @@ public class WfsServiceProperties {
     return builder.build();
   }
 
-  public static String wfsVersionToFactoryPid(String wfsVersion) throws IllegalArgumentException {
+  public static String wfsVersionToFactoryPid(String wfsVersion) {
     return WFS_VERSION_MAPPING.get(wfsVersion);
   }
 
-  public static String wfsFactoryPidToVersion(String factoryPid) throws IllegalArgumentException {
+  public static String wfsFactoryPidToVersion(String factoryPid) {
     return WFS_VERSION_MAPPING.inverse().get(factoryPid);
   }
 }

@@ -21,7 +21,5 @@ public interface FieldProvider extends ObjectField {
 
   List<FunctionField> getDiscoveryFunctions();
 
-  // TODO: tbatie - 5/16/17 - Should we make this return fields instead? It could be reused for a
-  // rest endpoint but not for graphql
   List<FunctionField> getMutationFunctions();
 }

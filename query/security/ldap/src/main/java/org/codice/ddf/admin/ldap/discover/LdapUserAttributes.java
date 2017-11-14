@@ -13,11 +13,11 @@
  */
 package org.codice.ddf.admin.ldap.discover;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.codice.ddf.admin.api.Field;
@@ -32,8 +32,6 @@ import org.codice.ddf.admin.ldap.commons.ServerGuesser;
 import org.codice.ddf.admin.ldap.fields.LdapDistinguishedName;
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindUserInfo;
 import org.codice.ddf.admin.ldap.fields.connection.LdapConnectionField;
-import org.forgerock.opendj.ldap.LdapException;
-import org.forgerock.opendj.ldap.SearchResultReferenceIOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,16 +81,9 @@ public class LdapUserAttributes extends BaseFunctionField<StringField.ListImpl> 
         return null;
       }
 
-      Set<String> ldapEntryAttributes = new HashSet<>();
       ServerGuesser serverGuesser = ServerGuesser.buildGuesser(connectionAttempt.getResult());
-      try {
-        ldapEntryAttributes = serverGuesser.getClaimAttributeOptions(baseUserDn.getValue());
-
-      } catch (SearchResultReferenceIOException | LdapException e) {
-        LOGGER.warn(
-            "Error retrieving attributes from LDAP server; this may indicate a "
-                + "configuration issue with config.");
-      }
+      Set<String> ldapEntryAttributes =
+          serverGuesser.getClaimAttributeOptions(baseUserDn.getValue());
 
       entries = new StringField.ListImpl();
       entries.setValue(Arrays.asList(ldapEntryAttributes.toArray()));
@@ -122,13 +113,7 @@ public class LdapUserAttributes extends BaseFunctionField<StringField.ListImpl> 
         DefaultMessages.CANNOT_CONNECT);
   }
 
-  /**
-   * Intentionally scoped as private. This is a test support method to be invoked by Spock tests
-   * which will elevate scope as needed in order to execute. If Java-based unit tests are ever
-   * needed, this scope will need to be updated to package-private.
-   *
-   * @param utils Ldap support utilities
-   */
+  @VisibleForTesting
   private void setTestingUtils(LdapTestingUtils utils) {
     this.utils = utils;
   }

@@ -251,7 +251,9 @@ public class ExtendedOsgiGraphQLServlet extends OsgiGraphQLServlet implements Ev
 
     transformedProviders.forEach(this::bindProvider);
 
-    bindProvider(errorCodeProvider);
+    if(errorCodeProvider != null) {
+      bindProvider(errorCodeProvider);
+    }
 
     LOGGER.trace("Finished refreshing GraphQL schema.");
   }

@@ -15,6 +15,10 @@ package org.codice.ddf.admin.common.fields.base.scalar;
 
 import static org.codice.ddf.admin.api.fields.ScalarField.ScalarType.INTEGER;
 
+import java.util.concurrent.Callable;
+
+import org.codice.ddf.admin.common.fields.base.BaseListField;
+
 public class IntegerField extends BaseScalarField<Integer> {
 
   public static final String DEFAULT_FIELD_NAME = "integer";
@@ -23,11 +27,48 @@ public class IntegerField extends BaseScalarField<Integer> {
     this(DEFAULT_FIELD_NAME);
   }
 
+  public IntegerField(int value) {
+    this();
+    setValue(value);
+  }
+
   public IntegerField(String fieldName) {
     super(fieldName, null, null, INTEGER);
   }
 
   protected IntegerField(String fieldName, String fieldTypeName, String description) {
     super(fieldName, fieldTypeName, description, INTEGER);
+  }
+
+  public static class ListImpl extends BaseListField<IntegerField> {
+
+    public static final String DEFAULT_FIELD_NAME = "integers";
+    private Callable<IntegerField> newInteger;
+
+    public ListImpl(String fieldName) {
+      super(fieldName);
+      newInteger = IntegerField::new;
+    }
+
+    public ListImpl() {
+      this(DEFAULT_FIELD_NAME);
+    }
+
+    @Override
+    public Callable<IntegerField> getCreateListEntryCallable() {
+      return newInteger;
+    }
+
+    @Override
+    public ListImpl useDefaultRequired() {
+      newInteger =
+              () -> {
+                IntegerField newIntegerField = new IntegerField();
+                newIntegerField.isRequired(true);
+                return newIntegerField;
+              };
+
+      return this;
+    }
   }
 }

@@ -53,9 +53,9 @@ public abstract class BaseEnumField<S> extends BaseField<S> implements EnumField
       String fieldTypeName,
       String description,
       List<EnumValue<S>> enumValues,
-      EnumValue<S> enumValue) {
+      EnumValue<S> initialValue) {
     this(fieldName, fieldTypeName, description, enumValues);
-    setValue(enumValue == null ? null : enumValue.getValue());
+    setValue(initialValue == null ? null : initialValue.getValue());
   }
 
   @Override

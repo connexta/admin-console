@@ -54,6 +54,8 @@ public class DefaultMessages {
 
   public static final String INVALID_PATH_TRAILING_SLASH = "INVALID_PATH_TRAILING_SLASH";
 
+  public static final String DIRECTORY_DOES_NOT_EXIST = "DIRECTORY_DOES_NOT_EXIST";
+
   public static ErrorMessage failedTestSetup() {
     return new ErrorMessageImpl(FAILED_TEST_SETUP);
   }
@@ -140,5 +142,9 @@ public class DefaultMessages {
 
   public static ErrorMessage invalidPathTrailingSlash(List<Object> path) {
     return new ErrorMessageImpl(INVALID_PATH_TRAILING_SLASH, path);
+  }
+
+  public static ErrorMessage directoryDoesNotExist(List<Object> path) {
+    return new ErrorMessageImpl(DIRECTORY_DOES_NOT_EXIST, path);
   }
 }

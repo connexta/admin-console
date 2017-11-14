@@ -59,6 +59,10 @@ public class GraphQLTransformCommons {
       }
     }
 
+    if(errorCodes.isEmpty()) {
+      return null;
+    }
+
     GraphQLEnumType.Builder enumTypeBuilder =
         GraphQLEnumType.newEnum().name("ErrorCode").description("All possible error codes.");
     errorCodes.forEach(enumTypeBuilder::value);

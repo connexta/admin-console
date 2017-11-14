@@ -90,16 +90,20 @@ public class GraphQLTransformOutput {
   }
 
   public GraphQLOutputType fieldToGraphQLObjectType(ObjectField field) {
-    // Check if the objectField is recursive, if so bail early
-    if (referenceTypeProvider.isTypePresent(field.getFieldType())) {
-      return referenceTypeProvider.getType(field.getFieldType());
-    }
 
     // Field provider names should be unique and looks pretty without "Payload" added to the name
     String typeName =
-        field instanceof FieldProvider
-            ? field.getFieldType()
-            : createOutputObjectFieldTypeName(field.getFieldType());
+            field instanceof FieldProvider
+                    ? field.getFieldType()
+                    : createOutputObjectFieldTypeName(field.getFieldType());
+
+    // Check if the objectField is recursive, if so bail early
+    if (referenceTypeProvider.isTypePresent(typeName)) {
+      return referenceTypeProvider.getType(typeName);
+    } else {
+      // Add a GraphQLTypeReference to support recursion
+      referenceTypeProvider.addType(typeName, new GraphQLTypeReference(typeName));
+    }
 
     List<GraphQLFieldDefinition> innerFields = fieldsToGraphQLFieldDefinition(field.getFields());
 
@@ -109,8 +113,7 @@ public class GraphQLTransformOutput {
           functionsToGraphQLFieldDefinition(((FieldProvider) field).getDiscoveryFunctions()));
     }
 
-    // Add a GraphQLTypeReference to support recursion
-    referenceTypeProvider.addType(field.getFieldType(), new GraphQLTypeReference(typeName));
+
     return GraphQLObjectType.newObject()
         .name(typeName)
         .description(field.getDescription())

@@ -40,6 +40,8 @@ public class LdapMessages {
 
   public static final String INVALID_USER_ATTRIBUTE = "INVALID_USER_ATTRIBUTE";
 
+  private LdapMessages() {}
+
   public static ErrorMessage invalidDnFormatError(List<Object> path) {
     return new ErrorMessageImpl(INVALID_DN, path);
   }

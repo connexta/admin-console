@@ -17,7 +17,7 @@ import static org.codice.ddf.admin.common.services.ServiceCommons.FLAG_PASSWORD;
 import static org.codice.ddf.admin.common.services.ServiceCommons.SERVICE_PID_KEY;
 import static org.codice.ddf.admin.common.services.ServiceCommons.mapValue;
 
-import java.util.Collections;
+import com.google.common.collect.ImmutableList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -31,6 +31,7 @@ public class OpenSearchServiceProperties {
 
   public static final String USERNAME = "username";
 
+  @SuppressWarnings("squid:S2068" /* Used as a key, not a hard-coded password */)
   public static final String PASSWORD = "password";
 
   public static final String SHORTNAME = "shortname";
@@ -41,11 +42,13 @@ public class OpenSearchServiceProperties {
   public static final String OPENSEARCH_FEATURE = "catalog-opensearch-source";
 
   public static final List<String> OPENSEARCH_FACTORY_PIDS =
-      Collections.singletonList(OPENSEARCH_FACTORY_PID);
+      ImmutableList.of(OPENSEARCH_FACTORY_PID);
 
   public static final Function<Map<String, Object>, OpenSearchSourceConfigurationField>
       SERVICE_PROPS_TO_OPENSEARCH_CONFIG =
           OpenSearchServiceProperties::servicePropsToOpenSearchConfig;
+
+  private OpenSearchServiceProperties() {}
 
   public static OpenSearchSourceConfigurationField servicePropsToOpenSearchConfig(
       Map<String, Object> props) {

@@ -53,6 +53,8 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractComponentTest {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AbstractComponentTest.class);
+  private static final String ETC_SYSTEM_PROPERTIES = "etc/system.properties";
+  private static final String ETC_KARAF_MGMT_CFG = "etc/org.apache.karaf.management.cfg";
 
   @Rule public PaxExamRule paxExamRule = new PaxExamRule(this);
 
@@ -78,6 +80,7 @@ public abstract class AbstractComponentTest {
   protected abstract List<Feature> features();
 
   @Configuration
+  @SuppressWarnings("squid:S00112" /* Exception needs to be thrown */)
   public Option[] config() throws Exception {
     List<Option> features =
         features()
@@ -122,26 +125,26 @@ public abstract class AbstractComponentTest {
         cleanCaches());
   }
 
+  @SuppressWarnings("squid:S00112" /* Throwing generic Exception intentionally */)
   protected List<Option> configurableSettings() throws Exception {
     return Arrays.asList(
         keepRuntimeFolder(),
         logLevel(LogLevelOption.LogLevel.INFO),
 
         // TODO: tbatie - 8/15/17 - Change these to dynamic port once refactored
-        editConfigurationFilePut("etc/system.properties", "ddf.home", "${karaf.home}"),
-        editConfigurationFilePut(
-            "etc/system.properties", "org.codice.ddf.system.httpsPort", "9993"),
-        editConfigurationFilePut("etc/system.properties", "org.codice.ddf.system.httpPort", "9994"),
-        editConfigurationFilePut(
-            "etc/system.properties", "org.codice.ddf.catalog.ftp.port", "9995"),
-        editConfigurationFilePut("etc/org.apache.karaf.management.cfg", "rmiRegistryPort", "20001"),
-        editConfigurationFilePut("etc/org.apache.karaf.management.cfg", "rmiServerPort", "20002"),
-        editConfigurationFilePut("etc/org.apache.karaf.management.cfg", "rmiServerPort", "20002"),
+        editConfigurationFilePut(ETC_SYSTEM_PROPERTIES, "ddf.home", "${karaf.home}"),
+        editConfigurationFilePut(ETC_SYSTEM_PROPERTIES, "org.codice.ddf.system.httpsPort", "9993"),
+        editConfigurationFilePut(ETC_SYSTEM_PROPERTIES, "org.codice.ddf.system.httpPort", "9994"),
+        editConfigurationFilePut(ETC_SYSTEM_PROPERTIES, "org.codice.ddf.catalog.ftp.port", "9995"),
+        editConfigurationFilePut(ETC_KARAF_MGMT_CFG, "rmiRegistryPort", "20001"),
+        editConfigurationFilePut(ETC_KARAF_MGMT_CFG, "rmiServerPort", "20002"),
+        editConfigurationFilePut(ETC_KARAF_MGMT_CFG, "rmiServerPort", "20002"),
         editConfigurationFilePut(
             "etc/org.apache.karaf.features.cfg", "featuresBootAsynchronous", "true"));
   }
 
   @BeforeExam
+  @SuppressWarnings("squid:S00112" /* Exception needs to be thrown */)
   public void beforeExam() throws Exception {
     adminConfig = new AdminConfig(configurationAdmin);
     serviceManager =

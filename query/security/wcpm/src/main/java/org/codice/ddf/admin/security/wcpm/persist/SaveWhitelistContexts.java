@@ -71,8 +71,7 @@ public class SaveWhitelistContexts extends BaseFunctionField<ContextPath.ListImp
                 new PolicyManagerServiceProperties().whiteListToPolicyManagerProps(contexts),
                 true));
 
-    OperationReport configReport =
-        configurator.commit("Whitelist Contexts saved with details: {}", contexts.toString());
+    OperationReport configReport = configurator.commit("Whitelist Contexts saved.");
 
     if (configReport.containsFailedResults()) {
       addErrorMessage(failedPersistError());

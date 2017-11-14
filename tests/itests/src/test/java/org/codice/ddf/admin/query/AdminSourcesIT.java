@@ -241,8 +241,7 @@ public class AdminSourcesIT extends AbstractComponentTest {
   @Ignore
   @Test
   // TODO: 8/23/17 phuffer - In order for the CSW feature to start, the ActionProvider must be
-  // removed
-  //                         from the spatial-csw-transformer blueprint.
+  // removed from the spatial-csw-transformer blueprint.
   public void testCsw() {
     // create CSW source
     Map<String, Object> cswConfigToSave =

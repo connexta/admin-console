@@ -13,9 +13,11 @@
  */
 package org.codice.ddf.admin.api;
 
-public interface Events {
+public class Events {
 
-  String REFRESH_SCHEMA = "graphql/servlet/REFRESH_SCHEMA";
+  public static final String REFRESH_SCHEMA = "graphql/servlet/REFRESH_SCHEMA";
 
-  String EVENT_REASON = "EVENT_REASON";
+  public static final String EVENT_REASON = "EVENT_REASON";
+
+  private Events() {}
 }

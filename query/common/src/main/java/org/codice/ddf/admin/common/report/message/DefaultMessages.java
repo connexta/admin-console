@@ -54,6 +54,8 @@ public class DefaultMessages {
 
   public static final String INVALID_PATH_TRAILING_SLASH = "INVALID_PATH_TRAILING_SLASH";
 
+  private DefaultMessages() {}
+
   public static ErrorMessage failedTestSetup() {
     return new ErrorMessageImpl(FAILED_TEST_SETUP);
   }

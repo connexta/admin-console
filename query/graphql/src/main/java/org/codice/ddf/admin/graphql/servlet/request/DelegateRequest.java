@@ -152,6 +152,7 @@ public class DelegateRequest implements HttpServletRequest {
   }
 
   @Override
+  @SuppressWarnings("squid:S2254" /* Method use required */)
   public String getRequestedSessionId() {
     return request.getRequestedSessionId();
   }
@@ -372,13 +373,12 @@ public class DelegateRequest implements HttpServletRequest {
   }
 
   @Override
-  public AsyncContext startAsync() throws IllegalStateException {
+  public AsyncContext startAsync() {
     return request.startAsync();
   }
 
   @Override
-  public AsyncContext startAsync(ServletRequest servletRequest, ServletResponse servletResponse)
-      throws IllegalStateException {
+  public AsyncContext startAsync(ServletRequest servletRequest, ServletResponse servletResponse) {
     return request.startAsync(servletRequest, servletResponse);
   }
 

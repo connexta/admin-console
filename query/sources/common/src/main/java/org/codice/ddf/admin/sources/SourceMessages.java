@@ -20,6 +20,8 @@ public class SourceMessages {
 
   public static final String DUPLICATE_SOURCE_NAME = "DUPLICATE_SOURCE_NAME";
 
+  private SourceMessages() {}
+
   public static ErrorMessageImpl duplicateSourceNameError(List<Object> path) {
     return new ErrorMessageImpl(DUPLICATE_SOURCE_NAME, path);
   }

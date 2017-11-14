@@ -15,8 +15,8 @@ package org.codice.ddf.admin.ldap.persist;
 
 import static org.codice.ddf.admin.common.report.message.DefaultMessages.failedPersistError;
 import static org.codice.ddf.admin.security.common.fields.ldap.LdapUseCase.AttributeStore.ATTRIBUTE_STORE;
-import static org.codice.ddf.admin.security.common.fields.ldap.LdapUseCase.Authentication.AUTHENTICATION;
 import static org.codice.ddf.admin.security.common.fields.ldap.LdapUseCase.AuthenticationAndAttributeStore.AUTHENTICATION_AND_ATTRIBUTE_STORE;
+import static org.codice.ddf.admin.security.common.fields.ldap.LdapUseCase.AuthenticationEnumValue.AUTHENTICATION;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -76,54 +76,49 @@ public class CreateLdapConfiguration extends BaseFunctionField<BooleanField> {
   public BooleanField performFunction() {
     Configurator configurator = configuratorSuite.getConfiguratorFactory().getConfigurator();
 
-    switch (config.settingsField().useCase()) {
-      case AUTHENTICATION:
-      case AUTHENTICATION_AND_ATTRIBUTE_STORE:
-        {
-          Map<String, Object> ldapLoginServiceProps =
-              ldapServiceCommons.ldapConfigurationToLdapLoginService(config);
-          configurator.add(
-              configuratorSuite
-                  .getFeatureActions()
-                  .start(LdapLoginServiceProperties.LDAP_LOGIN_FEATURE));
-          configurator.add(
-              configuratorSuite
-                  .getManagedServiceActions()
-                  .create(
-                      LdapLoginServiceProperties.LDAP_LOGIN_MANAGED_SERVICE_FACTORY_PID,
-                      ldapLoginServiceProps));
-        }
+    String authType = config.settingsField().useCase();
+    if (authType.equalsIgnoreCase(AUTHENTICATION)
+        || authType.equalsIgnoreCase(AUTHENTICATION_AND_ATTRIBUTE_STORE)) {
+      Map<String, Object> ldapLoginServiceProps =
+          ldapServiceCommons.ldapConfigurationToLdapLoginService(config);
+      configurator.add(
+          configuratorSuite
+              .getFeatureActions()
+              .start(LdapLoginServiceProperties.LDAP_LOGIN_FEATURE));
+      configurator.add(
+          configuratorSuite
+              .getManagedServiceActions()
+              .create(
+                  LdapLoginServiceProperties.LDAP_LOGIN_MANAGED_SERVICE_FACTORY_PID,
+                  ldapLoginServiceProps));
     }
 
-    switch (config.settingsField().useCase()) {
-      case ATTRIBUTE_STORE:
-      case AUTHENTICATION_AND_ATTRIBUTE_STORE:
-        {
-          Path newAttributeMappingPath =
-              Paths.get(
-                  System.getProperty("ddf.home"),
-                  "etc",
-                  "ws-security",
-                  "ldapAttributeMap-" + UUID.randomUUID().toString() + ".props");
-          Map<String, Object> ldapClaimsServiceProps =
-              ldapServiceCommons.ldapConfigToLdapClaimsHandlerService(
-                  config, newAttributeMappingPath.toString());
-          configurator.add(
-              configuratorSuite
-                  .getPropertyActions()
-                  .create(newAttributeMappingPath, config.claimsMapping()));
-          configurator.add(
-              configuratorSuite
-                  .getFeatureActions()
-                  .start(LdapClaimsHandlerServiceProperties.LDAP_CLAIMS_HANDLER_FEATURE));
-          configurator.add(
-              configuratorSuite
-                  .getManagedServiceActions()
-                  .create(
-                      LdapClaimsHandlerServiceProperties
-                          .LDAP_CLAIMS_HANDLER_MANAGED_SERVICE_FACTORY_PID,
-                      ldapClaimsServiceProps));
-        }
+    if (authType.equalsIgnoreCase(ATTRIBUTE_STORE)
+        || authType.equalsIgnoreCase(AUTHENTICATION_AND_ATTRIBUTE_STORE)) {
+      Path newAttributeMappingPath =
+          Paths.get(
+              System.getProperty("ddf.home"),
+              "etc",
+              "ws-security",
+              "ldapAttributeMap-" + UUID.randomUUID().toString() + ".props");
+      Map<String, Object> ldapClaimsServiceProps =
+          ldapServiceCommons.ldapConfigToLdapClaimsHandlerService(
+              config, newAttributeMappingPath.toString());
+      configurator.add(
+          configuratorSuite
+              .getPropertyActions()
+              .create(newAttributeMappingPath, config.claimsMapping()));
+      configurator.add(
+          configuratorSuite
+              .getFeatureActions()
+              .start(LdapClaimsHandlerServiceProperties.LDAP_CLAIMS_HANDLER_FEATURE));
+      configurator.add(
+          configuratorSuite
+              .getManagedServiceActions()
+              .create(
+                  LdapClaimsHandlerServiceProperties
+                      .LDAP_CLAIMS_HANDLER_MANAGED_SERVICE_FACTORY_PID,
+                  ldapClaimsServiceProps));
     }
 
     OperationReport report = configurator.commit("Creating LDAP configuration.");

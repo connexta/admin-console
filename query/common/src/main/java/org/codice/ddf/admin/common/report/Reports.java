@@ -19,6 +19,8 @@ import org.codice.ddf.admin.api.report.Report;
 
 public class Reports {
 
+  private Reports() {}
+
   public static <T> Report<T> emptyReport() {
     return new ReportImpl<>();
   }

@@ -29,6 +29,7 @@ public class CredentialsField extends BaseObjectField {
 
   public static final String USERNAME_FIELD_NAME = "username";
 
+  @SuppressWarnings("squid:S2068" /* Password field name not a hard-coded password */)
   public static final String PASSWORD_FIELD_NAME = "password";
 
   private StringField username;

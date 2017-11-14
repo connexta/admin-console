@@ -6,7 +6,6 @@ import com.google.common.io.Resources
 import com.google.common.net.HttpHeaders
 import graphql.validation.ValidationErrorType
 import groovy.json.JsonBuilder
-import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField
 import org.codice.ddf.admin.common.fields.base.scalar.IntegerField
 import org.codice.ddf.admin.common.fields.base.scalar.StringField
@@ -57,11 +56,11 @@ class GraphQLTransformationTest extends Specification {
             (TestObjectField.HIDDEN_FIELD_NAME)            : HIDDEN_FIELD_RETURN_VALUE
     ]
 
-    static STRING = StringField.DEFAULT_FIELD_NAME
+    static STRING = StringField.DEFAULT_STRING_FIELD_NAME
 
-    static BOOLEAN = BooleanField.DEFAULT_FIELD_NAME
+    static BOOLEAN = BooleanField.DEFAULT_BOOLEAN_FIELD_NAME
 
-    static INTEGER = IntegerField.DEFAULT_FIELD_NAME
+    static INTEGER = IntegerField.DEFAULT_INTEGER_FIELD_NAME
 
     static LIST = TestFieldProvider.LIST_FIELD_NAME
 
@@ -451,7 +450,7 @@ class GraphQLTransformationTest extends Specification {
         return [
                 path: path,
                 message: code,
-                "locations": null,
+                "locations": [],
                 "errorType": "DataFetchingException",
                 "extensions": null
         ]

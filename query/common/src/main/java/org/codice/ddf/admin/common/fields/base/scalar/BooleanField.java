@@ -17,7 +17,7 @@ import static org.codice.ddf.admin.api.fields.ScalarField.ScalarType.BOOLEAN;
 
 public class BooleanField extends BaseScalarField<Boolean> {
 
-  public static final String DEFAULT_FIELD_NAME = "boolean";
+  public static final String DEFAULT_BOOLEAN_FIELD_NAME = "boolean";
 
   public BooleanField(boolean value) {
     this();
@@ -25,7 +25,7 @@ public class BooleanField extends BaseScalarField<Boolean> {
   }
 
   public BooleanField() {
-    this(DEFAULT_FIELD_NAME);
+    this(DEFAULT_BOOLEAN_FIELD_NAME);
   }
 
   public BooleanField(String fieldName) {

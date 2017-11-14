@@ -135,6 +135,7 @@ public class SourceUtilCommons {
     return sourceConfigs;
   }
 
+  @SuppressWarnings("squid:S135" /* Two break statements required */)
   public void populateAvailability(BooleanField availability, PidField pid) {
     for (Source source : getAllSourceReferences()) {
       if (source instanceof ConfiguredService) {

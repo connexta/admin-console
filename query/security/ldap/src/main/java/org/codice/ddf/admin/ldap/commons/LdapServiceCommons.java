@@ -18,11 +18,10 @@ import static org.codice.ddf.admin.common.services.ServiceCommons.SERVICE_PID_KE
 import static org.codice.ddf.admin.common.services.ServiceCommons.mapValue;
 import static org.codice.ddf.admin.ldap.fields.connection.LdapEncryptionMethodField.LdapsEncryption.LDAPS;
 import static org.codice.ddf.admin.security.common.fields.ldap.LdapUseCase.AttributeStore.ATTRIBUTE_STORE;
-import static org.codice.ddf.admin.security.common.fields.ldap.LdapUseCase.Authentication.AUTHENTICATION;
+import static org.codice.ddf.admin.security.common.fields.ldap.LdapUseCase.AuthenticationEnumValue.AUTHENTICATION;
 import static org.codice.ddf.admin.security.common.services.LdapClaimsHandlerServiceProperties.PROPERTY_FILE_LOCATION;
 
 import java.net.URI;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
@@ -140,7 +139,7 @@ public class LdapServiceCommons {
           config.bindUserInfoField().credentialsField().password());
       ldapStsConfig.put(
           LdapLoginServiceProperties.BIND_METHOD, config.bindUserInfoField().bindMethod());
-      //        ldapStsConfig.put(KDC_ADDRESS, config.bindKdcAddress());
+      //        ldapStsConfig.put(KDC_ADDRESS, config.bindKdcAddress())
       ldapStsConfig.put(LdapLoginServiceProperties.REALM, config.bindUserInfoField().realm());
 
       ldapStsConfig.put(
@@ -193,7 +192,7 @@ public class LdapServiceCommons {
     String attributeMappingsPath = mapValue(props, PROPERTY_FILE_LOCATION);
     if (StringUtils.isNotEmpty(attributeMappingsPath)) {
       Path path = Paths.get(attributeMappingsPath).toAbsolutePath();
-      if (Files.exists(path)) {
+      if (path.toFile().exists()) {
         claimMappings = new HashMap<>(configuratorSuite.getPropertyActions().getProperties(path));
       }
     }
@@ -223,7 +222,7 @@ public class LdapServiceCommons {
     if (bindUserInfo.bindMethod() == LdapBindMethod.DigestMd5Sasl.DIGEST_MD5_SASL) {
       bindUserInfo.realm(mapValue(props, LdapLoginServiceProperties.REALM));
     }
-    //        ldapConfiguration.bindKdcAddress((String) props.get(KDC_ADDRESS));
+    //        ldapConfiguration.bindKdcAddress((String) props.get(KDC_ADDRESS))
 
     LdapDirectorySettingsField settings =
         new LdapDirectorySettingsField()
@@ -273,14 +272,13 @@ public class LdapServiceCommons {
   }
 
   private static URI getUriFromProperty(String ldapUrl) {
-    if (StringUtils.isNotEmpty(ldapUrl)) {
-      ldapUrl = PropertyResolver.resolveProperties(ldapUrl);
-      if (!URI_MATCHER.matcher(ldapUrl).matches()) {
-        ldapUrl = "ldap://" + ldapUrl;
-      }
-      return URI.create(ldapUrl);
+    if (StringUtils.isEmpty(ldapUrl)) {
+      return null;
     }
-
-    return null;
+    String newUri = PropertyResolver.resolveProperties(ldapUrl);
+    if (!URI_MATCHER.matcher(newUri).matches()) {
+      newUri = "ldap://" + newUri;
+    }
+    return URI.create(newUri);
   }
 }

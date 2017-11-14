@@ -188,7 +188,9 @@ describe('admin-wizard', () => {
       it('should set error values', () => {
         const Component = withErrors(({ errors, onError }) =>
           <div className={errors.length}>
-            <Mount on={() => onError([{ message: 'hello' }])} />
+            <Mount on={() => onError({
+              graphQLErrors: [{ message: 'hello' }]
+            })} />
           </div>
         )
 

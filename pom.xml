@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.codice.ddf.admin.query</groupId>
   <artifactId>admin</artifactId>
-  <version>1.1.1-SNAPSHOT</version>
+  <version>1.1.1</version>
   <packaging>pom</packaging>
   <name>DDF :: Admin Console</name>
   <modules>
@@ -18,6 +17,7 @@
     <connection>scm:git:https://github.com/connexta/admin-console-beta.git</connection>
     <developerConnection>scm:git:https://github.com/connexta/admin-console-beta.git</developerConnection>
     <url>https://github.com/connexta/admin-console-beta</url>
+    <tag>admin-1.1.1</tag>
   </scm>
   <distributionManagement>
     <repository>
@@ -35,7 +35,7 @@
   </distributionManagement>
   <properties>
     <project.report.output.directory>project-info</project.report.output.directory>
-    <snapshots.repository.url></snapshots.repository.url>
+    <snapshots.repository.url />
     <commons-validator.version>1.6</commons-validator.version>
     <slf4j-api.version>1.7.24</slf4j-api.version>
     <spark.version>2.5.5</spark.version>
@@ -43,8 +43,8 @@
     <gson.version>2.7</gson.version>
     <osgi.version>6.0.0</osgi.version>
     <maven.compiler.source>1.8</maven.compiler.source>
-    <reports.repository.url></reports.repository.url>
-    <ddf.scm.connection.url></ddf.scm.connection.url>
+    <reports.repository.url />
+    <ddf.scm.connection.url />
     <junit.version>4.12</junit.version>
     <groovy.version>2.4.7</groovy.version>
     <ddf.version>2.11.2</ddf.version>

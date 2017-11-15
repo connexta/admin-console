@@ -18,7 +18,7 @@
     <parent>
         <artifactId>admin</artifactId>
         <groupId>org.codice.ddf.admin.query</groupId>
-        <version>1.1.1-SNAPSHOT</version>
+        <version>1.1.1</version>
     </parent>
     <name>DDF :: Admin Console :: Query :: UI</name>
     <artifactId>admin-ui</artifactId>

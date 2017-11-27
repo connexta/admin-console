@@ -24,7 +24,10 @@ import {
 
 import WizardView from './wizard'
 
-const mapStateToProps = (state, { wizardId }) => {
+const id = (v) => v
+
+const mapStateToProps = (root, { wizardId, rootSelector = id }) => {
+  const state = rootSelector(root)
   const stageId = getCurrentStage(state)
 
   return {

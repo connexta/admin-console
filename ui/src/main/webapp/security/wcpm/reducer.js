@@ -2,15 +2,12 @@ import { combineReducers } from 'redux-immutable'
 
 import { fromJS, Map, List, Record } from 'immutable'
 
-import sub from 'redux-submarine'
-
-export const submarine = sub()
-export const isEditing = (state) => submarine(state).get('editing') !== null
-export const hasSubmitted = (state) => submarine(state).get('submitted')
-export const editingToken = (state) => submarine(state).get('editing')
-export const getValue = (state) => submarine(state).get('value')
-export const getErrors = (state) => submarine(state).get('errors')
-export const getNotification = (state) => submarine(state).get('notification')
+export const isEditing = (state) => state.get('editing') !== null
+export const hasSubmitted = (state) => state.get('submitted')
+export const editingToken = (state) => state.get('editing')
+export const getValue = (state) => state.get('value')
+export const getErrors = (state) => state.get('errors')
+export const getNotification = (state) => state.get('notification')
 
 export const edit = (token, value) => ({ type: 'wcpm/EDIT', token, value })
 export const cancel = () => ({ type: 'wcpm/CANCEL' })

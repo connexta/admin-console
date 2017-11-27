@@ -1,10 +1,7 @@
 import { combineReducers } from 'redux-immutable'
 import { List, Map } from 'immutable'
 
-import sub from 'redux-submarine'
-
-export const submarine = sub()
-export const getCurrentStage = (state) => submarine(state).getIn(['stages']).last()
+export const getCurrentStage = (state) => state.getIn(['stages']).last()
 export const next = (stage) => ({ type: 'admin-wizard/PUSH_STAGE', stage })
 export const prev = () => ({ type: 'admin-wizard/POP_STAGE' })
 
@@ -24,7 +21,7 @@ const stages = (state = List.of('introduction-stage'), { type, stage }) => {
 export const setShared = (key, value) =>
   ({ type: `admin-wizard/SET_SHARED_${key.toUpperCase()}`, key, value })
 export const clearShared = () => ({ type: 'admin-wizard/CLEAR_SHARED' })
-export const getShared = (state) => submarine(state).get('shared')
+export const getShared = (state) => state.get('shared')
 
 const shared = (state = Map(), { type, key, value }) => {
   if (type.match('admin-wizard/SET_SHARED') !== null) {
@@ -39,7 +36,7 @@ const shared = (state = Map(), { type, key, value }) => {
 export const setLocal = (key, value) =>
   ({ type: `admin-wizard/SET_LOCAL_${key.toUpperCase()}`, key, value })
 export const clearLocal = () => ({ type: 'admin-wizard/CLEAR_LOCAL' })
-export const getLocal = (state) => submarine(state).get('local')
+export const getLocal = (state) => state.get('local')
 
 const local = (state = Map(), { type, key, value }) => {
   if (type.match('admin-wizard/SET_LOCAL') !== null) {

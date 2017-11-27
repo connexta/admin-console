@@ -5,6 +5,10 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 
 import { getTheme } from './reducer'
 
+const id = (v) => v
+
 export default connect(
-  (state) => ({ muiTheme: getMuiTheme(getTheme(state)) })
+  (root, { rootSelector = id }) => ({
+    muiTheme: getMuiTheme(getTheme(rootSelector(root)))
+  })
 )(MuiThemeProvider)

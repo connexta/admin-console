@@ -145,9 +145,6 @@ if (process.env.NODE_ENV === 'production') {
       .concat('./src/main/webapp/app.js')
       .map(function (spec) { return path.resolve(spec) }),
     plugins: [
-      new webpack.DefinePlugin({
-        'process.env.NODE_ENV': '"ci"'
-      }),
       new HtmlWebpackPlugin()
     ],
     module: {

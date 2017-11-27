@@ -83,15 +83,20 @@ class AppBarView extends Component {
   }
 }
 
-export default connect((state) => ({
-  theme: getTheme(state)
-}), (dispatch) => ({
-  updateColor: (path) => (color) => {
-    dispatch(updateThemeColor(path, color))
-    window.forceUpdateThemeing()
-  },
-  setThemePreset: (themeName) => {
-    dispatch(setThemePreset(themeName))
-    window.forceUpdateThemeing()
-  }
-}))(AppBarView)
+const id = (v) => v
+
+export default connect(
+  (root, { rootSelector = id }) => ({
+    theme: getTheme(rootSelector(root))
+  }),
+  (dispatch) => ({
+    updateColor: (path) => (color) => {
+      dispatch(updateThemeColor(path, color))
+      window.forceUpdateThemeing()
+    },
+    setThemePreset: (themeName) => {
+      dispatch(setThemePreset(themeName))
+      window.forceUpdateThemeing()
+    }
+  })
+)(AppBarView)

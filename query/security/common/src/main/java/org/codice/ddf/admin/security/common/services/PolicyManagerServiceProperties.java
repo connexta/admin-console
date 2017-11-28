@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.apache.commons.collections.ListUtils;
-import org.codice.ddf.admin.api.ConfiguratorSuite;
+import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite;
 import org.codice.ddf.admin.common.fields.common.ContextPath;
 import org.codice.ddf.admin.common.services.ServiceCommons;
 import org.codice.ddf.admin.security.common.fields.wcpm.ContextPolicyBin;

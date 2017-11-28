@@ -13,7 +13,7 @@
  **/
 package org.codice.ddf.admin.sources.wfs
 
-import org.codice.ddf.admin.api.ConfiguratorSuite
+import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite
 import org.codice.ddf.admin.api.FieldProvider
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.internal.admin.configurator.actions.FeatureActions

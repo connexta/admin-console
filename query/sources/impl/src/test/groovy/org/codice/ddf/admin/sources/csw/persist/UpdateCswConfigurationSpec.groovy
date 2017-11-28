@@ -14,7 +14,7 @@
 package org.codice.ddf.admin.sources.csw.persist
 
 import ddf.catalog.source.Source
-import org.codice.ddf.admin.api.ConfiguratorSuite
+import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite
 import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.configurator.Configurator

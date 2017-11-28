@@ -32,7 +32,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.lang.StringUtils;
-import org.codice.ddf.admin.api.ConfiguratorSuite;
+import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite;
 import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.services.ServiceCommons;
 import org.codice.ddf.admin.ldap.fields.config.LdapConfigurationField;

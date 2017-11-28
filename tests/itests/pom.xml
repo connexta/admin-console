@@ -64,6 +64,13 @@
             <type>xml</type>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>ddf.admin</groupId>
+            <artifactId>admin-app</artifactId>
+            <version>${ddf.version}</version>
+            <classifier>features</classifier>
+            <type>xml</type>
+        </dependency>
         <!--Feature file dependencies end-->
 
         <!--ddf dependencies-->

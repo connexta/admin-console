@@ -15,7 +15,7 @@ package org.codice.ddf.admin.sources.opensearch;
 
 import com.google.common.collect.ImmutableList;
 import java.util.List;
-import org.codice.ddf.admin.api.ConfiguratorSuite;
+import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.function.BaseFieldProvider;
 import org.codice.ddf.admin.sources.opensearch.discover.DiscoverOpenSearchSource;

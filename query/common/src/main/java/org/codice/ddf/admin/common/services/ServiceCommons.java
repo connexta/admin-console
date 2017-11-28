@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.apache.commons.lang.text.StrSubstitutor;
-import org.codice.ddf.admin.api.ConfiguratorSuite;
+import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite;
 import org.codice.ddf.admin.api.Events;
 import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.api.report.Report;

@@ -15,7 +15,6 @@ package org.codice.ddf.admin.sources.csw;
 
 import com.google.common.collect.ImmutableList;
 import java.util.List;
-import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.function.BaseFieldProvider;
 import org.codice.ddf.admin.sources.csw.discover.DiscoverCswSource;
@@ -23,6 +22,7 @@ import org.codice.ddf.admin.sources.csw.discover.GetCswConfigurations;
 import org.codice.ddf.admin.sources.csw.persist.CreateCswConfiguration;
 import org.codice.ddf.admin.sources.csw.persist.DeleteCswConfiguration;
 import org.codice.ddf.admin.sources.csw.persist.UpdateCswConfiguration;
+import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite;
 
 public class CswFieldProvider extends BaseFieldProvider {
 

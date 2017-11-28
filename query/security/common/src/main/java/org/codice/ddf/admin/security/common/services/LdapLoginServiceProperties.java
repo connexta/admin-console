@@ -14,7 +14,7 @@
 package org.codice.ddf.admin.security.common.services;
 
 import java.util.Map;
-import org.codice.ddf.admin.api.ConfiguratorSuite;
+import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite;
 
 public class LdapLoginServiceProperties {
 

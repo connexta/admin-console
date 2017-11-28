@@ -17,13 +17,13 @@ import ddf.catalog.service.ConfiguredService;
 import ddf.catalog.source.Source;
 import ddf.catalog.util.Describable;
 import java.util.List;
-import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.api.report.Report;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.common.report.Reports;
 import org.codice.ddf.admin.common.services.ServiceCommons;
 import org.codice.ddf.admin.sources.SourceMessages;
+import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite;
 
 public class SourceValidationUtils {
 

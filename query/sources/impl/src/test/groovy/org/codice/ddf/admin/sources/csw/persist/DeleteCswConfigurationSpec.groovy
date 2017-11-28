@@ -13,7 +13,7 @@
  */
 package org.codice.ddf.admin.sources.csw.persist
 
-import org.codice.ddf.admin.api.ConfiguratorSuite
+import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.configurator.Configurator
 import org.codice.ddf.admin.configurator.ConfiguratorFactory

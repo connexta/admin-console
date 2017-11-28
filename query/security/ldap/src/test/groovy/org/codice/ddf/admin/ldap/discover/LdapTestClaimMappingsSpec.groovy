@@ -14,7 +14,7 @@
 package org.codice.ddf.admin.ldap.discover
 
 import com.google.common.collect.ImmutableMap
-import org.codice.ddf.admin.api.ConfiguratorSuite
+import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite
 import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.api.fields.ListField
 import org.codice.ddf.admin.api.report.FunctionReport

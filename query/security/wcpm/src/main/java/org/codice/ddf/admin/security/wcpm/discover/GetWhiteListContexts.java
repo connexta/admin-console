@@ -18,10 +18,10 @@ import static org.codice.ddf.admin.security.common.services.PolicyManagerService
 import com.google.common.collect.ImmutableSet;
 import java.util.List;
 import java.util.Set;
-import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.function.GetFunctionField;
 import org.codice.ddf.admin.common.fields.common.ContextPath;
+import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite;
 
 public class GetWhiteListContexts extends GetFunctionField<ContextPath.ListImpl> {
 

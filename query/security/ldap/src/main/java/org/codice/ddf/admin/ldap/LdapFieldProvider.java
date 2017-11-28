@@ -16,7 +16,6 @@ package org.codice.ddf.admin.ldap;
 import com.google.common.collect.ImmutableList;
 import java.util.Collections;
 import java.util.List;
-import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.function.BaseFieldProvider;
 import org.codice.ddf.admin.ldap.discover.GetLdapConfigurations;
@@ -29,6 +28,7 @@ import org.codice.ddf.admin.ldap.discover.LdapTestDirectorySettings;
 import org.codice.ddf.admin.ldap.discover.LdapUserAttributes;
 import org.codice.ddf.admin.ldap.persist.CreateLdapConfiguration;
 import org.codice.ddf.admin.ldap.persist.DeleteLdapConfiguration;
+import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite;
 
 public class LdapFieldProvider extends BaseFieldProvider {
   public static final String DESCRIPTION = "Facilities for interacting with LDAP servers.";

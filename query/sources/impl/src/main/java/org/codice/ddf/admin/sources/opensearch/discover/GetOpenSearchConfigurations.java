@@ -20,7 +20,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.util.List;
 import java.util.Set;
-import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.api.fields.ListField;
@@ -31,6 +30,7 @@ import org.codice.ddf.admin.common.services.ServiceCommons;
 import org.codice.ddf.admin.sources.fields.type.OpenSearchSourceConfigurationField;
 import org.codice.ddf.admin.sources.opensearch.OpenSearchSourceInfoField;
 import org.codice.ddf.admin.sources.utils.SourceUtilCommons;
+import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite;
 
 public class GetOpenSearchConfigurations
     extends BaseFunctionField<ListField<OpenSearchSourceInfoField>> {

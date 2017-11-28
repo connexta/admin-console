@@ -19,7 +19,7 @@ import java.util.List;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.function.BaseFieldProvider;
 import org.codice.ddf.admin.security.sts.discover.GetStsClaimsFunctionField;
-import org.codice.ddf.internal.admin.configurator.actions.ServiceActions;
+import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite;
 
 public class StsFieldProvider extends BaseFieldProvider {
 
@@ -32,9 +32,9 @@ public class StsFieldProvider extends BaseFieldProvider {
 
   private GetStsClaimsFunctionField getStsClaims;
 
-  public StsFieldProvider(ServiceActions serviceActions) {
+  public StsFieldProvider(ConfiguratorSuite configuratorSuite) {
     super(NAME, TYPE_NAME, DESCRIPTION);
-    getStsClaims = new GetStsClaimsFunctionField(serviceActions);
+    getStsClaims = new GetStsClaimsFunctionField(configuratorSuite.getServiceActions());
   }
 
   @Override

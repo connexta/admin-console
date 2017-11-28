@@ -21,7 +21,6 @@ import com.google.common.collect.ImmutableSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
-import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.common.ContextPath;
@@ -29,6 +28,7 @@ import org.codice.ddf.admin.common.report.message.DefaultMessages;
 import org.codice.ddf.admin.configurator.Configurator;
 import org.codice.ddf.admin.configurator.OperationReport;
 import org.codice.ddf.admin.security.common.services.PolicyManagerServiceProperties;
+import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite;
 
 public class SaveWhitelistContexts extends BaseFunctionField<ContextPath.ListImpl> {
 

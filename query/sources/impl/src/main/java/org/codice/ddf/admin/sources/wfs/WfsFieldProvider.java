@@ -15,7 +15,6 @@ package org.codice.ddf.admin.sources.wfs;
 
 import com.google.common.collect.ImmutableList;
 import java.util.List;
-import org.codice.ddf.admin.api.ConfiguratorSuite;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.function.BaseFieldProvider;
 import org.codice.ddf.admin.sources.wfs.discover.DiscoverWfsSource;
@@ -23,6 +22,7 @@ import org.codice.ddf.admin.sources.wfs.discover.GetWfsConfigurations;
 import org.codice.ddf.admin.sources.wfs.persist.CreateWfsConfiguration;
 import org.codice.ddf.admin.sources.wfs.persist.DeleteWfsConfiguration;
 import org.codice.ddf.admin.sources.wfs.persist.UpdateWfsConfiguration;
+import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite;
 
 public class WfsFieldProvider extends BaseFieldProvider {
 

@@ -27,6 +27,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.comp.test.AbstractComponentTest;
+import org.codice.ddf.admin.comp.test.AdminAppFeatureFile;
 import org.codice.ddf.admin.comp.test.AdminQueryAppFeatureFile;
 import org.codice.ddf.admin.comp.test.ComponentTestFeatureFile;
 import org.codice.ddf.admin.comp.test.Feature;
@@ -76,6 +77,7 @@ public class AdminSourcesIT extends AbstractComponentTest {
   public List<Feature> features() {
     return Arrays.asList(
         PlatformAppFeatureFile.featureFile(),
+        AdminAppFeatureFile.featureFile(),
         SecurityAppFeatureFile.featureFile(),
         ComponentTestFeatureFile.thirdPartyFeature().bootFeature(),
         ComponentTestFeatureFile.commonTestDependenciesFeature().bootFeature(),
@@ -85,7 +87,6 @@ public class AdminSourcesIT extends AbstractComponentTest {
         // startFeatures
         ComponentTestFeatureFile.securityAll().bootFeature(),
         ComponentTestFeatureFile.catalogCoreApiFeature().bootFeature(),
-        ComponentTestFeatureFile.configuratorFeature(),
         ComponentTestFeatureFile.configSecurityPolicy(),
         ComponentTestFeatureFile.spatialWfs20Source(),
         ComponentTestFeatureFile.spatialWfs10Source(),

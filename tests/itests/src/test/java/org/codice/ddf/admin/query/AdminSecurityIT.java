@@ -26,6 +26,7 @@ import java.util.Map;
 import org.codice.ddf.admin.api.fields.EnumValue;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
 import org.codice.ddf.admin.comp.test.AbstractComponentTest;
+import org.codice.ddf.admin.comp.test.AdminAppFeatureFile;
 import org.codice.ddf.admin.comp.test.AdminQueryAppFeatureFile;
 import org.codice.ddf.admin.comp.test.ComponentTestFeatureFile;
 import org.codice.ddf.admin.comp.test.Feature;
@@ -99,6 +100,7 @@ public class AdminSecurityIT extends AbstractComponentTest {
     // only have to call our admin-console-app feature
     return Arrays.asList(
         PlatformAppFeatureFile.featureFile(),
+        AdminAppFeatureFile.featureFile(),
         SecurityAppFeatureFile.featureFile(),
         ComponentTestFeatureFile.thirdPartyFeature().bootFeature(),
         ComponentTestFeatureFile.commonTestDependenciesFeature().bootFeature(),
@@ -108,7 +110,6 @@ public class AdminSecurityIT extends AbstractComponentTest {
         // Added a boot feature because the tests need the ServiceManager running before we can
         // startFeatures
         ComponentTestFeatureFile.securityAll().bootFeature(),
-        ComponentTestFeatureFile.configuratorFeature(),
         ComponentTestFeatureFile.configSecurityPolicy(),
         ComponentTestFeatureFile.ldapClaimsHandlerFeature(),
         ComponentTestFeatureFile.ldapLoginFeature(),

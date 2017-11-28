@@ -109,7 +109,7 @@
 
 
     <reference id="configuratorSuite"
-               interface="org.codice.ddf.admin.api.ConfiguratorSuite"
+               interface="org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite"
                availability="mandatory"/>
 
 </blueprint>

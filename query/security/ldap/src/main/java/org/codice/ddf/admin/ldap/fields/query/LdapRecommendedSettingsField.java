@@ -33,7 +33,7 @@ public class LdapRecommendedSettingsField extends BaseObjectField {
 
   private static final String GROUPS_DNS = "groupsDns";
 
-  private static final String USER_NAME_ATTRIBUTES = "userNameAttributes";
+  private static final String LOGIN_USER_ATTRIBUTES = "loginUserAttributes";
 
   private static final String GROUP_OBJECT_CLASSES = "groupObjectClasses";
 
@@ -48,7 +48,7 @@ public class LdapRecommendedSettingsField extends BaseObjectField {
 
   private LdapDistinguishedName.ListImpl groupDns;
 
-  private StringField.ListImpl userNameAttributes;
+  private StringField.ListImpl loginUserAttributes;
 
   private StringField.ListImpl groupObjectClasses;
 
@@ -62,7 +62,7 @@ public class LdapRecommendedSettingsField extends BaseObjectField {
     super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
     userDns = new LdapDistinguishedName.ListImpl(USER_DNS);
     groupDns = new LdapDistinguishedName.ListImpl(GROUPS_DNS);
-    userNameAttributes = new StringField.ListImpl(USER_NAME_ATTRIBUTES);
+    loginUserAttributes = new StringField.ListImpl(LOGIN_USER_ATTRIBUTES);
     groupObjectClasses = new StringField.ListImpl(GROUP_OBJECT_CLASSES);
     groupAttributesHoldingMember = new StringField.ListImpl(GROUP_ATTRIBUTES_HOLDING_MEMBER);
     memberAttributesReferencedInGroup =
@@ -79,8 +79,8 @@ public class LdapRecommendedSettingsField extends BaseObjectField {
     return groupDns;
   }
 
-  public ListField<StringField> userNameAttributesField() {
-    return userNameAttributes;
+  public ListField<StringField> loginUserAttributesField() {
+    return loginUserAttributes;
   }
 
   public ListField<StringField> groupObjectClassesField() {
@@ -110,8 +110,8 @@ public class LdapRecommendedSettingsField extends BaseObjectField {
     return this;
   }
 
-  public LdapRecommendedSettingsField userNameAttributes(List<String> userNameAttributes) {
-    this.userNameAttributes.setValue(userNameAttributes);
+  public LdapRecommendedSettingsField loginUserAttributes(List<String> loginUserAttributes) {
+    this.loginUserAttributes.setValue(loginUserAttributes);
     return this;
   }
 
@@ -142,7 +142,7 @@ public class LdapRecommendedSettingsField extends BaseObjectField {
     return ImmutableList.of(
         userDns,
         groupDns,
-        userNameAttributes,
+        loginUserAttributes,
         groupObjectClasses,
         groupAttributesHoldingMember,
         memberAttributesReferencedInGroup,

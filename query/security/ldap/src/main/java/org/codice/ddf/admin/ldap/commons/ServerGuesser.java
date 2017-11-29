@@ -121,7 +121,7 @@ public abstract class ServerGuesser {
     }
   }
 
-  public List<String> getUserNameAttribute() {
+  public List<String> getLoginUserAttribute() {
     return ImmutableList.of("uid");
   }
 
@@ -264,7 +264,7 @@ public abstract class ServerGuesser {
     }
 
     @Override
-    public List<String> getUserNameAttribute() {
+    public List<String> getLoginUserAttribute() {
       return Collections.singletonList("sAMAccountName");
     }
 

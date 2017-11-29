@@ -89,7 +89,7 @@ class LdapTestClaimMappingsSpec extends Specification {
 
         // Initialize bad paths
         baseMsg = [LdapTestClaimMappings.FIELD_NAME]
-        badPaths = [badOrMissingUserNameAttrPath: baseMsg + [LdapDirectorySettingsField.USER_NAME_ATTRIBUTE],
+        badPaths = [badOrMissingLoginUserAttrPath: baseMsg + [LdapDirectorySettingsField.LOGIN_USER_ATTRIBUTE],
                     missingUserPath             : baseMsg + [LdapDirectorySettingsField.BASE_USER_DN],
                     missingHostPath             : baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME, HostnameField.DEFAULT_FIELD_NAME],
                     missingPortPath             : baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME, PortField.DEFAULT_FIELD_NAME],
@@ -126,7 +126,7 @@ class LdapTestClaimMappingsSpec extends Specification {
 
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME)   : noEncryptionLdapConnectionInfo().getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)      : simpleBindInfo().getValue(),
-                (LdapTestClaimMappings.USER_NAME_ATTRIBUTE): userAttribute.getValue(),
+                (LdapTestClaimMappings.LOGIN_USER_ATTRIBUTE): userAttribute.getValue(),
                 (LdapTestClaimMappings.BASE_USER_DN)       : baseDn.getValue(),
                 (CLAIMS_MAPPING)                           : createClaimsMapping(ImmutableMap.of("claim1", "cn")).getValue()]
 
@@ -147,7 +147,7 @@ class LdapTestClaimMappingsSpec extends Specification {
 
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME)   : noEncryptionLdapConnectionInfo().port(666).getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)      : simpleBindInfo().getValue(),
-                (LdapTestClaimMappings.USER_NAME_ATTRIBUTE): userAttribute.getValue(),
+                (LdapTestClaimMappings.LOGIN_USER_ATTRIBUTE): userAttribute.getValue(),
                 (LdapTestClaimMappings.BASE_USER_DN)       : baseDn.getValue(),
                 (CLAIMS_MAPPING)                           : createClaimsMapping(ImmutableMap.of("claim1", "cn")).getValue()]
 
@@ -166,7 +166,7 @@ class LdapTestClaimMappingsSpec extends Specification {
 
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME)   : noEncryptionLdapConnectionInfo().getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)      : simpleBindInfo().password('badPassword').getValue(),
-                (LdapTestClaimMappings.USER_NAME_ATTRIBUTE): userAttribute.getValue(),
+                (LdapTestClaimMappings.LOGIN_USER_ATTRIBUTE): userAttribute.getValue(),
                 (LdapTestClaimMappings.BASE_USER_DN)       : baseDn.getValue(),
                 (CLAIMS_MAPPING)                           : createClaimsMapping(ImmutableMap.of("claim1", "cn")).getValue()]
 
@@ -186,7 +186,7 @@ class LdapTestClaimMappingsSpec extends Specification {
 
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME)   : noEncryptionLdapConnectionInfo().getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)      : simpleBindInfo().getValue(),
-                (LdapTestClaimMappings.USER_NAME_ATTRIBUTE): userAttribute.getValue(),
+                (LdapTestClaimMappings.LOGIN_USER_ATTRIBUTE): userAttribute.getValue(),
                 (LdapTestClaimMappings.BASE_USER_DN)       : baseDn.getValue(),
                 (CLAIMS_MAPPING)                           : createClaimsMapping(ImmutableMap.of("claim1", "cn")).getValue()]
 
@@ -212,7 +212,7 @@ class LdapTestClaimMappingsSpec extends Specification {
                 "claim3", "sn"))
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME)   : noEncryptionLdapConnectionInfo().getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)      : simpleBindInfo().getValue(),
-                (LdapTestClaimMappings.USER_NAME_ATTRIBUTE): userAttribute.getValue(),
+                (LdapTestClaimMappings.LOGIN_USER_ATTRIBUTE): userAttribute.getValue(),
                 (LdapTestClaimMappings.BASE_USER_DN)       : baseDn.getValue(),
                 (CLAIMS_MAPPING)                           : claimsMapping.getValue()]
 
@@ -239,7 +239,7 @@ class LdapTestClaimMappingsSpec extends Specification {
                 "claim4", "employeetype"))
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME)   : noEncryptionLdapConnectionInfo().getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)      : simpleBindInfo().getValue(),
-                (LdapTestClaimMappings.USER_NAME_ATTRIBUTE): userAttribute.getValue(),
+                (LdapTestClaimMappings.LOGIN_USER_ATTRIBUTE): userAttribute.getValue(),
                 (LdapTestClaimMappings.BASE_USER_DN)       : baseDn.getValue(),
                 (CLAIMS_MAPPING)                           : claimsMapping.getValue()]
 
@@ -270,7 +270,7 @@ class LdapTestClaimMappingsSpec extends Specification {
 
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME)   : noEncryptionLdapConnectionInfo().getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)      : simpleBindInfo().getValue(),
-                (LdapTestClaimMappings.USER_NAME_ATTRIBUTE): userAttribute.getValue(),
+                (LdapTestClaimMappings.LOGIN_USER_ATTRIBUTE): userAttribute.getValue(),
                 (LdapTestClaimMappings.BASE_USER_DN)       : baseDn.getValue(),
                 (CLAIMS_MAPPING)                           : claimsMapping.getValue()]
 
@@ -286,9 +286,9 @@ class LdapTestClaimMappingsSpec extends Specification {
         report.getErrorMessages()*.path as Set == failedPaths
     }
 
-    def 'fail when usernameAttribute format is incorrect'() {
+    def 'fail when loginUserAttribute format is incorrect'() {
         setup:
-        def failedPaths = [badPaths.badOrMissingUserNameAttrPath] as Set
+        def failedPaths = [badPaths.badOrMissingLoginUserAttrPath] as Set
 
         def claimsMapping = createClaimsMapping(ImmutableMap.of("claim1", "sn",
                 "claim2", "cn",
@@ -298,7 +298,7 @@ class LdapTestClaimMappingsSpec extends Specification {
 
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME)   : noEncryptionLdapConnectionInfo().getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)      : simpleBindInfo().getValue(),
-                (LdapTestClaimMappings.USER_NAME_ATTRIBUTE): userAttribute,
+                (LdapTestClaimMappings.LOGIN_USER_ATTRIBUTE): userAttribute,
                 (LdapTestClaimMappings.BASE_USER_DN)       : baseDn.getValue(),
                 (CLAIMS_MAPPING)                           : claimsMapping.getValue()]
 
@@ -322,7 +322,7 @@ class LdapTestClaimMappingsSpec extends Specification {
 
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME)   : noEncryptionLdapConnectionInfo().getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)      : simpleBindInfo().getValue(),
-                (LdapTestClaimMappings.USER_NAME_ATTRIBUTE): userAttribute.getValue(),
+                (LdapTestClaimMappings.LOGIN_USER_ATTRIBUTE): userAttribute.getValue(),
                 (LdapTestClaimMappings.BASE_USER_DN)       : baseDn.getValue(),
                 (CLAIMS_MAPPING)                           : claimsMapping.getValue()]
 

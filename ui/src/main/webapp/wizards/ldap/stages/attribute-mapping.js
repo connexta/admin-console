@@ -153,13 +153,13 @@ class AttributeMapper extends Component {
   }
 }
 
-const testClaimMappings = (conn, info, userNameAttribute, dn, mapping) => ({
+const testClaimMappings = (conn, info, loginUserAttribute, dn, mapping) => ({
   fetchPolicy: 'network-only',
   query: gql`
     query TestClaimMappings(
       $conn: LdapConnection!,
       $info: BindUserInfo!,
-      $userNameAttribute: LdapAttributeName!,
+      $loginUserAttribute: LdapAttributeName!,
       $dn: DistinguishedName!
       $mapping: [ClaimsMapEntry]!
     ) {
@@ -167,14 +167,14 @@ const testClaimMappings = (conn, info, userNameAttribute, dn, mapping) => ({
         testClaimMappings(
           connection: $conn,
           bindInfo: $info,
-          userNameAttribute: $userNameAttribute,
+          loginUserAttribute: $loginUserAttribute,
           baseUserDn: $dn,
           claimsMapping: $mapping
         )
       }
     }
   `,
-  variables: { conn, info, userNameAttribute, dn, mapping }
+  variables: { conn, info, loginUserAttribute, dn, mapping }
 })
 
 const LdapAttributeMappingStage = (props) => {
@@ -229,7 +229,7 @@ const LdapAttributeMappingStage = (props) => {
     realm: configs.bindRealm
   }
 
-  const userNameAttribute = configs.userNameAttribute
+  const loginUserAttribute = configs.loginUserAttribute
   const dn = configs.baseUserDn
   const mapping = Object.keys(attributeMappings).map((key) => ({ key, value: attributeMappings[key] }))
 
@@ -255,7 +255,7 @@ const LdapAttributeMappingStage = (props) => {
           <Next
             onClick={() => {
               onStartSubmit()
-              client.query(testClaimMappings(conn, info, userNameAttribute, dn, mapping))
+              client.query(testClaimMappings(conn, info, loginUserAttribute, dn, mapping))
                 .then(() => {
                   onEndSubmit()
                   next('confirm')

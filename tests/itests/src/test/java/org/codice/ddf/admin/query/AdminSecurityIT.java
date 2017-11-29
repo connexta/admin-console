@@ -55,6 +55,7 @@ import org.ops4j.pax.exam.spi.reactors.PerClass;
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
 public class AdminSecurityIT extends AbstractComponentTest {
+
   @Override
   public List<Option> customSettings() {
     return super.customSettings();
@@ -155,8 +156,6 @@ public class AdminSecurityIT extends AbstractComponentTest {
   /**
    * For the user's convenience, identical policy bins are collapsed into a single policy bin. This
    * test confirms two policies bins can be persisted and retrieved as a single collapsed policy
-   *
-   * @throws IOException
    */
   @Test
   public void savePolicies() throws IOException {
@@ -261,8 +260,8 @@ public class AdminSecurityIT extends AbstractComponentTest {
     LdapDirectorySettingsField dirSettings =
         new LdapDirectorySettingsField()
             .baseUserDn(TEST_DN)
-            .usernameAttribute(TEST_ATTRIBUTE)
-            .groupAttributeHoldingMember(TEST_ATTRIBUTE)
+            .loginUserAttribute(TEST_ATTRIBUTE)
+            .memberAttributeReferencedInGroup(TEST_ATTRIBUTE)
             .baseGroupDn(TEST_DN)
             .useCase(ldapUseCase.getValue());
 
@@ -270,7 +269,7 @@ public class AdminSecurityIT extends AbstractComponentTest {
         || ldapUseCase
             .getValue()
             .equals(LdapUseCase.AUTHENTICATION_AND_ATTRIBUTE_STORE.getValue())) {
-      dirSettings.groupObjectClass(TEST_ATTRIBUTE).memberAttributeReferencedInGroup(TEST_ATTRIBUTE);
+      dirSettings.groupObjectClass(TEST_ATTRIBUTE).groupAttributeHoldingMember(TEST_ATTRIBUTE);
 
       newConfig.claimMappingsField(
           new ClaimsMapEntry.ListImpl()

@@ -49,7 +49,7 @@ class CreateLdapConfigurationSpec extends Specification {
                         missingUseCasePath     : baseMsg + [LdapDirectorySettingsField.DEFAULT_FIELD_NAME, LdapUseCase.DEFAULT_FIELD_NAME],
                         missingUserPath        : baseMsg + [LdapDirectorySettingsField.DEFAULT_FIELD_NAME, LdapDirectorySettingsField.BASE_USER_DN],
                         missingGroupPath       : baseMsg + [LdapDirectorySettingsField.DEFAULT_FIELD_NAME, LdapDirectorySettingsField.BASE_GROUP_DN],
-                        missingUserNameAttrPath: baseMsg + [LdapDirectorySettingsField.DEFAULT_FIELD_NAME, LdapDirectorySettingsField.USER_NAME_ATTRIBUTE],
+                        missingLoginUserAttrPath: baseMsg + [LdapDirectorySettingsField.DEFAULT_FIELD_NAME, LdapDirectorySettingsField.LOGIN_USER_ATTRIBUTE],
                         missingGroupObjectPath : baseMsg + [LdapDirectorySettingsField.DEFAULT_FIELD_NAME, LdapDirectorySettingsField.GROUP_OBJECT_CLASS],
                         missingGroupAttribPath : baseMsg + [LdapDirectorySettingsField.DEFAULT_FIELD_NAME, LdapDirectorySettingsField.GROUP_ATTRIBUTE_HOLDING_MEMBER],
                         missingMemberAttribPath: baseMsg + [LdapDirectorySettingsField.DEFAULT_FIELD_NAME, LdapDirectorySettingsField.MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP],
@@ -89,7 +89,7 @@ class CreateLdapConfigurationSpec extends Specification {
                                                 authBadPaths.missingUseCasePath,
                                                 authBadPaths.missingUserPath,
                                                 authBadPaths.missingGroupPath,
-                                                authBadPaths.missingUserNameAttrPath] as Set
+                                                authBadPaths.missingLoginUserAttrPath] as Set
     }
 
     def 'fail on missing required fields for attribute store'() {
@@ -113,7 +113,7 @@ class CreateLdapConfigurationSpec extends Specification {
                                                 authBadPaths.missingBindMethodPath,
                                                 authBadPaths.missingUserPath,
                                                 authBadPaths.missingGroupPath,
-                                                authBadPaths.missingUserNameAttrPath,
+                                                authBadPaths.missingLoginUserAttrPath,
                                                 attributeStoreBadPaths.missingGroupAttributeHoldingMemberPath,
                                                 attributeStoreBadPaths.missingGroupObjectClassPath,
                                                 attributeStoreBadPaths.missingMemberAttributeReferencedInGroupPath,

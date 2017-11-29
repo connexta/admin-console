@@ -79,14 +79,14 @@ const ConfirmStage = (props) => {
   }
 
   const settings = {
-    userNameAttribute: configs.userNameAttribute,
+    loginUserAttribute: configs.loginUserAttribute,
+    memberAttributeReferencedInGroup: configs.memberAttributeReferencedInGroup,
     baseUserDn: configs.baseUserDn,
     baseGroupDn: configs.baseGroupDn,
     useCase: configs.ldapUseCase
   }
 
   if (isAttrStore) {
-    settings.memberAttributeReferencedInGroup = configs.memberAttributeReferencedInGroup
     settings.groupObjectClass = configs.groupObjectClass
     settings.groupAttributeHoldingMember = configs.groupAttributeHoldingMember
   }
@@ -121,8 +121,8 @@ const ConfirmStage = (props) => {
               label='Base User DN'
               value={configs.baseUserDn} />
             <Info
-              label='User Name Attribute'
-              value={configs.userNameAttribute} />
+              label='User Login Attribute'
+              value={configs.loginUserAttribute} />
           </Flexbox>
           <Flexbox style={confirmationInfo} flexDirection='column'>
             <Info
@@ -146,7 +146,6 @@ const ConfirmStage = (props) => {
               label='Group Attribute Holding Member References'
               value={configs.groupAttributeHoldingMember} />
             <Info
-              visible={isAttrStore}
               label='Member Attribute Referenced in Groups'
               value={configs.memberAttributeReferencedInGroup} />
           </Flexbox>

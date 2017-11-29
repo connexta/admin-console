@@ -47,7 +47,7 @@
     <ddf.scm.connection.url />
     <junit.version>4.12</junit.version>
     <groovy.version>2.4.7</groovy.version>
-    <ddf.version>2.11.2</ddf.version>
+    <ddf.version>2.11.3-SNAPSHOT</ddf.version>
     <commons-collections.version>3.2.2</commons-collections.version>
     <ddf.support.version>2.3.9</ddf.support.version>
     <guava.version>18.0</guava.version>

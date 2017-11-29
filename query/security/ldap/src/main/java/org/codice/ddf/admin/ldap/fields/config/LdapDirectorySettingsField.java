@@ -30,7 +30,7 @@ public class LdapDirectorySettingsField extends BaseObjectField {
   public static final String DESCRIPTION =
       "Contains information about the LDAP structure and various attributes required to setup.";
 
-  public static final String USER_NAME_ATTRIBUTE = "userNameAttribute";
+  public static final String LOGIN_USER_ATTRIBUTE = "loginUserAttribute";
 
   public static final String BASE_USER_DN = "baseUserDn";
 
@@ -43,7 +43,7 @@ public class LdapDirectorySettingsField extends BaseObjectField {
   public static final String MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP =
       "memberAttributeReferencedInGroup";
 
-  private LdapAttributeName usernameAttribute;
+  private LdapAttributeName loginUserAttribute;
 
   private LdapDistinguishedName baseUserDn;
 
@@ -60,7 +60,7 @@ public class LdapDirectorySettingsField extends BaseObjectField {
   public LdapDirectorySettingsField() {
     super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
 
-    this.usernameAttribute = new LdapAttributeName(USER_NAME_ATTRIBUTE);
+    this.loginUserAttribute = new LdapAttributeName(LOGIN_USER_ATTRIBUTE);
     this.baseUserDn = new LdapDistinguishedName(BASE_USER_DN);
     this.baseGroupDn = new LdapDistinguishedName(BASE_GROUP_DN);
     this.groupObjectClass = new StringField(GROUP_OBJECT_CLASS);
@@ -73,7 +73,7 @@ public class LdapDirectorySettingsField extends BaseObjectField {
   @Override
   public List<Field> getFields() {
     return ImmutableList.of(
-        usernameAttribute,
+        loginUserAttribute,
         baseUserDn,
         baseGroupDn,
         groupObjectClass,
@@ -83,8 +83,8 @@ public class LdapDirectorySettingsField extends BaseObjectField {
   }
 
   // Field getters
-  public LdapAttributeName usernameAttributeField() {
-    return usernameAttribute;
+  public LdapAttributeName loginUserAttributeField() {
+    return loginUserAttribute;
   }
 
   public LdapUseCase useCaseField() {
@@ -124,8 +124,8 @@ public class LdapDirectorySettingsField extends BaseObjectField {
     return groupObjectClass.getValue();
   }
 
-  public String usernameAttribute() {
-    return usernameAttribute.getValue();
+  public String loginUserAttribute() {
+    return loginUserAttribute.getValue();
   }
 
   public String groupAttributeHoldingMember() {
@@ -138,7 +138,7 @@ public class LdapDirectorySettingsField extends BaseObjectField {
 
   public LdapDirectorySettingsField useDefaultRequiredForAuthentication() {
     baseUserDn.isRequired(true);
-    usernameAttribute.isRequired(true);
+    loginUserAttribute.isRequired(true);
     useCase.isRequired(true);
     baseGroupDn.isRequired(true);
     isRequired(true);
@@ -173,8 +173,8 @@ public class LdapDirectorySettingsField extends BaseObjectField {
     return this;
   }
 
-  public LdapDirectorySettingsField usernameAttribute(String usernameAttribute) {
-    this.usernameAttribute.setValue(usernameAttribute);
+  public LdapDirectorySettingsField loginUserAttribute(String loginUserAttribute) {
+    this.loginUserAttribute.setValue(loginUserAttribute);
     return this;
   }
 

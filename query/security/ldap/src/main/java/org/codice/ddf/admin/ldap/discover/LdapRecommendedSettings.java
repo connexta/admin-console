@@ -83,7 +83,7 @@ public class LdapRecommendedSettings extends BaseFunctionField<LdapRecommendedSe
       return new LdapRecommendedSettingsField()
           .userDns(guesser.getUserBaseChoices())
           .groupDns(guesser.getGroupBaseChoices())
-          .userNameAttributes(guesser.getUserNameAttribute())
+          .loginUserAttributes(guesser.getLoginUserAttribute())
           .groupObjectClasses(guesser.getGroupObjectClass())
           .groupAttributesHoldingMember(guesser.getGroupAttributeHoldingMember())
           .memberAttributesReferencedInGroup(guesser.getMemberAttributeReferencedInGroup())

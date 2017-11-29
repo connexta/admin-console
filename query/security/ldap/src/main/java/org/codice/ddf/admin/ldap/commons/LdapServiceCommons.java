@@ -46,6 +46,7 @@ import org.codice.ddf.configuration.PropertyResolver;
 import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite;
 
 public class LdapServiceCommons {
+
   private static final Pattern URI_MATCHER = Pattern.compile("\\w*://.*");
 
   private final ConfiguratorSuite configuratorSuite;
@@ -101,7 +102,7 @@ public class LdapServiceCommons {
           LdapClaimsHandlerServiceProperties.BIND_METHOD, config.bindUserInfoField().bindMethod());
       props.put(
           LdapClaimsHandlerServiceProperties.LOGIN_USER_ATTRIBUTE,
-          config.settingsField().usernameAttribute());
+          config.settingsField().loginUserAttribute());
       props.put(
           LdapClaimsHandlerServiceProperties.USER_BASE_DN, config.settingsField().baseUserDn());
       props.put(
@@ -144,15 +145,11 @@ public class LdapServiceCommons {
 
       ldapStsConfig.put(
           LdapLoginServiceProperties.LOGIN_USER_ATTRIBUTE,
-          config.settingsField().usernameAttribute());
+          config.settingsField().loginUserAttribute());
 
-      // TODO: oconnormi - 10/02/17 The ui needs to be updated to include a field for the group
-      // member user attribute
       ldapStsConfig.put(
           LdapLoginServiceProperties.MEMBERSHIP_USER_ATTRIBUTE,
-          config.settingsField().groupAttributeHoldingMember() == null
-              ? config.settingsField().usernameAttribute()
-              : config.settingsField().groupAttributeHoldingMember());
+          config.settingsField().memberAttributeReferencedInGroup());
 
       ldapStsConfig.put(
           LdapLoginServiceProperties.USER_BASE_DN, config.settingsField().baseUserDn());
@@ -177,15 +174,15 @@ public class LdapServiceCommons {
 
     LdapDirectorySettingsField settings =
         new LdapDirectorySettingsField()
-            .usernameAttribute(
+            .loginUserAttribute(
                 mapValue(props, LdapClaimsHandlerServiceProperties.LOGIN_USER_ATTRIBUTE))
             .baseUserDn(mapValue(props, LdapClaimsHandlerServiceProperties.USER_BASE_DN))
             .baseGroupDn(mapValue(props, LdapClaimsHandlerServiceProperties.GROUP_BASE_DN))
             .groupObjectClass(mapValue(props, LdapClaimsHandlerServiceProperties.OBJECT_CLASS))
             .groupAttributeHoldingMember(
-                mapValue(props, LdapClaimsHandlerServiceProperties.MEMBERSHIP_USER_ATTRIBUTE))
-            .memberAttributeReferencedInGroup(
                 mapValue(props, LdapClaimsHandlerServiceProperties.MEMBER_NAME_ATTRIBUTE))
+            .memberAttributeReferencedInGroup(
+                mapValue(props, LdapClaimsHandlerServiceProperties.MEMBERSHIP_USER_ATTRIBUTE))
             .useCase(ATTRIBUTE_STORE);
 
     Map<String, String> claimMappings = Collections.emptyMap();
@@ -226,8 +223,8 @@ public class LdapServiceCommons {
 
     LdapDirectorySettingsField settings =
         new LdapDirectorySettingsField()
-            .usernameAttribute(mapValue(props, LdapLoginServiceProperties.LOGIN_USER_ATTRIBUTE))
-            .groupAttributeHoldingMember(
+            .loginUserAttribute(mapValue(props, LdapLoginServiceProperties.LOGIN_USER_ATTRIBUTE))
+            .memberAttributeReferencedInGroup(
                 mapValue(props, LdapLoginServiceProperties.MEMBERSHIP_USER_ATTRIBUTE))
             .baseUserDn(mapValue(props, LdapLoginServiceProperties.USER_BASE_DN))
             .baseGroupDn(mapValue(props, LdapLoginServiceProperties.GROUP_BASE_DN))

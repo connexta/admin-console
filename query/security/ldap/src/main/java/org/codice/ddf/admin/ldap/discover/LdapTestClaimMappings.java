@@ -54,7 +54,7 @@ public class LdapTestClaimMappings extends TestFunctionField {
   public static final String DESCRIPTION =
       "Tests whether the attributes mapped to claims exist on users beneath the user base.";
 
-  public static final String USER_NAME_ATTRIBUTE = "userNameAttribute";
+  public static final String LOGIN_USER_ATTRIBUTE = "loginUserAttribute";
 
   public static final String BASE_USER_DN = "baseUserDn";
 
@@ -64,7 +64,7 @@ public class LdapTestClaimMappings extends TestFunctionField {
 
   private LdapBindUserInfo bindInfo;
 
-  private LdapAttributeName usernameAttribute;
+  private LdapAttributeName loginUserAttribute;
 
   private LdapDistinguishedName baseUserDn;
 
@@ -80,7 +80,7 @@ public class LdapTestClaimMappings extends TestFunctionField {
 
     conn = new LdapConnectionField().useDefaultRequired();
     bindInfo = new LdapBindUserInfo().useDefaultRequired();
-    usernameAttribute = new LdapAttributeName(USER_NAME_ATTRIBUTE).isRequired(true);
+    loginUserAttribute = new LdapAttributeName(LOGIN_USER_ATTRIBUTE).isRequired(true);
     baseUserDn = new LdapDistinguishedName(BASE_USER_DN);
     baseUserDn.isRequired(true);
     claimMappings = new ClaimsMapEntry.ListImpl();
@@ -93,7 +93,7 @@ public class LdapTestClaimMappings extends TestFunctionField {
 
   @Override
   public List<Field> getArguments() {
-    return ImmutableList.of(conn, bindInfo, usernameAttribute, baseUserDn, claimMappings);
+    return ImmutableList.of(conn, bindInfo, loginUserAttribute, baseUserDn, claimMappings);
   }
 
   @Override
@@ -185,7 +185,7 @@ public class LdapTestClaimMappings extends TestFunctionField {
         .getLdapQueryResults(
             ldapConnection,
             baseUserDn.getValue(),
-            Filter.and(Filter.present(usernameAttribute.getValue()), Filter.present(mapAttribute))
+            Filter.and(Filter.present(loginUserAttribute.getValue()), Filter.present(mapAttribute))
                 .toString(),
             SearchScope.WHOLE_SUBTREE,
             1)

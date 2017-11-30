@@ -32,7 +32,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.lang.StringUtils;
-import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite;
 import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.services.ServiceCommons;
 import org.codice.ddf.admin.ldap.fields.config.LdapConfigurationField;
@@ -44,6 +43,7 @@ import org.codice.ddf.admin.ldap.fields.connection.LdapEncryptionMethodField;
 import org.codice.ddf.admin.security.common.services.LdapClaimsHandlerServiceProperties;
 import org.codice.ddf.admin.security.common.services.LdapLoginServiceProperties;
 import org.codice.ddf.configuration.PropertyResolver;
+import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite;
 
 public class LdapServiceCommons {
   private static final Pattern URI_MATCHER = Pattern.compile("\\w*://.*");

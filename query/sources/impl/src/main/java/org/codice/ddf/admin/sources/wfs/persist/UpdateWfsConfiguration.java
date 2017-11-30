@@ -20,7 +20,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.util.List;
 import java.util.Set;
-import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite;
 import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
@@ -30,6 +29,7 @@ import org.codice.ddf.admin.common.services.ServiceCommons;
 import org.codice.ddf.admin.sources.SourceMessages;
 import org.codice.ddf.admin.sources.fields.type.WfsSourceConfigurationField;
 import org.codice.ddf.admin.sources.utils.SourceValidationUtils;
+import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite;
 
 public class UpdateWfsConfiguration extends BaseFunctionField<BooleanField> {
 

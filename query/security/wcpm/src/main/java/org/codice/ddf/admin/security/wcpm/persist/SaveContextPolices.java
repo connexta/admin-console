@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite;
 import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
@@ -41,6 +40,7 @@ import org.codice.ddf.admin.security.common.fields.wcpm.ClaimsMapEntry;
 import org.codice.ddf.admin.security.common.fields.wcpm.ContextPolicyBin;
 import org.codice.ddf.admin.security.common.services.PolicyManagerServiceProperties;
 import org.codice.ddf.admin.security.common.services.StsServiceProperties;
+import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite;
 
 public class SaveContextPolices extends BaseFunctionField<ContextPolicyBin.ListImpl> {
 

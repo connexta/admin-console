@@ -13,7 +13,6 @@
  */
 package org.codice.ddf.admin.sources.opensearch.discover;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.util.List;
@@ -98,7 +97,8 @@ public class DiscoverOpenSearchSource
     return ImmutableSet.of(DefaultMessages.CANNOT_CONNECT, DefaultMessages.UNKNOWN_ENDPOINT);
   }
 
-  @VisibleForTesting
+  @SuppressWarnings(
+      "squid:UnusedPrivateMethod" /* For testing purposes only. Groovy can access private methods. */)
   private void setOpenSearchSourceUtils(OpenSearchSourceUtils openSearchSourceUtils) {
     this.openSearchSourceUtils = openSearchSourceUtils;
   }

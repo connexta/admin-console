@@ -13,7 +13,6 @@
  */
 package org.codice.ddf.admin.ldap.discover;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.io.IOException;
@@ -112,7 +111,8 @@ public class LdapRecommendedSettings extends BaseFunctionField<LdapRecommendedSe
         DefaultMessages.CANNOT_CONNECT);
   }
 
-  @VisibleForTesting
+  @SuppressWarnings(
+      "squid:UnusedPrivateMethod" /* For testing purposes only. Groovy can access private methods. */)
   private void setTestingUtils(LdapTestingUtils utils) {
     this.utils = utils;
   }

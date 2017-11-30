@@ -15,7 +15,6 @@ package org.codice.ddf.admin.ldap.discover;
 
 import static org.codice.ddf.admin.ldap.commons.LdapMessages.userAttributeNotFoundError;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.io.IOException;
@@ -192,12 +191,14 @@ public class LdapTestClaimMappings extends TestFunctionField {
         .isEmpty();
   }
 
-  @VisibleForTesting
+  @SuppressWarnings(
+      "squid:UnusedPrivateMethod" /* For testing purposes only. Groovy can access private methods. */)
   private void setTestingUtils(LdapTestingUtils utils) {
     this.utils = utils;
   }
 
-  @VisibleForTesting
+  @SuppressWarnings(
+      "squid:UnusedPrivateMethod" /* For testing purposes only. Groovy can access private methods. */)
   private void setStsServiceProperties(StsServiceProperties stsServiceProperties) {
     this.stsServiceProperties = stsServiceProperties;
   }

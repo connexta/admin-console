@@ -154,17 +154,16 @@ const configInputs = [
     tooltip: 'Distinguished name of the LDAP directory in which users can be found.'
   },
   {
-    key: 'userNameAttribute',
-    optionKey: 'userNameAttributes',
-    label: 'User Name Attribute',
-    tooltip: 'Attribute used to designate the user’s name in LDAP.  Typically uid or cn.'
+    key: 'loginUserAttribute',
+    optionKey: 'loginUserAttributes',
+    label: 'User Login Attribute',
+    tooltip: 'Attribute used to designate the user’s login in LDAP.  Typically uid or cn.'
   },
   {
     key: 'memberAttributeReferencedInGroup',
     optionKey: 'memberAttributesReferencedInGroup',
     label: 'Member Attribute Referenced in Groups',
-    tooltip: 'The attribute of the user entry that, when combined with the Base User DN, forms the reference value, e.g. XXX=jsmith,ou=users,dc=example,dc=com',
-    attrStoreOnly: true
+    tooltip: 'The attribute of the user entry that, when combined with the Base User DN, forms the reference value, e.g. XXX=jsmith,ou=users,dc=example,dc=com'
   },
   {
     key: 'baseGroupDn',
@@ -263,7 +262,7 @@ const DirectorySettings = (props) => {
   }
 
   const settings = {
-    userNameAttribute: configs.userNameAttribute,
+    loginUserAttribute: configs.loginUserAttribute,
     baseUserDn: configs.baseUserDn,
     baseGroupDn: configs.baseGroupDn,
     useCase: configs.ldapUseCase

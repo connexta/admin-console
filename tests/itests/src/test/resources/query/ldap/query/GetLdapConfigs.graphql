@@ -16,7 +16,7 @@ query {
         realm
       }
       directorySettings {
-        userNameAttribute
+        loginUserAttribute
         baseUserDn
         baseGroupDn
         groupObjectClass

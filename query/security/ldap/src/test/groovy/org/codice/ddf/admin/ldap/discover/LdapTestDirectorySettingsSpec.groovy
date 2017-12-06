@@ -69,13 +69,13 @@ class LdapTestDirectorySettingsSpec extends Specification {
                     missingUseCasePath         : baseMsg + [LdapDirectorySettingsField.DEFAULT_FIELD_NAME, LdapUseCase.DEFAULT_FIELD_NAME],
                     missingUserPath            : baseMsg + [LdapDirectorySettingsField.DEFAULT_FIELD_NAME, LdapDirectorySettingsField.BASE_USER_DN],
                     missingGroupPath           : baseMsg + [LdapDirectorySettingsField.DEFAULT_FIELD_NAME, LdapDirectorySettingsField.BASE_GROUP_DN],
-                    missingUserNameAttrPath    : baseMsg + [LdapDirectorySettingsField.DEFAULT_FIELD_NAME, LdapDirectorySettingsField.USER_NAME_ATTRIBUTE],
+                    missingLoginUserAttrPath    : baseMsg + [LdapDirectorySettingsField.DEFAULT_FIELD_NAME, LdapDirectorySettingsField.LOGIN_USER_ATTRIBUTE],
                     missingGroupObjectPath     : baseMsg + [LdapDirectorySettingsField.DEFAULT_FIELD_NAME, LdapDirectorySettingsField.GROUP_OBJECT_CLASS],
                     missingGroupAttribPath     : baseMsg + [LdapDirectorySettingsField.DEFAULT_FIELD_NAME, LdapDirectorySettingsField.GROUP_ATTRIBUTE_HOLDING_MEMBER],
                     missingMemberAttribPath    : baseMsg + [LdapDirectorySettingsField.DEFAULT_FIELD_NAME, LdapDirectorySettingsField.MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP],
                     badUserDnPath              : baseMsg + [LdapDirectorySettingsField.DEFAULT_FIELD_NAME, LdapDirectorySettingsField.BASE_USER_DN],
                     badGroupDnPath             : baseMsg + [LdapDirectorySettingsField.DEFAULT_FIELD_NAME, LdapDirectorySettingsField.BASE_GROUP_DN],
-                    badUserNameAttribFormatPath: baseMsg + [LdapDirectorySettingsField.DEFAULT_FIELD_NAME, LdapDirectorySettingsField.USER_NAME_ATTRIBUTE],
+                    badLoginUserAttribFormatPath: baseMsg + [LdapDirectorySettingsField.DEFAULT_FIELD_NAME, LdapDirectorySettingsField.LOGIN_USER_ATTRIBUTE],
                     badGroupAttribFormatPath   : baseMsg + [LdapDirectorySettingsField.DEFAULT_FIELD_NAME, LdapDirectorySettingsField.GROUP_ATTRIBUTE_HOLDING_MEMBER],
                     badMemberAttribFormatPath  : baseMsg + [LdapDirectorySettingsField.DEFAULT_FIELD_NAME, LdapDirectorySettingsField.MEMBER_ATTRIBUTE_REFERENCED_IN_GROUP]
         ]
@@ -107,7 +107,7 @@ class LdapTestDirectorySettingsSpec extends Specification {
                                                 badPaths.missingUseCasePath,
                                                 badPaths.missingUserPath,
                                                 badPaths.missingGroupPath,
-                                                badPaths.missingUserNameAttrPath] as Set
+                                                badPaths.missingLoginUserAttrPath] as Set
     }
 
     def 'fail on missing required fields for LDAP Attribute Store'() {
@@ -292,14 +292,14 @@ class LdapTestDirectorySettingsSpec extends Specification {
         } == 1
 
         report.getErrorMessages()*.getPath() as Set == [badPaths.badUserDnPath,
-                                                badPaths.missingUserNameAttrPath] as Set
+                                                badPaths.missingLoginUserAttrPath] as Set
         ldapConnectionIsClosed
     }
 
-    def 'fail when the usernameAttribute format is incorrect'() {
+    def 'fail when the loginUserAttribute format is incorrect'() {
         setup:
         def ldapSettings = initLdapSettings(ATTRIBUTE_STORE, true)
-                .usernameAttribute("space & speci@l ch@r@cters")
+                .loginUserAttribute("space & speci@l ch@r@cters")
 
         args = [(LdapConnectionField.DEFAULT_FIELD_NAME)       : noEncryptionLdapConnectionInfo().getValue(),
                 (LdapBindUserInfo.DEFAULT_FIELD_NAME)          : simpleBindInfo().getValue(),
@@ -315,7 +315,7 @@ class LdapTestDirectorySettingsSpec extends Specification {
             it.getCode() == LdapMessages.INVALID_USER_ATTRIBUTE
         } == 1
 
-        report.getErrorMessages()*.getPath() as Set == [badPaths.badUserNameAttribFormatPath] as Set
+        report.getErrorMessages()*.getPath() as Set == [badPaths.badLoginUserAttribFormatPath] as Set
     }
 
     def 'fail when the groupAttributeHoldingMember format is incorrect'() {

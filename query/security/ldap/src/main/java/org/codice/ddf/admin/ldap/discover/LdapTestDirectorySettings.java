@@ -157,13 +157,13 @@ public class LdapTestDirectorySettings extends TestFunctionField {
         utils.getLdapQueryResults(
             ldapConnection,
             settings.baseUserDn(),
-            Filter.present(settings.usernameAttribute()).toString(),
+            Filter.present(settings.loginUserAttribute()).toString(),
             SearchScope.WHOLE_SUBTREE,
             1);
 
     if (baseUsersResults.isEmpty()) {
       addErrorMessage(noUsersInBaseUserDnError(settings.baseUserDnField().getPath()));
-      addErrorMessage(userAttributeNotFoundError(settings.usernameAttributeField().getPath()));
+      addErrorMessage(userAttributeNotFoundError(settings.loginUserAttributeField().getPath()));
     }
   }
 

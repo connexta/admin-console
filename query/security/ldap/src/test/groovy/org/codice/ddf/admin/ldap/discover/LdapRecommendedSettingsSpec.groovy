@@ -149,8 +149,8 @@ class LdapRecommendedSettingsSpec extends Specification {
             it == 'ou=groups,dc=example,dc=com'
         }
 
-        recSettings.userNameAttributesField().value.size() == 1
-        recSettings.userNameAttributesField().value.first() == 'uid'
+        recSettings.loginUserAttributesField().value.size() == 1
+        recSettings.loginUserAttributesField().value.first() == 'uid'
 
         recSettings.groupObjectClassesField().value.collect {
             it.toLowerCase()

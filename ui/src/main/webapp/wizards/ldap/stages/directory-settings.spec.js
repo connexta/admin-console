@@ -30,7 +30,8 @@ describe('<LDAP />', () => {
 
       expect(visible).to.deep.equal([
         'baseUserDn',
-        'userNameAttribute',
+        'loginUserAttribute',
+        'memberAttributeReferencedInGroup',
         'baseGroupDn'
       ])
 
@@ -39,7 +40,6 @@ describe('<LDAP />', () => {
         .map((comp) => comp.prop('id'))
 
       expect(notVisible).to.deep.equal([
-        'memberAttributeReferencedInGroup',
         'groupObjectClass',
         'groupAttributeHoldingMember'
       ])

@@ -56,7 +56,7 @@ public class LdapTestingCommons {
       String useCase, boolean includeAttributeFields) {
     LdapDirectorySettingsField settingsField =
         new LdapDirectorySettingsField()
-            .usernameAttribute("sn")
+            .loginUserAttribute("sn")
             .baseUserDn(LDAP_SERVER_BASE_USER_DN)
             .baseGroupDn(LDAP_SERVER_BASE_GROUP_DN)
             .useCase(useCase);

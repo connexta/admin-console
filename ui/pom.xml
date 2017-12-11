@@ -46,14 +46,8 @@
                         <Web-ContextPath>/admin/hub</Web-ContextPath>
                         <_wab>${project.build.directory}/webapp/</_wab>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-                        <Embed-Dependency>
-                            platform-error-servlet
-                        </Embed-Dependency>
                         <Import-Package>
-                            org.eclipse.jetty.server,
-                            org.eclipse.jetty.server.handler,
-                            org.eclipse.jetty.servlets,
-                            *
+                            org.eclipse.jetty.servlets;version="[9.2.19, 9.2.19]"
                         </Import-Package>
                     </instructions>
                 </configuration>

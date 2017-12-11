@@ -13,7 +13,6 @@
  */
 package org.codice.ddf.admin.sources.wfs.discover;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.util.List;
@@ -95,7 +94,8 @@ public class DiscoverWfsSource extends BaseFunctionField<WfsSourceConfigurationF
     return ImmutableSet.of(DefaultMessages.CANNOT_CONNECT, DefaultMessages.UNKNOWN_ENDPOINT);
   }
 
-  @VisibleForTesting
+  @SuppressWarnings(
+      "squid:UnusedPrivateMethod" /* For testing purposes only. Groovy can access private methods. */)
   private void setWfsSourceUtils(WfsSourceUtils wfsSourceUtils) {
     this.wfsSourceUtils = wfsSourceUtils;
   }

@@ -18,7 +18,6 @@ import static org.codice.ddf.admin.ldap.fields.connection.LdapBindMethod.DigestM
 import static org.codice.ddf.admin.ldap.fields.connection.LdapEncryptionMethodField.LdapsEncryption.LDAPS;
 import static org.codice.ddf.admin.ldap.fields.connection.LdapEncryptionMethodField.StartTlsEncryption.START_TLS;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.io.IOException;
@@ -106,7 +105,8 @@ public class LdapTestBind extends TestFunctionField {
         DefaultMessages.CANNOT_CONNECT);
   }
 
-  @VisibleForTesting
+  @SuppressWarnings(
+      "squid:UnusedPrivateMethod" /* For testing purposes only. Groovy can access private methods. */)
   private void setTestingUtils(LdapTestingUtils utils) {
     this.utils = utils;
   }

@@ -26,6 +26,7 @@ import org.codice.ddf.admin.query.dev.system.discover.GetFeatures;
 import org.codice.ddf.admin.query.dev.system.persist.CreateFeatureDependencyGraph;
 import org.codice.ddf.admin.query.dev.system.persist.CreatePackageDependencyGraph;
 import org.codice.ddf.admin.query.dev.system.persist.CreateServiceDependencyGraph;
+import org.codice.ddf.admin.query.dev.system.persist.GenerateFeatureFiles;
 
 public class DeveloperToolsFieldProvider extends BaseFieldProvider {
 
@@ -41,6 +42,7 @@ public class DeveloperToolsFieldProvider extends BaseFieldProvider {
   private CreateServiceDependencyGraph createServiceDepGraph;
   private CreatePackageDependencyGraph createPkgDepsGraph;
   private CreateFeatureDependencyGraph createFeatureDepsGraph;
+  private GenerateFeatureFiles generateFeatureFiles;
 
   public DeveloperToolsFieldProvider(BundleService bundleService, FeaturesService featuresService) {
     super(FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
@@ -52,6 +54,7 @@ public class DeveloperToolsFieldProvider extends BaseFieldProvider {
     createServiceDepGraph = new CreateServiceDependencyGraph(bundleUtils);
     createPkgDepsGraph = new CreatePackageDependencyGraph(bundleUtils);
     createFeatureDepsGraph = new CreateFeatureDependencyGraph(featureUtils);
+    generateFeatureFiles = new GenerateFeatureFiles(bundleUtils);
   }
 
   @Override
@@ -61,6 +64,6 @@ public class DeveloperToolsFieldProvider extends BaseFieldProvider {
 
   @Override
   public List<FunctionField> getMutationFunctions() {
-    return ImmutableList.of(createServiceDepGraph, createPkgDepsGraph, createFeatureDepsGraph);
+    return ImmutableList.of(createServiceDepGraph, createPkgDepsGraph, createFeatureDepsGraph, generateFeatureFiles);
   }
 }

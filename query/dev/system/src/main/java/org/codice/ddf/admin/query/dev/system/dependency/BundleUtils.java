@@ -13,9 +13,9 @@
  */
 package org.codice.ddf.admin.query.dev.system.dependency;
 
-import com.google.common.annotations.VisibleForTesting;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +46,8 @@ import org.osgi.service.blueprint.reflect.ReferenceMetadata;
 import org.osgi.service.blueprint.reflect.ServiceMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.annotations.VisibleForTesting;
 
 public class BundleUtils {
 
@@ -193,8 +195,18 @@ public class BundleUtils {
     }
   }
 
-  public static Optional<BundleField> getBundleById(List<BundleField> bundles, int id) {
+  public static Optional<BundleField> getBundleById(Collection<BundleField> bundles, int id) {
     return bundles.stream().filter(bundle -> bundle.id().equals(id)).findFirst();
+  }
+
+  public static List<BundleField> getBundlesById(Collection<BundleField> bundles, List<Integer> ids) {
+    return CollectionUtils.isEmpty(ids)
+        ? Collections.emptyList()
+        : ids.stream()
+            .map(id -> getBundleById(bundles, id))
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .collect(Collectors.toList());
   }
 
   private ServiceField createServiceField(ServiceReference ref) {

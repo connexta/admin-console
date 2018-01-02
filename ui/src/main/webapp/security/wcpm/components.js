@@ -144,7 +144,7 @@ const messages = {
   INVALID_CONTEXT_PATH: 'Invalid context path.',
   MISSING_REQUIRED_FIELD: 'A required field is missing.',
   EMPTY_FIELD: 'The provided field cannot be empty.',
-  MISSING_KEY_VALUE: 'The provied mapping is missing value for a key.',
+  MISSING_KEY_VALUE: 'The provided mapping is missing value for a key.',
   INVALID_PORT_RANGE: 'The provided port is out of range.',
   INVALID_HOSTNAME: 'The provided hostname is invalid.',
   FAILED_PERSIST: 'Unable to save changes.',

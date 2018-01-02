@@ -47,7 +47,7 @@ describe('<EditableList />', () => {
   })
   it('should render errors correctly', () => {
     const list = ['a']
-    const errors = ['an error occured']
+    const errors = ['an error occurred']
     const wrapper = shallow(<EditableList errors={errors} list={list} />)
     const field = wrapper.find(TextField).first()
     expect(field.prop('errorText')).to.equal(errors[0])
@@ -96,7 +96,7 @@ describe('<EditableList />', () => {
   })
   it('should render with an immutable List of errors', () => {
     const list = ['a']
-    const errors = List.of('an error occured')
+    const errors = List.of('an error occurred')
     const wrapper = shallow(<EditableList errors={errors} list={list} />)
     const field = wrapper.find(TextField).first()
     expect(field.prop('errorText')).to.equal(errors.get(0))

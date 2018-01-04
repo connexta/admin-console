@@ -18,6 +18,7 @@ import {
 } from 'admin-wizard/inputs'
 
 import { groupErrors } from './errors'
+import {getFriendlyMessage} from 'graphql-errors'
 
 const testConnect = (conn) => ({
   fetchPolicy: 'network-only',
@@ -50,6 +51,8 @@ const NetworkSettings = (props) => {
     'encryption'
   ], props.errors)
 
+  const isPortInvalid = configs.port === undefined || configs.port < 0 || configs.port > 65535
+
   return (
     <div>
       <Mount
@@ -74,7 +77,7 @@ const NetworkSettings = (props) => {
 
         <Port
           value={configs.port}
-          errorText={errors.port}
+          errorText={isPortInvalid ? getFriendlyMessage('INVALID_PORT_RANGE') : errors.port}
           onEdit={onEdit('port')}
           options={[389, 636]} />
 
@@ -87,7 +90,7 @@ const NetworkSettings = (props) => {
 
         <Navigation>
           <Back onClick={prev} />
-          <Next
+          <Next disabled={isPortInvalid}
             onClick={() => {
               onStartSubmit()
               client.query(testConnect({

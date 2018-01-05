@@ -52,7 +52,7 @@ const localEnhancers = {
   options: withOptions
 }
 
-const sharedEnchancers = {
+const sharedEnhancers = {
   configs: withConfigs
 }
 
@@ -88,8 +88,8 @@ export const createWizard = (wizardId, stages, { shared = {} } = {}) => {
       o[stageId] = createSharedEnhancer(shared[name], name)(o[stageId])
     })
 
-    Object.keys(sharedEnchancers).forEach((name) => {
-      o[stageId] = createSharedEnhancer(sharedEnchancers[name], name)(o[stageId])
+    Object.keys(sharedEnhancers).forEach((name) => {
+      o[stageId] = createSharedEnhancer(sharedEnhancers[name], name)(o[stageId])
     })
 
     return o

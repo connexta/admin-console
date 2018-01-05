@@ -228,7 +228,7 @@ const queries = compose(
       })
       .then(onCancel)
       .catch((err) =>
-        onError('An error occured while trying to save the policy', err.graphQLErrors))
+        onError('An error occurred while trying to save the policy', err.graphQLErrors))
     })
   }),
   graphql(saveWhitelistContexts, {
@@ -244,7 +244,7 @@ const queries = compose(
       })
       .then(onCancel)
       .catch((err) =>
-        onError('An error occured while trying to save the whitelist', err.graphQLErrors))
+        onError('An error occurred while trying to save the whitelist', err.graphQLErrors))
     })
   }),
   graphql(Query)

@@ -17,7 +17,7 @@ class EditableList extends Component {
       hintText = 'Add a new item'
     } = this.props
 
-    // immutable.js compatability
+    // immutable.js compatibility
     const len = IL.isList(list) ? list.size : list.length
     const err = (i) => IL.isList(errors) ? errors.get(i) : errors[i]
 

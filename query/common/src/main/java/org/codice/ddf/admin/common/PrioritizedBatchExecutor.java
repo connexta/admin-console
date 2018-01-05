@@ -95,7 +95,7 @@ public class PrioritizedBatchExecutor<T, R> {
   /**
    * Start task execution and blocks until the highest priority task batch has returned a valid
    * result according to the task handler, then cleans up remaining tasks. The current instance of
-   * the {@code PrioritizedBatchExecutor} is not useable after calling {@code getFirst(long,
+   * the {@code PrioritizedBatchExecutor} is not usable after calling {@code getFirst(long,
    * TimeUnit)}.
    *
    * <p>If the {@code totalWaitTime} is exceeded, no result has been found yet, and all batches have

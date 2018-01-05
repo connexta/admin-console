@@ -48,7 +48,7 @@ public class CswSourceInfoField extends BaseObjectField {
     return this;
   }
 
-  public CswSourceInfoField isAvaliable(boolean available) {
+  public CswSourceInfoField isAvailable(boolean available) {
     isAvailable.setValue(available);
     return this;
   }

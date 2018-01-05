@@ -61,7 +61,7 @@ public class AdminSecurityIT extends AbstractComponentTest {
     return super.customSettings();
   }
 
-  // TODO: tbatie - 8/12/17 - Figure out why the SCR bunlde is taking so long
+  // TODO: tbatie - 8/12/17 - Figure out why the SCR bundle is taking so long
 
   // TODO: tbatie - 8/19/17 - Fix port once dynamic port is refactored for general testing
   public static final String GRAPHQL_ENDPOINT = "https://localhost:9993/admin/hub/graphql";

@@ -64,7 +64,7 @@ public class UpdateOpenSearchConfiguration extends BaseFunctionField<BooleanFiel
 
   @Override
   public BooleanField performFunction() {
-    // TODO: 8/23/17 phuffer - Uncommnt once feature starts correctly
+    // TODO: 8/23/17 phuffer - Uncomment once feature starts correctly
     //        Configurator configurator = configuratorSuite.getConfiguratorFactory()
     //                .getConfigurator();
     //        configurator.add(configuratorSuite.getFeatureActions()

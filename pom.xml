@@ -339,11 +339,11 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
                 <!--  We don't want to inherit this *change* to the plugin configuration. -->
-                <!--  Sub modules will still inherit the plugin and the configuration from pluginManagment -->
+                <!--  Sub modules will still inherit the plugin and the configuration from pluginManagement -->
                 <inherited>false</inherited>
                 <executions>
                     <execution>
-                        <!-- Match the execution defined in the pluginManagment and override it-->
+                        <!-- Match the execution defined in the pluginManagement and override it-->
                         <!-- Prev check here. -->
                         <id>checkstyle-check</id>
                         <phase>none</phase>

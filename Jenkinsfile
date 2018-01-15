@@ -34,7 +34,7 @@ pipeline {
                     steps {
                         withMaven(maven: 'Maven 3.5.2', globalMavenSettingsConfig: 'default-global-settings', mavenSettingsConfig: 'codice-maven-settings', mavenOpts: '${LARGE_MVN_OPTS} ${LINUX_MVN_RANDOM}') {
                             // TODO: oconnormi - 01/15/2018 - Re-enable itests once stabilized/fixed
-                            sh 'mvn install -B -nsu $DISABLE_DOWNLOAD_PROGRESS_OPTS' -pl !$ITESTS
+                            sh 'mvn install -B -nsu $DISABLE_DOWNLOAD_PROGRESS_OPTS -pl !$ITESTS'
                         }
                     }
                 }
@@ -44,7 +44,7 @@ pipeline {
                     steps {
                         withMaven(maven: 'Maven 3.5.2', jdk: 'jdk8-latest', globalMavenSettingsConfig: 'default-global-settings', mavenSettingsConfig: 'codice-maven-settings', mavenOpts: '${LARGE_MVN_OPTS}') {
                             // TODO: oconnormi - 01/15/2018 - Re-enable itests once stabilized/fixed
-                            bat 'mvn install -B -nsu %DISABLE_DOWNLOAD_PROGRESS_OPTS%' -pl !%ITESTS%
+                            bat 'mvn install -B -nsu %DISABLE_DOWNLOAD_PROGRESS_OPTS% -pl !%ITESTS%'
                         }
                     }
                 }
@@ -59,7 +59,7 @@ pipeline {
                         withMaven(maven: 'Maven 3.5.2', globalMavenSettingsConfig: 'default-global-settings', mavenSettingsConfig: 'codice-maven-settings', mavenOpts: '${LARGE_MVN_OPTS} ${LINUX_MVN_RANDOM}', options: [artifactsPublisher(disabled: true), dependenciesFingerprintPublisher(disabled: true, includeScopeCompile: false, includeScopeProvided: false, includeScopeRuntime: false, includeSnapshotVersions: false)]) {
                             sh 'mvn install -B -Dfindbugs.skip=true -Dpmd.skip=true -Dcheckstyle.skip=true -DskipTests=true -nsu $DISABLE_DOWNLOAD_PROGRESS_OPTS'
                             // TODO: oconnormi - 01/15/2018 - Re-enable itests once stabilized/fixed
-                            sh 'mvn install -B -Dgib.enabled=true -Dgib.referenceBranch=/refs/remotes/origin/$CHANGE_TARGET -nsu $DISABLE_DOWNLOAD_PROGRESS_OPTS' -pl !ITESTS
+                            sh 'mvn install -B -Dgib.enabled=true -Dgib.referenceBranch=/refs/remotes/origin/$CHANGE_TARGET -nsu $DISABLE_DOWNLOAD_PROGRESS_OPTS -pl !$ITESTS'
                         }
                     }
                 }
@@ -75,7 +75,7 @@ pipeline {
                         withMaven(maven: 'Maven 3.5.2', jdk: 'jdk8-latest', globalMavenSettingsConfig: 'default-global-settings', mavenSettingsConfig: 'codice-maven-settings', mavenOpts: '${LARGE_MVN_OPTS}', options: [artifactsPublisher(disabled: true), dependenciesFingerprintPublisher(disabled: true, includeScopeCompile: false, includeScopeProvided: false, includeScopeRuntime: false, includeSnapshotVersions: false)]) {
                             bat 'mvn install -B -Dfindbugs.skip=true -Dpmd.skip=true -Dcheckstyle.skip=true -DskipTests=true -nsu %DISABLE_DOWNLOAD_PROGRESS_OPTS%'
                             // TODO: oconnormi - 01/15/2018 - Re-enable itests once stabilized/fixed
-                            bat 'mvn install -B -Dgib.enabled=true -Dgib.referenceBranch=/refs/remotes/origin/%CHANGE_TARGET% -nsu %DISABLE_DOWNLOAD_PROGRESS_OPTS%' -pl !%ITESTS%
+                            bat 'mvn install -B -Dgib.enabled=true -Dgib.referenceBranch=/refs/remotes/origin/%CHANGE_TARGET% -nsu %DISABLE_DOWNLOAD_PROGRESS_OPTS% -pl !%ITESTS%'
                         }
                     }
                 }

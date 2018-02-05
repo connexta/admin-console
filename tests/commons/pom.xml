@@ -61,6 +61,11 @@
       <artifactId>accessors-smart</artifactId>
       <version>1.2</version>
     </dependency>
+    <dependency>
+      <groupId>ddf.lib</groupId>
+      <artifactId>test-common</artifactId>
+      <version>${ddf.version}</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

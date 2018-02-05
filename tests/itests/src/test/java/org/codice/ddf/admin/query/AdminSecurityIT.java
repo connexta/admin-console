@@ -44,7 +44,7 @@ import org.codice.ddf.admin.security.common.fields.ldap.LdapUseCase;
 import org.codice.ddf.admin.security.common.fields.wcpm.ClaimsMapEntry;
 import org.codice.ddf.admin.security.common.fields.wcpm.ContextPolicyBin;
 import org.codice.ddf.internal.admin.configurator.actions.ServiceReader;
-import org.codice.ddf.itests.common.annotations.BeforeExam;
+import org.codice.ddf.test.common.annotations.BeforeExam;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Option;

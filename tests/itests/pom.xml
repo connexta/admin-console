@@ -91,6 +91,11 @@
             <version>${ddf.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>ddf.lib</groupId>
+            <artifactId>test-common</artifactId>
+            <version>${ddf.version}</version>
+        </dependency>
         <!--ddf dependencies end-->
 
         <dependency>

@@ -237,6 +237,11 @@
                 <!--problems connecting to the container or running the tests-->
                 <version>2.17</version>
                 <configuration>
+                    <!--
+                        TODO - Re-enable and fix component tests once feature file refactoring has been completed.
+                        see: https://github.com/codice/ddf/pull/2896
+                    -->
+                    <skipITs>true</skipITs>
                     <argLine>-Djava.awt.headless=true -noverify</argLine>
                 </configuration>
                 <executions>

@@ -123,7 +123,7 @@ const DiscoveryStage = (props) => {
                   })
                   .catch((e) => {
                     onEndSubmit()
-                    onError(e)
+                    onError({ graphQLErrors: e })
                   })
               }}
             />

@@ -17,6 +17,9 @@ import java.util.List;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.api.fields.ObjectField;
 
+/**
+ *
+ */
 public interface FieldProvider extends ObjectField {
 
   List<FunctionField> getDiscoveryFunctions();

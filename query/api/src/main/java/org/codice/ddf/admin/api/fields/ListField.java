@@ -17,13 +17,39 @@ import java.util.Collection;
 import java.util.List;
 import org.codice.ddf.admin.api.Field;
 
+// TODO: 2/12/18 phuffer - Investigate getting field's generic type in here
+/**
+ * An ordered list of fields
+ *
+ * @param <T> field sub-type contained by this list
+ */
 public interface ListField<T extends Field> extends Field<List> {
 
+  /**
+   * Creates an entry for this list.
+   *
+   * @return the newly created entry, cannot be null
+   */
   T createListEntry();
 
+  /**
+   * @return this list
+   */
   List<T> getList();
 
+  /**
+   * Adds a field to this list
+   *
+   * @param field the field to add
+   * @return this list
+   */
   ListField<T> add(T field);
 
+  /**
+   * Adds a collection of fields to this list
+   *
+   * @param fields the collection of fields
+   * @return this list
+   */
   ListField<T> addAll(Collection<T> fields);
 }

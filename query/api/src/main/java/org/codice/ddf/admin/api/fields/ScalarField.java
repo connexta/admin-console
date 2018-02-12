@@ -15,8 +15,19 @@ package org.codice.ddf.admin.api.fields;
 
 import org.codice.ddf.admin.api.Field;
 
+// TODO: 2/12/18 phuffer - change S to T
+/**
+ * A field that represents a primitive type.
+ *
+ * @param <S> a {@link ScalarType}
+ */
 public interface ScalarField<S> extends Field<S> {
 
+  /**
+   * This scalars {@link ScalarType}.
+   *
+   * @return the type, cannot be null
+   */
   ScalarType getScalarType();
 
   enum ScalarType {

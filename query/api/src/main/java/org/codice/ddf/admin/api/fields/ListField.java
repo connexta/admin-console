@@ -21,7 +21,7 @@ import org.codice.ddf.admin.api.Field;
 /**
  * An ordered list of fields
  *
- * @param <T> field sub-type contained by this list
+ * @param <T> field type contained by this list
  */
 public interface ListField<T extends Field> extends Field<List> {
 
@@ -33,10 +33,13 @@ public interface ListField<T extends Field> extends Field<List> {
   T createListEntry();
 
   /**
+   * Returns the fields contained in this {@code ListField} in a simple collection.
+   *
    * @return this list
    */
   List<T> getList();
 
+  // TODO: 2/14/18 phuffer - Investigate if anyone is using builder pattern
   /**
    * Adds a field to this list
    *

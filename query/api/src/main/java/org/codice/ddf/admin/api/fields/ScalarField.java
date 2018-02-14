@@ -24,7 +24,7 @@ import org.codice.ddf.admin.api.Field;
 public interface ScalarField<S> extends Field<S> {
 
   /**
-   * This scalars {@link ScalarType}.
+   * This scalar's {@link ScalarType}.
    *
    * @return the type, cannot be null
    */

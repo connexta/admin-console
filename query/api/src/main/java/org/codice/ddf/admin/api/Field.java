@@ -17,11 +17,12 @@ import java.util.List;
 import java.util.Set;
 import org.codice.ddf.admin.api.report.ErrorMessage;
 
+// TODO: 2/14/18 phuffer - Consider overall statement about nullability or using nonnull/notnull
 /**
  * A {@code Field} is a container for a value. It is used by the {@link
  * org.codice.ddf.admin.api.fields.FunctionField} as arguments and return types.
  *
- * @param <T> the type of the value contains by this {@code Field}
+ * @param <T> the type of the value contained by this {@code Field}
  */
 public interface Field<T> {
 
@@ -51,7 +52,7 @@ public interface Field<T> {
   /**
    * Human readable codes describing different errors that can be returned from validation of this
    * field. Good error codes give an accurate description of what went wrong. An example of a good
-   * error code is "MISSING_REQUIRED_FIELD".
+   * error code is "INVALID_PORT_RANGE".
    *
    * @return set of error codes, or empty if there are none
    */
@@ -60,7 +61,7 @@ public interface Field<T> {
   /**
    * Returns the original value contained in this field.
    *
-   * @return the value, cannot be null
+   * @return the value, can be null
    */
   T getValue();
 
@@ -68,7 +69,7 @@ public interface Field<T> {
    * Returns a sanitized value of this field. For example, for a field that represents a password,
    * this method would be called to "mask" the password.
    *
-   * <p>This method should delegate to {@link #getSanitizedValue()} if this field's value does not
+   * <p>This method should delegate to {@link #getValue()} if this field's value does not
    * need to be sanitized.
    *
    * @return the sanitized value, cannot be null
@@ -100,6 +101,7 @@ public interface Field<T> {
    * @param required whether or not this field argument is required
    * @return this field
    */
+  // TODO: 2/14/18 phuffer - Consider renaming to setRequired
   Field<T> isRequired(boolean required);
 
   // TODO: 2/12/18 phuffer - Consider returning a Set<ErrorMessage>
@@ -119,6 +121,7 @@ public interface Field<T> {
    */
   List<Object> getPath();
 
+  // TODO: 2/14/18 phuffer - To ArgumentField as well
   /**
    * Sets the path of this field
    *

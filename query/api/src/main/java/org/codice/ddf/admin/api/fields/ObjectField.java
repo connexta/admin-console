@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import org.codice.ddf.admin.api.Field;
 
+// TODO: 2/14/18 phuffer - Add an example here
 /**
  * A container of {@link Field}s. An {@code ObjectField}'s value is a map of field names to values.
  * The name's of fields contained within this object must have unique names.
@@ -29,6 +30,4 @@ public interface ObjectField extends Field<Map<String, Object>> {
    * @return a {@code List} of this {@code ObjectField}'s {@link Field}s.
    */
   List<Field> getFields();
-
-  // TODO: 2/12/18 phuffer -  Consider overriding Field#getValue() to expand javadoc
 }

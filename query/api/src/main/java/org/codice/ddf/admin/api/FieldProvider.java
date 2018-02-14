@@ -14,15 +14,29 @@
 package org.codice.ddf.admin.api;
 
 import java.util.List;
+
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.api.fields.ObjectField;
 
-/**
- *
- */
+// TODO: 2/14/18 phuffer - Rename this from FieldProvider
+// TODO: 2/14/18 phuffer - Does this really need to extend object field? Is this really a Field?
+/** Provides a list of read-only and mutative functions. */
 public interface FieldProvider extends ObjectField {
 
+  // TODO: 2/14/18 phuffer - Consider renaming to getQueryFunctions() (or something else)
+  /**
+   * Returns a list of functions registered in this provider that perform read-only operations. For
+   * example: retrieving system configurations, testing user input, querying external systems, etc.
+   *
+   * @return list of non-destructive functions, cannot be null
+   */
   List<FunctionField> getDiscoveryFunctions();
 
+  /**
+   * Returns a list of functions registered in this provider that perform mutative operations
+   * (creates, updates, deletes, etc).
+   *
+   * @return list of mutative functions, cannot be null
+   */
   List<FunctionField> getMutationFunctions();
 }

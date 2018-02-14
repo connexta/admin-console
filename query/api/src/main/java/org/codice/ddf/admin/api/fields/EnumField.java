@@ -16,7 +16,16 @@ package org.codice.ddf.admin.api.fields;
 import java.util.List;
 import org.codice.ddf.admin.api.Field;
 
+// TODO: 2/14/18 phuffer - Leave an example here
+/**
+ * A field representing an enumeration.
+ *
+ * @param <S>
+ * @param <T> the type of the fields in this enumeration
+ */
+// TODO: 2/14/18 phuffer - remove T extends EnumValue<S>
 public interface EnumField<S, T extends EnumValue<S>> extends Field<S> {
 
+  // TODO: 2/14/18 phuffer - Replace type T with EnumValue<S>
   List<T> getEnumValues();
 }

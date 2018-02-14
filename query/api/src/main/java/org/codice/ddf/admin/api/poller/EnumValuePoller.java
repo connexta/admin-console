@@ -16,6 +16,14 @@ package org.codice.ddf.admin.api.poller;
 import java.util.List;
 import org.codice.ddf.admin.api.fields.EnumValue;
 
+// TODO: 2/14/18 phuffer - Review this interface for alternatives. Also, is this an SPI or internal?
+/**
+ * Defines a utility API for downstream projects to extend {@link
+ * org.codice.ddf.admin.api.fields.EnumField}s with new values.
+ *
+ * @param <V>
+ * @param <T>
+ */
 public interface EnumValuePoller<V, T> {
 
   List<EnumValue<T>> getEnumValues();

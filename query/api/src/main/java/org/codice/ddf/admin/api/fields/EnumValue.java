@@ -13,11 +13,31 @@
  */
 package org.codice.ddf.admin.api.fields;
 
+/**
+ * Enumeration value contained inside an {@link EnumField}.
+ *
+ * @param <T> the type of this value
+ */
 public interface EnumValue<T> {
 
+  /**
+   * A unique title to identify this enumeration value.
+   *
+   * @return the title, cannot be null
+   */
   String getEnumTitle();
 
+  /**
+   * A human-readable description of this enumeration value.
+   *
+   * @return the description, cannot be null
+   */
   String getDescription();
 
+  /**
+   * The enumeration value.
+   *
+   * @return the value, cannot be null
+   */
   T getValue();
 }

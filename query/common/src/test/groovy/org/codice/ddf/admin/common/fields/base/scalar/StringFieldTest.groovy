@@ -20,9 +20,10 @@ class StringFieldTest extends Specification {
 
     List<Object> FIELD_PATH = [StringField.DEFAULT_STING_FIELD_NAME]
 
-    def 'Empty field error when empty string provided'() {
+    def 'Empty field error when empty string provided for required field'() {
         setup:
         def stringField = new StringField()
+        stringField.isRequired(true)
         stringField.setValue(value)
         stringField.setPath(FIELD_PATH)
 
@@ -38,9 +39,27 @@ class StringFieldTest extends Specification {
         value << ['', ' ']
     }
 
+    def 'No error when empty string provided for optional field'() {
+        setup:
+        def stringField = new StringField()
+        stringField.isRequired(false)
+        stringField.setValue(value)
+        stringField.setPath(FIELD_PATH)
+
+        when:
+        def validationMsgs = stringField.validate()
+
+        then:
+        validationMsgs.size() == 0
+
+        where:
+        value << ['', ' ']
+    }
+
     def 'Returns all the possible error codes correctly'(){
         setup:
         def emptyStringField = new StringField()
+        emptyStringField.isRequired(true)
         emptyStringField.setValue('')
         emptyStringField.setPath(FIELD_PATH)
 

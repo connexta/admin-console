@@ -34,7 +34,7 @@ const InputView = ({ value = '', label, onEdit, message = {}, tooltip, muiTheme,
         errorStyle={messageStyles[type]}
         value={value}
         floatingLabelText={label}
-        onChange={(e) => onEdit(e.target.value)}
+        onChange={(e) => onEdit(e.target.value.replace(/^\s+/g, ''))}
         {...rest} />
       {(tooltip)
         ? (<IconButton style={{position: 'absolute', right: '10px', bottom: '0px'}}

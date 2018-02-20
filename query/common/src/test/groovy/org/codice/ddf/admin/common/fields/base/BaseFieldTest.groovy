@@ -42,7 +42,19 @@ class BaseFieldTest extends Specification {
         validationMsgs.get(0).getPath() == FIELD_PATH
     }
 
-    def 'Missing required field if value is List and is empty'() {
+    def 'No error when optional value is not provided'() {
+        setup:
+        testField.isRequired(false)
+        testField.setValue(null)
+
+        when:
+        def validationMsgs = testField.validate()
+
+        then:
+        validationMsgs.size() == 0
+    }
+
+    def 'Missing required field if required value is List and is empty'() {
         setup:
         testField.isRequired(true)
         testField.setValue([])
@@ -54,6 +66,18 @@ class BaseFieldTest extends Specification {
         validationMsgs.size() == 1
         validationMsgs.get(0).getCode() == DefaultMessages.MISSING_REQUIRED_FIELD
         validationMsgs.get(0).getPath() == FIELD_PATH
+    }
+
+    def 'No error if optional value is List and is empty'() {
+        setup:
+        testField.isRequired(false)
+        testField.setValue([])
+
+        when:
+        def validationMsgs = testField.validate()
+
+        then:
+        validationMsgs.size() == 0
     }
 
     def 'Returns all the possible error codes correctly'(){

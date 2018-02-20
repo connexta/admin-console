@@ -53,7 +53,7 @@ public class ReportImpl<T> implements Report<T> {
   }
 
   @Override
-  public <S> Report<T> addErrorMessages(Report<S> report) {
+  public Report<T> addErrorMessages(Report<?> report) {
     errorMessages.addAll(report.getErrorMessages());
     return this;
   }

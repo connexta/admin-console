@@ -15,4 +15,9 @@ package org.codice.ddf.admin.api.report;
 
 import org.codice.ddf.admin.api.Field;
 
+// TODO: 2/20/18 phuffer - Do we need this? Use Report in FunctionField
+/**
+ * Convenience interface for enforcing return types of {@link
+ * org.codice.ddf.admin.api.fields.FunctionField}s
+ */
 public interface FunctionReport<T extends Field> extends Report<T> {}

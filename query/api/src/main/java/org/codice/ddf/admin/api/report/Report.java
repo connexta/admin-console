@@ -15,20 +15,53 @@ package org.codice.ddf.admin.api.report;
 
 import java.util.List;
 
-/** A Report can contain only errors messages or a result but not both. */
+/**
+ * A report contains the result of an operation or error messages associated with the execution of
+ * the operation. A Report can contain only errors messages or a result, but not both.
+ */
 public interface Report<T> {
 
+  // TODO: 2/20/18 phuffer - Consider removing builder pattern for all these methods
+  /**
+   * Adds an {@link ErrorMessage} to this report.
+   *
+   * @param message the message to add
+   * @return this report
+   */
   Report<T> addErrorMessage(ErrorMessage message);
 
-  <S> Report<T> addErrorMessages(Report<S> report);
+  /**
+   * Copies the error messages from the given {@code report}.
+   *
+   * @param report report to copy error messages from
+   * @return this report
+   */
+  Report<T> addErrorMessages(Report<?> report);
 
+  // TODO: 2/20/18 phuffer - Consider returning Set<ErrorMessage>
+  /**
+   * @return the error messages inside this report
+   */
   List<ErrorMessage> getErrorMessages();
 
+  /**
+   * @return true if there are errors; otherwise, false
+   */
   boolean containsErrorMessages();
 
+  /**
+   * @return the result of this report, or null if there are errors
+   */
   T getResult();
 
+  /**
+   * @param result the result of this report
+   * @return this report
+   */
   Report<T> setResult(T result);
 
+  /**
+   * @return true if this report has a result; otherwise, false
+   */
   boolean isResultPresent();
 }

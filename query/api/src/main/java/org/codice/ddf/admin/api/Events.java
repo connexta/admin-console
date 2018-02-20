@@ -13,10 +13,19 @@
  */
 package org.codice.ddf.admin.api;
 
+/**
+ * OSGi events related to the GraphQL schema.
+ */
 public class Events {
 
+  /**
+   * Event key for refreshing the GraphQL schema.
+   */
   public static final String REFRESH_SCHEMA = "graphql/servlet/REFRESH_SCHEMA";
 
+  /**
+   * Key used to extract reason for event. Typically used for logging.
+   */
   public static final String EVENT_REASON = "EVENT_REASON";
 
   private Events() {}

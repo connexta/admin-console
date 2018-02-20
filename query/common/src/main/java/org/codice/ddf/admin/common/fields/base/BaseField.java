@@ -15,15 +15,23 @@ package org.codice.ddf.admin.common.fields.base;
 
 import static org.codice.ddf.admin.common.report.message.DefaultMessages.missingRequiredFieldError;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
 import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.codice.ddf.admin.common.report.message.DefaultMessages;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+
+/**
+ * Handles common operations for all {@link Field}s that extend this class, such as basic
+ * validation.
+ *
+ * @param <T> type of value contained by this field
+ */
 public abstract class BaseField<T> implements Field<T> {
 
   private String name;
@@ -87,6 +95,14 @@ public abstract class BaseField<T> implements Field<T> {
     return this;
   }
 
+  /**
+   * If this field is required and a value is not present, a {@link
+   * DefaultMessages#MISSING_REQUIRED_FIELD} error will be added to this field's errors. If the
+   * field's value is of type {@code java.util.List}, a {@link
+   * DefaultMessages#MISSING_REQUIRED_FIELD} will be added to this field's errors if it is empty.
+   *
+   * {@inheritDoc}
+   */
   @Override
   @SuppressWarnings("squid:S3923" /* Not combining if and else if statements for clarity */)
   public List<ErrorMessage> validate() {

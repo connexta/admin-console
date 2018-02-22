@@ -12,7 +12,9 @@ export const withConfigs = (Component) => ({ state, setState, props }) => {
 
   const onEdit = (id) => {
     if (typeof id === 'string') {
-      return (value) => setState(state.set(id, value))
+      return (value) => {
+        setState(state.set(id, (typeof value === 'string' && value.trim().length === 0) ? undefined : value))
+      }
     } else if (typeof id === 'object') {
       setState(state.merge(id))
     }

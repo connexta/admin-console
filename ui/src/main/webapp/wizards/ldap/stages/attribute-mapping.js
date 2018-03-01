@@ -15,12 +15,12 @@ import { Select, InputAuto } from 'admin-wizard/inputs'
 import { Card, CardHeader } from 'material-ui/Card'
 
 import {
-  Table,
-  TableBody,
-  TableHeader,
-  TableHeaderColumn,
-  TableRow,
-  TableRowColumn
+    Table,
+    TableBody,
+    TableHeader,
+    TableHeaderColumn,
+    TableRow,
+    TableRowColumn
 } from 'material-ui/Table'
 
 import RaisedButton from 'material-ui/RaisedButton'
@@ -47,21 +47,28 @@ class AttributeMapper extends Component {
   filterUpdateMappings () {
     const {
       onEdit,
+      setMappedErrors,
+      errors,
       configs: {
         attributeMappings = {}
       } = {}
     } = this.props
 
+    const newErrors = errors.slice()
     const filtered = Object.keys(attributeMappings).filter((_, i) => {
-      if (this.state.selected === 'all') {
-        return false
+      const filter = this.state.selected !== 'all' && this.state.selected.indexOf(i) === -1
+
+      if (!filter) {
+        newErrors.splice(i, 1)
       }
+
       return this.state.selected.indexOf(i) === -1
     }).reduce((o, key) => {
       o[key] = attributeMappings[key]
       return o
     }, {})
 
+    setMappedErrors(newErrors)
     onEdit('attributeMappings')(filtered)
     this.setState({ selected: [] })
   }
@@ -177,100 +184,125 @@ const testClaimMappings = (conn, info, loginUserAttribute, dn, mapping) => ({
   variables: { conn, info, loginUserAttribute, dn, mapping }
 })
 
-const LdapAttributeMappingStage = (props) => {
-  const {
-    client,
-    onError,
-    onStartSubmit,
-    onEndSubmit,
-    next,
+class LdapAttributeMappingStage extends Component {
 
-    configs,
-    configs: {
-      attributeMappings = {}
-    } = {},
-    onEdit,
-
-    errors,
-
-    data: { sts = {}, ldap = {} },
-
-    prev
-  } = props
-
-  const keys = [ 'claimsMapping' ]
-
-  const claimErrors = errors
-    .filter((err) => keys.some((key) => err.path.includes(key)))
-    .reduce((acc, err) => {
-      const index = parseInt(err.path[err.path.length - 2])
-      acc[index] = err.message
-      return acc
-    }, [])
-
-  // filter out unique messages
-  const messages = errors.filter((err, i) => {
-    const before = errors.slice(0, i).map((err) => err.message)
-    return !before.includes(err.message)
-  })
-
-  const conn = {
-    hostname: configs.hostname,
-    port: configs.port,
-    encryption: configs.encryption
+  constructor (props) {
+    super(props)
+    this.state = {mappedErrors: []}
   }
 
-  const info = {
-    creds: {
-      username: configs.bindUser,
-      password: configs.bindUserPassword
-    },
-    bindMethod: configs.bindUserMethod,
-    realm: configs.bindRealm
+  setMappedErrors (errors) {
+    this.setState({mappedErrors: errors})
   }
 
-  const loginUserAttribute = configs.loginUserAttribute
-  const dn = configs.baseUserDn
-  const mapping = Object.keys(attributeMappings).map((key) => ({ key, value: attributeMappings[key] }))
+  render () {
+    const {
+            client,
+            onError,
+            onStartSubmit,
+            onEndSubmit,
+            next,
 
-  return (
-    <div>
-      <Title>LDAP User Attribute Mapping</Title>
-      <Description>
-        In order to authorize users, their attributes must be mapped to the Security Token
-        Service (STS) claims. Not all attributes must be mapped but any unmapped attributes
-        will not be used for authorization.
-      </Description>
+            configs,
+            configs: {
+                attributeMappings = {}
+            } = {},
+            onEdit,
 
-      <AttributeMapper
-        errors={claimErrors}
-        onEdit={onEdit}
-        claims={sts.claims}
-        attributes={ldap.userAttributes}
-        configs={configs} />
+            errors,
 
-      <Body>
-        <Navigation>
-          <Back onClick={prev} />
-          <Next
-            onClick={() => {
-              onStartSubmit()
-              client.query(testClaimMappings(conn, info, loginUserAttribute, dn, mapping))
-                .then(() => {
-                  onEndSubmit()
-                  next('confirm')
-                })
-                .catch((err) => {
-                  onEndSubmit()
-                  onError(err)
-                })
-            }}
-            disabled={Object.keys(attributeMappings).length === 0} />
-        </Navigation>
-        {messages.map((msg, i) => <Message key={i} {...msg} />)}
-      </Body>
-    </div>
-  )
+            data: { sts = {}, ldap = {} },
+
+            prev
+        } = this.props
+
+        // filter out unique messages
+    const messages = errors.filter((err, i) => {
+      const before = errors.slice(0, i).map((err) => err.message)
+      return !before.includes(err.message)
+    })
+
+    const conn = {
+      hostname: configs.hostname,
+      port: configs.port,
+      encryption: configs.encryption
+    }
+
+    const info = {
+      creds: {
+        username: configs.bindUser,
+        password: configs.bindUserPassword
+      },
+      bindMethod: configs.bindUserMethod,
+      realm: configs.bindRealm
+    }
+
+    const loginUserAttribute = configs.loginUserAttribute
+    const dn = configs.baseUserDn
+    const mapping = Object.keys(attributeMappings).map((key) => ({ key, value: attributeMappings[key] }))
+
+    return (
+      <div>
+        <Title>LDAP User Attribute Mapping</Title>
+        <Description>
+                In order to authorize users, their attributes must be mapped to the Security Token
+                Service (STS) claims. Not all attributes must be mapped but any unmapped attributes
+                will not be used for authorization.
+              </Description>
+
+        <AttributeMapper
+          errors={this.state.mappedErrors}
+          setMappedErrors={(errs) => this.setMappedErrors(errs)}
+          onEdit={onEdit}
+          claims={sts.claims}
+          attributes={ldap.userAttributes}
+          configs={configs} />
+
+        <Body>
+          <Navigation>
+            <Back onClick={prev} />
+            <Next
+              onClick={() => {
+                onStartSubmit()
+                client.query(testClaimMappings(conn, info, loginUserAttribute, dn, mapping))
+                            .then(() => {
+                              onEndSubmit()
+                              next('confirm')
+                            })
+                            .catch((err) => {
+                              onEndSubmit()
+                              onError(err)
+                              mapTableErrors(err, (errs) => this.setMappedErrors(errs))
+                            })
+              }}
+              disabled={Object.keys(attributeMappings).length === 0} />
+          </Navigation>
+          {messages.map((msg, i) => <Message key={i} {...msg} />)}
+        </Body>
+      </div>
+    )
+  }
+}
+
+const mapTableErrors = (err = {}, setMappedErrors) => {
+  if (Array.isArray(err.graphQLErrors) && err.graphQLErrors.length > 0) {
+    const errors = err.graphQLErrors.map(({ message: code, ...rest }) => ({
+      message: code,
+      ...rest
+    }))
+
+    const keys = [ 'claimsMapping' ]
+
+    const mappedErrors = errors
+            .filter((err) => keys.some((key) => err.path.includes(key)))
+            .reduce((acc, err) => {
+              const index = parseInt(err.path[err.path.length - 2])
+              acc[index] = err.message
+              return acc
+            }, [])
+
+    setMappedErrors(mappedErrors)
+  }
 }
 
 export default graphql(gql`

@@ -435,7 +435,7 @@
                     <plugin>
                         <groupId>org.owasp</groupId>
                         <artifactId>dependency-check-maven</artifactId>
-                        <version>1.4.5</version>
+                        <version>3.0.2</version>
                         <dependencies>
                             <dependency>
                                 <groupId>ddf.support</groupId>
@@ -446,42 +446,43 @@
                         <configuration>
                             <failBuildOnCVSS>7</failBuildOnCVSS>
                             <format>ALL</format>
-                            <suppressionFile>dependency-check-maven-config.xml</suppressionFile>
+                            <suppressionFiles>
+                                <suppressionFile>https://raw.githubusercontent.com/codice/ddf/master/dependency-check-maven-config.xml</suppressionFile>
+                                <suppressionFile>https://raw.githubusercontent.com/codice/ddf-support/master/support-owasp/src/main/resources/dependency-check-maven-config.xml</suppressionFile>
+                                <suppressionFile>dependency-check-maven-config.xml</suppressionFile>
+                            </suppressionFiles>
                             <skipTestScope>true</skipTestScope>
+                            <!--Disabling by plugin maintainer recommendation in https://github.com/jeremylong/DependencyCheck/issues/978#issuecomment-353579332
+                                to speed up OWASP runs, as it is a fairly lengthy analyzer-->
+                            <centralAnalyzerEnabled>false</centralAnalyzerEnabled>
+                            <!--Disable .NET analyzers-->
+                            <nuspecAnalyzerEnabled>false</nuspecAnalyzerEnabled>
+                            <assemblyAnalyzerEnabled>false</assemblyAnalyzerEnabled>
+                            <!--Disable other unneeded analyzers-->
+                            <cmakeAnalyzerEnabled>false</cmakeAnalyzerEnabled>
+                            <cocoapodsAnalyzerEnabled>false</cocoapodsAnalyzerEnabled>
+                            <autoconfAnalyzerEnabled>false</autoconfAnalyzerEnabled>
+                            <rubygemsAnalyzerEnabled>false</rubygemsAnalyzerEnabled>
+                            <!--We have a separate NSP analysis step-->
+                            <nspAnalyzerEnabled>false</nspAnalyzerEnabled>
+                            <!--Analyzes Ruby Gemfile.lock files, not OSGi bundles-->
+                            <bundleAuditAnalyzerEnabled>false</bundleAuditAnalyzerEnabled>
                         </configuration>
                         <executions>
                             <execution>
+                                <id>aggregation</id>
                                 <phase>package</phase>
                                 <goals>
-                                    <goal>check</goal>
+                                    <goal>aggregate</goal>
                                 </goals>
+                                <configuration>
+                                    <outputDirectory>target/OWASP_Reports</outputDirectory>
+                                </configuration>
                             </execution>
                         </executions>
                     </plugin>
                 </plugins>
             </build>
-            <reporting>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-checkstyle-plugin</artifactId>
-                        <configuration>
-                            <skip>true</skip>
-                        </configuration>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.owasp</groupId>
-                        <artifactId>dependency-check-maven</artifactId>
-                        <version>1.2.9</version>
-                        <reportSets>
-                            <reportSet>
-                                <reports>
-                                    <report>aggregate</report>
-                                </reports>
-                            </reportSet>
-                        </reportSets>
-                    </plugin>
-                </plugins>
-            </reporting>
         </profile>
     </profiles>
 

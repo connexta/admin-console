@@ -66,9 +66,9 @@
     </properties>
 
     <scm>
-        <url>https://github.com/connexta/admin-console-beta</url>
-        <connection>scm:git:https://github.com/connexta/admin-console-beta.git</connection>
-        <developerConnection>scm:git:https://github.com/connexta/admin-console-beta.git</developerConnection>
+        <url>https://github.com/connexta/admin-console</url>
+        <connection>scm:git:https://github.com/connexta/admin-console.git</connection>
+        <developerConnection>scm:git:https://github.com/connexta/admin-console.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
     <distributionManagement>

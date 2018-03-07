@@ -34,7 +34,6 @@
     <feature name="admin-query-federation" install="manual" version="${project.version}"
              description="DDF :: Admin Console :: Query :: Federation">
         <feature>admin-query-core</feature>
-        <bundle>mvn:ddf.catalog.core/catalog-core-api/${ddf.version}</bundle>
         <bundle>mvn:org.codice.ddf.admin.query/admin-query-sources-impl/${project.version}</bundle>
     </feature>
 

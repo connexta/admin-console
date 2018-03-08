@@ -1,0 +1,49 @@
+<!--
+/**
+ * Copyright (c) Codice Foundation
+ *
+ * This is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation, either
+ * version 3 of the License, or any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details. A copy of the GNU Lesser General Public License is distributed along with this program and can be found at
+ * <http://www.gnu.org/licenses/lgpl.html>.
+ *
+ **/
+-->
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+
+    <reference id="featureService" interface="org.apache.karaf.features.FeaturesService" availability="mandatory"/>
+
+
+    <service id="csw_source_component" interface="org.codice.ddf.admin.component.api.Component">
+        <bean class="org.codice.ddf.admin.component.impl.CswSourceComponent">
+            <argument ref="featureService"/>
+        </bean>
+    </service>
+
+    <service id="embedded_ldap_component"  interface="org.codice.ddf.admin.component.api.Component">
+        <bean class="org.codice.ddf.admin.component.impl.EmbeddedLdapComponent">
+            <argument ref="featureService"/>
+        </bean>
+    </service>
+
+    <service id="idp_component" interface="org.codice.ddf.admin.component.api.Component">
+        <bean class="org.codice.ddf.admin.component.impl.IdpComponent">
+            <argument ref="featureService"/>
+        </bean>
+    </service>
+
+    <reference-list id="components"
+                    interface="org.codice.ddf.admin.component.api.Component"
+                    availability="optional"
+    >
+    </reference-list>
+
+
+    <service id="componentFieldProvider" interface="org.codice.ddf.admin.api.FieldProvider">
+        <bean class="org.codice.ddf.admin.component.impl.ComponentFieldProvider">
+            <argument ref="components"/>
+        </bean>
+    </service>
+</blueprint>

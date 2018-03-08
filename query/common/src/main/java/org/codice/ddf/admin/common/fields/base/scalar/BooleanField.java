@@ -19,6 +19,12 @@ public class BooleanField extends BaseScalarField<Boolean> {
 
   public static final String DEFAULT_BOOLEAN_FIELD_NAME = "boolean";
 
+  private static final BooleanField RETURN_TYPE = new BooleanField();
+
+  private static final BooleanField FALSE = new BooleanField(false);
+
+  private static final BooleanField TRUE = new BooleanField(false);
+
   public BooleanField(boolean value) {
     this();
     setValue(value);
@@ -34,5 +40,13 @@ public class BooleanField extends BaseScalarField<Boolean> {
 
   protected BooleanField(String fieldName, String fieldTypeName, String description) {
     super(fieldName, fieldTypeName, description, BOOLEAN);
+  }
+
+  public static BooleanField of(boolean value) {
+    return new BooleanField(value);
+  }
+
+  public static BooleanField returnType() {
+    return RETURN_TYPE;
   }
 }

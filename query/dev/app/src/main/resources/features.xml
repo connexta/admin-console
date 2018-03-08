@@ -23,5 +23,20 @@
         <feature>admin-query-graphql</feature>
         <feature>admin-query-ui</feature>
         <bundle>mvn:org.codice.ddf.admin.query/admin-dev-system/${project.version}</bundle>
+
+        <feature>admin-query-component</feature>
+        <feature>admin-query-configurations</feature>
+    </feature>
+
+    <feature name="admin-query-component" version="${project.version}"
+             description="Exposes capabilities of the system.">
+        <bundle>mvn:org.codice.ddf.admin.query/component-api/${project.version}</bundle>
+        <bundle>mvn:org.codice.ddf.admin.query/component-impl/${project.version}</bundle>
+    </feature>
+
+    <feature name="admin-query-configurations" version="${project.version}"
+             description="Exposes configurations of the system.">
+        <bundle>mvn:org.codice.ddf.admin.query/configuration-api/${project.version}</bundle>
+        <bundle>mvn:org.codice.ddf.admin.query/configuration-impl/${project.version}</bundle>
     </feature>
 </features>

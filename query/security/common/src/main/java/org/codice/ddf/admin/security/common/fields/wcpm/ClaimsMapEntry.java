@@ -18,8 +18,10 @@ import static org.codice.ddf.admin.common.report.message.DefaultMessages.missing
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
 import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.codice.ddf.admin.common.fields.base.BaseListField;
@@ -112,6 +114,8 @@ public class ClaimsMapEntry extends BaseObjectField {
 
     public static final String DEFAULT_FIELD_NAME = "claimsMapping";
 
+    public static final ListImpl RETURN_TYPE = new ListImpl();
+
     private Callable<ClaimsMapEntry> newClaimsEntry;
 
     public ListImpl() {
@@ -140,6 +144,27 @@ public class ClaimsMapEntry extends BaseObjectField {
           };
 
       return this;
+    }
+
+    public Map<String, String> toMap() {
+      return getList()
+          .stream()
+          .collect(Collectors.toMap(ClaimsMapEntry::key, ClaimsMapEntry::value));
+    }
+
+    public ListImpl fromMap(Map<String, String> claims) {
+      ListImpl newMapping = new ListImpl();
+      claims
+          .entrySet()
+          .stream()
+          .map(e -> new ClaimsMapEntry().key(e.getKey()).value(e.getValue()))
+          .forEach(newMapping::add);
+
+      return newMapping;
+    }
+
+    public static ListImpl returnType() {
+      return RETURN_TYPE;
     }
   }
 }

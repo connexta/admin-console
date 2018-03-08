@@ -44,13 +44,26 @@ public class StsClaimField extends StringField {
 
     public static final String DEFAULT_FIELD_NAME = "claims";
 
+    private Callable<StsClaimField> createStsClaim;
+
     public ListImpl() {
-      super(DEFAULT_FIELD_NAME);
+      this(DEFAULT_FIELD_NAME);
+    }
+
+    public ListImpl(String fieldName) {
+      super(fieldName);
+      createStsClaim = StsClaimField::new;
     }
 
     @Override
     public Callable<StsClaimField> getCreateListEntryCallable() {
-      return StsClaimField::new;
+      return createStsClaim;
+    }
+
+    @Override
+    public ListImpl useDefaultRequired() {
+      createStsClaim = () -> new StsClaimField().isRequired(true);
+      return this;
     }
   }
 }

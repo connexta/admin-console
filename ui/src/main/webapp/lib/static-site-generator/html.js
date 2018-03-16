@@ -37,7 +37,7 @@ const styles = {
 
 export default ({ assets, children }) => {
   const bundles = assets.filter((asset) => asset.match(/bundle.*js$/))
-    .concat('/admin/iframe-resizer/2.6.2/js/iframeResizer.contentWindow.min.js')
+    .concat('/webjars/iframe-resizer/2.6.2/js/iframeResizer.contentWindow.min.js')
   const css = assets.filter((asset) => asset.match(/.*css$/))
 
   return (

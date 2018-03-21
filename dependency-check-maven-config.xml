@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <suppressions xmlns="https://www.owasp.org/index.php/OWASP_Dependency_Check_Suppression">
-
+    <suppress>
+        <notes>
+            This CVE is related to a graphing library used in a developer utility and is not used in production. The latest version of jgraphx is at 3.4.1.3 .
+            This suppression should be removed once the dependency is upgraded.
+        </notes>
+        <cve>CVE-2017-18197</cve>
+    </suppress>
 </suppressions>

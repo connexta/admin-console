@@ -26,17 +26,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.BaseFunctionField;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
+import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 import org.codice.ddf.admin.common.report.message.DefaultMessages;
 import org.codice.ddf.admin.configurator.Configurator;
 import org.codice.ddf.admin.configurator.OperationReport;
 import org.codice.ddf.admin.ldap.commons.LdapServiceCommons;
 import org.codice.ddf.admin.ldap.fields.config.LdapConfigurationField;
+import org.codice.ddf.admin.security.common.SecurityValidation;
+import org.codice.ddf.admin.security.common.fields.wcpm.ClaimsMapEntry;
 import org.codice.ddf.admin.security.common.services.LdapClaimsHandlerServiceProperties;
 import org.codice.ddf.admin.security.common.services.LdapLoginServiceProperties;
+import org.codice.ddf.admin.security.common.services.StsServiceProperties;
 import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite;
 
 public class CreateLdapConfiguration extends BaseFunctionField<BooleanField> {
@@ -53,11 +58,14 @@ public class CreateLdapConfiguration extends BaseFunctionField<BooleanField> {
 
   private LdapServiceCommons ldapServiceCommons;
 
+  private StsServiceProperties stsServiceProperties;
+
   public CreateLdapConfiguration(ConfiguratorSuite configuratorSuite) {
     super(FIELD_NAME, DESCRIPTION);
     this.configuratorSuite = configuratorSuite;
 
     config = new LdapConfigurationField().useDefaultRequired();
+    stsServiceProperties = new StsServiceProperties();
 
     this.ldapServiceCommons = new LdapServiceCommons(configuratorSuite);
   }
@@ -145,6 +153,18 @@ public class CreateLdapConfiguration extends BaseFunctionField<BooleanField> {
     if (containsErrorMsgs()) {
       return;
     }
+
+    List<StringField> claimArgs =
+        config
+            .claimMappingsField()
+            .getList()
+            .stream()
+            .map(ClaimsMapEntry::claimField)
+            .collect(Collectors.toList());
+
+    addErrorMessages(
+        SecurityValidation.validateStsClaimsExist(
+            claimArgs, configuratorSuite.getServiceActions(), stsServiceProperties));
   }
 
   @Override

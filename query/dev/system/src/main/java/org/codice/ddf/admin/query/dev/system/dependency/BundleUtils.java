@@ -13,7 +13,6 @@
  */
 package org.codice.ddf.admin.query.dev.system.dependency;
 
-import com.google.common.annotations.VisibleForTesting;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -21,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
 import org.apache.aries.blueprint.PassThroughMetadata;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -47,7 +47,24 @@ import org.osgi.service.blueprint.reflect.ServiceMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableMap;
+
 public class BundleUtils {
+
+  public static final Map<Integer, String> STATE_TO_NAME_MAP =
+      new ImmutableMap.Builder<Integer, String>()
+          .put(Bundle.UNINSTALLED, "UNINSTALLED")
+          .put(Bundle.INSTALLED, "INSTALLED")
+          .put(Bundle.RESOLVED, "RESOLVED")
+          .put(Bundle.STARTING, "STARTING")
+          .put(Bundle.STOPPING, "STOPPING")
+          .put(Bundle.ACTIVE, "ACTIVE")
+          .build();
+
+  public static final Map<String, Integer> STATE_TO_VALUE = STATE_TO_NAME_MAP.entrySet()
+          .stream()
+          .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
 
   private static final Logger LOGGER = LoggerFactory.getLogger(BundleUtils.class);
   public static final String BLUEPRINT_BUNDLE_IDENTIFIER =

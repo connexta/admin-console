@@ -62,6 +62,7 @@ export default ({ assets, children }) => {
         </div>
         {bundles.map((name, i) =>
           <script key={i} type='text/javascript' src={name} />)}
+        <script src="https://www.gstatic.com/charts/loader.js"></script>
       </body>
     </html>
   )

@@ -22,6 +22,7 @@
              description="Includes tools strictly for development purposes.">
         <feature>admin-query-graphql</feature>
         <feature>admin-query-ui</feature>
+        <bundle>mvn:io.fastjson/boon/0.34</bundle>
         <bundle>mvn:org.codice.ddf.admin.query/admin-dev-system/${project.version}</bundle>
     </feature>
 </features>

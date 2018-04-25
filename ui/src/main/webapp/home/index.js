@@ -7,6 +7,7 @@ import Paper from 'material-ui/Paper'
 import AccountIcon from 'material-ui/svg-icons/action/account-circle'
 import LanguageIcon from 'material-ui/svg-icons/action/language'
 import VpnLockIcon from 'material-ui/svg-icons/notification/vpn-lock'
+import BugReport from 'material-ui/svg-icons/action/bug-report'
 import muiThemeable from 'material-ui/styles/muiThemeable'
 
 import { expandingTile } from './styles.css'
@@ -77,6 +78,12 @@ const SourcesHomeView = () => (
         title='LDAP Setup Wizard'
         subtitle='Configure LDAP as a login'
         Icon={AccountIcon} />
+
+      <TileLink
+          to='/dev'
+          title='Developer Tools'
+          subtitle='Tools 4 u and me'
+          Icon={BugReport} />
     </Flexbox>
   </div>
 )

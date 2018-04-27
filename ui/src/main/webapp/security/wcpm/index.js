@@ -31,8 +31,10 @@ import {
   getErrors
 } from './reducer'
 
+const id = (v) => v
+
 const NotifyErrors = connect(
-  (state) => ({ message: getNotification(state) }),
+  (root, { rootSelector = id }) => ({ message: getNotification(rootSelector(root)) }),
   { onClose: dismiss }
 )(
   ({ message, onClose }) =>
@@ -49,7 +51,8 @@ import Policy, { PolicyEdit, NewPolicy, validator as policyValidator } from './p
 
 const connector = (key, validator) => {
   return connect(
-    (state, { policies, whitelisted }) => {
+    (root, { policies, whitelisted, rootSelector = id }) => {
+      const state = rootSelector(root)
       const value = getValue(state)
       return {
         [key]: value,
@@ -70,6 +73,7 @@ const insert = (value, index, array) => array.slice(0, index).concat(value, arra
 let WebContextPolicyManager = (props) => {
   const {
     data,
+    rootSelector,
 
     whitelisted = [],
     policies = [],
@@ -90,6 +94,7 @@ let WebContextPolicyManager = (props) => {
       return (
         <ConnectedPolicyEdit
           data={data}
+          rootSelector={rootSelector}
           number={i + 1}
           policies={mergedPolicies}
           whitelisted={whitelisted}
@@ -114,7 +119,10 @@ let WebContextPolicyManager = (props) => {
   const els = [
     !(editing && index === -1)
     ? <Whitelist onEdit={(value) => onEdit(-1, value)} whitelisted={whitelisted} />
-    : <ConnectedWhitelistEdit policies={mergedPolicies} onSave={onSaveWhitelist} />
+    : <ConnectedWhitelistEdit
+      rootSelector={rootSelector}
+      policies={mergedPolicies}
+      onSave={onSaveWhitelist} />
   ].concat(ps)
     .map(applyPanel)
     .map(applyDisabled)
@@ -124,16 +132,19 @@ let WebContextPolicyManager = (props) => {
     <div>
       {els}
       <NewPolicy disabled={editing} onCreate={(value) => onEdit(mergedPolicies.length, value)} />
-      <NotifyErrors />
+      <NotifyErrors rootSelector={rootSelector} />
     </div>
   )
 }
 
 WebContextPolicyManager = connect(
-  (state) => ({
-    editing: isEditing(state),
-    index: editingToken(state)
-  }),
+  (root, { rootSelector = id }) => {
+    const state = rootSelector(root)
+    return {
+      editing: isEditing(state),
+      index: editingToken(state)
+    }
+  },
   (dispatch, { policies = [], whitelisted, onSavePolicy, onSaveWhitelist }) => ({
     onEdit: (...args) => dispatch(edit(...args)),
     onDelete: (index) => {

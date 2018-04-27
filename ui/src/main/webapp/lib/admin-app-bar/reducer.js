@@ -1,4 +1,3 @@
-import sub from 'redux-submarine'
 import { fromJS } from 'immutable'
 
 import defaultTheme from 'themes/defaultTheme'
@@ -15,8 +14,6 @@ const presetThemes = {
   'Solarized Dark': solarizedDarkTheme
 }
 
-export const submarine = sub()
-
 export default (state = fromJS(adminTheme), { type, path, value, themeName }) => {
   switch (type) {
     case 'THEME/SET_COLOR':
@@ -30,4 +27,4 @@ export default (state = fromJS(adminTheme), { type, path, value, themeName }) =>
   }
 }
 
-export const getTheme = (state) => submarine(state).toJS()
+export const getTheme = (state) => state.toJS()

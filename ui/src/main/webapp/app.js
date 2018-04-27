@@ -3,6 +3,12 @@ import { Provider } from 'react-redux'
 import { ApolloProvider } from 'react-apollo'
 import { Router, hashHistory } from 'react-router'
 
+import {
+  getWizard,
+  getWcpm,
+  getTheme
+} from './reducer'
+
 import store from './store'
 import client from './client'
 import Ldap from './wizards/ldap'
@@ -22,10 +28,10 @@ import fonts from 'webpack-fonts'
 const App = ({ children }) => (
   <Provider store={store}>
     <ApolloProvider client={client}>
-      <MuiThemeProvider>
+      <MuiThemeProvider rootSelector={getTheme}>
         <div className={fonts.roboto}>
           <Backdrop>
-            <AdminAppBar />
+            <AdminAppBar rootSelector={(state) => state.get('theme')} />
             <div style={{ maxWidth: 960, margin: '0 auto', padding: '0 20px' }}>{children}</div>
           </Backdrop>
           <DevTools />
@@ -35,14 +41,21 @@ const App = ({ children }) => (
   </Provider>
 )
 
+const SourcesWizard = Sources(ddfSources)
+
 export const routes = {
   path: '/',
   component: App,
   indexRoute: { component: Home },
   childRoutes: [
-    { path: 'ldap', component: Ldap },
-    { path: 'sources', component: Sources(ddfSources) },
-    { path: 'web-context-policy-manager', component: Wcpm },
+    { path: 'ldap', component: () => <Ldap rootSelector={getWizard} /> },
+    {
+      path: 'sources',
+      component: () => {
+        return <SourcesWizard rootSelector={getWizard} />
+      }
+    },
+    { path: 'web-context-policy-manager', component: () => <Wcpm rootSelector={getWcpm} /> },
     { path: 'graphiql', component: GraphiQL }
   ]
 }

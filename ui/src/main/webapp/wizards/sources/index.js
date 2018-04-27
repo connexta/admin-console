@@ -55,4 +55,4 @@ const opts = {
 
 const Wizard = createWizard('sources', stageMapping, opts)
 
-export default (sources) => () => <Wizard sources={sources} />
+export default (sources) => (props) => <Wizard sources={sources} {...props} />

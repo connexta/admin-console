@@ -22,13 +22,13 @@ export default (props) => {
     <Mount key={wizardId} off={clearShared}>
       <Mount key={stageId} off={clearLocal}>
         {(stages[stageId] !== undefined)
-          ? <Component
+          ? <div id={stageId}><Component
             local={local}
             setLocal={setLocal}
             shared={shared}
             setShared={setShared}
             restart={clearShared}
-            {...rest} />
+            {...rest} /></div>
           : <div>Cannot Find stage with id = {stageId}</div>}
       </Mount>
     </Mount>

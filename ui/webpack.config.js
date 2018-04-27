@@ -145,9 +145,6 @@ if (process.env.NODE_ENV === 'production') {
       .concat('./src/main/webapp/app.js')
       .map(function (spec) { return path.resolve(spec) }),
     plugins: [
-      new webpack.DefinePlugin({
-        'process.env.NODE_ENV': '"ci"'
-      }),
       new HtmlWebpackPlugin()
     ],
     module: {
@@ -185,25 +182,34 @@ if (process.env.NODE_ENV === 'production') {
     entry: [
       'stack-source-map/register'
     ].concat(
-      glob.sync('./src/main/webapp/**/*spec.js')
-          .map(function (spec) { return path.resolve(spec) })
-    ),
+      [].concat(
+        glob.sync('./src/main/webapp/**/*spec.js'),
+        glob.sync('./src/main/webapp/**/*e2e.js')
+      ).map(function (spec) { return path.resolve(spec) })
+    ).concat('mocha-html-reporter/register'),
     devServer: {
       noInfo: true,
       contentBase: 'src/main/resources/',
       inline: true,
       compress: true,
       hot: true,
-      host: '0.0.0.0'
+      host: '0.0.0.0',
+      proxy: {
+        '/admin': {
+          target: 'https://localhost:8993',
+          secure: false
+        }
+      }
     },
     plugins: [
       new HtmlWebpackPlugin(),
+      new webpack.NamedModulesPlugin(),
       new webpack.HotModuleReplacementPlugin()
     ],
     module: {
       rules: [
         {
-          test: /spec\.js$/,
+          test: /(spec|e2e)\.js$/,
           use: [
             'mocha-loader',
             path.resolve(__dirname, 'spec-loader.js'),

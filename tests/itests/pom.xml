@@ -49,22 +49,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>ddf.security</groupId>
-            <artifactId>security-services-app</artifactId>
-            <version>${ddf.version}</version>
-            <classifier>features</classifier>
-            <type>xml</type>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>ddf.platform</groupId>
-            <artifactId>platform-app</artifactId>
-            <version>${ddf.version}</version>
-            <classifier>features</classifier>
-            <type>xml</type>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>ddf.admin</groupId>
             <artifactId>admin-app</artifactId>
             <version>${ddf.version}</version>

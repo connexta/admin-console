@@ -111,6 +111,7 @@ public abstract class BaseField<T> implements Field<T> {
     if (isRequired()) {
       if (getValue() == null) {
         errors.add(missingRequiredFieldError(getPath()));
+        // TODO: phuffer - Move this list check to BaseListField
       } else if (getValue() instanceof List && ((List) getValue()).isEmpty()) {
         errors.add(missingRequiredFieldError(getPath()));
       }

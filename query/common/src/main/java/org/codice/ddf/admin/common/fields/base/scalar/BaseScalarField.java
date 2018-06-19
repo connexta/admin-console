@@ -16,6 +16,11 @@ package org.codice.ddf.admin.common.fields.base.scalar;
 import org.codice.ddf.admin.api.fields.ScalarField;
 import org.codice.ddf.admin.common.fields.base.BaseField;
 
+/**
+ * Base class for scalar {@link org.codice.ddf.admin.api.Field} types.
+ *
+ * @param <T>
+ */
 public abstract class BaseScalarField<T> extends BaseField<T> implements ScalarField<T> {
 
   private T value;
@@ -27,6 +32,7 @@ public abstract class BaseScalarField<T> extends BaseField<T> implements ScalarF
     this.scalarType = scalarType;
   }
 
+  @Override
   public T getValue() {
     return value;
   }

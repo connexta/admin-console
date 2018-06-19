@@ -13,8 +13,6 @@
  */
 package org.codice.ddf.admin.common.fields.base;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -22,17 +20,29 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 import org.codice.ddf.admin.api.Field;
 import org.codice.ddf.admin.api.fields.ObjectField;
 import org.codice.ddf.admin.api.report.ErrorMessage;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+
 public abstract class BaseObjectField extends BaseField<Map<String, Object>>
     implements ObjectField {
 
+  /**
+   * Constructor.
+   *
+   * @param fieldName name of this {@link Field}
+   * @param fieldTypeName name of the type of this {@link Field}
+   * @param description description of this {@link Field}
+   */
   public BaseObjectField(String fieldName, String fieldTypeName, String description) {
     super(fieldName, fieldTypeName, description);
   }
 
+  /** @return a map of this object's inner {@link Field}s' names and their values */
   @Override
   public Map<String, Object> getValue() {
     Map<String, Object> values = new HashMap<>();
@@ -41,9 +51,11 @@ public abstract class BaseObjectField extends BaseField<Map<String, Object>>
       values.put(field.getFieldName(), field.getValue());
     }
 
+    // TODO: phuffer - should return immutable map?
     return values;
   }
 
+  /** @return a map of this object's inner {@link Field}s' names and their sanitized values */
   @Override
   public Map<String, Object> getSanitizedValue() {
     Map<String, Object> values = new HashMap<>();
@@ -55,6 +67,11 @@ public abstract class BaseObjectField extends BaseField<Map<String, Object>>
     return values;
   }
 
+  /**
+   * Sets this {@link ObjectField}'s inner {@link Field} and their values.
+   *
+   * @param values a map of inner {@link Field}'s names to their values
+   */
   @Override
   public void setValue(Map<String, Object> values) {
     if (values == null || values.isEmpty()) {
@@ -67,6 +84,12 @@ public abstract class BaseObjectField extends BaseField<Map<String, Object>>
         .forEach(field -> field.setValue(values.get(field.getFieldName())));
   }
 
+  /**
+   * Validates every inner {@link Field} contained within this {@link ObjectField}.
+   *
+   * @return a list containing {@link ErrorMessage} if there were validation errors, otherwise an
+   *     empty list
+   */
   @Override
   public List<ErrorMessage> validate() {
     List<ErrorMessage> validationErrors = super.validate();
@@ -84,6 +107,11 @@ public abstract class BaseObjectField extends BaseField<Map<String, Object>>
     return validationErrors;
   }
 
+  /**
+   * Sets the path of each inner {@link Field} contained within this {@link ObjectField}.
+   *
+   * @param path the path to set on each inner {@link Field}
+   */
   @Override
   public void setPath(List<Object> path) {
     super.setPath(path);
@@ -93,6 +121,12 @@ public abstract class BaseObjectField extends BaseField<Map<String, Object>>
         .forEach(child -> child.setPath(createInnerFieldPath(getPath(), child.getFieldName())));
   }
 
+  /**
+   * Returns a set of error codes containing the union any inner {@link Field}'s error codes and the
+   * error codes from this {@link ObjectField}.
+   *
+   * @return a set of error codes that can be returned by this {@link Field}
+   */
   @Override
   public Set<String> getErrorCodes() {
     return new ImmutableSet.Builder<String>()

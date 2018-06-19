@@ -24,6 +24,9 @@ import org.codice.ddf.admin.api.report.ErrorMessage;
 import org.codice.ddf.admin.common.fields.base.BaseListField;
 import org.codice.ddf.admin.common.report.message.DefaultMessages;
 
+/**
+ * A {@link org.codice.ddf.admin.api.Field} representing a primitive string type.
+ */
 public class StringField extends BaseScalarField<String> {
 
   public static final String DEFAULT_STRING_FIELD_NAME = "string";

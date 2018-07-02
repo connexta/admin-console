@@ -18,6 +18,8 @@ import static org.codice.ddf.admin.common.report.message.DefaultMessages.cannotC
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Map;
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.core.Response;
@@ -183,7 +185,8 @@ public class RequestUtils {
               ? new SecureCxfClientFactory<>(url, clientServiceClass)
               : new SecureCxfClientFactory<>(url, clientServiceClass, username, password);
 
-      webClient = clientFactory.getWebClient();
+      webClient =
+          AccessController.doPrivileged((PrivilegedAction<WebClient>) clientFactory::getWebClient);
     }
 
     public WebClientBuilder queryParams(Map<String, Object> queryParams) {

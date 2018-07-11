@@ -537,7 +537,7 @@
     <feature name="thirdparty" install="manual" version="${project.version}">
         <feature prerequisite="true">wrap</feature>
         <bundle>mvn:ch.qos.cal10n/cal10n-api/0.7.4</bundle>
-        <bundle>mvn:com.google.guava/guava/18.0</bundle>
+        <bundle>mvn:com.google.guava/guava/${guava.version}</bundle>
         <bundle>mvn:com.googlecode.json-simple/json-simple/1.1.1</bundle>
         <bundle>mvn:com.sun.mail/javax.mail/1.5.5</bundle>
         <bundle>mvn:commons-codec/commons-codec/1.10</bundle>
@@ -578,45 +578,45 @@
         <bundle>mvn:org.apache.commons/commons-jexl/2.1.1</bundle>
         <bundle>mvn:org.apache.commons/commons-lang3/3.4</bundle>
         <bundle>mvn:org.apache.cxf.xjc-utils/cxf-xjc-runtime/3.0.5</bundle>
-        <bundle>mvn:org.apache.cxf/cxf-core/3.1.11</bundle>
-        <bundle>mvn:org.apache.cxf/cxf-rt-bindings-coloc/3.1.11</bundle>
-        <bundle>mvn:org.apache.cxf/cxf-rt-bindings-corba/3.1.11</bundle>
-        <bundle>mvn:org.apache.cxf/cxf-rt-bindings-object/3.1.11</bundle>
-        <bundle>mvn:org.apache.cxf/cxf-rt-bindings-soap/3.1.11</bundle>
-        <bundle>mvn:org.apache.cxf/cxf-rt-bindings-xml/3.1.11</bundle>
-        <bundle>mvn:org.apache.cxf/cxf-rt-databinding-aegis/3.1.11</bundle>
-        <bundle>mvn:org.apache.cxf/cxf-rt-databinding-jaxb/3.1.11</bundle>
-        <bundle>mvn:org.apache.cxf/cxf-rt-databinding-xmlbeans/3.1.11</bundle>
-        <bundle>mvn:org.apache.cxf/cxf-rt-features-clustering/3.1.11</bundle>
-        <bundle>mvn:org.apache.cxf/cxf-rt-features-logging/3.1.11</bundle>
-        <bundle>mvn:org.apache.cxf/cxf-rt-features-metrics/3.1.11</bundle>
-        <bundle>mvn:org.apache.cxf/cxf-rt-features-throttling/3.1.11</bundle>
-        <bundle>mvn:org.apache.cxf/cxf-rt-frontend-jaxrs/3.1.11</bundle>
-        <bundle>mvn:org.apache.cxf/cxf-rt-frontend-jaxws/3.1.11</bundle>
-        <bundle>mvn:org.apache.cxf/cxf-rt-frontend-js/3.1.11</bundle>
-        <bundle>mvn:org.apache.cxf/cxf-rt-frontend-simple/3.1.11</bundle>
-        <bundle>mvn:org.apache.cxf/cxf-rt-javascript/3.1.11</bundle>
-        <bundle>mvn:org.apache.cxf/cxf-rt-management/3.1.11</bundle>
-        <bundle>mvn:org.apache.cxf/cxf-rt-rs-client/3.1.11</bundle>
-        <bundle>mvn:org.apache.cxf/cxf-rt-rs-extension-providers/3.1.11</bundle>
-        <bundle>mvn:org.apache.cxf/cxf-rt-rs-extension-search/3.1.11</bundle>
-        <bundle>mvn:org.apache.cxf/cxf-rt-rs-json-basic/3.1.11</bundle>
-        <bundle>mvn:org.apache.cxf/cxf-rt-rs-security-jose/3.1.11</bundle>
-        <bundle>mvn:org.apache.cxf/cxf-rt-rs-security-sso-saml/3.1.11</bundle>
-        <bundle>mvn:org.apache.cxf/cxf-rt-rs-security-xml/3.1.11</bundle>
-        <bundle>mvn:org.apache.cxf/cxf-rt-rs-service-description/3.1.11</bundle>
-        <bundle>mvn:org.apache.cxf/cxf-rt-security-saml/3.1.11</bundle>
-        <bundle>mvn:org.apache.cxf/cxf-rt-security/3.1.11</bundle>
-        <bundle>mvn:org.apache.cxf/cxf-rt-transports-http-jetty/3.1.11</bundle>
-        <bundle>mvn:org.apache.cxf/cxf-rt-transports-http/3.1.11</bundle>
-        <bundle>mvn:org.apache.cxf/cxf-rt-transports-jms/3.1.11</bundle>
-        <bundle>mvn:org.apache.cxf/cxf-rt-transports-local/3.1.11</bundle>
-        <bundle>mvn:org.apache.cxf/cxf-rt-ws-addr/3.1.11</bundle>
-        <bundle>mvn:org.apache.cxf/cxf-rt-ws-mex/3.1.11</bundle>
-        <bundle>mvn:org.apache.cxf/cxf-rt-ws-policy/3.1.11</bundle>
-        <bundle>mvn:org.apache.cxf/cxf-rt-ws-rm/3.1.11</bundle>
-        <bundle>mvn:org.apache.cxf/cxf-rt-ws-security/3.1.11</bundle>
-        <bundle>mvn:org.apache.cxf/cxf-rt-wsdl/3.1.11</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-core/${cxf.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-rt-bindings-coloc/${cxf.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-rt-bindings-corba/${cxf.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-rt-bindings-object/${cxf.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-rt-bindings-soap/${cxf.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-rt-bindings-xml/${cxf.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-rt-databinding-aegis/${cxf.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-rt-databinding-jaxb/${cxf.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-rt-databinding-xmlbeans/${cxf.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-rt-features-clustering/${cxf.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-rt-features-logging/${cxf.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-rt-features-metrics/${cxf.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-rt-features-throttling/${cxf.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-rt-frontend-jaxrs/${cxf.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-rt-frontend-jaxws/${cxf.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-rt-frontend-js/${cxf.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-rt-frontend-simple/${cxf.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-rt-javascript/${cxf.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-rt-management/${cxf.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-rt-rs-client/${cxf.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-rt-rs-extension-providers/${cxf.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-rt-rs-extension-search/${cxf.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-rt-rs-json-basic/${cxf.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-rt-rs-security-jose/${cxf.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-rt-rs-security-sso-saml/${cxf.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-rt-rs-security-xml/${cxf.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-rt-rs-service-description/${cxf.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-rt-security-saml/${cxf.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-rt-security/${cxf.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-rt-transports-http-jetty/${cxf.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-rt-transports-http/${cxf.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-rt-transports-jms/${cxf.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-rt-transports-local/${cxf.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-rt-ws-addr/${cxf.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-rt-ws-mex/${cxf.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-rt-ws-policy/${cxf.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-rt-ws-rm/${cxf.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-rt-ws-security/${cxf.version}</bundle>
+        <bundle>mvn:org.apache.cxf/cxf-rt-wsdl/${cxf.version}</bundle>
         <bundle>mvn:org.apache.felix/org.apache.felix.metatype/1.1.2</bundle>
         <bundle>mvn:org.apache.felix/org.apache.felix.scr.compat/1.0.4</bundle>
         <bundle>mvn:org.apache.felix/org.apache.felix.scr/2.0.8</bundle>

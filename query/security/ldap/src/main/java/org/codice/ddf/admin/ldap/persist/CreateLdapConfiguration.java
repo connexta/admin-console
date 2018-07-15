@@ -22,6 +22,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -130,7 +132,10 @@ public class CreateLdapConfiguration extends BaseFunctionField<BooleanField> {
                   ldapClaimsServiceProps));
     }
 
-    OperationReport report = configurator.commit("Creating LDAP configuration.");
+    OperationReport report =
+        AccessController.doPrivileged(
+            (PrivilegedAction<OperationReport>)
+                () -> configurator.commit("Creating LDAP configuration."));
 
     if (report.containsFailedResults()) {
       addErrorMessage(failedPersistError());

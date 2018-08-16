@@ -29,7 +29,6 @@ import org.codice.ddf.admin.common.services.ServiceCommons;
 import org.codice.ddf.admin.sources.fields.type.WfsSourceConfigurationField;
 import org.codice.ddf.admin.sources.utils.SourceUtilCommons;
 import org.codice.ddf.admin.sources.wfs.WfsSourceInfoField;
-import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite;
 
 public class GetWfsConfigurations extends BaseFunctionField<ListField<WfsSourceInfoField>> {
 
@@ -40,22 +39,18 @@ public class GetWfsConfigurations extends BaseFunctionField<ListField<WfsSourceI
 
   public static final WfsSourceInfoField.ListImpl RETURN_TYPE = new WfsSourceInfoField.ListImpl();
 
+  private final SourceUtilCommons sourceUtilCommons;
+
+  private final ServiceCommons serviceCommons;
+
   private PidField pid;
 
-  private SourceUtilCommons sourceUtilCommons;
-
-  private ServiceCommons serviceCommons;
-
-  private final ConfiguratorSuite configuratorSuite;
-
-  public GetWfsConfigurations(ConfiguratorSuite configuratorSuite) {
+  public GetWfsConfigurations(SourceUtilCommons sourceUtilCommons, ServiceCommons serviceCommons) {
     super(FIELD_NAME, DESCRIPTION);
-    this.configuratorSuite = configuratorSuite;
+    this.sourceUtilCommons = sourceUtilCommons;
+    this.serviceCommons = serviceCommons;
 
     pid = new PidField();
-
-    sourceUtilCommons = new SourceUtilCommons(configuratorSuite);
-    serviceCommons = new ServiceCommons(configuratorSuite);
   }
 
   @Override
@@ -95,7 +90,7 @@ public class GetWfsConfigurations extends BaseFunctionField<ListField<WfsSourceI
 
   @Override
   public FunctionField<ListField<WfsSourceInfoField>> newInstance() {
-    return new GetWfsConfigurations(configuratorSuite);
+    return new GetWfsConfigurations(sourceUtilCommons, serviceCommons);
   }
 
   @Override

@@ -30,7 +30,8 @@ import org.codice.ddf.admin.common.fields.common.CredentialsField;
 import org.codice.ddf.admin.common.fields.common.ResponseField;
 import org.codice.ddf.admin.common.fields.common.UrlField;
 import org.codice.ddf.admin.common.report.Reports;
-import org.codice.ddf.cxf.SecureCxfClientFactory;
+import org.codice.ddf.cxf.client.ClientFactoryFactory;
+import org.codice.ddf.cxf.client.SecureCxfClientFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +40,12 @@ public class RequestUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(RequestUtils.class);
 
   private static final int CLIENT_TIMEOUT_MILLIS = 10000;
+
+  private final ClientFactoryFactory clientFactoryFactory;
+
+  public RequestUtils(ClientFactoryFactory clientFactoryFactory) {
+    this.clientFactoryFactory = clientFactoryFactory;
+  }
 
   /**
    * Creates a secure CXF {@code WebClient} and sends a GET request to the URL given by the
@@ -180,10 +187,12 @@ public class RequestUtils {
 
     private WebClientBuilder(
         String url, String username, String password, Class clientServiceClass) {
+
       SecureCxfClientFactory<WebClient> clientFactory =
           StringUtils.isEmpty(username) || StringUtils.isEmpty(password)
-              ? new SecureCxfClientFactory<>(url, clientServiceClass)
-              : new SecureCxfClientFactory<>(url, clientServiceClass, username, password);
+              ? clientFactoryFactory.getSecureCxfClientFactory(url, clientServiceClass)
+              : clientFactoryFactory.getSecureCxfClientFactory(
+                  url, clientServiceClass, username, password);
 
       webClient =
           AccessController.doPrivileged((PrivilegedAction<WebClient>) clientFactory::getWebClient);

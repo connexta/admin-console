@@ -13,14 +13,16 @@
  **/
 package org.codice.ddf.admin.sources.opensearch.discover
 
-import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite
 import org.codice.ddf.admin.api.Field
 import org.codice.ddf.admin.api.fields.ListField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
+import org.codice.ddf.admin.common.services.ServiceCommons
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.sources.opensearch.OpenSearchSourceInfoField
 import org.codice.ddf.admin.sources.services.OpenSearchServiceProperties
 import org.codice.ddf.admin.sources.test.SourceCommonsSpec
+import org.codice.ddf.admin.sources.utils.SourceUtilCommons
+import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceReader
@@ -64,7 +66,7 @@ class GetOpenSearchConfigsSpec extends SourceCommonsSpec {
         configuratorSuite.serviceReader >> serviceReader
         configuratorSuite.managedServiceActions >> managedServiceActions
 
-        getOpenSearchConfigsFunction = new GetOpenSearchConfigurations(configuratorSuite)
+        getOpenSearchConfigsFunction = new GetOpenSearchConfigurations(new SourceUtilCommons(configuratorSuite), new ServiceCommons(configuratorSuite))
     }
 
     def 'No pid argument returns all configs'() {
@@ -128,7 +130,7 @@ class GetOpenSearchConfigsSpec extends SourceCommonsSpec {
         return true
     }
 
-    def 'Returns all the possible error codes correctly'(){
+    def 'Returns all the possible error codes correctly'() {
         setup:
         args.put(PID, S_PID)
         serviceActions.read(S_PID) >> [:]

@@ -83,8 +83,6 @@ class SourceCommonsSpec extends Specification {
 
     public static final String TEST_SOURCENAME = "testSourceName"
 
-    public static final String TEST_CONTENT_TYPE = 'text/xml'
-
     static Map<String, Object> getBaseDiscoverByAddressArgs(String hostName = 'localhost', int port = 8993) {
         return [
                 (ADDRESS)    : new AddressField().hostname(hostName).port(port).getValue(),
@@ -124,76 +122,10 @@ class SourceCommonsSpec extends Specification {
             (USERNAME)       : TEST_USERNAME
     ]
 
-    static class TestRequestUtils extends RequestUtils {
-
-        RequestUtils.WebClientBuilder webClientBuilder
-
-        Boolean endpointIsReachable
-
-        TestRequestUtils(RequestUtils.WebClientBuilder mockWebClientBuilder, Boolean isReachable) {
-            webClientBuilder = mockWebClientBuilder
-            endpointIsReachable = isReachable
-        }
-
-        TestRequestUtils(RequestUtils.WebClientBuilder mockWebClientBuilder) {
-            webClientBuilder = mockWebClientBuilder
-        }
-
-        @Override
-        public RequestUtils.WebClientBuilder createWebClientBuilder(String url, String username, String password) {
-            return webClientBuilder
-        }
-
-        @Override
-        public RequestUtils.WebClientBuilder createWebClientBuilder(String url, String username, String password, Class serviceClass) {
-            return webClientBuilder
-        }
-
-        @Override
-        public Report<Void> endpointIsReachable(UrlField urlField) {
-            if(endpointIsReachable == null) {
-                return super.endpointIsReachable(urlField)
-            }
-
-            Report report = Reports.emptyReport()
-            if (!endpointIsReachable) {
-                report.addErrorMessage(new ErrorMessageImpl(TEST_ERROR_CODE))
-            }
-            return report
-        }
-    }
-
     def mockReport(boolean hasError) {
         def report = Mock(OperationReport)
         report.containsFailedResults() >> hasError
         return report
-    }
-
-    def createMockWebClientBuilder(int statusCode, String responseBody, String contentType = TEST_CONTENT_TYPE) {
-        def mediaType = Spy(MediaType)
-        mediaType.toString() >> contentType
-
-        def mockResponse = Mock(Response)
-        mockResponse.getStatus() >> statusCode
-        mockResponse.readEntity(String.class) >> responseBody
-        mockResponse.getMediaType() >> mediaType
-
-        def mockWebClient = Mock(WebClient)
-        mockWebClient.get() >> mockResponse
-        mockWebClient.post(_ as Object) >> mockResponse
-
-        def webClientBuilder = Mock(RequestUtils.WebClientBuilder)
-        webClientBuilder.queryParams(_) >> webClientBuilder
-        webClientBuilder.path(_) >> webClientBuilder
-        webClientBuilder.contentType(_) >> webClientBuilder
-        webClientBuilder.accept(_) >> webClientBuilder
-        webClientBuilder.encoding(_) >> webClientBuilder
-        webClientBuilder.acceptEncoding(_) >> webClientBuilder
-        webClientBuilder.header(_, _) >> webClientBuilder
-        webClientBuilder.headers(_) >> webClientBuilder
-        webClientBuilder.build() >> mockWebClient
-
-        return webClientBuilder
     }
 
     /**

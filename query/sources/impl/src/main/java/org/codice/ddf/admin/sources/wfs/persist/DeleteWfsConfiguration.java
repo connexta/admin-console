@@ -24,31 +24,26 @@ import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.common.report.message.DefaultMessages;
 import org.codice.ddf.admin.common.services.ServiceCommons;
-import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite;
 
 public class DeleteWfsConfiguration extends BaseFunctionField<BooleanField> {
 
   public static final String FIELD_NAME = "deleteWfsSource";
 
-  public static final String DESCRIPTION =
+  private static final String DESCRIPTION =
       "Deletes a WFS source configuration specified by the pid.";
 
-  public static final BooleanField RETURN_TYPE = new BooleanField();
+  private static final BooleanField RETURN_TYPE = new BooleanField();
+
+  private final ServiceCommons serviceCommons;
 
   private PidField pid;
 
-  private ServiceCommons serviceCommons;
-
-  private final ConfiguratorSuite configuratorSuite;
-
-  public DeleteWfsConfiguration(ConfiguratorSuite configuratorSuite) {
+  public DeleteWfsConfiguration(ServiceCommons serviceCommons) {
     super(FIELD_NAME, DESCRIPTION);
-    this.configuratorSuite = configuratorSuite;
+    this.serviceCommons = serviceCommons;
 
     pid = new PidField();
     pid.isRequired(true);
-
-    serviceCommons = new ServiceCommons(configuratorSuite);
   }
 
   @Override
@@ -78,7 +73,7 @@ public class DeleteWfsConfiguration extends BaseFunctionField<BooleanField> {
 
   @Override
   public FunctionField<BooleanField> newInstance() {
-    return new DeleteWfsConfiguration(configuratorSuite);
+    return new DeleteWfsConfiguration(serviceCommons);
   }
 
   @Override

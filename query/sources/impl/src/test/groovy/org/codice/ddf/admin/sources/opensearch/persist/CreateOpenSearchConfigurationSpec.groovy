@@ -14,19 +14,17 @@
 package org.codice.ddf.admin.sources.opensearch.persist
 
 import ddf.catalog.source.FederatedSource
-import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite
-import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
+import org.codice.ddf.admin.common.services.ServiceCommons
 import org.codice.ddf.admin.configurator.Configurator
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.sources.SourceMessages
 import org.codice.ddf.admin.sources.fields.type.OpenSearchSourceConfigurationField
 import org.codice.ddf.admin.sources.fields.type.SourceConfigField
 import org.codice.ddf.admin.sources.test.SourceCommonsSpec
-import org.codice.ddf.internal.admin.configurator.actions.FeatureActions
-import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions
-import org.codice.ddf.internal.admin.configurator.actions.ServiceActions
-import org.codice.ddf.internal.admin.configurator.actions.ServiceReader
+import org.codice.ddf.admin.sources.utils.SourceUtilCommons
+import org.codice.ddf.admin.sources.utils.SourceValidationUtils
+import org.codice.ddf.internal.admin.configurator.actions.*
 import org.junit.Ignore
 
 class CreateOpenSearchConfigurationSpec extends SourceCommonsSpec {
@@ -61,6 +59,10 @@ class CreateOpenSearchConfigurationSpec extends SourceCommonsSpec {
 
     FederatedSource federatedSource
 
+    ServiceCommons serviceCommons
+
+    SourceValidationUtils sourceValidationUtils
+
     def federatedSources = []
 
     def setup() {
@@ -83,7 +85,10 @@ class CreateOpenSearchConfigurationSpec extends SourceCommonsSpec {
         configuratorSuite.managedServiceActions >> managedServiceActions
         configuratorSuite.featureActions >> featureActions
 
-        createOpenSearchConfiguration = new CreateOpenSearchConfiguration(configuratorSuite)
+        serviceCommons = new ServiceCommons(configuratorSuite)
+        sourceValidationUtils = new SourceValidationUtils(new SourceUtilCommons(configuratorSuite), serviceCommons)
+
+        createOpenSearchConfiguration = new CreateOpenSearchConfiguration(sourceValidationUtils, serviceCommons)
     }
 
     def 'Successfully create new OpenSearch configuration'() {
@@ -155,12 +160,12 @@ class CreateOpenSearchConfigurationSpec extends SourceCommonsSpec {
         report.getErrorMessages()*.getPath() == [SOURCE_NAME_PATH, ENDPOINT_URL_PATH]
     }
 
-    def 'Returns all the possible error codes correctly'(){
+    def 'Returns all the possible error codes correctly'() {
         setup:
-        CreateOpenSearchConfiguration createDuplicateNameConfig = new CreateOpenSearchConfiguration(configuratorSuite)
+        CreateOpenSearchConfiguration createDuplicateNameConfig = new CreateOpenSearchConfiguration(sourceValidationUtils, serviceCommons)
         serviceReader.getServices(_, _) >> federatedSources
 
-        CreateOpenSearchConfiguration createFailPersistConfig = new CreateOpenSearchConfiguration(configuratorSuite)
+        CreateOpenSearchConfiguration createFailPersistConfig = new CreateOpenSearchConfiguration(sourceValidationUtils, serviceCommons)
         serviceReader.getServices(_, _) >> []
 
         when:

@@ -29,37 +29,33 @@ import org.codice.ddf.admin.common.services.ServiceCommons;
 import org.codice.ddf.admin.sources.SourceMessages;
 import org.codice.ddf.admin.sources.fields.type.OpenSearchSourceConfigurationField;
 import org.codice.ddf.admin.sources.utils.SourceValidationUtils;
-import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite;
 
 public class UpdateOpenSearchConfiguration extends BaseFunctionField<BooleanField> {
 
   public static final String FIELD_NAME = "updateOpenSearchSource";
 
-  public static final String DESCRIPTION =
+  private static final String DESCRIPTION =
       String.format(
           "Updates a OpenSearch source configuration specified by the pid. A password of {%s} acts as a flag to not update the password.",
           FLAG_PASSWORD);
 
-  public static final BooleanField RETURN_TYPE = new BooleanField();
+  private static final BooleanField RETURN_TYPE = new BooleanField();
+
+  private final SourceValidationUtils sourceValidationUtils;
+
+  private final ServiceCommons serviceCommons;
 
   private OpenSearchSourceConfigurationField config;
 
-  private SourceValidationUtils sourceValidationUtils;
-
-  private ServiceCommons serviceCommons;
-
-  private final ConfiguratorSuite configuratorSuite;
-
-  public UpdateOpenSearchConfiguration(ConfiguratorSuite configuratorSuite) {
+  public UpdateOpenSearchConfiguration(
+      SourceValidationUtils sourceValidationUtils, ServiceCommons serviceCommons) {
     super(FIELD_NAME, DESCRIPTION);
-    this.configuratorSuite = configuratorSuite;
+    this.sourceValidationUtils = sourceValidationUtils;
+    this.serviceCommons = serviceCommons;
 
     config = new OpenSearchSourceConfigurationField();
     config.useDefaultRequired();
     config.pidField().isRequired(true);
-
-    sourceValidationUtils = new SourceValidationUtils(configuratorSuite);
-    serviceCommons = new ServiceCommons(configuratorSuite);
   }
 
   @Override
@@ -105,7 +101,7 @@ public class UpdateOpenSearchConfiguration extends BaseFunctionField<BooleanFiel
 
   @Override
   public FunctionField<BooleanField> newInstance() {
-    return new UpdateOpenSearchConfiguration(configuratorSuite);
+    return new UpdateOpenSearchConfiguration(sourceValidationUtils, serviceCommons);
   }
 
   @Override

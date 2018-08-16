@@ -26,7 +26,6 @@ import org.codice.ddf.admin.common.fields.common.CredentialsField;
 import org.codice.ddf.admin.common.report.message.DefaultMessages;
 import org.codice.ddf.admin.sources.csw.CswSourceUtils;
 import org.codice.ddf.admin.sources.fields.type.CswSourceConfigurationField;
-import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite;
 
 public class DiscoverCswSource extends BaseFunctionField<CswSourceConfigurationField> {
 
@@ -42,19 +41,15 @@ public class DiscoverCswSource extends BaseFunctionField<CswSourceConfigurationF
 
   private AddressField address;
 
-  private CswSourceUtils cswSourceUtils;
+  private final CswSourceUtils cswSourceUtils;
 
-  private final ConfiguratorSuite configuratorSuite;
-
-  public DiscoverCswSource(ConfiguratorSuite configuratorSuite) {
+  public DiscoverCswSource(CswSourceUtils cswSourceUtils) {
     super(FIELD_NAME, DESCRIPTION);
-    this.configuratorSuite = configuratorSuite;
+    this.cswSourceUtils = cswSourceUtils;
 
     credentials = new CredentialsField();
     address = new AddressField();
     address.isRequired(true);
-
-    cswSourceUtils = new CswSourceUtils(configuratorSuite);
   }
 
   @Override
@@ -86,17 +81,11 @@ public class DiscoverCswSource extends BaseFunctionField<CswSourceConfigurationF
 
   @Override
   public FunctionField<CswSourceConfigurationField> newInstance() {
-    return new DiscoverCswSource(configuratorSuite);
+    return new DiscoverCswSource(cswSourceUtils);
   }
 
   @Override
   public Set<String> getFunctionErrorCodes() {
     return ImmutableSet.of(DefaultMessages.CANNOT_CONNECT, DefaultMessages.UNKNOWN_ENDPOINT);
-  }
-
-  @SuppressWarnings(
-      "squid:UnusedPrivateMethod" /* For testing purposes only. Groovy can access private methods. */)
-  private void setCswSourceUtils(CswSourceUtils cswSourceUtils) {
-    this.cswSourceUtils = cswSourceUtils;
   }
 }

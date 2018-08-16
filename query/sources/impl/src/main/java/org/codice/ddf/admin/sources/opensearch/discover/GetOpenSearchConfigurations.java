@@ -30,35 +30,31 @@ import org.codice.ddf.admin.common.services.ServiceCommons;
 import org.codice.ddf.admin.sources.fields.type.OpenSearchSourceConfigurationField;
 import org.codice.ddf.admin.sources.opensearch.OpenSearchSourceInfoField;
 import org.codice.ddf.admin.sources.utils.SourceUtilCommons;
-import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite;
 
 public class GetOpenSearchConfigurations
     extends BaseFunctionField<ListField<OpenSearchSourceInfoField>> {
 
   public static final String FIELD_NAME = "sources";
 
-  public static final String DESCRIPTION =
+  private static final String DESCRIPTION =
       "Retrieves all currently configured OpenSearch sources. If a source pid is specified, only that source configuration will be returned.";
 
-  public static final ListField<OpenSearchSourceInfoField> RETURN_TYPE =
+  private static final ListField<OpenSearchSourceInfoField> RETURN_TYPE =
       new OpenSearchSourceInfoField.ListImpl();
+
+  private final SourceUtilCommons sourceUtilCommons;
+
+  private final ServiceCommons serviceCommons;
 
   private PidField pid;
 
-  private SourceUtilCommons sourceUtilCommons;
-
-  private ServiceCommons serviceCommons;
-
-  private final ConfiguratorSuite configuratorSuite;
-
-  public GetOpenSearchConfigurations(ConfiguratorSuite configuratorSuite) {
+  public GetOpenSearchConfigurations(
+      SourceUtilCommons sourceUtilCommons, ServiceCommons serviceCommons) {
     super(FIELD_NAME, DESCRIPTION);
-    this.configuratorSuite = configuratorSuite;
+    this.sourceUtilCommons = sourceUtilCommons;
+    this.serviceCommons = serviceCommons;
 
     pid = new PidField();
-
-    sourceUtilCommons = new SourceUtilCommons(configuratorSuite);
-    serviceCommons = new ServiceCommons(configuratorSuite);
   }
 
   @Override
@@ -105,7 +101,7 @@ public class GetOpenSearchConfigurations
 
   @Override
   public FunctionField<ListField<OpenSearchSourceInfoField>> newInstance() {
-    return new GetOpenSearchConfigurations(configuratorSuite);
+    return new GetOpenSearchConfigurations(sourceUtilCommons, serviceCommons);
   }
 
   @Override

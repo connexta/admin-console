@@ -13,15 +13,17 @@
  */
 package org.codice.ddf.admin.sources.csw.discover
 
-import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite
 import org.codice.ddf.admin.api.Field
 import org.codice.ddf.admin.api.fields.ListField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
+import org.codice.ddf.admin.common.services.ServiceCommons
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.sources.csw.CswSourceInfoField
 import org.codice.ddf.admin.sources.fields.CswProfile
 import org.codice.ddf.admin.sources.services.CswServiceProperties
 import org.codice.ddf.admin.sources.test.SourceCommonsSpec
+import org.codice.ddf.admin.sources.utils.SourceUtilCommons
+import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceReader
@@ -52,6 +54,10 @@ class GetCswConfigsSpec extends SourceCommonsSpec {
 
     ConfiguratorSuite configuratorSuite
 
+    SourceUtilCommons sourceUtilCommons
+
+    ServiceCommons serviceCommons
+
     def args = [
             (PID): S_PID_2
     ]
@@ -70,7 +76,10 @@ class GetCswConfigsSpec extends SourceCommonsSpec {
         configuratorSuite.serviceReader >> serviceReader
         configuratorSuite.managedServiceActions >> managedServiceActions
 
-        getCswConfigsFunction = new GetCswConfigurations(configuratorSuite)
+        sourceUtilCommons = new SourceUtilCommons(configuratorSuite)
+        serviceCommons = new ServiceCommons(configuratorSuite)
+
+        getCswConfigsFunction = new GetCswConfigurations(sourceUtilCommons, serviceCommons)
     }
 
     def 'No pid argument returns all configs'() {
@@ -141,9 +150,9 @@ class GetCswConfigsSpec extends SourceCommonsSpec {
         return managedServiceConfigs
     }
 
-    def 'Returns all the possible error codes correctly'(){
+    def 'Returns all the possible error codes correctly'() {
         setup:
-        GetCswConfigurations noExistingConfigFunc = new GetCswConfigurations(configuratorSuite)
+        GetCswConfigurations noExistingConfigFunc = new GetCswConfigurations(sourceUtilCommons, serviceCommons)
         args.put(PID, S_PID)
         serviceActions.read(S_PID) >> [:]
 

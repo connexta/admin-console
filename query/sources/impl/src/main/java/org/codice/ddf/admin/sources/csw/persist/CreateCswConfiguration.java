@@ -29,7 +29,6 @@ import org.codice.ddf.admin.common.services.ServiceCommons;
 import org.codice.ddf.admin.sources.SourceMessages;
 import org.codice.ddf.admin.sources.fields.type.CswSourceConfigurationField;
 import org.codice.ddf.admin.sources.utils.SourceValidationUtils;
-import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite;
 
 public class CreateCswConfiguration extends BaseFunctionField<BooleanField> {
 
@@ -41,21 +40,18 @@ public class CreateCswConfiguration extends BaseFunctionField<BooleanField> {
 
   private CswSourceConfigurationField config;
 
-  private SourceValidationUtils sourceValidationUtils;
+  private final SourceValidationUtils sourceValidationUtils;
 
-  private ServiceCommons serviceCommons;
+  private final ServiceCommons serviceCommons;
 
-  private final ConfiguratorSuite configuratorSuite;
-
-  public CreateCswConfiguration(ConfiguratorSuite configuratorSuite) {
+  public CreateCswConfiguration(
+      SourceValidationUtils sourceValidationUtils, ServiceCommons serviceCommons) {
     super(FIELD_NAME, DESCRIPTION);
-    this.configuratorSuite = configuratorSuite;
+    this.sourceValidationUtils = sourceValidationUtils;
+    this.serviceCommons = serviceCommons;
 
     config = new CswSourceConfigurationField();
     config.useDefaultRequired();
-
-    sourceValidationUtils = new SourceValidationUtils(configuratorSuite);
-    serviceCommons = new ServiceCommons(configuratorSuite);
   }
 
   @Override
@@ -99,7 +95,7 @@ public class CreateCswConfiguration extends BaseFunctionField<BooleanField> {
 
   @Override
   public FunctionField<BooleanField> newInstance() {
-    return new CreateCswConfiguration(configuratorSuite);
+    return new CreateCswConfiguration(sourceValidationUtils, serviceCommons);
   }
 
   @Override

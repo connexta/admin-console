@@ -41,7 +41,6 @@ import org.codice.ddf.admin.sources.utils.RequestUtils;
 import org.codice.ddf.admin.sources.utils.SourceTaskCallable;
 import org.codice.ddf.admin.sources.utils.SourceTaskHandler;
 import org.codice.ddf.admin.sources.utils.SourceUtilCommons;
-import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -64,11 +63,11 @@ public class OpenSearchSourceUtils {
 
   private final SourceUtilCommons sourceUtilCommons;
 
-  private RequestUtils requestUtils;
+  private final RequestUtils requestUtils;
 
-  public OpenSearchSourceUtils(ConfiguratorSuite configuratorSuite) {
-    this.requestUtils = new RequestUtils();
-    this.sourceUtilCommons = new SourceUtilCommons(configuratorSuite);
+  public OpenSearchSourceUtils(RequestUtils requestUtils, SourceUtilCommons sourceUtilCommons) {
+    this.requestUtils = requestUtils;
+    this.sourceUtilCommons = sourceUtilCommons;
   }
 
   /**
@@ -177,11 +176,5 @@ public class OpenSearchSourceUtils {
       LOGGER.debug("Failed to compile OpenSearch totalResults XPath.");
       return Reports.from(unknownEndpointError(responseField.requestUrlField().getPath()));
     }
-  }
-
-  @SuppressWarnings(
-      "squid:UnusedPrivateMethod" /* For testing purposes only. Groovy can access private methods. */)
-  private void setRequestUtils(RequestUtils requestUtils) {
-    this.requestUtils = requestUtils;
   }
 }

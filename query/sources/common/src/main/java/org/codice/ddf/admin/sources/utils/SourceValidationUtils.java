@@ -23,17 +23,16 @@ import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.common.report.Reports;
 import org.codice.ddf.admin.common.services.ServiceCommons;
 import org.codice.ddf.admin.sources.SourceMessages;
-import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite;
 
 public class SourceValidationUtils {
 
-  private SourceUtilCommons sourceUtilCommons;
+  private final SourceUtilCommons sourceUtilCommons;
 
-  private ServiceCommons serviceCommons;
+  private final ServiceCommons serviceCommons;
 
-  public SourceValidationUtils(ConfiguratorSuite configuratorSuite) {
-    sourceUtilCommons = new SourceUtilCommons(configuratorSuite);
-    serviceCommons = new ServiceCommons(configuratorSuite);
+  public SourceValidationUtils(SourceUtilCommons sourceUtilCommons, ServiceCommons serviceCommons) {
+    this.sourceUtilCommons = sourceUtilCommons;
+    this.serviceCommons = serviceCommons;
   }
 
   private boolean findSourceNameMatch(String servicePid, String sourceName) {

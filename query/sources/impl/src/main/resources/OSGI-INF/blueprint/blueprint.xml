@@ -12,26 +12,145 @@
  **/
 -->
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
-    <service id="cswFieldProvider" interface="org.codice.ddf.admin.api.FieldProvider">
-        <bean class="org.codice.ddf.admin.sources.csw.CswFieldProvider">
-            <argument ref="configuratorSuite"/>
-        </bean>
-    </service>
 
-    <service id="openSearchFieldProvider" interface="org.codice.ddf.admin.api.FieldProvider">
-        <bean class="org.codice.ddf.admin.sources.opensearch.OpenSearchFieldProvider">
-            <argument ref="configuratorSuite"/>
-        </bean>
-    </service>
+  <reference id="configuratorSuite"
+    interface="org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite"
+    availability="mandatory"/>
 
-    <service id="wfsFieldProvider" interface="org.codice.ddf.admin.api.FieldProvider">
-        <bean class="org.codice.ddf.admin.sources.wfs.WfsFieldProvider">
-            <argument ref="configuratorSuite"/>
-        </bean>
-    </service>
+  <reference id="clientFactoryFactory" interface="org.codice.ddf.cxf.client.ClientFactoryFactory"
+    availability="mandatory"/>
 
-    <reference id="configuratorSuite"
-               interface="org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite"
-               availability="mandatory"/>
+  <bean id="requestUtils" class="org.codice.ddf.admin.sources.utils.RequestUtils">
+    <argument ref="clientFactoryFactory"/>
+  </bean>
 
+  <bean id="sourceUtilCommons" class="org.codice.ddf.admin.sources.utils.SourceUtilCommons">
+    <argument ref="configuratorSuite"/>
+  </bean>
+
+  <bean id="serviceCommons" class="org.codice.ddf.admin.common.services.ServiceCommons">
+    <argument ref="configuratorSuite"/>
+  </bean>
+
+  <bean id="sourceValidationUtils" class="org.codice.ddf.admin.sources.utils.SourceValidationUtils">
+    <argument ref="sourceUtilCommons"/>
+    <argument ref="serviceCommons"/>
+  </bean>
+
+  <!-- SETUP CswFieldProvider -->
+  <bean id="cswUtils" class="org.codice.ddf.admin.sources.csw.CswSourceUtils">
+    <argument ref="sourceUtilCommons"/>
+    <argument ref="requestUtils"/>
+  </bean>
+
+  <bean id="discoverCswSource" class="org.codice.ddf.admin.sources.csw.discover.DiscoverCswSource">
+    <argument ref="cswUtils"/>
+  </bean>
+
+  <bean id="getCswConfigurations" class="org.codice.ddf.admin.sources.csw.discover.GetCswConfigurations">
+    <argument ref="sourceUtilCommons"/>
+    <argument ref="serviceCommons"/>
+  </bean>
+
+  <bean id="createCswConfiguration" class="org.codice.ddf.admin.sources.csw.persist.CreateCswConfiguration">
+    <argument ref="sourceValidationUtils"/>
+    <argument ref="serviceCommons"/>
+  </bean>
+
+  <bean id="deleteCswConfiguration" class="org.codice.ddf.admin.sources.csw.persist.DeleteCswConfiguration">
+    <argument ref="serviceCommons"/>
+  </bean>
+
+  <bean id="updateCswConfiguration" class="org.codice.ddf.admin.sources.csw.persist.UpdateCswConfiguration">
+    <argument ref="sourceValidationUtils"/>
+    <argument ref="serviceCommons"/>
+  </bean>
+
+  <service id="cswFieldProvider" interface="org.codice.ddf.admin.api.FieldProvider">
+    <bean class="org.codice.ddf.admin.sources.csw.CswFieldProvider">
+      <property name="discoverCswSource" ref="discoverCswSource"/>
+      <property name="getCswConfigurations" ref="getCswConfigurations"/>
+      <property name="createCswConfiguration" ref="createCswConfiguration"/>
+      <property name="deleteCswConfiguration" ref="deleteCswConfiguration"/>
+      <property name="updateCswConfiguration" ref="updateCswConfiguration"/>
+    </bean>
+  </service>
+
+   <!-- SETUP OpenSearchFieldProvider -->
+  <bean id="osUtils" class="org.codice.ddf.admin.sources.opensearch.OpenSearchSourceUtils">
+    <argument ref="requestUtils"/>
+    <argument ref="sourceUtilCommons"/>
+  </bean>
+
+  <bean id="discoverOpenSearchSource" class="org.codice.ddf.admin.sources.opensearch.discover.DiscoverOpenSearchSource">
+    <argument ref="osUtils"/>
+  </bean>
+
+  <bean id="getOpenSearchConfiguration" class="org.codice.ddf.admin.sources.opensearch.discover.GetOpenSearchConfigurations">
+    <argument ref="sourceUtilCommons"/>
+    <argument ref="serviceCommons"/>
+  </bean>
+
+  <bean id="createOpenSearchConfiguration" class="org.codice.ddf.admin.sources.opensearch.persist.CreateOpenSearchConfiguration">
+    <argument ref="sourceValidationUtils"/>
+    <argument ref="serviceCommons"/>
+  </bean>
+
+  <bean id="deleteOpenSearchConfiguration" class="org.codice.ddf.admin.sources.opensearch.persist.DeleteOpenSearchConfiguration">
+    <argument ref="serviceCommons"/>
+  </bean>
+
+  <bean id="updateOpenSearchConfiguration" class="org.codice.ddf.admin.sources.opensearch.persist.UpdateOpenSearchConfiguration">
+    <argument ref="sourceValidationUtils"/>
+    <argument ref="serviceCommons"/>
+  </bean>
+
+  <service id="openSearchFieldProvider" interface="org.codice.ddf.admin.api.FieldProvider">
+    <bean class="org.codice.ddf.admin.sources.opensearch.OpenSearchFieldProvider">
+      <property name="discoverOpenSearchSource" ref="discoverOpenSearchSource"/>
+      <property name="getOpenSearchConfigurations" ref="getOpenSearchConfiguration"/>
+      <property name="createOpenSearchConfiguration" ref="createOpenSearchConfiguration"/>
+      <property name="deleteOpenSearchConfiguration" ref="deleteOpenSearchConfiguration"/>
+      <property name="updateOpenSearchConfiguration" ref="updateOpenSearchConfiguration"/>
+    </bean>
+  </service>
+
+  <!-- SETUP WfsFieldProvider -->
+  <bean id="wfsSourceUtils" class="org.codice.ddf.admin.sources.wfs.WfsSourceUtils">
+    <argument ref="requestUtils"/>
+    <argument ref="sourceUtilCommons"/>
+  </bean>
+
+  <bean id="discoverWfsSource" class="org.codice.ddf.admin.sources.wfs.discover.DiscoverWfsSource">
+    <argument ref="wfsSourceUtils"/>
+  </bean>
+
+  <bean id="getWfsConfiguration" class="org.codice.ddf.admin.sources.wfs.discover.GetWfsConfigurations">
+    <argument ref="sourceUtilCommons"/>
+    <argument ref="serviceCommons"/>
+  </bean>
+
+  <bean id="createWfsConfiguration" class="org.codice.ddf.admin.sources.wfs.persist.CreateWfsConfiguration">
+    <argument ref="sourceValidationUtils"/>
+    <argument ref="serviceCommons"/>
+  </bean>
+
+  <bean id="deleteWfsConfiguration" class="org.codice.ddf.admin.sources.wfs.persist.DeleteWfsConfiguration">
+    <argument ref="serviceCommons"/>
+  </bean>
+
+  <bean id="updateWfsConfiguration" class="org.codice.ddf.admin.sources.wfs.persist.UpdateWfsConfiguration">
+    <argument ref="sourceValidationUtils"/>
+    <argument ref="serviceCommons"/>
+  </bean>
+
+  <service id="wfsFieldProvider" interface="org.codice.ddf.admin.api.FieldProvider">
+    <bean class="org.codice.ddf.admin.sources.wfs.WfsFieldProvider">
+      <property name="discoverWfsSource" ref="discoverWfsSource"/>
+      <property name="getWfsConfiguration" ref="getWfsConfiguration"/>
+      <property name="createWfsConfiguration" ref="createWfsConfiguration"/>
+      <property name="deleteWfsConfiguration" ref="deleteWfsConfiguration"/>
+      <property name="updateWfsConfiguration" ref="updateWfsConfiguration"/>
+    </bean>
+  </service>
 </blueprint>

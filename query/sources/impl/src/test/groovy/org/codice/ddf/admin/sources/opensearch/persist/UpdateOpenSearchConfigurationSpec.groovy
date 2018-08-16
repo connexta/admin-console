@@ -14,9 +14,8 @@
 package org.codice.ddf.admin.sources.opensearch.persist
 
 import ddf.catalog.source.FederatedSource
-import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite
-import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
+import org.codice.ddf.admin.common.services.ServiceCommons
 import org.codice.ddf.admin.configurator.Configurator
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.sources.SourceMessages
@@ -24,10 +23,9 @@ import org.codice.ddf.admin.sources.fields.type.OpenSearchSourceConfigurationFie
 import org.codice.ddf.admin.sources.fields.type.SourceConfigField
 import org.codice.ddf.admin.sources.services.OpenSearchServiceProperties
 import org.codice.ddf.admin.sources.test.SourceCommonsSpec
-import org.codice.ddf.internal.admin.configurator.actions.FeatureActions
-import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions
-import org.codice.ddf.internal.admin.configurator.actions.ServiceActions
-import org.codice.ddf.internal.admin.configurator.actions.ServiceReader
+import org.codice.ddf.admin.sources.utils.SourceUtilCommons
+import org.codice.ddf.admin.sources.utils.SourceValidationUtils
+import org.codice.ddf.internal.admin.configurator.actions.*
 import org.junit.Ignore
 
 class UpdateOpenSearchConfigurationSpec extends SourceCommonsSpec {
@@ -84,7 +82,9 @@ class UpdateOpenSearchConfigurationSpec extends SourceCommonsSpec {
         configuratorSuite.managedServiceActions >> managedServiceActions
         configuratorSuite.featureActions >> featureActions
 
-        updateOpenSearchConfiguration = new UpdateOpenSearchConfiguration(configuratorSuite)
+        ServiceCommons serviceCommons = new ServiceCommons(configuratorSuite)
+
+        updateOpenSearchConfiguration = new UpdateOpenSearchConfiguration(new SourceValidationUtils(new SourceUtilCommons(configuratorSuite), serviceCommons), serviceCommons)
     }
 
     def 'Successfully update existing OpenSearch configuration'() {
@@ -207,7 +207,7 @@ class UpdateOpenSearchConfigurationSpec extends SourceCommonsSpec {
         report.getErrorMessages()*.getPath() == [PID_PATH, SOURCE_NAME_PATH, ENDPOINT_URL_PATH]
     }
 
-    def 'Returns all the possible error codes correctly'(){
+    def 'Returns all the possible error codes correctly'() {
         when:
         def errorCodes = updateOpenSearchConfiguration.getFunctionErrorCodes()
 

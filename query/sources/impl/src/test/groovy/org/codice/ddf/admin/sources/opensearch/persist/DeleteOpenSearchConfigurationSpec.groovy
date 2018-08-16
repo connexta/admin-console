@@ -1,5 +1,6 @@
 package org.codice.ddf.admin.sources.opensearch.persist
 
+import org.codice.ddf.admin.common.services.ServiceCommons
 import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.configurator.Configurator
@@ -29,7 +30,10 @@ class DeleteOpenSearchConfigurationSpec extends SourceCommonsSpec {
     def args = [
             (PID): S_PID
     ]
+
     private ServiceActions serviceActions
+
+    ServiceCommons serviceCommons
 
     def setup() {
         configurator = Mock(Configurator)
@@ -44,7 +48,9 @@ class DeleteOpenSearchConfigurationSpec extends SourceCommonsSpec {
         configuratorSuite.serviceActions >> serviceActions
         configuratorSuite.managedServiceActions >> managedServiceActions
 
-        deleteOpenSearchConfigurationFunction = new DeleteOpenSearchConfiguration(configuratorSuite)
+        serviceCommons = new ServiceCommons(configuratorSuite)
+
+        deleteOpenSearchConfigurationFunction = new DeleteOpenSearchConfiguration(serviceCommons)
     }
 
     def 'Successfully deleting WFS config returns true'() {
@@ -98,10 +104,10 @@ class DeleteOpenSearchConfigurationSpec extends SourceCommonsSpec {
 
     def 'Returns all the possible error codes correctly'(){
         setup:
-        DeleteOpenSearchConfiguration deleteOpenSearchNoExistingConfig = new DeleteOpenSearchConfiguration(configuratorSuite)
+        DeleteOpenSearchConfiguration deleteOpenSearchNoExistingConfig = new DeleteOpenSearchConfiguration(serviceCommons)
         serviceActions.read(S_PID) >> [:]
 
-        DeleteOpenSearchConfiguration deleteOpenSearchFailPersist = new DeleteOpenSearchConfiguration(configuratorSuite)
+        DeleteOpenSearchConfiguration deleteOpenSearchFailPersist = new DeleteOpenSearchConfiguration(serviceCommons)
         serviceActions.read(S_PID) >> configToBeDeleted
         configurator.commit(_, _) >> mockReport(true)
 

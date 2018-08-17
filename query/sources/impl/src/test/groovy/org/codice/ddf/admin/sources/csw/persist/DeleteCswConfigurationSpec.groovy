@@ -13,12 +13,13 @@
  */
 package org.codice.ddf.admin.sources.csw.persist
 
-import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite
 import org.codice.ddf.admin.common.report.message.DefaultMessages
+import org.codice.ddf.admin.common.services.ServiceCommons
 import org.codice.ddf.admin.configurator.Configurator
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.sources.services.CswServiceProperties
 import org.codice.ddf.admin.sources.test.SourceCommonsSpec
+import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions
 
@@ -53,6 +54,8 @@ class DeleteCswConfigurationSpec extends SourceCommonsSpec {
 
     def configToDelete = createCswConfigToDelete()
 
+    def serviceCommons
+
     def setup() {
         configurator = Mock(Configurator)
         serviceActions = Mock(ServiceActions)
@@ -66,7 +69,10 @@ class DeleteCswConfigurationSpec extends SourceCommonsSpec {
         configuratorSuite.configuratorFactory >> configuratorFactory
         configuratorSuite.serviceActions >> serviceActions
         configuratorSuite.managedServiceActions >> managedServiceActions
-        deleteCswConfiguration = new DeleteCswConfiguration(configuratorSuite)
+
+        serviceCommons = new ServiceCommons(configuratorSuite)
+
+        deleteCswConfiguration = new DeleteCswConfiguration(serviceCommons)
     }
 
     def 'Successfully deleting CSW configuration returns true'() {
@@ -118,12 +124,12 @@ class DeleteCswConfigurationSpec extends SourceCommonsSpec {
         report.getErrorMessages()*.getPath() == [SERVICE_PID_PATH]
     }
 
-    def 'Returns all the possible error codes correctly'(){
+    def 'Returns all the possible error codes correctly'() {
         setup:
-        DeleteCswConfiguration deleteCswNoExistingConfig = new DeleteCswConfiguration(configuratorSuite)
+        DeleteCswConfiguration deleteCswNoExistingConfig = new DeleteCswConfiguration(serviceCommons)
         serviceActions.read(_ as String) >> [:]
 
-        DeleteCswConfiguration deleteCswFailPersist = new DeleteCswConfiguration(configuratorSuite)
+        DeleteCswConfiguration deleteCswFailPersist = new DeleteCswConfiguration(serviceCommons)
         serviceActions.read(S_PID) >> configToDelete
         configurator.commit(_, _) >> mockReport(true)
 

@@ -16,6 +16,7 @@ package org.codice.ddf.admin.sources.csw.discover;
 import static org.codice.ddf.admin.sources.services.CswServiceProperties.CSW_FACTORY_PIDS;
 import static org.codice.ddf.admin.sources.services.CswServiceProperties.SERVICE_PROPS_TO_CSW_CONFIG;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.util.List;
@@ -30,34 +31,29 @@ import org.codice.ddf.admin.common.services.ServiceCommons;
 import org.codice.ddf.admin.sources.csw.CswSourceInfoField;
 import org.codice.ddf.admin.sources.fields.type.CswSourceConfigurationField;
 import org.codice.ddf.admin.sources.utils.SourceUtilCommons;
-import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite;
 
 public class GetCswConfigurations extends BaseFunctionField<ListField<CswSourceInfoField>> {
 
-  public static final String FIELD_NAME = "sources";
+  @VisibleForTesting public static final String FIELD_NAME = "sources";
 
-  public static final String DESCRIPTION =
+  private static final String DESCRIPTION =
       "Retrieves all currently configured CSW sources. If the pid argument is specified, only the source configuration with that pid will be returned.";
 
-  public static final ListField<CswSourceInfoField> RETURN_TYPE = new CswSourceInfoField.ListImpl();
+  private static final ListField<CswSourceInfoField> RETURN_TYPE =
+      new CswSourceInfoField.ListImpl();
+
+  private final SourceUtilCommons sourceUtilCommons;
+
+  private final ServiceCommons serviceCommons;
 
   private PidField pid;
 
-  private SourceUtilCommons sourceUtilCommons;
-
-  private ServiceCommons serviceCommons;
-
-  private final ConfiguratorSuite configuratorSuite;
-
-  public GetCswConfigurations(ConfiguratorSuite configuratorSuite) {
+  public GetCswConfigurations(SourceUtilCommons sourceUtilCommons, ServiceCommons serviceCommons) {
     super(FIELD_NAME, DESCRIPTION);
-    this.configuratorSuite = configuratorSuite;
+    this.sourceUtilCommons = sourceUtilCommons;
+    this.serviceCommons = serviceCommons;
 
     pid = new PidField();
-
-    sourceUtilCommons = new SourceUtilCommons(configuratorSuite);
-
-    serviceCommons = new ServiceCommons(configuratorSuite);
   }
 
   @Override
@@ -102,7 +98,7 @@ public class GetCswConfigurations extends BaseFunctionField<ListField<CswSourceI
 
   @Override
   public FunctionField<ListField<CswSourceInfoField>> newInstance() {
-    return new GetCswConfigurations(configuratorSuite);
+    return new GetCswConfigurations(sourceUtilCommons, serviceCommons);
   }
 
   @Override

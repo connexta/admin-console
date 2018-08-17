@@ -26,37 +26,32 @@ import org.codice.ddf.admin.common.fields.common.CredentialsField;
 import org.codice.ddf.admin.common.report.message.DefaultMessages;
 import org.codice.ddf.admin.sources.fields.type.OpenSearchSourceConfigurationField;
 import org.codice.ddf.admin.sources.opensearch.OpenSearchSourceUtils;
-import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite;
 
 public class DiscoverOpenSearchSource
     extends BaseFunctionField<OpenSearchSourceConfigurationField> {
 
   public static final String FIELD_NAME = "discover";
 
-  public static final String DESCRIPTION =
+  private static final String DESCRIPTION =
       "Attempts to discover an OpenSearch source using the given hostname and port or URL. If a URL "
           + "is provided, it will take precedence over a hostname and port.";
 
-  public static final OpenSearchSourceConfigurationField RETURN_TYPE =
+  private static final OpenSearchSourceConfigurationField RETURN_TYPE =
       new OpenSearchSourceConfigurationField();
+
+  private final OpenSearchSourceUtils openSearchSourceUtils;
 
   private CredentialsField credentials;
 
   private AddressField address;
 
-  private OpenSearchSourceUtils openSearchSourceUtils;
-
-  private final ConfiguratorSuite configuratorSuite;
-
-  public DiscoverOpenSearchSource(ConfiguratorSuite configuratorSuite) {
+  public DiscoverOpenSearchSource(OpenSearchSourceUtils openSearchSourceUtils) {
     super(FIELD_NAME, DESCRIPTION);
-    this.configuratorSuite = configuratorSuite;
+    this.openSearchSourceUtils = openSearchSourceUtils;
 
     credentials = new CredentialsField();
     address = new AddressField();
     address.isRequired(true);
-
-    openSearchSourceUtils = new OpenSearchSourceUtils(configuratorSuite);
   }
 
   @Override
@@ -89,17 +84,11 @@ public class DiscoverOpenSearchSource
 
   @Override
   public FunctionField<OpenSearchSourceConfigurationField> newInstance() {
-    return new DiscoverOpenSearchSource(configuratorSuite);
+    return new DiscoverOpenSearchSource(openSearchSourceUtils);
   }
 
   @Override
   public Set<String> getFunctionErrorCodes() {
     return ImmutableSet.of(DefaultMessages.CANNOT_CONNECT, DefaultMessages.UNKNOWN_ENDPOINT);
-  }
-
-  @SuppressWarnings(
-      "squid:UnusedPrivateMethod" /* For testing purposes only. Groovy can access private methods. */)
-  private void setOpenSearchSourceUtils(OpenSearchSourceUtils openSearchSourceUtils) {
-    this.openSearchSourceUtils = openSearchSourceUtils;
   }
 }

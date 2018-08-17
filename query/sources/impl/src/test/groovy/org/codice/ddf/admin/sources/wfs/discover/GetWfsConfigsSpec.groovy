@@ -13,16 +13,17 @@
  **/
 package org.codice.ddf.admin.sources.wfs.discover
 
-import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite
 import org.codice.ddf.admin.api.Field
-import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.api.fields.ListField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
+import org.codice.ddf.admin.common.services.ServiceCommons
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.sources.fields.WfsVersion
 import org.codice.ddf.admin.sources.services.WfsServiceProperties
 import org.codice.ddf.admin.sources.test.SourceCommonsSpec
+import org.codice.ddf.admin.sources.utils.SourceUtilCommons
 import org.codice.ddf.admin.sources.wfs.WfsSourceInfoField
+import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceReader
@@ -73,7 +74,7 @@ class GetWfsConfigsSpec extends SourceCommonsSpec {
         configuratorSuite.serviceReader >> serviceReader
         configuratorSuite.managedServiceActions >> managedServiceActions
 
-        getWfsConfigsFunction = new GetWfsConfigurations(configuratorSuite)
+        getWfsConfigsFunction = new GetWfsConfigurations(new SourceUtilCommons(configuratorSuite), new ServiceCommons(configuratorSuite))
     }
 
     def 'No pid argument returns all configs'() {
@@ -142,7 +143,7 @@ class GetWfsConfigsSpec extends SourceCommonsSpec {
         return managedServiceConfigs
     }
 
-    def 'Returns all the possible error codes correctly'(){
+    def 'Returns all the possible error codes correctly'() {
         setup:
         functionArgs.put(PID, S_PID)
         serviceActions.read(S_PID) >> [:]

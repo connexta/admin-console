@@ -29,7 +29,6 @@ import org.codice.ddf.admin.common.services.ServiceCommons;
 import org.codice.ddf.admin.sources.SourceMessages;
 import org.codice.ddf.admin.sources.fields.type.WfsSourceConfigurationField;
 import org.codice.ddf.admin.sources.utils.SourceValidationUtils;
-import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite;
 
 public class CreateWfsConfiguration extends BaseFunctionField<BooleanField> {
 
@@ -37,25 +36,22 @@ public class CreateWfsConfiguration extends BaseFunctionField<BooleanField> {
 
   private static final String DESCRIPTION = "Creates a WFS source configuration.";
 
-  public static final BooleanField RETURN_TYPE = new BooleanField();
+  private static final BooleanField RETURN_TYPE = new BooleanField();
+
+  private final SourceValidationUtils sourceValidationUtils;
+
+  private final ServiceCommons serviceCommons;
 
   private WfsSourceConfigurationField config;
 
-  private SourceValidationUtils sourceValidationUtils;
-
-  private ServiceCommons serviceCommons;
-
-  private final ConfiguratorSuite configuratorSuite;
-
-  public CreateWfsConfiguration(ConfiguratorSuite configuratorSuite) {
+  public CreateWfsConfiguration(
+      SourceValidationUtils sourceValidationUtils, ServiceCommons serviceCommons) {
     super(FIELD_NAME, DESCRIPTION);
-    this.configuratorSuite = configuratorSuite;
+    this.sourceValidationUtils = sourceValidationUtils;
+    this.serviceCommons = serviceCommons;
 
     config = new WfsSourceConfigurationField();
     config.useDefaultRequired();
-
-    sourceValidationUtils = new SourceValidationUtils(configuratorSuite);
-    serviceCommons = new ServiceCommons(configuratorSuite);
   }
 
   @Override
@@ -108,7 +104,7 @@ public class CreateWfsConfiguration extends BaseFunctionField<BooleanField> {
 
   @Override
   public FunctionField<BooleanField> newInstance() {
-    return new CreateWfsConfiguration(configuratorSuite);
+    return new CreateWfsConfiguration(sourceValidationUtils, serviceCommons);
   }
 
   @Override

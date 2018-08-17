@@ -14,9 +14,8 @@
 package org.codice.ddf.admin.sources.csw.persist
 
 import ddf.catalog.source.Source
-import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite
-import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
+import org.codice.ddf.admin.common.services.ServiceCommons
 import org.codice.ddf.admin.configurator.Configurator
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.sources.SourceMessages
@@ -25,10 +24,9 @@ import org.codice.ddf.admin.sources.fields.type.CswSourceConfigurationField
 import org.codice.ddf.admin.sources.fields.type.SourceConfigField
 import org.codice.ddf.admin.sources.services.CswServiceProperties
 import org.codice.ddf.admin.sources.test.SourceCommonsSpec
-import org.codice.ddf.internal.admin.configurator.actions.FeatureActions
-import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions
-import org.codice.ddf.internal.admin.configurator.actions.ServiceActions
-import org.codice.ddf.internal.admin.configurator.actions.ServiceReader
+import org.codice.ddf.admin.sources.utils.SourceUtilCommons
+import org.codice.ddf.admin.sources.utils.SourceValidationUtils
+import org.codice.ddf.internal.admin.configurator.actions.*
 import org.junit.Ignore
 
 class UpdateCswConfigurationSpec extends SourceCommonsSpec {
@@ -95,7 +93,10 @@ class UpdateCswConfigurationSpec extends SourceCommonsSpec {
         configuratorSuite.managedServiceActions >> managedServiceActions
         configuratorSuite.serviceReader >> serviceReader
         configuratorSuite.featureActions >> featureActions
-        updateCswConfiguration = new UpdateCswConfiguration(configuratorSuite)
+
+        ServiceCommons serviceCommons = new ServiceCommons(configuratorSuite)
+
+        updateCswConfiguration = new UpdateCswConfiguration(new SourceValidationUtils(new SourceUtilCommons(configuratorSuite), serviceCommons), serviceCommons)
     }
 
     def 'Successfully update CSW configuration'() {
@@ -220,7 +221,7 @@ class UpdateCswConfigurationSpec extends SourceCommonsSpec {
         report.getErrorMessages()*.getPath() == [SERVICE_PID_PATH, SOURCE_NAME_PATH, ENDPOINT_URL_PATH, CSW_PROFILE_PATH]
     }
 
-    def 'Returns all the possible error codes correctly'(){
+    def 'Returns all the possible error codes correctly'() {
         when:
         def errorCodes = updateCswConfiguration.getFunctionErrorCodes()
 

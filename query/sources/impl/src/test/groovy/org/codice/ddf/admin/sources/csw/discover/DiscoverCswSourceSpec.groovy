@@ -13,14 +13,26 @@
  **/
 package org.codice.ddf.admin.sources.csw.discover
 
-import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite
-import org.codice.ddf.admin.api.fields.FunctionField
+import org.apache.cxf.jaxrs.client.WebClient
+import org.codice.ddf.admin.api.report.Report
 import org.codice.ddf.admin.common.fields.common.HostField
+import org.codice.ddf.admin.common.fields.common.UrlField
+import org.codice.ddf.admin.common.report.Reports
 import org.codice.ddf.admin.common.report.message.DefaultMessages
+import org.codice.ddf.admin.common.report.message.ErrorMessageImpl
+import org.codice.ddf.admin.common.services.ServiceCommons
 import org.codice.ddf.admin.sources.csw.CswSourceUtils
 import org.codice.ddf.admin.sources.fields.CswProfile
 import org.codice.ddf.admin.sources.test.SourceCommonsSpec
+import org.codice.ddf.admin.sources.utils.RequestUtils
+import org.codice.ddf.admin.sources.utils.SourceUtilCommons
+import org.codice.ddf.cxf.client.ClientFactoryFactory
+import org.codice.ddf.cxf.client.SecureCxfClientFactory
+import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite
 import spock.lang.Shared
+
+import javax.ws.rs.core.MediaType
+import javax.ws.rs.core.Response
 
 class DiscoverCswSourceSpec extends SourceCommonsSpec {
 
@@ -58,13 +70,9 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
 
     DiscoverCswSource discoverCsw
 
-    def setup() {
-        discoverCsw = new DiscoverCswSource(Mock(ConfiguratorSuite))
-    }
-
     def 'Successfully discover DDF federation profile with URL'() {
         setup:
-        discoverCsw.setCswSourceUtils(prepareCswSourceUtils(200, ddfCswResponse, true))
+        discoverCsw = new DiscoverCswSource(prepareCswSourceUtils(200, ddfCswResponse, true))
 
         when:
         def report = discoverCsw.execute(getBaseDiscoverByUrlArgs(TEST_CSW_URL), FUNCTION_PATH)
@@ -75,12 +83,12 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
         config.cswProfile() == CswProfile.DDFCswFederatedSource.CSW_FEDERATION_PROFILE_SOURCE
         config.outputSchema() == CswSourceUtils.METACARD_OUTPUT_SCHEMA
         config.spatialOperator() == NO_FILTER
-        config.credentials().password() == FLAG_PASSWORD
+        config.credentials().password() == ServiceCommons.FLAG_PASSWORD
     }
 
     def 'Successfully discover CSWSpecification federation profile with URL'() {
         setup:
-        discoverCsw.setCswSourceUtils(prepareCswSourceUtils(200, specCswResponse, true))
+        discoverCsw = new DiscoverCswSource(prepareCswSourceUtils(200, specCswResponse, true))
 
         when:
         def report = discoverCsw.execute(getBaseDiscoverByUrlArgs(TEST_CSW_URL), FUNCTION_PATH)
@@ -96,7 +104,7 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
 
     def 'Successfully discover GMD CSW federation profile with URL'() {
         setup:
-        discoverCsw.setCswSourceUtils(prepareCswSourceUtils(200, gmdCswResponse, true))
+        discoverCsw = new DiscoverCswSource(prepareCswSourceUtils(200, gmdCswResponse, true))
 
         when:
         def report = discoverCsw.execute(getBaseDiscoverByUrlArgs(TEST_CSW_URL), FUNCTION_PATH)
@@ -112,7 +120,7 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
 
     def 'Successfully discover DDF federation profile using hostname and port'() {
         setup:
-        discoverCsw.setCswSourceUtils(prepareCswSourceUtils(200, ddfCswResponse, true))
+        discoverCsw = new DiscoverCswSource(prepareCswSourceUtils(200, ddfCswResponse, true))
 
         when:
         def report = discoverCsw.execute(getBaseDiscoverByAddressArgs(), FUNCTION_PATH)
@@ -129,7 +137,7 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
 
     def 'Successfully discover CSWSpecification federation profile using hostname and port'() {
         setup:
-        discoverCsw.setCswSourceUtils(prepareCswSourceUtils(200, specCswResponse, true))
+        discoverCsw = new DiscoverCswSource(prepareCswSourceUtils(200, specCswResponse, true))
 
         when:
         def report = discoverCsw.execute(getBaseDiscoverByAddressArgs(), FUNCTION_PATH)
@@ -145,7 +153,7 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
 
     def 'Successfully discover GMD CSW federation profile using hostname and port'() {
         setup:
-        discoverCsw.setCswSourceUtils(prepareCswSourceUtils(200, gmdCswResponse, true))
+        discoverCsw = new DiscoverCswSource(prepareCswSourceUtils(200, gmdCswResponse, true))
 
         when:
         def report = discoverCsw.execute(getBaseDiscoverByAddressArgs(), FUNCTION_PATH)
@@ -161,7 +169,7 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
 
     def 'Unknown endpoint error with bad HTTP status'() {
         setup:
-        discoverCsw.setCswSourceUtils(prepareCswSourceUtils(500, gmdCswResponse, true))
+        discoverCsw = new DiscoverCswSource(prepareCswSourceUtils(500, gmdCswResponse, true))
 
         when:
         def report = discoverCsw.execute(getBaseDiscoverByUrlArgs(TEST_CSW_URL), FUNCTION_PATH)
@@ -174,7 +182,7 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
 
     def 'Unknown endpoint error with unrecognized response when using URL'() {
         setup:
-        discoverCsw.setCswSourceUtils(prepareCswSourceUtils(200, badResponseBody, true))
+        discoverCsw = new DiscoverCswSource(prepareCswSourceUtils(200, badResponseBody, true))
 
         when:
         def report = discoverCsw.execute(getBaseDiscoverByUrlArgs(TEST_CSW_URL), FUNCTION_PATH)
@@ -187,7 +195,7 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
 
     def 'Unknown endpoint error with unrecognized response when using hostname+port'() {
         setup:
-        discoverCsw.setCswSourceUtils(prepareCswSourceUtils(200, badResponseBody, true))
+        discoverCsw = new DiscoverCswSource(prepareCswSourceUtils(200, badResponseBody, true))
 
         when:
         def report = discoverCsw.execute(getBaseDiscoverByAddressArgs(), FUNCTION_PATH)
@@ -200,7 +208,7 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
 
     def 'Unknown endpoint if no pre-formatted URLs work when discovering with host+port'() {
         setup:
-        discoverCsw.setCswSourceUtils(prepareCswSourceUtils(200, badResponseBody, false))
+        discoverCsw = new DiscoverCswSource(prepareCswSourceUtils(200, badResponseBody, false))
 
         when:
         def report = discoverCsw.execute(getBaseDiscoverByAddressArgs(), FUNCTION_PATH)
@@ -213,7 +221,7 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
 
     def 'Unrecognized CSW output schema defaults to CSW 2.0.2 schema'() {
         setup:
-        discoverCsw.setCswSourceUtils(prepareCswSourceUtils(200, unrecognizedCswResponse, true))
+        discoverCsw = new DiscoverCswSource(prepareCswSourceUtils(200, unrecognizedCswResponse, true))
 
         when:
         def report = discoverCsw.execute(getBaseDiscoverByUrlArgs(TEST_CSW_URL), FUNCTION_PATH)
@@ -229,7 +237,7 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
 
     def 'Unknown endpoint error when there is no output schema'() {
         setup:
-        discoverCsw.setCswSourceUtils(prepareCswSourceUtils(200, noOutputSchemaCswResponse, true))
+        discoverCsw = new DiscoverCswSource(prepareCswSourceUtils(200, noOutputSchemaCswResponse, true))
 
         when:
         def report = discoverCsw.execute(getBaseDiscoverByUrlArgs(TEST_CSW_URL), FUNCTION_PATH)
@@ -242,6 +250,9 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
     }
 
     def 'Fail when missing required fields'() {
+        setup:
+        discoverCsw = new DiscoverCswSource()
+
         when:
         def report = discoverCsw.execute(null, FUNCTION_PATH)
 
@@ -254,13 +265,11 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
         report.getErrorMessages()*.getPath() == [URL_FIELD_PATH]
     }
 
-    def 'Returns all the possible error codes correctly'(){
+    def 'Returns all the possible error codes correctly'() {
         setup:
-        DiscoverCswSource cannotConnectCsw = new DiscoverCswSource(Mock(ConfiguratorSuite))
-        cannotConnectCsw.setCswSourceUtils(prepareCswSourceUtils(200, badResponseBody, false))
-
-        DiscoverCswSource unknownEndpointCsw = new DiscoverCswSource(Mock(ConfiguratorSuite))
-        unknownEndpointCsw.setCswSourceUtils(prepareCswSourceUtils(200, noOutputSchemaCswResponse, true))
+        discoverCsw = new DiscoverCswSource()
+        DiscoverCswSource cannotConnectCsw = new DiscoverCswSource(prepareCswSourceUtils(200, badResponseBody, false))
+        DiscoverCswSource unknownEndpointCsw = new DiscoverCswSource(prepareCswSourceUtils(200, noOutputSchemaCswResponse, true))
 
         when:
         def errorCodes = discoverCsw.getFunctionErrorCodes()
@@ -274,9 +283,56 @@ class DiscoverCswSourceSpec extends SourceCommonsSpec {
     }
 
     def prepareCswSourceUtils(int statusCode, String responseBody, boolean endpointIsReachable) {
-        def requestUtils = new TestRequestUtils(createMockWebClientBuilder(statusCode, responseBody), endpointIsReachable)
-        def cswUtils = new CswSourceUtils(Mock(ConfiguratorSuite))
-        cswUtils.setRequestUtils(requestUtils)
-        return cswUtils
+        final clientFactoryFactory = Mock(ClientFactoryFactory) {
+            final secureCxfClientFactory = Mock(SecureCxfClientFactory) {
+                getWebClient() >> mockWebClient(statusCode, responseBody)
+            }
+
+            getSecureCxfClientFactory(_ as String, _ as Class) >> secureCxfClientFactory
+            getSecureCxfClientFactory(_ as String, _ as Class, _ as String, _ as String) >> secureCxfClientFactory
+        }
+
+        def sourceUtilCommons = new SourceUtilCommons(Mock(ConfiguratorSuite))
+        def requestUtils = new TestRequestUtils(clientFactoryFactory, endpointIsReachable)
+
+        return new CswSourceUtils(sourceUtilCommons, requestUtils)
+    }
+
+    def mockWebClient(int statusCode, String responseBody) {
+        return Mock(WebClient) {
+            final mockResponse = Mock(Response) {
+                getStatus() >> statusCode
+                readEntity(String.class) >> responseBody
+                getMediaType() >> Mock(MediaType) {
+                    toString() >> "text/xml"
+                }
+            }
+
+            get() >> mockResponse
+            post(_ as Object) >> mockResponse
+        }
+    }
+
+    static class TestRequestUtils extends RequestUtils {
+
+        Boolean endpointIsReachable
+
+        TestRequestUtils(ClientFactoryFactory clientFactoryFactory, Boolean isReachable) {
+            super(clientFactoryFactory)
+            endpointIsReachable = isReachable
+        }
+
+        @Override
+        Report<Void> endpointIsReachable(UrlField urlField) {
+            if (endpointIsReachable == null) {
+                return super.endpointIsReachable(urlField)
+            }
+
+            Report report = Reports.emptyReport()
+            if (!endpointIsReachable) {
+                report.addErrorMessage(new ErrorMessageImpl(TEST_ERROR_CODE))
+            }
+            return report
+        }
     }
 }

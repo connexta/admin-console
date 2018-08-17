@@ -24,7 +24,6 @@ import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.common.report.message.DefaultMessages;
 import org.codice.ddf.admin.common.services.ServiceCommons;
-import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite;
 
 public class DeleteCswConfiguration extends BaseFunctionField<BooleanField> {
 
@@ -39,16 +38,12 @@ public class DeleteCswConfiguration extends BaseFunctionField<BooleanField> {
 
   private ServiceCommons serviceCommons;
 
-  private final ConfiguratorSuite configuratorSuite;
-
-  public DeleteCswConfiguration(ConfiguratorSuite configuratorSuite) {
+  public DeleteCswConfiguration(ServiceCommons serviceCommons) {
     super(FIELD_NAME, DESCRIPTION);
-    this.configuratorSuite = configuratorSuite;
+    this.serviceCommons = serviceCommons;
 
     pid = new PidField();
     pid.isRequired(true);
-
-    serviceCommons = new ServiceCommons(configuratorSuite);
   }
 
   @Override
@@ -78,7 +73,7 @@ public class DeleteCswConfiguration extends BaseFunctionField<BooleanField> {
 
   @Override
   public FunctionField<BooleanField> newInstance() {
-    return new DeleteCswConfiguration(configuratorSuite);
+    return new DeleteCswConfiguration(serviceCommons);
   }
 
   @Override

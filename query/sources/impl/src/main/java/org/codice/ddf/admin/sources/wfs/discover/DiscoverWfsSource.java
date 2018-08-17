@@ -26,35 +26,30 @@ import org.codice.ddf.admin.common.fields.common.CredentialsField;
 import org.codice.ddf.admin.common.report.message.DefaultMessages;
 import org.codice.ddf.admin.sources.fields.type.WfsSourceConfigurationField;
 import org.codice.ddf.admin.sources.wfs.WfsSourceUtils;
-import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite;
 
 public class DiscoverWfsSource extends BaseFunctionField<WfsSourceConfigurationField> {
 
   public static final String FIELD_NAME = "discover";
 
-  public static final String DESCRIPTION =
+  private static final String DESCRIPTION =
       "Attempts to discover a WFS source using the given hostname and port or URL. If a URL"
           + " is provided, it will take precedence over a hostname and port.";
 
-  public static final WfsSourceConfigurationField RETURN_TYPE = new WfsSourceConfigurationField();
+  private static final WfsSourceConfigurationField RETURN_TYPE = new WfsSourceConfigurationField();
+
+  private final WfsSourceUtils wfsSourceUtils;
 
   private CredentialsField credentials;
 
   private AddressField address;
 
-  private WfsSourceUtils wfsSourceUtils;
-
-  private final ConfiguratorSuite configuratorSuite;
-
-  public DiscoverWfsSource(ConfiguratorSuite configuratorSuite) {
+  public DiscoverWfsSource(WfsSourceUtils wfsSourceUtils) {
     super(FIELD_NAME, DESCRIPTION);
-    this.configuratorSuite = configuratorSuite;
+    this.wfsSourceUtils = wfsSourceUtils;
 
     credentials = new CredentialsField();
     address = new AddressField();
     address.isRequired(true);
-
-    wfsSourceUtils = new WfsSourceUtils(configuratorSuite);
   }
 
   @Override
@@ -86,17 +81,11 @@ public class DiscoverWfsSource extends BaseFunctionField<WfsSourceConfigurationF
 
   @Override
   public FunctionField<WfsSourceConfigurationField> newInstance() {
-    return new DiscoverWfsSource(configuratorSuite);
+    return new DiscoverWfsSource(wfsSourceUtils);
   }
 
   @Override
   public Set<String> getFunctionErrorCodes() {
     return ImmutableSet.of(DefaultMessages.CANNOT_CONNECT, DefaultMessages.UNKNOWN_ENDPOINT);
-  }
-
-  @SuppressWarnings(
-      "squid:UnusedPrivateMethod" /* For testing purposes only. Groovy can access private methods. */)
-  private void setWfsSourceUtils(WfsSourceUtils wfsSourceUtils) {
-    this.wfsSourceUtils = wfsSourceUtils;
   }
 }

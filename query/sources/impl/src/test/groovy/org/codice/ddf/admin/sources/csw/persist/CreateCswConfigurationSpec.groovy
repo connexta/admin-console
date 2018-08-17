@@ -14,9 +14,8 @@
 package org.codice.ddf.admin.sources.csw.persist
 
 import ddf.catalog.source.Source
-import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite
-import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
+import org.codice.ddf.admin.common.services.ServiceCommons
 import org.codice.ddf.admin.configurator.Configurator
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.sources.SourceMessages
@@ -24,17 +23,14 @@ import org.codice.ddf.admin.sources.fields.CswProfile
 import org.codice.ddf.admin.sources.fields.type.CswSourceConfigurationField
 import org.codice.ddf.admin.sources.fields.type.SourceConfigField
 import org.codice.ddf.admin.sources.test.SourceCommonsSpec
-import org.codice.ddf.internal.admin.configurator.actions.FeatureActions
-import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions
-import org.codice.ddf.internal.admin.configurator.actions.ServiceActions
-import org.codice.ddf.internal.admin.configurator.actions.ServiceReader
+import org.codice.ddf.admin.sources.utils.SourceUtilCommons
+import org.codice.ddf.admin.sources.utils.SourceValidationUtils
+import org.codice.ddf.internal.admin.configurator.actions.*
 import org.junit.Ignore
 
 class CreateCswConfigurationSpec extends SourceCommonsSpec {
 
     static final List<Object> FUNCTION_PATH = [CreateCswConfiguration.FIELD_NAME]
-
-    static TEST_OUTPUT_SCHEMA = 'testOutputSchema'
 
     static TEST_CSW_PROFILE = CswProfile.DDFCswFederatedSource.CSW_FEDERATION_PROFILE_SOURCE
 
@@ -51,6 +47,8 @@ class CreateCswConfigurationSpec extends SourceCommonsSpec {
     static SOURCE_NAME_PATH = [CONFIG_PATH, SourceConfigField.SOURCE_NAME_FIELD_NAME].flatten()
 
     static CSW_PROFILE_PATH = [CONFIG_PATH, CSW_PROFILE].flatten()
+
+    static TEST_OUTPUT_SCHEMA = 'testOutputSchema'
 
     CreateCswConfiguration createCswConfiguration
 
@@ -69,6 +67,10 @@ class CreateCswConfigurationSpec extends SourceCommonsSpec {
     ConfiguratorSuite configuratorSuite
 
     Source federatedSource
+
+    SourceValidationUtils sourceValidationUtils
+
+    ServiceCommons serviceCommons
 
     def federatedSources = []
 
@@ -91,7 +93,10 @@ class CreateCswConfigurationSpec extends SourceCommonsSpec {
         configuratorSuite.featureActions >> featureActions
         configuratorSuite.managedServiceActions >> managedServiceActions
 
-        createCswConfiguration = new CreateCswConfiguration(configuratorSuite)
+        serviceCommons = new ServiceCommons(configuratorSuite)
+        sourceValidationUtils = new SourceValidationUtils(new SourceUtilCommons(configuratorSuite), serviceCommons)
+
+        createCswConfiguration = new CreateCswConfiguration(sourceValidationUtils, serviceCommons)
     }
 
     def 'Successfully create new CSW configuration'() {
@@ -158,12 +163,12 @@ class CreateCswConfigurationSpec extends SourceCommonsSpec {
         report.getErrorMessages()*.getPath() == [SOURCE_NAME_PATH, ENDPOINT_URL_PATH, CSW_PROFILE_PATH]
     }
 
-    def 'Returns all the possible error codes correctly'(){
+    def 'Returns all the possible error codes correctly'() {
         setup:
-        CreateCswConfiguration createDuplicateNameConfig = new CreateCswConfiguration(configuratorSuite)
+        CreateCswConfiguration createDuplicateNameConfig = new CreateCswConfiguration(sourceValidationUtils, serviceCommons)
         serviceReader.getServices(_, _) >> federatedSources
 
-        CreateCswConfiguration createFailPersistConfig = new CreateCswConfiguration(configuratorSuite)
+        CreateCswConfiguration createFailPersistConfig = new CreateCswConfiguration(sourceValidationUtils, serviceCommons)
         serviceReader.getServices(_, _) >> []
 
         when:

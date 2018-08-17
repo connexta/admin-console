@@ -22,7 +22,6 @@ import org.codice.ddf.admin.sources.wfs.discover.GetWfsConfigurations;
 import org.codice.ddf.admin.sources.wfs.persist.CreateWfsConfiguration;
 import org.codice.ddf.admin.sources.wfs.persist.DeleteWfsConfiguration;
 import org.codice.ddf.admin.sources.wfs.persist.UpdateWfsConfiguration;
-import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite;
 
 public class WfsFieldProvider extends BaseFieldProvider {
 
@@ -44,13 +43,8 @@ public class WfsFieldProvider extends BaseFieldProvider {
 
   private DeleteWfsConfiguration deleteWfsConfig;
 
-  public WfsFieldProvider(ConfiguratorSuite configuratorSuite) {
+  public WfsFieldProvider() {
     super(NAME, TYPE_NAME, DESCRIPTION);
-    discoverWfsSource = new DiscoverWfsSource(configuratorSuite);
-    getWfsConfigs = new GetWfsConfigurations(configuratorSuite);
-    createWfsConfig = new CreateWfsConfiguration(configuratorSuite);
-    updateWfsConfig = new UpdateWfsConfiguration(configuratorSuite);
-    deleteWfsConfig = new DeleteWfsConfiguration(configuratorSuite);
   }
 
   @Override
@@ -61,5 +55,25 @@ public class WfsFieldProvider extends BaseFieldProvider {
   @Override
   public List<FunctionField> getMutationFunctions() {
     return ImmutableList.of(createWfsConfig, updateWfsConfig, deleteWfsConfig);
+  }
+
+  public void setDiscoverWfsSource(DiscoverWfsSource discoverWfsSource) {
+    this.discoverWfsSource = discoverWfsSource;
+  }
+
+  public void setGetWfsConfiguration(GetWfsConfigurations getWfsConfigs) {
+    this.getWfsConfigs = getWfsConfigs;
+  }
+
+  public void setCreateWfsConfiguration(CreateWfsConfiguration createWfsConfig) {
+    this.createWfsConfig = createWfsConfig;
+  }
+
+  public void setUpdateWfsConfiguration(UpdateWfsConfiguration updateWfsConfig) {
+    this.updateWfsConfig = updateWfsConfig;
+  }
+
+  public void setDeleteWfsConfiguration(DeleteWfsConfiguration deleteWfsConfig) {
+    this.deleteWfsConfig = deleteWfsConfig;
   }
 }

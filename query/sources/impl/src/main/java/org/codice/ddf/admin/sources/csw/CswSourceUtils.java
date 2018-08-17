@@ -43,7 +43,6 @@ import org.codice.ddf.admin.sources.utils.RequestUtils;
 import org.codice.ddf.admin.sources.utils.SourceTaskCallable;
 import org.codice.ddf.admin.sources.utils.SourceTaskHandler;
 import org.codice.ddf.admin.sources.utils.SourceUtilCommons;
-import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -81,9 +80,9 @@ public class CswSourceUtils {
 
   private RequestUtils requestUtils;
 
-  public CswSourceUtils(ConfiguratorSuite configuratorSuite) {
-    this.requestUtils = new RequestUtils();
-    this.sourceUtilCommons = new SourceUtilCommons(configuratorSuite);
+  public CswSourceUtils(SourceUtilCommons sourceUtilCommons, RequestUtils requestUtils) {
+    this.requestUtils = requestUtils;
+    this.sourceUtilCommons = sourceUtilCommons;
   }
 
   /**

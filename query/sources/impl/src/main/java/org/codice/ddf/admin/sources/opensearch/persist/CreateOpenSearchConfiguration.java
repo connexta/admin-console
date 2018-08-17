@@ -29,33 +29,29 @@ import org.codice.ddf.admin.common.services.ServiceCommons;
 import org.codice.ddf.admin.sources.SourceMessages;
 import org.codice.ddf.admin.sources.fields.type.OpenSearchSourceConfigurationField;
 import org.codice.ddf.admin.sources.utils.SourceValidationUtils;
-import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite;
 
 public class CreateOpenSearchConfiguration extends BaseFunctionField<BooleanField> {
 
   public static final String FIELD_NAME = "createOpenSearchSource";
 
-  public static final String DESCRIPTION = "Creates an OpenSearch source configuration.";
+  private static final String DESCRIPTION = "Creates an OpenSearch source configuration.";
 
-  public static final BooleanField RETURN_TYPE = new BooleanField();
+  private static final BooleanField RETURN_TYPE = new BooleanField();
+
+  private final SourceValidationUtils sourceValidationUtils;
+
+  private final ServiceCommons serviceCommons;
 
   private OpenSearchSourceConfigurationField config;
 
-  private SourceValidationUtils sourceValidationUtils;
-
-  private ServiceCommons serviceCommons;
-
-  private final ConfiguratorSuite configuratorSuite;
-
-  public CreateOpenSearchConfiguration(ConfiguratorSuite configuratorSuite) {
+  public CreateOpenSearchConfiguration(
+      SourceValidationUtils sourceValidationUtils, ServiceCommons serviceCommons) {
     super(FIELD_NAME, DESCRIPTION);
-    this.configuratorSuite = configuratorSuite;
+    this.sourceValidationUtils = sourceValidationUtils;
+    this.serviceCommons = serviceCommons;
 
     config = new OpenSearchSourceConfigurationField();
     config.useDefaultRequired();
-
-    sourceValidationUtils = new SourceValidationUtils(configuratorSuite);
-    serviceCommons = new ServiceCommons(configuratorSuite);
   }
 
   @Override
@@ -100,7 +96,7 @@ public class CreateOpenSearchConfiguration extends BaseFunctionField<BooleanFiel
 
   @Override
   public FunctionField<BooleanField> newInstance() {
-    return new CreateOpenSearchConfiguration(configuratorSuite);
+    return new CreateOpenSearchConfiguration(sourceValidationUtils, serviceCommons);
   }
 
   @Override

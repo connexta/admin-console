@@ -22,7 +22,6 @@ import org.codice.ddf.admin.sources.opensearch.discover.GetOpenSearchConfigurati
 import org.codice.ddf.admin.sources.opensearch.persist.CreateOpenSearchConfiguration;
 import org.codice.ddf.admin.sources.opensearch.persist.DeleteOpenSearchConfiguration;
 import org.codice.ddf.admin.sources.opensearch.persist.UpdateOpenSearchConfiguration;
-import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite;
 
 public class OpenSearchFieldProvider extends BaseFieldProvider {
 
@@ -43,13 +42,8 @@ public class OpenSearchFieldProvider extends BaseFieldProvider {
 
   private DeleteOpenSearchConfiguration deleteOpenSearchConfig;
 
-  public OpenSearchFieldProvider(ConfiguratorSuite configuratorSuite) {
+  public OpenSearchFieldProvider() {
     super(ID, TYPE_NAME, DESCRIPTION);
-    discoverOpenSearchSource = new DiscoverOpenSearchSource(configuratorSuite);
-    getOpenSearchConfigs = new GetOpenSearchConfigurations(configuratorSuite);
-    createOpenSearchConfigs = new CreateOpenSearchConfiguration(configuratorSuite);
-    updateOpenSearchConfigs = new UpdateOpenSearchConfiguration(configuratorSuite);
-    deleteOpenSearchConfig = new DeleteOpenSearchConfiguration(configuratorSuite);
   }
 
   @Override
@@ -61,5 +55,28 @@ public class OpenSearchFieldProvider extends BaseFieldProvider {
   public List<FunctionField> getMutationFunctions() {
     return ImmutableList.of(
         createOpenSearchConfigs, updateOpenSearchConfigs, deleteOpenSearchConfig);
+  }
+
+  public void setDiscoverOpenSearchSource(DiscoverOpenSearchSource discoverOpenSearchSource) {
+    this.discoverOpenSearchSource = discoverOpenSearchSource;
+  }
+
+  public void setGetOpenSearchConfigurations(GetOpenSearchConfigurations getOpenSearchConfigs) {
+    this.getOpenSearchConfigs = getOpenSearchConfigs;
+  }
+
+  public void setCreateOpenSearchConfiguration(
+      CreateOpenSearchConfiguration createOpenSearchConfigs) {
+    this.createOpenSearchConfigs = createOpenSearchConfigs;
+  }
+
+  public void setUpdateOpenSearchConfiguration(
+      UpdateOpenSearchConfiguration updateOpenSearchConfigs) {
+    this.updateOpenSearchConfigs = updateOpenSearchConfigs;
+  }
+
+  public void setDeleteOpenSearchConfiguration(
+      DeleteOpenSearchConfiguration deleteOpenSearchConfig) {
+    this.deleteOpenSearchConfig = deleteOpenSearchConfig;
   }
 }

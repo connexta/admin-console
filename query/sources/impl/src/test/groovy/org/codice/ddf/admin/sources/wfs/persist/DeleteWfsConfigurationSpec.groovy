@@ -13,12 +13,12 @@
  **/
 package org.codice.ddf.admin.sources.wfs.persist
 
-import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite
-import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
+import org.codice.ddf.admin.common.services.ServiceCommons
 import org.codice.ddf.admin.configurator.Configurator
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.sources.test.SourceCommonsSpec
+import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite
 import org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions
 
@@ -35,6 +35,8 @@ class DeleteWfsConfigurationSpec extends SourceCommonsSpec {
     ConfiguratorSuite configuratorSuite
 
     private ServiceActions serviceActions
+
+    ServiceCommons serviceCommons
 
     static RESULT_ARGUMENT_PATH = [DeleteWfsConfiguration.FIELD_NAME]
 
@@ -58,7 +60,10 @@ class DeleteWfsConfigurationSpec extends SourceCommonsSpec {
         configuratorSuite.configuratorFactory >> configuratorFactory
         configuratorSuite.serviceActions >> serviceActions
         configuratorSuite.managedServiceActions >> managedServiceActions
-        deleteWfsConfiguration = new DeleteWfsConfiguration(configuratorSuite)
+
+        serviceCommons = new ServiceCommons(configuratorSuite)
+
+        deleteWfsConfiguration = new DeleteWfsConfiguration(serviceCommons)
     }
 
     def 'Successfully delete WFS configuration'() {
@@ -114,12 +119,12 @@ class DeleteWfsConfigurationSpec extends SourceCommonsSpec {
         report.getErrorMessages()*.getPath() == [PID_PATH]
     }
 
-    def 'Returns all the possible error codes correctly'(){
+    def 'Returns all the possible error codes correctly'() {
         setup:
-        DeleteWfsConfiguration deleteWfsNoExistingConfig = new DeleteWfsConfiguration(configuratorSuite)
+        DeleteWfsConfiguration deleteWfsNoExistingConfig = new DeleteWfsConfiguration(serviceCommons)
         serviceActions.read(S_PID) >> [:]
 
-        DeleteWfsConfiguration deleteWfsFailPersist = new DeleteWfsConfiguration(configuratorSuite)
+        DeleteWfsConfiguration deleteWfsFailPersist = new DeleteWfsConfiguration(serviceCommons)
         serviceActions.read(S_PID) >> configToBeDeleted
         configurator.commit(_, _) >> mockReport(true)
 

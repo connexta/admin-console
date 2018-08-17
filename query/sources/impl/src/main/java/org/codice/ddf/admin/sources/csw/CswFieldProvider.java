@@ -22,7 +22,6 @@ import org.codice.ddf.admin.sources.csw.discover.GetCswConfigurations;
 import org.codice.ddf.admin.sources.csw.persist.CreateCswConfiguration;
 import org.codice.ddf.admin.sources.csw.persist.DeleteCswConfiguration;
 import org.codice.ddf.admin.sources.csw.persist.UpdateCswConfiguration;
-import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite;
 
 public class CswFieldProvider extends BaseFieldProvider {
 
@@ -44,13 +43,8 @@ public class CswFieldProvider extends BaseFieldProvider {
 
   private DeleteCswConfiguration deleteCswConfiguration;
 
-  public CswFieldProvider(ConfiguratorSuite configuratorSuite) {
+  public CswFieldProvider() {
     super(ID, TYPE_NAME, DESCRIPTION);
-    discoverCswSource = new DiscoverCswSource(configuratorSuite);
-    getCswConfigurations = new GetCswConfigurations(configuratorSuite);
-    createCswConfiguration = new CreateCswConfiguration(configuratorSuite);
-    updateCswConfiguration = new UpdateCswConfiguration(configuratorSuite);
-    deleteCswConfiguration = new DeleteCswConfiguration(configuratorSuite);
   }
 
   @Override
@@ -61,5 +55,25 @@ public class CswFieldProvider extends BaseFieldProvider {
   @Override
   public List<FunctionField> getMutationFunctions() {
     return ImmutableList.of(createCswConfiguration, updateCswConfiguration, deleteCswConfiguration);
+  }
+
+  public void setGetCswConfigurations(GetCswConfigurations getCswConfigurations) {
+    this.getCswConfigurations = getCswConfigurations;
+  }
+
+  public void setCreateCswConfiguration(CreateCswConfiguration createCswConfiguration) {
+    this.createCswConfiguration = createCswConfiguration;
+  }
+
+  public void setUpdateCswConfiguration(UpdateCswConfiguration updateCswConfiguration) {
+    this.updateCswConfiguration = updateCswConfiguration;
+  }
+
+  public void setDeleteCswConfiguration(DeleteCswConfiguration deleteCswConfiguration) {
+    this.deleteCswConfiguration = deleteCswConfiguration;
+  }
+
+  public void setDiscoverCswSource(DiscoverCswSource discoverCswSource) {
+    this.discoverCswSource = discoverCswSource;
   }
 }

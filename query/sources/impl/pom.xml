@@ -16,7 +16,7 @@
     <parent>
         <artifactId>admin-query-sources</artifactId>
         <groupId>org.codice.ddf.admin.query</groupId>
-        <version>1.2.2-SNAPSHOT</version>
+        <version>1.2.2</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 

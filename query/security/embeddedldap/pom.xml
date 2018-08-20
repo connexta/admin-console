@@ -18,7 +18,7 @@
     <parent>
         <groupId>org.codice.ddf.admin.query</groupId>
         <artifactId>admin-query-security</artifactId>
-        <version>1.2.2</version>
+        <version>1.2.3-SNAPSHOT</version>
     </parent>
 
     <artifactId>admin-query-embeddedldap</artifactId>

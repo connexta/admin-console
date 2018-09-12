@@ -13,9 +13,14 @@
  */
 package org.codice.ddf.admin.ldap.fields.connection;
 
+import static org.codice.ddf.admin.ldap.fields.connection.LdapEncryptionMethodField.LdapsEncryption.LDAPS;
+
 import com.google.common.collect.ImmutableList;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
 import org.codice.ddf.admin.api.Field;
+import org.codice.ddf.admin.common.fields.base.BaseListField;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
 import org.codice.ddf.admin.common.fields.common.HostnameField;
 import org.codice.ddf.admin.common.fields.common.PortField;
@@ -94,5 +99,48 @@ public class LdapConnectionField extends BaseObjectField {
   public LdapConnectionField encryptionMethod(String encryptionMethod) {
     this.encryptionMethod.setValue(encryptionMethod);
     return this;
+  }
+
+  public String getLdapUrl() {
+    String url = encryptionMethod().equalsIgnoreCase(LDAPS) ? "ldaps://" : "ldap://";
+    return String.format("%s%s:%d", url, hostname(), port());
+  }
+
+  public static class ListImpl extends BaseListField<LdapConnectionField> {
+
+    public static final String DEFAULT_FIELD_NAME = "connection";
+
+    private Callable<LdapConnectionField> newConnection;
+
+    public ListImpl() {
+      super(DEFAULT_FIELD_NAME);
+      newConnection = LdapConnectionField::new;
+    }
+
+    public ListImpl(String fieldName) {
+      super(fieldName);
+      newConnection = LdapConnectionField::new;
+    }
+
+    @Override
+    public Callable<LdapConnectionField> getCreateListEntryCallable() {
+      return newConnection;
+    }
+
+    @Override
+    public ListImpl useDefaultRequired() {
+      newConnection =
+          () -> {
+            LdapConnectionField entry = new LdapConnectionField();
+            entry.useDefaultRequired();
+            return entry;
+          };
+
+      return this;
+    }
+
+    public List<String> getLdapUrls() {
+      return this.elements.stream().map(conn -> conn.getLdapUrl()).collect(Collectors.toList());
+    }
   }
 }

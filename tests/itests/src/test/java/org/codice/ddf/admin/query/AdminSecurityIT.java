@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.codice.ddf.admin.api.fields.EnumValue;
+import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.common.fields.common.CredentialsField;
 import org.codice.ddf.admin.comp.test.AbstractComponentTest;
 import org.codice.ddf.admin.comp.test.AdminAppFeatureFile;
@@ -257,6 +258,9 @@ public class AdminSecurityIT extends AbstractComponentTest {
             .hostname("testHostName")
             .port(666);
 
+    ListField<LdapConnectionField> connections = new LdapConnectionField.ListImpl();
+    connections.add(connection);
+
     LdapDirectorySettingsField dirSettings =
         new LdapDirectorySettingsField()
             .baseUserDn(TEST_DN)
@@ -276,6 +280,6 @@ public class AdminSecurityIT extends AbstractComponentTest {
               .add(new ClaimsMapEntry().key(TEST_CLAIM_KEY).value(TEST_CLAIM_VALUE)));
     }
 
-    return newConfig.connection(connection).bindUserInfo(bindUserInfo).settings(dirSettings);
+    return newConfig.connection(connections).bindUserInfo(bindUserInfo).settings(dirSettings);
   }
 }

@@ -39,7 +39,7 @@ public class LdapConfigurationField extends BaseObjectField {
 
   private PidField pid;
 
-  private LdapConnectionField connection;
+  private ListField<LdapConnectionField> connection;
 
   private LdapBindUserInfo bindUserInfo;
 
@@ -50,15 +50,20 @@ public class LdapConfigurationField extends BaseObjectField {
   public LdapConfigurationField() {
     super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
     pid = new PidField();
-    connection = new LdapConnectionField();
+    connection = new LdapConnectionField.ListImpl();
     bindUserInfo = new LdapBindUserInfo();
     settings = new LdapDirectorySettingsField();
     claimMappings = new ClaimsMapEntry.ListImpl();
   }
 
   // Field getters
-  public LdapConnectionField connectionField() {
+  public ListField<LdapConnectionField> connectionField() {
     return connection;
+  }
+
+  public LdapConfigurationField connectionField(ListField<LdapConnectionField> entries) {
+    connection = entries;
+    return this;
   }
 
   public LdapBindUserInfo bindUserInfoField() {
@@ -100,7 +105,12 @@ public class LdapConfigurationField extends BaseObjectField {
     return this;
   }
 
-  public LdapConfigurationField connection(LdapConnectionField connection) {
+  public LdapConfigurationField connection(List<LdapConnectionField> connection) {
+    this.connection.setValue(connection);
+    return this;
+  }
+
+  public LdapConfigurationField connection(ListField<LdapConnectionField> connection) {
     this.connection.setValue(connection.getValue());
     return this;
   }
@@ -136,7 +146,6 @@ public class LdapConfigurationField extends BaseObjectField {
   }
 
   public LdapConfigurationField useDefaultRequired() {
-    connection.useDefaultRequired();
     bindUserInfo.useDefaultRequired();
     settings.useDefaultRequiredForAuthentication();
     isRequired(true);

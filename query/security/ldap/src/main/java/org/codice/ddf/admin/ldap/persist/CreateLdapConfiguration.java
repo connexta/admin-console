@@ -146,6 +146,7 @@ public class CreateLdapConfiguration extends BaseFunctionField<BooleanField> {
 
   @Override
   public void validate() {
+    config.connectionField().isRequired(true);
     String useCase = config.settingsField().useCase();
     if (useCase != null
         && (useCase.equals(ATTRIBUTE_STORE)

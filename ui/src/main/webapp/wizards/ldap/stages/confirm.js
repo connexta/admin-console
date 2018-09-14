@@ -110,10 +110,7 @@ const ConfirmStage = (props) => {
               value={useCaseMapping[configs.ldapUseCase]} />
             <Info
               label='Host Connections'
-              value={hosts.map(host => {
-                return (
-                  host.hostname + ':' + host.port
-              )})} />
+              value={hosts.map(host => { return (host.hostname + ':' + host.port) })} />
             <Info
               label='Encryption Method'
               value={configs.encryption} />

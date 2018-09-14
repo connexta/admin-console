@@ -259,12 +259,12 @@ public class LdapServiceCommons {
 
     Boolean startTlsB = (Boolean) props.get(startTls);
 
-    Object ldapUrlsObj = props.get(ldapUrl);
+    Object ldapUrlsObj = mapValue(props, ldapUrl);
     if (ldapUrlsObj instanceof String[]) {
       for (String url : ((String[]) ldapUrlsObj)) {
         connection.add(getLdapConnectionField(url, startTlsB));
       }
-    } else {
+    } else if (ldapUrlsObj != null) {
       connection.add(getLdapConnectionField(ldapUrlsObj.toString(), startTlsB));
     }
 

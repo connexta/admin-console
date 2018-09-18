@@ -99,7 +99,7 @@ class NetworkSettings extends Component {
           on={setDefaults}
           port={636}
           encryption='ldaps'
-          loadbalancing='round-robin' />
+          loadbalancing='round_robin' />
 
         <Title>LDAP Network Settings</Title>
         <Description>
@@ -188,7 +188,7 @@ class NetworkSettings extends Component {
             value={configs.loadbalancing}
             onEdit={onEdit('loadbalancing')}
             label='Load Balancing Algorithm'
-            options={[ 'round-robin', 'failover' ]} />
+            options={[ 'round_robin', 'failover' ]} />
 
           <Navigation>
             <Back onClick={prev} />

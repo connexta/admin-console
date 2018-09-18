@@ -44,6 +44,8 @@ public class LdapLoginServiceProperties {
 
   public static final String LDAP_URL = "ldapUrl";
 
+  public static final String LDAP_LOAD_BALANCING = "ldapLoadBalancing";
+
   public static final String START_TLS = "startTls";
   // ---
 

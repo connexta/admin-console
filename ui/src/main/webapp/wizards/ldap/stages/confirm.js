@@ -25,23 +25,25 @@ const confirmationInfo = ({
   textOverflow: 'ellipsis'
 })
 
-const createLdapConfig = (hosts, info, settings, mapping) => ({
+const createLdapConfig = (hosts, ldapLoadBalancing, info, settings, mapping) => ({
   mutation: gql`
     mutation CreateLdapConfig(
       $hosts: [LdapConnection],
+      $ldapLoadBalancing: LdapLoadBalancing,
       $info: BindUserInfo,
       $settings: LdapDirectorySettings,
       $mapping: [ClaimsMapEntry]
     ) {
       createLdapConfig(config: {
         connection: $hosts,
+        ldapLoadBalancing: $ldapLoadBalancing,
         bindInfo: $info,
         directorySettings: $settings,
         claimsMapping: $mapping
       })
     }
   `,
-  variables: { hosts, info, settings, mapping }
+  variables: { hosts, ldapLoadBalancing, info, settings, mapping }
 })
 
 const ConfirmStage = (props) => {
@@ -92,6 +94,8 @@ const ConfirmStage = (props) => {
     port: configs.connectionInfo[key][1],
     encryption: configs.encryption
   }))
+
+  const ldapLoadBalancing = configs.loadbalancing
 
   return (
     <div>
@@ -161,7 +165,7 @@ const ConfirmStage = (props) => {
           <Finish
             onClick={() => {
               onStartSubmit()
-              client.mutate(createLdapConfig(hosts, info, settings, mapping))
+              client.mutate(createLdapConfig(hosts, ldapLoadBalancing, info, settings, mapping))
                 .then(() => {
                   onEndSubmit()
                   next('final-stage')

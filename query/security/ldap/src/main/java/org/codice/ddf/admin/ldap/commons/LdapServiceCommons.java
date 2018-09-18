@@ -40,6 +40,7 @@ import org.codice.ddf.admin.ldap.fields.connection.LdapBindMethod;
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindUserInfo;
 import org.codice.ddf.admin.ldap.fields.connection.LdapConnectionField;
 import org.codice.ddf.admin.ldap.fields.connection.LdapEncryptionMethodField;
+import org.codice.ddf.admin.ldap.fields.connection.LdapLoadBalancingField;
 import org.codice.ddf.admin.security.common.services.LdapClaimsHandlerServiceProperties;
 import org.codice.ddf.admin.security.common.services.LdapLoginServiceProperties;
 import org.codice.ddf.configuration.PropertyResolver;
@@ -96,6 +97,9 @@ public class LdapServiceCommons {
               .toArray(new String[] {});
       boolean startTls = isStartTls(config.connectionField().getList().get(0));
       props.put(LdapClaimsHandlerServiceProperties.URL, ldapUrls);
+      props.put(
+          LdapClaimsHandlerServiceProperties.LOAD_BALANCING,
+          config.loadBalancingField().getValue());
       props.put(LdapClaimsHandlerServiceProperties.START_TLS, startTls);
       props.put(
           LdapClaimsHandlerServiceProperties.LDAP_BIND_USER_DN,
@@ -141,6 +145,8 @@ public class LdapServiceCommons {
       boolean startTls = isStartTls(config.connectionField().getList().get(0));
 
       ldapStsConfig.put(LdapLoginServiceProperties.LDAP_URL, ldapUrls);
+      ldapStsConfig.put(
+          LdapLoginServiceProperties.LDAP_LOAD_BALANCING, config.loadBalancingField().getValue());
       ldapStsConfig.put(LdapLoginServiceProperties.START_TLS, Boolean.toString(startTls));
       ldapStsConfig.put(
           LdapLoginServiceProperties.LDAP_BIND_USER_DN,
@@ -180,6 +186,9 @@ public class LdapServiceCommons {
             LdapClaimsHandlerServiceProperties.URL,
             LdapClaimsHandlerServiceProperties.START_TLS);
 
+    LdapLoadBalancingField loadBalancing = new LdapLoadBalancingField();
+    loadBalancing.setValue(mapValue(props, LdapClaimsHandlerServiceProperties.LOAD_BALANCING));
+
     LdapBindUserInfo bindUserInfo =
         new LdapBindUserInfo()
             .username(mapValue(props, LdapClaimsHandlerServiceProperties.LDAP_BIND_USER_DN))
@@ -210,6 +219,7 @@ public class LdapServiceCommons {
 
     return new LdapConfigurationField()
         .connection(connection)
+        .loadBalancing(loadBalancing)
         .bindUserInfo(bindUserInfo)
         .settings(settings)
         .mapAllClaims(claimMappings)
@@ -223,6 +233,9 @@ public class LdapServiceCommons {
     ListField<LdapConnectionField> connection =
         getLdapConnectionField(
             props, LdapLoginServiceProperties.LDAP_URL, LdapLoginServiceProperties.START_TLS);
+
+    LdapLoadBalancingField loadBalancing = new LdapLoadBalancingField();
+    loadBalancing.setValue(mapValue(props, LdapLoginServiceProperties.LDAP_LOAD_BALANCING));
 
     LdapBindUserInfo bindUserInfo =
         new LdapBindUserInfo()
@@ -248,6 +261,7 @@ public class LdapServiceCommons {
 
     return new LdapConfigurationField()
         .connection(connection)
+        .loadBalancing(loadBalancing)
         .bindUserInfo(bindUserInfo)
         .settings(settings)
         .pid(mapValue(props, SERVICE_PID_KEY));

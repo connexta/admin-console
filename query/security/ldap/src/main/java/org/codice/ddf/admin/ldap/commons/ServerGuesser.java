@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -34,6 +35,7 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.codice.ddf.admin.ldap.fields.query.LdapTypeField;
+import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.opendj.ldap.Entries;
@@ -84,6 +86,9 @@ public abstract class ServerGuesser {
   private static final Predicate<ObjectClass> STRUCT_OR_AUX =
       oc -> oc.getObjectClassType() == STRUCTURAL || oc.getObjectClassType() == AUXILIARY;
 
+  private static final Predicate<ObjectClass> GROUP =
+      oc -> oc.getNameOrOID().toLowerCase().contains("group");
+
   private ServerGuesser(Connection connection) {
     this.connection = connection;
   }
@@ -126,23 +131,45 @@ public abstract class ServerGuesser {
   }
 
   public List<String> getGroupObjectClass() {
-    return ImmutableList.of("groupOfNames", "group", "posixGroup");
+    return new ArrayList<>(
+        getResults("(|(objectClass=group)(objectClass=group*)(objectClass=*Group*))")
+            .stream()
+            .flatMap(entry -> Entries.getObjectClasses(entry).stream())
+            .filter(GROUP)
+            .map(ObjectClass::getNameOrOID)
+            .collect(Collectors.toCollection(TreeSet::new)));
   }
 
   public List<String> getGroupAttributeHoldingMember() {
-    return ImmutableList.of(MEMBER, "uniqueMember", "memberUid");
+    List<SearchResultEntry> queryResults =
+        getResults("(|(objectClass=group)(objectClass=group*)(objectClass=*Group*))");
+    Set<String> memberAttribute = new TreeSet<>();
+    for (SearchResultEntry entry : queryResults) {
+      for (Attribute attr : entry.getAllAttributes()) {
+        String name = attr.getAttributeDescription().getAttributeType().getNameOrOID();
+        if (name.toLowerCase().contains(MEMBER)) {
+          memberAttribute.add(name);
+        }
+      }
+    }
+
+    return new ArrayList<>(memberAttribute);
   }
 
   public List<String> getMemberAttributeReferencedInGroup() {
-    return ImmutableList.of("uid");
+    return ImmutableList.of("uid", "cn");
   }
 
   public List<String> getUserBaseChoices() {
-    return getChoices("(|(ou=user*)(name=user*)(cn=user*))");
+    return new ArrayList<>(getChoices("(objectClass=person)", true, new NameSorter("user")));
   }
 
   public List<String> getGroupBaseChoices() {
-    return getChoices("(|(ou=group*)(name=group*)(cn=group*)(objectClass=groupOfUniqueNames))");
+    return new ArrayList<>(
+        getChoices(
+            "(|(objectClass=group)(objectClass=group*)(objectClass=*Group*))",
+            true,
+            new NameSorter("group")));
   }
 
   public Set<String> getClaimAttributeOptions(String baseUserDn) {
@@ -192,28 +219,43 @@ public abstract class ServerGuesser {
         .collect(Collectors.toCollection(TreeSet::new));
   }
 
-  private List<String> getChoices(String query) {
+  private Set<String> getChoices(String query, boolean returnParents, Comparator<String> sorter) {
+    List<SearchResultEntry> queryResults = getResults(query);
+
+    Set<String> choices = new TreeSet<>(sorter);
+    for (SearchResultEntry entry : queryResults) {
+      DN name = entry.getName();
+      if (returnParents) {
+        choices.add(name.parent().toString());
+      } else {
+        choices.add(name.toString());
+      }
+    }
+
+    return choices;
+  }
+
+  private List<SearchResultEntry> getResults(String query) {
     List<String> baseContexts = getBaseContexts();
 
-    List<String> choices = new ArrayList<>();
+    List<SearchResultEntry> results = new ArrayList<>();
     for (String baseContext : baseContexts) {
       try (ConnectionEntryReader reader =
           connection.search(baseContext, SearchScope.WHOLE_SUBTREE, query)) {
         while (reader.hasNext()) {
           if (!reader.isReference()) {
-            SearchResultEntry resultEntry = reader.readEntry();
-            choices.add(resultEntry.getName().toString());
+            results.add(reader.readEntry());
           } else {
             // TODO RAP 07 Dec 16: What do we need to do with remote references?
             reader.readReference();
           }
         }
       } catch (IOException e) {
-        LOGGER.debug("Error getting choices", e);
+        LOGGER.debug("Error getting query results", e);
       }
     }
 
-    return choices;
+    return results;
   }
 
   private static class DefaultGuesser extends ServerGuesser {
@@ -269,23 +311,17 @@ public abstract class ServerGuesser {
     }
 
     @Override
-    public List<String> getGroupObjectClass() {
-      return Collections.singletonList("group");
-    }
-
-    @Override
-    public List<String> getGroupAttributeHoldingMember() {
-      return Collections.singletonList(MEMBER);
-    }
-
-    @Override
     public List<String> getUserBaseChoices() {
       return super.getUserBaseChoices().stream().filter(USER_DN_EXC).collect(Collectors.toList());
     }
 
     @Override
     public List<String> getGroupBaseChoices() {
-      return super.getGroupBaseChoices().stream().filter(GROUP_DN_EXC).collect(Collectors.toList());
+      return super.getGroupBaseChoices()
+          .stream()
+          .filter(GROUP_DN_EXC)
+          .filter(USER_DN_EXC)
+          .collect(Collectors.toList());
     }
   }
 
@@ -327,6 +363,27 @@ public abstract class ServerGuesser {
     @SuppressWarnings("squid:UnusedPrivateMethod" /* Constructor used in the GUESSER_LOOKUP map */)
     private OpenDjGuesser(Connection connection) {
       super(connection);
+    }
+  }
+
+  private static class NameSorter implements Comparator<String> {
+    private String preference;
+
+    NameSorter(String preference) {
+      this.preference = preference.toUpperCase();
+    }
+
+    @Override
+    public int compare(String one, String two) {
+      boolean oneHasPreference = one.toUpperCase().contains(preference);
+      boolean twoHasPreference = two.toUpperCase().contains(preference);
+      if (oneHasPreference && !twoHasPreference) {
+        return -1;
+      } else if (!oneHasPreference && twoHasPreference) {
+        return 1;
+      } else {
+        return (new Integer(one.length()).compareTo(new Integer(two.length())));
+      }
     }
   }
 }

@@ -13,7 +13,8 @@ describe('<LDAP />', () => {
       const wrapper = shallow(
         <DirectorySettings
           configs={{
-            ldapUseCase: 'Authentication'
+            ldapUseCase: 'Authentication',
+            connectionInfo: [['localhost', '636', 'ldaps']]
           }}
           options={{}}
           errors={[]}
@@ -48,7 +49,8 @@ describe('<LDAP />', () => {
       const wrapper = shallow(
         <DirectorySettings
           configs={{
-            ldapUseCase: 'AttributeStore'
+            ldapUseCase: 'AttributeStore',
+            connectionInfo: [['localhost', '636', 'ldaps']]
           }}
           options={{}}
           errors={[]}
@@ -63,7 +65,8 @@ describe('<LDAP />', () => {
       const wrapper = shallow(
         <DirectorySettings
           configs={{
-            ldapUseCase: 'AuthenticationAndAttributeStore'
+            ldapUseCase: 'AuthenticationAndAttributeStore',
+            connectionInfo: [['localhost', '636', 'ldaps']]
           }}
           options={{}}
           errors={[]}

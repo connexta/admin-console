@@ -144,7 +144,7 @@ class LdapRecommendedSettingsSpec extends Specification {
         recSettings.userDnsField().value.size() == 1
         recSettings.userDnsField().value.first() == 'ou=users,dc=example,dc=com'
 
-        recSettings.groupDnsField().value.size() == 2
+        recSettings.groupDnsField().value.size() == 1
         recSettings.groupDnsField().value.any {
             it == 'ou=groups,dc=example,dc=com'
         }
@@ -154,13 +154,13 @@ class LdapRecommendedSettingsSpec extends Specification {
 
         recSettings.groupObjectClassesField().value.collect {
             it.toLowerCase()
-        } as Set == ['group', 'groupofnames', 'posixgroup'] as Set
+        } as Set == ['groupofnames'] as Set
 
         recSettings.groupAttributesHoldingMemberField().value.collect {
             it.toLowerCase()
-        } as Set == ['member', 'uniquemember', 'memberuid'] as Set
+        } as Set == ['member'] as Set
 
-        recSettings.memberAttributesReferencedInGroupField().value == ['uid']
+        recSettings.memberAttributesReferencedInGroupField().value == ['uid', 'cn']
 
         recSettings.queryBasesField().value == [TestLdapServer.getBaseDistinguishedName()]
 

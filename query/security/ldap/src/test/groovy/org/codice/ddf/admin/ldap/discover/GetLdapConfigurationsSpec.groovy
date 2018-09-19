@@ -66,7 +66,7 @@ class GetLdapConfigurationsSpec extends Specification {
     private getTestLdapServiceProps() {
         def config = new LdapConfigurationField()
                 .bindUserInfo(LdapTestingCommons.simpleBindInfo().password('notTheFlagPassword'))
-                .connection(LdapTestingCommons.noEncryptionLdapConnectionInfo())
+                .connection(LdapTestingCommons.noEncryptionLdapConnectionList())
 
         return [
                 'somePid': new LdapServiceCommons(configuratorSuite).ldapConfigToLdapClaimsHandlerService(config, "/some/path")

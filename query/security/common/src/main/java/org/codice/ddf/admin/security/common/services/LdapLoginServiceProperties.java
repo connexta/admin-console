@@ -36,11 +36,15 @@ public class LdapLoginServiceProperties {
 
   public static final String MEMBERSHIP_USER_ATTRIBUTE = "membershipUserAttribute";
 
+  public static final String MEMBER_NAME_ATTRIBUTE = "memberNameAttribute";
+
   public static final String USER_BASE_DN = "userBaseDn";
 
   public static final String GROUP_BASE_DN = "groupBaseDn";
 
   public static final String LDAP_URL = "ldapUrl";
+
+  public static final String LDAP_LOAD_BALANCING = "ldapLoadBalancing";
 
   public static final String START_TLS = "startTls";
   // ---

@@ -25,23 +25,25 @@ const confirmationInfo = ({
   textOverflow: 'ellipsis'
 })
 
-const createLdapConfig = (conn, info, settings, mapping) => ({
+const createLdapConfig = (hosts, ldapLoadBalancing, info, settings, mapping) => ({
   mutation: gql`
     mutation CreateLdapConfig(
-      $conn: LdapConnection,
+      $hosts: [LdapConnection],
+      $ldapLoadBalancing: LdapLoadBalancing,
       $info: BindUserInfo,
       $settings: LdapDirectorySettings,
       $mapping: [ClaimsMapEntry]
     ) {
       createLdapConfig(config: {
-        connection: $conn,
+        connection: $hosts,
+        ldapLoadBalancing: $ldapLoadBalancing,
         bindInfo: $info,
         directorySettings: $settings,
         claimsMapping: $mapping
       })
     }
   `,
-  variables: { conn, info, settings, mapping }
+  variables: { hosts, ldapLoadBalancing, info, settings, mapping }
 })
 
 const ConfirmStage = (props) => {
@@ -62,12 +64,6 @@ const ConfirmStage = (props) => {
   } = props
 
   const isAttrStore = ldapUseCase === 'AuthenticationAndAttributeStore' || ldapUseCase === 'AttributeStore'
-
-  const conn = {
-    hostname: configs.hostname,
-    port: configs.port,
-    encryption: configs.encryption
-  }
 
   const info = {
     creds: {
@@ -93,6 +89,14 @@ const ConfirmStage = (props) => {
 
   const mapping = Object.keys(configs.attributeMappings || {}).map((key) => ({ key, value: configs.attributeMappings[key] }))
 
+  const hosts = Object.keys(configs.connectionInfo || {}).map((key, i) => ({
+    hostname: configs.connectionInfo[key][0],
+    port: configs.connectionInfo[key][1],
+    encryption: configs.encryption
+  }))
+
+  const ldapLoadBalancing = configs.loadbalancing
+
   return (
     <div>
       <Title>LDAP Settings Confirmation</Title>
@@ -109,14 +113,14 @@ const ConfirmStage = (props) => {
               label='LDAP Function'
               value={useCaseMapping[configs.ldapUseCase]} />
             <Info
-              label='Hostname'
-              value={configs.hostname} />
-            <Info
-              label='Port'
-              value={configs.port} />
+              label='Host Connections'
+              value={hosts.map(host => { return (host.hostname + ':' + host.port) })} />
             <Info
               label='Encryption Method'
               value={configs.encryption} />
+            <Info
+              label='Load Balancing Algorithm'
+              value={configs.loadbalancing} />
             <Info
               label='Base User DN'
               value={configs.baseUserDn} />
@@ -161,7 +165,7 @@ const ConfirmStage = (props) => {
           <Finish
             onClick={() => {
               onStartSubmit()
-              client.mutate(createLdapConfig(conn, info, settings, mapping))
+              client.mutate(createLdapConfig(hosts, ldapLoadBalancing, info, settings, mapping))
                 .then(() => {
                   onEndSubmit()
                   next('final-stage')

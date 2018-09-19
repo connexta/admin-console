@@ -15,6 +15,7 @@ package org.codice.ddf.admin.ldap;
 
 import java.io.IOException;
 import java.util.Properties;
+import org.codice.ddf.admin.api.fields.ListField;
 import org.codice.ddf.admin.ldap.fields.config.LdapDirectorySettingsField;
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindMethod.SimpleEnumValue;
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindUserInfo;
@@ -39,6 +40,12 @@ public class LdapTestingCommons {
         .hostname(TestLdapServer.getHostname())
         .port(TestLdapServer.getLdapPort())
         .encryptionMethod(LdapEncryptionMethodField.NoEncryption.NONE);
+  }
+
+  public static ListField<LdapConnectionField> noEncryptionLdapConnectionList() {
+    ListField<LdapConnectionField> connections = new LdapConnectionField.ListImpl();
+    connections.add(noEncryptionLdapConnectionInfo());
+    return connections;
   }
 
   public static LdapBindUserInfo simpleBindInfo() {

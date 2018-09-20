@@ -87,16 +87,8 @@ public class LdapServiceCommons {
     Map<String, Object> props = new HashMap<>();
 
     if (config != null) {
-      final String[] ldapUrls =
-          config
-              .connectionField()
-              .getList()
-              .stream()
-              .map(conn -> conn.getLdapUrl())
-              .collect(Collectors.toList())
-              .toArray(new String[] {});
-      boolean startTls = isStartTls(config.connectionField().getList().get(0));
-      props.put(LdapClaimsHandlerServiceProperties.URL, ldapUrls);
+      boolean startTls = isStartTls(config.connectionField());
+      props.put(LdapClaimsHandlerServiceProperties.URL, getLdapUrls(config.connectionField()));
       props.put(
           LdapClaimsHandlerServiceProperties.LOAD_BALANCING,
           config.loadBalancingField().getValue());
@@ -134,17 +126,9 @@ public class LdapServiceCommons {
     Map<String, Object> ldapStsConfig = new HashMap<>();
 
     if (config != null) {
-      final String[] ldapUrls =
-          config
-              .connectionField()
-              .getList()
-              .stream()
-              .map(conn -> conn.getLdapUrl())
-              .collect(Collectors.toList())
-              .toArray(new String[] {});
-      boolean startTls = isStartTls(config.connectionField().getList().get(0));
+      boolean startTls = isStartTls(config.connectionField());
 
-      ldapStsConfig.put(LdapLoginServiceProperties.LDAP_URL, ldapUrls);
+      ldapStsConfig.put(LdapLoginServiceProperties.LDAP_URL, getLdapUrls(config.connectionField()));
       ldapStsConfig.put(
           LdapLoginServiceProperties.LDAP_LOAD_BALANCING, config.loadBalancingField().getValue());
       ldapStsConfig.put(LdapLoginServiceProperties.START_TLS, Boolean.toString(startTls));
@@ -177,6 +161,15 @@ public class LdapServiceCommons {
           LdapLoginServiceProperties.GROUP_BASE_DN, config.settingsField().baseGroupDn());
     }
     return ldapStsConfig;
+  }
+
+  private String[] getLdapUrls(ListField<LdapConnectionField> connections) {
+    return connections
+        .getList()
+        .stream()
+        .map(LdapConnectionField::getLdapUrl)
+        .collect(Collectors.toList())
+        .toArray(new String[] {});
   }
 
   private LdapConfigurationField ldapClaimsHandlerServiceToLdapConfig(Map<String, Object> props) {
@@ -268,18 +261,18 @@ public class LdapServiceCommons {
   }
 
   private ListField<LdapConnectionField> getLdapConnectionField(
-      Map<String, Object> props, String ldapUrl, String startTls) {
+      Map<String, Object> props, String ldapUrlKey, String startTlsKey) {
     ListField<LdapConnectionField> connection = new LdapConnectionField.ListImpl();
 
-    Boolean startTlsB = (Boolean) props.get(startTls);
+    Boolean isStartTls = (Boolean) props.get(startTlsKey);
 
-    Object ldapUrlsObj = mapValue(props, ldapUrl);
-    if (ldapUrlsObj instanceof String[]) {
-      for (String url : ((String[]) ldapUrlsObj)) {
-        connection.add(getLdapConnectionField(url, startTlsB));
+    Object ldapUrls = mapValue(props, ldapUrlKey);
+    if (ldapUrls instanceof String[]) {
+      for (String url : ((String[]) ldapUrls)) {
+        connection.add(getLdapConnectionField(url, isStartTls));
       }
-    } else if (ldapUrlsObj != null) {
-      connection.add(getLdapConnectionField(ldapUrlsObj.toString(), startTlsB));
+    } else if (ldapUrls != null) {
+      connection.add(getLdapConnectionField(ldapUrls.toString(), isStartTls));
     }
 
     return connection;
@@ -307,8 +300,17 @@ public class LdapServiceCommons {
     return connection;
   }
 
-  private static boolean isStartTls(LdapConnectionField config) {
-    return config.encryptionMethod().equalsIgnoreCase(LdapLoginServiceProperties.START_TLS);
+  private static boolean isStartTls(ListField<LdapConnectionField> config) {
+    boolean startTls = false;
+    if (config != null && !config.getList().isEmpty()) {
+      startTls =
+          config
+              .getList()
+              .get(0)
+              .encryptionMethod()
+              .equalsIgnoreCase(LdapLoginServiceProperties.START_TLS);
+    }
+    return startTls;
   }
 
   private static String getLdapUrl(LdapConnectionField connection) {

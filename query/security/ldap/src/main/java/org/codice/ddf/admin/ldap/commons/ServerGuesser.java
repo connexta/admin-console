@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -34,8 +35,11 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 import org.codice.ddf.admin.ldap.fields.query.LdapTypeField;
 import org.forgerock.opendj.ldap.Attribute;
+import org.forgerock.opendj.ldap.AttributeDescription;
+import org.forgerock.opendj.ldap.ByteString;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.opendj.ldap.Entries;
@@ -86,8 +90,11 @@ public abstract class ServerGuesser {
   private static final Predicate<ObjectClass> STRUCT_OR_AUX =
       oc -> oc.getObjectClassType() == STRUCTURAL || oc.getObjectClassType() == AUXILIARY;
 
-  private static final Predicate<ObjectClass> GROUP =
-      oc -> oc.getNameOrOID().toLowerCase().contains("group");
+  private static final List<String> MEMBERSHIP_ATTRIBUTES =
+      Arrays.asList("member", "uniquemember", "memberuid");
+
+  private static final List<String> GROUP_OCS =
+      Arrays.asList("group", "groupofnames", "groupofuniquenames", "posixgroup");
 
   private ServerGuesser(Connection connection) {
     this.connection = connection;
@@ -131,29 +138,39 @@ public abstract class ServerGuesser {
   }
 
   public List<String> getGroupObjectClass() {
-    return new ArrayList<>(
-        getResults("(|(objectClass=group)(objectClass=group*)(objectClass=*Group*))")
-            .stream()
-            .flatMap(entry -> Entries.getObjectClasses(entry).stream())
-            .filter(GROUP)
-            .map(ObjectClass::getNameOrOID)
-            .collect(Collectors.toCollection(TreeSet::new)));
+    return getResults("(|(objectClass=group)(objectClass=group*)(objectClass=*Group*))")
+        .stream()
+        .map(SearchResultEntry::getAllAttributes)
+        .map(Iterable::spliterator)
+        .flatMap(it -> StreamSupport.stream(it, false))
+        .filter(
+            attr ->
+                attr.getAttributeDescription()
+                    .getAttributeType()
+                    .getNameOrOID()
+                    .equalsIgnoreCase("objectClass"))
+        .map(Attribute::spliterator)
+        .flatMap(it -> StreamSupport.stream(it, false))
+        .map(ByteString::toString)
+        .filter(name -> GROUP_OCS.contains(name.toLowerCase()))
+        .distinct()
+        .sorted()
+        .collect(Collectors.toList());
   }
 
   public List<String> getGroupAttributeHoldingMember() {
-    List<SearchResultEntry> queryResults =
-        getResults("(|(objectClass=group)(objectClass=group*)(objectClass=*Group*))");
-    Set<String> memberAttribute = new TreeSet<>();
-    for (SearchResultEntry entry : queryResults) {
-      for (Attribute attr : entry.getAllAttributes()) {
-        String name = attr.getAttributeDescription().getAttributeType().getNameOrOID();
-        if (name.toLowerCase().contains(MEMBER)) {
-          memberAttribute.add(name);
-        }
-      }
-    }
-
-    return new ArrayList<>(memberAttribute);
+    return getResults("(|(objectClass=group)(objectClass=group*)(objectClass=*Group*))")
+        .stream()
+        .map(SearchResultEntry::getAllAttributes)
+        .map(Iterable::spliterator)
+        .flatMap(it -> StreamSupport.stream(it, false))
+        .map(Attribute::getAttributeDescription)
+        .map(AttributeDescription::getAttributeType)
+        .map(AttributeType::getNameOrOID)
+        .filter(name -> MEMBERSHIP_ATTRIBUTES.contains(name.toLowerCase()))
+        .distinct()
+        .sorted()
+        .collect(Collectors.toList());
   }
 
   public List<String> getMemberAttributeReferencedInGroup() {
@@ -366,6 +383,19 @@ public abstract class ServerGuesser {
     }
   }
 
+  /**
+   * This comparator sorts Strings that contain a preferred value to the beginning of a list. For
+   * example, when sorting LDAP DNs for a user OU the preference value would be to find an OU with
+   * 'user' or 'users' in the name. If the list of user based OUs is:
+   * [OU=services,OU=users,DC=example,DC=com OU=accounts,DC=example,DC=com
+   * OU=users,DC=example,DC=com] then the sorted list would be: [OU=users,DC=example,DC=com
+   * OU=services,OU=users,DC=example,DC=com OU=accounts,DC=example,DC=com]
+   *
+   * <p>This comparator also sorts by string length such that shorter values are moved to the
+   * beginning of a list. The reason for this is to prefer higher level OUs so that the default
+   * values include more users or groups. In the above example, OU=users,DC=example,DC=com is more
+   * inclusive than OU=services,OU=users,DC=example,DC=com
+   */
   private static class NameSorter implements Comparator<String> {
     private String preference;
 

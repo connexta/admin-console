@@ -140,7 +140,10 @@ public class LdapConnectionField extends BaseObjectField {
     }
 
     public List<String> getLdapUrls() {
-      return this.elements.stream().map(conn -> conn.getLdapUrl()).collect(Collectors.toList());
+      return this.elements
+          .stream()
+          .map(LdapConnectionField::getLdapUrl)
+          .collect(Collectors.toList());
     }
   }
 }

@@ -108,7 +108,7 @@ public class LdapConnectionField extends BaseObjectField {
 
   public static class ListImpl extends BaseListField<LdapConnectionField> {
 
-    public static final String DEFAULT_FIELD_NAME = "connection";
+    public static final String DEFAULT_FIELD_NAME = "connections";
 
     private Callable<LdapConnectionField> newConnection;
 
@@ -135,15 +135,16 @@ public class LdapConnectionField extends BaseObjectField {
             entry.useDefaultRequired();
             return entry;
           };
-
+      isRequired(true);
       return this;
     }
 
-    public List<String> getLdapUrls() {
+    public String[] getLdapUrls() {
       return this.elements
           .stream()
           .map(LdapConnectionField::getLdapUrl)
-          .collect(Collectors.toList());
+          .collect(Collectors.toList())
+          .toArray(new String[] {});
     }
   }
 }

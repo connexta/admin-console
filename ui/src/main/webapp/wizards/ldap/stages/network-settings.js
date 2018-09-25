@@ -99,7 +99,7 @@ class NetworkSettings extends Component {
           on={setDefaults}
           port={636}
           encryption='ldaps'
-          loadbalancing='round_robin' />
+          loadbalancing='roundRobin' />
 
         <Title>LDAP Network Settings</Title>
         <Description>
@@ -108,7 +108,8 @@ class NetworkSettings extends Component {
           encryption method. Typically, port 636 uses LDAPS encryption and port 389 uses
           StartTLS.  Adding more than one host creates a cluster.  The cluster connections can
           be load balanced between the hosts (round-robin) or can be treated as a failover cluster
-          where the first host is considered the primary host.
+          where the first host is considered the primary host.  The configuration of each host
+          in the cluster is assumed to be the same (i.e. bind user, directory settings, etc).
         </Description>
 
         <Body>
@@ -188,7 +189,7 @@ class NetworkSettings extends Component {
             value={configs.loadbalancing}
             onEdit={onEdit('loadbalancing')}
             label='Load Balancing Algorithm'
-            options={[ 'round_robin', 'failover' ]} />
+            options={[ 'roundRobin', 'failover' ]} />
 
           <Navigation>
             <Back onClick={prev} />

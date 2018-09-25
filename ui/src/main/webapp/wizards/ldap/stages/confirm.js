@@ -35,7 +35,7 @@ const createLdapConfig = (hosts, ldapLoadBalancing, info, settings, mapping) => 
       $mapping: [ClaimsMapEntry]
     ) {
       createLdapConfig(config: {
-        connection: $hosts,
+        connections: $hosts,
         ldapLoadBalancing: $ldapLoadBalancing,
         bindInfo: $info,
         directorySettings: $settings,

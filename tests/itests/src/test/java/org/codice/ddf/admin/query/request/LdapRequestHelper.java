@@ -105,7 +105,7 @@ public class LdapRequestHelper {
           requestFactory
               .createRequest()
               .usingMutation("CreateLdapConfig.graphql")
-              .addArgument("connection", config.connectionField().getValue())
+              .addArgument("connection", config.connectionsField().getValue())
               .addArgument("bindInfo", config.bindUserInfoField().getValue())
               .addArgument("settings", config.settingsField().getValue())
               .addArgument("claimsMapping", config.claimMappingsField().getValue())

@@ -39,7 +39,7 @@ public class LdapLoadBalancingField extends BaseEnumField<String> {
   }
 
   public static final class RoundRobinEnumValue implements EnumValue<String> {
-    public static final String ROUND_ROBIN = "round_robin";
+    public static final String ROUND_ROBIN = "roundRobin";
 
     public static final String DESCRIPTION =
         "The configured LDAP server cluster will be treated as an all active cluster and connections to the cluster will be made in a round-robin order.";

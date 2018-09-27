@@ -146,13 +146,15 @@ public class CreateLdapConfiguration extends BaseFunctionField<BooleanField> {
 
   @Override
   public void validate() {
-    config.connectionField().isRequired(true);
     String useCase = config.settingsField().useCase();
     if (useCase != null
         && (useCase.equals(ATTRIBUTE_STORE)
             || useCase.equals(AUTHENTICATION_AND_ATTRIBUTE_STORE))) {
       config.settingsField().useDefaultRequiredForAttributeStore();
       config.claimMappingsField().isRequired(true);
+    }
+    if (config.connectionsField().getList().size() > 1) {
+      config.loadBalancingField().isRequired(true);
     }
 
     super.validate();

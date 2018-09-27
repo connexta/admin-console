@@ -33,7 +33,8 @@ describe('<LDAP />', () => {
         'baseUserDn',
         'loginUserAttribute',
         'memberAttributeReferencedInGroup',
-        'baseGroupDn'
+        'baseGroupDn',
+        'groupAttributeHoldingMember'
       ])
 
       const notVisible = wrapper.find(InputAuto)
@@ -41,8 +42,7 @@ describe('<LDAP />', () => {
         .map((comp) => comp.prop('id'))
 
       expect(notVisible).to.deep.equal([
-        'groupObjectClass',
-        'groupAttributeHoldingMember'
+        'groupObjectClass'
       ])
     })
     it('should show all fields when `AttributeStore`', () => {

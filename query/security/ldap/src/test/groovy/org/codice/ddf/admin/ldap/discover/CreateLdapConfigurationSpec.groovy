@@ -40,7 +40,7 @@ class CreateLdapConfigurationSpec extends Specification {
     def setup() {
         // Initialize bad paths
         baseMsg = [CreateLdapConfiguration.FIELD_NAME, LdapConfigurationField.DEFAULT_FIELD_NAME]
-        authBadPaths = [missingConnectionPath    : baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME],
+        authBadPaths = [missingConnectionPath    : baseMsg + [LdapConnectionField.ListImpl.DEFAULT_FIELD_NAME],
                         missingUsernamePath: baseMsg + [LdapBindUserInfo.DEFAULT_FIELD_NAME, CredentialsField.DEFAULT_FIELD_NAME, CredentialsField.USERNAME_FIELD_NAME],
                         missingUserpasswordPath: baseMsg + [LdapBindUserInfo.DEFAULT_FIELD_NAME, CredentialsField.DEFAULT_FIELD_NAME, CredentialsField.PASSWORD_FIELD_NAME],
                         missingBindMethodPath  : baseMsg + [LdapBindUserInfo.DEFAULT_FIELD_NAME, LdapBindMethod.DEFAULT_FIELD_NAME],

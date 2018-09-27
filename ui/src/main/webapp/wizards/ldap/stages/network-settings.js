@@ -99,7 +99,7 @@ class NetworkSettings extends Component {
           on={setDefaults}
           port={636}
           encryption='ldaps'
-          loadbalancing='round_robin' />
+          loadbalancing='roundRobin' />
 
         <Title>LDAP Network Settings</Title>
         <Description>
@@ -108,10 +108,18 @@ class NetworkSettings extends Component {
           encryption method. Typically, port 636 uses LDAPS encryption and port 389 uses
           StartTLS.  Adding more than one host creates a cluster.  The cluster connections can
           be load balanced between the hosts (round-robin) or can be treated as a failover cluster
-          where the first host is considered the primary host.
+          where the first host is considered the primary host.  The configuration of each host
+          in the cluster is assumed to be the same (i.e. bind user, directory settings, etc).
         </Description>
 
         <Body>
+          <Select
+            value={configs.encryption}
+            errorText={errors.encryption}
+            onEdit={onEdit('encryption')}
+            label='Encryption Method'
+            options={[ 'none', 'ldaps', 'startTls' ]} />
+
           <Hostname
             value={configs.hostname}
             errorText={errors.hostname}
@@ -123,6 +131,12 @@ class NetworkSettings extends Component {
             errorText={isPortInvalid ? getFriendlyMessage('INVALID_PORT_RANGE') : errors.port}
             onEdit={onEdit('port')}
             options={[389, 636]} />
+
+          <Select
+            value={configs.loadbalancing}
+            onEdit={onEdit('loadbalancing')}
+            label='Load Balancing Algorithm'
+            options={[ 'roundRobin', 'failover' ]} />
 
           {messages.map((msg, i) => <Message key={i} {...msg} />)}
 
@@ -176,19 +190,6 @@ class NetworkSettings extends Component {
             style={{ display: 'block', marginTop: 20 }}
             disabled={this.state.selected.length === 0}
             onClick={this.filterUpdateHosts.bind(this)} />
-
-          <Select
-            value={configs.encryption}
-            errorText={errors.encryption}
-            onEdit={onEdit('encryption')}
-            label='Encryption Method'
-            options={[ 'none', 'ldaps', 'startTls' ]} />
-
-          <Select
-            value={configs.loadbalancing}
-            onEdit={onEdit('loadbalancing')}
-            label='Load Balancing Algorithm'
-            options={[ 'round_robin', 'failover' ]} />
 
           <Navigation>
             <Back onClick={prev} />

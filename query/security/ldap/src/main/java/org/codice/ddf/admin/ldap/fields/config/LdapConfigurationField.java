@@ -40,7 +40,7 @@ public class LdapConfigurationField extends BaseObjectField {
 
   private PidField pid;
 
-  private ListField<LdapConnectionField> connection;
+  private LdapConnectionField.ListImpl connections;
 
   private LdapLoadBalancingField loadBalancing;
 
@@ -53,7 +53,7 @@ public class LdapConfigurationField extends BaseObjectField {
   public LdapConfigurationField() {
     super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
     pid = new PidField();
-    connection = new LdapConnectionField.ListImpl();
+    connections = new LdapConnectionField.ListImpl();
     loadBalancing = new LdapLoadBalancingField();
     bindUserInfo = new LdapBindUserInfo();
     settings = new LdapDirectorySettingsField();
@@ -61,12 +61,12 @@ public class LdapConfigurationField extends BaseObjectField {
   }
 
   // Field getters
-  public ListField<LdapConnectionField> connectionField() {
-    return connection;
+  public LdapConnectionField.ListImpl connectionsField() {
+    return connections;
   }
 
-  public LdapConfigurationField connectionField(ListField<LdapConnectionField> entries) {
-    connection = entries;
+  public LdapConfigurationField connectionsField(LdapConnectionField.ListImpl entries) {
+    connections = entries;
     return this;
   }
 
@@ -113,13 +113,13 @@ public class LdapConfigurationField extends BaseObjectField {
     return this;
   }
 
-  public LdapConfigurationField connection(List<LdapConnectionField> connection) {
-    this.connection.setValue(connection);
+  public LdapConfigurationField connections(List<LdapConnectionField> connections) {
+    this.connections.setValue(connections);
     return this;
   }
 
-  public LdapConfigurationField connection(ListField<LdapConnectionField> connection) {
-    this.connection.setValue(connection.getValue());
+  public LdapConfigurationField connections(LdapConnectionField.ListImpl connections) {
+    this.connections.setValue(connections.getValue());
     return this;
   }
 
@@ -155,10 +155,11 @@ public class LdapConfigurationField extends BaseObjectField {
 
   @Override
   public List<Field> getFields() {
-    return ImmutableList.of(pid, connection, loadBalancing, bindUserInfo, settings, claimMappings);
+    return ImmutableList.of(pid, connections, loadBalancing, bindUserInfo, settings, claimMappings);
   }
 
   public LdapConfigurationField useDefaultRequired() {
+    connections.useDefaultRequired();
     bindUserInfo.useDefaultRequired();
     settings.useDefaultRequiredForAuthentication();
     isRequired(true);

@@ -87,8 +87,8 @@ public class LdapServiceCommons {
     Map<String, Object> props = new HashMap<>();
 
     if (config != null) {
-      boolean startTls = isStartTls(config.connectionField());
-      props.put(LdapClaimsHandlerServiceProperties.URL, getLdapUrls(config.connectionField()));
+      boolean startTls = isStartTls(config.connectionsField());
+      props.put(LdapClaimsHandlerServiceProperties.URL, config.connectionsField().getLdapUrls());
       props.put(
           LdapClaimsHandlerServiceProperties.LOAD_BALANCING,
           config.loadBalancingField().getValue());
@@ -126,9 +126,10 @@ public class LdapServiceCommons {
     Map<String, Object> ldapStsConfig = new HashMap<>();
 
     if (config != null) {
-      boolean startTls = isStartTls(config.connectionField());
+      boolean startTls = isStartTls(config.connectionsField());
 
-      ldapStsConfig.put(LdapLoginServiceProperties.LDAP_URL, getLdapUrls(config.connectionField()));
+      ldapStsConfig.put(
+          LdapLoginServiceProperties.LDAP_URL, config.connectionsField().getLdapUrls());
       ldapStsConfig.put(
           LdapLoginServiceProperties.LDAP_LOAD_BALANCING, config.loadBalancingField().getValue());
       ldapStsConfig.put(LdapLoginServiceProperties.START_TLS, Boolean.toString(startTls));
@@ -163,18 +164,9 @@ public class LdapServiceCommons {
     return ldapStsConfig;
   }
 
-  private String[] getLdapUrls(ListField<LdapConnectionField> connections) {
-    return connections
-        .getList()
-        .stream()
-        .map(LdapConnectionField::getLdapUrl)
-        .collect(Collectors.toList())
-        .toArray(new String[] {});
-  }
-
   private LdapConfigurationField ldapClaimsHandlerServiceToLdapConfig(Map<String, Object> props) {
-    ListField<LdapConnectionField> connection =
-        getLdapConnectionField(
+    LdapConnectionField.ListImpl connections =
+        getLdapConnectionsField(
             props,
             LdapClaimsHandlerServiceProperties.URL,
             LdapClaimsHandlerServiceProperties.START_TLS);
@@ -211,7 +203,7 @@ public class LdapServiceCommons {
     }
 
     return new LdapConfigurationField()
-        .connection(connection)
+        .connections(connections)
         .loadBalancing(loadBalancing)
         .bindUserInfo(bindUserInfo)
         .settings(settings)
@@ -223,8 +215,8 @@ public class LdapServiceCommons {
   }
 
   private LdapConfigurationField ldapLoginServiceToLdapConfiguration(Map<String, Object> props) {
-    ListField<LdapConnectionField> connection =
-        getLdapConnectionField(
+    LdapConnectionField.ListImpl connections =
+        getLdapConnectionsField(
             props, LdapLoginServiceProperties.LDAP_URL, LdapLoginServiceProperties.START_TLS);
 
     LdapLoadBalancingField loadBalancing = new LdapLoadBalancingField();
@@ -253,16 +245,16 @@ public class LdapServiceCommons {
             .useCase(AUTHENTICATION);
 
     return new LdapConfigurationField()
-        .connection(connection)
+        .connections(connections)
         .loadBalancing(loadBalancing)
         .bindUserInfo(bindUserInfo)
         .settings(settings)
         .pid(mapValue(props, SERVICE_PID_KEY));
   }
 
-  private ListField<LdapConnectionField> getLdapConnectionField(
+  private LdapConnectionField.ListImpl getLdapConnectionsField(
       Map<String, Object> props, String ldapUrlKey, String startTlsKey) {
-    ListField<LdapConnectionField> connection = new LdapConnectionField.ListImpl();
+    LdapConnectionField.ListImpl connection = new LdapConnectionField.ListImpl();
 
     Boolean isStartTls = (Boolean) props.get(startTlsKey);
 

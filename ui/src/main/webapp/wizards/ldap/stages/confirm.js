@@ -79,12 +79,12 @@ const ConfirmStage = (props) => {
     memberAttributeReferencedInGroup: configs.memberAttributeReferencedInGroup,
     baseUserDn: configs.baseUserDn,
     baseGroupDn: configs.baseGroupDn,
-    useCase: configs.ldapUseCase
+    useCase: configs.ldapUseCase,
+    groupAttributeHoldingMember: configs.groupAttributeHoldingMember
   }
 
   if (isAttrStore) {
     settings.groupObjectClass = configs.groupObjectClass
-    settings.groupAttributeHoldingMember = configs.groupAttributeHoldingMember
   }
 
   const mapping = Object.keys(configs.attributeMappings || {}).map((key) => ({ key, value: configs.attributeMappings[key] }))
@@ -146,7 +146,6 @@ const ConfirmStage = (props) => {
               label='LDAP Group Object Class'
               value={configs.groupObjectClass} />
             <Info
-              visible={isAttrStore}
               label='Group Attribute Holding Member References'
               value={configs.groupAttributeHoldingMember} />
             <Info

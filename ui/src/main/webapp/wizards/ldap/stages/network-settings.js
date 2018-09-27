@@ -113,6 +113,13 @@ class NetworkSettings extends Component {
         </Description>
 
         <Body>
+          <Select
+            value={configs.encryption}
+            errorText={errors.encryption}
+            onEdit={onEdit('encryption')}
+            label='Encryption Method'
+            options={[ 'none', 'ldaps', 'startTls' ]} />
+
           <Hostname
             value={configs.hostname}
             errorText={errors.hostname}
@@ -124,6 +131,12 @@ class NetworkSettings extends Component {
             errorText={isPortInvalid ? getFriendlyMessage('INVALID_PORT_RANGE') : errors.port}
             onEdit={onEdit('port')}
             options={[389, 636]} />
+
+          <Select
+            value={configs.loadbalancing}
+            onEdit={onEdit('loadbalancing')}
+            label='Load Balancing Algorithm'
+            options={[ 'roundRobin', 'failover' ]} />
 
           {messages.map((msg, i) => <Message key={i} {...msg} />)}
 
@@ -177,19 +190,6 @@ class NetworkSettings extends Component {
             style={{ display: 'block', marginTop: 20 }}
             disabled={this.state.selected.length === 0}
             onClick={this.filterUpdateHosts.bind(this)} />
-
-          <Select
-            value={configs.encryption}
-            errorText={errors.encryption}
-            onEdit={onEdit('encryption')}
-            label='Encryption Method'
-            options={[ 'none', 'ldaps', 'startTls' ]} />
-
-          <Select
-            value={configs.loadbalancing}
-            onEdit={onEdit('loadbalancing')}
-            label='Load Balancing Algorithm'
-            options={[ 'roundRobin', 'failover' ]} />
 
           <Navigation>
             <Back onClick={prev} />

@@ -52,16 +52,13 @@ class NetworkSettings extends Component {
     const {
         onEdit,
         configs: {
-          connectionInfo = {}
+          connectionInfo = []
         } = {}
       } = this.props
 
-    const filtered = Object.keys(connectionInfo).filter((_, i) => {
+    const filtered = connectionInfo.filter((_, i) => {
       return this.state.selected.indexOf(i) === -1
-    }).reduce((o, key) => {
-      o[key] = connectionInfo[key]
-      return o
-    }, {})
+    })
 
     onEdit('connectionInfo')(filtered)
     this.setState({ selected: [] })
@@ -75,7 +72,7 @@ class NetworkSettings extends Component {
       next,
       configs,
       configs: {
-        connectionInfo = {}
+        connectionInfo = []
       } = {},
       onEdit,
       onError,
@@ -152,13 +149,11 @@ class NetworkSettings extends Component {
                 port: configs.port,
                 encryption: configs.encryption
               })).then((result) => {
+                connectionInfo.push([configs.hostname, configs.port])
                 onEdit({
                   hostname: '',
                   messages: [],
-                  connectionInfo: {
-                    ...connectionInfo,
-                    [Date.now()]: [configs.hostname, configs.port]
-                  }
+                  connectionInfo: connectionInfo
                 })
                 onError([])
                 onEndSubmit()

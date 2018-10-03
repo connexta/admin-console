@@ -17,7 +17,7 @@
     <parent>
         <artifactId>admin-query-security</artifactId>
         <groupId>org.codice.ddf.admin.query</groupId>
-        <version>1.2.3-SNAPSHOT</version>
+        <version>1.2.3</version>
     </parent>
 
     <artifactId>admin-query-sts</artifactId>

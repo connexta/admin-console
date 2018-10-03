@@ -17,7 +17,7 @@
     <parent>
         <artifactId>admin-query</artifactId>
         <groupId>org.codice.ddf.admin.query</groupId>
-        <version>1.2.3-SNAPSHOT</version>
+        <version>1.2.3</version>
     </parent>
     <artifactId>admin-dev</artifactId>
     <name>DDF :: Admin Console :: Query :: Dev</name>

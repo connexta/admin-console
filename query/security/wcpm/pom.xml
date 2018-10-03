@@ -17,7 +17,7 @@
     <parent>
         <artifactId>admin-query-security</artifactId>
         <groupId>org.codice.ddf.admin.query</groupId>
-        <version>1.2.3</version>
+        <version>1.2.4-SNAPSHOT</version>
     </parent>
     <artifactId>admin-query-wcpm</artifactId>
     <name>DDF :: Admin Console :: Query :: Security :: Web Context Policy Manager</name>

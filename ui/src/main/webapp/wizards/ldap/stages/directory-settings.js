@@ -245,12 +245,9 @@ const DirectorySettings = (props) => {
   const isAttrStore = ldapUseCase === 'AuthenticationAndAttributeStore' || ldapUseCase === 'AttributeStore'
   const nextStageId = isAttrStore ? 'attribute-mapping' : 'confirm'
 
-  const connKey = Object.keys(configs.connectionInfo)[0]
-  const connInfo = configs.connectionInfo[connKey]
-
   const conn = {
-    hostname: connInfo[0],
-    port: connInfo[1],
+    hostname: configs.connectionList[0].hostname,
+    port: configs.connectionList[0].port,
     encryption: configs.encryption
   }
 

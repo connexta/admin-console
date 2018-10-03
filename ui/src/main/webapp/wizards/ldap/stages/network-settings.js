@@ -52,15 +52,15 @@ class NetworkSettings extends Component {
     const {
         onEdit,
         configs: {
-          connectionInfo = []
+          connectionList = []
         } = {}
       } = this.props
 
-    const filtered = connectionInfo.filter((_, i) => {
+    const filtered = connectionList.filter((_, i) => {
       return this.state.selected.indexOf(i) === -1
     })
 
-    onEdit('connectionInfo')(filtered)
+    onEdit('connectionList')(filtered)
     this.setState({ selected: [] })
   }
 
@@ -72,7 +72,7 @@ class NetworkSettings extends Component {
       next,
       configs,
       configs: {
-        connectionInfo = []
+        connectionList = []
       } = {},
       onEdit,
       onError,
@@ -88,7 +88,7 @@ class NetworkSettings extends Component {
 
     const isPortInvalid = configs.port === undefined || configs.port < 0 || configs.port > 65535
 
-    const missingHost = configs.connectionInfo === undefined || Object.keys(configs.connectionInfo).length === 0
+    const missingHost = configs.connectionList === undefined || configs.connectionList.length === 0
 
     return (
       <div>
@@ -149,11 +149,11 @@ class NetworkSettings extends Component {
                 port: configs.port,
                 encryption: configs.encryption
               })).then((result) => {
-                connectionInfo.push([configs.hostname, configs.port])
+                let updatedConnections = connectionList.concat([{hostname: configs.hostname, port: configs.port}])
                 onEdit({
                   hostname: '',
                   messages: [],
-                  connectionInfo: connectionInfo
+                  connectionList: updatedConnections
                 })
                 onError([])
                 onEndSubmit()
@@ -171,10 +171,10 @@ class NetworkSettings extends Component {
               </TableRow>
             </TableHeader>
             <TableBody showRowHover deselectOnClickaway={false}>
-              {Object.keys(connectionInfo).map((connInfo, i) =>
+              {connectionList.map((connection, i) =>
                 <TableRow key={i} selected={this.state.selected === 'all' || this.state.selected.indexOf(i) > -1}>
-                  <TableRowColumn>{connectionInfo[connInfo][0]}</TableRowColumn>
-                  <TableRowColumn>{connectionInfo[connInfo][1]}</TableRowColumn>
+                  <TableRowColumn>{connection.hostname}</TableRowColumn>
+                  <TableRowColumn>{connection.port}</TableRowColumn>
                 </TableRow>
               )}
             </TableBody>

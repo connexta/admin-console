@@ -89,9 +89,9 @@ const ConfirmStage = (props) => {
 
   const mapping = Object.keys(configs.attributeMappings || {}).map((key) => ({ key, value: configs.attributeMappings[key] }))
 
-  const hosts = Object.keys(configs.connectionInfo || {}).map((key, i) => ({
-    hostname: configs.connectionInfo[key][0],
-    port: configs.connectionInfo[key][1],
+  const hosts = configs.connectionList.map((connection, i) => ({
+    hostname: connection.hostname,
+    port: connection.port,
     encryption: configs.encryption
   }))
 

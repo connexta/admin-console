@@ -14,7 +14,7 @@ describe('<LDAP />', () => {
         <DirectorySettings
           configs={{
             ldapUseCase: 'Authentication',
-            connectionInfo: [['localhost', '636', 'ldaps']]
+            connectionList: [{hostname: 'localhost', port: '636', encryption: 'ldaps'}]
           }}
           options={{}}
           errors={[]}
@@ -50,7 +50,7 @@ describe('<LDAP />', () => {
         <DirectorySettings
           configs={{
             ldapUseCase: 'AttributeStore',
-            connectionInfo: [['localhost', '636', 'ldaps']]
+            connectionList: [{hostname: 'localhost', port: '636', encryption: 'ldaps'}]
           }}
           options={{}}
           errors={[]}
@@ -66,7 +66,7 @@ describe('<LDAP />', () => {
         <DirectorySettings
           configs={{
             ldapUseCase: 'AuthenticationAndAttributeStore',
-            connectionInfo: [['localhost', '636', 'ldaps']]
+            connectionList: [{hostname: 'localhost', port: '636', encryption: 'ldaps'}]
           }}
           options={{}}
           errors={[]}

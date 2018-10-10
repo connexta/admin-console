@@ -51,6 +51,7 @@
         <slf4j-api.version>1.7.24</slf4j-api.version>
         <osgi.version>6.0.0</osgi.version>
         <osgi.compendium.version>5.0.0</osgi.compendium.version>
+        <commons-lang3.version>3.8</commons-lang3.version>
 
         <ddf.scm.connection.url />
         <snapshots.repository.url />

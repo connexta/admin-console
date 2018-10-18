@@ -26,6 +26,8 @@ public class LdapClaimsHandlerServiceProperties {
 
   public static final String URL = "url";
 
+  public static final String LOAD_BALANCING = "loadBalancing";
+
   public static final String START_TLS = "startTls";
 
   public static final String LDAP_BIND_USER_DN = "ldapBindUserDn";

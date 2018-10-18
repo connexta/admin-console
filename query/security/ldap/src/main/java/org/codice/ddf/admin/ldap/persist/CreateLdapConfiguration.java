@@ -153,6 +153,9 @@ public class CreateLdapConfiguration extends BaseFunctionField<BooleanField> {
       config.settingsField().useDefaultRequiredForAttributeStore();
       config.claimMappingsField().isRequired(true);
     }
+    if (config.connectionsField().getList().size() > 1) {
+      config.loadBalancingField().isRequired(true);
+    }
 
     super.validate();
     if (containsErrorMsgs()) {

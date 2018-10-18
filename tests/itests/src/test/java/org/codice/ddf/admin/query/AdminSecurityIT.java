@@ -257,6 +257,9 @@ public class AdminSecurityIT extends AbstractComponentTest {
             .hostname("testHostName")
             .port(666);
 
+    LdapConnectionField.ListImpl connections = new LdapConnectionField.ListImpl();
+    connections.add(connection);
+
     LdapDirectorySettingsField dirSettings =
         new LdapDirectorySettingsField()
             .baseUserDn(TEST_DN)
@@ -276,6 +279,6 @@ public class AdminSecurityIT extends AbstractComponentTest {
               .add(new ClaimsMapEntry().key(TEST_CLAIM_KEY).value(TEST_CLAIM_VALUE)));
     }
 
-    return newConfig.connection(connection).bindUserInfo(bindUserInfo).settings(dirSettings);
+    return newConfig.connections(connections).bindUserInfo(bindUserInfo).settings(dirSettings);
   }
 }

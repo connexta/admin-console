@@ -41,6 +41,12 @@ public class LdapTestingCommons {
         .encryptionMethod(LdapEncryptionMethodField.NoEncryption.NONE);
   }
 
+  public static LdapConnectionField.ListImpl noEncryptionLdapConnectionList() {
+    LdapConnectionField.ListImpl connections = new LdapConnectionField.ListImpl();
+    connections.add(noEncryptionLdapConnectionInfo());
+    return connections;
+  }
+
   public static LdapBindUserInfo simpleBindInfo() {
     return new LdapBindUserInfo()
         .bindMethod(SimpleEnumValue.SIMPLE)

@@ -182,8 +182,7 @@ const configInputs = [
     key: 'groupAttributeHoldingMember',
     optionKey: 'groupAttributesHoldingMember',
     label: 'Group Attribute Holding Member References',
-    tooltip: 'Multivalued-attribute on the group entry that holds references to users.',
-    attrStoreOnly: true
+    tooltip: 'Multivalued-attribute on the group entry that holds references to users.'
   },
   {
     key: 'queryBase',
@@ -247,8 +246,8 @@ const DirectorySettings = (props) => {
   const nextStageId = isAttrStore ? 'attribute-mapping' : 'confirm'
 
   const conn = {
-    hostname: configs.hostname,
-    port: configs.port,
+    hostname: configs.connectionList[0].hostname,
+    port: configs.connectionList[0].port,
     encryption: configs.encryption
   }
 
@@ -265,13 +264,13 @@ const DirectorySettings = (props) => {
     loginUserAttribute: configs.loginUserAttribute,
     baseUserDn: configs.baseUserDn,
     baseGroupDn: configs.baseGroupDn,
-    useCase: configs.ldapUseCase
+    useCase: configs.ldapUseCase,
+    memberAttributeReferencedInGroup: configs.memberAttributeReferencedInGroup,
+    groupAttributeHoldingMember: configs.groupAttributeHoldingMember
   }
 
   if (isAttrStore) {
-    settings.memberAttributeReferencedInGroup = configs.memberAttributeReferencedInGroup
     settings.groupObjectClass = configs.groupObjectClass
-    settings.groupAttributeHoldingMember = configs.groupAttributeHoldingMember
   }
 
   return (

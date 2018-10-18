@@ -120,8 +120,8 @@ const BindSettings = (props) => {
             onClick={() => {
               onStartSubmit()
               client.query(testBind({
-                hostname: configs.hostname,
-                port: configs.port,
+                hostname: configs.connectionList[0].hostname,
+                port: configs.connectionList[0].port,
                 encryption: configs.encryption
               }, {
                 creds: {

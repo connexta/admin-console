@@ -13,7 +13,8 @@ describe('<LDAP />', () => {
       const wrapper = shallow(
         <DirectorySettings
           configs={{
-            ldapUseCase: 'Authentication'
+            ldapUseCase: 'Authentication',
+            connectionList: [{hostname: 'localhost', port: '636', encryption: 'ldaps'}]
           }}
           options={{}}
           errors={[]}
@@ -32,7 +33,8 @@ describe('<LDAP />', () => {
         'baseUserDn',
         'loginUserAttribute',
         'memberAttributeReferencedInGroup',
-        'baseGroupDn'
+        'baseGroupDn',
+        'groupAttributeHoldingMember'
       ])
 
       const notVisible = wrapper.find(InputAuto)
@@ -40,15 +42,15 @@ describe('<LDAP />', () => {
         .map((comp) => comp.prop('id'))
 
       expect(notVisible).to.deep.equal([
-        'groupObjectClass',
-        'groupAttributeHoldingMember'
+        'groupObjectClass'
       ])
     })
     it('should show all fields when `AttributeStore`', () => {
       const wrapper = shallow(
         <DirectorySettings
           configs={{
-            ldapUseCase: 'AttributeStore'
+            ldapUseCase: 'AttributeStore',
+            connectionList: [{hostname: 'localhost', port: '636', encryption: 'ldaps'}]
           }}
           options={{}}
           errors={[]}
@@ -63,7 +65,8 @@ describe('<LDAP />', () => {
       const wrapper = shallow(
         <DirectorySettings
           configs={{
-            ldapUseCase: 'AuthenticationAndAttributeStore'
+            ldapUseCase: 'AuthenticationAndAttributeStore',
+            connectionList: [{hostname: 'localhost', port: '636', encryption: 'ldaps'}]
           }}
           options={{}}
           errors={[]}

@@ -40,9 +40,7 @@ class CreateLdapConfigurationSpec extends Specification {
     def setup() {
         // Initialize bad paths
         baseMsg = [CreateLdapConfiguration.FIELD_NAME, LdapConfigurationField.DEFAULT_FIELD_NAME]
-        authBadPaths = [missingHostPath    : baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME, HostnameField.DEFAULT_FIELD_NAME],
-                        missingPortPath    : baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME, PortField.DEFAULT_FIELD_NAME],
-                        missingEncryptPath : baseMsg + [LdapConnectionField.DEFAULT_FIELD_NAME, LdapEncryptionMethodField.DEFAULT_FIELD_NAME],
+        authBadPaths = [missingConnectionPath    : baseMsg + [LdapConnectionField.ListImpl.DEFAULT_FIELD_NAME],
                         missingUsernamePath: baseMsg + [LdapBindUserInfo.DEFAULT_FIELD_NAME, CredentialsField.DEFAULT_FIELD_NAME, CredentialsField.USERNAME_FIELD_NAME],
                         missingUserpasswordPath: baseMsg + [LdapBindUserInfo.DEFAULT_FIELD_NAME, CredentialsField.DEFAULT_FIELD_NAME, CredentialsField.PASSWORD_FIELD_NAME],
                         missingBindMethodPath  : baseMsg + [LdapBindUserInfo.DEFAULT_FIELD_NAME, LdapBindMethod.DEFAULT_FIELD_NAME],
@@ -75,14 +73,12 @@ class CreateLdapConfigurationSpec extends Specification {
         FunctionReport report = createConfigFunc.execute(null, FUNCTION_PATH)
 
         then:
-        report.getErrorMessages().size() == 10
+        report.getErrorMessages().size() == 8
         report.getErrorMessages().count {
             it.getCode() == DefaultMessages.MISSING_REQUIRED_FIELD
-        } == 10
+        } == 8
 
-        report.getErrorMessages()*.getPath() as Set == [authBadPaths.missingHostPath,
-                                                authBadPaths.missingPortPath,
-                                                authBadPaths.missingEncryptPath,
+        report.getErrorMessages()*.getPath() as Set == [authBadPaths.missingConnectionPath,
                                                 authBadPaths.missingUsernamePath,
                                                 authBadPaths.missingUserpasswordPath,
                                                 authBadPaths.missingBindMethodPath,
@@ -105,9 +101,7 @@ class CreateLdapConfigurationSpec extends Specification {
         FunctionReport report = createConfigFunc.execute(args, FUNCTION_PATH)
 
         then:
-        report.getErrorMessages()*.getPath() as Set == [authBadPaths.missingHostPath,
-                                                authBadPaths.missingPortPath,
-                                                authBadPaths.missingEncryptPath,
+        report.getErrorMessages()*.getPath() as Set == [authBadPaths.missingConnectionPath,
                                                 authBadPaths.missingUsernamePath,
                                                 authBadPaths.missingUserpasswordPath,
                                                 authBadPaths.missingBindMethodPath,
@@ -120,9 +114,9 @@ class CreateLdapConfigurationSpec extends Specification {
                                                 attributeStoreBadPaths.missingClaimsMappingPath
 
         ] as Set
-        report.getErrorMessages().size() == 13
+        report.getErrorMessages().size() == 11
         report.getErrorMessages().count {
             it.getCode() == DefaultMessages.MISSING_REQUIRED_FIELD
-        } == 13
+        } == 11
     }
 }

@@ -25,23 +25,25 @@ const confirmationInfo = ({
   textOverflow: 'ellipsis'
 })
 
-const createLdapConfig = (conn, info, settings, mapping) => ({
+const createLdapConfig = (hosts, ldapLoadBalancing, info, settings, mapping) => ({
   mutation: gql`
     mutation CreateLdapConfig(
-      $conn: LdapConnection,
+      $hosts: [LdapConnection],
+      $ldapLoadBalancing: LdapLoadBalancing,
       $info: BindUserInfo,
       $settings: LdapDirectorySettings,
       $mapping: [ClaimsMapEntry]
     ) {
       createLdapConfig(config: {
-        connection: $conn,
+        connections: $hosts,
+        ldapLoadBalancing: $ldapLoadBalancing,
         bindInfo: $info,
         directorySettings: $settings,
         claimsMapping: $mapping
       })
     }
   `,
-  variables: { conn, info, settings, mapping }
+  variables: { hosts, ldapLoadBalancing, info, settings, mapping }
 })
 
 const ConfirmStage = (props) => {
@@ -63,12 +65,6 @@ const ConfirmStage = (props) => {
 
   const isAttrStore = ldapUseCase === 'AuthenticationAndAttributeStore' || ldapUseCase === 'AttributeStore'
 
-  const conn = {
-    hostname: configs.hostname,
-    port: configs.port,
-    encryption: configs.encryption
-  }
-
   const info = {
     creds: {
       username: configs.bindUser,
@@ -83,15 +79,23 @@ const ConfirmStage = (props) => {
     memberAttributeReferencedInGroup: configs.memberAttributeReferencedInGroup,
     baseUserDn: configs.baseUserDn,
     baseGroupDn: configs.baseGroupDn,
-    useCase: configs.ldapUseCase
+    useCase: configs.ldapUseCase,
+    groupAttributeHoldingMember: configs.groupAttributeHoldingMember
   }
 
   if (isAttrStore) {
     settings.groupObjectClass = configs.groupObjectClass
-    settings.groupAttributeHoldingMember = configs.groupAttributeHoldingMember
   }
 
   const mapping = Object.keys(configs.attributeMappings || {}).map((key) => ({ key, value: configs.attributeMappings[key] }))
+
+  const hosts = configs.connectionList.map((connection, i) => ({
+    hostname: connection.hostname,
+    port: connection.port,
+    encryption: configs.encryption
+  }))
+
+  const ldapLoadBalancing = configs.loadbalancing
 
   return (
     <div>
@@ -109,14 +113,14 @@ const ConfirmStage = (props) => {
               label='LDAP Function'
               value={useCaseMapping[configs.ldapUseCase]} />
             <Info
-              label='Hostname'
-              value={configs.hostname} />
-            <Info
-              label='Port'
-              value={configs.port} />
+              label='Host Connections'
+              value={hosts.map(host => { return (host.hostname + ':' + host.port) })} />
             <Info
               label='Encryption Method'
               value={configs.encryption} />
+            <Info
+              label='Load Balancing Algorithm'
+              value={configs.loadbalancing} />
             <Info
               label='Base User DN'
               value={configs.baseUserDn} />
@@ -142,7 +146,6 @@ const ConfirmStage = (props) => {
               label='LDAP Group Object Class'
               value={configs.groupObjectClass} />
             <Info
-              visible={isAttrStore}
               label='Group Attribute Holding Member References'
               value={configs.groupAttributeHoldingMember} />
             <Info
@@ -161,7 +164,7 @@ const ConfirmStage = (props) => {
           <Finish
             onClick={() => {
               onStartSubmit()
-              client.mutate(createLdapConfig(conn, info, settings, mapping))
+              client.mutate(createLdapConfig(hosts, ldapLoadBalancing, info, settings, mapping))
                 .then(() => {
                   onEndSubmit()
                   next('final-stage')

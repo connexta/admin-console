@@ -25,6 +25,7 @@ import org.codice.ddf.admin.common.fields.base.BaseObjectField;
 import org.codice.ddf.admin.common.fields.common.PidField;
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindUserInfo;
 import org.codice.ddf.admin.ldap.fields.connection.LdapConnectionField;
+import org.codice.ddf.admin.ldap.fields.connection.LdapLoadBalancingField;
 import org.codice.ddf.admin.security.common.fields.wcpm.ClaimsMapEntry;
 
 public class LdapConfigurationField extends BaseObjectField {
@@ -39,7 +40,9 @@ public class LdapConfigurationField extends BaseObjectField {
 
   private PidField pid;
 
-  private LdapConnectionField connection;
+  private LdapConnectionField.ListImpl connections;
+
+  private LdapLoadBalancingField loadBalancing;
 
   private LdapBindUserInfo bindUserInfo;
 
@@ -50,15 +53,25 @@ public class LdapConfigurationField extends BaseObjectField {
   public LdapConfigurationField() {
     super(DEFAULT_FIELD_NAME, FIELD_TYPE_NAME, DESCRIPTION);
     pid = new PidField();
-    connection = new LdapConnectionField();
+    connections = new LdapConnectionField.ListImpl();
+    loadBalancing = new LdapLoadBalancingField();
     bindUserInfo = new LdapBindUserInfo();
     settings = new LdapDirectorySettingsField();
     claimMappings = new ClaimsMapEntry.ListImpl();
   }
 
   // Field getters
-  public LdapConnectionField connectionField() {
-    return connection;
+  public LdapConnectionField.ListImpl connectionsField() {
+    return connections;
+  }
+
+  public LdapConfigurationField connectionsField(LdapConnectionField.ListImpl entries) {
+    connections = entries;
+    return this;
+  }
+
+  public LdapLoadBalancingField loadBalancingField() {
+    return loadBalancing;
   }
 
   public LdapBindUserInfo bindUserInfoField() {
@@ -100,8 +113,18 @@ public class LdapConfigurationField extends BaseObjectField {
     return this;
   }
 
-  public LdapConfigurationField connection(LdapConnectionField connection) {
-    this.connection.setValue(connection.getValue());
+  public LdapConfigurationField connections(List<LdapConnectionField> connections) {
+    this.connections.setValue(connections);
+    return this;
+  }
+
+  public LdapConfigurationField connections(LdapConnectionField.ListImpl connections) {
+    this.connections.setValue(connections.getValue());
+    return this;
+  }
+
+  public LdapConfigurationField loadBalancing(LdapLoadBalancingField loadBalancing) {
+    this.loadBalancing.setValue(loadBalancing.getValue());
     return this;
   }
 
@@ -132,11 +155,11 @@ public class LdapConfigurationField extends BaseObjectField {
 
   @Override
   public List<Field> getFields() {
-    return ImmutableList.of(pid, connection, bindUserInfo, settings, claimMappings);
+    return ImmutableList.of(pid, connections, loadBalancing, bindUserInfo, settings, claimMappings);
   }
 
   public LdapConfigurationField useDefaultRequired() {
-    connection.useDefaultRequired();
+    connections.useDefaultRequired();
     bindUserInfo.useDefaultRequired();
     settings.useDefaultRequiredForAuthentication();
     isRequired(true);

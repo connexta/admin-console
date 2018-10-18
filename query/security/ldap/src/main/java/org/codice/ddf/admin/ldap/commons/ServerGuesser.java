@@ -21,8 +21,10 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -33,7 +35,11 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 import org.codice.ddf.admin.ldap.fields.query.LdapTypeField;
+import org.forgerock.opendj.ldap.Attribute;
+import org.forgerock.opendj.ldap.AttributeDescription;
+import org.forgerock.opendj.ldap.ByteString;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.opendj.ldap.Entries;
@@ -84,6 +90,12 @@ public abstract class ServerGuesser {
   private static final Predicate<ObjectClass> STRUCT_OR_AUX =
       oc -> oc.getObjectClassType() == STRUCTURAL || oc.getObjectClassType() == AUXILIARY;
 
+  private static final List<String> MEMBERSHIP_ATTRIBUTES =
+      Arrays.asList("member", "uniquemember", "memberuid");
+
+  private static final List<String> GROUP_OCS =
+      Arrays.asList("group", "groupofnames", "groupofuniquenames", "posixgroup");
+
   private ServerGuesser(Connection connection) {
     this.connection = connection;
   }
@@ -126,23 +138,55 @@ public abstract class ServerGuesser {
   }
 
   public List<String> getGroupObjectClass() {
-    return ImmutableList.of("groupOfNames", "group", "posixGroup");
+    return getResults("(|(objectClass=group)(objectClass=group*)(objectClass=*Group*))")
+        .stream()
+        .map(SearchResultEntry::getAllAttributes)
+        .map(Iterable::spliterator)
+        .flatMap(it -> StreamSupport.stream(it, false))
+        .filter(
+            attr ->
+                attr.getAttributeDescription()
+                    .getAttributeType()
+                    .getNameOrOID()
+                    .equalsIgnoreCase("objectClass"))
+        .map(Attribute::spliterator)
+        .flatMap(it -> StreamSupport.stream(it, false))
+        .map(ByteString::toString)
+        .filter(name -> GROUP_OCS.contains(name.toLowerCase()))
+        .distinct()
+        .sorted()
+        .collect(Collectors.toList());
   }
 
   public List<String> getGroupAttributeHoldingMember() {
-    return ImmutableList.of(MEMBER, "uniqueMember", "memberUid");
+    return getResults("(|(objectClass=group)(objectClass=group*)(objectClass=*Group*))")
+        .stream()
+        .map(SearchResultEntry::getAllAttributes)
+        .map(Iterable::spliterator)
+        .flatMap(it -> StreamSupport.stream(it, false))
+        .map(Attribute::getAttributeDescription)
+        .map(AttributeDescription::getAttributeType)
+        .map(AttributeType::getNameOrOID)
+        .filter(name -> MEMBERSHIP_ATTRIBUTES.contains(name.toLowerCase()))
+        .distinct()
+        .sorted()
+        .collect(Collectors.toList());
   }
 
   public List<String> getMemberAttributeReferencedInGroup() {
-    return ImmutableList.of("uid");
+    return ImmutableList.of("uid", "cn");
   }
 
   public List<String> getUserBaseChoices() {
-    return getChoices("(|(ou=user*)(name=user*)(cn=user*))");
+    return new ArrayList<>(getChoices("(objectClass=person)", true, new NameSorter("user")));
   }
 
   public List<String> getGroupBaseChoices() {
-    return getChoices("(|(ou=group*)(name=group*)(cn=group*)(objectClass=groupOfUniqueNames))");
+    return new ArrayList<>(
+        getChoices(
+            "(|(objectClass=group)(objectClass=group*)(objectClass=*Group*))",
+            true,
+            new NameSorter("group")));
   }
 
   public Set<String> getClaimAttributeOptions(String baseUserDn) {
@@ -192,28 +236,43 @@ public abstract class ServerGuesser {
         .collect(Collectors.toCollection(TreeSet::new));
   }
 
-  private List<String> getChoices(String query) {
+  private Set<String> getChoices(String query, boolean returnParents, Comparator<String> sorter) {
+    List<SearchResultEntry> queryResults = getResults(query);
+
+    Set<String> choices = new TreeSet<>(sorter);
+    for (SearchResultEntry entry : queryResults) {
+      DN name = entry.getName();
+      if (returnParents) {
+        choices.add(name.parent().toString());
+      } else {
+        choices.add(name.toString());
+      }
+    }
+
+    return choices;
+  }
+
+  private List<SearchResultEntry> getResults(String query) {
     List<String> baseContexts = getBaseContexts();
 
-    List<String> choices = new ArrayList<>();
+    List<SearchResultEntry> results = new ArrayList<>();
     for (String baseContext : baseContexts) {
       try (ConnectionEntryReader reader =
           connection.search(baseContext, SearchScope.WHOLE_SUBTREE, query)) {
         while (reader.hasNext()) {
           if (!reader.isReference()) {
-            SearchResultEntry resultEntry = reader.readEntry();
-            choices.add(resultEntry.getName().toString());
+            results.add(reader.readEntry());
           } else {
             // TODO RAP 07 Dec 16: What do we need to do with remote references?
             reader.readReference();
           }
         }
       } catch (IOException e) {
-        LOGGER.debug("Error getting choices", e);
+        LOGGER.debug("Error getting query results", e);
       }
     }
 
-    return choices;
+    return results;
   }
 
   private static class DefaultGuesser extends ServerGuesser {
@@ -269,23 +328,17 @@ public abstract class ServerGuesser {
     }
 
     @Override
-    public List<String> getGroupObjectClass() {
-      return Collections.singletonList("group");
-    }
-
-    @Override
-    public List<String> getGroupAttributeHoldingMember() {
-      return Collections.singletonList(MEMBER);
-    }
-
-    @Override
     public List<String> getUserBaseChoices() {
       return super.getUserBaseChoices().stream().filter(USER_DN_EXC).collect(Collectors.toList());
     }
 
     @Override
     public List<String> getGroupBaseChoices() {
-      return super.getGroupBaseChoices().stream().filter(GROUP_DN_EXC).collect(Collectors.toList());
+      return super.getGroupBaseChoices()
+          .stream()
+          .filter(GROUP_DN_EXC)
+          .filter(USER_DN_EXC)
+          .collect(Collectors.toList());
     }
   }
 
@@ -327,6 +380,40 @@ public abstract class ServerGuesser {
     @SuppressWarnings("squid:UnusedPrivateMethod" /* Constructor used in the GUESSER_LOOKUP map */)
     private OpenDjGuesser(Connection connection) {
       super(connection);
+    }
+  }
+
+  /**
+   * This comparator sorts Strings that contain a preferred value to the beginning of a list. For
+   * example, when sorting LDAP DNs for a user OU the preference value would be to find an OU with
+   * 'user' or 'users' in the name. If the list of user based OUs is:
+   * [OU=services,OU=users,DC=example,DC=com OU=accounts,DC=example,DC=com
+   * OU=users,DC=example,DC=com] then the sorted list would be: [OU=users,DC=example,DC=com
+   * OU=services,OU=users,DC=example,DC=com OU=accounts,DC=example,DC=com]
+   *
+   * <p>This comparator also sorts by string length such that shorter values are moved to the
+   * beginning of a list. The reason for this is to prefer higher level OUs so that the default
+   * values include more users or groups. In the above example, OU=users,DC=example,DC=com is more
+   * inclusive than OU=services,OU=users,DC=example,DC=com
+   */
+  private static class NameSorter implements Comparator<String> {
+    private String preference;
+
+    NameSorter(String preference) {
+      this.preference = preference.toUpperCase();
+    }
+
+    @Override
+    public int compare(String one, String two) {
+      boolean oneHasPreference = one.toUpperCase().contains(preference);
+      boolean twoHasPreference = two.toUpperCase().contains(preference);
+      if (oneHasPreference && !twoHasPreference) {
+        return -1;
+      } else if (!oneHasPreference && twoHasPreference) {
+        return 1;
+      } else {
+        return (new Integer(one.length()).compareTo(new Integer(two.length())));
+      }
     }
   }
 }

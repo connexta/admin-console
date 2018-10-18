@@ -223,8 +223,8 @@ class LdapAttributeMappingStage extends Component {
     })
 
     const conn = {
-      hostname: configs.hostname,
-      port: configs.port,
+      hostname: configs.connectionList[0].hostname,
+      port: configs.connectionList[0].port,
       encryption: configs.encryption
     }
 
@@ -319,8 +319,8 @@ export default graphql(gql`
     fetchPolicy: 'network-only',
     variables: {
       conn: {
-        hostname: configs.hostname,
-        port: configs.port,
+        hostname: configs.connectionList[0].hostname,
+        port: configs.connectionList[0].port,
         encryption: configs.encryption
       },
       info: {

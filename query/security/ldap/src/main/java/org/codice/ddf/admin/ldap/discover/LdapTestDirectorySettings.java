@@ -36,6 +36,7 @@ import org.codice.ddf.admin.ldap.commons.LdapTestingUtils;
 import org.codice.ddf.admin.ldap.fields.config.LdapDirectorySettingsField;
 import org.codice.ddf.admin.ldap.fields.connection.LdapBindUserInfo;
 import org.codice.ddf.admin.ldap.fields.connection.LdapConnectionField;
+import org.forgerock.opendj.ldap.ByteString;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.Filter;
 import org.forgerock.opendj.ldap.SearchScope;
@@ -203,37 +204,49 @@ public class LdapTestDirectorySettings extends TestFunctionField {
       addErrorMessage(
           noGroupsWithMembersError(settings.groupAttributeHoldingMemberField().getPath()));
     } else {
-      checkReferencedUser(ldapConnection, groups.get(0));
-    }
-  }
-
-  void checkReferencedUser(Connection ldapConnection, SearchResultEntry group) {
-    String memberRef =
-        group.getAttribute(settings.groupAttributeHoldingMember()).firstValueAsString();
-    // This memberRef will be in the format:
-    // memberAttributeReferencedInGroup + username + baseUserDN
-    // Strip the baseUserDN and query for the remainder as a Filter
-    // beneath the baseUserDN
-    List<String> split = Arrays.asList(memberRef.split(","));
-
-    String userFilter = split.get(0);
-    String checkUserBase = String.join(",", split.subList(1, split.size()));
-    // Check that the userFilter is correctly formatted and that the expected userBase was
-    // found in a matched group
-    if (checkUserBase.equalsIgnoreCase(settings.baseUserDn())
-        && userFilter.split("=")[0].equalsIgnoreCase(settings.memberAttributeReferencedInGroup())) {
-      List<SearchResultEntry> foundMember =
-          utils.getLdapQueryResults(
-              ldapConnection, settings.baseUserDn(), userFilter, SearchScope.WHOLE_SUBTREE, 1);
-
-      if (foundMember.isEmpty()) {
+      boolean hasReferencedUser = false;
+      for (SearchResultEntry group : groups) {
+        if (checkReferencedUser(ldapConnection, group)) {
+          hasReferencedUser = true;
+          break;
+        }
+      }
+      if (!hasReferencedUser) {
         addErrorMessage(
             noReferencedMemberError(settings.memberAttributeReferencedInGroupField().getPath()));
       }
-    } else {
-      addErrorMessage(
-          noReferencedMemberError(settings.memberAttributeReferencedInGroupField().getPath()));
     }
+  }
+
+  boolean checkReferencedUser(Connection ldapConnection, SearchResultEntry group) {
+    boolean hasReferencedMember = false;
+    for (ByteString memberRef :
+        group.getAttribute(settings.groupAttributeHoldingMember()).toArray()) {
+      // This memberRef will be in the format:
+      // memberAttributeReferencedInGroup + username + baseUserDN
+      // Strip the baseUserDN and query for the remainder as a Filter
+      // beneath the baseUserDN
+      List<String> split = Arrays.asList(memberRef.toString().split(","));
+
+      String userFilter = split.get(0);
+      String checkUserBase = String.join(",", split.subList(1, split.size()));
+      // Check that the userFilter is correctly formatted and that the expected userBase was
+      // found in a matched group
+      if (checkUserBase.toUpperCase().endsWith(settings.baseUserDn().toUpperCase())
+          && userFilter.split("=")[0].equalsIgnoreCase(
+              settings.memberAttributeReferencedInGroup())) {
+        List<SearchResultEntry> foundMember =
+            utils.getLdapQueryResults(
+                ldapConnection, settings.baseUserDn(), userFilter, SearchScope.WHOLE_SUBTREE, 1);
+
+        if (!foundMember.isEmpty()) {
+          hasReferencedMember = true;
+          break;
+        }
+      }
+    }
+
+    return hasReferencedMember;
   }
 
   /**

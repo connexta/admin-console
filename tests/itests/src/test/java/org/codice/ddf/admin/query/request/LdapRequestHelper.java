@@ -18,11 +18,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.fail;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import org.boon.Boon;
 import org.codice.ddf.admin.comp.graphql.GraphQlHelper;
 import org.codice.ddf.admin.ldap.fields.config.LdapConfigurationField;
 import org.codice.ddf.itests.common.WaitCondition;
@@ -69,6 +70,7 @@ public class LdapRequestHelper {
   }
 
   public void waitForConfigs(List<Map<String, Object>> expectedConfigs, boolean ignorePid) {
+    Gson gson = new GsonBuilder().create();
     WaitCondition.expect("Successfully retrieved Ldap configuration.")
         .within(30L, TimeUnit.SECONDS)
         .until(
@@ -91,8 +93,8 @@ public class LdapRequestHelper {
                       && retrievedConfigs.containsAll(expectedConfigs);
 
               if (!conditionMet) {
-                LOGGER.info("Expecting configs:\n{}", Boon.toJson(expectedConfigs));
-                LOGGER.info("Received:\n{}", Boon.toJson(retrievedConfigs));
+                LOGGER.info("Expecting configs:\n{}", gson.toJson(expectedConfigs));
+                LOGGER.info("Received:\n{}", gson.toJson(retrievedConfigs));
               }
 
               return conditionMet;

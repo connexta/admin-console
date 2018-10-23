@@ -169,7 +169,7 @@
         <bundle>mvn:ddf.test.thirdparty/rest-assured/${ddf.version}</bundle>
         <bundle>mvn:ddf.test.itests/test-itests-common/${ddf.version}</bundle>
         <bundle>mvn:org.codice.ddf.admin.query/commons/${project.version}</bundle>
-        <bundle>mvn:io.fastjson/boon/0.34</bundle>
+        <bundle>mvn:com.google.code.gson/gson/${gson.version}</bundle>
 
         <feature>security-policy-api-dependencies</feature>
         <feature>admin-core-appservice-dependencies</feature>

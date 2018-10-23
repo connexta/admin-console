@@ -14,19 +14,22 @@
 package org.codice.ddf.admin.graphql.transform;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import org.boon.Boon;
 import org.codice.ddf.admin.api.report.ErrorMessage;
 
 public class FunctionDataFetcherException extends RuntimeException {
 
   private final ArrayList<ErrorMessage> customMessages;
+  private static final Gson GSON_PP =
+      new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
   public FunctionDataFetcherException(
       String functionName, List<Object> args, List<ErrorMessage> customMessages) {
-    super(Boon.toPrettyJson(toMap(functionName, args, customMessages)));
+    super(GSON_PP.toJson(toMap(functionName, args, customMessages)));
     this.customMessages = new ArrayList<>();
     this.customMessages.addAll(customMessages);
   }

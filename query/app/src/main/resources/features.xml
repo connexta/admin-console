@@ -84,7 +84,7 @@
         <feature>admin-query-core</feature>
         <feature>graphql-dependencies</feature>
         <bundle>mvn:commons-collections/commons-collections/3.2.2</bundle>
-        <bundle>mvn:io.fastjson/boon/0.34</bundle>
+        <bundle>mvn:com.google.code.gson/gson/${gson.version}</bundle>
         <bundle>mvn:org.codice.ddf.admin.query/admin-graphql/${project.version}</bundle>
     </feature>
 

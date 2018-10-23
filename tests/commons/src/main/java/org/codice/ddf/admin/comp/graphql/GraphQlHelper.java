@@ -36,10 +36,10 @@ public class GraphQlHelper {
   @SuppressWarnings("squid:S2068" /* Password used internally */)
   public static final String PASSWORD = "admin";
 
-  private final Gson gsonPrettyPrint =
-      new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+  private static final Gson GSON = new GsonBuilder().create();
 
-  private final Gson gson = new GsonBuilder().create();
+  private static final Gson GSON_PP =
+      new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
   private Class resourceClass;
 
@@ -171,10 +171,10 @@ public class GraphQlHelper {
       query.put("query", queryBody);
 
       if (!reqArgs.isEmpty()) {
-        query.put("variables", gson.toJson(reqArgs));
+        query.put("variables", GSON.toJson(reqArgs));
       }
 
-      String queryStr = gsonPrettyPrint.toJson(query);
+      String queryStr = GSON_PP.toJson(query);
       LOGGER.debug("\nSending request:\n{}", queryStr);
 
       response =

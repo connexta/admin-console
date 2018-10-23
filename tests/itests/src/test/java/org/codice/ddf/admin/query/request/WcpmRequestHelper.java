@@ -40,7 +40,7 @@ public class WcpmRequestHelper {
 
   public static final String WCPM_MUTATION_RESOURCE_PATH = "/query/wcpm/mutation/";
 
-  private final Gson gson = new GsonBuilder().create();
+  private static final Gson GSON = new GsonBuilder().create();
 
   private GraphQlHelper requestFactory;
 
@@ -102,8 +102,8 @@ public class WcpmRequestHelper {
                               policyToMatch -> policyMatches(policyToMatch, expectedPolicies));
 
               if (!conditionMet) {
-                LOGGER.info("Expecting configs:\n{}", gson.toJson(expectedPolicies));
-                LOGGER.info("Received:\n", gson.toJson(retrievedPolicies));
+                LOGGER.info("Expecting configs:\n{}", GSON.toJson(expectedPolicies));
+                LOGGER.info("Received:\n", GSON.toJson(retrievedPolicies));
               }
 
               return conditionMet;
@@ -152,8 +152,8 @@ public class WcpmRequestHelper {
                       && retrievedWhiteList.containsAll(expectedWhiteList);
 
               if (!conditionMet) {
-                LOGGER.info("Expecting configs:\n{}", gson.toJson(expectedWhiteList));
-                LOGGER.info("Received:\n{}", gson.toJson(retrievedWhiteList));
+                LOGGER.info("Expecting configs:\n{}", GSON.toJson(expectedWhiteList));
+                LOGGER.info("Received:\n{}", GSON.toJson(retrievedWhiteList));
               }
 
               return conditionMet;

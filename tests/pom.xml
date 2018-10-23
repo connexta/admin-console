@@ -20,7 +20,7 @@
         <version>1.3.0-SNAPSHOT</version>
     </parent>
     <name>DDF :: Admin Console :: Tests</name>
-    <artifactId>itests</artifactId>
+    <artifactId>tests</artifactId>
     <packaging>pom</packaging>
 
     <properties>
@@ -71,7 +71,7 @@
         <!-- End of pax exam dependencies -->
     </dependencies>
     <modules>
+        <module>itest-commons</module>
         <module>itests</module>
-        <module>commons</module>
     </modules>
 </project>

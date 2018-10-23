@@ -1,0 +1,110 @@
+<!--
+/**
+ * Copyright (c) Codice Foundation
+ *
+ * This is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation, either
+ * version 3 of the License, or any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details. A copy of the GNU Lesser General Public License is distributed along with this program and can be found at
+ * <http://www.gnu.org/licenses/lgpl.html>.
+ *
+ **/
+ -->
+<features name="${project.artifactId}-${project.version}"
+          xmlns="http://karaf.apache.org/xmlns/features/v1.3.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.3.0 http://karaf.apache.org/xmlns/features/v1.3.0">
+
+    <repository>mvn:ddf.features/admin/${ddf.version}/xml/features</repository>
+    <repository>mvn:ddf.features/security/${ddf.version}/xml/features</repository>
+    <repository>mvn:ddf.catalog/catalog-app/${ddf.version}/xml/features</repository>
+
+    <feature name="admin-query-api" install="manual" version="${project.version}"
+             description="DDF :: Admin Console :: Query :: Core ">
+        <bundle>mvn:org.codice.ddf.admin.query/admin-query-api/${project.version}</bundle>
+    </feature>
+
+    <feature name="admin-query-sts" install="manual" version="${project.version}"
+             description="DDF :: Admin Console :: Query :: Security Token Service">
+        <feature>admin-query-api</feature>
+        <feature>apache-commons</feature>
+        <feature>admin-configurator</feature>
+        <feature>security-policy-context</feature>
+        <bundle>mvn:org.codice.ddf.admin.query/admin-query-sts/${project.version}</bundle>
+    </feature>
+
+    <feature name="admin-query-wcpm" install="manual" version="${project.version}"
+             description="DDF :: Admin Console :: Query :: Security :: Web Context Policy Manager">
+        <feature>apache-commons</feature>
+        <feature>admin-query-api</feature>
+        <feature>admin-configurator</feature>
+        <feature>security-policy-context</feature>
+        <bundle>mvn:org.codice.ddf.admin.query/admin-query-wcpm/${project.version}</bundle>
+    </feature>
+
+    <feature name="admin-query-ldap" install="manual" version="${project.version}"
+             description="DDF :: Admin Console :: Query :: Security :: LDAP">
+        <feature>apache-commons</feature>
+        <feature>admin-query-api</feature>
+        <feature>admin-configurator</feature>
+        <bundle>mvn:org.codice.ddf.admin.query/admin-query-ldap/${project.version}</bundle>
+    </feature>
+
+    <feature name="admin-query-embeddedldap" install="manual" version="${project.version}"
+             description="DDF :: Admin Console :: Query :: Security :: Embedded LDAP">
+        <feature>admin-query-api</feature>
+        <feature>admin-configurator</feature>
+        <bundle>mvn:org.codice.ddf.admin.query/admin-query-embeddedldap/${project.version}</bundle>
+    </feature>
+
+    <feature name="admin-query-sources" install="manual" version="${project.version}"
+             description="DDF :: Admin Console :: Query :: Sources">
+        <feature>catalog-core-api</feature>
+        <feature>admin-query-api</feature>
+        <feature>admin-configurator</feature>
+        <bundle>mvn:org.apache.commons/commons-lang3/${commons-lang3.version}</bundle>
+        <bundle>mvn:org.codice.ddf.admin.query/admin-query-sources-impl/${project.version}</bundle>
+    </feature>
+
+    <feature name="graphql-java" install="manual" version="${project.version}"
+             description="Required dependencies for graphql-java bundle">
+        <bundle>mvn:com.graphql-java/graphql-java/${graphql-java.version}</bundle>
+        <bundle>mvn:org.antlr/antlr4-runtime/4.7.1</bundle>
+        <bundle>mvn:com.graphql-java/java-dataloader/2.0.2</bundle>
+        <bundle>mvn:org.reactivestreams/reactive-streams/1.0.2</bundle>
+    </feature>
+
+    <feature name="graphql-transformer-servlet" install="manual" version="${project.version}">
+        <feature prerequisite="true">wrap</feature>
+        <feature>graphql-java</feature>
+        <feature>pax-http-whiteboard</feature>
+        <feature>admin-query-api</feature>
+        <bundle>mvn:com.fasterxml.jackson.core/jackson-core/2.8.11</bundle>
+        <bundle>mvn:com.fasterxml.jackson.core/jackson-annotations/2.8.11</bundle>
+        <bundle>mvn:com.fasterxml.jackson.core/jackson-databind/2.8.11</bundle>
+        <bundle>mvn:com.fasterxml.jackson.datatype/jackson-datatype-jdk8/2.8.11</bundle>
+
+        <bundle>mvn:io.fastjson/boon/${boon.version}</bundle>
+        <bundle>mvn:org.codice.ddf.admin.query/admin-graphql/${project.version}</bundle>
+    </feature>
+
+    <feature name="admin-query-ui" install="manual" version="${project.version}"
+             description="DDF :: Admin Console :: Query :: UI">
+        <feature>admin-core</feature>
+        <bundle>mvn:org.eclipse.jetty/jetty-servlets/9.2.19.v20160908</bundle>
+        <bundle>mvn:org.codice.ddf.admin.query/admin-ui/${project.version}</bundle>
+        <bundle>mvn:org.codice.ddf.admin.query/admin-module/${project.version}</bundle>
+    </feature>
+
+    <feature name="admin-query-all" install="auto" version="${project.version}"
+             description="Includes a source setup wizard, LDAP setup wizard and a GUI for the web context policy manager. Go to /admin/hub to access the UI.">
+        <feature>graphql-transformer-servlet</feature>
+        <feature>admin-query-sts</feature>
+        <feature>admin-query-wcpm</feature>
+        <feature>admin-query-ldap</feature>
+        <feature>admin-query-embeddedldap</feature>
+        <feature>admin-query-sources</feature>
+        <feature>admin-query-ui</feature>
+    </feature>
+</features>

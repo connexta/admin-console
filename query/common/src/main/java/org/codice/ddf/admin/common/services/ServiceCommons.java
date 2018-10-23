@@ -126,7 +126,17 @@ public class ServiceCommons {
   }
 
   public static <T> T mapValue(Map<String, Object> props, String key) {
-    return props.get(key) == null ? null : (T) props.get(key);
+    if (props.get(key) == null) {
+      return null;
+    }
+
+    T value = (T) props.get(key);
+
+    if (value instanceof String && ((String) value).length() == 0) {
+      return null;
+    }
+
+    return value;
   }
 
   public static class ServicePropertyBuilder {

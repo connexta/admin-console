@@ -1,12 +1,12 @@
 package groovy.org.codice.ddf.admin.security.wcpm.persist
 
 import org.apache.karaf.jaas.config.JaasRealm
+import org.codice.ddf.platform.filter.AuthenticationException
+import org.codice.ddf.platform.filter.FilterChain
 import org.codice.ddf.security.handler.api.AuthenticationHandler
 import org.codice.ddf.security.handler.api.HandlerResult
 
 import javax.security.auth.login.AppConfigurationEntry
-import javax.servlet.FilterChain
-import javax.servlet.ServletException
 import javax.servlet.ServletRequest
 import javax.servlet.ServletResponse
 
@@ -30,12 +30,12 @@ class WcpmTestingCommons {
             }
 
             @Override
-            HandlerResult getNormalizedToken(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain, boolean b) throws ServletException {
+            HandlerResult getNormalizedToken(ServletRequest request, ServletResponse response, FilterChain chain, boolean resolve) throws AuthenticationException {
                 return null
             }
 
             @Override
-            HandlerResult handleError(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws ServletException {
+            HandlerResult handleError(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain chain) throws AuthenticationException {
                 return null
             }
         }

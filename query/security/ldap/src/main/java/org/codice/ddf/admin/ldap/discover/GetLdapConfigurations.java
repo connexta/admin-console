@@ -14,6 +14,8 @@
 package org.codice.ddf.admin.ldap.discover;
 
 import com.google.common.collect.ImmutableSet;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Set;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.api.fields.ListField;
@@ -44,7 +46,9 @@ public class GetLdapConfigurations extends GetFunctionField<ListField<LdapConfig
 
   @Override
   public ListField<LdapConfigurationField> performFunction() {
-    return serviceCommons.getLdapConfigurations();
+    return AccessController.doPrivileged(
+        (PrivilegedAction<ListField<LdapConfigurationField>>)
+            () -> serviceCommons.getLdapConfigurations());
   }
 
   @Override

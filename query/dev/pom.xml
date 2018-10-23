@@ -25,7 +25,6 @@
 
     <modules>
         <module>system</module>
-        <module>app</module>
     </modules>
 
 </project>

@@ -27,7 +27,7 @@ import org.codice.ddf.admin.common.fields.common.ContextPath;
 import org.codice.ddf.admin.common.report.message.DefaultMessages;
 import org.codice.ddf.admin.configurator.Configurator;
 import org.codice.ddf.admin.configurator.OperationReport;
-import org.codice.ddf.admin.security.common.services.PolicyManagerServiceProperties;
+import org.codice.ddf.admin.security.wcpm.PolicyManagerServiceProperties;
 import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite;
 
 public class SaveWhitelistContexts extends BaseFunctionField<ContextPath.ListImpl> {

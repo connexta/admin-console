@@ -18,7 +18,6 @@ import org.codice.ddf.admin.api.FieldProvider
 import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.api.poller.EnumValuePoller
 import org.codice.ddf.admin.api.report.Report
-import org.codice.ddf.admin.common.fields.base.BaseFunctionField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.configurator.Configurator
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
@@ -28,7 +27,7 @@ import org.codice.ddf.admin.security.common.fields.wcpm.AuthType
 import org.codice.ddf.admin.security.common.fields.wcpm.ClaimsMapEntry
 import org.codice.ddf.admin.security.common.fields.wcpm.ContextPolicyBin
 import org.codice.ddf.admin.security.common.fields.wcpm.Realm
-import org.codice.ddf.admin.security.common.services.PolicyManagerServiceProperties
+import org.codice.ddf.admin.security.wcpm.PolicyManagerServiceProperties
 import org.codice.ddf.admin.security.common.services.StsServiceProperties
 import org.codice.ddf.admin.security.wcpm.AuthTypesPoller
 import org.codice.ddf.admin.security.wcpm.RealmTypesPoller

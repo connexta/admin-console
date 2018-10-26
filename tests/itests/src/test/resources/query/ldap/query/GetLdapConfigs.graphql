@@ -2,11 +2,12 @@ query {
   ldap {
     configs {
       pid
-      connection {
+      connections {
         hostname
         port
         encryption
       }
+      ldapLoadBalancing
       bindInfo {
         creds {
           username

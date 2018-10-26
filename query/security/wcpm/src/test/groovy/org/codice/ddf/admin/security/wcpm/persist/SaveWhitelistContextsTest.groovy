@@ -16,12 +16,11 @@ package org.codice.ddf.admin.security.wcpm.persist
 import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite
 import org.codice.ddf.admin.api.fields.FunctionField
 import org.codice.ddf.admin.api.report.Report
-import org.codice.ddf.admin.common.fields.base.BaseFunctionField
 import org.codice.ddf.admin.common.report.message.DefaultMessages
 import org.codice.ddf.admin.configurator.Configurator
 import org.codice.ddf.admin.configurator.ConfiguratorFactory
 import org.codice.ddf.admin.configurator.OperationReport
-import org.codice.ddf.admin.security.common.services.PolicyManagerServiceProperties
+import org.codice.ddf.admin.security.wcpm.PolicyManagerServiceProperties
 import org.codice.ddf.admin.security.wcpm.WcpmFieldProvider
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceReader

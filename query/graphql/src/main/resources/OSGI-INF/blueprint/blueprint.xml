@@ -19,7 +19,7 @@
         <reference-listener bind-method="bindFieldProvider" unbind-method="unbindFieldProvider" ref="graphQLServlet"/>
     </reference-list>
 
-    <bean id="graphQLServlet" class="org.codice.ddf.admin.graphql.servlet.ExtendedOsgiGraphQLServlet" >
+    <bean id="graphQLServlet" class="org.codice.ddf.graphql.servlet.GraphQLTransformerServlet" >
         <property name="fieldProviders" ref="fieldProviders" />
     </bean>
 

@@ -29,5 +29,6 @@
         <module>wcpm</module>
         <module>sts</module>
         <module>common</module>
+        <module>security-policy</module>
     </modules>
 </project>

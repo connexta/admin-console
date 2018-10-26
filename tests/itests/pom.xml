@@ -15,57 +15,18 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <artifactId>itests</artifactId>
+        <artifactId>tests</artifactId>
         <groupId>org.codice.ddf.admin.query</groupId>
         <version>1.3.0-SNAPSHOT</version>
     </parent>
     <name>DDF :: Admin Console :: Tests :: ITests</name>
-    <artifactId>tests</artifactId>
+    <artifactId>itests</artifactId>
 
     <dependencies>
-        <!--Feature file dependencies-->
         <dependency>
             <groupId>org.codice.ddf.admin.query</groupId>
-            <artifactId>admin-query-ldap</artifactId>
+            <artifactId>itest-commons</artifactId>
             <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.codice.ddf.admin.query</groupId>
-            <artifactId>admin-query-app</artifactId>
-            <version>${project.version}</version>
-            <classifier>features</classifier>
-            <type>xml</type>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.codice.ddf.admin.query</groupId>
-            <artifactId>commons</artifactId>
-            <version>${project.version}</version>
-            <classifier>features</classifier>
-            <type>xml</type>
-            <scope>test</scope>
-        </dependency>
-        <!--Feature file dependencies end-->
-
-        <!--ddf dependencies-->
-        <dependency>
-            <groupId>org.codice.ddf</groupId>
-            <artifactId>kernel</artifactId>
-            <version>${ddf.version}</version>
-            <type>zip</type>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.codice.ddf</groupId>
-            <artifactId>ddf-common</artifactId>
-            <version>${ddf.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>ddf.test.itests</groupId>
-            <artifactId>test-itests-common</artifactId>
-            <version>${ddf.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -73,48 +34,73 @@
             <artifactId>test-common</artifactId>
             <version>${ddf.version}</version>
         </dependency>
-        <!--ddf dependencies end-->
-
         <dependency>
-            <groupId>org.codice.ddf.admin.query</groupId>
-            <artifactId>admin-graphql</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.codice.ddf.admin.query</groupId>
-            <artifactId>admin-query-security-common</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.codice.ddf.admin.query</groupId>
-            <artifactId>commons</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.codice.ddf.admin.query</groupId>
-            <artifactId>admin-query-sources-common</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>ddf.catalog.core</groupId>
-            <artifactId>catalog-core-standardframework</artifactId>
+            <groupId>ddf.platform</groupId>
+            <artifactId>sync-installer-api</artifactId>
             <version>${ddf.version}</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <version>2.1.0</version>
+            <groupId>ddf.features</groupId>
+            <artifactId>apps</artifactId>
+            <version>${ddf.version}</version>
+            <type>xml</type>
+            <classifier>features</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>ddf.features</groupId>
+            <artifactId>install-profiles</artifactId>
+            <version>${ddf.version}</version>
+            <type>xml</type>
+            <classifier>features</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>ddf.features</groupId>
+            <artifactId>admin-query</artifactId>
+            <version>${project.version}</version>
+            <type>xml</type>
+            <classifier>features</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>ddf.features</groupId>
+            <artifactId>admin-query-testing</artifactId>
+            <version>${project.version}</version>
+            <type>xml</type>
+            <classifier>features</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>ddf.features</groupId>
+            <artifactId>test-utilities</artifactId>
+            <version>${ddf.version}</version>
+            <type>xml</type>
+            <classifier>features</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.codice.ddf</groupId>
+            <artifactId>kernel</artifactId>
+            <version>${ddf.version}</version>
+            <type>zip</type>
             <scope>test</scope>
         </dependency>
     </dependencies>
 
     <build>
+        <testResources>
+            <testResource>
+                <directory>${project.build.outputDirectory}</directory>
+                <targetPath>${project.build.testOutputDirectory}</targetPath>
+            </testResource>
+            <testResource>
+                <directory>${project.basedir}/src/test/resources</directory>
+                <targetPath>${project.build.testOutputDirectory}</targetPath>
+            </testResource>
+        </testResources>
         <plugins>
             <plugin>
                 <groupId>org.apache.servicemix.tooling</groupId>
@@ -137,6 +123,25 @@
                 <version>3.0.1</version>
                 <executions>
                     <execution>
+                        <id>copy-security-policy</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.codice.ddf.admin.query</groupId>
+                                    <artifactId>admin-query-security-policy</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>policy</type>
+                                    <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
+                                    <destFileName>admin-query-security.policy</destFileName>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>unpack-ddf-common</id>
                         <phase>pre-integration-test</phase>
                         <goals>
@@ -144,14 +149,6 @@
                         </goals>
                         <configuration>
                             <artifactItems>
-                                <artifactItem>
-                                    <groupId>org.codice.ddf</groupId>
-                                    <artifactId>ddf-common</artifactId>
-                                    <version>${ddf.version}</version>
-                                    <type>jar</type>
-                                    <outputDirectory>${project.build.testOutputDirectory}/ddf-common</outputDirectory>
-                                    <excludes>**/META-INF/**,**/OSGI-INF/**</excludes>
-                                </artifactItem>
                                 <artifactItem>
                                     <groupId>org.codice.ddf.admin.query</groupId>
                                     <artifactId>admin-query-common</artifactId>
@@ -216,7 +213,6 @@
                         TODO - Re-enable and fix component tests once feature file refactoring has been completed.
                         see: https://github.com/codice/ddf/pull/2896
                     -->
-                    <skipITs>true</skipITs>
                     <argLine>-Djava.awt.headless=true -noverify</argLine>
                 </configuration>
                 <executions>

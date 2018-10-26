@@ -18,7 +18,7 @@ import java.util.Set;
 import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.function.GetFunctionField;
 import org.codice.ddf.admin.security.common.fields.wcpm.ContextPolicyBin;
-import org.codice.ddf.admin.security.common.services.PolicyManagerServiceProperties;
+import org.codice.ddf.admin.security.wcpm.PolicyManagerServiceProperties;
 import org.codice.ddf.internal.admin.configurator.actions.ServiceReader;
 
 public class GetContextPolicies extends GetFunctionField<ContextPolicyBin.ListImpl> {

@@ -13,6 +13,8 @@
  */
 package org.codice.ddf.admin.query.request;
 
+import static org.awaitility.Awaitility.await;
+import static org.codice.ddf.test.common.options.TestResourcesOptions.getTestResource;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -26,8 +28,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import org.boon.Boon;
 import org.codice.ddf.admin.common.fields.common.ContextPath;
-import org.codice.ddf.admin.comp.graphql.GraphQlHelper;
-import org.codice.ddf.itests.common.WaitCondition;
+import org.codice.ddf.admin.graphql.test.GraphQlHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,24 +49,27 @@ public class WcpmRequestHelper {
   public WcpmRequestHelper(String graphQlEndpoint) {
     requestFactory =
         new GraphQlHelper(
-            WcpmRequestHelper.class,
-            WCPM_QUERY_RESOURCE_PATH,
-            WCPM_MUTATION_RESOURCE_PATH,
+            getTestResource(WCPM_QUERY_RESOURCE_PATH),
+            getTestResource(WCPM_MUTATION_RESOURCE_PATH),
             graphQlEndpoint);
   }
 
-  public void waitForWcpmInSchema() {
-    WaitCondition.expect("getWhiteList in schema.")
-        .within(30L, TimeUnit.SECONDS)
+  public void saveWhitelistDefaultValues() {
+    await("getWhiteList appears in schema.")
+        .atMost(30L, TimeUnit.SECONDS)
         .until(
             () -> {
               LOGGER.info("Waiting for wcpm in graphql schema.");
-              originalWhitelist = getWhiteListContexts();
+              try {
+                originalWhitelist = getWhiteListContexts();
+              } catch (Exception e) {
+                LOGGER.info("Failed to sent getWhiteListRequest.", e);
+              }
               return originalWhitelist != null && !originalWhitelist.isEmpty();
             });
 
-    WaitCondition.expect("Context policy manager appears in schema.")
-        .within(30L, TimeUnit.SECONDS)
+    await("Context policy manager appears in schema.")
+        .atMost(30L, TimeUnit.SECONDS)
         .until(
             () -> {
               LOGGER.info("Waiting for wcpm in graphql schema.");
@@ -85,8 +89,8 @@ public class WcpmRequestHelper {
   }
 
   public void waitForContextPolicies(List<Map<String, Object>> expectedPolicies) {
-    WaitCondition.expect("Successfully retrieve policies.")
-        .within(30L, TimeUnit.SECONDS)
+    await("Successfully retrieve policies.")
+        .atMost(30L, TimeUnit.SECONDS)
         .until(
             () -> {
               List<Map<String, Object>> retrievedPolicies = getContextPolicies();
@@ -137,8 +141,8 @@ public class WcpmRequestHelper {
   }
 
   public void waitForWhiteList(List<String> expectedWhiteList) {
-    WaitCondition.expect("Successfully retrieve expected white list.")
-        .within(30L, TimeUnit.SECONDS)
+    await("Successfully retrieve expected white list.")
+        .atMost(30L, TimeUnit.SECONDS)
         .until(
             () -> {
               List<String> retrievedWhiteList = getWhiteListContexts();

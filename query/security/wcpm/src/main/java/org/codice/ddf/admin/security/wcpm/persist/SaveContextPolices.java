@@ -16,8 +16,8 @@ package org.codice.ddf.admin.security.wcpm.persist;
 import static org.codice.ddf.admin.common.report.message.DefaultMessages.failedPersistError;
 import static org.codice.ddf.admin.common.report.message.DefaultMessages.invalidPathTrailingSlash;
 import static org.codice.ddf.admin.security.common.SecurityMessages.noRootContextError;
-import static org.codice.ddf.admin.security.common.services.PolicyManagerServiceProperties.POLICY_MANAGER_PID;
-import static org.codice.ddf.admin.security.common.services.PolicyManagerServiceProperties.ROOT_CONTEXT_PATH;
+import static org.codice.ddf.admin.security.wcpm.PolicyManagerServiceProperties.POLICY_MANAGER_PID;
+import static org.codice.ddf.admin.security.wcpm.PolicyManagerServiceProperties.ROOT_CONTEXT_PATH;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -38,8 +38,8 @@ import org.codice.ddf.admin.security.common.SecurityMessages;
 import org.codice.ddf.admin.security.common.SecurityValidation;
 import org.codice.ddf.admin.security.common.fields.wcpm.ClaimsMapEntry;
 import org.codice.ddf.admin.security.common.fields.wcpm.ContextPolicyBin;
-import org.codice.ddf.admin.security.common.services.PolicyManagerServiceProperties;
 import org.codice.ddf.admin.security.common.services.StsServiceProperties;
+import org.codice.ddf.admin.security.wcpm.PolicyManagerServiceProperties;
 import org.codice.ddf.internal.admin.configurator.actions.ConfiguratorSuite;
 
 public class SaveContextPolices extends BaseFunctionField<ContextPolicyBin.ListImpl> {

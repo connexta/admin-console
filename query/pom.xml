@@ -29,8 +29,6 @@
         <module>graphql</module>
         <module>sources</module>
         <module>security</module>
-        <module>utils</module>
-        <module>app</module>
         <module>dev</module>
     </modules>
 </project>

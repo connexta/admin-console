@@ -1,0 +1,9 @@
+priority "grant";
+
+grant codeBase "file:/admin-configurator-impl/admin-query-ldap" {
+    permission java.io.FilePermission "${ddf.home.perm}etc${/}ws-security${/}-", "read, write";
+}
+
+grant codeBase "file:/admin-query-sources-impl/dib-admin-query-sources-impl" {
+    permission java.io.FilePermission "${ddf.home.perm}etc${/}keystores${/}-", "read";
+}

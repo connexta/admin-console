@@ -104,7 +104,11 @@
             <version>${project.version}</version>
             <classifier>tests</classifier>
         </dependency>
-        <!--end test dependencies-->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>${gson.version}</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

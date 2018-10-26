@@ -86,7 +86,7 @@
         <bundle>mvn:com.fasterxml.jackson.core/jackson-databind/2.8.11</bundle>
         <bundle>mvn:com.fasterxml.jackson.datatype/jackson-datatype-jdk8/2.8.11</bundle>
 
-        <bundle>mvn:io.fastjson/boon/${boon.version}</bundle>
+        <bundle>mvn:com.google.code.gson/gson/${gson.version}</bundle>
         <bundle>mvn:org.codice.ddf.admin.query/admin-graphql/${project.version}</bundle>
     </feature>
 

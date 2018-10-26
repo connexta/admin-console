@@ -29,9 +29,9 @@ public class GraphQLProviderImpl
         GraphQLTypesProvider,
         GraphQLMutationProvider {
 
-  private List<GraphQLFieldDefinition> queries;
-  private List<GraphQLFieldDefinition> mutations;
-  private List<GraphQLTypesProvider> typesProviders;
+  private final List<GraphQLFieldDefinition> queries;
+  private final List<GraphQLFieldDefinition> mutations;
+  private final List<GraphQLTypesProvider> typesProviders;
 
   public GraphQLProviderImpl(
       List<GraphQLFieldDefinition> queries,

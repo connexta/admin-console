@@ -30,7 +30,7 @@ public class GraphQLTransformCommons {
 
   private GraphQLTransformOutput transformOutput;
 
-  public GraphQLTransformCommons() {
+  private GraphQLTransformCommons() {
     transformOutput = new GraphQLTransformOutput();
   }
 
@@ -38,7 +38,7 @@ public class GraphQLTransformCommons {
     return new GraphQLTransformCommons().fieldProvidersToGraphQlProvider(providers);
   }
 
-  public GraphQLProvider fieldProvidersToGraphQlProvider(List<FieldProvider> providers) {
+  private GraphQLProvider fieldProvidersToGraphQlProvider(List<FieldProvider> providers) {
     List<GraphQLFieldDefinition> queries =
         providers
             .stream()

@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 public class ExecutionStrategyProviderImpl implements ExecutionStrategyProvider {
   private static final Logger LOGGER = LoggerFactory.getLogger(ExecutionStrategyProviderImpl.class);
 
-  private ExtendedEnhancedExecutionStrategy strategy;
+  private final ExtendedEnhancedExecutionStrategy strategy;
 
   public ExecutionStrategyProviderImpl() {
     strategy = new ExtendedEnhancedExecutionStrategy();

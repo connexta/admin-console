@@ -21,7 +21,7 @@
     <repository>mvn:ddf.catalog/catalog-app/${ddf.version}/xml/features</repository>
 
     <feature name="admin-query-api" install="manual" version="${project.version}"
-             description="DDF :: Admin Console :: Query :: Core ">
+             description="DDF :: Admin Console :: Query :: Api ">
         <bundle>mvn:org.codice.ddf.admin.query/admin-query-api/${project.version}</bundle>
     </feature>
 
@@ -75,7 +75,8 @@
         <bundle>mvn:org.reactivestreams/reactive-streams/1.0.2</bundle>
     </feature>
 
-    <feature name="graphql-transformer-servlet" install="manual" version="${project.version}">
+    <feature name="graphql-transformer-servlet" install="manual" version="${project.version}"
+            description="Contains a graphGl servlet responsible for transforming the query api into a graphql schema and endpoint.">
         <feature prerequisite="true">wrap</feature>
         <feature>graphql-java</feature>
         <feature>pax-http-whiteboard</feature>

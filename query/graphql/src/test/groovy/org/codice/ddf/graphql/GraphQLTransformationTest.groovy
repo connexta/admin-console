@@ -23,8 +23,6 @@ import spock.lang.Specification
 
 class GraphQLTransformationTest extends Specification {
 
-    static STATUS_OK = 200
-
     static TEST_OBJECT_NAME = TestObjectField.FIELD_NAME
 
     static STRING_ARG_VALUE = TestObjectField.SAMPLE_STRING_VALUE
@@ -112,7 +110,7 @@ class GraphQLTransformationTest extends Specification {
         servlet.doGet(request, response)
 
         then:
-        response.getStatus() == STATUS_OK
+        response.getStatus() == HttpURLConnection.HTTP_OK
         getResponseContentAsMap().errors == null
         getResponseContentAsMap().data.__schema != null
     }
@@ -126,7 +124,7 @@ class GraphQLTransformationTest extends Specification {
         servlet.doGet(request, response)
 
         then:
-        response.getStatus() == STATUS_OK
+        response.getStatus() == HttpURLConnection.HTTP_OK
         getResponseContentAsMap().errors == null
         getResponseContentAsMap().data ==
                 [
@@ -153,7 +151,7 @@ class GraphQLTransformationTest extends Specification {
         servlet.doGet(request, response)
 
         then:
-        response.getStatus() == STATUS_OK
+        response.getStatus() == HttpURLConnection.HTTP_OK
         getResponseContentAsMap().errors == null
         getResponseContentAsMap().data ==
                 [
@@ -178,7 +176,7 @@ class GraphQLTransformationTest extends Specification {
         servlet.doGet(request, response)
 
         then:
-        response.getStatus() == STATUS_OK
+        response.getStatus() == HttpURLConnection.HTTP_OK
         getResponseContentAsMap().errors as Set == [
                 createError([TEST_OBJECT_NAME]),
                 createError([TEST_OBJECT_NAME, INTEGER]),
@@ -213,7 +211,7 @@ class GraphQLTransformationTest extends Specification {
         servlet.doGet(request, response)
 
         then:
-        response.getStatus() == STATUS_OK
+        response.getStatus() == HttpURLConnection.HTTP_OK
         getResponseContentAsMap().data == null
         getResponseContentAsMap().errors.get(0).validationErrorType == ValidationErrorType.MissingFieldArgument.name()
     }
@@ -227,7 +225,7 @@ class GraphQLTransformationTest extends Specification {
         servlet.doGet(request, response)
 
         then:
-        response.getStatus() == STATUS_OK
+        response.getStatus() == HttpURLConnection.HTTP_OK
         getResponseContentAsMap().data == [
                 (FUNCTION_NAME): [
                         (TestFieldProvider.REQUIRED_ARG_FUNCTION_NAME): null
@@ -254,7 +252,7 @@ class GraphQLTransformationTest extends Specification {
         servlet.doGet(request, response)
 
         then:
-        response.getStatus() == STATUS_OK
+        response.getStatus() == HttpURLConnection.HTTP_OK
         getResponseContentAsMap().errors == null
         getResponseContentAsMap().data ==
                 [
@@ -288,7 +286,7 @@ class GraphQLTransformationTest extends Specification {
         servlet.doPost(request, response)
 
         then:
-        response.getStatus() == STATUS_OK
+        response.getStatus() == HttpURLConnection.HTTP_OK
         getResponseContentAsList()[0].errors == null
         getResponseContentAsList()[0].data == [
                 (FUNCTION_NAME): [
@@ -326,7 +324,7 @@ class GraphQLTransformationTest extends Specification {
         servlet.doPost(request, response)
 
         then:
-        response.getStatus() == STATUS_OK
+        response.getStatus() == HttpURLConnection.HTTP_OK
         getResponseContentAsList()[0].errors == null
         getResponseContentAsList()[0].data == [
                 (FUNCTION_NAME): [
@@ -368,7 +366,7 @@ class GraphQLTransformationTest extends Specification {
         servlet.doGet(request, response)
 
         then:
-        response.getStatus() == STATUS_OK
+        response.getStatus() == HttpURLConnection.HTTP_OK
         getResponseContentAsMap().errors == null
     }
 

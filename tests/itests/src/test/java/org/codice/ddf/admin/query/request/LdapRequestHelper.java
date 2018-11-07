@@ -20,11 +20,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.fail;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import org.boon.Boon;
 import org.codice.ddf.admin.graphql.test.GraphQlHelper;
 import org.codice.ddf.admin.ldap.fields.config.LdapConfigurationField;
 import org.slf4j.Logger;
@@ -33,6 +34,8 @@ import org.slf4j.LoggerFactory;
 public class LdapRequestHelper {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(LdapRequestHelper.class);
+
+  private static final Gson GSON = new GsonBuilder().create();
 
   public static final String LDAP_QUERY_RESOURCE_PATH = "/query/ldap/query/";
 
@@ -97,8 +100,8 @@ public class LdapRequestHelper {
                       && retrievedConfigs.containsAll(expectedConfigs);
 
               if (!conditionMet) {
-                LOGGER.info("Expecting configs:\n{}", Boon.toJson(expectedConfigs));
-                LOGGER.info("Received:\n{}", Boon.toJson(retrievedConfigs));
+                LOGGER.info("Expecting configs:\n{}", GSON.toJson(expectedConfigs));
+                LOGGER.info("Received:\n{}", GSON.toJson(retrievedConfigs));
               }
 
               return conditionMet;

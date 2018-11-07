@@ -20,13 +20,14 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.fail;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.jayway.restassured.response.ExtractableResponse;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import org.boon.Boon;
 import org.codice.ddf.admin.common.fields.common.ContextPath;
 import org.codice.ddf.admin.graphql.test.GraphQlHelper;
 import org.slf4j.Logger;
@@ -39,6 +40,8 @@ public class WcpmRequestHelper {
   public static final String WCPM_QUERY_RESOURCE_PATH = "/query/wcpm/query/";
 
   public static final String WCPM_MUTATION_RESOURCE_PATH = "/query/wcpm/mutation/";
+
+  private static final Gson GSON = new GsonBuilder().create();
 
   private GraphQlHelper requestFactory;
 
@@ -103,8 +106,8 @@ public class WcpmRequestHelper {
                               policyToMatch -> policyMatches(policyToMatch, expectedPolicies));
 
               if (!conditionMet) {
-                LOGGER.info("Expecting configs:\n{}", Boon.toJson(expectedPolicies));
-                LOGGER.info("Received:\n", Boon.toJson(retrievedPolicies));
+                LOGGER.info("Expecting configs:\n{}", GSON.toJson(expectedPolicies));
+                LOGGER.info("Received:\n", GSON.toJson(retrievedPolicies));
               }
 
               return conditionMet;
@@ -153,8 +156,8 @@ public class WcpmRequestHelper {
                       && retrievedWhiteList.containsAll(expectedWhiteList);
 
               if (!conditionMet) {
-                LOGGER.info("Expecting configs:\n{}", Boon.toJson(expectedWhiteList));
-                LOGGER.info("Received:\n{}", Boon.toJson(retrievedWhiteList));
+                LOGGER.info("Expecting configs:\n{}", GSON.toJson(expectedWhiteList));
+                LOGGER.info("Received:\n{}", GSON.toJson(retrievedWhiteList));
               }
 
               return conditionMet;

@@ -51,11 +51,6 @@
             <version>${commons-collections.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.fastjson</groupId>
-            <artifactId>boon</artifactId>
-            <version>${boon.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.compendium</artifactId>
             <version>${osgi.version}</version>
@@ -65,6 +60,11 @@
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <version>3.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>${gson.version}</version>
         </dependency>
 
         <!--test dependencies-->
@@ -104,7 +104,6 @@
             <version>${project.version}</version>
             <classifier>tests</classifier>
         </dependency>
-        <!--end test dependencies-->
     </dependencies>
     <build>
         <plugins>

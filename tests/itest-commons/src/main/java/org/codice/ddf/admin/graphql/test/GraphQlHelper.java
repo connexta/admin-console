@@ -16,6 +16,8 @@ package org.codice.ddf.admin.graphql.test;
 import static com.jayway.restassured.RestAssured.given;
 import static junit.framework.TestCase.fail;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.jayway.restassured.response.ExtractableResponse;
 import java.io.File;
 import java.io.FileInputStream;
@@ -23,7 +25,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.io.IOUtils;
-import org.boon.Boon;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,6 +35,11 @@ public class GraphQlHelper {
 
   @SuppressWarnings("squid:S2068" /* Password used internally */)
   public static final String PASSWORD = "admin";
+
+  private static final Gson GSON = new GsonBuilder().create();
+
+  private static final Gson GSON_PP =
+      new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
   private String queryResourcePath;
 
@@ -138,10 +144,10 @@ public class GraphQlHelper {
       query.put("query", queryBody);
 
       if (!reqArgs.isEmpty()) {
-        query.put("variables", Boon.toJson(reqArgs));
+        query.put("variables", GSON.toJson(reqArgs));
       }
 
-      String queryStr = Boon.toPrettyJson(query);
+      String queryStr = GSON_PP.toJson(query);
       LOGGER.debug("\nSending request:\n{}", queryStr);
 
       response =

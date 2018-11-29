@@ -39,7 +39,7 @@
         <ddf.version>2.14.0-SNAPSHOT</ddf.version>
         <ddf.support.version>2.3.9</ddf.support.version>
         <guava.version>20.0</guava.version>
-        <karaf.version>4.1.2</karaf.version>
+        <karaf.version>4.2.1</karaf.version>
         <groovy.version>2.4.7</groovy.version>
         <commons-lang.version>2.6</commons-lang.version>
         <node.version>v7.1.0</node.version>

@@ -1,0 +1,601 @@
+{
+  "summary": {
+    "title": "Admin Wizards"
+  },
+  "detail": {
+    "contributors": [],
+    "diagrams": [
+      {
+        "title": "Admin Wizards Diagram",
+        "thumbnail": "./public/content/images/thumbnail.jpg",
+        "id": 0,
+        "$$hashKey": "object:30",
+        "diagramJson": {
+          "cells": [
+            {
+              "type": "tm.Process",
+              "size": {
+                "width": 100,
+                "height": 100
+              },
+              "position": {
+                "x": 414,
+                "y": 223
+              },
+              "angle": 0,
+              "id": "1cf84941-e924-4723-9027-3be3f49e9bfe",
+              "z": 1,
+              "hasOpenThreats": false,
+              "threats": [
+                {
+                  "status": "Mitigated",
+                  "severity": "High",
+                  "title": "Potential Process Crash or Stop for GraphQL Endpoint",
+                  "type": "Denial of service",
+                  "description": "GraphQL Endpoint crashes, halts, stops or runs slowly; in all cases violating an availability metric.",
+                  "mitigation": "Admin Console can be used to start/stop/restart the application.",
+                  "$$hashKey": "object:58"
+                },
+                {
+                  "status": "Mitigated",
+                  "severity": "High",
+                  "title": "Potential Data Repudiation by GraphQL Endpoint",
+                  "type": "Repudiation",
+                  "description": "GraphQL Endpoint claims that it did not receive data from a source outside the trust boundary.",
+                  "mitigation": "GraphQL Endpoint performs logging and auditing.",
+                  "$$hashKey": "object:64"
+                }
+              ],
+              "attrs": {
+                ".element-shape": {
+                  "class": "element-shape hasNoOpenThreats isInScope"
+                },
+                "text": {
+                  "text": "GraphQL\nEndpoint"
+                },
+                ".element-text": {
+                  "class": "element-text hasNoOpenThreats isInScope"
+                }
+              }
+            },
+            {
+              "type": "tm.Process",
+              "size": {
+                "width": 100,
+                "height": 100
+              },
+              "position": {
+                "x": 688,
+                "y": 72
+              },
+              "angle": 0,
+              "id": "246d12ba-4cf9-4a97-bae6-0ca0dfb3054a",
+              "z": 3,
+              "hasOpenThreats": false,
+              "attrs": {
+                ".element-shape": {
+                  "class": "element-shape hasNoOpenThreats isInScope"
+                },
+                "text": {
+                  "text": "Remote DDF\nSource"
+                },
+                ".element-text": {
+                  "class": "element-text hasNoOpenThreats isInScope"
+                }
+              }
+            },
+            {
+              "type": "tm.Actor",
+              "size": {
+                "width": 160,
+                "height": 80
+              },
+              "position": {
+                "x": 384,
+                "y": 502
+              },
+              "angle": 0,
+              "id": "ef34ac07-8d47-47db-82d2-da62f5e32528",
+              "z": 5,
+              "hasOpenThreats": false,
+              "threats": [
+                {
+                  "status": "Mitigated",
+                  "severity": "High",
+                  "type": "Spoofing",
+                  "title": "Spoofing of the External Web Application",
+                  "description": "The Admin Console UI may be spoofed by an attcker and this may lead to data being sent to the attacker's target instead of the Admin Console UI.",
+                  "mitigation": "Mitigatted by use of HTTPS",
+                  "$$hashKey": "object:284"
+                }
+              ],
+              "attrs": {
+                ".element-shape": {
+                  "class": "element-shape hasNoOpenThreats isInScope"
+                },
+                "text": {
+                  "text": "Admin Console UI"
+                },
+                ".element-text": {
+                  "class": "element-text hasNoOpenThreats isInScope"
+                }
+              }
+            },
+            {
+              "type": "tm.Flow",
+              "smooth": true,
+              "source": {
+                "id": "deb14a5a-7623-4f79-accd-8196d7a075be"
+              },
+              "target": {
+                "id": "1cf84941-e924-4723-9027-3be3f49e9bfe"
+              },
+              "vertices": [
+                {
+                  "x": 340,
+                  "y": 159
+                }
+              ],
+              "id": "4572fcef-6ed2-4e70-b3cb-ed450edb1510",
+              "labels": [
+                {
+                  "position": 0.5,
+                  "attrs": {
+                    "text": {
+                      "text": "LDAPS Response",
+                      "font-weight": "400",
+                      "font-size": "small"
+                    }
+                  }
+                }
+              ],
+              "z": 6,
+              "hasOpenThreats": false,
+              "threats": [
+                {
+                  "status": "Mitigated",
+                  "severity": "High",
+                  "type": "Spoofing",
+                  "title": "Spoofing the LDAP Server",
+                  "description": "LDAP may be spoofed by an attacker and this may lead to unauthorized access to the GraphQL Endpoint",
+                  "mitigation": "By default we recommend LDAPS which requires a trusted certificate.",
+                  "$$hashKey": "object:265"
+                },
+                {
+                  "status": "Mitigated",
+                  "severity": "High",
+                  "title": "Data Flow LDAP/LDAPS is Potentially Interrupted",
+                  "type": "Denial of service",
+                  "description": "An external agent interrupts data flowing across a trust boundary in either direction.",
+                  "mitigation": "Exception will be thrown and the external client would have to re-authenticate.",
+                  "$$hashKey": "object:256"
+                },
+                {
+                  "status": "Mitigated",
+                  "severity": "High",
+                  "type": "Elevation of privilege",
+                  "title": "GraphQL Endpoint May be Subject to Elevation of Privilege Using Remote Code Execution",
+                  "description": "LDAP Server may be able to remotely execute code for the GraphQL Endpoint",
+                  "mitigation": "An LDAP client is used that should prevent malicious responses.",
+                  "$$hashKey": "object:511"
+                },
+                {
+                  "status": "Mitigated",
+                  "severity": "High",
+                  "title": "Elevation by Changing the Execution Flow in GraphQL Endpoint",
+                  "type": "Elevation of privilege",
+                  "description": "An attacker may pass data into GraphQL Endpoint in order to change the flow of program execution within GraphQL Endpoint to the attacker's choosing.",
+                  "mitigation": "Input to the GraphQL endpoint is validated.",
+                  "$$hashKey": "object:120"
+                },
+                {
+                  "status": "Mitigated",
+                  "severity": "High",
+                  "title": "Weak Credential Storage",
+                  "type": "Information Disclosure",
+                  "description": "Credentials given to the GraphQL Endpoint may be stored or logged insecurely.",
+                  "mitigation": "The system does not log the credentials and the system encrypts them when stored.",
+                  "$$hashKey": "object:120"
+                },
+                {
+                  "status": "Mitigated",
+                  "severity": "High",
+                  "title": "The LDAP Server Data Store Could Be Corrupted",
+                  "type": "Tampering",
+                  "description": "Data flowing across LDAPS may be tampered with by an attacker. This may lead to corruption of LDAP Server. Ensure the integrity of the data flow to the data store.",
+                  "mitigation": "LDAP is read only.",
+                  "$$hashKey": "object:120"
+                }
+              ],
+              "attrs": {
+                ".marker-target": {
+                  "class": "marker-target hasNoOpenThreats isInScope"
+                },
+                ".connection": {
+                  "class": "connection hasNoOpenThreats isInScope"
+                }
+              }
+            },
+            {
+              "type": "tm.Flow",
+              "smooth": true,
+              "source": {
+                "id": "1cf84941-e924-4723-9027-3be3f49e9bfe"
+              },
+              "target": {
+                "id": "deb14a5a-7623-4f79-accd-8196d7a075be"
+              },
+              "vertices": [
+                {
+                  "x": 295,
+                  "y": 243
+                }
+              ],
+              "id": "dced64e5-2b4f-40c8-af94-aa42d193db14",
+              "labels": [
+                {
+                  "position": 0.5,
+                  "attrs": {
+                    "text": {
+                      "text": "LDAPS Request",
+                      "font-weight": "400",
+                      "font-size": "small"
+                    }
+                  }
+                }
+              ],
+              "z": 7,
+              "hasOpenThreats": false,
+              "threats": [
+                {
+                  "status": "Mitigated",
+                  "severity": "High",
+                  "description": "An external agent prevents access to a data store on the other side of the trust boundary.",
+                  "title": "Data Store Inaccessible",
+                  "type": "Denial Of Service",
+                  "mitigation": "If server is inaccessible, the user is notified.",
+                  "$$hashKey": "object:622"
+                }
+              ],
+              "attrs": {
+                ".marker-target": {
+                  "class": "marker-target hasNoOpenThreats isInScope"
+                },
+                ".connection": {
+                  "class": "connection hasNoOpenThreats isInScope"
+                }
+              }
+            },
+            {
+              "type": "tm.Flow",
+              "smooth": true,
+              "source": {
+                "id": "1cf84941-e924-4723-9027-3be3f49e9bfe"
+              },
+              "target": {
+                "id": "ef34ac07-8d47-47db-82d2-da62f5e32528"
+              },
+              "vertices": [
+                {
+                  "x": 506,
+                  "y": 419
+                }
+              ],
+              "id": "76bfa97b-d16f-4d6c-9e25-ce3965cec513",
+              "labels": [
+                {
+                  "position": 0.5,
+                  "attrs": {
+                    "text": {
+                      "text": "HTTPS Response",
+                      "font-weight": "400",
+                      "font-size": "small"
+                    }
+                  }
+                }
+              ],
+              "z": 9,
+              "hasOpenThreats": false,
+              "attrs": {
+                ".marker-target": {
+                  "class": "marker-target hasNoOpenThreats isInScope"
+                },
+                ".connection": {
+                  "class": "connection hasNoOpenThreats isInScope"
+                }
+              }
+            },
+            {
+              "type": "tm.Store",
+              "size": {
+                "width": 160,
+                "height": 80
+              },
+              "position": {
+                "x": 58,
+                "y": 74
+              },
+              "angle": 0,
+              "id": "deb14a5a-7623-4f79-accd-8196d7a075be",
+              "z": 10,
+              "hasOpenThreats": false,
+              "attrs": {
+                ".element-shape": {
+                  "class": "element-shape hasNoOpenThreats isInScope"
+                },
+                "text": {
+                  "text": "LDAP Server"
+                },
+                ".element-text": {
+                  "class": "element-text hasNoOpenThreats isInScope"
+                }
+              }
+            },
+            {
+              "type": "tm.Flow",
+              "smooth": true,
+              "source": {
+                "id": "1cf84941-e924-4723-9027-3be3f49e9bfe"
+              },
+              "target": {
+                "id": "246d12ba-4cf9-4a97-bae6-0ca0dfb3054a"
+              },
+              "vertices": [
+                {
+                  "x": 552,
+                  "y": 154
+                }
+              ],
+              "id": "115622bf-46b4-4fa9-83ae-49f2ded16de8",
+              "labels": [
+                {
+                  "position": 0.5,
+                  "attrs": {
+                    "text": {
+                      "text": "HTTPS Request",
+                      "font-weight": "400",
+                      "font-size": "small"
+                    }
+                  }
+                }
+              ],
+              "z": 13,
+              "hasOpenThreats": false,
+              "threats": [
+                {
+                  "status": "Mitigated",
+                  "severity": "High",
+                  "title": "HTTPS Communication Is Potentially Interrupted",
+                  "type": "Denial of service",
+                  "description": "An external agent interrupts data flowing across a trust boundary in either direction.",
+                  "mitigation": "User can resend requests that fail.",
+                  "$$hashKey": "object:50"
+                }
+              ],
+              "attrs": {
+                ".marker-target": {
+                  "class": "marker-target hasNoOpenThreats isInScope"
+                },
+                ".connection": {
+                  "class": "connection hasNoOpenThreats isInScope"
+                }
+              }
+            },
+            {
+              "type": "tm.Flow",
+              "smooth": true,
+              "source": {
+                "id": "246d12ba-4cf9-4a97-bae6-0ca0dfb3054a"
+              },
+              "target": {
+                "id": "1cf84941-e924-4723-9027-3be3f49e9bfe"
+              },
+              "vertices": [
+                {
+                  "x": 629,
+                  "y": 242
+                }
+              ],
+              "id": "7a8730bf-81d2-4d8d-8146-dfab44d22d2f",
+              "labels": [
+                {
+                  "position": 0.5,
+                  "attrs": {
+                    "text": {
+                      "text": "HTTPS Response",
+                      "font-weight": "400",
+                      "font-size": "small"
+                    }
+                  }
+                }
+              ],
+              "z": 14,
+              "hasOpenThreats": false,
+              "threats": [
+                {
+                  "status": "Mitigated",
+                  "severity": "High",
+                  "title": "Elevation by Changing the Execution Flow in GraphQL Endpoint",
+                  "type": "Elevation of privilege",
+                  "description": "An attacker may pass data into GraphQL Endpoint in order to change the flow of program execution within GraphQL Endpoint to the attacker's choosing.",
+                  "mitigation": "Input to the GraphQL endpoint is validated.",
+                  "$$hashKey": "object:120"
+                },
+                {
+                  "status": "Mitigated",
+                  "severity": "High",
+                  "title": "Potential Data Repudiation by GraphQL Endpoint",
+                  "type": "Repudiation",
+                  "description": "GraphQL Endpoint claims that it did not receive data from a source outside the trust boundary. Consider using logging or auditing to record the source, time, and summary of the received data.",
+                  "mitigation": "GraphQL endpoint performs logging and auditing.",
+                  "$$hashKey": "object:63"
+                },
+                {
+                  "status": "Mitigated",
+                  "severity": "High",
+                  "type": "Spoofing",
+                  "title": "Spoofing the remote DDF Source Processing",
+                  "description": "Remote DDF Source may be spoofed by an attacker and this may lead to unauthorized access to the GraphQL Endpoint",
+                  "mitigation": "HTTPS is supported and encouraged",
+                  "$$hashKey": "object:265"
+                }
+              ],
+              "attrs": {
+                ".marker-target": {
+                  "class": "marker-target hasNoOpenThreats isInScope"
+                },
+                ".connection": {
+                  "class": "connection hasNoOpenThreats isInScope"
+                }
+              }
+            },
+            {
+              "type": "tm.Boundary",
+              "smooth": true,
+              "source": {
+                "x": 296,
+                "y": 447
+              },
+              "target": {
+                "x": 619,
+                "y": 442
+              },
+              "vertices": [
+                {
+                  "x": 459,
+                  "y": 374
+                }
+              ],
+              "id": "69395ce9-b5a0-4645-af60-e29764c4d1b3",
+              "z": 15,
+              "attrs": {}
+            },
+            {
+              "type": "tm.Boundary",
+              "smooth": true,
+              "source": {
+                "x": 76,
+                "y": 279
+              },
+              "target": {
+                "x": 283,
+                "y": 2
+              },
+              "vertices": [
+                {
+                  "x": 259,
+                  "y": 184
+                }
+              ],
+              "id": "6f3e764f-9503-4e36-b0d8-e431eba1b9e7",
+              "z": 16,
+              "attrs": {}
+            },
+            {
+              "type": "tm.Boundary",
+              "smooth": true,
+              "source": {
+                "x": 643,
+                "y": 16
+              },
+              "target": {
+                "x": 794,
+                "y": 242
+              },
+              "vertices": [
+                {
+                  "x": 677,
+                  "y": 174
+                }
+              ],
+              "id": "0d575d4c-9207-41ea-a06f-224902de5502",
+              "z": 17,
+              "attrs": {}
+            },
+            {
+              "type": "tm.Flow",
+              "smooth": true,
+              "source": {
+                "id": "ef34ac07-8d47-47db-82d2-da62f5e32528"
+              },
+              "target": {
+                "id": "1cf84941-e924-4723-9027-3be3f49e9bfe"
+              },
+              "vertices": [
+                {
+                  "x": 406,
+                  "y": 409
+                }
+              ],
+              "id": "38ebf68d-48ba-4f66-844c-4611dac77aac",
+              "labels": [
+                {
+                  "position": 0.5,
+                  "attrs": {
+                    "text": {
+                      "text": "HTTPS Request",
+                      "font-weight": "400",
+                      "font-size": "small"
+                    }
+                  }
+                }
+              ],
+              "z": 18,
+              "hasOpenThreats": true,
+              "threats": [
+                {
+                  "status": "Mitigated",
+                  "severity": "High",
+                  "title": "Elevation by Changing the Execution Flow in GraphQL Endpoint",
+                  "type": "Elevation of privilege",
+                  "description": "An attacker may pass data into GraphQL Endpoint in order to change the flow of program execution within GraphQL Endpoint to the attacker's choosing.",
+                  "mitigation": "Input to the GraphQL endpoint is validated.",
+                  "$$hashKey": "object:203"
+                },
+                {
+                  "status": "Mitigated",
+                  "severity": "High",
+                  "title": "HTTPS Data Flow is Potentially Interrupted",
+                  "type": "Denial of service",
+                  "description": "An external agent interrupts data flowing across a trust boundary in either direction.",
+                  "mitigation": "Error is returned and user can try and send data again.",
+                  "$$hashKey": "object:77"
+                },
+                {
+                  "status": "Mitigated",
+                  "severity": "High",
+                  "type": "Tampering",
+                  "title": "JavaScript Object Notation Processing",
+                  "description": "If a dataflow contains JSON, JSON processing and hijacking threats may be exploited.",
+                  "mitigation": "Inout from Admin Console UI is validated.",
+                  "$$hashKey": "object:231"
+                },
+                {
+                  "status": "Open",
+                  "severity": "High",
+                  "title": "DoS attack via GraphQL Endpoint Source Discovery",
+                  "type": "Denial of service",
+                  "description": "A malicious actor could send multiple requests to the GraphQL Endpoint to DoS an external DDF source during source discovery.",
+                  "mitigation": "GRAPHQL Endpoint has request throttling.",
+                  "$$hashKey": "object:276"
+                }
+              ],
+              "attrs": {
+                ".marker-target": {
+                  "class": "marker-target hasOpenThreats isInScope"
+                },
+                ".connection": {
+                  "class": "connection hasOpenThreats isInScope"
+                }
+              }
+            }
+          ]
+        },
+        "size": {
+          "height": 590,
+          "width": 1548.05517578125
+        }
+      }
+    ]
+  }
+}

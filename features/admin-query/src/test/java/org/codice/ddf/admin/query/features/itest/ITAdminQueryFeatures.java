@@ -24,12 +24,16 @@ import static org.codice.ddf.test.common.options.VmOptions.defaultVmOptions;
 import static org.ops4j.pax.exam.CoreOptions.junitBundles;
 import static org.ops4j.pax.exam.CoreOptions.options;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 import javax.inject.Inject;
 import org.codice.ddf.sync.installer.api.SynchronizedInstaller;
 import org.codice.ddf.test.common.features.FeatureUtilities;
 import org.codice.ddf.test.common.features.TestUtilitiesFeatures;
 import org.codice.ddf.test.common.options.TestResourcesOptions;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -68,6 +72,19 @@ public class ITAdminQueryFeatures {
   @Inject private SynchronizedInstaller syncInstaller;
 
   private String featureName;
+
+  @Before
+  public void before() {
+    System.out.println("Pax Url Config:");
+    try {
+      for (String line : Files.readAllLines(Paths.get("etc/org.ops4j.pax.url.mvn.repositories"))) {
+        System.out.println(line);
+      }
+
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
 
   public ITAdminQueryFeatures(String featureName) {
     this.featureName = featureName;

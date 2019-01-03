@@ -159,7 +159,7 @@
                   "title": "Spoofing the LDAP Server",
                   "description": "LDAP may be spoofed by an attacker and this may lead to unauthorized access to the GraphQL Endpoint",
                   "mitigation": "By default we recommend LDAPS which requires a trusted certificate.",
-                  "$$hashKey": "object:265"
+                  "$$hashKey": "object:164"
                 },
                 {
                   "status": "Mitigated",
@@ -168,7 +168,7 @@
                   "type": "Denial of service",
                   "description": "An external agent interrupts data flowing across a trust boundary in either direction.",
                   "mitigation": "Exception will be thrown and the external client would have to re-authenticate.",
-                  "$$hashKey": "object:256"
+                  "$$hashKey": "object:170"
                 },
                 {
                   "status": "Mitigated",
@@ -195,7 +195,7 @@
                   "type": "Information Disclosure",
                   "description": "Credentials given to the GraphQL Endpoint may be stored or logged insecurely.",
                   "mitigation": "The system does not log the credentials and the system encrypts them when stored.",
-                  "$$hashKey": "object:120"
+                  "$$hashKey": "object:121"
                 },
                 {
                   "status": "Mitigated",
@@ -204,7 +204,7 @@
                   "type": "Tampering",
                   "description": "Data flowing across LDAPS may be tampered with by an attacker. This may lead to corruption of LDAP Server. Ensure the integrity of the data flow to the data store.",
                   "mitigation": "LDAP is read only.",
-                  "$$hashKey": "object:120"
+                  "$$hashKey": "object:122"
                 }
               ],
               "attrs": {
@@ -252,9 +252,9 @@
                   "severity": "High",
                   "description": "An external agent prevents access to a data store on the other side of the trust boundary.",
                   "title": "Data Store Inaccessible",
-                  "type": "Denial Of Service",
+                  "type": "Denial of service",
                   "mitigation": "If server is inaccessible, the user is notified.",
-                  "$$hashKey": "object:622"
+                  "$$hashKey": "object:54"
                 }
               ],
               "attrs": {
@@ -478,13 +478,13 @@
                 "y": 279
               },
               "target": {
-                "x": 283,
-                "y": 2
+                "x": 271,
+                "y": 4
               },
               "vertices": [
                 {
-                  "x": 259,
-                  "y": 184
+                  "x": 240,
+                  "y": 169
                 }
               ],
               "id": "6f3e764f-9503-4e36-b0d8-e431eba1b9e7",
@@ -567,7 +567,7 @@
                   "type": "Tampering",
                   "title": "JavaScript Object Notation Processing",
                   "description": "If a dataflow contains JSON, JSON processing and hijacking threats may be exploited.",
-                  "mitigation": "Inout from Admin Console UI is validated.",
+                  "mitigation": "Input from Admin Console UI is validated.",
                   "$$hashKey": "object:231"
                 },
                 {

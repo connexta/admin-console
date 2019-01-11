@@ -113,6 +113,7 @@
                 <configuration>
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                        <Export-Package/>
                         <Embed-Dependency>
                             graphql-java-servlet
                         </Embed-Dependency>

@@ -17,7 +17,7 @@
   <parent>
     <artifactId>itests</artifactId>
     <groupId>org.codice.ddf.admin.query</groupId>
-    <version>1.2.6-SNAPSHOT</version>
+    <version>1.2.6</version>
   </parent>
   <artifactId>commons</artifactId>
   <name>DDF :: Admin Console :: Tests :: Commons</name>

@@ -99,25 +99,6 @@ pipeline {
                        }
                     }
                 }
-                stage('nodeJsSecurity') {
-                    agent { label 'linux-small' }
-                    steps {
-                        script {
-                            def packageFiles = findFiles(glob: '**/package.json')
-                            for (int i = 0; i < packageFiles.size(); i++) {
-                                dir(packageFiles[i].path.split('package.json')[0]) {
-                                    def packageFile = readJSON file: 'package.json'
-                                    if (packageFile.scripts =~ /.*webpack.*/ || packageFile.containsKey("browserify")) {
-                                        nodejs(configId: 'npmrc-default', nodeJSInstallationName: 'nodejs') {
-                                            echo "Scanning ${packageFiles[i].path}"
-                                            sh 'nsp check'
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
             }
         }
         /*

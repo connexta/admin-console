@@ -52,6 +52,9 @@
         <osgi.version>6.0.0</osgi.version>
         <osgi.compendium.version>5.0.0</osgi.compendium.version>
         <commons-lang3.version>3.8</commons-lang3.version>
+        <codice-maven.version>0.2</codice-maven.version>
+        <codice-test.version>0.3</codice-test.version>
+        <mockito.version>1.10.19</mockito.version>
 
         <ddf.scm.connection.url />
         <snapshots.repository.url />
@@ -106,9 +109,10 @@
         </dependency>
         <!--Spock dependencies-->
         <dependency>
-            <groupId>ddf.lib</groupId>
-            <artifactId>spock-shaded</artifactId>
-            <version>${ddf.version}</version>
+            <groupId>org.codice.test</groupId>
+            <artifactId>spock-all</artifactId>
+            <version>${codice-test.version}</version>
+            <type>pom</type>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -123,6 +127,12 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.codice.test</groupId>
+            <artifactId>spock-extensions</artifactId>
+            <version>${codice-test.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -239,7 +249,14 @@
                 <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>0.7.4.201502262128</version>
+                    <version>0.8.2</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.codice.maven</groupId>
+                            <artifactId>jacoco</artifactId>
+                            <version>${codice-maven.version}</version>
+                        </dependency>
+                    </dependencies>
                     <executions>
                         <execution>
                             <id>default-prepare-agent</id>

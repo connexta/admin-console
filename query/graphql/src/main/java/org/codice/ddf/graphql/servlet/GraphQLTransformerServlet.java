@@ -42,6 +42,8 @@ public class GraphQLTransformerServlet extends OsgiGraphQLHttpServlet implements
       "GraphQL servlet unbinding field provider %s";
 
   private final Cache<String, Object> cache;
+
+  // TODO: tbatie - 2019-01-04 - Remove custom scheduler, graphql servlet now has a delay for refreshing the schema
   private final ScheduledExecutorService scheduler;
   private GraphQLProvider graphQLProvider;
   private List<FieldProvider> fieldProviders;

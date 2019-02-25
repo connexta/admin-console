@@ -174,7 +174,7 @@ public class GraphQLTransformOutput {
 
     FunctionField<Field> funcField = field.newInstance();
     FunctionReport<Field> result =
-        funcField.execute(args, env.getFieldTypeInfo().getPath().toList());
+        funcField.execute(args, env.getExecutionStepInfo().getPath().toList());
 
     if (!result.getErrorMessages().isEmpty()) {
       throw new FunctionDataFetcherException(

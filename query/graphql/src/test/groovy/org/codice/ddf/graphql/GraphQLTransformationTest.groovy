@@ -96,6 +96,7 @@ class GraphQLTransformationTest extends Specification {
 
     def setup() {
         servlet = new GraphQLTransformerServlet()
+        servlet.init(null)
         servlet.setFieldProviders([new TestFieldProvider()])
         servlet.refreshSchema()
         request = new MockHttpServletRequest()

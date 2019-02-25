@@ -69,6 +69,7 @@
 
     <feature name="graphql-java" install="manual" version="${project.version}"
              description="Required dependencies for graphql-java bundle">
+        <bundle>mvn:com.graphql-java/java-dataloader/${graphql-java-dataloader.version}</bundle>
         <bundle>mvn:com.graphql-java/graphql-java/${graphql-java.version}</bundle>
         <bundle>mvn:org.antlr/antlr4-runtime/4.7.1</bundle>
         <bundle>mvn:com.graphql-java/java-dataloader/2.0.2</bundle>
@@ -81,10 +82,10 @@
         <feature>graphql-java</feature>
         <feature>pax-http-whiteboard</feature>
         <feature>admin-query-api</feature>
-        <bundle>mvn:com.fasterxml.jackson.core/jackson-core/2.8.11</bundle>
-        <bundle>mvn:com.fasterxml.jackson.core/jackson-annotations/2.8.11</bundle>
-        <bundle>mvn:com.fasterxml.jackson.core/jackson-databind/2.8.11</bundle>
-        <bundle>mvn:com.fasterxml.jackson.datatype/jackson-datatype-jdk8/2.8.11</bundle>
+        <bundle>mvn:com.fasterxml.jackson.core/jackson-core/2.9.7</bundle>
+        <bundle>mvn:com.fasterxml.jackson.core/jackson-annotations/2.9.7</bundle>
+        <bundle>mvn:com.fasterxml.jackson.core/jackson-databind/2.9.7</bundle>
+        <bundle>mvn:com.fasterxml.jackson.datatype/jackson-datatype-jdk8/2.9.7</bundle>
 
         <bundle>mvn:com.google.code.gson/gson/${gson.version}</bundle>
         <bundle>mvn:org.codice.ddf.admin.query/admin-graphql/${project.version}</bundle>

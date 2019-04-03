@@ -19,7 +19,6 @@ import org.codice.ddf.admin.api.fields.FunctionField;
 import org.codice.ddf.admin.common.fields.base.function.BaseFieldProvider;
 import org.codice.ddf.admin.security.wcpm.discover.GetAuthTypes;
 import org.codice.ddf.admin.security.wcpm.discover.GetContextPolicies;
-import org.codice.ddf.admin.security.wcpm.discover.GetRealms;
 import org.codice.ddf.admin.security.wcpm.discover.GetWhiteListContexts;
 import org.codice.ddf.admin.security.wcpm.persist.SaveContextPolices;
 import org.codice.ddf.admin.security.wcpm.persist.SaveWhitelistContexts;
@@ -36,8 +35,6 @@ public class WcpmFieldProvider extends BaseFieldProvider {
   // Discovery functions
   private GetAuthTypes getAuthTypes;
 
-  private GetRealms getRealms;
-
   private GetWhiteListContexts getWhiteListContexts;
 
   private GetContextPolicies getContextPolicies;
@@ -50,7 +47,6 @@ public class WcpmFieldProvider extends BaseFieldProvider {
   public WcpmFieldProvider(ConfiguratorSuite configuratorSuite) {
     super(NAME, TYPE_NAME, DESCRIPTION);
     getAuthTypes = new GetAuthTypes(configuratorSuite.getServiceReader());
-    getRealms = new GetRealms(configuratorSuite.getServiceReader());
     getWhiteListContexts = new GetWhiteListContexts(configuratorSuite);
     getContextPolicies = new GetContextPolicies(configuratorSuite.getServiceReader());
 
@@ -60,7 +56,7 @@ public class WcpmFieldProvider extends BaseFieldProvider {
 
   @Override
   public List<FunctionField> getDiscoveryFunctions() {
-    return ImmutableList.of(getAuthTypes, getRealms, getWhiteListContexts, getContextPolicies);
+    return ImmutableList.of(getAuthTypes, getWhiteListContexts, getContextPolicies);
   }
 
   @Override

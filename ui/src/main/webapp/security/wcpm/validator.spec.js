@@ -6,12 +6,11 @@ import { validator as whitelistValidator } from './whitelist'
 describe('validators', () => {
   describe('validator(policy)', () => {
     it('should not allow empty fields', () => {
-      const policy = createPolicy({ realm: '', paths: [], authTypes: [] })
+      const policy = createPolicy({ paths: [], authTypes: [] })
       const errors = policyValidator(policy)
       expect(errors.isEmpty()).to.equal(false)
       expect(errors.getIn(['paths', 0])).to.not.equal(undefined)
       expect(errors.get('authTypes')).to.not.equal(undefined)
-      expect(errors.get('realm')).to.not.equal(undefined)
     })
     it('should not allow invalid context paths', () => {
       const policy = createPolicy({ paths: ['asdf'], authTypes: ['GUEST'] })
@@ -40,7 +39,7 @@ describe('validators', () => {
       expect(errors.getIn(['paths', 0])).to.not.equal(undefined)
     })
     it('should be a valid policy', () => {
-      const policy = createPolicy({ realm: 'karaf', paths: ['/'], authTypes: ['GUEST'] })
+      const policy = createPolicy({ paths: ['/'], authTypes: ['GUEST'] })
       const errors = policyValidator(policy)
       expect(errors.isEmpty()).to.equal(true)
     })

@@ -16,7 +16,6 @@ import Spinner from 'components/Spinner'
 
 import ContextPaths, { ContentPathsView } from './context-paths'
 import AuthTypes, { AuthTypesView } from './auth-types'
-import Realms, { RealmsView } from './realms'
 import RequiredClaims, { RequiredClaimsView } from './required-claims'
 
 const Layout = ({ children, number }) => (
@@ -33,7 +32,7 @@ const PolicyEdit = (props) => {
     data: {
       loading,
       sts = { claims: [] },
-      wcpm = { realms: [], authTypes: [] }
+      wcpm = { authTypes: [] }
     },
 
     policy,
@@ -67,13 +66,6 @@ const PolicyEdit = (props) => {
           onUpdate={(value, path = []) => onUpdate(['authTypes'].concat(path), value)} />
         <ServerErrors errors={serverErrors.authTypes} />
         <Divider />
-        <Realms
-          wcpm={wcpm}
-          realm={policy.realm}
-          errors={errors.realm}
-          onUpdate={(value, path = []) => onUpdate(['realm'].concat(path), value)} />
-        <ServerErrors errors={serverErrors.realm} />
-        <Divider />
         <RequiredClaims
           sts={sts}
           claimsMapping={policy.claimsMapping}
@@ -93,7 +85,6 @@ PolicyEdit.fragments = {
     fragment policyEdit on Query {
       sts { claims }
       wcpm {
-        realms
         authTypes
       }
     }
@@ -107,8 +98,6 @@ const PolicyView = ({ onEdit, policy, number }) => (
       <Divider />
       <AuthTypesView authTypes={policy.authTypes} />
       <Divider />
-      <RealmsView realm={policy.realm} />
-      <Divider />
       <RequiredClaimsView claimsMapping={policy.claimsMapping} />
     </Layout>
   </EditRegion>
@@ -119,7 +108,6 @@ PolicyView.fragments = {
     fragment policy on ContextPolicyBinPayload {
       paths
       authTypes
-      realm
       claimsMapping {
         key
         value
@@ -132,7 +120,6 @@ export { PolicyEdit }
 export default PolicyView
 
 const Policy = Record({
-  realm: '',
   paths: List(),
   authTypes: List(),
   claimsMapping: List()
@@ -140,7 +127,6 @@ const Policy = Record({
 
 export const createPolicy = (policy = {}) => {
   return new Policy({
-    realm: policy.realm,
     paths: List(policy.paths),
     authTypes: List(policy.authTypes),
     claimsMapping: List(policy.claimsMapping)
@@ -184,10 +170,6 @@ export const validator = (policy, { whitelisted = [], policies = [] } = {}) => {
 
   if (policy.authTypes.size === 0) {
     errors = errors.set('authTypes', 'Must specify at least one auth type')
-  }
-
-  if (policy.realm === undefined || policy.realm === '') {
-    errors = errors.set('realm', 'Must specify the realm')
   }
 
   const all = policies.filter(policy => !policy.editing).concat(policy)

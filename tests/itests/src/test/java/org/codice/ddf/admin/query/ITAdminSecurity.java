@@ -86,8 +86,6 @@ public class ITAdminSecurity {
 
   public static final String TEST_CONTEXT_PATH_2 = "/testing/2";
 
-  public static final String TEST_REALM = "karaf";
-
   public static final String TEST_AUTH_TYPE = "BASIC";
 
   public static final String TEST_CLAIM_KEY =
@@ -131,6 +129,7 @@ public class ITAdminSecurity {
             TestUtilitiesFeatures.testCommon(),
             AdminQueryTestingFeatures.itestCommons(),
             TestUtilitiesFeatures.awaitility(),
+            TestUtilitiesFeatures.hamcrestAll(),
             TestUtilitiesFeatures.restAssured(),
             AppsFeatures.securityServicesApp(),
             AdminQueryFeatures.adminQueryAll()));
@@ -146,11 +145,6 @@ public class ITAdminSecurity {
   @Test
   public void getAuthTypes() throws Exception {
     assertThat(WCPM_REQUEST_HELPER.getAuthType().isEmpty(), is(false));
-  }
-
-  @Test
-  public void getRealms() throws IOException {
-    assertThat(WCPM_REQUEST_HELPER.getRealms().isEmpty(), is(false));
   }
 
   @Test
@@ -180,7 +174,6 @@ public class ITAdminSecurity {
       Map<String, Object> newPolicy1 =
           new ContextPolicyBin(serviceReader)
               .addContextPath(TEST_CONTEXT_PATH)
-              .realm(TEST_REALM)
               .addAuthType(TEST_AUTH_TYPE)
               .addClaimsMapping(TEST_CLAIM_KEY, TEST_CLAIM_VALUE)
               .getValue();
@@ -188,7 +181,6 @@ public class ITAdminSecurity {
       Map<String, Object> newPolicy2 =
           new ContextPolicyBin(serviceReader)
               .addContextPath(TEST_CONTEXT_PATH_2)
-              .realm(TEST_REALM)
               .addAuthType(TEST_AUTH_TYPE)
               .addClaimsMapping(TEST_CLAIM_KEY, TEST_CLAIM_VALUE)
               .getValue();
@@ -202,7 +194,6 @@ public class ITAdminSecurity {
           new ContextPolicyBin(serviceReader)
               .addContextPath(TEST_CONTEXT_PATH)
               .addContextPath(TEST_CONTEXT_PATH_2)
-              .realm(TEST_REALM)
               .addAuthType(TEST_AUTH_TYPE)
               .addClaimsMapping(TEST_CLAIM_KEY, TEST_CLAIM_VALUE)
               .getValue();

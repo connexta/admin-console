@@ -88,6 +88,12 @@
             <type>zip</type>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-all</artifactId>
+            <version>${hamcrest-all.version}</version>
+        </dependency>
+
     </dependencies>
 
     <build>

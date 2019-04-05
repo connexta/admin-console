@@ -36,8 +36,9 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <ddf.version>2.14.0-SNAPSHOT</ddf.version>
+        <ddf.version>2.15.0-SNAPSHOT</ddf.version>
         <ddf.support.version>2.3.9</ddf.support.version>
+        <codice-test.version>0.3</codice-test.version>
         <guava.version>20.0</guava.version>
         <karaf.version>4.1.2</karaf.version>
         <groovy.version>2.4.7</groovy.version>
@@ -107,9 +108,16 @@
         </dependency>
         <!--Spock dependencies-->
         <dependency>
-            <groupId>ddf.lib</groupId>
-            <artifactId>spock-shaded</artifactId>
-            <version>${ddf.version}</version>
+            <groupId>org.codice.test</groupId>
+            <artifactId>spock-all</artifactId>
+            <version>${codice-test.version}</version>
+            <type>pom</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.codice.test</groupId>
+            <artifactId>spock-extensions</artifactId>
+            <version>${codice-test.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

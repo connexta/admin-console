@@ -74,6 +74,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>2.11.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>ddf.platform</groupId>
             <artifactId>sync-installer-api</artifactId>
             <version>${ddf.version}</version>
@@ -95,6 +101,30 @@
         <dependency>
             <groupId>ddf.features</groupId>
             <artifactId>test-utilities</artifactId>
+            <version>${ddf.version}</version>
+            <type>xml</type>
+            <classifier>features</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>ddf.features</groupId>
+            <artifactId>admin</artifactId>
+            <version>${ddf.version}</version>
+            <type>xml</type>
+            <classifier>features</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>ddf.features</groupId>
+            <artifactId>security</artifactId>
+            <version>${ddf.version}</version>
+            <type>xml</type>
+            <classifier>features</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>ddf.catalog</groupId>
+            <artifactId>catalog-app</artifactId>
             <version>${ddf.version}</version>
             <type>xml</type>
             <classifier>features</classifier>

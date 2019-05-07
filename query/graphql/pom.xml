@@ -60,13 +60,9 @@
         <dependency>
             <groupId>com.graphql-java</groupId>
             <artifactId>graphql-java-annotations</artifactId>
-            <version>0.13.1</version>
+            <version>0.14.0</version>
         </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.16.8</version>
-        </dependency>
+
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
@@ -156,9 +152,6 @@
                             *
                         </Import-Package>
                         <Embed-Dependency>
-                            graphql-java,
-                            lombok,
-
                             graphql-java-annotations,
                             graphql-java-servlet
                         </Embed-Dependency>
@@ -186,13 +179,6 @@
                         <goals>
                             <goal>enforce</goal>
                         </goals>
-                        <configuration>
-                            <rules>
-                                <ArtifactSizeEnforcerRule implementation="org.codice.ddf.admin.enforcer.ArtifactSizeEnforcerRule">
-                                    <maxArtifactSize>1.9_MB</maxArtifactSize>
-                                </ArtifactSizeEnforcerRule>
-                            </rules>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>

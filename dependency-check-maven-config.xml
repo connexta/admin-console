@@ -7,4 +7,10 @@
         </notes>
         <cve>CVE-2017-18197</cve>
     </suppress>
+    <suppress>
+        <notes>
+            This CVE is mitigated by the file system being locked down to only privileged users.
+        </notes>
+        <cve>CVE-2018-11788</cve>
+    </suppress>
 </suppressions>

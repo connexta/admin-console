@@ -115,6 +115,7 @@ public class ITAdminSources {
             AdminQueryTestingFeatures.itestCommons(),
             TestUtilitiesFeatures.awaitility(),
             TestUtilitiesFeatures.restAssured(),
+            TestUtilitiesFeatures.hamcrestAll(),
             InstallProfilesFeatures.profileStandard(),
             AdminQueryFeatures.adminQueryAll()));
   }

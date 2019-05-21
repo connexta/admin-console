@@ -74,7 +74,6 @@ const notification = (state = null, { type, message = null }) => {
 const Errors = Record({
   paths: [],
   authTypes: [],
-  realm: [],
   claimMapping: [],
   all: []
 })
@@ -88,7 +87,6 @@ const errors = (state = Map(), { type, errors = [] }) => {
       const groups = [
         'paths',
         'authTypes',
-        'realm',
         'claimMapping'
       ]
 

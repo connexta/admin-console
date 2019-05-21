@@ -177,9 +177,9 @@ let Root = ({ data: { loading, graphQLErrors, ...fields }, ...props }) => (
       <H1 style={{textAlign: 'center'}}>Web Context Policy Manager</H1>
       <Description>
         The Web Context Policy Manager defines security policies for all
-        subpaths of this web server.  It defines the realms a path should be
-        authenticated against, the type of authentication that a path requires,
-        and any user attributes that are required for authorization.
+        subpaths of this web server.  It defines the type of authentication
+        that a path requires, and any user attributes that are required
+        for authorization.
       </Description>
 
       <Description>

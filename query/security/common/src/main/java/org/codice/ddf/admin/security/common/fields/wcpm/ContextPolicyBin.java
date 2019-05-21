@@ -40,8 +40,6 @@ public class ContextPolicyBin extends BaseObjectField {
 
   private AuthType.ListImpl authTypes;
 
-  private Realm realm;
-
   private ClaimsMapEntry.ListImpl claimsMapping;
 
   private ServiceReader serviceReader;
@@ -52,18 +50,7 @@ public class ContextPolicyBin extends BaseObjectField {
 
     contexts = new ContextPath.ListImpl();
     authTypes = new AuthType.ListImpl(serviceReader);
-    realm = new Realm(serviceReader);
     claimsMapping = new ClaimsMapEntry.ListImpl();
-  }
-
-  public ContextPolicyBin realm(String realm) {
-    this.realm.setValue(realm);
-    return this;
-  }
-
-  public ContextPolicyBin realm(Realm realm) {
-    this.realm = realm;
-    return this;
   }
 
   public ContextPolicyBin addContextPath(ContextPath contextPath) {
@@ -121,10 +108,6 @@ public class ContextPolicyBin extends BaseObjectField {
     return authTypes.getValue();
   }
 
-  public String realm() {
-    return realm.getValue();
-  }
-
   public Map<String, String> claimsMapping() {
     Map<String, String> mapping = new HashMap<>();
     claimsMapping.getList().forEach(entry -> mapping.put(entry.key(), entry.value()));
@@ -137,14 +120,13 @@ public class ContextPolicyBin extends BaseObjectField {
 
   @Override
   public List<Field> getFields() {
-    return ImmutableList.of(contexts, authTypes, realm, claimsMapping);
+    return ImmutableList.of(contexts, authTypes, claimsMapping);
   }
 
   public ContextPolicyBin useDefaultRequiredFields() {
     isRequired(true);
     contexts.isRequired(true);
     authTypes.useDefaultRequired();
-    realm.isRequired(true);
     claimsMapping.useDefaultRequired();
     return this;
   }

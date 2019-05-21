@@ -3,7 +3,6 @@ query GetPolicies {
     policies {
       paths
       authTypes
-      realm
       claimsMapping {
         key
         value

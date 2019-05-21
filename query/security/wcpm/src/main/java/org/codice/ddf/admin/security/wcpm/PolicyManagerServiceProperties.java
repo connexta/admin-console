@@ -37,8 +37,6 @@ public class PolicyManagerServiceProperties {
 
   public static final String AUTH_TYPES = "authenticationTypes";
 
-  public static final String REALMS = "realms";
-
   public static final String REQUIRED_ATTRIBUTES = "requiredAttributes";
 
   public static final String WHITE_LIST_CONTEXT = "whiteListContexts";
@@ -53,7 +51,6 @@ public class PolicyManagerServiceProperties {
 
   public Map<String, Object> contextPoliciesToPolicyManagerProps(
       List<ContextPolicyBin> contextPolicies) {
-    List<String> realmsProps = new ArrayList<>();
     List<String> authTypesProps = new ArrayList<>();
     List<String> reqAttrisProps = new ArrayList<>();
 
@@ -61,7 +58,6 @@ public class PolicyManagerServiceProperties {
       bin.contexts()
           .forEach(
               context -> {
-                realmsProps.add(context + "=" + bin.realm());
                 authTypesProps.add(context + "=" + String.join("|", bin.authTypes()));
                 if (bin.claimsMapping().isEmpty()) {
                   reqAttrisProps.add(context + "=");
@@ -84,8 +80,6 @@ public class PolicyManagerServiceProperties {
     return ImmutableMap.of(
         AUTH_TYPES,
         authTypesProps.toArray(new String[0]),
-        REALMS,
-        realmsProps.toArray(new String[0]),
         REQUIRED_ATTRIBUTES,
         reqAttrisProps.toArray(new String[0]));
   }
@@ -109,7 +103,6 @@ public class PolicyManagerServiceProperties {
 
       policies.add(
           new ContextPolicyBin(serviceReader)
-              .realm(policy.getRealm())
               .addClaimsMap(policyRequiredAttributes)
               .authTypes(policy.getAuthenticationMethods())
               .addContextPath(policy.getContextPath()));
@@ -124,8 +117,7 @@ public class PolicyManagerServiceProperties {
       boolean foundBin = false;
 
       for (ContextPolicyBin collapsedBin : collapsedBins) {
-        if (bin.realm().equals(collapsedBin.realm())
-            && ListUtils.isEqualList(bin.authTypes(), collapsedBin.authTypes())
+        if (ListUtils.isEqualList(bin.authTypes(), collapsedBin.authTypes())
             && bin.claimsMapping().equals(collapsedBin.claimsMapping())) {
           for (ContextPath contextPath : bin.contextFields().getList()) {
             collapsedBin.addContextPath(contextPath);

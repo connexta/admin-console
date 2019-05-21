@@ -26,11 +26,11 @@ import org.codice.ddf.admin.security.common.SecurityMessages
 import org.codice.ddf.admin.security.common.fields.wcpm.AuthType
 import org.codice.ddf.admin.security.common.fields.wcpm.ClaimsMapEntry
 import org.codice.ddf.admin.security.common.fields.wcpm.ContextPolicyBin
-import org.codice.ddf.admin.security.common.fields.wcpm.Realm
+
 import org.codice.ddf.admin.security.wcpm.PolicyManagerServiceProperties
 import org.codice.ddf.admin.security.common.services.StsServiceProperties
 import org.codice.ddf.admin.security.wcpm.AuthTypesPoller
-import org.codice.ddf.admin.security.wcpm.RealmTypesPoller
+
 import org.codice.ddf.admin.security.wcpm.WcpmFieldProvider
 import org.codice.ddf.internal.admin.configurator.actions.ServiceActions
 import org.codice.ddf.internal.admin.configurator.actions.ServiceReader
@@ -54,7 +54,6 @@ class SaveContextPoliciesSpec extends Specification {
 
     String[] testClaims
     AuthTypesPoller authTypesPoller
-    RealmTypesPoller realmTypesPoller
 
     def testData
 
@@ -72,7 +71,6 @@ class SaveContextPoliciesSpec extends Specification {
                         [
                                 paths        : ['/'],
                                 authTypes    : [BASIC],
-                                realm        :  KARAF,
                                 claimsMapping: [
                                         [
                                                 (ClaimsMapEntry.KEY_FIELD_NAME)  : 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role',
@@ -83,7 +81,6 @@ class SaveContextPoliciesSpec extends Specification {
                         [
                                 paths        : ['/test'],
                                 authTypes    : [SAML, PKI],
-                                realm        : KARAF,
                                 claimsMapping: [
                                         [
                                                 (ClaimsMapEntry.KEY_FIELD_NAME)  : 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role',
@@ -96,8 +93,6 @@ class SaveContextPoliciesSpec extends Specification {
 
         authTypesPoller = new AuthTypesPoller()
         authTypesPoller.setAuthHandlers([BASIC_HANDLER, SAML_HANDLER, PKI_HANDLER])
-        realmTypesPoller = new RealmTypesPoller()
-        realmTypesPoller.setRealms([KARAF_REALM])
 
         operationReport = Mock(OperationReport)
         configuratorFactory = Mock(ConfiguratorFactory)
@@ -108,7 +103,6 @@ class SaveContextPoliciesSpec extends Specification {
         configurator.commit(_, _) >> operationReport
         serviceReader.getServiceReference(_) >> policyManager
         serviceReader.getServices(EnumValuePoller.class, AuthType.AUTH_TYPE_POLLER_FILTER) >> ([authTypesPoller] as Set)
-        serviceReader.getServices(EnumValuePoller.class, Realm.REALM_POLLER_FILTER) >> ([realmTypesPoller] as Set)
         configuratorFactory.getConfigurator() >> configurator
         stsConfig = [(StsServiceProperties.STS_CLAIMS_PROPS_KEY_CLAIMS): testClaims]
         serviceActions.read(_) >> stsConfig
@@ -196,36 +190,6 @@ class SaveContextPoliciesSpec extends Specification {
         report.getErrorMessages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, 'policies', 0, 'authTypes']
         report.getResult() == null
 
-    }
-
-    def 'Fail if invalid realm'() {
-        setup:
-        operationReport.containsFailedResults() >> false
-        testData.policies[0].realm = 'COFFEE'
-
-        when:
-        Report report = saveContextPoliciesFunction.execute(testData, FUNCTION_PATH)
-
-        then:
-        report.getErrorMessages().size() == 1
-        report.getErrorMessages()[0].code == DefaultMessages.UNSUPPORTED_ENUM
-        report.getErrorMessages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, 'policies', 0, Realm.DEFAULT_FIELD_NAME]
-        report.getResult() == null
-    }
-
-    def 'Fail if no realm'() {
-        setup:
-        operationReport.containsFailedResults() >> false
-        testData.policies[0].realm = null
-
-        when:
-        Report report = saveContextPoliciesFunction.execute(testData, FUNCTION_PATH)
-
-        then:
-        report.getErrorMessages().size() == 1
-        report.getErrorMessages()[0].code == DefaultMessages.MISSING_REQUIRED_FIELD
-        report.getErrorMessages()[0].path == [WcpmFieldProvider.NAME, SaveContextPolices.FUNCTION_FIELD_NAME, 'policies', 0, Realm.DEFAULT_FIELD_NAME]
-        report.getResult() == null
     }
 
     def 'Pass if no claims Mapping'() {

@@ -34,7 +34,6 @@ describe('<WebContextPolicyManager />', () => {
   const policy = {
     paths: [],
     authTypes: [],
-    realm: 'random',
     claimsMapping: [],
     __typename: 'ContextPolicyBinPayload'
   }
@@ -69,7 +68,6 @@ describe('<WebContextPolicyManager />', () => {
         wcpm: {
           policies,
           whitelisted,
-          realms: ['karaf'],
           authTypes: ['guest'],
           __typename: 'WebContextPolicyManager'
         },

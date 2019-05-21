@@ -236,17 +236,6 @@ public class WcpmRequestHelper {
     return response.jsonPath().get("data.wcpm.authTypes");
   }
 
-  public List<String> getRealms() {
-    ExtractableResponse response =
-        requestFactory.createRequest().usingQuery("GetRealms.graphql").send().getResponse();
-
-    if (responseHasErrors(response)) {
-      return Collections.emptyList();
-    }
-
-    return response.jsonPath().get("data.wcpm.realms");
-  }
-
   private boolean responseHasErrors(ExtractableResponse response) {
     return response != null && response.jsonPath().get("errors") != null;
   }

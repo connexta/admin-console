@@ -2,7 +2,6 @@ mutation saveContextPolicies($policies: [ContextPolicyBin]!) {
   saveContextPolicies(policies: $policies) {
     paths
     authTypes
-    realm
     claimsMapping {
       key
       value

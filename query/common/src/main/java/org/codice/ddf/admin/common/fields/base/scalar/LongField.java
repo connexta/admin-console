@@ -25,10 +25,6 @@ public class LongField extends BaseScalarField<Long> {
     super(fieldName, null, null, ScalarType.LONG);
   }
 
-  public LongField(String fieldName, String description) {
-    super(fieldName, null, description, ScalarType.LONG);
-  }
-
   protected LongField(String fieldName, String fieldTypeName, String description) {
     super(fieldName, fieldTypeName, description, ScalarType.LONG);
   }

@@ -5,6 +5,7 @@ query TestMessagePaths {
         path3 {
           returnErrors(testObj: {list: ["str"]}) {
             integer
+            long
             boolean
             string
             list

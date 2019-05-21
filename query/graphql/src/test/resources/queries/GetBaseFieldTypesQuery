@@ -1,10 +1,12 @@
 query TestGetBaseValues {
   testing {
     getInteger
+    getLong
     getBoolean
     getString
     getList {
       integer
+      long
       boolean
       string
       list

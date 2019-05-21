@@ -3,6 +3,7 @@ query MissingInnerRequiredFields {
     requiredArg(testObj: {}) {
       string
       integer
+      long
       boolean
       list
       enumeration

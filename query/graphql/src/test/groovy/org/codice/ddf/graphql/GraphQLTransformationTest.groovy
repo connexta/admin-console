@@ -9,6 +9,7 @@ import graphql.validation.ValidationErrorType
 import groovy.json.JsonBuilder
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField
 import org.codice.ddf.admin.common.fields.base.scalar.IntegerField
+import org.codice.ddf.admin.common.fields.base.scalar.LongField
 import org.codice.ddf.admin.common.fields.base.scalar.StringField
 import org.codice.ddf.admin.common.fields.test.TestEnumField
 import org.codice.ddf.admin.common.fields.test.TestFieldProvider
@@ -28,6 +29,8 @@ class GraphQLTransformationTest extends Specification {
     static STRING_ARG_VALUE = TestObjectField.SAMPLE_STRING_VALUE
 
     static INTEGER_ARG_VALUE = TestObjectField.SAMPLE_INTEGER_VALUE
+
+    static LONG_ARG_VALUE = TestObjectField.SAMPLE_LONG_VALUE
 
     static BOOLEAN_ARG_VALUE = TestObjectField.SAMPLE_BOOLEAN_VALUE
 
@@ -54,6 +57,8 @@ class GraphQLTransformationTest extends Specification {
     static BOOLEAN = BooleanField.DEFAULT_BOOLEAN_FIELD_NAME
 
     static INTEGER = IntegerField.DEFAULT_INTEGER_FIELD_NAME
+
+    static LONG = LongField.DEFAULT_LONG_FIELD_NAME
 
     static LIST = TestFieldProvider.LIST_FIELD_NAME
 
@@ -87,6 +92,7 @@ class GraphQLTransformationTest extends Specification {
             [
                     stringArg     : STRING_ARG_VALUE,
                     integerArg    : INTEGER_ARG_VALUE,
+                    longArg       : LONG_ARG_VALUE,
                     booleanArg    : BOOLEAN_ARG_VALUE,
                     listArg       : LIST_ARG_VALUE,
                     enumArg       : ENUM_ARG_VALUE,
@@ -130,6 +136,7 @@ class GraphQLTransformationTest extends Specification {
                 [
                         (FUNCTION_NAME): [
                                 (TestFieldProvider.GET_INT_FUNCTION_NAME)   : TestFieldProvider.GetInt.GET_INT_VALUE,
+                                (TestFieldProvider.GET_LONG_FUNCTION_NAME)  : TestFieldProvider.GetLong.GET_LONG_VALUE,
                                 (TestFieldProvider.GET_BOOL_FUNCTION_NAME)  : TestFieldProvider.GetBoolean.GET_BOOLEAN_VALUE,
                                 (TestFieldProvider.GET_STRING_FUNCTION_NAME): TestFieldProvider.GetString.GET_STRING_VALUE,
                                 (TestFieldProvider.GET_LIST_FUNCTION_NAME)  : [
@@ -160,6 +167,7 @@ class GraphQLTransformationTest extends Specification {
                                         (STRING)     : STRING_ARG_VALUE,
                                         (BOOLEAN)    : BOOLEAN_ARG_VALUE,
                                         (INTEGER)    : INTEGER_ARG_VALUE,
+                                        (LONG)       : LONG_ARG_VALUE,
                                         (LIST)       : LIST_ARG_VALUE,
                                         (ENUMERATION): ENUM_ARG_VALUE
                                 ]
@@ -180,13 +188,14 @@ class GraphQLTransformationTest extends Specification {
         getResponseContentAsMap().errors as Set == [
                 createError([TEST_OBJECT_NAME]),
                 createError([TEST_OBJECT_NAME, INTEGER]),
+                createError([TEST_OBJECT_NAME, LONG]),
                 createError([TEST_OBJECT_NAME, BOOLEAN]),
                 createError([TEST_OBJECT_NAME, STRING]),
                 createError([TEST_OBJECT_NAME, ENUMERATION]),
                 createError([TEST_OBJECT_NAME, LIST]),
                 createError([TEST_OBJECT_NAME, LIST, 0])
         ] as Set
-        getResponseContentAsMap().errors.size() == 7
+        getResponseContentAsMap().errors.size() == 8
 
         getResponseContentAsMap().data ==
                 [
@@ -233,6 +242,7 @@ class GraphQLTransformationTest extends Specification {
         ]
         getResponseContentAsMap().errors as Set == ([
                 createMissingRequiredFieldError(requiredArgFunctionPath, [TEST_OBJECT_NAME, INTEGER]),
+                createMissingRequiredFieldError(requiredArgFunctionPath, [TEST_OBJECT_NAME, LONG]),
                 createMissingRequiredFieldError(requiredArgFunctionPath, [TEST_OBJECT_NAME, BOOLEAN]),
                 createMissingRequiredFieldError(requiredArgFunctionPath, [TEST_OBJECT_NAME, STRING]),
                 createMissingRequiredFieldError(requiredArgFunctionPath, [TEST_OBJECT_NAME, ENUMERATION]),
@@ -260,6 +270,7 @@ class GraphQLTransformationTest extends Specification {
                                 (TestFieldProvider.REQUIRED_ARG_FUNCTION_NAME): [
                                         (STRING)      : STRING_ARG_VALUE,
                                         (INTEGER)     : INTEGER_ARG_VALUE,
+                                        (LONG)        : LONG_ARG_VALUE,
                                         (BOOLEAN)     : BOOLEAN_ARG_VALUE,
                                         (LIST)        : LIST_ARG_VALUE,
                                         (ENUMERATION) : ENUM_ARG_VALUE,
@@ -274,7 +285,7 @@ class GraphQLTransformationTest extends Specification {
         setup:
 
         def query = [
-                query: getQuery('SatisfiedRequiredFieldsQuery'),
+                query    : getQuery('SatisfiedRequiredFieldsQuery'),
                 variables: getVariables()
         ]
 
@@ -293,6 +304,7 @@ class GraphQLTransformationTest extends Specification {
                         (TestFieldProvider.REQUIRED_ARG_FUNCTION_NAME): [
                                 (STRING)      : STRING_ARG_VALUE,
                                 (INTEGER)     : INTEGER_ARG_VALUE,
+                                (LONG)        : LONG_ARG_VALUE,
                                 (BOOLEAN)     : BOOLEAN_ARG_VALUE,
                                 (LIST)        : LIST_ARG_VALUE,
                                 (ENUMERATION) : ENUM_ARG_VALUE,
@@ -307,12 +319,12 @@ class GraphQLTransformationTest extends Specification {
         setup:
 
         def goodQuery = [
-                query: getQuery('SatisfiedRequiredFieldsQuery'),
+                query    : getQuery('SatisfiedRequiredFieldsQuery'),
                 variables: getVariables()
         ]
 
         def badQuery = [
-                query: getQuery('MissingRequiredInnerFieldsArgumentQuery'),
+                query    : getQuery('MissingRequiredInnerFieldsArgumentQuery'),
                 variables: getVariables()
         ]
 
@@ -331,6 +343,7 @@ class GraphQLTransformationTest extends Specification {
                         (TestFieldProvider.REQUIRED_ARG_FUNCTION_NAME): [
                                 (STRING)      : STRING_ARG_VALUE,
                                 (INTEGER)     : INTEGER_ARG_VALUE,
+                                (LONG)        : LONG_ARG_VALUE,
                                 (BOOLEAN)     : BOOLEAN_ARG_VALUE,
                                 (LIST)        : LIST_ARG_VALUE,
                                 (ENUMERATION) : ENUM_ARG_VALUE,
@@ -342,6 +355,7 @@ class GraphQLTransformationTest extends Specification {
 
         getResponseContentAsList()[1].errors as Set == ([
                 createMissingRequiredFieldError(requiredArgFunctionPath, [TEST_OBJECT_NAME, INTEGER]),
+                createMissingRequiredFieldError(requiredArgFunctionPath, [TEST_OBJECT_NAME, LONG]),
                 createMissingRequiredFieldError(requiredArgFunctionPath, [TEST_OBJECT_NAME, BOOLEAN]),
                 createMissingRequiredFieldError(requiredArgFunctionPath, [TEST_OBJECT_NAME, STRING]),
                 createMissingRequiredFieldError(requiredArgFunctionPath, [TEST_OBJECT_NAME, ENUMERATION]),
@@ -406,10 +420,10 @@ class GraphQLTransformationTest extends Specification {
         List<String> path = functionPath + additionalPath
 
         return [
-                path: path,
-                message: code,
-                "locations": [],
-                "errorType": "DataFetchingException",
+                path        : path,
+                message     : code,
+                "locations" : [],
+                "errorType" : "DataFetchingException",
                 "extensions": null
         ]
     }

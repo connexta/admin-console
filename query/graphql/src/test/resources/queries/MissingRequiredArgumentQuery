@@ -3,6 +3,7 @@ query MissingRequiredArg {
     requiredArg {
       string
       integer
+      long
       list
       enumeration
     }

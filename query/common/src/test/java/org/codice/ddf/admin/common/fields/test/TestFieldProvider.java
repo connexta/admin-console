@@ -29,6 +29,7 @@ import org.codice.ddf.admin.common.fields.base.function.BaseFieldProvider;
 import org.codice.ddf.admin.common.fields.base.function.GetFunctionField;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.common.fields.base.scalar.IntegerField;
+import org.codice.ddf.admin.common.fields.base.scalar.LongField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 import org.codice.ddf.admin.common.report.message.ErrorMessageImpl;
 
@@ -45,6 +46,8 @@ public class TestFieldProvider extends BaseFieldProvider {
   public static final String RETURN_ERRORS_FUNCTION_NAME = "returnErrors";
 
   public static final String GET_INT_FUNCTION_NAME = "getInteger";
+
+  public static final String GET_LONG_FUNCTION_NAME = "getLong";
 
   public static final String GET_BOOL_FUNCTION_NAME = "getBoolean";
 
@@ -63,6 +66,8 @@ public class TestFieldProvider extends BaseFieldProvider {
   public static final String ERROR_MSG = "ERROR_MSG";
 
   private GetInt getInt;
+
+  private GetLong getLong;
 
   private GetBoolean getBoolean;
 
@@ -83,6 +88,7 @@ public class TestFieldProvider extends BaseFieldProvider {
   public TestFieldProvider() {
     super(TEST_FUNCTION_NAME, "Test", "Testing purposes only.");
     getInt = new GetInt();
+    getLong = new GetLong();
     getBoolean = new GetBoolean();
     getString = new GetString();
     getList = new GetList();
@@ -96,7 +102,7 @@ public class TestFieldProvider extends BaseFieldProvider {
   @Override
   public List<FunctionField> getDiscoveryFunctions() {
     return ImmutableList.of(
-        getInt, getBoolean, getString, getList, getEnum, multiArgFunc, reqArgFunc);
+        getInt, getLong, getBoolean, getString, getList, getEnum, multiArgFunc, reqArgFunc);
   }
 
   @Override
@@ -134,6 +140,39 @@ public class TestFieldProvider extends BaseFieldProvider {
     @Override
     public FunctionField<IntegerField> newInstance() {
       return new GetInt();
+    }
+
+    @Override
+    public Set<String> getFunctionErrorCodes() {
+      return ImmutableSet.of();
+    }
+  }
+
+  public static class GetLong extends GetFunctionField<LongField> {
+
+    public static final long GET_LONG_VALUE = 999L;
+
+    public static final LongField RETURN_TYPE = new LongField();
+
+    public GetLong() {
+      super(GET_LONG_FUNCTION_NAME, "Returns a sample long.");
+    }
+
+    @Override
+    public LongField performFunction() {
+      LongField longField = new LongField();
+      longField.setValue(GET_LONG_VALUE);
+      return longField;
+    }
+
+    @Override
+    public LongField getReturnType() {
+      return RETURN_TYPE;
+    }
+
+    @Override
+    public FunctionField<LongField> newInstance() {
+      return new GetLong();
     }
 
     @Override
@@ -338,6 +377,8 @@ public class TestFieldProvider extends BaseFieldProvider {
 
     private IntegerField integerArg;
 
+    private LongField longArg;
+
     private BooleanField booleanArg;
 
     private StringField.ListImpl listArg;
@@ -350,6 +391,7 @@ public class TestFieldProvider extends BaseFieldProvider {
           "Generates a TestObjectField using the various args passed.");
       stringArg = new StringField();
       integerArg = new IntegerField();
+      longArg = new LongField();
       booleanArg = new BooleanField();
       listArg = new StringField.ListImpl(LIST_FIELD_NAME);
       enumArg = new TestEnumField();
@@ -362,7 +404,7 @@ public class TestFieldProvider extends BaseFieldProvider {
 
     @Override
     public List<Field> getArguments() {
-      return ImmutableList.of(stringArg, integerArg, booleanArg, listArg, enumArg);
+      return ImmutableList.of(stringArg, integerArg, longArg, booleanArg, listArg, enumArg);
     }
 
     @Override
@@ -370,6 +412,7 @@ public class TestFieldProvider extends BaseFieldProvider {
       return new TestObjectField()
           .setString(stringArg.getValue())
           .setInteger(integerArg.getValue())
+          .setLong(longArg.getValue())
           .setBoolean(booleanArg.getValue())
           .setList(listArg.getValue())
           .setEnum(enumArg.getValue());
@@ -463,6 +506,7 @@ public class TestFieldProvider extends BaseFieldProvider {
     public TestObjectField performFunction() {
       addErrorMessage(sampleError(objectFieldArg.getPath()));
       addErrorMessage(sampleError(objectFieldArg.getIntegerField().getPath()));
+      addErrorMessage(sampleError(objectFieldArg.getLongField().getPath()));
       addErrorMessage(sampleError(objectFieldArg.getBooleanField().getPath()));
       addErrorMessage(sampleError(objectFieldArg.getStringField().getPath()));
       addErrorMessage(sampleError(objectFieldArg.getListField().getPath()));

@@ -19,7 +19,7 @@ import org.codice.ddf.admin.api.fields.ScalarField;
 
 public class GraphQLTransformScalar {
 
-  GraphQLTypesProviderImpl<GraphQLScalarType> scalarTypesProvider;
+  private GraphQLTypesProviderImpl<GraphQLScalarType> scalarTypesProvider;
 
   public GraphQLTransformScalar() {
     scalarTypesProvider = new GraphQLTypesProviderImpl<>();
@@ -69,6 +69,15 @@ public class GraphQLTransformScalar {
                     field.getFieldType(),
                     field.getDescription(),
                     Scalars.GraphQLFloat.getCoercing());
+        break;
+      case LONG:
+        type =
+            field.getFieldType() == null
+                ? Scalars.GraphQLLong
+                : new GraphQLScalarType(
+                    field.getFieldType(),
+                    field.getDescription(),
+                    Scalars.GraphQLLong.getCoercing());
     }
 
     scalarTypesProvider.addType(field.getFieldType(), type);

@@ -11,19 +11,21 @@
  * License is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  */
-package org.codice.ddf.admin.api.fields;
+package org.codice.ddf.admin.common.fields.base.scalar;
 
-import org.codice.ddf.admin.api.Field;
+public class LongField extends BaseScalarField<Long> {
 
-public interface ScalarField<S> extends Field<S> {
+  public static final String DEFAULT_LONG_FIELD_NAME = "long";
 
-  ScalarType getScalarType();
+  public LongField() {
+    this(DEFAULT_LONG_FIELD_NAME);
+  }
 
-  enum ScalarType {
-    STRING,
-    INTEGER,
-    FLOAT,
-    BOOLEAN,
-    LONG
+  public LongField(String fieldName) {
+    super(fieldName, null, null, ScalarType.LONG);
+  }
+
+  protected LongField(String fieldName, String fieldTypeName, String description) {
+    super(fieldName, fieldTypeName, description, ScalarType.LONG);
   }
 }

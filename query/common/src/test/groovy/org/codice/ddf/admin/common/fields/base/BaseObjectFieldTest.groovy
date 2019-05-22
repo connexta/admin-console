@@ -63,7 +63,7 @@ class BaseObjectFieldTest extends Specification {
 
     def 'Setting values of nested object fields'() {
         setup:
-        def subFieldOfInnerField = ((ObjectField) topLevelField.getFields()[5]).getFields()[0]
+        def subFieldOfInnerField = ((ObjectField) topLevelField.getFields()[6]).getFields()[0]
 
         expect:
         subFieldOfInnerField.getValue() == null

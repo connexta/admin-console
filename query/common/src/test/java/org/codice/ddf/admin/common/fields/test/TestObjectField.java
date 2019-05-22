@@ -29,6 +29,7 @@ import org.codice.ddf.admin.common.fields.base.BaseListField;
 import org.codice.ddf.admin.common.fields.base.BaseObjectField;
 import org.codice.ddf.admin.common.fields.base.scalar.BooleanField;
 import org.codice.ddf.admin.common.fields.base.scalar.IntegerField;
+import org.codice.ddf.admin.common.fields.base.scalar.LongField;
 import org.codice.ddf.admin.common.fields.base.scalar.StringField;
 
 public class TestObjectField extends BaseObjectField {
@@ -36,6 +37,8 @@ public class TestObjectField extends BaseObjectField {
   public static final String FIELD_NAME = "testObj";
 
   public static final Integer SAMPLE_INTEGER_VALUE = 8675309;
+
+  public static final Long SAMPLE_LONG_VALUE = 12345L;
 
   public static final boolean SAMPLE_BOOLEAN_VALUE = true;
 
@@ -59,6 +62,8 @@ public class TestObjectField extends BaseObjectField {
 
   private IntegerField integerField;
 
+  private LongField longField;
+
   private BooleanField booleanField;
 
   private StringField stringField;
@@ -72,6 +77,7 @@ public class TestObjectField extends BaseObjectField {
   public TestObjectField() {
     super(FIELD_NAME, "TestObjectField", "A sample object containing all supported base types.");
     integerField = new IntegerField();
+    longField = new LongField();
     booleanField = new BooleanField();
     stringField = new StringField();
     listField = new StringField.ListImpl(LIST_FIELD_NAME).useDefaultRequired();
@@ -82,6 +88,10 @@ public class TestObjectField extends BaseObjectField {
 
   public IntegerField getIntegerField() {
     return integerField;
+  }
+
+  public LongField getLongField() {
+    return longField;
   }
 
   public BooleanField getBooleanField() {
@@ -110,6 +120,11 @@ public class TestObjectField extends BaseObjectField {
 
   public TestObjectField setInteger(Integer val) {
     this.integerField.setValue(val);
+    return this;
+  }
+
+  public TestObjectField setLong(Long val) {
+    this.longField.setValue(val);
     return this;
   }
 
@@ -146,6 +161,7 @@ public class TestObjectField extends BaseObjectField {
   public static TestObjectField createSampleTestObject() {
     return new TestObjectField()
         .setInteger(SAMPLE_INTEGER_VALUE)
+        .setLong(SAMPLE_LONG_VALUE)
         .setBoolean(SAMPLE_BOOLEAN_VALUE)
         .setString(SAMPLE_STRING_VALUE)
         .setList(SAMPLE_LIST_VALUE)
@@ -163,6 +179,7 @@ public class TestObjectField extends BaseObjectField {
   public List<Field> getFields() {
     return ImmutableList.of(
         integerField,
+        longField,
         booleanField,
         stringField,
         listField,

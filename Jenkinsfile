@@ -38,7 +38,8 @@ pipeline {
                         }
                     }
                 }
-                stage('Windows Full Build') {
+		//Commenting out Windows builds until pipeline issues can be resolved
+                /*stage('Windows Full Build') {
                     when { expression { env.CHANGE_ID == null } }
                     agent { label 'server-2016-large' }
                     steps {
@@ -47,7 +48,7 @@ pipeline {
                             bat 'mvn install -B -nsu %DISABLE_DOWNLOAD_PROGRESS_OPTS% -pl !%ITESTS%'
                         }
                     }
-                }
+                }*/
                 stage('Linux PR Build') {
                     when {
                         allOf {
@@ -63,7 +64,8 @@ pipeline {
                         }
                     }
                 }
-                stage('Windows PR Build') {
+		//Commenting out Windows builds until pipeline issues can be resolved
+                /*stage('Windows PR Build') {
                     when {
                         allOf {
                             expression { env.CHANGE_ID != null }
@@ -78,7 +80,7 @@ pipeline {
                             bat 'mvn install -B -Dgib.enabled=true -Dgib.referenceBranch=/refs/remotes/origin/%CHANGE_TARGET% -nsu %DISABLE_DOWNLOAD_PROGRESS_OPTS% -pl !%ITESTS%'
                         }
                     }
-                }
+                }*/
             }
         }
         stage('Security Analysis') {

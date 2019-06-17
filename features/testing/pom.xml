@@ -82,9 +82,10 @@
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
             </plugin>
-            <plugin>
-                <artifactId>maven-failsafe-plugin</artifactId>
-            </plugin>
+            <!-- TODO: Uncomment once https://github.com/connexta/admin-console/issues/246 is complete. -->
+            <!--<plugin>-->
+                <!--<artifactId>maven-failsafe-plugin</artifactId>-->
+            <!--</plugin>-->
         </plugins>
     </build>
 </project>

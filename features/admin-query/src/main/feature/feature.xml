@@ -16,9 +16,10 @@
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.3.0 http://karaf.apache.org/xmlns/features/v1.3.0">
 
-    <repository>mvn:ddf.features/admin/${ddf.version}/xml/features</repository>
-    <repository>mvn:ddf.features/security/${ddf.version}/xml/features</repository>
-    <repository>mvn:ddf.catalog/catalog-app/${ddf.version}/xml/features</repository>
+    <!-- TODO: Uncomment and put in version ranges once https://github.com/connexta/admin-console/issues/246 is complete. -->
+    <!--<repository>mvn:ddf.features/admin/${ddf.version}/xml/features</repository>-->
+    <!--<repository>mvn:ddf.features/security/${ddf.version}/xml/features</repository>-->
+    <!--<repository>mvn:ddf.catalog/catalog-app/${ddf.version}/xml/features</repository>-->
 
     <feature name="admin-query-api" install="manual" version="${project.version}"
              description="DDF :: Admin Console :: Query :: Api ">

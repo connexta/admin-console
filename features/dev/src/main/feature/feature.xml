@@ -17,7 +17,8 @@
           xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.3.0 http://karaf.apache.org/xmlns/features/v1.3.0">
 
     <repository>mvn:ddf.features/admin-query/${project.version}/xml/features</repository>
-    <repository>mvn:ddf.features/admin/${ddf.version}/xml/features</repository>
+    <!-- TODO: Uncomment and put in version ranges once https://github.com/connexta/admin-console/issues/246 is complete. -->
+    <!--<repository>mvn:ddf.features/admin/${ddf.version}/xml/features</repository>-->
 
     <feature name="admin-query-dev-tools" install="auto" version="${project.version}"
              description="Includes tools strictly for development purposes.">

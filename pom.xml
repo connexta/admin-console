@@ -36,7 +36,7 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <ddf.version>2.15.0</ddf.version>
+        <ddf.version>2.16.0</ddf.version>
         <ddf.support.version>2.3.9</ddf.support.version>
         <codice-test.version>0.3</codice-test.version>
         <guava.version>20.0</guava.version>

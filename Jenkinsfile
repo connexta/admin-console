@@ -12,7 +12,7 @@ pipeline {
           Restrict nightly builds to master branch, all others will be built on change only.
           Note: The BRANCH_NAME will only work with a multi-branch job using the github-branch-source
         */
-        cron(BRANCH_NAME == "master" ? "H H(19-21) * * *" : "")
+        cron(BRANCH_NAME == "master" ? "@weekly" : "")
     }
     environment {
         ITESTS = 'tests/itests'

@@ -17,7 +17,7 @@
     <parent>
         <artifactId>admin-query</artifactId>
         <groupId>org.codice.ddf.admin.query</groupId>
-        <version>1.2.8</version>
+        <version>1.2.9-SNAPSHOT</version>
     </parent>
     <artifactId>admin-query-security</artifactId>
     <name>DDF :: Admin Console :: Query :: Security</name>

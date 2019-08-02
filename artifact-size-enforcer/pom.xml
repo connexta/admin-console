@@ -17,7 +17,7 @@
     <parent>
         <artifactId>admin</artifactId>
         <groupId>org.codice.ddf.admin.query</groupId>
-        <version>1.3.2-SNAPSHOT</version>
+        <version>1.3.2</version>
     </parent>
     <artifactId>artifact-size-enforcer</artifactId>
     <name>DDF :: Admin Console :: Artifact Size Enforcer</name>

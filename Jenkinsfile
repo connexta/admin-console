@@ -32,7 +32,7 @@ pipeline {
                 stage('Linux Full Build') {
                     when { expression { env.CHANGE_ID == null } }
                     steps {
-                        withMaven(maven: 'Maven 3.5.2', globalMavenSettingsConfig: 'default-global-settings', mavenSettingsConfig: 'codice-maven-settings', mavenOpts: '${LARGE_MVN_OPTS} ${LINUX_MVN_RANDOM}') {
+                        withMaven(maven: 'maven-latest', globalMavenSettingsConfig: 'default-global-settings', mavenSettingsConfig: 'codice-maven-settings', mavenOpts: '${LARGE_MVN_OPTS} ${LINUX_MVN_RANDOM}') {
                             // TODO: oconnormi - 01/15/2018 - Re-enable itests once stabilized/fixed
                             sh 'mvn install -B -nsu $DISABLE_DOWNLOAD_PROGRESS_OPTS -pl !$ITESTS'
                         }
@@ -43,7 +43,7 @@ pipeline {
                     when { expression { env.CHANGE_ID == null } }
                     agent { label 'server-2016-large' }
                     steps {
-                        withMaven(maven: 'Maven 3.5.2', jdk: 'jdk8-latest', globalMavenSettingsConfig: 'default-global-settings', mavenSettingsConfig: 'codice-maven-settings', mavenOpts: '${LARGE_MVN_OPTS}') {
+                        withMaven(maven: 'maven-latest', jdk: 'jdk8-latest', globalMavenSettingsConfig: 'default-global-settings', mavenSettingsConfig: 'codice-maven-settings', mavenOpts: '${LARGE_MVN_OPTS}') {
                             // TODO: oconnormi - 01/15/2018 - Re-enable itests once stabilized/fixed
                             bat 'mvn install -B -nsu %DISABLE_DOWNLOAD_PROGRESS_OPTS% -pl !%ITESTS%'
                         }
@@ -57,7 +57,7 @@ pipeline {
                         }
                     }
                     steps {
-                        withMaven(maven: 'Maven 3.5.2', globalMavenSettingsConfig: 'default-global-settings', mavenSettingsConfig: 'codice-maven-settings', mavenOpts: '${LARGE_MVN_OPTS} ${LINUX_MVN_RANDOM}', options: [artifactsPublisher(disabled: true), dependenciesFingerprintPublisher(disabled: true, includeScopeCompile: false, includeScopeProvided: false, includeScopeRuntime: false, includeSnapshotVersions: false)]) {
+                        withMaven(maven: 'maven-latest', globalMavenSettingsConfig: 'default-global-settings', mavenSettingsConfig: 'codice-maven-settings', mavenOpts: '${LARGE_MVN_OPTS} ${LINUX_MVN_RANDOM}', options: [artifactsPublisher(disabled: true), dependenciesFingerprintPublisher(disabled: true, includeScopeCompile: false, includeScopeProvided: false, includeScopeRuntime: false, includeSnapshotVersions: false)]) {
                             sh 'mvn install -B -Dfindbugs.skip=true -Dpmd.skip=true -Dcheckstyle.skip=true -DskipTests=true -nsu $DISABLE_DOWNLOAD_PROGRESS_OPTS'
                             // TODO: oconnormi - 01/15/2018 - Re-enable itests once stabilized/fixed
                             sh 'mvn install -B -Dgib.enabled=true -Dgib.referenceBranch=/refs/remotes/origin/$CHANGE_TARGET -nsu $DISABLE_DOWNLOAD_PROGRESS_OPTS -pl !$ITESTS'
@@ -74,7 +74,7 @@ pipeline {
                     }
                     agent { label 'server-2016-large' }
                     steps {
-                        withMaven(maven: 'Maven 3.5.2', jdk: 'jdk8-latest', globalMavenSettingsConfig: 'default-global-settings', mavenSettingsConfig: 'codice-maven-settings', mavenOpts: '${LARGE_MVN_OPTS}', options: [artifactsPublisher(disabled: true), dependenciesFingerprintPublisher(disabled: true, includeScopeCompile: false, includeScopeProvided: false, includeScopeRuntime: false, includeSnapshotVersions: false)]) {
+                        withMaven(maven: 'maven-latest', jdk: 'jdk8-latest', globalMavenSettingsConfig: 'default-global-settings', mavenSettingsConfig: 'codice-maven-settings', mavenOpts: '${LARGE_MVN_OPTS}', options: [artifactsPublisher(disabled: true), dependenciesFingerprintPublisher(disabled: true, includeScopeCompile: false, includeScopeProvided: false, includeScopeRuntime: false, includeSnapshotVersions: false)]) {
                             bat 'mvn install -B -Dfindbugs.skip=true -Dpmd.skip=true -Dcheckstyle.skip=true -DskipTests=true -nsu %DISABLE_DOWNLOAD_PROGRESS_OPTS%'
                             // TODO: oconnormi - 01/15/2018 - Re-enable itests once stabilized/fixed
                             bat 'mvn install -B -Dgib.enabled=true -Dgib.referenceBranch=/refs/remotes/origin/%CHANGE_TARGET% -nsu %DISABLE_DOWNLOAD_PROGRESS_OPTS% -pl !%ITESTS%'
@@ -89,7 +89,7 @@ pipeline {
                 stage('OWASP') {
                     steps {
                        script {
-                           withMaven(maven: 'Maven 3.5.2', jdk: 'jdk8-latest', globalMavenSettingsConfig: 'default-global-settings', mavenSettingsConfig: 'codice-maven-settings', mavenOpts: '${LARGE_MVN_OPTS} ${LINUX_MVN_RANDOM}') {
+                           withMaven(maven: 'maven-latest', jdk: 'jdk8-latest', globalMavenSettingsConfig: 'default-global-settings', mavenSettingsConfig: 'codice-maven-settings', mavenOpts: '${LARGE_MVN_OPTS} ${LINUX_MVN_RANDOM}') {
                                // If this build is not a pull request, run full owasp scan. Otherwise run incremental scan
                                if (env.CHANGE_ID == null) {
                                    sh 'mvn install -q -B -Powasp -DskipTests=true -DskipStatic=true $DISABLE_DOWNLOAD_PROGRESS_OPTS'
@@ -116,7 +116,7 @@ pipeline {
                 }
             }
             steps{
-                withMaven(maven: 'Maven 3.5.2', jdk: 'jdk8-latest', globalMavenSettingsConfig: 'default-global-settings', mavenSettingsConfig: 'codice-maven-settings', mavenOpts: '${LINUX_MVN_RANDOM}') {
+                withMaven(maven: 'maven-latest', jdk: 'jdk8-latest', globalMavenSettingsConfig: 'default-global-settings', mavenSettingsConfig: 'codice-maven-settings', mavenOpts: '${LINUX_MVN_RANDOM}') {
                     sh 'mvn javadoc:aggregate -B -Dfindbugs.skip=true -Dpmd.skip=true -Dcheckstyle.skip=true -DskipTests=true -nsu $DISABLE_DOWNLOAD_PROGRESS_OPTS'
                     sh 'mvn deploy -B -Dfindbugs.skip=true -Dpmd.skip=true -Dcheckstyle.skip=true -DskipTests=true -DretryFailedDeploymentCount=10 -nsu $DISABLE_DOWNLOAD_PROGRESS_OPTS'
                 }
@@ -126,7 +126,7 @@ pipeline {
             parallel {
                 stage('SonarCloud') {
                     steps {
-                        withMaven(maven: 'Maven 3.5.2', jdk: 'jdk8-latest', globalMavenSettingsConfig: 'default-global-settings', mavenSettingsConfig: 'codice-maven-settings', mavenOpts: '${LARGE_MVN_OPTS} ${LINUX_MVN_RANDOM}') {
+                        withMaven(maven: 'maven-latest', jdk: 'jdk8-latest', globalMavenSettingsConfig: 'default-global-settings', mavenSettingsConfig: 'codice-maven-settings', mavenOpts: '${LARGE_MVN_OPTS} ${LINUX_MVN_RANDOM}') {
                             withCredentials([string(credentialsId: 'SonarQubeGithubToken', variable: 'SONARQUBE_GITHUB_TOKEN'), string(credentialsId: 'cxbot-sonarcloud', variable: 'SONAR_TOKEN')]) {
                                 script {
                                     // If this build is not a pull request, run sonar scan. otherwise run incremental scan
@@ -151,7 +151,7 @@ pipeline {
                             if (env.BRANCH_NAME != 'master') {
                                 echo "Coverity is only run on master"
                             } else {
-                                withMaven(maven: 'Maven 3.5.2', jdk: 'jdk8-latest', globalMavenSettingsConfig: 'default-global-settings', mavenSettingsConfig: 'codice-maven-settings', mavenOpts: '${LINUX_MVN_RANDOM}') {
+                                withMaven(maven: 'maven-latest', jdk: 'jdk8-latest', globalMavenSettingsConfig: 'default-global-settings', mavenSettingsConfig: 'codice-maven-settings', mavenOpts: '${LINUX_MVN_RANDOM}') {
                                     withCredentials([string(credentialsId: 'admin-console-coverity-token', variable: 'COVERITY_TOKEN')]) {
                                         withEnv(["PATH=${tool 'coverity-linux'}/bin:${env.PATH}"]) {
                                             configFileProvider([configFile(fileId: 'coverity-maven-settings', replaceTokens: true, variable: 'MAVEN_SETTINGS')]) {

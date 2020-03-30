@@ -122,47 +122,16 @@ pipeline {
                 }
             }
         }
-        stage('Quality Analysis') {
-            parallel {
-                stage('SonarCloud') {
-                    steps {
-                        withMaven(maven: 'maven-latest', jdk: 'jdk8-latest', globalMavenSettingsConfig: 'default-global-settings', mavenSettingsConfig: 'codice-maven-settings', mavenOpts: '${LARGE_MVN_OPTS} ${LINUX_MVN_RANDOM}') {
-                            withCredentials([string(credentialsId: 'SonarQubeGithubToken', variable: 'SONARQUBE_GITHUB_TOKEN'), string(credentialsId: 'cxbot-sonarcloud', variable: 'SONAR_TOKEN')]) {
-                                script {
-                                    // If this build is not a pull request, run sonar scan. otherwise run incremental scan
-                                    if (env.CHANGE_ID == null) {
-                                        sh 'mvn -q -B -Dcheckstyle.skip=true org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONAR_TOKEN  -Dsonar.organization=cx -Dsonar.projectKey=ac -Dsonar.exclusions=${COVERAGE_EXCLUSIONS} -pl !$ITESTS $DISABLE_DOWNLOAD_PROGRESS_OPTS'
-                                    } else {
-                                        sh 'mvn -q -B -Dcheckstyle.skip=true org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar -Dsonar.github.pullRequest=${CHANGE_ID} -Dsonar.github.oauth=${SONARQUBE_GITHUB_TOKEN} -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONAR_TOKEN -Dsonar.organization=cx -Dsonar.projectKey=ac -Dsonar.exclusions=${COVERAGE_EXCLUSIONS} -pl !$ITESTS -Dgib.enabled=true -Dgib.referenceBranch=/refs/remotes/origin/$CHANGE_TARGET $DISABLE_DOWNLOAD_PROGRESS_OPTS'
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                // Coverity will be skipped on all PR builds
-                stage('Coverity') {
-                    agent { label 'linux-medium' }
-                    steps {
-                        retry(3) {
-                            checkout scm
-                        }
+        stage('Sonar Cloud') {
+            steps {
+                withMaven(maven: 'maven-latest', jdk: 'jdk8-latest', globalMavenSettingsConfig: 'default-global-settings', mavenSettingsConfig: 'codice-maven-settings', mavenOpts: '${LARGE_MVN_OPTS} ${LINUX_MVN_RANDOM}') {
+                    withCredentials([string(credentialsId: 'SonarQubeGithubToken', variable: 'SONARQUBE_GITHUB_TOKEN'), string(credentialsId: 'cxbot-sonarcloud', variable: 'SONAR_TOKEN')]) {
                         script {
-                            if (env.BRANCH_NAME != 'master') {
-                                echo "Coverity is only run on master"
+                            // If this build is not a pull request, run sonar scan. otherwise run incremental scan
+                            if (env.CHANGE_ID == null) {
+                                sh 'mvn -q -B -Dcheckstyle.skip=true org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONAR_TOKEN  -Dsonar.organization=cx -Dsonar.projectKey=ac -Dsonar.exclusions=${COVERAGE_EXCLUSIONS} -pl !$ITESTS $DISABLE_DOWNLOAD_PROGRESS_OPTS'
                             } else {
-                                withMaven(maven: 'maven-latest', jdk: 'jdk8-latest', globalMavenSettingsConfig: 'default-global-settings', mavenSettingsConfig: 'codice-maven-settings', mavenOpts: '${LINUX_MVN_RANDOM}') {
-                                    withCredentials([string(credentialsId: 'admin-console-coverity-token', variable: 'COVERITY_TOKEN')]) {
-                                        withEnv(["PATH=${tool 'coverity-linux'}/bin:${env.PATH}"]) {
-                                            configFileProvider([configFile(fileId: 'coverity-maven-settings', replaceTokens: true, variable: 'MAVEN_SETTINGS')]) {
-                                                echo sh(returnStdout: true, script: 'env')
-                                                sh 'cov-build --dir cov-int mvn -DskipTests=true -DskipStatic=true install -B --settings $MAVEN_SETTINGS $DISABLE_DOWNLOAD_PROGRESS_OPTS'
-                                                sh 'tar czvf ac.tgz cov-int'
-                                                sh 'curl --form token=$COVERITY_TOKEN --form email=cmp-security-team@connexta.com --form file=@ac.tgz --form version="master" --form description="Description: Admin Console CI Build" https://scan.coverity.com/builds?project=connexta%2Fadmin-console'
-                                            }
-                                        }
-                                    }
-                                }
+                                sh 'mvn -q -B -Dcheckstyle.skip=true org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar -Dsonar.github.pullRequest=${CHANGE_ID} -Dsonar.github.oauth=${SONARQUBE_GITHUB_TOKEN} -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONAR_TOKEN -Dsonar.organization=cx -Dsonar.projectKey=ac -Dsonar.exclusions=${COVERAGE_EXCLUSIONS} -pl !$ITESTS -Dgib.enabled=true -Dgib.referenceBranch=/refs/remotes/origin/$CHANGE_TARGET $DISABLE_DOWNLOAD_PROGRESS_OPTS'
                             }
                         }
                     }

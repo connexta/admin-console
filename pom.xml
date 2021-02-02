@@ -464,7 +464,7 @@
                     <plugin>
                         <groupId>org.owasp</groupId>
                         <artifactId>dependency-check-maven</artifactId>
-                        <version>3.0.2</version>
+                        <version>6.0.5</version>
                         <dependencies>
                             <dependency>
                                 <groupId>ddf.support</groupId>
@@ -503,8 +503,10 @@
                             <bundleAuditAnalyzerEnabled>false</bundleAuditAnalyzerEnabled>
 
                             <!-- The following properties enable using a mirror for nist NVD data -->
+                            <cveUrl11Modified>${owasp.cveUrl11Modified}</cveUrl11Modified>
                             <cveUrl12Modified>${owasp.cveUrl12Modified}</cveUrl12Modified>
                             <cveUrl20Modified>${owasp.cveUrl20Modified}</cveUrl20Modified>
+                            <cveUrl11Base>${owasp.cveUrl11Base}</cveUrl11Base>
                             <cveUrl12Base>${owasp.cveUrl12Base}</cveUrl12Base>
                             <cveUrl20Base>${owasp.cveUrl20Base}</cveUrl20Base>
                             <!-- End NVD mirror configuration -->

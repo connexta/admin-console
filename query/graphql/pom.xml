@@ -43,7 +43,7 @@
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.5</version>
+            <version>2.7</version>
         </dependency>
         <dependency>
             <groupId>commons-collections</groupId>
@@ -117,7 +117,7 @@
                             graphql-java-servlet
                         </Embed-Dependency>
                         <!--graphql-servlet uses SCR, an alternative to blueprint. The line below overrides the service declarations-->
-                        <_dsannotations />
+                        <_dsannotations/>
                     </instructions>
                 </configuration>
             </plugin>

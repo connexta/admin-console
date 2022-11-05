@@ -38,7 +38,7 @@
     "apollo-client": "^1.4.1",
     "color": "^1.0.3",
     "es6-promise": "^4.1.0",
-    "file-loader": "^0.11.2",
+    "file-loader": "^6.0.0",
     "flexbox-react": "4.2.1",
     "graphql": "^0.9.1",
     "immutable": "^3.8.1",
